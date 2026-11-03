@@ -194,3 +194,17 @@ html[data-rt-theme=cs2]{scrollbar-color:#3a4a5a transparent}
 [data-rt-theme=cs2] .rt-toast:not(.rt-leaving)::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--tone);transform-origin:left;animation:cs2-drain 4.5s linear both}
 [data-rt-theme=cs2] :is(button,.btn):active:not(:disabled){transform:translateY(1px)}
 [data-rt-theme=cs2] .panel:has(.tally[data-state=speaking]) .mark[data-logo],.panel[data-rt-theme=cs2]:has(.tally[data-state=speaking]) .mark[data-logo]{animation:cs2-frame 1.2s ease-in-out infinite}
+
+/* ── v2.16 polish: CS2 ──
+   Soundboard pads are inventory cards: each carries a rarity colour (Consumer → Covert) as a glow
+   rising from its bottom edge, with the slot label tinted to match. */
+[data-rt-theme=cs2] .pad{--rar:#b0c3d9;border:1px solid rgba(255,255,255,.07);
+  background:radial-gradient(110% 85% at 50% 135%,color-mix(in srgb,var(--rar) 30%,transparent),transparent 72%),linear-gradient(180deg,rgba(255,255,255,.035),rgba(0,0,0,.22)),rgba(20,20,20,.45);box-shadow:inset 0 -3px 0 var(--rar)}
+[data-rt-theme=cs2] .pad:nth-child(6n+2){--rar:#5e98d9}
+[data-rt-theme=cs2] .pad:nth-child(6n+3){--rar:#4b69ff}
+[data-rt-theme=cs2] .pad:nth-child(6n+4){--rar:#8847ff}
+[data-rt-theme=cs2] .pad:nth-child(6n+5){--rar:#d32ce6}
+[data-rt-theme=cs2] .pad:nth-child(6n){--rar:#eb4b4b}
+[data-rt-theme=cs2] .pad:hover{background:radial-gradient(110% 95% at 50% 135%,color-mix(in srgb,var(--rar) 46%,transparent),transparent 75%),rgba(255,255,255,.07)}
+[data-rt-theme=cs2] .pad span{color:color-mix(in srgb,var(--rar) 65%,#fff)}
+[data-rt-theme=cs2] .pad.playing{background:linear-gradient(90deg,rgba(101,228,106,.18),rgba(20,20,20,.4) 80%);box-shadow:inset 3px 0 0 #65e46a,inset 0 -3px 0 var(--rar)}

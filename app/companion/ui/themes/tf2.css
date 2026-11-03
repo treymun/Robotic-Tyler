@@ -197,3 +197,13 @@ html[data-rt-theme=tf2]{scrollbar-color:var(--tf-tan) var(--tf-dark-brown)}
 [data-rt-theme=tf2] .rt-toast:not(.rt-leaving){animation:tf-feed .28s ease-out backwards}
 [data-rt-theme=tf2] :is(button,.btn):active:not(:disabled){transform:scale(.95,.9)}
 [data-rt-theme=tf2] .panel:has(.tally[data-state=speaking]) .mark[data-logo],.panel[data-rt-theme=tf2]:has(.tally[data-state=speaking]) .mark[data-logo]{animation:tf-bob .7s ease-in-out infinite}
+
+/* ── v2.16 polish: TF2 ──
+   The three stats sit in backpack slots, each edged and labelled in an item-quality colour:
+   Unique gold for voice, Strange orange for the running spend counter, Genuine green for timing. */
+[data-rt-theme=tf2] .stats{gap:6px;padding:0;background:none;border:0;box-shadow:none}
+[data-rt-theme=tf2] .stat{--q:var(--tf-unique);padding:6px 8px 7px;border:2px solid color-mix(in srgb,var(--q) 70%,#2a2523);border-radius:6px;
+  background:radial-gradient(120% 70% at 50% 0%,color-mix(in srgb,var(--q) 12%,transparent),transparent 70%),linear-gradient(180deg,#3c352e,#2a2523);box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 2px 0 rgba(0,0,0,.35)}
+[data-rt-theme=tf2] .stat:nth-child(2){--q:var(--tf-strange)}
+[data-rt-theme=tf2] .stat:nth-child(3){--q:var(--tf-genuine)}
+[data-rt-theme=tf2] .stat dt{color:var(--q)}
