@@ -1,0 +1,12 @@
+# Keep LF everywhere (the generated files and the trivia source are compared byte for byte),
+# including on Windows checkouts such as the CI's Windows runner.
+* text=auto eol=lf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+*.png binary
+*.ico binary
+*.bmp binary
+*.wav binary
+*.woff2 binary
+*.wasm binary
+*.onnx binary

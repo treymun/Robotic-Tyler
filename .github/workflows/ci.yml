@@ -133,6 +133,19 @@ jobs:
       - name: Build the app installers
         if: env.PUBLISH != 'true'
         run: npm run build:both
+      # electron-builder can race itself creating a missing release, so the release exists
+      # (as a draft, hidden until everything is uploaded) before it runs.
+      - name: Prepare the release as a draft while it builds
+        if: env.PUBLISH == 'true' && steps.published.outputs.skip != 'true'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" --draft=true
+          else
+            gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --draft --target "$GITHUB_SHA" --title "ROBOTIC TYLER ${TAG#v}" --notes "Building the downloads..."
+          fi
       - name: Build and publish the app installers to the release
         if: env.PUBLISH == 'true' && steps.published.outputs.skip != 'true'
         env:
@@ -169,7 +182,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release upload "$TAG" dist/release/ROBOTIC-TYLER-Setup-*.exe dist/release/*.zip dist/release/SHA256SUMS.txt --clobber
-          gh release edit "$TAG" --title "ROBOTIC TYLER ${TAG#v}" --notes-file dist/release/RELEASE-NOTES.md
+          gh release edit "$TAG" --draft=false --latest --title "ROBOTIC TYLER ${TAG#v}" --notes-file dist/release/RELEASE-NOTES.md
       - name: Upload the downloads
         if: steps.published.outputs.skip != 'true'
         uses: actions/upload-artifact@v4
