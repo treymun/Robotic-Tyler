@@ -24,16 +24,21 @@ npm run test:all
 
 ## Publishing a release
 
-1. Put the project in a GitHub repository. The workflow points the updater at that repository
-   automatically (`tools/set-release-repo.mjs`). For local release builds, run it yourself once:
-   `node tools/set-release-repo.mjs <your-github-name>/<repo>`
-2. Bump `"version"` in `package.json`.
-3. Tag and push: `git tag v2.14.0 && git push origin v2.14.0`.
+1. The project lives at **github.com/treymun/Robotic-Tyler**. The workflow points the updater and
+   the setup at the repository it runs in (`tools/set-release-repo.mjs`). For local release builds,
+   run it yourself once: `node tools/set-release-repo.mjs <your-github-name>/<repo>`
+2. Bump `"version"` in `package.json` and `browser-extension/manifest.json`, and add a section at the
+   top of `CHANGES.md`. Push to `main`.
+3. Publish, either way:
+   - on GitHub: **Actions → CI → Run workflow**, tick **Publish**, then **Run workflow**; or
+   - push a tag: `git tag v2.14.0 && git push origin v2.14.0`.
 
-The Windows job builds both app installers and publishes them to a GitHub Release for that tag,
-builds the setup against them, then adds the setup, the Chrome extension zip and checksums and writes the release page ("Which file do I need?"
-plus the newest section of `CHANGES.md`). `npm run package:release` builds the same files locally
-in `dist/release/`.
+The Windows job builds both app installers and publishes them to the GitHub Release
+`v<version>`, builds the setup against them, then adds the setup, the Chrome extension zip and
+checksums, and writes the release page (the Setup download, plus the newest section of
+`CHANGES.md`). A release that already has its setup is left alone if the job runs again, because
+rebuilt installers wouldn't match the checksums in the setup people already downloaded; bump the
+version instead. `npm run package:release` builds the same files locally in `dist/release/`.
 
 What people download (the two primary files):
 

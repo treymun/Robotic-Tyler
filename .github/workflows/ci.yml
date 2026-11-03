@@ -4,8 +4,9 @@
 #   Chrome extension as a build artifact.
 # - Pushes to main and manual runs: the Windows setup (ROBOTIC-TYLER-Setup-<version>.exe)
 #   and the two app installers it downloads, as artifacts.
-# - Tags like v2.14.0: the same Windows build, signed when a certificate is
-#   configured, published as a GitHub Release. The release page offers two downloads
+# - Tags like v2.14.0, or Actions → CI → Run workflow with "Publish" ticked: the same
+#   Windows build, signed when a certificate is configured, published as the GitHub
+#   Release v<version from package.json>. The release page offers two downloads
 #   (the Chrome extension zip and the setup); the app installers ("component" files)
 #   sit next to them for the setup to download and for installed apps to update from.
 #
@@ -21,6 +22,11 @@ on:
     tags: ['v*']
   pull_request:
   workflow_dispatch:
+    inputs:
+      publish:
+        description: Publish the release for the version in package.json (vX.Y.Z)
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -73,22 +79,25 @@ jobs:
     timeout-minutes: 45
     permissions:
       contents: write
+    env:
+      PUBLISH: ${{ startsWith(github.ref, 'refs/tags/v') || (github.event_name == 'workflow_dispatch' && inputs.publish) }}
     steps:
-      # A published release is never rebuilt: rebuilt installers wouldn't match the
-      # checksums recorded in the setup people already downloaded.
-      - name: Leave an already-published release alone
+      - uses: actions/checkout@v4
+      # The release is v<version in package.json>. A published release is never rebuilt:
+      # rebuilt installers wouldn't match the checksums in the setup people already have.
+      - name: Release tag, and leave an already-published release alone
         id: published
-        if: startsWith(github.ref, 'refs/tags/v')
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[].name' 2>/dev/null | grep -q '^ROBOTIC-TYLER-Setup-'; then
+          TAG="v$(node -p "require('./package.json').version")"
+          echo "TAG=$TAG" >> "$GITHUB_ENV"
+          if [[ "$GITHUB_REF" == refs/tags/v* && "$GITHUB_REF_NAME" != "$TAG" ]]; then echo "::error::Tag $GITHUB_REF_NAME doesn't match package.json ($TAG)"; exit 1; fi
+          if [ "$PUBLISH" = "true" ] && gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[].name' 2>/dev/null | grep -q '^ROBOTIC-TYLER-Setup-'; then
             echo "skip=true" >> "$GITHUB_OUTPUT"
-            echo "::notice::Release $GITHUB_REF_NAME already has its setup, so it is left as published."
+            echo "::notice::Release $TAG already has its setup, so it is left as published."
           fi
-      - uses: actions/checkout@v4
-        if: steps.published.outputs.skip != 'true'
       - uses: actions/setup-node@v4
         if: steps.published.outputs.skip != 'true'
         with:
@@ -122,10 +131,10 @@ jobs:
             echo "::warning::No WINDOWS_CERT_P12 secret: building unsigned installers."
           fi
       - name: Build the app installers
-        if: (!startsWith(github.ref, 'refs/tags/v')) && steps.published.outputs.skip != 'true'
+        if: env.PUBLISH != 'true'
         run: npm run build:both
       - name: Build and publish the app installers to the release
-        if: (startsWith(github.ref, 'refs/tags/v')) && steps.published.outputs.skip != 'true'
+        if: env.PUBLISH == 'true' && steps.published.outputs.skip != 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run release
@@ -154,13 +163,13 @@ jobs:
         if: steps.published.outputs.skip != 'true'
         run: npm run package:release
       - name: Finish the GitHub release page
-        if: (startsWith(github.ref, 'refs/tags/v')) && steps.published.outputs.skip != 'true'
+        if: env.PUBLISH == 'true' && steps.published.outputs.skip != 'true'
         shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release upload "$GITHUB_REF_NAME" dist/release/ROBOTIC-TYLER-Setup-*.exe dist/release/*.zip dist/release/SHA256SUMS.txt --clobber
-          gh release edit "$GITHUB_REF_NAME" --title "ROBOTIC TYLER ${GITHUB_REF_NAME#v}" --notes-file dist/release/RELEASE-NOTES.md
+          gh release upload "$TAG" dist/release/ROBOTIC-TYLER-Setup-*.exe dist/release/*.zip dist/release/SHA256SUMS.txt --clobber
+          gh release edit "$TAG" --title "ROBOTIC TYLER ${TAG#v}" --notes-file dist/release/RELEASE-NOTES.md
       - name: Upload the downloads
         if: steps.published.outputs.skip != 'true'
         uses: actions/upload-artifact@v4

@@ -76,6 +76,8 @@ test('the release notes lead with the one Setup download and the CI publishes it
  assert.ok(head.includes(`ROBOTIC-TYLER-Chrome-Extension-${version}.zip`),'the zip is offered for other systems');
  assert.doesNotMatch(head,/Portable/);
  const ci=read('.github/workflows/ci.yml');
- assert.match(ci,/npm run build:setup/);assert.match(ci,/gh release upload "\$GITHUB_REF_NAME" dist\/release\/ROBOTIC-TYLER-Setup-\*\.exe/);
+ assert.match(ci,/npm run build:setup/);assert.match(ci,/gh release upload "\$TAG" dist\/release\/ROBOTIC-TYLER-Setup-\*\.exe/);
+ assert.match(ci,/workflow_dispatch:\n    inputs:\n      publish:/,'Run workflow can publish');
+ assert.match(ci,/Release tag, and leave an already-published release alone/,'a published release is never rebuilt');
  assert.ok(ci.indexOf('npm run release')<ci.indexOf('npm run build:setup'),'the setup is built after the app installers it records');
 });
