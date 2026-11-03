@@ -36,8 +36,10 @@
  const clean=v=>THEMES.includes(v)?v:'steam';
  const root=document.documentElement;
  const listeners=new Set();
- // Each theme has its own Tyler logo (ui/logos/<theme>.png); Steam is the fallback.
- const setLogo=theme=>{for(const img of document.querySelectorAll('img.mark')){const src='ui/logos/'+theme+'.png';if(!img.getAttribute('src')?.endsWith(src)){img.onerror=()=>{img.onerror=null;img.src='ui/logos/steam.png';};img.src=src;}img.dataset.theme=theme;}};
+ // Each theme has its own Tyler logo (ui/logos/<theme>.png); Steam is the fallback. Once the page
+ // has loaded, ui-logos.js redraws it at its exact on-screen size so it stays crisp (v2.18).
+ const sharpen=(img,theme)=>{const go=()=>globalThis.TylerLogos?.sharpen(img,theme);if(document.readyState==='complete')requestAnimationFrame(go);else addEventListener('load',go,{once:true});};
+ const setLogo=theme=>{for(const img of document.querySelectorAll('img.mark')){const src='ui/logos/'+theme+'.png';if(!img.getAttribute('src')?.endsWith(src)){img.removeAttribute('srcset');img.onerror=()=>{img.onerror=null;img.removeAttribute('srcset');img.src='ui/logos/steam.png';};img.src=src;}img.dataset.theme=theme;sharpen(img,theme);}};
  const setLabel=theme=>{const label=document.getElementById('uiThemeName');if(label)label.textContent=INFO[theme][0];};
  function apply(value){
   const theme=clean(value);root.dataset.rtTheme=theme;

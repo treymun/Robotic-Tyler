@@ -11,7 +11,7 @@ import {createRequire} from 'node:module';
 const require=createRequire(import.meta.url);
 const {chromium}=require('playwright');
 const ROOT=path.resolve(import.meta.dirname,'../..');
-const THEMES=['steam','classic','tf2','cs2','portal','cs16','hev','l4d','winxp','doom'];
+const THEMES=['steam','classic','tf2','cs2','portal','cs16','hev','l4d','winxp','doom','quake','pipboy','combine','deadlock','minecraft','payday','dreamcast','gmod','ricochet','dod'];
 const types={'.html':'text/html','.js':'text/javascript','.mjs':'text/javascript','.css':'text/css','.json':'application/json','.svg':'image/svg+xml','.png':'image/png','.webp':'image/webp','.woff2':'font/woff2'};
 
 function serve(){
@@ -63,18 +63,21 @@ test('the settings page and the Voice Studio switch logos with the theme',async(
  try{
   const settings=await browser.newPage();const errors=[];settings.on('pageerror',e=>errors.push(e.message));
   await settings.addInitScript(mock,'steam');await settings.goto(base+'/browser-extension/settings.html#appearance');
-  const logo=()=>settings.evaluate(()=>new Promise(done=>{const i=document.querySelector('img.mark');const check=()=>i.complete?done({src:i.getAttribute('src'),ok:i.naturalWidth===128,pixel:getComputedStyle(i).imageRendering}):setTimeout(check,30);check();}));
-  assert.deepEqual(await logo(),{src:'ui/logos/steam.png',ok:true,pixel:'auto'});
+  // v2.18: the file is the src; once laid out, ui-logos.js adds a srcset drawn at the exact displayed size.
+  const logo=theme=>settings.evaluate(t=>new Promise(done=>{const i=document.querySelector('img.mark');const check=()=>{if(!i.complete||i.dataset.sharp!==t||!i.srcset)return setTimeout(check,30);
+   const cs=getComputedStyle(i),box=i.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight);
+   done({src:i.getAttribute('src'),ok:i.naturalWidth>0&&Math.abs(i.naturalWidth-box)<=1&&i.srcset.startsWith('data:image/png'),pixel:cs.imageRendering});};check();}),theme);
+  assert.deepEqual(await logo('steam'),{src:'ui/logos/steam.png',ok:true,pixel:'auto'});
   for(const theme of THEMES.slice(1)){
    await settings.click('.tg-card[data-theme='+theme+']');await settings.click('#tgApply');
-   const got=await logo();assert.equal(got.src,'ui/logos/'+theme+'.png');assert.equal(got.ok,true,theme+' logo loads');
+   const got=await logo(theme);assert.equal(got.src,'ui/logos/'+theme+'.png');assert.equal(got.ok,true,theme+' logo loads at its displayed size');
    if(theme==='doom')assert.equal(got.pixel,'pixelated','the DOOM logo keeps its pixels sharp');
   }
   assert.deepEqual(errors,[]);
   const voice=await browser.newPage();voice.on('pageerror',e=>errors.push(e.message));
   await voice.addInitScript(mock,'hev');await voice.goto(base+'/voice-app/native.html');
   await voice.waitForFunction(()=>document.getElementById('brand-logo')?.dataset.theme==='hev');
-  assert.equal(await voice.evaluate(()=>new Promise(done=>{const i=document.getElementById('brand-logo');const c=()=>i.complete?done(i.getAttribute('src')+' '+i.naturalWidth):setTimeout(c,30);c();})),'logos/hev.png 128');
+  assert.equal(await voice.evaluate(()=>new Promise(done=>{const i=document.getElementById('brand-logo');const c=()=>i.complete&&i.dataset.sharp==='hev'?done(i.getAttribute('src')+' '+(i.naturalWidth>0&&i.srcset.startsWith('data:image/png'))):setTimeout(c,30);c();})),'logos/hev.png true');
   assert.deepEqual(errors,[]);
  }finally{await browser.close();server.close();}
 });

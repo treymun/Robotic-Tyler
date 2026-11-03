@@ -13,6 +13,8 @@
  const T=globalThis.TylerTheme,UI=globalThis.TylerUI;
  // Pixel-art logos keep hard edges (the panel's canvas does the same, see ui-logos.js).
  const PIXEL=new Set(globalThis.TylerLogos?.pixel||['doom','minecraft']);
+ // Each logo is redrawn at its exact displayed size once it is laid out (v2.18, see ui-logos.js).
+ const sharp=(img,theme)=>requestAnimationFrame(()=>requestAnimationFrame(()=>globalThis.TylerLogos?.sharpen(img,theme)));
  if(!gallery||!stage||!T||!UI)return;
  const icon=n=>globalThis.TylerIcons?.svg(n)||'';
  const kit=()=>globalThis.TylerKit?.page();
@@ -40,7 +42,7 @@
  function panelFor(theme,{card=false}={}){
   const panel=document.createElement('aside');panel.className='panel';panel.dataset.rtTheme=theme;panel.dataset.voice='true';panel.dataset.platform='chrome';
   const bar=parts.bar.cloneNode(true),mark=bar.querySelector('.mark');
-  if(mark){mark.querySelector('canvas')?.remove();const img=document.createElement('img');img.className='mark-art';img.alt='';img.src='ui/logos/'+theme+'.png';mark.append(img);mark.dataset.logo=theme;}
+  if(mark){mark.querySelector('canvas')?.remove();const img=document.createElement('img');img.className='mark-art';img.alt='';img.src='ui/logos/'+theme+'.png';if(PIXEL.has(theme))img.style.imageRendering='pixelated';mark.append(img);mark.dataset.logo=theme;sharp(img,theme);}
   const sub=bar.querySelector('.ident-sub');if(sub)sub.textContent='Chrome · voice and chat';
   const tally=parts.tally.cloneNode(true);tally.dataset.state=card?'listening':'speaking';
   const label=tally.querySelector('.tally-label'),text=tally.querySelector('.tally-text');
@@ -73,7 +75,7 @@
   const card=document.createElement('div');card.className='tg-card';card.dataset.theme=theme;card.setAttribute('role','radio');
   const shot=document.createElement('div');shot.className='tg-shot';const host=document.createElement('div');host.className='tg-host';host.dataset.card='';shot.append(host);
   const meta=document.createElement('div');meta.className='tg-meta';
-  const logo=document.createElement('img');logo.className='tg-logo';logo.alt='';logo.src='ui/logos/'+theme+'.png';if(PIXEL.has(theme))logo.style.imageRendering='pixelated';
+  const logo=document.createElement('img');logo.className='tg-logo';logo.alt='';logo.src='ui/logos/'+theme+'.png';if(PIXEL.has(theme))logo.style.imageRendering='pixelated';sharp(logo,theme);
   const title=document.createElement('span');title.className='tg-name';title.textContent=name;
   const badge=document.createElement('span');badge.className='tg-badge';badge.textContent='In use';
   meta.append(logo,title);if(light){const tag=document.createElement('span');tag.className='tg-tag';tag.textContent='Light';meta.append(tag);}meta.append(badge);
@@ -103,7 +105,7 @@
   }
   const [name,desc,light]=T.info[selected];
   $('tgName').textContent=name;$('tgDesc').textContent=desc+(light?' Light theme.':'');
-  const logo=$('tgLogo');logo.src='ui/logos/'+selected+'.png';logo.style.imageRendering=PIXEL.has(selected)?'pixelated':'';
+  const logo=$('tgLogo');if(logo.dataset.theme!==selected){logo.removeAttribute('srcset');logo.src='ui/logos/'+selected+'.png';logo.dataset.theme=selected;}logo.style.imageRendering=PIXEL.has(selected)?'pixelated':'';sharp(logo,selected);
   const same=selected===applied;apply.disabled=same;
   apply.querySelector('.lbl').textContent=same?'In use':'Apply '+name;
   state.textContent=same?'This is the theme every Tyler window uses now.':'Previewing '+name+'. Nothing changes until you press Apply.';
