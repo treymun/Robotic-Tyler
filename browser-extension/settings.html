@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; connect-src https://openrouter.ai https://generativelanguage.googleapis.com; style-src 'self'; img-src 'self' data:; font-src 'self'; base-uri 'none'; form-action 'none'">
+<title>ROBOTIC TYLER Settings</title>
+<link rel="icon" href="icons/icon-32.png">
+<link rel="stylesheet" href="ui/tokens.css">
+<link rel="stylesheet" href="settings.css">
+<link rel="stylesheet" href="ui/icons.css">
+<link rel="stylesheet" href="ui/kit.css">
+<link rel="stylesheet" href="ui/fonts/fonts.css">
+<link rel="stylesheet" href="ui/themes/classic.css">
+<link rel="stylesheet" href="ui/themes/tf2.css">
+<link rel="stylesheet" href="ui/themes/cs2.css">
+<link rel="stylesheet" href="ui/themes/portal.css">
+<link rel="stylesheet" href="ui/themes/cs16.css">
+<link rel="stylesheet" href="ui/themes/hev.css">
+<link rel="stylesheet" href="ui/themes/l4d.css">
+<link rel="stylesheet" href="ui/themes/winxp.css">
+<link rel="stylesheet" href="ui/themes/doom.css">
+<script src="theme.js"></script>
+</head>
+<body data-desktop="false">
+<div class="app">
+  <aside class="side">
+    <div class="brand">
+      <img class="mark" src="ui/logos/steam.png" alt="">
+      <span class="brand-text"><strong>ROBOTIC TYLER</strong><small id="uiPlatform">Settings</small></span>
+    </div>
+    <nav class="section-nav" aria-label="Settings sections"></nav>
+    <div class="side-foot">
+      <div class="side-key"><span class="key-dot" id="uiKeyDot" aria-hidden="true"></span>
+      <span id="uiKeySide">Checking saved keys…</span></div>
+      <button type="button" class="theme-chip" data-target="appearance"><span data-icon="appearance"></span><span>Theme: <b id="uiThemeName">Steam</b></span></button>
+    </div>
+  </aside>
+
+  <main class="content" id="top">
+    <header class="page-head" aria-live="polite">
+      <h1 id="uiSectionTitle">Overview</h1>
+      <p id="uiSectionDescription">Setup steps and account status</p>
+    </header>
+
+    <div id="sections" class="sections">
+
+<!-- ── Appearance: theme gallery (theme-gallery.js) ────────────── -->
+<section class="sheet" id="appearance" data-ui-zone="appearance">
+  <div class="sheet-head">
+    <h2 id="tgHeading">Theme</h2>
+    <p>Pick a look for every ROBOTIC TYLER window: the chat panel, these settings and the Voice Studio. Previews use sample content only; nothing is sent until you press Apply.</p>
+  </div>
+  <div class="tg-layout">
+    <div id="themeGallery" class="tg-grid" role="radiogroup" aria-labelledby="tgHeading"></div>
+    <div id="themeStage" class="tg-stage" aria-live="polite">
+      <div class="tg-stage-head"><img id="tgLogo" class="tg-logo-lg" src="ui/logos/steam.png" alt=""><div><h3 id="tgName">Steam</h3><p id="tgDesc"></p></div></div>
+      <div class="tg-actions"><button type="button" id="tgApply" class="primary"><span class="lbl">Apply</span></button><p id="tgState" class="hint"></p></div>
+      <div class="tg-stage-preview"><div class="tg-host"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Overview ─────────────────────────────────────────────── -->
+<section class="sheet" id="quickStart" data-ui-zone="overview">
+  <div class="sheet-head">
+    <h2>Get Tyler running</h2>
+    <p><span class="only-chrome">Save one AI key, open Steam chat in Chrome and press Connect &amp; start in the bot panel. Turn on extras when you want them.</span><span class="only-desktop">Save one AI key and open the Steam chat window. The desktop Control Center handles text chat; Steam group voice runs in the Chrome extension.</span></p>
+  </div>
+  <ol class="setup-steps">
+    <li class="setup-step" id="uiKeyStep">
+      <span class="setup-n" aria-hidden="true">1</span>
+      <div><b>Add an AI key</b><small id="uiKeyState">Checking saved keys…</small></div>
+      <button type="button" class="secondary" data-target="ai">Set up AI</button>
+    </li>
+    <li class="setup-step">
+      <span class="setup-n" aria-hidden="true">2</span>
+      <div><b>Connect in Steam chat</b><small><span class="only-chrome">Open Steam web chat and press Connect &amp; start in Tyler's panel.</span><span class="only-desktop">Open the Steam chat window and press Connect &amp; start.</span></small></div>
+      <button type="button" class="secondary" id="uiOpenSteam">Open Steam chat</button>
+    </li>
+    <li class="setup-step">
+      <span class="setup-n" aria-hidden="true">3</span>
+      <div><b>Pick your extras</b><small>Party host, trivia, votes and custom commands are off until you enable them.</small></div>
+      <button type="button" class="secondary" data-target="squad">Squad features</button>
+    </li>
+  </ol>
+  <p id="easyStatus" class="hint" role="status">Checking saved setup…</p>
+</section>
+
+<section class="sheet" id="usagePulse" data-ui-zone="overview">
+  <div class="sheet-head">
+    <h2>This profile's usage</h2>
+    <p>Successful text generations reported by your provider. Speech and transcription are billed separately.</p>
+  </div>
+  <dl class="pulse">
+    <div><dt>Requests</dt><dd id="sumRequests">0</dd></div>
+    <div><dt>Tokens</dt><dd id="sumTokens">0</dd></div>
+    <div><dt>Text cost</dt><dd id="sumCost">$0.0000</dd></div>
+    <div><dt>Spoken replies</dt><dd id="sumSpeech">0</dd></div>
+  </dl>
+  <div class="link-row">
+    <a target="_blank" rel="noopener noreferrer" href="https://openrouter.ai/settings/keys">Create an OpenRouter key</a>
+    <a target="_blank" rel="noopener noreferrer" href="https://openrouter.ai/settings/credits">Check OpenRouter credits</a>
+    <a target="_blank" rel="noopener noreferrer" href="https://aistudio.google.com/apikey">Get a Google AI Studio key</a>
+  </div>
+</section>
+
+<!-- ── AI & personality ─────────────────────────────────────── -->
+<section class="sheet" id="studio" data-ui-zone="ai">
+  <div class="sheet-head">
+    <h2>Provider and model</h2>
+    <p>One key powers text<span class="only-chrome"> and voice</span>. Keys stay in this profile and are checked with the provider when you save.</p>
+  </div>
+  <div class="grid two">
+    <label>AI provider
+      <select id="aiProvider"><option value="openrouter">OpenRouter</option><option value="gemini">Google Gemini</option></select>
+    </label>
+    <label>OpenRouter conversation model
+      <select id="brain"><option value="fast">Llama 3.3 70B, Groq preferred (default)</option><option value="budget">Mistral Small 3.2, budget</option></select>
+    </label>
+    <label>OpenRouter API key
+      <input id="openrouterKey" type="password" autocomplete="off" placeholder="Leave blank to keep the saved key">
+    </label>
+    <label>Google Gemini API key
+      <input id="geminiKey" type="password" autocomplete="off" placeholder="Leave blank to keep the saved key">
+    </label>
+  </div>
+  <div class="toggle-grid">
+    <label class="toggle"><input id="smartRouting" type="checkbox"><span><b>Smart model routing</b><small>Casual comments use the budget model; longer or complex questions use Llama. No extra classifier call.</small></span></label>
+    <label class="toggle"><input id="streamAI" type="checkbox" checked><span><b>Stream AI text</b><small>Use OpenRouter streaming for a faster first reply.</small></span></label>
+    <label class="toggle"><input id="friendMemory" type="checkbox"><span><b>Remember verified friends</b><small>Separate local memory for confirmed Steam accounts, kept for 7 days.</small></span></label>
+  </div>
+  <label class="narrow">Local text spending cap (USD, 0 = off)
+    <input id="spendingCapUSD" type="number" min="0" max="100" step="0.25" value="0">
+  </label>
+  <p class="hint">This cap uses provider-reported text costs only. Set a hard limit on your OpenRouter key too.</p>
+</section>
+
+<section class="sheet" id="personalitySheet" data-ui-zone="ai">
+  <div class="sheet-head">
+    <h2>Personality</h2>
+    <p>Start from a preset, shape it with the sliders, or write your own description.</p>
+  </div>
+  <div class="preset-strip" role="group" aria-label="Personality presets">
+    <button type="button" class="preset" data-preset="rowdy">Rowdy squad</button>
+    <button type="button" class="preset" data-preset="coach">Helpful coach</button>
+    <button type="button" class="preset" data-preset="chaos">Chaos goblin</button>
+    <button type="button" class="preset" data-preset="chill">Chill wingman</button>
+  </div>
+  <div class="slider-grid">
+    <label>Humor <small id="humorLevelLabel">High</small>
+      <input id="humorLevel" type="range" min="0" max="100" step="1" value="72">
+    </label>
+    <label>Edginess <small id="edgeLevelLabel">Rowdy</small>
+      <input id="edgeLevel" type="range" min="0" max="100" step="1" value="68">
+    </label>
+    <label>Helpfulness <small id="helpLevelLabel">Balanced</small>
+      <input id="helpLevel" type="range" min="0" max="100" step="1" value="52">
+    </label>
+    <label>Chaos <small id="chaosLevelLabel">Controlled</small>
+      <input id="chaosLevel" type="range" min="0" max="100" step="1" value="44">
+    </label>
+  </div>
+  <button type="button" id="forgePrompt" class="secondary">Write personality from sliders</button>
+  <label>Personality description
+    <textarea id="personality" rows="5" placeholder="A witty gaming buddy. Respect boundaries and reply to the latest message."></textarea>
+  </label>
+  <div class="grid two">
+    <label>Roast intensity
+      <select id="roastMode"><option value="savage">Savage: strong profanity and sharp roasts</option><option value="rowdy">Rowdy: playful profanity</option><option value="custom">Custom personality only</option></select>
+    </label>
+    <label>Reply length
+      <select id="length"><option value="short">Fast: short banter</option><option value="normal">Adaptive: concise, longer when helpful</option><option value="detailed">Detailed: up to two short paragraphs</option></select>
+    </label>
+    <label>Text response speed
+      <select id="textSpeed"><option value="balanced">Turbo: quick replies with adaptive pacing</option><option value="cautious">Cautious: more time between messages</option></select>
+    </label>
+    <label>Talkativeness
+      <select id="talkativeness"><option value="quiet">Quiet: only when addressed</option><option value="occasional">Occasional banter</option><option value="active" selected>Active conversation</option></select>
+    </label>
+  </div>
+</section>
+
+<section class="sheet" id="playground" data-ui-zone="ai">
+  <div class="sheet-head">
+    <h2>Preview a reply</h2>
+    <p>Uses your chosen provider and the current, unsaved form values.</p>
+  </div>
+  <label>What a friend says
+    <textarea id="previewPrompt" rows="3" placeholder="Tyler, who's throwing this match?"></textarea>
+  </label>
+  <div class="actions">
+    <button id="previewReply" type="button">Preview reply</button>
+    <button id="previewRoast" type="button" class="secondary">Preview roast</button>
+  </div>
+  <pre id="previewOutput" class="output">Previews appear here before you save.</pre>
+</section>
+
+<!-- ── Voice (Chrome only) ─────────────────────────────────── -->
+<section class="sheet only-chrome" id="voice" data-ui-zone="voice">
+  <div class="sheet-head">
+    <h2>How Tyler sounds and listens</h2>
+    <p>Speech uses Grok Voice through OpenRouter with a Voxtral fallback. Short replies keep voice banter snappy.</p>
+  </div>
+  <div class="grid two">
+    <label>Voice
+      <select id="speechVoice"><option value="rex">rex</option><option value="eve">eve</option><option value="ara">ara</option><option value="sal">sal</option><option value="leo">leo</option></select>
+    </label>
+    <label>Noise filter
+      <select id="noiseLevel"><option value="balanced">Balanced: 0.55 s of speech (default)</option><option value="strong">Strong: louder input, 0.8 s of speech</option><option value="sensitive">Sensitive: quiet voices, 0.2 s of speech</option></select>
+    </label>
+  </div>
+  <div class="toggle-grid">
+    <label class="toggle"><input id="fastSpeech" type="checkbox" checked><span><b>Start speaking sooner</b><small>Tyler starts saying the first sentence while the rest of the reply is still being written. Needs Stream AI text (OpenRouter). Turn off if replies ever sound cut or repeated.</small></span></label>
+  </div>
+  <p class="hint">Fine-tune sensitivity, interruptions and turn-taking live from the Conversation section of Tyler's panel in Steam. The Checks tab shows how long each part of a voice reply takes.</p>
+</section>
+
+<!-- ── Squad & friends ─────────────────────────────────────── -->
+<section class="sheet" id="suiteSettings" data-ui-zone="squad">
+  <div class="sheet-head">
+    <h2>Squad features</h2>
+    <p>Group features for the Steam chat Tyler is connected to. Everything here is off until you turn it on.</p>
+  </div>
+  <div class="toggle-grid">
+    <label class="toggle"><input id="suiteVoting" type="checkbox"><span><b>Game voting</b><small>Approved friends type <code>!vote GAME</code>.</small></span></label>
+    <label class="toggle"><input id="suiteParty" type="checkbox"><span><b>Party host</b><small>Approved friends create game nights, join and get rotating teams.</small></span></label>
+    <label class="toggle"><input id="suiteArcade" type="checkbox"><span><b>Multiplayer trivia</b><small><code>!trivia</code> and <code>!answer 1–4</code> to earn XP, with questions from the same 500 as <code>play trivia</code>.</small></span></label>
+    <label class="toggle"><input id="suiteEvents" type="checkbox"><span><b>Manual personality events</b><small>One-click GG, tough-loss and achievement messages. Never automatic.</small></span></label>
+    <label class="toggle"><input id="suiteProfiles" type="checkbox"><span><b>Friend preferences</b><small>Notes you maintain about friends who opted in. Never inferred.</small></span></label>
+    <label class="toggle"><input id="suiteCoaching" type="checkbox"><span><b>Game-coach replies</b><small>Practical advice when someone asks. No fake real-time telemetry.</small></span></label>
+    <label class="toggle"><input id="suiteAwareness" type="checkbox"><span><b>Conversation awareness</b><small>Follow-ups use recent chat history without guessing who spoke.</small></span></label>
+    <label class="toggle"><input id="suiteAdaptive" type="checkbox"><span><b>Adaptive personality</b><small>Recent conversation cues adjust the tone of replies.</small></span></label>
+    <label class="toggle only-chrome"><input id="suiteDirector" type="checkbox"><span><b>AI soundboard director</b><small>Plays a cue on clear wins or losses, with a 90-second cooldown. Uses the Chrome voice bridge.</small></span></label>
+    <label class="toggle"><input id="suiteNudges" type="checkbox"><span><b>Party check-in</b><small>One text check-in after 12 quiet minutes, at most once an hour.</small></span></label>
+    <label class="toggle"><input id="suiteHud" type="checkbox" checked><span><b>Extended squad HUD</b><small>Queue status, XP and diagnostics inside Steam.</small></span></label>
+  </div>
+</section>
+
+<section class="sheet" id="approvedFriends" data-ui-zone="squad">
+  <div class="sheet-head">
+    <h2>Approved friends</h2>
+    <p>Steam accounts allowed to use game voting, party host, multiplayer trivia and custom commands.</p>
+  </div>
+  <label>Approved Steam account IDs<textarea id="libraryAllowedIds" rows="3" placeholder="One verified 17-digit Steam ID per line" spellcheck="false"></textarea></label>
+</section>
+
+<section class="sheet" id="friendProfiles" data-ui-zone="squad">
+  <div class="sheet-head">
+    <h2>Verified friends</h2>
+    <p>Nicknames for explicitly configured 17-digit Steam account IDs. This never identifies anyone in voice chat.</p>
+  </div>
+  <div class="grid two">
+    <label>Steam account ID<input id="friendID" type="text" inputmode="numeric" maxlength="17" placeholder="7656119XXXXXXXXXX"></label>
+    <label>Nickname<input id="friendNickname" type="text" maxlength="60" placeholder="Their chosen nickname"></label>
+  </div>
+  <div class="actions"><button id="friendSave" type="button">Add or update</button><button id="friendErase" class="secondary" type="button">Remove nickname</button></div>
+  <p class="hint" id="friendStatus" role="status">Names are only used for confirmed message authors.</p>
+  <div id="friendCards" class="friend-cards"></div>
+</section>
+
+<!-- ── Games ───────────────────────────────────────────────── -->
+<section class="sheet" id="steamActivity" data-ui-zone="games">
+  <div class="sheet-head">
+    <h2>Public game activity</h2>
+    <p>Checks public Steam profiles only. It can't see private games, game telemetry or friends lists, and some profiles block the XML feed.</p>
+  </div>
+  <label class="toggle"><input type="checkbox" id="activityEnabled"><span><b>Check public game activity</b><small>Off by default. The squad panel in Steam checks only while it's open.</small></span></label>
+  <label>Steam account IDs to watch, one per line
+    <textarea id="activitySteamIds" rows="3" placeholder="7656119…"></textarea>
+  </label>
+  <p class="hint">Up to eight visible profiles. No Steam API key needed; IDs are stored locally.</p>
+</section>
+
+<!-- ── Advanced ────────────────────────────────────────────── -->
+<section class="sheet" id="social" data-ui-zone="advanced">
+  <div class="sheet-head">
+    <h2>Memory and running jokes</h2>
+    <p>Unknown speakers stay unnamed. Clearing the conversation in Steam resets the local running context.</p>
+  </div>
+  <label>Inside jokes, one per line
+    <textarea id="insideJokes" rows="4" maxlength="3600" placeholder="A running joke or shared gaming memory"></textarea>
+  </label>
+  <label class="narrow">AI turns between callback opportunities
+    <input id="callbackGap" type="number" min="3" max="30" value="6">
+  </label>
+  <label>Nicknames for confirmed accounts: Steam account ID = nickname
+    <textarea id="nicknameAliases" rows="3" maxlength="2400" placeholder="7656119XXXXXXXXXX = nickname"></textarea>
+  </label>
+</section>
+
+<section class="sheet" id="usageSection" data-ui-zone="advanced">
+  <div class="sheet-head">
+    <h2>Keys and usage detail</h2>
+    <p>The summary covers successful text generations. Speech and transcription charges are tracked by your provider.</p>
+  </div>
+  <p id="status" role="status">Loading current settings…</p>
+  <div id="usageSummary" class="usage-banner" aria-live="polite"></div>
+  <details class="raw"><summary>Raw usage record</summary><pre id="usage"></pre></details>
+</section>
+
+    </div>
+
+    <footer class="savebar">
+      <p id="uiNavStatus" class="ui-clean" role="status">All changes are kept when you press Save settings.</p>
+      <div class="actions">
+        <button id="clear" class="secondary" type="button">Remove saved API keys</button>
+        <button id="steam" class="secondary" type="button">Open Steam chat</button>
+        <button id="save" class="primary" type="button">Save settings</button>
+      </div>
+    </footer>
+    <p class="fineprint">Keys are stored in this <span class="only-chrome">Chrome profile</span><span class="only-desktop">app's Windows data folder, encrypted with your Windows account</span> and never bundled into exports.</p>
+  </main>
+</div>
+
+<script src="ui-icons.js"></script>
+<script src="ui-kit.js"></script>
+<script src="ui-template.js"></script>
+<script src="settings.js"></script>
+<script src="v22-settings.js"></script>
+<script src="settings-navigation.js"></script>
+<script src="v23-settings.js"></script>
+<script src="theme-gallery.js"></script>
+</body>
+</html>

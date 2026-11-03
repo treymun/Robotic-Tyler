@@ -1,0 +1,9 @@
+ROBOTIC TYLER PATCH v2.6.0
+
+- Connect & start now finds the Steam chat and a recent message by itself. You're only
+  asked to click when two chats are open side by side, and Tyler remembers your pick.
+- One shared command list: the AI never answers a line another feature owns, and
+  !help lists exactly what's switched on.
+- The sender, time and message ID come from Steam's own message data: Tyler ignores its
+  own messages and re-drawn old history.
+- Update Chrome as usual: copy browser-extension/ over the same folder, then Reload.

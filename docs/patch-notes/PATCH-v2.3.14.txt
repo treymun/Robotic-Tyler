@@ -1,0 +1,34 @@
+ROBOTIC TYLER v2.3.14 - Expanded arcade and natural text answers
+
+UPDATE
+Close Steam chat tabs. Copy all browser-extension contents over the SAME
+existing unpacked extension folder, including the neural folder. Reload
+the extension, reopen Steam chat and Connect & start. Keep the original
+folder and extension ID to preserve saved keys, preferences and statistics.
+
+ADDED / IMPROVED
+New games: Hangman, quick math, riddles and reverse-code puzzles.
+Improved vault, scramble, multiple-choice trivia and interactive RPS.
+Start with play GAME; answer naturally in chat without !game guess.
+Additions include alternate answer forms, hints, skip/end/replay controls,
+duplicate guesses without losing attempts, and choosing games from Sounds.
+See ARCADE-GUIDE.md for the complete guide and important input rules.
+
+Gameplay messages are queued so simultaneous answers use the latest round
+state. Existing history is marked read on connecting; handled lines and
+message IDs reduce replay when Steam updates chat rows. Gameplay answers
+are excluded from ordinary AI text replies, including buffered replies.
+Existing chat sound permissions, optional AI commentary, and verified
+leaderboard behavior remain. This does not remove IDs from Squad Suite.
+
+All earlier fixes and features are included, including bundled local neural
+speech detection, game downloads and queue tools. Electron/native Steam
+companion code is unchanged. New natural-answer arcade support is Chrome
+only. Existing !game commands remain supported.
+
+VALIDATION
+70 automated checks plus JavaScript syntax checks pass. New tests cover
+aliases, plain answers, ignored chatter, wrong/repeated guesses, round
+expiration, Hangman misses, trivia choices, replay controls and new games.
+The real bundled speech model test also remains passing. Live Steam UI,
+simultaneous real-player input and spoken audio have not been tested here.

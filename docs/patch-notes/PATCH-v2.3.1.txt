@@ -1,0 +1,39 @@
+ROBOTIC TYLER v2.3.1 - Chrome storage fix
+
+UPDATE WITHOUT LOSING SETTINGS
+1. In chrome://extensions, find your existing ROBOTIC TYLER extension.
+   Note its ID and the existing unpacked extension folder (Details).
+2. Close all Steam web chat tabs. Back up that extension folder.
+3. Extract this ZIP somewhere temporary. Copy the CONTENTS of its
+   ROBOTIC_TYLER_v2.3/browser-extension folder over the SAME existing
+   unpacked extension folder. Replace the files and include both new
+   content-storage files. Keep the original folder path.
+4. Click Reload on the EXISTING extension in chrome://extensions.
+   Its ID should remain the same. Reopen https://steamcommunity.com/chat/.
+5. Verify saved settings, voice controls, and emergency stop in Settings.
+
+Do not uninstall the extension, clear its storage, or Load unpacked from a
+different path to update: a different extension ID can use a separate store.
+The patch never clears or migrates existing settings, API keys or memory.
+The ZIP contains source, not your private settings or installed EXEs.
+
+CAUSE AND FIX
+The worker restricts chrome.storage.local to TRUSTED_CONTEXTS, while Steam
+content scripts previously tried to read it directly. Chrome denied those
+reads, including the v22 preferences read in automatic.js at first run.
+Content scripts now message the existing worker for explicitly allowed
+non-secret settings, usage, arcade stats and latency data. Only arcade
+stats and latency can be written through this endpoint. The existing Steam
+sender check still applies. Storage change notifications are relayed with
+an allowlist so emergency stop and voice preference changes work live.
+API keys remain in protected storage. No broad storage permissions added.
+
+SCOPE AND VALIDATION
+Chrome manifest version: 2.3.1. Existing project version labels remain 2.3.
+All original files are included. Electron text-only and native Steam
+companion code are unchanged. Chrome stays the primary voice experience.
+Screen awareness, Deadlock commentary, roast battles, persona studio and
+custom commands remain included. Original experimental/live-testing labels
+in README-v2.3.md still apply; this patch does not certify those integrations.
+38 automated tests pass, including restricted-context regression tests.
+Live Chrome/Steam voice and screen capture have not been tested here.

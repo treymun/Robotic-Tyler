@@ -1,0 +1,28 @@
+// Controls the ordinary visible YouTube player. No media URL/API extraction.
+(()=>{
+ let activeToken='',lastAction='',bound,reported='',endSent=false;
+ const send=async message=>{try{return await chrome.runtime.sendMessage(message);}catch{return null;}};
+ async function event(state,type,title=''){if(reported===state.token+'|'+type)return;reported=state.token+'|'+type;await send({type:'music:event',token:state.token,event:type,title});}
+ async function tick(){
+  const r=await send({type:'music:pending'}),state=r?.command;if(!state)return;
+  const video=document.querySelector('video');
+  if(['pause','stop'].includes(state.action)){video?.pause();lastAction=state.action+'|'+state.token;return;}
+  if(state.action==='resume'){
+   if(lastAction==='resume|'+state.token)return;lastAction='resume|'+state.token;
+   if(video)try{await video.play();}catch{await event(state,'blocked');}return;
+  }
+  if(state.action!=='play')return;
+  if(location.pathname==='/results'){
+   if(activeToken===state.token)return;
+   const link=[...document.querySelectorAll('ytd-video-renderer a#video-title')].find(a=>{try{return new URL(a.href).hostname==='www.youtube.com'&&new URL(a.href).pathname==='/watch';}catch{return false;}});
+   if(link){activeToken=state.token;endSent=false;reported='';lastAction='';link.click();}return;
+  }
+  if(location.pathname!=='/watch'||!video)return;
+  if(activeToken!==state.token){activeToken=state.token;endSent=false;reported='';}
+  if(bound!==video){bound=video;video.addEventListener('ended',()=>{if(document.querySelector('.ad-showing'))return;video.pause();if(!endSent){endSent=true;void event({token:activeToken},'ended');}});}
+  if(lastAction!=='play|'+state.token){lastAction='play|'+state.token;endSent=false;video.muted=false;try{await video.play();}catch{await event(state,'blocked');}}
+  if(video.error){await event(state,'error');return;}
+  if(!document.querySelector('.ad-showing')&&!video.paused&&video.readyState>=2){const title=document.querySelector('h1.ytd-watch-metadata')?.textContent||document.title.replace(/ - YouTube$/,'');await event(state,'playing',title);}
+ }
+ setInterval(()=>void tick(),1200);void tick();
+})();

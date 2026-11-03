@@ -1,0 +1,40 @@
+ROBOTIC TYLER v2.3.17 - Louder independent music volume
+
+UPDATE
+Close Steam web chat tabs, replace all contents of the SAME existing
+unpacked browser-extension folder, and Reload at chrome://extensions.
+Reopen Steam chat, Connect & start and share the music tab audio again.
+Keep the original folder/extension ID to preserve settings and keys.
+
+VOLUME
+The music relay no longer passes through the AI bridge's 35% master gain.
+It now has an independent 0-200% gain range, a visible percentage label,
+smooth volume changes and a peak compressor (threshold -3 dB, ratio 20:1).
+AI speech and soundboard volumes are unchanged. The compressor helps with
+peaks but does not guarantee distortion-free output for every source/mix.
+
+Commands:
+music volume 50  - quieter starting point
+music volume 100 - source level before peak compression
+music volume 150 - boost
+music volume 200 - maximum boost
+music volume 0   - mute
+
+Because the old extra attenuation is removed, the same slider percentage
+is louder than before. Start at 50 and adjust. Also check YouTube's player
+volume and the listener's Steam volume for ROBOTIC TYLER. This is music-only
+volume, not a change to your system's playback or your friends' computers.
+
+ADS
+This patch does not block or skip ads. YouTube Premium Lite can still show
+ads on music. Full YouTube Premium includes ad-free music playback when
+the correct subscribed account is signed into the music tab. Embedded
+creator promotions or other content are not removed by this extension.
+https://blog.youtube/news-and-events/youtube-premium-lite-background-play-downloads/
+No subscription purchase or account change is performed by this update.
+
+All prior features remain included. No keys/settings are cleared. Chrome
+music tab control and Steam audio delivery remain experimental and have
+not been tested live here. 82 automated checks and syntax checks pass,
+including actual mixer-node wiring with a simulated AudioContext, gain
+clamping, mute, compressor output, independent AI gain and disconnect.

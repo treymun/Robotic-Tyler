@@ -1,0 +1,66 @@
+ROBOTIC TYLER v2.3.21 - Shared sender recognition and music spam protection
+
+INSTALL
+Close ALL Steam web chat tabs first. Copy ALL browser-extension contents
+over the SAME existing unpacked extension folder, including neural and the
+new sender-main.js file. Reload the existing extension at chrome://extensions.
+Reopen Steam chat, Connect & start and re-share the YouTube tab audio.
+Do not uninstall or change folders; saved settings and keys stay in place.
+The Music panel title and Sender check should both show v2.3.21.
+
+SENDER FIX
+The user's screenshot shows Steam's speakerName class. Earlier readers did
+not recognize it. The shared reader now recognizes this author header,
+including names/avatars in separate wrappers and grouped messages.
+All applicable Chrome text-chat features use the same reader: music names
+and skip votes, arcade/trivia scores and verified leaderboard credit, normal
+AI replies and account-based friend context, game votes, parties, roast
+battles, custom commands, selected-account sound access and download request
+sender metadata. Existing owner settings and access lists still apply.
+
+When plain DOM attributes lack an account key, a small MAIN-world adapter
+tries bounded sender/message fields on that message's React-rendered element.
+It does not search global friends stores or read credentials, arbitrary
+state, callbacks or authentication data. It refreshes metadata on reused DOM
+nodes, ignores mentions/quotes/rosters and rejects conflicting accounts.
+Names alone are labels, not extra skip votes or account permissions. Changing
+a nickname cannot add a second vote to the same detected account. The skip
+rule remains exactly TWO different detected Steam accounts.
+
+SPAM PROTECTION
+- One chat song request per detected person every 5 seconds.
+- Other chat music commands: one per person every 2 seconds.
+- Up to 8 accepted chat commands in a 10-second room burst.
+- Chat clear/reset/stop have a shared 10-second cleanup cooldown.
+- Three waiting songs per person and 12 total waiting songs remain.
+- At most 12 chat commands can wait for local processing.
+- Duplicate explicit message IDs are not replayed after DOM redraws.
+- Blocked spam updates the panel instead of generating another chat reply.
+- Music notices are paced at least 3 seconds apart, with only one pending
+  notice; now-playing cards take priority over ordinary queue acknowledgements.
+- Local Clear waiting queue and Reset music controls bypass chat cooldowns
+  and invalidate pending chat commands. A controller timeout frees stuck work.
+- Panel-only Pause chat music commands keeps music playing while blocking
+  chat controls. Click Resume chat music commands to reopen requests.
+Unidentified senders share one cooldown bucket instead of getting a new one
+for each changed display name. Cooldowns are not erased by chat reset spam.
+
+VERIFY
+Check v2.3.21 is visible. Have two friends each send a new text message.
+Sender check should show each name and ready for skip votes. Request a song:
+the card should show the requester. One friend types music skip twice; only
+one vote counts. The other types music skip to reach 2/2. Try play trivia
+group and answer with plain A/B/C/D; correct scores should name each sender.
+
+LIMITS
+114 automated checks and syntax checks for 135 JavaScript files passed.
+The screenshot confirmed speakerName but did not expose full account markup.
+Tests use representative DOM/React fixtures and actual extension controllers;
+recognition in the user's running Steam session has not been live-verified.
+Steam can change private React field layouts; Sender check remains explicit
+if an account cannot be read. This identifies TEXT message authors, not
+speakers inside the mixed voice recording. No account ID entry is needed for
+recognition. No external messages were sent during verification.
+
+All previous patches included. Chrome playback setup and voice filtering
+retained. Electron and the native companion are unchanged.

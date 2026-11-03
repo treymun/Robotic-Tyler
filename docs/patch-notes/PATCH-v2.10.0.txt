@@ -1,0 +1,5 @@
+ROBOTIC TYLER PATCH v2.10.0
+
+- Five new themes in Settings > Theme: Counter-Strike 1.6, Half-Life HEV suit, Left 4 Dead,
+  Windows XP (light) and DOOM (classic).
+- Update Chrome as usual: copy browser-extension/ over the same folder, then Reload.

@@ -1,0 +1,209 @@
+/*
+ * ROBOTIC TYLER "Portal style" theme (v2.9): the only light theme.
+ *
+ * Test-chamber signage: white wall panels on a tiled grid, black type with
+ * heavy black rules, thin oversized numbers like a chamber sign, and the two
+ * portal colours glowing blue (#2A9DFF) and orange (#FF8A00). The status light
+ * is a glowing portal oval: blue while listening, orange while speaking.
+ * Type: "Tyler Portal" = Barlow (OFL), an open DIN-style sans close to the
+ * games' signage lettering.
+ * Style only: no Portal logos, signage artwork, pictograms or game fonts.
+ */
+[data-rt-theme=portal]{
+  color-scheme:light;
+  --p-blue:#2a9dff;--p-blue-ink:#0062b8;--p-blue-fill:#0a6fd1;--p-orange:#ff8a00;--p-orange-ink:#a14d00;
+  --p-ink:#1b1d1f;--p-wall:#eceff1;--p-seam:#d9dee2;
+
+  --rt-bar:#ffffff;--rt-bg:var(--p-wall);--rt-bg-deep:#e6eaed;
+  --rt-surface:#ffffff;--rt-surface-2:#f2f4f6;--rt-surface-3:#e6eaed;
+  --rt-block:#ffffff;--rt-block-hover:#f2f4f6;--rt-input:#ffffff;--rt-select:#dceafa;
+  --rt-line:#cfd5da;--rt-line-soft:#e1e5e8;--rt-line-strong:var(--p-ink);
+
+  --rt-ink:var(--p-ink);--rt-ink-strong:#000000;--rt-ink-2:#2b2f33;--rt-ink-3:#454b51;--rt-ink-4:#555b62;--rt-ink-disabled:#9aa1a8;
+  --rt-link:var(--p-blue-ink);--rt-link-hover:#00407a;
+  --rt-blue:var(--p-ink);--rt-blue-deep:var(--p-blue-fill);--rt-active:var(--p-orange);
+  --rt-blue-fade:#ffffff;--rt-blue-fade-hover:var(--p-blue-fill);
+  --rt-green:var(--p-blue-fill);--rt-green-hover:#0b7be6;--rt-green-ink:#ffffff;--rt-green-line:#004f99;
+
+  --rt-state-standby:#555b62;--rt-state-ready:#0b6e60;--rt-state-listening:var(--p-blue-ink);--rt-state-thinking:#7a5600;
+  --rt-state-speaking:var(--p-orange-ink);--rt-state-waiting:#6f45a8;--rt-state-error:#b3261e;
+  --rt-danger:#b3261e;--rt-danger-bg:#c62828;--rt-danger-hover:#a51f1f;--rt-danger-ink:#ffffff;--rt-success:#0b6e60;--rt-focus:var(--p-blue);
+  --rt-accent:var(--p-orange);--rt-accent-soft:rgba(255,138,0,.12);--rt-accent-line:rgba(255,138,0,.55);
+
+  --rt-on-accent:#ffffff;--rt-accent-fill:var(--p-blue-fill);
+  --rt-meter:linear-gradient(90deg,var(--p-blue),var(--p-orange));--rt-marker:var(--p-ink);--rt-edge:var(--p-ink);--rt-page-glow:#ffffff;
+
+  --rt-font:"Tyler Portal","Segoe UI","Helvetica Neue",Arial,sans-serif;
+  --rt-font-display:"Tyler Portal","Segoe UI","Helvetica Neue",Arial,sans-serif;
+  --rt-text-xs:12px;--rt-text-sm:13px;--rt-text-md:14px;--rt-text-lg:15px;
+  --rt-track:.14em;
+  --rt-r-xs:2px;--rt-r-sm:4px;--rt-r-md:6px;--rt-r-lg:8px;
+  --rt-shadow-float:0 0 0 1px rgba(0,0,0,.18),0 20px 50px rgba(20,30,40,.35);
+  --p-tiles:linear-gradient(var(--p-seam) 1px,transparent 1px) 0 0/44px 44px,linear-gradient(90deg,var(--p-seam) 1px,transparent 1px) 0 0/44px 44px;
+}
+html[data-rt-theme=portal]{scrollbar-color:#9aa1a8 transparent}
+[data-rt-theme=portal] :is(.scroll,.content,main){scrollbar-color:#9aa1a8 transparent}
+
+/* ── Test-chamber wall: white tiles with seams ────────────────────────── */
+.panel[data-rt-theme=portal]{background:var(--p-tiles),var(--p-wall)}
+[data-rt-theme=portal] body{background:var(--p-tiles),var(--p-wall) fixed}
+[data-rt-theme=portal] main{background:transparent}
+
+/* Signage type: thin big titles, tracked small capitals, black rules */
+[data-rt-theme=portal] h1{font-weight:300;font-size:36px;letter-spacing:.04em;color:#000}
+[data-rt-theme=portal] h2{font-weight:600;font-size:13px;letter-spacing:.18em;color:#000;padding-bottom:6px;border-bottom:3px solid var(--p-ink)}
+[data-rt-theme=portal] :is(.sheet-head h2,.card>h2){font-weight:600;font-size:13px;letter-spacing:.18em;color:#000;border-bottom:0;padding-bottom:0}
+[data-rt-theme=portal] .sheet-head{background:none;box-shadow:inset 0 -3px 0 var(--p-ink)}
+[data-rt-theme=portal] .wordmark{font-weight:300;font-size:20px;letter-spacing:.16em;color:#000}
+[data-rt-theme=portal] .brand-text strong{font-weight:300;font-size:17px;letter-spacing:.16em;color:#000}
+[data-rt-theme=portal] .ident-sub{letter-spacing:.2em;color:var(--rt-ink-3)}
+[data-rt-theme=portal] label:not(:has(>input[type=checkbox])):not(.toggle){font-weight:600;letter-spacing:.16em;color:var(--rt-ink-3)}
+[data-rt-theme=portal] :is(.tally-label,.stat dt,.pulse dt,.facts b,.matrix dt,details.feature>summary){font-weight:600;letter-spacing:.16em}
+
+/* Header like a chamber sign: white panel over a heavy black rule */
+[data-rt-theme=portal] .bar{background:#fff;padding-top:14px;padding-bottom:14px;box-shadow:inset 0 -4px 0 var(--p-ink)}
+[data-rt-theme=portal] .bar .mark:not([data-logo]){border-radius:var(--rt-r-sm)}
+[data-rt-theme=portal] .side{background:#fff;box-shadow:inset -4px 0 0 var(--p-ink)}
+[data-rt-theme=portal] .foot{background:#fff;box-shadow:inset 0 3px 0 var(--p-ink)}
+[data-rt-theme=portal] .savebar{background:#fff;box-shadow:inset 0 3px 0 var(--p-ink),0 -6px 20px rgba(20,30,40,.12)}
+
+/* Status light is a portal: a glowing oval, blue listening, orange speaking */
+[data-rt-theme=portal] .tally{background:#fff;border:1px solid var(--rt-line);box-shadow:0 1px 2px rgba(0,0,0,.06)}
+[data-rt-theme=portal] .tally-light{align-self:center;width:14px;height:30px;border-radius:50%;background:transparent;border:3px solid var(--tone);box-shadow:0 0 10px 1px color-mix(in srgb,var(--tone) 70%,transparent),inset 0 0 6px color-mix(in srgb,var(--tone) 60%,transparent)!important}
+[data-rt-theme=portal] .tally[data-state=listening]{--tone:var(--p-blue)}
+[data-rt-theme=portal] .tally[data-state=speaking]{--tone:var(--p-orange)}
+[data-rt-theme=portal] .tally[data-state=listening] .tally-label{color:var(--p-blue-ink)}
+[data-rt-theme=portal] .tally[data-state=speaking] .tally-label{color:var(--p-orange-ink)}
+[data-rt-theme=portal] .tally-wave i{background:var(--p-ink)}
+
+/* Numbers like a chamber sign: thin and oversized */
+[data-rt-theme=portal] .stats{background:#fff;border:1px solid var(--rt-line)}
+[data-rt-theme=portal] .stat{border-left-color:var(--p-ink)}
+[data-rt-theme=portal] .stat dd{font-weight:300;font-size:24px;line-height:1.1;color:#000}
+[data-rt-theme=portal] .pulse dd{font-weight:300;font-size:34px;color:#000}
+
+/* Tabs: tracked capitals, orange portal underline on the open one */
+[data-rt-theme=portal] .tabs{background:#fff;box-shadow:inset 0 -1px 0 var(--rt-line)}
+[data-rt-theme=portal] .tabs button{font-weight:600;letter-spacing:.16em;color:var(--rt-ink-3);border:0;border-bottom:3px solid transparent;background:transparent;box-shadow:none}
+[data-rt-theme=portal] .tabs button:hover{color:#000;border-color:transparent;box-shadow:none}
+[data-rt-theme=portal] .tabs button[aria-selected=true]{color:#000;border-bottom-color:var(--p-orange)}
+[data-rt-theme=portal] :is(.section-nav button,nav:not(.tabs) button){font-weight:600;letter-spacing:.12em;text-transform:uppercase;font-size:13px;color:var(--rt-ink-3);border:0;background:transparent}
+[data-rt-theme=portal] :is(.section-nav button,nav:not(.tabs) button):hover{background:var(--rt-surface-2);color:#000;box-shadow:none}
+[data-rt-theme=portal] :is(.section-nav button[aria-current=page],nav:not(.tabs) button.active){background:#fff;color:#000;box-shadow:inset 4px 0 0 var(--p-orange)}
+[data-rt-theme=portal] :is(.section-nav button[aria-current=page],nav:not(.tabs) button.active) .ic{color:#000}
+
+/* Wall panels */
+[data-rt-theme=portal] :where(details,.callout,.quick-help,.confirm,.deck-entry,.board-tools,.sheet,.card,.route-card,.panel,.mini-callout>div,.usage-banner,.facts>div,.matrix>div,.arcade-tickets>div,.friend-card,#setup){
+  background:#fff;border:1px solid var(--rt-line);box-shadow:0 1px 2px rgba(0,0,0,.06)}
+[data-rt-theme=portal] details.feature[open],[data-rt-theme=portal] .raw{background:#fff}
+[data-rt-theme=portal] :is(.facts>div,.matrix>div,.mini-callout>div,.arcade-tickets>div){background:#fff}
+[data-rt-theme=portal] details details{background:var(--rt-surface-2);box-shadow:none}
+[data-rt-theme=portal] summary:hover,[data-rt-theme=portal] details.feature>summary:hover{background:var(--rt-surface-2);color:#000}
+[data-rt-theme=portal] details.feature>summary{color:#000}
+[data-rt-theme=portal] :is(.quick-help,.confirm,#setup){box-shadow:inset 4px 0 0 var(--p-orange),0 1px 2px rgba(0,0,0,.06)}
+[data-rt-theme=portal] .deck-entry{box-shadow:inset 4px 0 0 var(--p-blue),0 1px 2px rgba(0,0,0,.06)}
+[data-rt-theme=portal] .banner{background:#fff4e6;border-left-color:var(--p-orange);color:#000}
+
+/* Buttons: signage outline by default, solid blue main action with portal glow */
+[data-rt-theme=portal] button{font-weight:600;letter-spacing:.1em;text-transform:uppercase;font-size:12px;color:var(--p-ink);background:#fff;border:2px solid var(--p-ink);box-shadow:none}
+[data-rt-theme=portal] button:hover{color:var(--p-blue-ink);background:#fff;border-color:var(--p-blue);box-shadow:0 0 0 3px rgba(42,157,255,.22),0 0 12px rgba(42,157,255,.35)}
+[data-rt-theme=portal] :is(.primary,#start,#save){color:#fff;background:var(--p-blue-fill);border-color:var(--p-blue-fill)}
+[data-rt-theme=portal] :is(.primary,#start,#save):hover{color:#fff;background:var(--p-blue-fill);border-color:var(--p-blue);box-shadow:0 0 0 3px rgba(42,157,255,.3),0 0 16px rgba(42,157,255,.55)}
+[data-rt-theme=portal] .danger{color:#fff;background:var(--rt-danger-bg);border-color:var(--rt-danger-bg)}
+[data-rt-theme=portal] .danger:hover{color:#fff;background:var(--rt-danger-hover);border-color:var(--rt-danger-hover);box-shadow:0 0 0 3px rgba(198,40,40,.2)}
+[data-rt-theme=portal] button:disabled{color:var(--rt-ink-disabled);background:#f2f4f6;border-color:#c9ced3;box-shadow:none}
+[data-rt-theme=portal] :is(.ghost,.icon,.icon-btn){border-color:transparent;background:transparent}
+[data-rt-theme=portal] :is(.ghost,.icon,.icon-btn):hover{background:var(--rt-surface-2);border-color:transparent;box-shadow:none;color:#000}
+[data-rt-theme=portal] :is(.pad,.friend-card,.preset,.link-btn){text-transform:none;letter-spacing:0;font-size:var(--rt-text-md)}
+[data-rt-theme=portal] .link-btn{border:0;background:none;color:var(--p-blue-ink)}
+[data-rt-theme=portal] .pad{background:#fff;border:1px solid var(--rt-line);box-shadow:0 1px 2px rgba(0,0,0,.06)}
+[data-rt-theme=portal] .pad span{font-weight:600;letter-spacing:.14em}
+[data-rt-theme=portal] .pad:hover{border-color:var(--p-blue);box-shadow:0 0 0 3px rgba(42,157,255,.2)}
+[data-rt-theme=portal] .pad::after{border-left-color:var(--p-blue-fill)}
+[data-rt-theme=portal] .pad.playing{border-color:var(--p-orange);box-shadow:0 0 0 3px rgba(255,138,0,.22),inset 4px 0 0 var(--p-orange)}
+[data-rt-theme=portal] .preset.active{color:#fff;background:var(--p-blue-fill);border-color:var(--p-blue-fill)}
+
+/* Fields and controls */
+[data-rt-theme=portal] input:where(:not([type=checkbox],[type=radio],[type=range],[type=file])),[data-rt-theme=portal] :is(textarea,select){
+  color:#000;background-color:#fff;border:1px solid #9aa1a8;border-radius:var(--rt-r-sm);box-shadow:none}
+[data-rt-theme=portal] :is(input,textarea,select):focus{border-color:var(--p-blue);box-shadow:0 0 0 3px rgba(42,157,255,.25)}
+[data-rt-theme=portal] input[type=checkbox]:not(:checked){background:#fff;border:2px solid var(--p-ink)}
+[data-rt-theme=portal] input[type=checkbox]{border-radius:2px;box-shadow:none}
+[data-rt-theme=portal] input[type=checkbox]:checked{border:2px solid var(--p-blue-fill)}
+[data-rt-theme=portal] input[type=range]{accent-color:var(--p-blue-fill)}
+[data-rt-theme=portal] .toggle>input[type=checkbox]{background:#c9ced3;border:0;box-shadow:none}
+[data-rt-theme=portal] .toggle>input[type=checkbox]::after{background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.3)}
+[data-rt-theme=portal] .toggle>input[type=checkbox]:checked{background:var(--p-blue-fill);border:0;box-shadow:0 0 8px rgba(42,157,255,.5)}
+[data-rt-theme=portal] .toggle-grid .toggle:hover{background:var(--rt-surface-2)}
+[data-rt-theme=portal] :is(pre,.output,.v22-log,.response){background:var(--rt-bg-deep);border:1px solid var(--rt-line);box-shadow:none;color:#000}
+[data-rt-theme=portal] code{background:var(--rt-bg-deep);color:var(--p-blue-ink)}
+[data-rt-theme=portal] :is(.meter,.arcade-progress,.lat-track){background:#dde2e6;box-shadow:none}
+[data-rt-theme=portal] .seg-other{background:#b8bfc5}
+[data-rt-theme=portal] .lat-first{box-shadow:none}
+[data-rt-theme=portal] .pill{color:var(--p-blue-ink);background:#e3f0fd}
+[data-rt-theme=portal] .pill.on{color:var(--p-orange-ink);background:#fff1e0}
+[data-rt-theme=portal] :is(.step-n,.setup-n,.friend-card .avatar){color:#fff;background:var(--p-ink);border-radius:var(--rt-r-xs);font-weight:600}
+[data-rt-theme=portal] .setup-step[data-done=true] .setup-n{background:var(--p-blue-fill)}
+[data-rt-theme=portal] .arcade-achievement{background:var(--rt-bg-deep)}
+[data-rt-theme=portal] .arcade-achievement.earned{color:#000;background:#fff1e0;box-shadow:inset 3px 0 0 var(--p-orange)}
+[data-rt-theme=portal] .owner-dot{box-shadow:none!important}
+[data-rt-theme=portal] .route li{background:#fff;box-shadow:inset 0 0 0 1px var(--rt-line)}
+[data-rt-theme=portal] .route li:not(:last-child)::after{background:var(--p-ink)}
+[data-rt-theme=portal] .route li:not(:last-child)::before{border-left-color:var(--p-ink)}
+[data-rt-theme=portal] .route li:last-child{background:#fff4e6;box-shadow:inset 4px 0 0 var(--p-orange)}
+[data-rt-theme=portal] .route li:last-child b{color:var(--p-orange-ink)}
+
+/* ── Status strip: a live portal and the test chamber's indicator dots ──
+   The light is a portal that swirls (blue while listening, orange while
+   talking) and closes on standby. Dots along the bottom turn orange one by
+   one like a chamber timer while Tyler thinks, and all orange while it talks. */
+[data-rt-theme=portal] .tally{padding:10px 12px 22px 10px}
+[data-rt-theme=portal] .tally-light{width:20px;height:36px;flex:0 0 20px;overflow:hidden;background:radial-gradient(closest-side,color-mix(in srgb,var(--tone) 30%,#fff),color-mix(in srgb,var(--tone) 12%,#fff));transition:transform .35s cubic-bezier(.3,1.4,.6,1),opacity .35s}
+[data-rt-theme=portal] .tally-light::before{content:"";position:absolute;left:50%;top:50%;width:48px;height:48px;margin:-24px 0 0 -24px;
+  background:conic-gradient(transparent 0 15%,color-mix(in srgb,var(--tone) 75%,transparent) 28%,transparent 42% 62%,color-mix(in srgb,var(--tone) 55%,transparent) 78%,transparent 92%);animation:p-swirl 2.6s linear infinite}
+[data-rt-theme=portal] .tally:is([data-state=listening],[data-state=speaking]) .tally-light::before{animation-duration:1.1s}
+[data-rt-theme=portal] .tally[data-state=thinking] .tally-light{animation:p-flip 1.6s steps(1) infinite}
+[data-rt-theme=portal] .tally:is([data-state=standby],[data-state=paused]) .tally-light{transform:scale(.3,.45);opacity:.5}
+[data-rt-theme=portal] .tally:is([data-state=standby],[data-state=paused]) .tally-light::before{animation:none}
+@keyframes p-swirl{to{transform:rotate(1turn)}}
+@keyframes p-flip{0%{border-color:var(--p-blue)}50%{border-color:var(--p-orange)}}
+[data-rt-theme=portal] .tally::before,[data-rt-theme=portal] .tally::after{content:"";position:absolute;left:40px;right:12px;bottom:8px;height:6px;background:radial-gradient(circle,var(--dot) 0 2px,transparent 2.6px) 0 50%/10px 6px repeat-x}
+[data-rt-theme=portal] .tally::before{--dot:#5fb4ff}
+[data-rt-theme=portal] .tally::after{--dot:var(--p-orange);clip-path:inset(0 100% 0 0)}
+[data-rt-theme=portal] .tally[data-state=listening]::before{animation:p-pulse 1.4s ease-in-out infinite}
+[data-rt-theme=portal] .tally[data-state=thinking]::after{animation:p-tick 4s steps(32,end) infinite}
+[data-rt-theme=portal] .tally[data-state=speaking]::after{clip-path:inset(0 0 0 0);filter:drop-shadow(0 0 2px rgba(255,138,0,.8))}
+[data-rt-theme=portal] .tally[data-state=error]::before{--dot:#d93a30;animation:p-pulse .8s steps(1) infinite}
+[data-rt-theme=portal] .tally[data-state=waiting]::before{--dot:#a98bd6}
+[data-rt-theme=portal] .tally:is([data-state=standby],[data-state=paused])::before{--dot:#c3cad0}
+@keyframes p-pulse{0%,100%{opacity:1}50%{opacity:.35}}
+@keyframes p-tick{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+
+/* ── v2.13: the header is a test-chamber sign ──
+   A thin chamber number on the right with the sign's progress rule, and the
+   logo bare on white (the art has its own outline). */
+.panel[data-rt-theme=portal] .bar::after{content:"01";order:1;font:300 34px/1 var(--rt-font-display);color:#000;letter-spacing:-.02em;padding:0 10px 4px;border-bottom:3px solid #000;margin-right:2px}
+.panel[data-rt-theme=portal] .bar .icon-btn{order:2}
+[data-rt-theme=portal] .brand-text strong{white-space:nowrap;letter-spacing:.1em}
+
+/* ── Icons, dialogs, notifications and tooltips (v2.14) ──
+   Test-chamber signage: solid black pictograms on white tiles; the chosen tab or
+   page lights its tile in portal blue. Messages are test-instruction cards: a big
+   thin number, a black rule, numbered steps, white card on the tiled wall. */
+[data-rt-theme=portal] .ic-v .b{fill:currentColor}
+[data-rt-theme=portal] .ic-v .d{stroke:var(--ic-cut,#fff);stroke-width:1.7px}
+[data-rt-theme=portal] .ic-v .s{stroke-width:1.8px}
+[data-rt-theme=portal] :is(.tabs button,.section-nav button,nav:not(.tabs) button) .ic{--ic-size:22px;--ic-cut:#fff;padding:2px;color:var(--p-ink);background:#fff;border:1.5px solid var(--p-ink);border-radius:3px}
+[data-rt-theme=portal] :is(.tabs button[aria-selected=true],.section-nav button[aria-current=page],nav:not(.tabs) button.active) .ic{--ic-cut:var(--p-blue-fill);color:#fff;background:var(--p-blue-fill);border-color:var(--p-blue-fill)}
+[data-rt-theme=portal] :is(.rt-toast,.rt-dialog){background:#fff;color:var(--p-ink);border:1px solid var(--p-ink);border-radius:2px;box-shadow:0 2px 0 rgba(0,0,0,.08),0 12px 30px rgba(0,0,0,.18)}
+[data-rt-theme=portal] .rt-toast{padding-left:60px;border-bottom:4px solid var(--tone)}
+[data-rt-theme=portal] .rt-toast::before{content:attr(data-n);position:absolute;left:10px;top:9px;font:300 30px/1 var(--rt-font-display);letter-spacing:-.02em;color:#000}
+[data-rt-theme=portal] .rt-toast::after{content:"";position:absolute;left:50px;top:10px;bottom:12px;width:2px;background:#000}
+[data-rt-theme=portal] :is(.rt-toast-title,.rt-dialog-title){font-family:var(--rt-font-display);font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#000}
+[data-rt-theme=portal] .rt-dialog{position:relative;padding-top:58px;border-top:5px solid var(--tone)}
+[data-rt-theme=portal] .rt-dialog::before{content:attr(data-n);position:absolute;left:16px;top:6px;font:300 44px/1 var(--rt-font-display);letter-spacing:-.03em;color:#000;border-bottom:3px solid #000;padding-bottom:2px}
+[data-rt-theme=portal] .rt-steps{list-style:none;counter-reset:step;padding:0;border-top:1px solid var(--p-seam)}
+[data-rt-theme=portal] .rt-steps li{counter-increment:step;display:grid;grid-template-columns:34px 1fr;align-items:baseline;padding:6px 0;border-bottom:1px solid var(--p-seam)}
+[data-rt-theme=portal] .rt-steps li::before{content:counter(step,decimal-leading-zero);font:300 20px/1 var(--rt-font-display);color:#000}
+[data-rt-theme=portal] .rt-scrim{background:rgba(236,239,241,.6)}
+[data-rt-theme=portal] .rt-tip{background:#000;color:#fff;border:0;border-radius:2px;letter-spacing:.04em}

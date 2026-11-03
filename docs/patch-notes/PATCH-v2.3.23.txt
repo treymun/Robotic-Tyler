@@ -1,0 +1,55 @@
+ROBOTIC TYLER v2.3.23 - Chrome solo skipping and vote-to-kick
+
+INSTALL
+Close Steam web chat AND Tyler's YouTube player tabs. Replace ALL files in
+your SAME unpacked browser-extension folder, including the new
+steam-chat-main.js, steam-chat-client.js, moderation-core.js and moderation.js.
+Keep neural. Reload the existing extension at chrome://extensions. Reopen
+Steam chat, Connect & start and reopen/share a YouTube music tab as before.
+Do not uninstall or change the loaded folder path; saved settings stay.
+
+SOLO MUSIC SKIP
+When the bot can confirm exactly one other member in its ACTIVE voice
+channel, that actual person's music skip passes with one vote. Group voice
+still needs two distinct voters. Voice membership is read fresh on each
+skip; silent/muted people are still counted. An unrelated text-chat user
+does not receive the solo exception. Unknown, changing, different-group or
+unavailable voice membership keeps the two-vote rule. Keep the active voice
+channel visible. This works independently of AI speech mode and does not
+require moderator permissions. Stop/reset still require two different
+accounts, including in solo sessions. All earlier spam protections remain.
+
+VOTE-TO-KICK
+New experimental Chrome moderation panel. Give the bot's Steam account
+kick permission through the group's own role settings, check permissions
+in Tyler's panel, and enable vote-to-kick for that group. It defaults off
+for new groups; Tyler cannot promote itself.
+
+!votekick NAME - call a vote; caller counts as first yes.
+!kick yes / !kick no - one vote per identified eligible account.
+!kick status / !kick cancel / !kick help.
+
+Three different yes voters automatically cause a ONE-HOUR group-chat kick.
+This is a group removal, not only voice disconnection. Owner and bot are
+protected. Target and bot cannot vote. Ballots last 60 seconds; three no
+votes reject early; five-minute cooldown between ballot starts.
+The panel offers a member dropdown when names are ambiguous and can cancel
+an open ballot. No IDs are typed in for targets or voters.
+
+Checks before execution: current group, enabled setting, active extension
+tab, emergency stop, Steam's kick permission, protected target, current
+membership, three distinct yes voters and fresh vote messages. Old history
+does not start fresh votes. Each ballot can execute only once; uncertain
+or failed kicks are not retried automatically. Group change/disable/stop
+cancels pending ballots. See MODERATION-GUIDE.md for complete setup/rules.
+
+TESTING STATUS
+141 automated checks and syntax checks for 143 JavaScript files passed.
+Automated checks passed for the model, actual extension controller, scoped
+Steam adapter and music integration using simulated Steam interface objects.
+The member/permission/kick and active-voice fields were checked against the
+installed Steam interface source. Live Chrome playback, live recognition,
+actual roles and real kicks have not been exercised during this patch.
+No real members were kicked and no account permissions were changed.
+Private Steam UI integrations remain experimental. Electron and the native
+companion are unchanged. All earlier patches/features are included.

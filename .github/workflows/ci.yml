@@ -1,0 +1,170 @@
+# ROBOTIC TYLER CI
+# - Every push and pull request: generated-file check, unit tests, real-extension
+#   end-to-end tests in Chromium, screenshots of every surface, and a zipped
+#   Chrome extension as a build artifact.
+# - Pushes to main and manual runs: the Windows setup (ROBOTIC-TYLER-Setup-<version>.exe)
+#   and the two app installers it downloads, as artifacts.
+# - Tags like v2.14.0: the same Windows build, signed when a certificate is
+#   configured, published as a GitHub Release. The release page offers two downloads
+#   (the Chrome extension zip and the setup); the app installers ("component" files)
+#   sit next to them for the setup to download and for installed apps to update from.
+#
+# Optional repository secrets (Settings → Secrets and variables → Actions):
+#   WINDOWS_CERT_P12       base64 of your .pfx code-signing certificate
+#   WINDOWS_CERT_PASSWORD  its password
+# Without them the installers are built unsigned (Windows SmartScreen will warn).
+name: CI
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Generated files are up to date
+        run: npm run check
+      - name: Unit and integration tests
+        run: npm test
+      - name: Install Chromium for end-to-end tests
+        run: npx playwright install --with-deps chromium
+      - name: End-to-end tests (real extension in Chromium)
+        run: npm run test:e2e
+      - name: Screenshots of every surface
+        if: always()
+        run: npm run preview -- tools/preview/out
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: tools/preview/out
+          if-no-files-found: ignore
+      - name: Package the Chrome extension (zip + install guide)
+        run: npm run package:release
+      - name: Upload the Chrome extension
+        uses: actions/upload-artifact@v4
+        with:
+          name: chrome-extension
+          path: |
+            dist/release/*.zip
+            dist/release/How to install.html
+
+  windows:
+    needs: test
+    if: github.event_name != 'pull_request'
+    runs-on: windows-latest
+    timeout-minutes: 45
+    permissions:
+      contents: write
+    steps:
+      # A published release is never rebuilt: rebuilt installers wouldn't match the
+      # checksums recorded in the setup people already downloaded.
+      - name: Leave an already-published release alone
+        id: published
+        if: startsWith(github.ref, 'refs/tags/v')
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          if gh release view "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[].name' 2>/dev/null | grep -q '^ROBOTIC-TYLER-Setup-'; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "::notice::Release $GITHUB_REF_NAME already has its setup, so it is left as published."
+          fi
+      - uses: actions/checkout@v4
+        if: steps.published.outputs.skip != 'true'
+      - uses: actions/setup-node@v4
+        if: steps.published.outputs.skip != 'true'
+        with:
+          node-version: 22
+      - uses: actions/setup-dotnet@v4
+        if: steps.published.outputs.skip != 'true'
+        with:
+          dotnet-version: '8.0.x'
+      - name: Build the Windows audio bridge
+        if: steps.published.outputs.skip != 'true'
+        run: dotnet publish windows-audio-bridge/RoboticTylerAudio.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o windows-audio-bridge/publish
+      - name: Install dependencies
+        if: steps.published.outputs.skip != 'true'
+        run: npm install --no-audit --no-fund
+      - name: Point auto-updates at this repository
+        if: steps.published.outputs.skip != 'true'
+        run: node tools/set-release-repo.mjs ${{ github.repository }}
+      - name: Code-signing certificate (optional)
+        if: steps.published.outputs.skip != 'true'
+        shell: bash
+        env:
+          CERT: ${{ secrets.WINDOWS_CERT_P12 }}
+          CERT_PASSWORD: ${{ secrets.WINDOWS_CERT_PASSWORD }}
+        run: |
+          if [ -n "$CERT" ]; then
+            echo "CSC_LINK=$CERT" >> "$GITHUB_ENV"
+            echo "CSC_KEY_PASSWORD=$CERT_PASSWORD" >> "$GITHUB_ENV"
+            echo "Signing with the configured certificate."
+          else
+            echo "CSC_IDENTITY_AUTO_DISCOVERY=false" >> "$GITHUB_ENV"
+            echo "::warning::No WINDOWS_CERT_P12 secret: building unsigned installers."
+          fi
+      - name: Build the app installers
+        if: (!startsWith(github.ref, 'refs/tags/v')) && steps.published.outputs.skip != 'true'
+        run: npm run build:both
+      - name: Build and publish the app installers to the release
+        if: (startsWith(github.ref, 'refs/tags/v')) && steps.published.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run release
+      - name: C compiler for the setup (MinGW-w64)
+        if: steps.published.outputs.skip != 'true'
+        shell: pwsh
+        run: |
+          if (-not (Get-Command gcc -ErrorAction SilentlyContinue)) {
+            choco install mingw -y --no-progress
+            'C:\ProgramData\mingw64\mingw64\bin' | Out-File -FilePath $env:GITHUB_PATH -Append
+          }
+      - name: Build the setup (records each app installer's SHA-256)
+        if: steps.published.outputs.skip != 'true'
+        run: npm run build:setup
+      - name: Sign the setup (optional)
+        if: (env.CSC_LINK != '') && steps.published.outputs.skip != 'true'
+        shell: pwsh
+        run: |
+          $pfx = Join-Path $env:RUNNER_TEMP 'setup-cert.pfx'
+          [IO.File]::WriteAllBytes($pfx, [Convert]::FromBase64String($env:CSC_LINK))
+          $signtool = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\bin\*\x64\signtool.exe" | Sort-Object FullName -Descending | Select-Object -First 1
+          & $signtool.FullName sign /f $pfx /p $env:CSC_KEY_PASSWORD /fd sha256 /tr http://timestamp.digicert.com /td sha256 (Get-ChildItem dist/setup/*.exe).FullName
+          if ($LASTEXITCODE -ne 0) { throw 'Signing the setup failed' }
+          Remove-Item $pfx
+      - name: Collect the downloads (setup, Chrome zip, notes, checksums)
+        if: steps.published.outputs.skip != 'true'
+        run: npm run package:release
+      - name: Finish the GitHub release page
+        if: (startsWith(github.ref, 'refs/tags/v')) && steps.published.outputs.skip != 'true'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload "$GITHUB_REF_NAME" dist/release/ROBOTIC-TYLER-Setup-*.exe dist/release/*.zip dist/release/SHA256SUMS.txt --clobber
+          gh release edit "$GITHUB_REF_NAME" --title "ROBOTIC TYLER ${GITHUB_REF_NAME#v}" --notes-file dist/release/RELEASE-NOTES.md
+      - name: Upload the downloads
+        if: steps.published.outputs.skip != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-release
+          path: dist/release
+          if-no-files-found: warn

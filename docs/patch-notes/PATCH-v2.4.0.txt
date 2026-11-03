@@ -1,0 +1,13 @@
+ROBOTIC TYLER PATCH v2.4.0
+
+- One source tree: app/companion/ and app/steam-preload.cjs are generated from
+  browser-extension/ by tools/build.mjs (Chrome-only scripts excluded).
+- Desktop Control Center gains moderation, admin, trivia and the current squad
+  tools; its HUD spend readout and squad/v2.3 settings now work.
+- New design system (ui/tokens.css) shared by the Steam panel, settings page and
+  Native Voice Studio. Panel: status tally, HUD, new Room tab.
+- Shared chat observer (chat-bus.js): per incoming message, text reads drop from
+  27.5 to 3 (227.5 to 3 with a 200-message history). Idle background messages:
+  33/min to 9/min.
+- One older optional module left unchanged (removed in v2.14.0).
+See CHANGES-v2.4.md.

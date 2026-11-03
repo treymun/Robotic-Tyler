@@ -1,0 +1,175 @@
+/*
+ * ROBOTIC TYLER "Half-Life HEV suit style" theme (v2.10).
+ * The suit's heads-up display: yellow readouts (255,220,0) glowing on dark,
+ * see-through rounded HUD boxes (black at 30–45%), small dim captions over big
+ * bright numbers, the segmented suit-power bar, damage red for warnings and
+ * the suit's own orange for the main action. A faint scan-line overlay.
+ * Signature: an orange suit-armour frame with panel seams, yellow-and-black
+ * hazard stripes under the header and over the footer, and tabs drawn like the
+ * weapon-selection slots (numbered rounded boxes).
+ * Type: "Tyler HEV" = Share Tech Mono (OFL) for readouts and captions, with
+ * Trebuchet MS for text, as the HUD uses.
+ * Style only: no Half-Life logos, the lambda symbol, artwork or game fonts.
+ */
+[data-rt-theme=hev]{
+  color-scheme:dark;
+  --h-yellow:#ffdc00;--h-dim:rgba(255,220,0,.55);--h-orange:#e8761e;--h-damage:#b40000;
+  --h-box:rgba(0,0,0,.42);--h-edge:rgba(255,220,0,.22);--h-glow:0 0 6px rgba(255,220,0,.55);
+  --rt-bar:#0d0b07;--rt-bg:#15120b;--rt-bg-deep:#0a0805;--rt-surface:#1f1b11;--rt-surface-2:#292313;--rt-surface-3:#332b16;
+  --rt-block:rgba(0,0,0,.42);--rt-block-hover:rgba(255,220,0,.06);--rt-input:#0a0805;--rt-select:#4a3b00;
+  --rt-line:rgba(255,220,0,.18);--rt-line-soft:rgba(255,220,0,.16);--rt-line-strong:rgba(255,220,0,.4);
+  --rt-ink:#f2dc8a;--rt-ink-strong:#fff3b0;--rt-ink-2:#e8d27c;--rt-ink-3:#d6be6a;--rt-ink-4:#c8ae5c;--rt-ink-disabled:#6e6236;
+  --rt-link:var(--h-yellow);--rt-link-hover:#fff3b0;--rt-blue:var(--h-yellow);--rt-blue-deep:var(--h-orange);--rt-active:var(--h-yellow);
+  --rt-blue-fade:rgba(0,0,0,.42);--rt-blue-fade-hover:rgba(255,220,0,.16);--rt-green:var(--h-orange);--rt-green-hover:#f28a30;--rt-green-ink:#140b00;--rt-green-line:#7a3a08;
+  --rt-state-standby:#c8ae5c;--rt-state-ready:#9fe070;--rt-state-listening:#8fd0ff;--rt-state-thinking:var(--h-yellow);--rt-state-speaking:#ffa64d;--rt-state-waiting:#d6a0ff;--rt-state-error:#ff6a5a;
+  --rt-danger:#ff6a5a;--rt-danger-bg:var(--h-damage);--rt-danger-hover:#cc1010;--rt-danger-ink:#ffffff;--rt-success:#9fe070;--rt-focus:var(--h-yellow);
+  --rt-accent:var(--h-yellow);--rt-accent-soft:rgba(255,220,0,.12);--rt-accent-line:rgba(255,220,0,.5);
+  --rt-on-accent:#fff3b0;--rt-accent-fill:#6a5400;--rt-meter:repeating-linear-gradient(90deg,var(--h-yellow) 0 7px,transparent 7px 10px);--rt-marker:#ffffff;--rt-edge:rgba(255,220,0,.3);--rt-page-glow:#2a1d08;
+  --rt-font:"Trebuchet MS","DejaVu Sans",Arial,sans-serif;--rt-font-display:"Tyler HEV","Consolas","Courier New",monospace;
+  --rt-text-xs:11px;--rt-text-sm:12px;--rt-text-md:13px;--rt-text-lg:15px;--rt-track:.12em;
+  --rt-r-xs:3px;--rt-r-sm:6px;--rt-r-md:8px;--rt-r-lg:10px;--rt-shadow-float:0 0 0 1px rgba(255,220,0,.15),0 18px 50px rgba(0,0,0,.8);
+  --h-scan:repeating-linear-gradient(0deg,rgba(255,220,0,.025) 0 1px,transparent 1px 3px);
+  --h-armor:linear-gradient(180deg,#f08a34,#d8691c 45%,#b4520f);
+  --h-hazard:repeating-linear-gradient(-45deg,#ffcc00 0 9px,#121212 9px 18px);
+}
+.panel[data-rt-theme=hev]{background:var(--h-scan),radial-gradient(120% 60% at 0 0,rgba(232,118,30,.16),transparent 55%),linear-gradient(180deg,#1b170e,#0f0d08)}
+[data-rt-theme=hev] body{background:var(--h-scan),radial-gradient(90% 50% at 0 0,rgba(232,118,30,.14),transparent 55%) fixed,#100d08}
+[data-rt-theme=hev] main{background:transparent}
+/* Readout type: captions dim, numbers bright and glowing */
+[data-rt-theme=hev] :is(h1,h2,.wordmark,.brand-text strong,.sheet-head h2,.card>h2,details.feature>summary,.marquee,button,label,.tally-label,.stat dt,.stat dd,.pulse dt,.pulse dd,.ident-sub,.facts b,.matrix dt,.pad span,.tabs button,.section-nav button,nav:not(.tabs) button){font-family:var(--rt-font-display);text-transform:uppercase}
+[data-rt-theme=hev] :is(h1,h2,.sheet-head h2,.card>h2,.wordmark,.brand-text strong){font-weight:400;color:var(--h-yellow);letter-spacing:.14em;text-shadow:var(--h-glow)}
+[data-rt-theme=hev] h2{font-size:17px}
+[data-rt-theme=hev] h1{font-size:30px}
+[data-rt-theme=hev] .wordmark{font-size:17px}
+[data-rt-theme=hev] :is(.ident-sub,.stat dt,.pulse dt,label:not(:has(>input[type=checkbox])):not(.toggle)){font-weight:400;letter-spacing:.16em;color:var(--rt-ink-3)}
+[data-rt-theme=hev] label:has(>input[type=checkbox]),[data-rt-theme=hev] .toggle{font-family:var(--rt-font);text-transform:none}
+[data-rt-theme=hev] .stat dd,[data-rt-theme=hev] .pulse dd{font-weight:400;font-size:20px;letter-spacing:0;line-height:1.05;color:var(--h-yellow);text-shadow:0 0 8px rgba(255,220,0,.6)}
+[data-rt-theme=hev] .stat small{color:var(--rt-ink-4)}
+/* HUD boxes */
+[data-rt-theme=hev] .bar{background:rgba(0,0,0,.45);box-shadow:inset 0 -1px 0 var(--h-edge)}
+[data-rt-theme=hev] :where(details,.callout,.quick-help,.confirm,.deck-entry,.board-tools,.sheet,.card,.route-card,.panel,.mini-callout>div,.usage-banner,.facts>div,.matrix>div,#setup,.arcade-tickets>div){background:var(--h-box);border:1px solid var(--h-edge);border-radius:var(--rt-r-md)}
+[data-rt-theme=hev] .stats{background:transparent;gap:6px;padding:0}
+[data-rt-theme=hev] .stat{background:var(--h-box);border:1px solid var(--h-edge);border-radius:var(--rt-r-md);padding:8px 10px}
+[data-rt-theme=hev] .stat:first-child{border-left:1px solid var(--h-edge)}
+[data-rt-theme=hev] .tally{background:var(--h-box);border:1px solid var(--h-edge);border-radius:var(--rt-r-md)}
+[data-rt-theme=hev] .tally-light{width:4px;box-shadow:0 0 10px var(--tone)!important}
+[data-rt-theme=hev] .tally-label{letter-spacing:.18em;text-shadow:0 0 6px currentColor}
+[data-rt-theme=hev] details.feature>summary{font-size:13px;letter-spacing:.14em;color:var(--h-yellow)}
+[data-rt-theme=hev] :is(.quick-help,.confirm,#setup){border-left:3px solid var(--h-orange)}
+[data-rt-theme=hev] .deck-entry{border-left:3px solid var(--h-yellow)}
+/* Tabs and nav */
+[data-rt-theme=hev] .tabs{gap:4px;padding:6px;background:rgba(0,0,0,.4);box-shadow:none}
+[data-rt-theme=hev] .tabs button{font-size:12px;letter-spacing:.14em;color:var(--rt-ink-4);border:1px solid transparent;border-radius:var(--rt-r-sm)}
+[data-rt-theme=hev] .tabs button:hover{color:var(--h-yellow);background:rgba(255,220,0,.06)}
+[data-rt-theme=hev] .tabs button[aria-selected=true]{color:var(--h-yellow);background:rgba(255,220,0,.1);border-color:rgba(255,220,0,.45);text-shadow:var(--h-glow)}
+[data-rt-theme=hev] :is(.section-nav button,nav:not(.tabs) button){font-size:13px;letter-spacing:.12em;color:var(--rt-ink-3);background:transparent;border:0}
+[data-rt-theme=hev] :is(.section-nav button,nav:not(.tabs) button):hover{color:var(--h-yellow);background:rgba(255,220,0,.06)}
+[data-rt-theme=hev] :is(.section-nav button[aria-current=page],nav:not(.tabs) button.active){color:var(--h-yellow);background:rgba(255,220,0,.1);box-shadow:inset 3px 0 0 var(--h-yellow);text-shadow:var(--h-glow)}
+[data-rt-theme=hev] .side{background:rgba(0,0,0,.4);box-shadow:inset -1px 0 0 var(--h-edge)}
+/* Buttons */
+[data-rt-theme=hev] button{font-size:13px;letter-spacing:.12em;color:var(--h-yellow);background:var(--h-box);border:1px solid rgba(255,220,0,.35);border-radius:var(--rt-r-sm);box-shadow:none}
+[data-rt-theme=hev] button:hover{color:#fff3b0;background:rgba(255,220,0,.16);text-shadow:var(--h-glow)}
+[data-rt-theme=hev] :is(.primary,#start,#save){color:#140b00;background:var(--h-orange);border-color:#f28a30}
+[data-rt-theme=hev] :is(.primary,#start,#save):hover{color:#140b00;background:#f28a30;box-shadow:0 0 14px rgba(232,118,30,.55);text-shadow:none}
+[data-rt-theme=hev] .danger{color:#fff;background:var(--h-damage);border-color:#ff3a2a}
+[data-rt-theme=hev] :is(.ghost,.icon,.icon-btn){background:transparent;border-color:transparent}
+[data-rt-theme=hev] :is(.pad,.friend-card,.preset,.link-btn){font-family:var(--rt-font);text-transform:none;letter-spacing:0;font-size:var(--rt-text-md)}
+[data-rt-theme=hev] .link-btn{border:0;background:none;color:var(--h-yellow)}
+/* Fields */
+[data-rt-theme=hev] input:where(:not([type=checkbox],[type=radio],[type=range],[type=file])),[data-rt-theme=hev] :is(textarea,select){color:#fff3b0;background-color:rgba(0,0,0,.55);border:1px solid rgba(255,220,0,.3);border-radius:var(--rt-r-sm);box-shadow:none}
+[data-rt-theme=hev] :is(input,textarea,select):focus{border-color:var(--h-yellow);box-shadow:0 0 0 2px rgba(255,220,0,.18)}
+[data-rt-theme=hev] input[type=checkbox],[data-rt-theme=hev] .toggle>input[type=checkbox]{width:15px;height:15px;background:rgba(0,0,0,.5);border:1px solid var(--h-yellow);border-radius:3px;box-shadow:none}
+[data-rt-theme=hev] input[type=checkbox]:checked,[data-rt-theme=hev] .toggle>input[type=checkbox]:checked{background:rgba(255,220,0,.12);border-color:var(--h-yellow)}
+[data-rt-theme=hev] .toggle>input[type=checkbox]::after{display:none}
+[data-rt-theme=hev] input[type=checkbox]:checked::after,[data-rt-theme=hev] .toggle>input[type=checkbox]:checked::after{display:block;content:"";position:absolute;left:4px;top:1px;width:4px;height:8px;background:none;border:solid var(--h-yellow);border-width:0 2px 2px 0;border-radius:0;box-shadow:none;transform:rotate(45deg);filter:drop-shadow(0 0 3px rgba(255,220,0,.8))}
+[data-rt-theme=hev] :is(pre,.output,.v22-log,.response){background:rgba(0,0,0,.55);border:1px solid var(--h-edge);box-shadow:none}
+[data-rt-theme=hev] :is(.meter,.arcade-progress,.lat-track){background:rgba(0,0,0,.5);box-shadow:inset 0 0 0 1px var(--h-edge)}
+[data-rt-theme=hev] .pill{color:var(--h-yellow);background:rgba(255,220,0,.1);box-shadow:inset 0 0 0 1px rgba(255,220,0,.4)}
+[data-rt-theme=hev] .pad{background:var(--h-box);border:1px solid var(--h-edge)}
+[data-rt-theme=hev] .pad b{color:var(--rt-ink-strong)}
+[data-rt-theme=hev] .pad::after{border-left-color:var(--h-yellow)}
+[data-rt-theme=hev] .pad:hover{background:rgba(255,220,0,.1)}
+[data-rt-theme=hev] .pad.playing{background:rgba(232,118,30,.2);box-shadow:inset 3px 0 0 var(--h-orange)}
+[data-rt-theme=hev] :is(.step-n,.setup-n,.friend-card .avatar){font-family:var(--rt-font-display);color:#140b00;background:var(--h-yellow);border-radius:var(--rt-r-sm)}
+[data-rt-theme=hev] code{color:var(--h-yellow);background:rgba(0,0,0,.5)}
+[data-rt-theme=hev] .savebar,[data-rt-theme=hev] .foot{background:rgba(0,0,0,.5);box-shadow:inset 0 1px 0 var(--h-edge)}
+[data-rt-theme=hev] .route li{background:var(--h-box);box-shadow:inset 0 0 0 1px var(--h-edge)}
+[data-rt-theme=hev] .route li:last-child{background:rgba(232,118,30,.18);box-shadow:inset 3px 0 0 var(--h-orange)}
+[data-rt-theme=hev] :is(.scroll,.content,main){scrollbar-color:rgba(255,220,0,.35) transparent}
+
+/* ── Suit armour frame, hazard stripes, weapon-slot tabs (v2.10.1) ──── */
+.panel[data-rt-theme=hev]{border:7px solid #c85c16;box-shadow:inset 0 0 0 2px #7a3306,0 0 0 1px #000,0 18px 50px rgba(0,0,0,.8);border-radius:14px}
+[data-rt-theme=hev] .bar{background:var(--h-armor);box-shadow:inset 0 1px 0 rgba(255,255,255,.35),inset 0 -2px 0 #7a3306;border-bottom:8px solid transparent;border-image:var(--h-hazard) 8}
+[data-rt-theme=hev] .bar .wordmark{color:#1a0c00;text-shadow:0 1px 0 rgba(255,255,255,.35);letter-spacing:.18em}
+[data-rt-theme=hev] .bar .ident-sub{color:#2a1400}
+[data-rt-theme=hev] .bar .mark:not([data-logo]){box-shadow:0 0 0 2px #7a3306}
+[data-rt-theme=hev] .bar .icon-btn{color:#1a0c00}
+[data-rt-theme=hev] .foot{background:var(--h-armor);box-shadow:inset 0 -1px 0 #7a3306;border-top:6px solid transparent;border-image:var(--h-hazard) 6}
+[data-rt-theme=hev] .foot small{color:#1a0c00}
+[data-rt-theme=hev] .foot button{color:#1a0c00;background:rgba(255,255,255,.18);border-color:#7a3306}
+[data-rt-theme=hev] .foot button:hover{color:#fff3b0;background:#1a0c00}
+[data-rt-theme=hev] .foot .danger{color:#fff;background:var(--h-damage);border-color:#3a0000}
+[data-rt-theme=hev] .tabs{counter-reset:slot;gap:6px;padding:8px}
+[data-rt-theme=hev] .tabs button{counter-increment:slot;position:relative;padding:16px 2px 7px;background:rgba(0,0,0,.45);border:1px solid rgba(255,220,0,.22);border-radius:8px}
+[data-rt-theme=hev] .tabs button::before{content:counter(slot);position:absolute;left:6px;top:3px;font-size:10px;color:var(--h-yellow);opacity:.8}
+[data-rt-theme=hev] .tabs button[aria-selected=true]{background:rgba(255,220,0,.14);border-color:var(--h-yellow);box-shadow:0 0 10px rgba(255,220,0,.25)}
+[data-rt-theme=hev] .side{background:var(--h-armor);box-shadow:inset -6px 0 0 #7a3306}
+[data-rt-theme=hev] .side :is(.brand-text strong,.brand-text small,.side-foot,.side-foot span,.side-foot label){color:#1a0c00;text-shadow:none}
+[data-rt-theme=hev] .side :is(.section-nav button,nav:not(.tabs) button){color:#1a0c00}
+[data-rt-theme=hev] .side :is(.section-nav button,nav:not(.tabs) button):hover{color:var(--h-yellow);background:#1a0c00}
+[data-rt-theme=hev] .side :is(.section-nav button[aria-current=page],nav:not(.tabs) button.active){color:var(--h-yellow);background:#140b00;box-shadow:inset 4px 0 0 var(--h-yellow)}
+[data-rt-theme=hev] .side .ic{color:currentColor}
+[data-rt-theme=hev] .savebar{background:var(--h-armor);border-top:6px solid transparent;border-image:var(--h-hazard) 6}
+[data-rt-theme=hev] .savebar p{color:#1a0c00}
+[data-rt-theme=hev] .stat:first-child dd::before{content:"";display:inline-block;width:14px;height:14px;margin-right:6px;vertical-align:0;
+  background:linear-gradient(var(--h-yellow),var(--h-yellow)) center/5px 100% no-repeat,linear-gradient(var(--h-yellow),var(--h-yellow)) center/100% 5px no-repeat;filter:drop-shadow(0 0 3px rgba(255,220,0,.7))}
+[data-rt-theme=hev] .side :is(.section-nav button,nav:not(.tabs) button) .ic{color:currentColor}
+[data-rt-theme=hev] .stat small{font-family:var(--rt-font);font-size:10.5px;letter-spacing:0}
+[data-rt-theme=hev] .stat{padding:8px 8px}
+
+/* ── Status strip: the suit's AUX POWER meter ──
+   Ten glowing cells under the status. They dip and recover while Tyler
+   listens, drain and refill cell by cell while it thinks (like sprinting),
+   flash like the HUD does on a change while it talks, and turn red on errors.
+   A faint scan line rolls down the glass. */
+[data-rt-theme=hev] .tally{padding:9px 12px 30px 12px}
+[data-rt-theme=hev] .tally-light{display:none}
+[data-rt-theme=hev] .tally-body{position:static}
+[data-rt-theme=hev] .tally::before{content:"AUX POWER";position:absolute;left:12px;bottom:8px;font:400 10px/1 var(--rt-font-display);letter-spacing:.16em;color:var(--h-yellow);text-shadow:var(--h-glow)}
+[data-rt-theme=hev] .tally-wave{position:absolute;left:96px;bottom:9px;width:167px;height:7px;display:block;z-index:1}
+[data-rt-theme=hev] .tally-wave i{display:none}
+[data-rt-theme=hev] .tally-wave::before,[data-rt-theme=hev] .tally-wave::after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(90deg,var(--cell) 0 14px,transparent 14px 17px)}
+[data-rt-theme=hev] .tally-wave::before{--cell:rgba(255,220,0,.16)}
+[data-rt-theme=hev] .tally-wave::after{--cell:var(--h-yellow);filter:drop-shadow(0 0 3px rgba(255,220,0,.75));clip-path:inset(-5px 0 -5px -5px)}
+[data-rt-theme=hev] .tally[data-state=listening] .tally-wave::after{animation:hev-dip 2.8s ease-in-out infinite}
+[data-rt-theme=hev] .tally[data-state=thinking] .tally-wave::after{animation:hev-drain 2.4s steps(10,end) infinite}
+[data-rt-theme=hev] .tally[data-state=speaking] .tally-wave::after{animation:hev-flash .7s ease-out infinite}
+[data-rt-theme=hev] .tally[data-state=waiting] .tally-wave::after{clip-path:inset(-5px 50% -5px -5px)}
+[data-rt-theme=hev] .tally[data-state=error] .tally-wave::after{--cell:#ff3b2b;filter:drop-shadow(0 0 3px rgba(255,40,20,.8));clip-path:inset(-5px 80% -5px -5px);animation:hev-blink .9s steps(1) infinite}
+[data-rt-theme=hev] .tally[data-state=error]::before{color:#ff6a5a}
+[data-rt-theme=hev] .tally:is([data-state=standby],[data-state=paused]) .tally-wave::after{clip-path:inset(-5px 100% -5px -5px)}
+[data-rt-theme=hev] .tally::after{content:"";position:absolute;left:0;right:0;top:0;height:40%;background:linear-gradient(180deg,transparent,rgba(255,220,0,.07),transparent);transform:translateY(-100%);pointer-events:none}
+[data-rt-theme=hev] .tally:is([data-state=listening],[data-state=thinking],[data-state=speaking])::after{animation:hev-scan 3.2s linear infinite}
+@keyframes hev-dip{0%,100%{clip-path:inset(-5px 0 -5px -5px)}35%{clip-path:inset(-5px 30% -5px -5px)}60%{clip-path:inset(-5px 10% -5px -5px)}}
+@keyframes hev-drain{0%{clip-path:inset(-5px 0 -5px -5px)}50%{clip-path:inset(-5px 100% -5px -5px)}100%{clip-path:inset(-5px 0 -5px -5px)}}
+@keyframes hev-flash{0%{opacity:1;filter:drop-shadow(0 0 7px rgba(255,240,150,1)) brightness(1.5)}100%{opacity:.85;filter:drop-shadow(0 0 3px rgba(255,220,0,.75))}}
+@keyframes hev-blink{0%{opacity:1}50%{opacity:.25}}
+@keyframes hev-scan{from{transform:translateY(-100%)}to{transform:translateY(260%)}}
+
+/* ── v2.13: the logo sits in a dark rounded HUD box on the armour plate, so the
+   orange suit art doesn't melt into the orange header. ── */
+[data-rt-theme=hev] :is(.mark[data-logo],img.mark,#brand-logo){--logo-pad:2px;background:rgba(0,0,0,.62);border:1px solid #7a3306;border-radius:8px;box-shadow:inset 0 0 8px rgba(255,160,40,.35)}
+[data-rt-theme=hev] .mark[data-logo]{width:42px;height:42px;margin:-5px 0}
+
+/* ── Icons, dialogs, notifications and tooltips (v2.14) ──
+   Industrial suit symbols: amber strokes with the HUD glow (dark on the orange
+   armour). Messages are suit-diagnostic boxes: dark glass, rounded HUD corners,
+   amber readout type, scan lines, and the hazard stripe on warnings and errors. */
+[data-rt-theme=hev] .ic{filter:drop-shadow(0 0 3px rgba(255,220,0,.45))}
+[data-rt-theme=hev] .bar .ic{filter:none}
+[data-rt-theme=hev] :is(.rt-toast,.rt-dialog){background:var(--h-scan),rgba(8,7,4,.96);border:1px solid var(--h-edge);border-radius:10px;box-shadow:0 0 0 1px rgba(0,0,0,.6),0 12px 34px rgba(0,0,0,.6)}
+[data-rt-theme=hev] .rt-toast{border-left:3px solid var(--tone)}
+[data-rt-theme=hev] :is(.rt-toast,.rt-dialog):is([data-kind=warning],[data-kind=error]){border-top:6px solid transparent;border-image:var(--h-hazard) 6;border-image-width:6px 0 0 0}
+[data-rt-theme=hev] :is(.rt-toast-title,.rt-dialog-title){font-family:var(--rt-font-display);font-weight:400;text-transform:uppercase;letter-spacing:.16em;color:var(--h-yellow);text-shadow:var(--h-glow)}
+[data-rt-theme=hev] :is(.rt-toast-text,.rt-dialog-text,.rt-steps){color:#e9dfb8}
+[data-rt-theme=hev] .rt-tip{background:rgba(8,7,4,.92);color:var(--h-yellow);border:1px solid var(--h-edge);border-radius:6px;font-family:var(--rt-font-display);letter-spacing:.06em}

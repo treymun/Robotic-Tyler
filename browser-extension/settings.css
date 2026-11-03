@@ -1,0 +1,234 @@
+/*
+ * Settings page (Chrome options page + Electron settings window), Steam theme.
+ * Laid out like Steam's own Settings dialog: a category rail on the left, toggle
+ * rows on the right. Builds on ui/tokens.css, which is linked first.
+ */
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html{background:var(--rt-bg)}
+body{margin:0;min-height:100vh;background:var(--rt-bg) linear-gradient(180deg,var(--rt-page-glow) 0,var(--rt-bg) 320px) no-repeat;color:var(--rt-ink);font:400 14px/1.5 var(--rt-font);-webkit-font-smoothing:antialiased}
+
+/* Platform-specific copy and sections */
+body[data-desktop=true] .only-chrome,body:not([data-desktop=true]) .only-desktop{display:none!important}
+
+/* ── App shell ───────────────────────────────────────────── */
+.app{display:grid;grid-template-columns:240px minmax(0,1fr);min-height:100vh}
+.side{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:18px;padding:18px 0 14px;background:var(--rt-bar);box-shadow:inset -1px 0 0 var(--rt-edge)}
+.brand{display:flex;align-items:center;gap:10px;padding:0 16px}
+.mark{display:block;width:40px;height:40px;margin:-4px 0;flex-shrink:0;object-fit:contain;padding:var(--logo-pad,0)}
+.mark[data-theme=doom]{image-rendering:pixelated}
+.brand-text{display:flex;flex-direction:column;line-height:1.2}
+.brand-text strong{font:700 14px/1.2 var(--rt-font-display);letter-spacing:.08em;color:var(--rt-ink-strong)}
+.brand-text small{font-size:11px;color:var(--rt-ink-3);margin-top:3px;text-transform:uppercase;letter-spacing:var(--rt-track)}
+.section-nav{display:flex;flex-direction:column;gap:1px}
+.section-nav button{display:flex;align-items:center;gap:12px;width:100%;margin:0;padding:9px 16px;min-height:38px;justify-content:flex-start;text-align:left;border-radius:0;
+  font:400 14px/1.2 var(--rt-font);color:var(--rt-ink-3);background:transparent;border:0;box-shadow:none}
+.section-nav button svg{width:18px;height:18px;flex-shrink:0;color:var(--rt-ink-4)}
+.section-nav button:hover{background:rgba(255,255,255,.05);color:var(--rt-ink-strong)}
+.section-nav button[aria-current=page]{background:var(--rt-select);color:var(--rt-ink-strong);box-shadow:inset 3px 0 0 var(--rt-active)}
+.section-nav button[aria-current=page] svg{color:var(--rt-blue)}
+.side-foot{margin-top:auto;display:flex;flex-direction:column;align-items:stretch;gap:12px;padding:12px 16px 0;font-size:12px;color:var(--rt-ink-3);box-shadow:inset 0 1px 0 var(--rt-line-soft)}
+.side-key{display:flex;align-items:center;gap:8px}
+.theme-chip{justify-content:flex-start;width:100%;min-height:30px;padding:5px 10px;font-size:12px;color:var(--rt-ink-2);background:var(--rt-block)}
+.theme-chip .ic{--ic-size:16px;margin:0}
+.theme-chip b{color:var(--rt-ink-strong)}
+.key-dot{width:8px;height:8px;border-radius:50%;background:var(--rt-state-standby);flex-shrink:0}
+.key-dot[data-on=true]{background:var(--rt-state-ready);box-shadow:0 0 6px var(--rt-state-ready)}
+
+.content{min-width:0;padding:28px 40px 0;max-width:920px;width:100%;display:flex;flex-direction:column}
+.page-head{margin-bottom:18px}
+h1{font:300 var(--rt-text-3xl)/1.15 var(--rt-font-display);letter-spacing:.02em;margin:0 0 4px;color:var(--rt-ink-strong);text-transform:uppercase}
+.page-head p{margin:0;color:var(--rt-ink-3);font-size:14px}
+
+/* Zones: one group of sections at a time (set by settings-navigation.js). */
+.sections{display:flex;flex-direction:column;gap:14px;flex:1}
+[data-ui-zone]{display:none}
+body[data-zone=overview] [data-ui-zone=overview],body[data-zone=ai] [data-ui-zone=ai],body[data-zone=voice] [data-ui-zone=voice],
+body[data-zone=squad] [data-ui-zone=squad],body[data-zone=games] [data-ui-zone=games],body[data-zone=advanced] [data-ui-zone=advanced],body[data-zone=appearance] [data-ui-zone=appearance]{display:block}
+body[data-desktop=true] [data-ui-zone].only-chrome{display:none!important}
+
+/* ── Sheets (setting groups) ─────────────────────────────── */
+.sheet,.card{background:var(--rt-block);border-radius:var(--rt-r-sm);padding:18px 20px 20px}
+.sheet-head{margin:0 0 14px;padding-bottom:12px;background:linear-gradient(90deg,var(--rt-line-soft),transparent) bottom/100% 1px no-repeat}
+.sheet-head h2,.card>h2{font:400 15px/1.3 var(--rt-font-display);margin:0 0 4px;letter-spacing:.06em;text-transform:uppercase;color:var(--rt-ink-strong)}
+.sheet-head p,.card>h2+p{margin:0;color:var(--rt-ink-3);font-size:13px;max-width:68ch}
+.card>h2+p{margin-bottom:14px}
+.section-kicker{display:none}
+h3{font:700 14px/1.35 var(--rt-font);margin:18px 0 6px;color:var(--rt-ink-strong)}
+p{margin:8px 0;color:var(--rt-ink)}
+.hint,small{color:var(--rt-ink-3);font-size:12.5px;line-height:1.5}
+.hint{display:block;margin:8px 0}
+code{font:12px/1.4 var(--rt-font-mono);background:rgba(0,0,0,.3);color:var(--rt-link);border-radius:var(--rt-r-xs);padding:1px 5px}
+a{color:var(--rt-link);text-decoration:none}
+a:hover{color:var(--rt-link-hover)}
+
+/* ── Fields ──────────────────────────────────────────────── */
+label{display:block;margin:14px 0 0;font-size:11px;font-weight:700;color:var(--rt-ink-3);text-transform:uppercase;letter-spacing:var(--rt-track)}
+label>small{font-weight:400;text-transform:none;letter-spacing:0}
+.grid.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 16px}
+.grid.two>label{margin-top:12px}
+.grid.compact{gap:4px 16px}
+.narrow{max-width:280px}
+input:where(:not([type=checkbox],[type=radio],[type=range],[type=file])),textarea,select{
+  display:block;width:100%;margin-top:6px;padding:8px 11px;min-height:34px;
+  font:400 14px/1.4 var(--rt-font);color:#fff;text-transform:none;letter-spacing:0;background:var(--rt-input);
+  border:1px solid #000;border-radius:var(--rt-r-sm);box-shadow:inset 0 1px 3px rgba(0,0,0,.4);transition:border-color var(--rt-fast),box-shadow var(--rt-fast)}
+textarea{resize:vertical;min-height:72px;line-height:1.5}
+select{appearance:none;padding-right:32px;cursor:pointer;
+  background-image:linear-gradient(45deg,transparent 50%,var(--rt-blue) 50%),linear-gradient(135deg,var(--rt-blue) 50%,transparent 50%);
+  background-position:calc(100% - 17px) 52%,calc(100% - 12px) 52%;background-size:5px 5px;background-repeat:no-repeat}
+input::placeholder,textarea::placeholder{color:var(--rt-ink-4)}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--rt-focus);box-shadow:inset 0 1px 3px rgba(0,0,0,.4),0 0 0 1px var(--rt-focus)}
+input[type=range]{display:block;width:100%;margin:10px 0 0;accent-color:var(--rt-active);cursor:pointer}
+input[type=checkbox]{appearance:none;-webkit-appearance:none;position:relative;width:16px;height:16px;margin:0;flex-shrink:0;cursor:pointer;background:var(--rt-input);border:1px solid #000;border-radius:var(--rt-r-xs);box-shadow:inset 0 1px 2px rgba(0,0,0,.5)}
+input[type=checkbox]:checked{background:var(--rt-accent-fill);border-color:var(--rt-blue-deep)}
+input[type=checkbox]:checked::after{content:"";position:absolute;left:4.5px;top:1.5px;width:4px;height:8px;border:solid var(--rt-on-accent);border-width:0 2px 2px 0;transform:rotate(45deg)}
+label:has(>input[type=checkbox]):not(.toggle){display:flex;align-items:flex-start;gap:10px;font-size:14px;font-weight:400;color:var(--rt-ink);text-transform:none;letter-spacing:0}
+label:has(>input[type=checkbox]):not(.toggle)>input{margin-top:2px}
+
+/* Toggle rows, like Steam's Settings dialog: label left, blue switch right. */
+.toggle-grid{display:flex;flex-direction:column;margin:14px 0 4px}
+.toggle{display:flex;flex-direction:row-reverse;align-items:center;justify-content:space-between;gap:18px;margin:12px 0 0;padding:0;cursor:pointer;font-weight:400;text-transform:none;letter-spacing:0}
+.toggle-grid .toggle{margin:0;padding:12px 4px;box-shadow:inset 0 -1px 0 var(--rt-line-soft)}
+.toggle-grid .toggle:last-child{box-shadow:none}
+.toggle-grid .toggle:hover{background:rgba(255,255,255,.03)}
+.toggle>span{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.toggle b{font-weight:400;color:var(--rt-ink-strong);font-size:14px}
+.toggle small{display:block}
+/* [type=checkbox] in these selectors outranks the plain Steam checkbox rules above. */
+.toggle>input[type=checkbox]{appearance:none;-webkit-appearance:none;position:relative;width:38px;height:20px;flex-shrink:0;margin:0;border-radius:10px;background:var(--rt-select);border:0;box-shadow:inset 0 1px 3px rgba(0,0,0,.5);transition:background-color var(--rt-fast);cursor:pointer}
+.toggle>input[type=checkbox]::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border:0;border-radius:50%;background:var(--rt-ink);box-shadow:0 1px 2px rgba(0,0,0,.5);transform:none;transition:transform var(--rt-med) var(--rt-ease)}
+.toggle>input[type=checkbox]:checked{background:var(--rt-active);border:0}
+.toggle>input[type=checkbox]:checked::after{top:2px;left:2px;width:16px;height:16px;border:0;border-radius:50%;transform:translateX(18px);background:var(--rt-on-accent)}
+
+/* ── Buttons: Steam blue hover-fade, green for the main action ── */
+button{font:400 13px/1.2 var(--rt-font);display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:32px;padding:7px 16px;margin:0;
+  color:var(--rt-blue);background:var(--rt-blue-fade);border:0;border-radius:var(--rt-r-sm);cursor:pointer}
+button:hover{color:var(--rt-on-accent);background:var(--rt-blue-fade-hover)}
+button:active{transform:translateY(1px)}
+button:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.primary,#save{color:var(--rt-green-ink);background:var(--rt-green);box-shadow:inset 0 0 0 1px var(--rt-green-line);font-size:14px;padding:8px 22px}
+.primary:hover,#save:hover{color:var(--rt-green-ink);background:var(--rt-green-hover)}
+.secondary{color:var(--rt-ink);background:rgba(255,255,255,.08)}
+.secondary:hover{color:var(--rt-on-accent);background:var(--rt-blue-fade-hover)}
+.danger{color:var(--rt-danger-ink);background:var(--rt-danger-bg)}
+.danger:hover{color:var(--rt-on-accent);background:var(--rt-danger-hover)}
+.actions,.v22-actions{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 0}
+
+/* Presets and sliders */
+.preset-strip{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 6px}
+.preset{padding:6px 14px;min-height:30px}
+.preset.active{color:var(--rt-on-accent);background:var(--rt-accent-fill)}
+.slider-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px 24px;margin:8px 0 14px}
+.slider-grid label{display:grid;grid-template-columns:1fr auto;align-items:center;margin-top:12px}
+.slider-grid label small{font-size:11px;font-weight:700;color:var(--rt-blue);background:var(--rt-blue-fade);border-radius:var(--rt-r-xs);padding:1px 8px;text-transform:uppercase;letter-spacing:var(--rt-track)}
+.slider-grid label input{grid-column:1/-1}
+
+/* Overview */
+.setup-steps{list-style:none;margin:0;padding:0}
+.setup-step{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:14px;padding:13px 0;box-shadow:inset 0 1px 0 var(--rt-line-soft)}
+.setup-step:first-child{box-shadow:none;padding-top:2px}
+.setup-step b{display:block;font-weight:400;font-size:15px;color:var(--rt-ink-strong)}
+.setup-step small{display:block;margin-top:2px}
+.setup-n{width:26px;height:26px;display:grid;place-items:center;border-radius:var(--rt-r-sm);font-size:12px;font-weight:700;color:var(--rt-on-accent);background:var(--rt-accent-fill);font-variant-numeric:tabular-nums}
+.setup-step[data-done=true] .setup-n{color:var(--rt-green-ink);background:var(--rt-green)}
+.pulse{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin:0}
+.pulse>div{padding:0 16px;box-shadow:inset 1px 0 0 var(--rt-line-soft)}
+.pulse>div:first-child{padding-left:0;box-shadow:none}
+.pulse dt{font-size:11px;font-weight:700;color:var(--rt-ink-3);text-transform:uppercase;letter-spacing:var(--rt-track)}
+.pulse dd{margin:4px 0 0;font:300 26px/1.2 var(--rt-font-display);font-variant-numeric:tabular-nums;color:var(--rt-ink-strong)}
+#easyStatus{display:none} /* superseded by the setup steps; settings.js still writes it */
+.link-row{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:18px;padding-top:14px;box-shadow:inset 0 1px 0 var(--rt-line-soft);font-size:13px}
+
+/* Friends */
+.friend-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:4px;margin-top:12px}
+.friend-cards>p{grid-column:1/-1;margin:0}
+.friend-card{display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:10px;justify-content:start;align-items:center;text-align:left;padding:8px 10px;min-height:52px;color:var(--rt-ink);background:rgba(0,0,0,.25)}
+.friend-card:hover{color:var(--rt-ink);background:var(--rt-select)}
+.friend-card .avatar{grid-row:1/3;width:34px;height:34px;border-radius:var(--rt-r-xs);display:grid;place-items:center;font-weight:700;color:var(--rt-on-accent);background:var(--rt-accent-fill);box-shadow:0 0 0 1px var(--rt-state-ready)}
+.friend-card strong{font-weight:400;color:var(--rt-state-ready);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.friend-card small{font:11px var(--rt-font-mono);color:var(--rt-ink-4)}
+
+/* Status, output and callouts */
+pre,.output,.v22-log{font:13px/1.5 var(--rt-font);white-space:pre-wrap;overflow-wrap:anywhere;max-height:260px;overflow:auto;margin:12px 0 0;padding:10px 12px;color:var(--rt-ink);background:var(--rt-bg-deep);border-radius:var(--rt-r-sm);box-shadow:inset 0 1px 3px rgba(0,0,0,.5)}
+#usage{font:12px/1.5 var(--rt-font-mono)}
+.usage-banner{margin:12px 0;padding:10px 12px;border-radius:var(--rt-r-sm);background:rgba(0,0,0,.25);color:var(--rt-ink);font-size:13px}
+.usage-banner:empty{display:none}
+.mini-callout{display:grid;gap:6px;margin:0 0 14px}
+.mini-callout>div{padding:10px 12px;border-radius:var(--rt-r-sm);background:rgba(0,0,0,.25)}
+.mini-callout strong{display:block;font-weight:700;color:var(--rt-ink-strong);margin-bottom:2px}
+.mini-callout span{color:var(--rt-ink-3);font-size:13px}
+.v22-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 16px;align-items:end}
+details{margin:14px 0 0;background:rgba(0,0,0,.2);border-radius:var(--rt-r-sm);padding:0 12px}
+details[open]{padding-bottom:12px}
+summary{cursor:pointer;padding:10px 0;font-size:13px;color:var(--rt-ink)}
+summary:hover,details[open]>summary{color:var(--rt-ink-strong)}
+.raw{background:rgba(0,0,0,.2)}
+
+/* ── Save bar: like the bottom of Steam's dialogs ───────────── */
+.savebar{position:sticky;bottom:0;z-index:5;display:flex;align-items:center;gap:16px;margin:24px -40px 0;padding:12px 40px;
+  background:var(--rt-bar);box-shadow:inset 0 1px 0 var(--rt-edge),0 -8px 24px rgba(0,0,0,.35)}
+.savebar p{flex:1;margin:0;font-size:13px;color:var(--rt-ink-3);display:flex;align-items:center;gap:8px;min-width:0}
+.savebar p::before{content:"";width:8px;height:8px;border-radius:50%;flex-shrink:0;background:var(--rt-ink-4)}
+.savebar p.ui-dirty{color:var(--rt-ink-strong)}
+.savebar p.ui-dirty::before{background:var(--rt-state-thinking)}
+.savebar p.ui-clean::before{background:var(--rt-state-speaking)}
+.savebar p.ui-error{color:var(--rt-danger)}
+.savebar p.ui-error::before{background:var(--rt-danger)}
+.savebar .actions{margin:0;flex-shrink:0}
+.fineprint{margin:0;padding:10px 0 24px;font-size:12px;color:var(--rt-ink-4)}
+
+/* Focus & motion */
+button:focus-visible,a:focus-visible,summary:focus-visible,input[type=checkbox]:focus-visible,input[type=range]:focus-visible{outline:1px solid var(--rt-focus);outline-offset:2px}
+/* ── Appearance: theme gallery (v2.14) ─────────────────── */
+.tg-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,410px);gap:18px;align-items:start}
+.tg-grid{display:grid;grid-template-columns:repeat(auto-fill,188px);justify-content:start;gap:12px}
+.tg-card{display:flex;flex-direction:column;gap:0;padding:0;overflow:hidden;cursor:pointer;background:var(--rt-block);
+  border:1px solid var(--rt-line);border-radius:var(--rt-r-md);outline:0;transition:border-color var(--rt-fast,.12s),transform var(--rt-fast,.12s)}
+.tg-card:hover{border-color:var(--rt-line-strong)}
+.tg-card[aria-checked=true]{border-color:var(--rt-active);box-shadow:0 0 0 2px var(--rt-active)}
+.tg-card:focus-visible{outline:2px solid var(--rt-focus);outline-offset:3px}
+.tg-shot{height:124px;overflow:hidden;position:relative;background:#0b0d10;border-bottom:1px solid var(--rt-line)}
+.tg-host{display:block}
+.tg-shot .tg-host{width:392px;transform:scale(.48);transform-origin:0 0}
+.tg-meta{display:flex;align-items:center;gap:7px;min-height:42px;padding:6px 8px}
+.tg-logo{width:30px;height:30px;flex-shrink:0;object-fit:contain}
+.tg-name{flex:1;min-width:0;font:700 12px/1.25 var(--rt-font);color:var(--rt-ink-strong)}
+.tg-tag,.tg-badge{flex-shrink:0;padding:1px 6px;border-radius:var(--rt-r-xs);font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
+.tg-tag{color:var(--rt-ink-3);background:var(--rt-select)}
+.tg-badge{display:none;color:var(--rt-on-accent);background:var(--rt-accent-fill)}
+.tg-card[data-applied=true] .tg-badge{display:inline-block}
+.tg-stage{position:sticky;top:16px;display:flex;flex-direction:column;gap:12px;padding:14px;background:var(--rt-block);border:1px solid var(--rt-line);border-radius:var(--rt-r-md)}
+.tg-stage-head{display:flex;align-items:center;gap:12px}
+.tg-stage-head h3{margin:0}
+.tg-stage-head p{margin:2px 0 0;font-size:12px;color:var(--rt-ink-3)}
+.tg-logo-lg{width:52px;height:52px;flex-shrink:0;object-fit:contain}
+.tg-stage-preview{max-width:392px;width:100%;align-self:center;border-radius:var(--rt-r-md);overflow:hidden;background:#0b0d10}
+.tg-actions{display:flex;flex-direction:column;align-items:stretch;gap:6px}
+.tg-actions .hint{margin:0}
+@media (max-width:1180px){.tg-layout{grid-template-columns:minmax(0,1fr)}.tg-stage{position:static;order:-1}}
+@media (max-width:520px){.tg-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}.tg-shot{height:100px}.tg-shot .tg-host{transform:scale(.38)}}
+
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+/* ── Narrow windows ──────────────────────────────────────── */
+@media (max-width:860px){
+  .app{grid-template-columns:1fr}
+  .side{position:sticky;top:0;z-index:6;height:auto;flex-direction:row;align-items:center;gap:12px;padding:8px 12px;box-shadow:inset 0 -1px 0 #000;overflow-x:auto}
+  .brand{padding:0}
+  .brand-text small,.side-foot{display:none}
+  .section-nav{flex-direction:row;gap:2px}
+  .section-nav button{width:auto;white-space:nowrap;padding:8px 12px}
+  .section-nav button[aria-current=page]{box-shadow:inset 0 -2px 0 var(--rt-active)}
+  .content{padding:20px 16px 0}
+  .savebar{margin:20px -16px 0;padding:10px 16px;flex-wrap:wrap}
+  .savebar p{flex-basis:100%}
+  .savebar .actions{flex-shrink:1;flex-wrap:wrap;min-width:0}
+  .grid.two,.slider-grid,.v22-grid{grid-template-columns:1fr}
+  .pulse{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:14px}
+  .pulse>div:nth-child(3){padding-left:0;box-shadow:none}
+  .setup-step{grid-template-columns:auto 1fr}
+  .setup-step>button{grid-column:2;justify-self:start}
+}
+/* Steam theme (v2.13): the logo sits in Steam's online-blue avatar frame, as in the chat panel. */
+:root[data-rt-theme=steam] img.mark{--logo-pad:2px;background:#1b2838;border:2px solid #53a4c4;border-radius:2px}

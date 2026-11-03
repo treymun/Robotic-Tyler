@@ -1,0 +1,81 @@
+// v2.8: what people download (tools/package-release.mjs) and the installer branding.
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import zlib from 'node:zlib';
+import crypto from 'node:crypto';
+import {execFileSync} from 'node:child_process';
+const ROOT=path.resolve(import.meta.dirname,'..');
+const read=f=>fs.readFileSync(path.join(ROOT,f),'utf8');
+const version=JSON.parse(read('browser-extension/manifest.json')).version;
+
+function unzip(buf){ // central directory → {name: Buffer}
+ const end=buf.lastIndexOf(Buffer.from([0x50,0x4b,0x05,0x06]));const count=buf.readUInt16LE(end+10);let p=buf.readUInt32LE(end+16);const out={};
+ for(let i=0;i<count;i++){
+  const method=buf.readUInt16LE(p+10),size=buf.readUInt32LE(p+20),nameLen=buf.readUInt16LE(p+28),extra=buf.readUInt16LE(p+30),comment=buf.readUInt16LE(p+32),local=buf.readUInt32LE(p+42);
+  const name=buf.toString('utf8',p+46,p+46+nameLen);const start=local+30+buf.readUInt16LE(local+26)+buf.readUInt16LE(local+28);const data=buf.subarray(start,start+size);
+  out[name]=method===8?zlib.inflateRawSync(data):data;p+=46+nameLen+extra+comment;
+ }
+ return out;
+}
+
+test('the Chrome download is one folder to load plus an install guide, with notes and checksums',()=>{
+ execFileSync(process.execPath,[path.join(ROOT,'tools/package-release.mjs')],{cwd:ROOT,stdio:'pipe'});
+ const dir=path.join(ROOT,'dist/release'),zipName=`ROBOTIC-TYLER-Chrome-Extension-${version}.zip`;
+ const files=unzip(fs.readFileSync(path.join(dir,zipName))),names=Object.keys(files);
+ const tops=[...new Set(names.map(n=>n.split('/')[0]))].sort();
+ assert.deepEqual(tops,['How to install.html','ROBOTIC TYLER Chrome extension']);
+ const folder='ROBOTIC TYLER Chrome extension/';
+ assert.equal(files[folder+'manifest.json'].toString(),read('browser-extension/manifest.json'),'files unpack byte for byte');
+ for(const f of ['icons/icon-128.png','ui/themes/portal.css','content.js'])assert.ok(names.includes(folder+f),f);
+ const guide=files['How to install.html'].toString();
+ assert.match(guide,/Load unpacked/);assert.match(guide,new RegExp('Version '+version.replace(/\./g,'\\.')));assert.match(guide,/<svg xmlns=/);
+ const notes=fs.readFileSync(path.join(dir,'RELEASE-NOTES.md'),'utf8');
+ assert.match(notes,/^## Download/);assert.ok(notes.includes(zipName));assert.match(notes,new RegExp("## What's new in "+version.replace(/\./g,'\\.')));
+ assert.doesNotMatch(notes,/^# /m,'the release title comes from GitHub, not the notes');
+ const sums=fs.readFileSync(path.join(dir,'SHA256SUMS.txt'),'utf8').trim().split('\n').map(l=>l.split('  '));
+ // Names as they appear on the release page; the app installers sit in components/ locally.
+ for(const [hash,file] of sums){const f=fs.existsSync(path.join(dir,file))?path.join(dir,file):path.join(dir,'components',file);
+  assert.equal(crypto.createHash('sha256').update(fs.readFileSync(f)).digest('hex'),hash,file);}
+});
+
+test('both app installers are branded, NSIS-only "component" files with separate identities',()=>{
+ const bmp=f=>{const b=fs.readFileSync(path.join(ROOT,f));assert.equal(b.toString('ascii',0,2),'BM',f);return [b.readInt32LE(18),Math.abs(b.readInt32LE(22)),b.readUInt16LE(28)];};
+ const seen={};
+ for(const [file,slug] of [['electron-builder.control.json','Control-Center'],['electron-builder.voice.json','Native-Steam-Companion']]){
+  const cfg=JSON.parse(read(file)),n=cfg.nsis;
+  assert.equal(n.artifactName,`ROBOTIC-TYLER-component-${slug}-\${version}.\${ext}`);
+  assert.deepEqual(cfg.win.target,[{target:'nsis',arch:['x64']}],'no portable build: one setup, apps that update themselves');
+  assert.equal(cfg.portable,undefined);
+  assert.equal(n.oneClick,false);assert.equal(n.perMachine,false);assert.equal(n.menuCategory,'ROBOTIC TYLER');assert.equal(n.runAfterFinish,true);assert.equal(n.deleteAppDataOnUninstall,false);
+  for(const k of ['installerIcon','uninstallerIcon','installerHeaderIcon'])assert.equal(n[k],'assets/robotic-tyler.ico');
+  assert.deepEqual(bmp(n.installerSidebar),[164,314,24]);assert.deepEqual(bmp(n.installerHeader),[150,57,24]);
+  assert.equal(cfg.directories.buildResources,'build');assert.ok(cfg.files.includes('assets/**/*'));
+  // Nothing two apps could share by accident: app id, folder/shortcut name, uninstall entry,
+  // update channel, and the updater cache folder (named after package "name").
+  const name=cfg.extraMetadata.name||JSON.parse(read('package.json')).name;
+  for(const [k,v] of Object.entries({appId:cfg.appId,product:cfg.productName,shortcut:n.shortcutName,uninstall:n.uninstallDisplayName,channel:cfg.publish[0].channel,name})){
+   assert.ok(!(seen[k]||[]).includes(v),k+' '+v+' is shared by both apps');(seen[k]=seen[k]||[]).push(v);}
+ }
+ const pkg=JSON.parse(read('package.json'));assert.equal(pkg.build.nsis.artifactName,JSON.parse(read('electron-builder.control.json')).nsis.artifactName);
+ assert.equal(pkg.scripts['package:release'],'node tools/package-release.mjs');
+ assert.equal(pkg.scripts['build:setup'],'node tools/setup/build-setup.mjs');
+ assert.match(pkg.scripts['build:win'],/build:both.*build:setup/);
+ for(const k of ['build:control','build:voice','release:control','release:voice'])assert.doesNotMatch(pkg.scripts[k],/portable/,k);
+});
+
+test('the release notes lead with the one Setup download and the CI publishes it',()=>{
+ const notes=fs.readFileSync(path.join(ROOT,'dist/release/RELEASE-NOTES.md'),'utf8');
+ const head=notes.split("## What's new")[0];
+ const setup=`ROBOTIC-TYLER-Setup-${version}.exe`;
+ if(fs.existsSync(path.join(ROOT,'dist/release',setup))){
+  assert.match(head,new RegExp('### ⬇️ \\['+setup.replace(/\./g,'\\.')+'\\]\\(https://github\\.com/[^/]+/[^/]+/releases/download/v'+version.replace(/\./g,'\\.')+'/'));
+  assert.match(head,/only file you need on Windows/);assert.match(head,/Chrome extension/);
+ }
+ assert.ok(head.includes(`ROBOTIC-TYLER-Chrome-Extension-${version}.zip`),'the zip is offered for other systems');
+ assert.doesNotMatch(head,/Portable/);
+ const ci=read('.github/workflows/ci.yml');
+ assert.match(ci,/npm run build:setup/);assert.match(ci,/gh release upload "\$GITHUB_REF_NAME" dist\/release\/ROBOTIC-TYLER-Setup-\*\.exe/);
+ assert.ok(ci.indexOf('npm run release')<ci.indexOf('npm run build:setup'),'the setup is built after the app installers it records');
+});

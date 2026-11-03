@@ -1,0 +1,9 @@
+ROBOTIC TYLER PATCH v2.5.0
+
+- Text mode no longer stops after 60 replies; a chat flood slows Tyler down instead.
+  Voice still stops after 60 spoken replies per start.
+- Start speaking sooner: the first sentence plays while the rest is being written
+  (Settings > Voice; on by default).
+- Checks tab: voice reply timing chart. Fixed: transcription time was never logged.
+- GitHub Actions CI with real-Chromium end-to-end tests; Windows builds on main.
+- Desktop auto-updates from GitHub Releases, plus optional code signing. See RELEASING.md.

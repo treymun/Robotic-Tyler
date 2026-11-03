@@ -1,0 +1,8 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {cleanTitle,safeSteamId,capHistory,levelFor,chooseVote,cleanProfile,diagnosticSummary,shouldRetry} from '../browser-extension/suite-core.mjs';
+test('verified ID validation and title sanitization',()=>{assert.equal(safeSteamId('76561198000000000'),true);assert.equal(safeSteamId('76561198000000000x'),false);assert.equal(cleanTitle(' Example\u0000 Game '),'Example  Game');});
+test('votes count only once per account and move their vote',()=>{const id='76561198000000000';let v=chooseVote({},'Example Game',id);v=chooseVote(v,'Example Game',id);assert.equal(v['example game'].ids.length,1);v=chooseVote(v,'Another Game',id);assert.equal(v['example game'],undefined);assert.equal(v['another game'].ids.length,1);});
+test('profile sanitizes notes and supports opt-out',()=>{const p=cleanProfile({note:'X'.repeat(1000),optOut:true});assert.equal(p.note.length,240);assert.equal(p.optOut,true);});
+test('level grows and diagnostics never contain key values',()=>{assert.equal(levelFor(0).level,1);assert.ok(levelFor(300).level>1);const d=diagnosticSummary({openrouterKey:'sk-secret'});assert.equal(d.model,true);assert.equal(JSON.stringify(d).includes('secret'),false);});
+test('cloud retry checks respect limits',()=>{assert.equal(shouldRetry({status:'queued',at:1000,lastChecked:1000},29000),true);assert.equal(shouldRetry({status:'posted',at:1000,lastChecked:1000},29000),false);assert.equal(shouldRetry({status:'queued',at:1000,lastChecked:1000},1000+86400001),false);assert.equal(capHistory(Array.from({length:100},(_,i)=>({i})),8).length,8);});

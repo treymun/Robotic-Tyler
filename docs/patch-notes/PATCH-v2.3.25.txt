@@ -1,0 +1,40 @@
+ROBOTIC TYLER v2.3.25 — Chrome Steam administration
+
+ADDED (experimental private Steam UI integration)
+Local Steam admin panel: ban until unbanned, refresh ban list, unban, choose
+and delete exactly one message, and a bounded local moderation log.
+Requires the bot's existing Steam permissions and per-group opt-in.
+No chat commands can invoke these local admin controls.
+
+Text mute: select a member in the admin panel and mute their text from now
+on. Tyler auto-deletes new loaded messages from that exact Steam account in
+the connected text channel. Earlier messages and other members' messages
+are left alone. No history sweep. Unmute stops queued future deletions.
+Mutes are session-only and clear on disable, emergency stop, group/channel
+change or reload. Requires Tyler's connected Chrome tab to keep running.
+Messages may be briefly visible before deletion; this is not a Steam-wide
+server mute. Steam timestamps have one-second precision, so the first
+partial second is conservatively left untouched to protect older messages.
+The deletion queue is bounded; messages older than 20 seconds are skipped
+rather than swept later. Missing permissions/unknown senders fail closed.
+
+CHANGED
+Removed the five-minute interval between kick ballots. Only one vote or
+kick remains active at a time, including an in-flight Steam request.
+Vote kick still needs three distinct eligible voters and lasts one hour.
+Other native admin mutations and kicks cannot run simultaneously.
+
+PRESERVED
+Solo music skip exception: the exact sole other active Steam voice member
+can skip alone; uncertain/group membership still needs two distinct votes.
+Music stop/reset still need two votes. Existing Chrome settings, voice,
+music, arcade/trivia, AI and game features preserved. Desktop apps unchanged.
+No Chrome permissions added. No live messages deleted or users moderated
+during development. Private Steam integration remains experimental.
+
+UPDATE
+Close old Steam chat and Tyler YouTube player tabs. Copy ALL files from
+browser-extension over the SAME existing unpacked extension folder. Reload
+the existing extension, reopen Steam chat, connect Tyler and re-share music.
+Do not uninstall the extension or change its folder; that preserves settings.
+See MODERATION-GUIDE.md for setup and permission requirements.

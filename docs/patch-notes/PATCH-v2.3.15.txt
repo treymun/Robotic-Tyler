@@ -1,0 +1,29 @@
+ROBOTIC TYLER v2.3.15 - Solo/group chat trivia
+
+Close Steam chat tabs. Copy ALL browser-extension contents over the SAME
+existing unpacked extension folder, including neural. Reload the existing
+extension, reopen Steam chat and Connect & start. Do not uninstall or change
+the folder path; saved keys, settings and statistics are preserved.
+
+Trivia now has 96 questions across eight categories, shuffled choices,
+ten-question solo/group matches, named answer results, per-player scores,
+streak bonuses, category badges, hints, timeouts and Steam chat leaderboards.
+Presentation uses emoji banners, separate option lines and compact reveals.
+Everything needed to play is in chat; the Sounds panel also has launchers.
+See TRIVIA-GUIDE.md for commands, scoring and author-recognition limitations.
+
+Automatic player recognition relies on actual message author metadata or
+author headers. When unavailable, use Name: answer. No Steam ID setup is
+required in everyone mode. These labels are scorekeeping only. Existing
+soundboard permissions and verified long-term leaderboard rules remain.
+
+All earlier features and fixes remain included, including neural speech
+detection and game-download tools. Electron/native companion code remains
+unchanged. This new trivia mode is Chrome only and text answers only.
+
+78 automated checks and extension JavaScript syntax checks pass. Tests cover
+question bank structure, category counts, shuffled answers, author metadata,
+unknown-author fallback, solo locking, group attempts, per-player credit,
+state immutability, scoring, hints, timeout, non-repeat matches and transition
+back to other arcade games. Live Steam layout/author recognition and actual
+multi-user play are not verified here. No real Steam messages were sent.

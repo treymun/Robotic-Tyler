@@ -1,0 +1,82 @@
+<!doctype html>
+<!--
+  Visual preview of the in-chat panel outside Steam. Loads the real isolated-world
+  scripts from browser-extension/ against a mocked chrome.runtime and a fake
+  Steam chat page. Serve the project root over HTTP (node tools/preview/shoot.mjs
+  does this) and open /tools/preview/panel.html?platform=chrome|desktop.
+  Preview only: shadow roots are forced open so screenshots can drive the UI.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ROBOTIC TYLER panel preview</title>
+<style>
+  html,body{margin:0;height:100%;background:#1b1d22;color:#c7cbd1;font:13px "Segoe UI",system-ui,sans-serif}
+  .steam{display:grid;grid-template-columns:240px 1fr;height:100%}
+  .friends{background:#202329;border-right:1px solid #2b2f36;padding:14px}
+  .friends h4{margin:0 0 12px;font-size:12px;color:#8b929c;font-weight:600}
+  .friend{display:flex;gap:10px;align-items:center;padding:6px 4px;color:#d3d7dd}
+  .friend i{width:28px;height:28px;border-radius:4px;background:#3a4250;display:block}
+  .friend small{display:block;color:#6fb36f;font-size:11px}
+  .room{display:flex;flex-direction:column;min-width:0}
+  .room header{padding:14px 18px;border-bottom:1px solid #2b2f36;font-weight:600;color:#e3e6ea}
+  .ChatHistory{flex:1;overflow:auto;padding:18px}
+  .chatMessageGroup{display:flex;gap:10px;margin-bottom:14px;max-width:640px}
+  .avatar{width:32px;height:32px;border-radius:4px;background:#4a5568;flex-shrink:0}
+  .speakerName{font-weight:600;color:#9fc6ff;font-size:12px}
+  .msgText{color:#d8dbe0;margin-top:2px}
+  .composer{padding:14px 18px;border-top:1px solid #2b2f36}
+  .composer textarea{width:100%;max-width:640px;height:40px;background:#2a2e35;border:1px solid #363b44;border-radius:4px;color:#ddd;padding:10px}
+</style>
+<script>
+  // Preview-only: open shadow roots so the screenshot script can click inside.
+  const nativeAttach=Element.prototype.attachShadow;
+  Element.prototype.attachShadow=function(options){return nativeAttach.call(this,{...options,mode:'open'});};
+  const params=new URLSearchParams(location.search);
+  if(params.get('platform')==='desktop')window.__TYLER_DESKTOP_TEXT_ONLY=true;
+  // Sample voice-turn timings for the Checks tab chart (older turns first).
+  const latency=[[620,1450,1310,false],[580,1380,1250,false],[700,1620,1400,false],[610,1290,640,true],[560,1210,590,true],[650,1500,700,true],[590,1340,610,true],[600,1260,560,true]].map(([stt,think,speech,early],i)=>{const total=stt+think+speech+180;return {at:Date.now()-(8-i)*95000,sttMs:stt,thinkMs:think,speechMs:speech,totalMs:total,firstAudioMs:early?stt+Math.round(think*.42)+520:total,early};});
+  const usage={requests:42,promptTokens:18234,completionTokens:5120,reportedCostUSD:0.0314,speechResponses:9};
+  const names=['Beep','Airhorn','Drumroll','Victory','Sad trombone','Alert','Coin','Jump','Laser','Countdown'];
+  const handlers={
+    'lease:claim':()=>({owner:true}),'lease:check':()=>({owner:true}),
+    connection:()=>({keyConfigured:true,provider:'OpenRouter',model:'Llama 3.3 70B',speechVoice:'rex',noiseLevel:'balanced',talkativeness:'active',textSpeed:'balanced',quickSetup:{mode:'auto',botName:'ROBOTIC TYLER'}}),
+    'storage:content':m=>m.action==='get'?{values:{usage,activityEnabled:false,tylerArcadeStats:{},v22Latency:latency,uiTheme:params.get('theme')||'steam'}}:{},
+    'soundboard:list':()=>({preferences:{volume:.6,access:'everyone',allowedIDs:''},slots:names.map((name,i)=>({slot:i+1,name,trigger:i===1?'!airhorn':'',custom:false})),boardBank:'Arcade',favorites:[2]}),
+    'suite:status':()=>({options:{hudEnabled:true},queue:[],party:null,votes:[],leaderboard:[]}),
+  };
+  const listeners=[];
+  window.chrome={runtime:{
+    getURL:p=>'/browser-extension/'+p,
+    sendMessage:async m=>{const fn=handlers[m?.type];try{return {ok:true,...(fn?fn(m):{})};}catch(e){return {ok:false,error:e.message};}},
+    onMessage:{addListener:fn=>listeners.push(fn)}
+  }};
+</script>
+</head>
+<body>
+<div class="steam">
+  <aside class="friends"><h4>Friends</h4>
+    <div class="friend"><i></i><div>Alex<small>In-game · Deadlock</small></div></div>
+    <div class="friend"><i></i><div>Sam<small>Online</small></div></div>
+    <div class="friend"><i></i><div>ROBOTIC TYLER<small>Online</small></div></div>
+  </aside>
+  <main class="room" data-chatid="12345">
+    <header>Friday squad · #general</header>
+    <div class="ChatHistory" role="log">
+      <div class="chatMessageGroup"><div class="avatar"></div><div><div class="speakerName">Alex</div><div class="msgText">tyler who is throwing this match</div></div></div>
+      <div class="chatMessageGroup"><div class="avatar"></div><div><div class="speakerName">ROBOTIC TYLER</div><div class="msgText">[ROBOTIC TYLER] Statistically? The guy asking.</div></div></div>
+      <div class="chatMessageGroup"><div class="avatar"></div><div><div class="speakerName">Sam</div><div class="msgText">!play daft punk one more time</div></div></div>
+    </div>
+    <div class="composer"><textarea placeholder="Message #general"></textarea></div>
+  </main>
+</div>
+<script>
+  // Same order as Chrome: read the manifest's isolated-world list (minus the VAD iframe bridge).
+  const desktopSkip=new Set(['neural-bridge.js','screen-awareness.js','music-core.js','music.js']);
+  (async()=>{const manifest=await (await fetch('/browser-extension/manifest.json')).json();
+   const iso=manifest.content_scripts.find(c=>c.world!=='MAIN'&&c.matches.some(m=>m.includes('steamcommunity.com/chat'))).js.filter(f=>f!=='neural-bridge.js');
+   const list=params.get('platform')==='desktop'?iso.filter(f=>!desktopSkip.has(f)):iso;
+   for(const f of list){await new Promise((resolve)=>{const s=document.createElement('script');s.src='/browser-extension/'+f;s.onload=resolve;s.onerror=()=>{console.error('load failed',f);resolve();};document.body.append(s);});}window.__tylerReady=true;})();
+</script>
+</body>
+</html>

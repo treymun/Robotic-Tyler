@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self'; script-src 'self'; img-src 'self' data:">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="native.css">
+<link rel="stylesheet" href="icons.css">
+<link rel="stylesheet" href="kit.css">
+<link rel="stylesheet" href="fonts/fonts.css">
+<link rel="stylesheet" href="themes/classic.css">
+<link rel="stylesheet" href="themes/tf2.css">
+<link rel="stylesheet" href="themes/cs2.css">
+<link rel="stylesheet" href="themes/portal.css">
+<link rel="stylesheet" href="themes/cs16.css">
+<link rel="stylesheet" href="themes/hev.css">
+<link rel="stylesheet" href="themes/l4d.css">
+<link rel="stylesheet" href="themes/winxp.css">
+<link rel="stylesheet" href="themes/doom.css">
+<title>ROBOTIC TYLER · Steam Companion</title>
+</head>
+<body>
+<div class="app">
+  <aside class="side">
+    <div class="brand">
+      <img id="brand-logo" src="logos/steam.png" alt="">
+      <span class="brand-text"><strong>ROBOTIC TYLER</strong><small>Native Steam companion</small></span>
+    </div>
+    <nav aria-label="Companion sections">
+      <button data-page="overview" class="active" type="button"><span data-icon="overview"></span>Overview</button>
+      <button data-page="voice" type="button"><span data-icon="voice"></span>Voice studio</button>
+      <button data-page="features" type="button"><span data-icon="apps"></span>Which app does what</button>
+      <button data-page="guide" type="button"><span data-icon="guide"></span>Setup guide</button>
+    </nav>
+    <div class="side-foot"><span class="dot" aria-hidden="true"></span><span id="bridge-status">Checking audio bridge…</span></div>
+    <button id="check-updates" class="link-btn" type="button">Check for updates</button>
+  </aside>
+
+  <main>
+    <header class="page-head">
+      <h1 id="title">Overview</h1>
+      <button id="settings" class="ghost" type="button"><span data-icon="ai"></span>Personality &amp; API settings</button>
+    </header>
+
+    <section data-view="overview">
+      <div class="route-card">
+        <div class="route-head">
+          <h2>How Tyler reaches your Steam voice room</h2>
+          <p>No embedded browser and no Steam injection. Tyler plays speech into a Windows virtual audio cable, and Steam uses the other end of that cable as its microphone.</p>
+        </div>
+        <ol class="route" aria-label="Audio route">
+          <li><b>Tyler</b><span>AI reply as speech</span></li>
+          <li><b>CABLE Input</b><span>Tyler's output device</span></li>
+          <li><b>CABLE Output</b><span>Virtual microphone</span></li>
+          <li><b>Steam voice</b><span>Your group hears Tyler</span></li>
+        </ol>
+        <div class="actions">
+          <button id="go-voice" class="primary" type="button"><span data-icon="sounds"></span>Set up audio</button>
+          <button id="open-steam" type="button">Open Steam friends</button>
+        </div>
+      </div>
+      <div class="facts">
+        <div><b>Voice output</b><p>Pick VB-CABLE Input as Tyler's playback device in Voice studio.</p></div>
+        <div><b>Personality and keys</b><p>The same settings window as the Control Center: keys, personality and models.</p></div>
+        <div><b>Steam text chat</b><p>Not read here. Use the Control Center or the Chrome extension for chat features.</p></div>
+      </div>
+    </section>
+
+    <section data-view="voice" hidden>
+      <div class="panel">
+        <h2>Audio devices</h2>
+        <p>Choose <b>CABLE Input</b> for Tyler. In Steam, open Settings → Voice and choose <b>CABLE Output</b> as the microphone. They're the two ends of the same virtual cable.</p>
+        <div class="form">
+          <label for="output">Tyler's output device</label>
+          <select id="output"><option>Detecting devices…</option></select>
+          <label for="listen-output">Device Steam plays friends through <span class="opt">optional, for listening</span></label>
+          <select id="listen-output"><option>Detecting devices…</option></select>
+        </div>
+        <div class="actions">
+          <button id="refresh" type="button">Refresh devices</button>
+          <button id="test" type="button"><span data-icon="sounds"></span>Play test tone</button>
+        </div>
+        <p class="note">To send your own voice too, route your microphone into the same cable with a mixer such as Voicemeeter. This app never controls or intercepts Steam's input.</p>
+      </div>
+      <div class="panel">
+        <h2>Talk through Steam</h2>
+        <label for="prompt">What should Tyler say?</label>
+        <textarea id="prompt" rows="3" placeholder="Give us a quick pep talk…"></textarea>
+        <div class="actions">
+          <button id="speak" class="primary" type="button"><span data-icon="play"></span>Ask AI and speak into Steam</button>
+          <button id="listen" type="button"><span data-icon="voice"></span>Listen 5 seconds and reply</button>
+        </div>
+        <p class="note">Listening records everything playing on the selected output device, not only Steam. Choose the speakers or headphones Steam uses, not the virtual cable, and get everyone's consent first.</p>
+        <div class="response" id="response" role="status">Ready when you are.</div>
+      </div>
+    </section>
+
+    <section data-view="features" hidden>
+      <div class="panel">
+        <h2>Which app does what</h2>
+        <p>All three programs share the same settings design. Pick the one that matches what you want Tyler to do.</p>
+        <dl class="matrix">
+          <div><dt>Chrome extension</dt><dd>The most complete option: Steam web voice and chat, the soundboard, music, party host, trivia and moderation.</dd></div>
+          <div><dt>Control Center</dt><dd>Text-only Steam chat in its own window, with moderation, trivia, party tools and settings.</dd></div>
+          <div><dt>Native Steam companion</dt><dd>This app. Routes AI speech into the real Steam client through a virtual cable, with optional short listening. It doesn't read Steam text chat.</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section data-view="guide" hidden>
+      <div class="panel">
+        <h2>First-time setup</h2>
+        <ol class="steps">
+          <li>Install VB-CABLE from VB-Audio and restart Windows if it asks.</li>
+          <li>Open <b>Personality &amp; API settings</b> and add your OpenRouter key.</li>
+          <li>In Voice studio, choose <b>CABLE Input</b> as Tyler's output device.</li>
+          <li>In Steam, open Settings → Voice and choose <b>CABLE Output</b> as your microphone.</li>
+          <li>Join a group voice room and press <b>Play test tone</b>. Ask a friend whether they heard it.</li>
+          <li>Type a message or use the short listening option to talk through Steam.</li>
+        </ol>
+        <p class="note">A selected device doesn't prove Steam is connected, so always test with a friend. Recording PC audio requires everyone's consent.</p>
+      </div>
+    </section>
+
+    <footer id="status">Native Steam bridge · experimental build</footer>
+  </main>
+</div>
+<script src="ui-icons.js"></script>
+<script src="ui-kit.js"></script>
+<script src="native.js"></script>
+</body>
+</html>

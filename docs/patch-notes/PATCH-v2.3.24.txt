@@ -1,0 +1,25 @@
+ROBOTIC TYLER v2.3.24 - No vote-kick cooldown; one at a time
+
+Removed the five-minute wait between kick ballots. A fresh vote can start
+immediately once the previous vote finishes, is cancelled, is rejected or
+expires. New votes cannot replace an open/passed/executing ballot. Steam
+kick requests also have an in-flight lock, preventing overlapping execution.
+
+Three distinct yes voters, one-hour kick, owner/bot protection and the
+60-second ballot expiry remain. Solo music skipping and all previous
+recognition/music spam protections are included. This is a Chrome update;
+Electron and native companion files are unchanged.
+
+INSTALL
+Close old Steam and Tyler YouTube tabs. Replace ALL browser-extension
+contents in the SAME existing unpacked extension folder, reload the existing
+extension, then reopen/reconnect. Keep sender and steam-chat adapters and
+neural. Do not uninstall or change the loaded folder path; settings remain.
+Confirm v2.3.24 in Tyler's panels. Existing per-group moderation opt-in and
+Steam kick-role permissions still apply.
+
+Tests cover immediate restart after terminal states, blocking a second
+active vote, delayed Steam execution not overlapping another kick, and two
+back-to-back completed ballots through the actual controller/adapter using
+simulated Steam interfaces. No real members were kicked during testing.
+Steam UI moderation integration remains experimental pending live use.

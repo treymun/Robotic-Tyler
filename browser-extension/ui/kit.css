@@ -1,0 +1,70 @@
+/*
+ * Dialogs, notifications and tooltips (v2.14), shared by the chat panel, the
+ * settings page and the Voice Studio (ui-kit.js builds the markup). They are
+ * placed inside the themed window, so every theme's tokens and controls apply;
+ * each theme file adds its own skin at the end ("Dialogs, notifications and
+ * tooltips"). This file is the structure plus the Steam look.
+ *
+ *   .rt-layer   the overlay inside a window (absolute in the panel, fixed on pages)
+ *   .rt-toast   notification: icon, title, text, optional action, dismiss
+ *   .rt-scrim + .rt-dialog   modal confirmation / error dialog
+ *   .rt-tip     tooltip for [data-tip] controls
+ */
+.rt-layer{position:absolute;inset:0;pointer-events:none;z-index:40}
+.rt-layer.rt-fixed{position:fixed;z-index:2147483000}
+.rt-toasts{position:absolute;left:10px;right:10px;bottom:48px;display:flex;flex-direction:column;align-items:stretch;gap:8px}
+.rt-fixed .rt-toasts{left:auto;right:20px;bottom:20px;width:min(380px,calc(100vw - 40px))}
+
+.rt-toast{
+  --tone:var(--rt-state-listening);
+  pointer-events:auto;position:relative;display:grid;grid-template-columns:auto 1fr auto;gap:4px 10px;align-items:start;
+  padding:10px 8px 10px 12px;background:var(--rt-surface);color:var(--rt-ink);
+  border:1px solid var(--rt-line);border-left:3px solid var(--tone);border-radius:var(--rt-r-md);
+  box-shadow:0 10px 28px rgba(0,0,0,.45);font:400 var(--rt-text-sm)/1.45 var(--rt-font);
+  animation:rt-toast-in .2s var(--rt-ease,ease-out) both;
+}
+.rt-toast[data-kind=success]{--tone:var(--rt-state-ready)}
+.rt-toast[data-kind=warning]{--tone:var(--rt-state-waiting)}
+.rt-toast[data-kind=error]{--tone:var(--rt-state-error)}
+.rt-toast>.ic{--ic-size:18px;grid-row:1/span 2;margin-top:1px}
+.rt-toast-title{grid-column:2;margin:0;font:700 var(--rt-text-sm)/1.35 var(--rt-font-display);color:var(--rt-ink-strong)}
+.rt-toast-text{grid-column:2;margin:0;color:var(--rt-ink);overflow-wrap:anywhere}
+.rt-toast-actions{grid-column:2;display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.rt-toast-actions button{margin:0}
+.rt-x{grid-column:3;grid-row:1;width:24px;height:24px;min-height:0;padding:0;margin:-3px 0 0;display:grid;place-items:center;
+  background:transparent;border:0;box-shadow:none;color:var(--rt-ink-3);border-radius:var(--rt-r-sm);cursor:pointer}
+.rt-x .ic{--ic-size:12px;margin:0}
+.rt-x:hover{color:var(--rt-ink-strong);background:var(--rt-select)}
+.rt-toast.rt-leaving{animation:rt-toast-out .16s ease-in both}
+@keyframes rt-toast-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes rt-toast-out{to{opacity:0;transform:translateY(6px)}}
+
+.rt-scrim{position:absolute;inset:0;pointer-events:auto;display:grid;place-items:center;padding:16px;background:rgba(0,0,0,.55);animation:rt-fade .15s ease-out both}
+.rt-fixed .rt-scrim{position:fixed}
+.rt-dialog{
+  --tone:var(--rt-state-listening);
+  width:min(420px,100%);max-height:calc(100% - 8px);overflow:auto;display:flex;flex-direction:column;gap:10px;
+  padding:16px 16px 14px;background:var(--rt-surface);color:var(--rt-ink);
+  border:1px solid var(--rt-line);border-top:3px solid var(--tone);border-radius:var(--rt-r-lg);
+  box-shadow:0 24px 60px rgba(0,0,0,.6);font:400 var(--rt-text-md)/1.5 var(--rt-font);animation:rt-pop .18s var(--rt-ease,ease-out) both;
+}
+.rt-dialog[data-kind=warning]{--tone:var(--rt-state-waiting)}
+.rt-dialog[data-kind=error]{--tone:var(--rt-state-error)}
+.rt-dialog[data-kind=success]{--tone:var(--rt-state-ready)}
+.rt-dialog-head{display:flex;align-items:center;gap:10px}
+.rt-dialog-head .ic{--ic-size:22px}
+.rt-dialog-title{margin:0;font:700 var(--rt-text-lg)/1.3 var(--rt-font-display);color:var(--rt-ink-strong)}
+.rt-dialog-text{margin:0;color:var(--rt-ink)}
+.rt-steps{margin:0;padding-left:22px;color:var(--rt-ink)}
+.rt-steps li{margin:2px 0}
+.rt-dialog-actions{display:flex;justify-content:flex-end;flex-wrap:wrap;gap:8px;margin-top:4px}
+.rt-dialog-actions button{margin:0}
+@keyframes rt-pop{from{opacity:0;transform:translateY(6px) scale(.98)}to{opacity:1;transform:none}}
+@keyframes rt-fade{from{opacity:0}to{opacity:1}}
+
+.rt-tip{position:absolute;max-width:240px;padding:5px 8px;pointer-events:none;
+  background:var(--rt-bg-deep);color:var(--rt-ink-strong);border:1px solid var(--rt-line);border-radius:var(--rt-r-sm);
+  box-shadow:0 6px 18px rgba(0,0,0,.45);font:400 var(--rt-text-xs)/1.4 var(--rt-font);animation:rt-fade .12s ease-out both}
+.rt-fixed .rt-tip{position:fixed}
+
+@media (prefers-reduced-motion:reduce){.rt-toast,.rt-toast.rt-leaving,.rt-scrim,.rt-dialog,.rt-tip{animation:none!important}}

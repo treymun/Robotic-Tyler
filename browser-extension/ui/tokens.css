@@ -1,0 +1,119 @@
+/*
+ * ROBOTIC TYLER design tokens: Steam theme (v2.4.1).
+ *
+ * Shared verbatim by every surface:
+ *   - the in-chat panel (compiled into ui-template.js, closed shadow root)
+ *   - the settings page (Chrome options page + Electron settings window)
+ *   - the Native Voice Studio dashboard (copied to voice-app/ by tools/build.mjs)
+ *
+ * Values follow Steam's own store / community / client styling: navy surfaces,
+ * #c7d5e0 body text, #66c0f4 links, #1a9fff active blue, green install-style
+ * call-to-action buttons, Motiva Sans and 2px control radii. Steam has no light
+ * theme, so neither do we. Tyler keeps its own name and robot mark; no Valve
+ * logos or artwork are used.
+ *
+ * Tokens are declared on :root AND :host so the same file works in a document
+ * and inside a shadow root.
+ */
+:root,:host{
+  color-scheme:dark;
+
+  /* Surfaces */
+  --rt-bar:#171a21;            /* Steam's top bar / footer floor */
+  --rt-bg:#1b2838;             /* Steam canvas */
+  --rt-bg-deep:#0e141b;        /* deepest well: outputs, inputs on dark */
+  --rt-surface:#16202d;        /* card surface */
+  --rt-surface-2:#1e2b3b;      /* hover on a card */
+  --rt-surface-3:#2a3f5a;      /* raised: chips, tracks */
+  --rt-block:rgba(0,0,0,.2);   /* Steam's translucent content block */
+  --rt-block-hover:rgba(255,255,255,.04);
+  --rt-input:#101822;          /* inputs and dropdowns */
+  --rt-select:#3d4450;         /* selected / hovered list row */
+  --rt-line:rgba(0,0,0,.45);   /* Steam hairline */
+  --rt-line-soft:#2a3f5a;      /* divider on navy */
+  --rt-line-strong:#3d4450;
+
+  /* Ink */
+  --rt-ink:#c7d5e0;            /* body */
+  --rt-ink-strong:#ffffff;     /* headlines, button labels */
+  --rt-ink-2:#acb2b8;
+  --rt-ink-3:#8f98a0;          /* secondary metadata */
+  --rt-ink-4:#86909b;          /* captions, timestamps (4.6:1 on canvas) */
+  --rt-ink-disabled:#56707f;
+
+  /* Blues */
+  --rt-link:#66c0f4;
+  --rt-link-hover:#ffffff;
+  --rt-blue:#67c1f5;
+  --rt-blue-deep:#417a9b;
+  --rt-active:#1a9fff;
+  --rt-blue-fade:rgba(103,193,245,.2);   /* default button fill */
+  --rt-blue-fade-hover:linear-gradient(-60deg,#417a9b 5%,#67c1f5 95%);
+
+  /* Green call to action (install / play / add to cart) */
+  /* Steam's install green, deep enough for white text to pass 4.5:1 */
+  --rt-green:linear-gradient(to bottom,#5c7e10 5%,#4c6b22 95%);
+  --rt-green-hover:linear-gradient(to bottom,#6b961b 5%,#557a14 95%);
+  --rt-green-ink:#ffffff;
+  --rt-green-line:#3e5a10;
+
+  /* Live state colours. Steam presence colours where Steam has one. */
+  --rt-state-standby:#9a9a9a;  /* offline */
+  --rt-state-ready:#57cbde;    /* online */
+  --rt-state-listening:#1a9fff;
+  --rt-state-thinking:#dba520;
+  --rt-state-speaking:#90ba3c; /* in-game */
+  --rt-state-waiting:#e0873b;
+  --rt-state-error:#ec6767;   /* 4.8:1 on the canvas */
+
+  --rt-danger:#e35e5e;
+  --rt-danger-ink:#ff8a8a;      /* text on a danger button */
+  --rt-danger-bg:rgba(163,52,52,.28);
+  --rt-danger-hover:linear-gradient(-60deg,#8c2a2a 5%,#c94a4a 95%);
+  --rt-success:#90ba3c;
+  --rt-focus:#66c0f4;
+
+  /* Theme hooks (v2.8): themes change these instead of overriding components */
+  --rt-on-accent:#ffffff;       /* text and marks on an accent fill */
+  --rt-accent-fill:linear-gradient(-60deg,#417a9b 5%,#67c1f5 95%); /* ticked boxes, step numbers, active presets */
+  --rt-meter:linear-gradient(90deg,#417a9b,#67c1f5);              /* level and progress fills */
+  --rt-marker:#ffffff;          /* thresholds and markers on a meter */
+  --rt-edge:#000000;            /* hard edges: inputs, bar dividers */
+  --rt-page-glow:#1f3247;       /* top glow on full pages */
+
+  /* Legacy aliases used by component sheets */
+  --rt-accent:var(--rt-active);
+  --rt-accent-soft:rgba(26,159,255,.16);
+  --rt-accent-line:rgba(102,192,244,.45);
+
+  /* Type. Motiva Sans is Steam's face: inside Steam's page it is already loaded
+     by Steam, elsewhere Arial takes over exactly as it does on Steam itself. */
+  --rt-font:"Motiva Sans",Arial,Helvetica,sans-serif;
+  --rt-font-display:"Motiva Sans",Arial,Helvetica,sans-serif;
+  --rt-font-mono:"Lucida Console",Monaco,"Courier New",monospace;
+
+  --rt-text-xs:11px;
+  --rt-text-sm:12px;
+  --rt-text-md:13px;
+  --rt-text-lg:14px;
+  --rt-text-xl:18px;
+  --rt-text-2xl:22px;
+  --rt-text-3xl:26px;
+  --rt-track:.06em;            /* Steam's tracked uppercase labels */
+
+  /* 4 px grid */
+  --rt-1:4px;--rt-2:8px;--rt-3:12px;--rt-4:16px;--rt-5:20px;--rt-6:24px;--rt-8:32px;--rt-10:40px;
+
+  /* Steam is nearly square */
+  --rt-r-xs:2px;
+  --rt-r-sm:2px;
+  --rt-r-md:3px;
+  --rt-r-lg:4px;
+  --rt-r-pill:999px;
+
+  --rt-shadow-float:0 0 0 1px #000,0 12px 40px rgba(0,0,0,.75);
+
+  --rt-ease:cubic-bezier(.2,.7,.2,1);
+  --rt-fast:120ms;
+  --rt-med:200ms;
+}

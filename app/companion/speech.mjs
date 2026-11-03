@@ -1,0 +1,10 @@
+export const VOICES=['rex','eve','ara','sal','leo'];
+export const SPEECH_MODELS=[{model:'x-ai/grok-voice-tts-1.0',voice:'rex'},{model:'mistralai/voxtral-mini-tts-2603',voice:'en_paul_neutral'}];
+export class Speech {
+ constructor(fetcher=globalThis.fetch){this.fetcher=fetcher;this.cooldowns=new Map();}
+ async generate(text,key,voice='rex',signal){let lastError='Speech providers are cooling down';for(const choice of SPEECH_MODELS){if(signal?.aborted)throw new DOMException('Speech cancelled','AbortError');if(Date.now()<(this.cooldowns.get(choice.model)||0))continue;try{const r=await this.fetcher('https://openrouter.ai/api/v1/audio/speech',{method:'POST',signal:signal?AbortSignal.any([AbortSignal.timeout(25000),signal]):AbortSignal.timeout(25000),headers:{'Content-Type':'application/json',Authorization:'Bearer '+key},body:JSON.stringify({...choice,voice:choice.model.startsWith('x-ai/')?(VOICES.includes(voice)?voice:'rex'):choice.voice,input:text.slice(0,300),response_format:'mp3'})});if(!r.ok){const e=await r.json().catch(()=>({}));lastError=('OpenRouter speech '+r.status+': '+String(e.error?.message||'Request failed')).split(key).join('[redacted]').slice(0,300);if(r.status===429||r.status>=500){const value=r.headers?.get('retry-after');const delay=Number(value)*1000||Math.max(0,(Date.parse(value)||0)-Date.now());this.cooldowns.set(choice.model,Date.now()+Math.max(60000,delay));continue;}throw Error(lastError);}
+   if(!r.headers.get('content-type')?.toLowerCase().startsWith('audio/'))throw Error('Speech provider returned non-audio data');const bytes=new Uint8Array(await r.arrayBuffer());if(!bytes.length||bytes.length>4000000)throw Error('Speech returned empty or oversized audio');let binary='';for(let i=0;i<bytes.length;i+=8192)binary+=String.fromCharCode(...bytes.subarray(i,i+8192));return {audio:btoa(binary),model:choice.model};
+  }catch(e){lastError=String(e.message).split(key).join('[redacted]');if(['TimeoutError','TypeError'].includes(e.name)){this.cooldowns.set(choice.model,Date.now()+60000);continue;}throw Error(lastError);}}
+  throw Error(lastError+'; speech fallback exhausted. Try later.');
+ }
+}

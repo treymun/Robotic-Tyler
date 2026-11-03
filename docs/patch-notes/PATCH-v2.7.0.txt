@@ -1,0 +1,8 @@
+ROBOTIC TYLER PATCH v2.7.0
+
+- New logo in Chrome (toolbar + extensions page), the chat panel, settings, Voice Studio,
+  desktop windows, tray and installers.
+- New theme: Settings > Theme > Classic Steam (2004). Every Tyler window switches at once;
+  pick "Steam" to go back.
+- Update Chrome as usual: copy browser-extension/ over the same folder, then Reload.
+  The new toolbar icon appears after the Reload.

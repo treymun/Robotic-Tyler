@@ -1,0 +1,10 @@
+ROBOTIC TYLER PATCH v2.8.0
+
+- New themes in Settings > Theme: Team Fortress 2 style, Counter-Strike 2 style and
+  Portal style (light), alongside Steam and Classic Steam (2004).
+- Cleaner downloads: branded Windows installers with clear names, a Chrome extension zip
+  with one folder to Load unpacked plus "How to install.html", and release notes that say
+  which file to pick.
+- Project folder tidied: README.md at the top, guides in docs/, old patch notes in
+  docs/patch-notes/, CHANGES.md.
+- Update Chrome as usual: copy browser-extension/ over the same folder, then Reload.

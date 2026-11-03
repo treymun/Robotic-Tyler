@@ -1,0 +1,7 @@
+node_modules/
+dist/
+test-results/
+tools/preview/out/
+windows-audio-bridge/publish/
+windows-audio-bridge/bin/
+windows-audio-bridge/obj/

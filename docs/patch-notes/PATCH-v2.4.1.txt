@@ -1,0 +1,8 @@
+ROBOTIC TYLER PATCH v2.4.1
+
+- Steam theme for the in-chat panel, settings page and Native Voice Studio:
+  Steam navy surfaces, blue hover-fade buttons, green install-style main action,
+  Motiva Sans with tracked uppercase heads, Steam checkboxes and toggles, and
+  Steam presence colours for Tyler's live status.
+- No behaviour changes. Light theme removed (Steam has none).
+See the top of CHANGES-v2.4.md.

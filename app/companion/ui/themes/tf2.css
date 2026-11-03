@@ -1,0 +1,188 @@
+/*
+ * ROBOTIC TYLER "Team Fortress 2 style" theme (v2.9).
+ *
+ * Built from TF2's own default menu scheme: TanLight text (#EBE2CA) on TanDark
+ * buttons (#756B5E) that turn TFOrange (#91493B) when hovered and show black
+ * text while pressed; dark brown rounded panels (TanDarker #2E2B2A, DarkBrown
+ * #292526); yellow check boxes; off-white progress bars; item-quality colours
+ * (Unique, Strange, Genuine…) and RED / BLU team colours.
+ * Type: chunky poster capitals ("Tyler TF2 Display" = Passion One, OFL) for
+ * titles, buttons and tabs, with Verdana for text, which TF2 itself uses.
+ * Style only: no TF2 logos, artwork, textures or game fonts.
+ */
+[data-rt-theme=tf2]{
+  color-scheme:dark;
+  --tf-tan-light:#ebe2ca;--tf-tan:#6c6256;--tf-tan-darker:#2e2b2a;--tf-dark-brown:#292526;--tf-brown:#3b3630;
+  --tf-orange:#91493b;--tf-orange-hi:#a45642;--tf-off-white:#c8bba1;--tf-progress:#fbebca;
+  --tf-red:#b8383b;--tf-blu:#5885a2;--tf-unique:#ffd700;--tf-strange:#e58a55;--tf-genuine:#83b38e;
+
+  --rt-bar:var(--tf-dark-brown);--rt-bg:var(--tf-tan-darker);--rt-bg-deep:#1e1b1a;
+  --rt-surface:var(--tf-brown);--rt-surface-2:#463f38;--rt-surface-3:#544b43;
+  --rt-block:var(--tf-brown);--rt-block-hover:#433d36;--rt-input:#1e1b1a;--rt-select:var(--tf-orange);
+  --rt-line:#151312;--rt-line-soft:#4a433c;--rt-line-strong:var(--tf-tan);
+
+  --rt-ink:var(--tf-tan-light);--rt-ink-strong:#fff7e3;--rt-ink-2:#dcd2b9;--rt-ink-3:var(--tf-off-white);--rt-ink-4:#bfb197;--rt-ink-disabled:#857b6c;
+  --rt-link:var(--tf-unique);--rt-link-hover:#fff7e3;
+  --rt-blue:var(--tf-tan-light);--rt-blue-deep:var(--tf-orange);--rt-active:var(--tf-orange);
+  --rt-blue-fade:var(--tf-tan);--rt-blue-fade-hover:var(--tf-orange);
+  --rt-green:var(--tf-orange);--rt-green-hover:var(--tf-orange-hi);--rt-green-ink:var(--tf-tan-light);--rt-green-line:#5c2c23;
+
+  --rt-state-standby:var(--tf-off-white);--rt-state-ready:#8fc96b;--rt-state-listening:#9db9d6;--rt-state-thinking:var(--tf-unique);
+  --rt-state-speaking:var(--tf-strange);--rt-state-waiting:#c39be0;--rt-state-error:#ff8a78;
+  --rt-danger:#ff8a78;--rt-danger-bg:#a01d1d;--rt-danger-hover:#b52626;--rt-danger-ink:#ffffff;--rt-success:#8fc96b;--rt-focus:var(--tf-unique);
+  --rt-accent:var(--tf-orange);--rt-accent-soft:rgba(145,73,59,.25);--rt-accent-line:rgba(145,73,59,.6);
+
+  --rt-on-accent:var(--tf-tan-light);--rt-accent-fill:var(--tf-orange);
+  --rt-meter:var(--tf-progress);--rt-marker:var(--tf-red);--rt-edge:#151312;--rt-page-glow:#3a2f29;
+
+  --rt-font:Verdana,"DejaVu Sans",Tahoma,sans-serif;
+  --rt-font-display:"Tyler TF2 Display",Impact,"Arial Black",sans-serif;
+  --rt-text-xs:11px;--rt-text-sm:11px;--rt-text-md:12px;--rt-text-lg:14px;
+  --rt-track:.02em;
+  --rt-r-xs:3px;--rt-r-sm:5px;--rt-r-md:7px;--rt-r-lg:10px;
+  --rt-shadow-float:0 0 0 2px #151312,0 16px 44px rgba(0,0,0,.65);
+}
+
+/* ── Poster capitals: titles, buttons, tabs, field labels ─────────────── */
+[data-rt-theme=tf2] :is(h1,h2,.wordmark,.brand-text strong,.sheet-head h2,.card>h2,details.feature>summary,.marquee,.tally-label,.stat dt,.pad span,.step-n,.setup-n,.pulse dt,.facts b,.matrix dt){
+  font-family:var(--rt-font-display);font-weight:400;text-transform:uppercase;letter-spacing:.03em}
+[data-rt-theme=tf2] :is(h1,h2,.sheet-head h2,.card>h2,.wordmark,.brand-text strong){color:var(--tf-tan-light);text-shadow:0 2px 0 rgba(0,0,0,.55)}
+[data-rt-theme=tf2] h2{font-size:20px;line-height:1.1}
+[data-rt-theme=tf2] h1{font-size:34px}
+[data-rt-theme=tf2] :is(.sheet-head h2,.card>h2){font-size:20px}
+[data-rt-theme=tf2] .wordmark{font-size:21px;letter-spacing:.04em}
+[data-rt-theme=tf2] .brand-text strong{font-size:19px}
+[data-rt-theme=tf2] label:not(:has(>input[type=checkbox])):not(.toggle){font-family:var(--rt-font-display);font-weight:400;font-size:13px;letter-spacing:.04em;color:var(--tf-off-white)}
+[data-rt-theme=tf2] .ident-sub{font-family:var(--rt-font-display);font-size:12px;letter-spacing:.06em;color:var(--tf-off-white)}
+
+/* ── Buttons: TanDark → TFOrange on hover, black text while pressed ───── */
+[data-rt-theme=tf2] button{font-family:var(--rt-font-display);font-weight:400;font-size:15px;letter-spacing:.04em;text-transform:uppercase;
+  color:var(--tf-tan-light);background:var(--tf-tan);border:0;border-radius:var(--rt-r-sm);box-shadow:inset 0 -2px 0 rgba(0,0,0,.28);transition:none}
+[data-rt-theme=tf2] button:hover{color:var(--tf-tan-light);background:var(--tf-orange)}
+[data-rt-theme=tf2] button:active{color:#000;background:var(--tf-orange);transform:none;box-shadow:inset 0 2px 0 rgba(0,0,0,.3)}
+[data-rt-theme=tf2] :is(.primary,#start,#save){color:var(--tf-tan-light);background:var(--tf-orange);box-shadow:inset 0 -3px 0 rgba(0,0,0,.3)}
+[data-rt-theme=tf2] :is(.primary,#start,#save):hover{background:var(--tf-orange-hi)}
+[data-rt-theme=tf2] .danger{color:#fff;background:var(--rt-danger-bg)}
+[data-rt-theme=tf2] .danger:hover{color:#fff;background:var(--rt-danger-hover)}
+[data-rt-theme=tf2] :is(.ghost,.icon,.icon-btn){background:transparent;box-shadow:none;color:var(--tf-off-white)}
+[data-rt-theme=tf2] :is(.ghost,.icon,.icon-btn):hover{background:var(--tf-orange);color:var(--tf-tan-light)}
+[data-rt-theme=tf2] :is(.pad,.friend-card,.preset,.link-btn){font-family:var(--rt-font);text-transform:none;letter-spacing:0;font-size:var(--rt-text-md)}
+[data-rt-theme=tf2] .pad b{font-family:var(--rt-font-display);font-size:17px;letter-spacing:.03em;text-transform:uppercase}
+[data-rt-theme=tf2] .link-btn{background:none;box-shadow:none;color:var(--rt-link)}
+
+/* ── Frame: TanDarker panel, DarkBrown bars, RED | BLU stripe ─────────── */
+.panel[data-rt-theme=tf2]{background:radial-gradient(130% 70% at 50% 0,#3a3431 0,var(--tf-tan-darker) 70%);border:2px solid #4a433c}
+[data-rt-theme=tf2] .bar{padding-top:12px;padding-bottom:12px;border-bottom:4px solid;border-image:linear-gradient(90deg,var(--tf-red) 0 50%,var(--tf-blu) 50% 100%) 1}
+[data-rt-theme=tf2] .bar .mark:not([data-logo]){border-radius:var(--rt-r-md);box-shadow:0 0 0 2px var(--tf-tan)}
+[data-rt-theme=tf2] .side{box-shadow:inset -4px 0 0 var(--tf-red)}
+[data-rt-theme=tf2] main{background:radial-gradient(90% 50% at 50% 0,#3a3431 0,var(--tf-tan-darker) 75%)}
+[data-rt-theme=tf2] body{background:radial-gradient(90% 40% at 50% 0,#3a3431 0,var(--tf-tan-darker) 75%) fixed}
+
+/* Tabs: rounded TanDark tabs, the open one in TFOrange */
+[data-rt-theme=tf2] .tabs{gap:4px;padding:8px 8px 0;margin-top:10px;background:var(--tf-dark-brown);box-shadow:inset 0 -3px 0 var(--tf-orange)}
+[data-rt-theme=tf2] .tabs button{padding:8px 2px 6px;font-size:14px;border-radius:var(--rt-r-sm) var(--rt-r-sm) 0 0;background:#4a433c;color:var(--tf-off-white);box-shadow:none;border:0}
+[data-rt-theme=tf2] .tabs button:hover{background:var(--tf-tan);color:var(--tf-tan-light)}
+[data-rt-theme=tf2] .tabs button[aria-selected=true]{background:var(--tf-orange);color:var(--tf-tan-light)}
+[data-rt-theme=tf2] :is(.section-nav button,nav:not(.tabs) button){font-family:var(--rt-font-display);font-size:16px;letter-spacing:.04em;text-transform:uppercase;background:transparent;color:var(--tf-off-white);box-shadow:none;border-radius:0}
+[data-rt-theme=tf2] :is(.section-nav button,nav:not(.tabs) button):hover{background:var(--tf-tan);color:var(--tf-tan-light)}
+[data-rt-theme=tf2] :is(.section-nav button[aria-current=page],nav:not(.tabs) button.active){background:var(--tf-orange);color:var(--tf-tan-light);box-shadow:none}
+[data-rt-theme=tf2] :is(.section-nav button[aria-current=page],nav:not(.tabs) button.active) .ic{color:var(--tf-tan-light)}
+
+/* Rounded brown boxes with a lighter rim */
+[data-rt-theme=tf2] :where(details,.callout,.quick-help,.confirm,.deck-entry,.board-tools,.sheet,.card,.route-card,.panel,.stats,.mini-callout>div,.usage-banner,.facts>div,.matrix>div,#setup){
+  background:var(--tf-brown);border:2px solid #4a433c;border-radius:var(--rt-r-lg);box-shadow:0 2px 0 rgba(0,0,0,.35)}
+[data-rt-theme=tf2] details.feature[open]{background:var(--tf-brown)}
+[data-rt-theme=tf2] details details{background:var(--tf-tan-darker)}
+[data-rt-theme=tf2] summary:hover,[data-rt-theme=tf2] details.feature>summary:hover{background:rgba(255,255,255,.04);color:var(--tf-tan-light)}
+[data-rt-theme=tf2] details.feature>summary{font-size:15px;color:var(--tf-tan-light)}
+[data-rt-theme=tf2] :is(.quick-help,.confirm,#setup){border-color:var(--tf-orange)}
+[data-rt-theme=tf2] .deck-entry{border-color:var(--tf-blu)}
+
+/* HUD-style status: chunky numbers, coloured labels */
+[data-rt-theme=tf2] .tally{background:linear-gradient(90deg,color-mix(in srgb,var(--tone) 16%,var(--tf-dark-brown)),var(--tf-dark-brown) 75%);border:2px solid #4a433c;border-radius:var(--rt-r-lg)}
+[data-rt-theme=tf2] .tally-light{width:5px;border-radius:3px}
+[data-rt-theme=tf2] .tally-label{font-size:15px}
+[data-rt-theme=tf2] .stats{background:var(--tf-dark-brown)}
+[data-rt-theme=tf2] .stat dt{font-size:12px;color:var(--tf-off-white)}
+[data-rt-theme=tf2] .stat dd{font-family:var(--rt-font-display);font-weight:400;font-size:22px;letter-spacing:.02em;color:var(--tf-tan-light)}
+[data-rt-theme=tf2] .pulse dd{font-family:var(--rt-font-display);font-weight:400;color:var(--tf-tan-light)}
+
+/* Fields */
+[data-rt-theme=tf2] input:where(:not([type=checkbox],[type=radio],[type=range],[type=file])),[data-rt-theme=tf2] :is(textarea,select){
+  color:var(--tf-tan-light);background-color:#1e1b1a;border:2px solid #4a433c;border-radius:var(--rt-r-sm);box-shadow:none}
+[data-rt-theme=tf2] :is(input,textarea,select):focus{border-color:var(--tf-unique);box-shadow:none}
+[data-rt-theme=tf2] input[type=range]{accent-color:var(--tf-orange)}
+
+/* TF2's yellow check boxes (the settings switches become them too) */
+[data-rt-theme=tf2] input[type=checkbox],[data-rt-theme=tf2] .toggle>input[type=checkbox]{
+  width:16px;height:16px;margin:0;background:transparent;border:2px solid var(--tf-unique);border-radius:2px;box-shadow:none;transition:none}
+[data-rt-theme=tf2] input[type=checkbox]:checked,[data-rt-theme=tf2] .toggle>input[type=checkbox]:checked{background:transparent;border-color:var(--tf-unique)}
+[data-rt-theme=tf2] .toggle>input[type=checkbox]::after{display:none}
+[data-rt-theme=tf2] input[type=checkbox]:checked::after,[data-rt-theme=tf2] .toggle>input[type=checkbox]:checked::after{
+  display:block;content:"";position:absolute;left:3.5px;top:0;width:4px;height:8px;background:none;border:solid var(--tf-unique);border-width:0 2.5px 2.5px 0;border-radius:0;box-shadow:none;transform:rotate(45deg)}
+
+/* Item-quality tags and progress */
+[data-rt-theme=tf2] .pill{color:var(--tf-unique);background:transparent;box-shadow:inset 0 0 0 1px var(--tf-unique);border-radius:var(--rt-r-xs)}
+[data-rt-theme=tf2] .pill.on{color:var(--tf-genuine);background:transparent;box-shadow:inset 0 0 0 1px var(--tf-genuine)}
+[data-rt-theme=tf2] :is(.meter,.arcade-progress,.lat-track){background:#1e1b1a;border-radius:var(--rt-r-xs);box-shadow:inset 0 0 0 1px #4a433c}
+[data-rt-theme=tf2] .pad{background:var(--tf-tan);box-shadow:inset 0 -2px 0 rgba(0,0,0,.28)}
+[data-rt-theme=tf2] .pad span{font-size:12px;color:var(--tf-tan-light);opacity:.85}
+[data-rt-theme=tf2] .pad::after{border-left-color:var(--tf-tan-light)}
+[data-rt-theme=tf2] .pad:hover{background:var(--tf-orange)}
+[data-rt-theme=tf2] .pad.playing{background:var(--tf-orange);box-shadow:inset 4px 0 0 var(--tf-unique)}
+[data-rt-theme=tf2] .arcade-achievement.earned{color:var(--tf-unique);background:var(--tf-dark-brown);box-shadow:inset 0 0 0 1px var(--tf-unique)}
+[data-rt-theme=tf2] code{color:var(--tf-unique);background:#1e1b1a}
+[data-rt-theme=tf2] :is(.step-n,.setup-n,.friend-card .avatar){color:var(--tf-tan-light);background:var(--tf-orange);border-radius:var(--rt-r-sm)}
+[data-rt-theme=tf2] .setup-step[data-done=true] .setup-n{color:#1e1b1a;background:var(--tf-genuine)}
+[data-rt-theme=tf2] .preset.active{color:var(--tf-tan-light);background:var(--tf-orange)}
+[data-rt-theme=tf2] .route li{background:var(--tf-tan);box-shadow:none}
+[data-rt-theme=tf2] .route li:last-child{background:var(--tf-orange);box-shadow:inset 4px 0 0 var(--tf-unique)}
+[data-rt-theme=tf2] .route li:last-child b{color:var(--tf-tan-light)}
+[data-rt-theme=tf2] :is(.scroll,.content,main){scrollbar-color:var(--tf-tan) var(--tf-dark-brown)}
+html[data-rt-theme=tf2]{scrollbar-color:var(--tf-tan) var(--tf-dark-brown)}
+[data-rt-theme=tf2] :is(.feature-meta,summary .pill){font-family:var(--rt-font);text-transform:none;letter-spacing:0;font-size:var(--rt-text-xs)}
+
+/* ── Status strip: the Medic's ÜberCharge meter ──
+   Charges up while Tyler thinks, sits ready when idle, and flashes red and
+   white like a deployed Über while it talks. BLU tint while listening. */
+[data-rt-theme=tf2] .tally{padding:9px 12px 30px 12px}
+[data-rt-theme=tf2] .tally-light{display:none}
+[data-rt-theme=tf2] .tally-wave{display:block;height:auto;flex-shrink:0}
+[data-rt-theme=tf2] .tally-wave i{display:none}
+[data-rt-theme=tf2] .tally-wave::before{content:"ÜBERCHARGE";font:400 14px/1 var(--rt-font-display);letter-spacing:.03em;color:var(--tf-tan-light);text-shadow:1px 1px 0 rgba(0,0,0,.6)}
+[data-rt-theme=tf2] .tally::before{content:"";position:absolute;left:10px;right:10px;bottom:9px;height:13px;border-radius:4px;background:#1a1617;box-shadow:inset 0 1px 3px rgba(0,0,0,.8),0 0 0 1px #4a433c}
+[data-rt-theme=tf2] .tally::after{content:"";position:absolute;left:12px;right:12px;bottom:11px;height:9px;border-radius:2px;
+  background:repeating-linear-gradient(-45deg,rgba(255,255,255,.22) 0 4px,transparent 4px 9px),linear-gradient(180deg,rgba(255,255,255,.25),transparent 55%),var(--tf-tan-light);
+  background-color:var(--tf-tan-light);clip-path:inset(0 0 0 0 round 2px)}
+[data-rt-theme=tf2] .tally[data-state=listening]::after{background-color:var(--tf-blu);clip-path:inset(0 30% 0 0 round 2px);animation:tf-stripes .8s linear infinite}
+[data-rt-theme=tf2] .tally[data-state=thinking]::after{background-color:var(--tf-unique);animation:tf-charge 2.4s cubic-bezier(.5,0,.9,.6) infinite,tf-stripes .5s linear infinite}
+[data-rt-theme=tf2] .tally[data-state=speaking]::after{animation:tf-uber .9s steps(1) infinite,tf-stripes .35s linear infinite}
+[data-rt-theme=tf2] .tally[data-state=speaking] .tally-wave::before{animation:tf-uber-text .9s steps(1) infinite}
+[data-rt-theme=tf2] .tally[data-state=waiting]::after{background-color:var(--tf-off-white);clip-path:inset(0 55% 0 0 round 2px)}
+[data-rt-theme=tf2] .tally[data-state=error]::after{background-color:var(--tf-red);clip-path:inset(0 88% 0 0 round 2px);animation:cl-blink-tf 1s steps(1) infinite}
+[data-rt-theme=tf2] .tally:is([data-state=standby],[data-state=paused])::after{clip-path:inset(0 100% 0 0 round 2px)}
+[data-rt-theme=tf2] .tally:is([data-state=standby],[data-state=paused]) .tally-wave::before{color:#8a7f6e}
+@keyframes tf-stripes{to{background-position:12.73px 0,0 0,0 0}}
+@keyframes tf-charge{from{clip-path:inset(0 100% 0 0 round 2px)}85%,to{clip-path:inset(0 0 0 0 round 2px)}}
+@keyframes tf-uber{0%{background-color:var(--tf-red)}50%{background-color:var(--tf-tan-light)}}
+@keyframes tf-uber-text{0%{color:#ff6b5e}50%{color:var(--tf-tan-light)}}
+@keyframes cl-blink-tf{0%{opacity:1}50%{opacity:.2}}
+
+/* ── v2.13: the logo sits in a class-portrait card: rounded, dark brown with a
+   tan rim, like the character portraits in TF2's loadout screens. ── */
+[data-rt-theme=tf2] :is(.mark[data-logo],img.mark,#brand-logo){--logo-pad:2px;background:linear-gradient(180deg,#4a413a,#2e2926);border:2px solid var(--tf-tan);border-radius:7px;box-shadow:0 2px 0 rgba(0,0,0,.55)}
+[data-rt-theme=tf2] .mark[data-logo]{width:44px;height:44px;margin:-6px 0}
+
+/* ── Icons, dialogs, notifications and tooltips (v2.14) ──
+   Chunky filled silhouettes in cream with a dark-brown outline, set slightly
+   off-square like hand-drawn HUD art. Messages are TF2 menu panels: rounded dark
+   brown with a lighter rim, a team-colour edge and big cream TF2 lettering. */
+[data-rt-theme=tf2] .ic{transform:rotate(-4deg);filter:drop-shadow(0 1.5px 0 rgba(0,0,0,.55))}
+[data-rt-theme=tf2] .ic-v .b{fill:currentColor;stroke:#2b2420;stroke-width:2.2px;paint-order:stroke}
+[data-rt-theme=tf2] .ic-v .d{stroke:#2b2420;stroke-width:1.9px}
+[data-rt-theme=tf2] .ic-v .s{stroke-width:2.3px}
+[data-rt-theme=tf2] .rt-toast{background:linear-gradient(180deg,#3b3630,#2e2b2a);border:2px solid #4a433c;border-left:7px solid var(--tone);border-radius:10px;box-shadow:0 4px 0 rgba(0,0,0,.45)}
+[data-rt-theme=tf2] :is(.rt-toast-title,.rt-dialog-title){font-family:var(--rt-font-display);font-weight:400;font-size:19px;letter-spacing:.02em;color:var(--tf-tan-light);text-shadow:0 2px 0 rgba(0,0,0,.55)}
+[data-rt-theme=tf2] .rt-dialog{background:linear-gradient(180deg,#3b3630,#2a2624);border:3px solid #4a433c;border-top:6px solid var(--tone);border-radius:14px;box-shadow:0 6px 0 rgba(0,0,0,.5)}
+[data-rt-theme=tf2] .rt-dialog-title{font-size:24px}
+[data-rt-theme=tf2] .rt-tip{background:#2b2522;color:var(--tf-tan-light);border:2px solid #6c6256;border-radius:6px;font-weight:700}

@@ -1,0 +1,44 @@
+ROBOTIC TYLER v2.3.18 - Chrome trivia automatic author detection
+
+INSTALL
+Close Steam web chat tabs. Copy ALL browser-extension contents over the
+SAME existing unpacked extension folder, including neural. Reload that
+extension at chrome://extensions. Reopen Steam chat and Connect & start.
+Do not uninstall or change the folder path/extension ID; settings and keys
+are retained. All earlier music-volume, trivia and voice changes included.
+
+WHAT CHANGED
+The Chrome trivia author reader now recognizes additional Steam sender-name
+header patterns, grouped message headers, relative/absolute Steam profile
+links, explicit sender attributes and avatar data-miniprofile account IDs.
+An account ID exposed by Steam is used automatically; users do not enter it.
+Repeated header elements containing the same author name are deduplicated
+instead of being incorrectly rejected as multiple people.
+
+A small bounded per-chat author cache keeps known account IDs associated
+with their labels for later grouped messages lacking a repeated header.
+Message-body/quote/reaction profile links are excluded so mentioning another
+player does not change the credited sender. Ambiguous multiple names or
+profile IDs are rejected rather than guessing from nearby chat or roster.
+The reader waits up to 400 ms for author metadata that arrives just after
+message text. Sender data is captured for queued trivia answers.
+
+These identities are game score labels only. They are NOT used to authorize
+downloads, API access, soundboard permissions or other account actions.
+Display-name-only fallback can still merge identical display names when
+Steam does not expose a stable profile ID. Manual Name: answer remains a
+fallback for layouts the reader cannot identify; it is not required when
+automatic detection succeeds. No extra name-entry step was added.
+
+TEST
+In the connected Chrome chat, type play trivia group. Have two different
+people answer a question with plain A/B/C/D or option text. Results should
+credit each author automatically. Repeated messages from one player should
+keep the same score. This build is for the Chrome extension; Electron and
+native companion source are unchanged.
+
+86 automated checks and JavaScript syntax checks pass. Added tests cover
+grouped messages, account profile keys, multiple same-name header elements,
+mentioned profiles and per-chat cache isolation. Actual live Steam DOM
+inspection was unavailable, so recognition in the user's exact current
+layout has NOT been verified. No real Steam messages were submitted.

@@ -1,0 +1,8 @@
+Bundled local components:
+ONNX Runtime Web 1.22.0 (MIT), from the user-provided npm archive.
+https://github.com/microsoft/onnxruntime
+Silero VAD v5 model (MIT), from @ricky0123/vad-web 0.0.31 user-provided archive.
+https://github.com/snakers4/silero-vad
+Model interface adapted from @ricky0123/vad-web (ISC).
+https://github.com/ricky0123/vad
+See accompanying license files. No runtime CDN downloads are used.

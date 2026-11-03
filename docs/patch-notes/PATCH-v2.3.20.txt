@@ -1,0 +1,27 @@
+ROBOTIC TYLER v2.3.20 - Music queue clear/reset
+
+music clear / !music clear
+Remove every waiting song while the current song continues. Current skip
+votes remain unchanged. A short confirmation is posted in Steam chat.
+
+music reset / !music reset
+Stop music and clear waiting songs, skip votes and pending local music
+commands/events. YouTube audio sharing stays ready for new requests.
+Fresh requests after reset completes work normally. This does not block
+future spam; it clears the current queue.
+
+Matching Clear waiting queue and Reset music buttons are in the Music panel.
+No manually entered Steam IDs are needed for either command. The existing
+two-different-account skip rule, fair queue, names and chat cards remain.
+
+INSTALL
+Close Steam chat tabs. Copy ALL browser-extension contents over the SAME
+existing unpacked extension folder, including neural. Reload the existing
+extension at chrome://extensions. Reopen chat, Connect & start and re-share
+the YouTube tab audio. Do not uninstall or change folders; settings stay.
+All previous features and patches included; Electron/native unchanged.
+
+Tests cover clearing a full personal queue without stopping the current
+song, preserving its votes, reset clearing votes, stale player events,
+fresh requests after reset and panel buttons. Live Steam playback was not
+operated during these tests.

@@ -1,0 +1,122 @@
+{
+  "manifest_version": 3,
+  "name": "ROBOTIC TYLER \u2014 Chrome Command Center v2.10",
+  "version": "2.14.0",
+  "description": "Browser-first Steam AI companion with opt-in screen-aware gaming commentary.",
+  "permissions": [
+    "storage",
+    "tabs"
+  ],
+  "host_permissions": [
+    "https://openrouter.ai/*",
+    "https://generativelanguage.googleapis.com/*",
+    "https://steamcommunity.com/*",
+    "https://www.youtube.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "options_page": "settings.html",
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "action": {
+    "default_title": "Open ROBOTIC TYLER settings",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://steamcommunity.com/chat/*"
+      ],
+      "js": [
+        "sender-main.js",
+        "steam-chat-main.js",
+        "soundboard-core.js",
+        "arcade-plus.js",
+        "trivia-bank.js",
+        "trivia-party.js",
+        "soundboard-audio.js",
+        "audio-bridge.js",
+        "wav-codec.js",
+        "noise-filter.js",
+        "neural-client.js",
+        "voice-listener.js"
+      ],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": [
+        "https://steamcommunity.com/chat/*"
+      ],
+      "js": [
+        "content-storage.js",
+        "platform.js",
+        "chat-bus.js",
+        "commands.js",
+        "neural-bridge.js",
+        "soundboard-core.js",
+        "arcade-plus.js",
+        "trivia-bank.js",
+        "trivia-party.js",
+        "soundboard-audio.js",
+        "identity.js",
+        "trivia-identity.js",
+        "steam-chat-client.js",
+        "auto-policy.js",
+        "selection.js",
+        "request.js",
+        "ui-template.js",
+        "ui-fonts.js",
+        "ui-logos.js",
+        "ui-icons.js",
+        "ui-kit.js",
+        "ui-state.js",
+        "setup-detect.js",
+        "content.js",
+        "soundboard.js",
+        "automatic.js",
+        "quick-start.js",
+        "squad-suite.js",
+        "screen-awareness.js",
+        "activity-watch.js",
+        "music-core.js",
+        "music.js",
+        "moderation-core.js",
+        "moderation.js",
+        "admin.js"
+      ],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://www.youtube.com/*"
+      ],
+      "js": [
+        "youtube-music.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'none';"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "neural-host.html"
+      ],
+      "matches": [
+        "https://steamcommunity.com/*"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+ROBOTIC TYLER v2.3.12 - Stop game-request replay + voice noise filter
+
+UPDATE
+Close Steam chat tabs. Copy all browser-extension contents over the SAME
+existing unpacked extension folder and Reload at chrome://extensions.
+Reopen Steam chat and Connect & start. Keep the same extension folder/ID
+to preserve settings, keys and tracked jobs. All prior patches included.
+
+REPLAY FIX
+Existing messages are marked as already read when the game reader connects.
+Changed rows remember handled command lines instead of relying only on the
+old 30-second suppression window. An unrelated update in the history no
+longer causes the entire history container to be scanned for commands.
+Normal text reading also establishes a history baseline and excludes rows
+containing game commands or bracketed bot output from ordinary AI replies.
+This prevents old requests from being submitted as new ones on row updates.
+An intentionally NEW request message can still be submitted normally,
+subject to existing queue limits and cooldowns.
+
+If duplicate cloud jobs remain from before this update, Stop tracking the
+duplicates and keep one job if you still want its link. Do not clear a
+wanted job simply to apply this patch. Actual new chat behavior still needs
+verification in Steam; no real chat messages or transfers were submitted
+during automated testing.
+
+NOISE FILTER INCLUDED
+Conversation > Fine-tune listening & turn-taking includes the enabled
+Filter keyboard clicks and background rumble checkbox from v2.3.11.
+Incoming audio uses 120 Hz high-pass and 4200 Hz low-pass filters, impulse
+rejection, sustained-signal onset and a 350 ms minimum qualifying capture.
+See PATCH-v2.3.11.txt for tuning and limits. This is heuristic filtering,
+not neural speech separation; real keyboard/microphone testing is needed.
+
+63 automated checks pass and extension JavaScript syntax checks pass.
+Regression tests cover existing history, grouped message changes after
+the old suppression window expires, and accepting genuinely new requests.

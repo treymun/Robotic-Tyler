@@ -1,0 +1,202 @@
+/*
+ * ROBOTIC TYLER "DOOM (classic) style" theme (v2.10).
+ * The 1993 look: black and hellfire backdrop, grey stone status bar with
+ * bevelled edges, big red HUD numbers, red menu lettering with dark shading,
+ * yellow ammo-count highlights and keycard colours for status.
+ * Signature: a burning red sky over brown rock, the stone status bar with big
+ * red numbers above their labels, tabs as the yellow-numbered ARMS grid, and a
+ * red pointer beside the menu item under the mouse.
+ * Type: "Tyler Doom" = Pixelify Sans (OFL), chunky pixel lettering.
+ * Style only: no DOOM logos, sprites, textures or game fonts.
+ */
+[data-rt-theme=doom]{
+  color-scheme:dark;
+  --d-red:#ff3b1f;--d-red-deep:#a80000;--d-yellow:#ffd34d;--d-stone:#4a4a4a;--d-stone-hi:#8a8a8a;--d-stone-lo:#151515;
+  --d-stone-tex:repeating-linear-gradient(45deg,#4e4e4e 0 2px,#474747 2px 4px,#515151 4px 5px);
+  --d-red-text:linear-gradient(180deg,#ff7a4a,#ff2a10 50%,#b00000);
+  --rt-bar:#2b2b2b;--rt-bg:#140a08;--rt-bg-deep:#0a0504;--rt-surface:#241c19;--rt-surface-2:#2e2420;--rt-surface-3:#3a2e29;
+  --rt-block:#1e1512;--rt-block-hover:#2a1c18;--rt-input:#0a0504;--rt-select:#5a1010;
+  --rt-line:#000000;--rt-line-soft:#3a2a24;--rt-line-strong:var(--d-stone-hi);
+  --rt-ink:#f0e6dc;--rt-ink-strong:#ffffff;--rt-ink-2:#e0d2c4;--rt-ink-3:#cdbcab;--rt-ink-4:#bba897;--rt-ink-disabled:#7a6a60;
+  --rt-link:var(--d-yellow);--rt-link-hover:#ffffff;--rt-blue:var(--d-red);--rt-blue-deep:var(--d-red-deep);--rt-active:var(--d-red);
+  --rt-blue-fade:#1a0d0a;--rt-blue-fade-hover:#3a0a06;--rt-green:var(--d-red-deep);--rt-green-hover:#c00000;--rt-green-ink:var(--d-yellow);--rt-green-line:#000000;
+  --rt-state-standby:#bba897;--rt-state-ready:#6ad46a;--rt-state-listening:#7fb2ff;--rt-state-thinking:var(--d-yellow);--rt-state-speaking:#ffa040;--rt-state-waiting:#c88cff;--rt-state-error:#ff5a4d;
+  --rt-danger:#ff5a4d;--rt-danger-bg:#8a0000;--rt-danger-hover:#a80000;--rt-danger-ink:#ffffff;--rt-success:#6ad46a;--rt-focus:var(--d-yellow);
+  --rt-accent:var(--d-red);--rt-accent-soft:rgba(255,59,31,.15);--rt-accent-line:rgba(255,59,31,.5);
+  --rt-on-accent:var(--d-yellow);--rt-accent-fill:var(--d-red-deep);--rt-meter:linear-gradient(90deg,#a80000,#ff3b1f 60%,#ffd34d);--rt-marker:#ffffff;--rt-edge:#000000;--rt-page-glow:#2a0805;
+  --rt-font:"Tyler Doom","Courier New",monospace;--rt-font-display:"Tyler Doom","Courier New",monospace;
+  --rt-text-xs:12px;--rt-text-sm:13px;--rt-text-md:14px;--rt-text-lg:16px;--rt-track:.04em;
+  --rt-r-xs:0;--rt-r-sm:0;--rt-r-md:0;--rt-r-lg:0;--rt-shadow-float:0 0 0 2px #000,0 0 40px rgba(170,20,0,.45);
+  --d-bevel:var(--d-stone-hi) var(--d-stone-lo) var(--d-stone-lo) var(--d-stone-hi);
+}
+[data-rt-theme=doom] *{-webkit-font-smoothing:none}
+/* Hellfire backdrop */
+.panel[data-rt-theme=doom]{background:radial-gradient(130% 55% at 50% 115%,rgba(190,30,0,.55),transparent 62%),linear-gradient(180deg,#1c0d09,#0b0504);border:3px solid;border-color:var(--d-bevel)}
+[data-rt-theme=doom] body{background:radial-gradient(100% 40% at 50% 110%,rgba(190,30,0,.5),transparent 60%) fixed,#0b0504}
+[data-rt-theme=doom] main{background:transparent}
+/* Red menu lettering with dark shading */
+[data-rt-theme=doom] :is(h1,h2,.wordmark,.brand-text strong,.sheet-head h2,.card>h2,.marquee){font-family:var(--rt-font-display);font-weight:700;text-transform:uppercase;letter-spacing:.04em;
+  background:var(--d-red-text);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(2px 2px 0 #000)}
+[data-rt-theme=doom] h2{font-size:22px}
+[data-rt-theme=doom] h1{font-size:40px}
+[data-rt-theme=doom] .wordmark{font-size:22px}
+[data-rt-theme=doom] :is(label,.tally-label,.stat dt,.pulse dt,.facts b,.matrix dt,details.feature>summary,.ident-sub){text-transform:uppercase;letter-spacing:.06em}
+[data-rt-theme=doom] label:not(:has(>input[type=checkbox])):not(.toggle){color:var(--d-yellow);font-size:13px}
+/* Stone status bar: header, footer, stats */
+[data-rt-theme=doom] :is(.bar,.foot,.stats,.tabs){background:var(--d-stone-tex)}
+[data-rt-theme=doom] .bar{border-bottom:3px solid;border-color:var(--d-bevel);padding-top:12px;padding-bottom:12px}
+[data-rt-theme=doom] .ident-sub{color:#e8e8e8}
+[data-rt-theme=doom] .foot{box-shadow:inset 0 3px 0 var(--d-stone-hi)}
+[data-rt-theme=doom] .foot small{color:#e8e8e8}
+[data-rt-theme=doom] .stats{border:3px solid;border-color:var(--d-stone-lo) var(--d-stone-hi) var(--d-stone-hi) var(--d-stone-lo)}
+[data-rt-theme=doom] .stat{border-left:3px solid var(--d-stone-lo)}
+[data-rt-theme=doom] .stat dt{color:#e8e8e8}
+[data-rt-theme=doom] .stat dd{font-weight:700;font-size:26px;line-height:1.05;color:var(--d-red);text-shadow:2px 2px 0 #000}
+[data-rt-theme=doom] .stat small{color:#e8e8e8}
+[data-rt-theme=doom] .pulse dd{font-weight:700;color:var(--d-red);text-shadow:2px 2px 0 #000}
+[data-rt-theme=doom] .tally{background:#0b0504;border:3px solid;border-color:var(--d-stone-lo) var(--d-stone-hi) var(--d-stone-hi) var(--d-stone-lo)}
+[data-rt-theme=doom] .tally-light{width:6px;box-shadow:0 0 10px var(--tone)!important}
+/* Tabs: stone keys, the open one lit red */
+[data-rt-theme=doom] .tabs{gap:3px;padding:6px;margin-top:8px;box-shadow:none;border-top:3px solid var(--d-stone-lo);border-bottom:3px solid var(--d-stone-lo)}
+[data-rt-theme=doom] .tabs button{font-weight:700;font-size:14px;color:#e8e8e8;background:#2b2b2b;border:3px solid;border-color:var(--d-bevel);text-shadow:1px 1px 0 #000}
+[data-rt-theme=doom] .tabs button:hover{color:var(--d-yellow);background:#2b2b2b}
+[data-rt-theme=doom] .tabs button[aria-selected=true]{color:var(--d-red);background:#0b0504;border-color:var(--d-stone-lo) var(--d-stone-hi) var(--d-stone-hi) var(--d-stone-lo)}
+/* Buttons: black plates in stone frames, red lettering; hover turns yellow */
+[data-rt-theme=doom] button{font-family:var(--rt-font-display);font-weight:700;font-size:15px;text-transform:uppercase;letter-spacing:.04em;color:var(--d-red);background:#1a0d0a;border:3px solid;border-color:var(--d-bevel);box-shadow:none;text-shadow:1px 1px 0 #000;transition:none}
+[data-rt-theme=doom] button:hover{color:var(--d-yellow);background:#3a0a06;text-shadow:0 0 8px rgba(255,90,0,.8)}
+[data-rt-theme=doom] button:active{border-color:var(--d-stone-lo) var(--d-stone-hi) var(--d-stone-hi) var(--d-stone-lo);transform:none}
+[data-rt-theme=doom] :is(.primary,#start,#save){color:var(--d-yellow);background:var(--d-red-deep)}
+[data-rt-theme=doom] :is(.primary,#start,#save):hover{color:#fff;background:#c00000}
+[data-rt-theme=doom] .danger{color:#fff;background:#8a0000}
+[data-rt-theme=doom] :is(.ghost,.icon,.icon-btn){border-color:transparent;background:transparent}
+[data-rt-theme=doom] :is(.pad,.friend-card,.preset,.link-btn){text-transform:none;letter-spacing:0}
+[data-rt-theme=doom] .link-btn{border:0;background:none;color:var(--d-yellow)}
+/* Panels: dark plates in thin stone frames */
+[data-rt-theme=doom] :where(details,.callout,.quick-help,.confirm,.deck-entry,.board-tools,.sheet,.card,.route-card,.panel,.mini-callout>div,.usage-banner,.facts>div,.matrix>div,#setup,.arcade-tickets>div){background:rgba(10,5,4,.82);border:2px solid #5a4a44}
+[data-rt-theme=doom] details.feature[open]{background:rgba(10,5,4,.88)}
+[data-rt-theme=doom] details.feature>summary{color:var(--d-yellow)}
+[data-rt-theme=doom] summary:hover,[data-rt-theme=doom] details[open]>summary{color:var(--d-yellow);background:rgba(255,59,31,.08)}
+[data-rt-theme=doom] summary::after{border-color:var(--d-red)}
+[data-rt-theme=doom] :is(.quick-help,.confirm,#setup){border-left:4px solid var(--d-red)}
+[data-rt-theme=doom] .deck-entry{border-left:4px solid #1f5fff}
+/* Fields */
+[data-rt-theme=doom] input:where(:not([type=checkbox],[type=radio],[type=range],[type=file])),[data-rt-theme=doom] :is(textarea,select){color:#fff;background-color:#0a0504;border:2px solid;border-color:var(--d-stone-lo) var(--d-stone-hi) var(--d-stone-hi) var(--d-stone-lo);box-shadow:none}
+[data-rt-theme=doom] :is(input,textarea,select):focus{border-color:var(--d-yellow);box-shadow:none}
+[data-rt-theme=doom] input[type=checkbox],[data-rt-theme=doom] .toggle>input[type=checkbox]{width:16px;height:16px;background:#0a0504;border:2px solid;border-color:var(--d-stone-lo) var(--d-stone-hi) var(--d-stone-hi) var(--d-stone-lo);border-radius:0;box-shadow:none}
+[data-rt-theme=doom] input[type=checkbox]:checked,[data-rt-theme=doom] .toggle>input[type=checkbox]:checked{background:#0a0504}
+[data-rt-theme=doom] .toggle>input[type=checkbox]::after{display:none}
+[data-rt-theme=doom] input[type=checkbox]:checked::after,[data-rt-theme=doom] .toggle>input[type=checkbox]:checked::after{display:block;content:"";position:absolute;left:2px;top:2px;width:8px;height:8px;background:var(--d-red);border:0;border-radius:0;box-shadow:0 0 6px var(--d-red);transform:none}
+[data-rt-theme=doom] :is(pre,.output,.v22-log,.response){background:#0a0504;border:2px solid #5a4a44;box-shadow:none}
+[data-rt-theme=doom] :is(.meter,.arcade-progress,.lat-track){background:#0a0504;border:2px solid;border-color:var(--d-stone-lo) var(--d-stone-hi) var(--d-stone-hi) var(--d-stone-lo);box-shadow:none}
+[data-rt-theme=doom] .pill{color:var(--d-yellow);background:#0a0504;box-shadow:inset 0 0 0 1px var(--d-yellow)}
+[data-rt-theme=doom] .pad{color:var(--rt-ink);background:#1a0d0a;border:3px solid;border-color:var(--d-bevel)}
+[data-rt-theme=doom] .pad b{color:#fff}
+[data-rt-theme=doom] .pad span{color:var(--d-yellow)}
+[data-rt-theme=doom] .pad::after{border-left-color:var(--d-red)}
+[data-rt-theme=doom] .pad.playing{background:#3a0a06;box-shadow:0 0 12px rgba(255,59,31,.5)}
+[data-rt-theme=doom] :is(.step-n,.setup-n,.friend-card .avatar){color:var(--d-yellow);background:var(--d-red-deep);border:2px solid #000}
+[data-rt-theme=doom] code{color:var(--d-yellow);background:#0a0504}
+[data-rt-theme=doom] .side{background:var(--d-stone-tex);box-shadow:inset -3px 0 0 var(--d-stone-lo)}
+[data-rt-theme=doom] .brand-text small{color:#e8e8e8}
+[data-rt-theme=doom] :is(.section-nav button,nav:not(.tabs) button){font-family:var(--rt-font-display);font-weight:700;color:#e8e8e8;background:transparent;border:0;text-transform:uppercase;text-shadow:1px 1px 0 #000}
+[data-rt-theme=doom] :is(.section-nav button,nav:not(.tabs) button):hover{color:var(--d-yellow);background:rgba(0,0,0,.25)}
+[data-rt-theme=doom] :is(.section-nav button[aria-current=page],nav:not(.tabs) button.active){color:var(--d-red);background:#0b0504;box-shadow:inset 4px 0 0 var(--d-red)}
+[data-rt-theme=doom] .savebar{background:var(--d-stone-tex);box-shadow:inset 0 3px 0 var(--d-stone-hi)}
+[data-rt-theme=doom] .savebar p{color:#e8e8e8}
+[data-rt-theme=doom] .route li{background:#1a0d0a;box-shadow:inset 0 0 0 2px #5a4a44}
+[data-rt-theme=doom] .route li:last-child{background:#3a0a06;box-shadow:inset 4px 0 0 var(--d-red)}
+
+/* ── Hell sky over rock, status bar, ARMS tabs, menu pointer (v2.10.1) ─ */
+[data-rt-theme=doom]{--d-rock:repeating-linear-gradient(28deg,rgba(0,0,0,.18) 0 3px,transparent 3px 9px),repeating-linear-gradient(-62deg,rgba(255,200,150,.05) 0 2px,transparent 2px 11px),linear-gradient(180deg,#5a3a26,#3a2416 55%,#22140c);
+  --d-sky:radial-gradient(60% 30% at 70% 8%,rgba(255,170,60,.55),transparent 70%),linear-gradient(180deg,#2a0000,#8a1600 22%,#c43a08 34%,#5a0e02 48%,transparent 60%)}
+.panel[data-rt-theme=doom]{background:var(--d-sky),var(--d-rock)}
+[data-rt-theme=doom] body{background:var(--d-sky),var(--d-rock) fixed}
+[data-rt-theme=doom] .scroll{background:rgba(12,6,4,.84)}
+[data-rt-theme=doom] main{background:rgba(12,6,4,.8)}
+[data-rt-theme=doom] .bar{background:rgba(10,4,2,.55);border-color:transparent;box-shadow:inset 0 -3px 0 #000}
+[data-rt-theme=doom] .wordmark{font-size:26px;letter-spacing:.06em}
+/* Status bar: big red number, label underneath */
+[data-rt-theme=doom] .stat{display:flex;flex-direction:column;align-items:center;text-align:center}
+[data-rt-theme=doom] .stat dd{order:1;font-size:28px}
+[data-rt-theme=doom] .stat dt{order:2;margin-top:2px;font-size:12px;color:#e8e8e8;text-shadow:1px 1px 0 #000}
+[data-rt-theme=doom] .stat small{order:3}
+/* Tabs as the ARMS grid: yellow numbers */
+[data-rt-theme=doom] .tabs{counter-reset:arms 1}
+[data-rt-theme=doom] .tabs button{counter-increment:arms;display:flex;flex-direction:column;gap:1px;padding:5px 2px 4px}
+[data-rt-theme=doom] .tabs button::before{content:counter(arms);font-size:15px;line-height:1;color:var(--d-yellow);text-shadow:1px 1px 0 #000}
+[data-rt-theme=doom] .tabs button[aria-selected=true]::before{color:#fff}
+/* Menu pointer */
+[data-rt-theme=doom] button:not(.tabs button):not(.icon-btn):not(.pad):hover::before{content:"";width:0;height:0;margin-right:6px;border-left:9px solid var(--d-red);border-top:6px solid transparent;border-bottom:6px solid transparent;filter:drop-shadow(1px 1px 0 #000)}
+[data-rt-theme=doom] :is(.section-nav button,nav:not(.tabs) button):hover::before,[data-rt-theme=doom] :is(.section-nav button[aria-current=page],nav:not(.tabs) button.active)::before{content:"";width:0;height:0;border-left:9px solid var(--d-red);border-top:6px solid transparent;border-bottom:6px solid transparent}
+[data-rt-theme=doom] .bar{background:transparent;box-shadow:inset 0 -3px 0 #000,inset 0 -6px 0 rgba(0,0,0,.4)}
+[data-rt-theme=doom] .bar .wordmark{filter:drop-shadow(2px 2px 0 #000) drop-shadow(0 0 8px rgba(255,80,0,.45))}
+[data-rt-theme=doom]{--rt-text-sm:14px;--rt-text-md:15px}
+[data-rt-theme=doom] .tally{margin-top:12px}
+
+/* ── Status strip: keycard slots, a damage flash and fire ──
+   Three key slots like the status bar's: the blue key lights while Tyler
+   listens, the yellow key blinks while it thinks (like a locked door), the red
+   key burns while it talks with flames along the bottom, all three when idle.
+   Errors flash the strip red like taking a hit. */
+[data-rt-theme=doom] .tally-wave{height:auto;gap:3px;padding:3px 4px;background:#000;border:2px solid;border-color:var(--d-stone-lo) var(--d-stone-hi) var(--d-stone-hi) var(--d-stone-lo)}
+[data-rt-theme=doom] .tally-wave i:nth-child(n+4){display:none}
+[data-rt-theme=doom] .tally[data-state] .tally-wave i{width:8px;height:12px;border-radius:1px;opacity:.14;animation:none;box-shadow:inset 0 -3px 0 rgba(0,0,0,.35)}
+[data-rt-theme=doom] .tally-wave i:nth-child(1){background:linear-gradient(180deg,#a8c0ff,#2a5cff 45%,#0a2aa0)}
+[data-rt-theme=doom] .tally-wave i:nth-child(2){background:linear-gradient(180deg,#fff3a0,#ffd34d 45%,#a07400)}
+[data-rt-theme=doom] .tally-wave i:nth-child(3){background:linear-gradient(180deg,#ffb09a,#ff2a10 45%,#900000)}
+[data-rt-theme=doom] .tally[data-state=ready] .tally-wave i,
+[data-rt-theme=doom] .tally[data-state=listening] .tally-wave i:nth-child(1),
+[data-rt-theme=doom] .tally[data-state=waiting] .tally-wave i:nth-child(2),
+[data-rt-theme=doom] .tally[data-state=speaking] .tally-wave i:nth-child(3){opacity:1;box-shadow:inset 0 -3px 0 rgba(0,0,0,.35),0 0 6px rgba(255,255,255,.35)}
+[data-rt-theme=doom] .tally[data-state=thinking] .tally-wave i:nth-child(2){opacity:1;animation:doom-key .5s steps(1) infinite}
+[data-rt-theme=doom] .tally[data-state=error] .tally-wave i:nth-child(3){opacity:1;animation:doom-key .35s steps(1) infinite}
+@keyframes doom-key{0%{opacity:1}50%{opacity:.14}}
+[data-rt-theme=doom] .tally{padding-bottom:13px}
+[data-rt-theme=doom] .tally-text{text-shadow:1px 1px 0 #000,2px 2px 0 rgba(0,0,0,.6)}
+[data-rt-theme=doom] .tally::before{content:"";position:absolute;inset:0;background:#ff0000;opacity:0;pointer-events:none}
+[data-rt-theme=doom] .tally[data-state=error]::before{animation:doom-hurt 1.6s steps(1) infinite}
+@keyframes doom-hurt{0%{opacity:.42}8%{opacity:.28}16%{opacity:.14}24%,100%{opacity:0}}
+[data-rt-theme=doom] .tally::after{content:"";position:absolute;left:0;right:0;bottom:0;height:30px;opacity:0;pointer-events:none;transform-origin:bottom;
+  background:radial-gradient(3px 11px at 50% 100%,rgba(255,250,200,.95),rgba(255,200,60,.8) 40%,transparent 72%) 0 100%/9px 24px repeat-x,
+    radial-gradient(5px 17px at 50% 100%,rgba(255,170,30,.9),rgba(255,90,0,.6) 50%,transparent 76%) 3px 100%/14px 28px repeat-x,
+    radial-gradient(8px 24px at 50% 100%,rgba(240,60,0,.75),rgba(150,10,0,.35) 60%,transparent 80%) 11px 100%/23px 30px repeat-x,
+    radial-gradient(12px 28px at 50% 100%,rgba(190,20,0,.6),transparent 75%) 5px 100%/37px 30px repeat-x,
+    linear-gradient(0deg,rgba(255,80,0,.55),rgba(255,40,0,.15) 35%,transparent 60%);
+  -webkit-mask:linear-gradient(0deg,#000 25%,rgba(0,0,0,.6) 60%,transparent);mask:linear-gradient(0deg,#000 25%,rgba(0,0,0,.6) 60%,transparent)}
+[data-rt-theme=doom] .tally[data-state=speaking]::after{opacity:1;animation:doom-fire .72s steps(1) infinite}
+@keyframes doom-fire{0%{background-position:0 100%,3px 100%,11px 100%,5px 100%,0 0;transform:scaleY(.9)}
+  17%{background-position:4px 100%,-2px 100%,4px 100%,12px 100%,0 0;transform:scaleY(1.08)}
+  33%{background-position:2px 100%,8px 100%,17px 100%,-6px 100%,0 0;transform:scaleY(.96)}
+  50%{background-position:6px 100%,1px 100%,-3px 100%,16px 100%,0 0;transform:scaleY(1.15)}
+  67%{background-position:1px 100%,10px 100%,8px 100%,1px 100%,0 0;transform:scaleY(.92)}
+  83%{background-position:5px 100%,5px 100%,20px 100%,9px 100%,0 0;transform:scaleY(1.05)}}
+
+/* ── v2.13: the logo is the status-bar face: pixel art in a recessed stone box,
+   exactly where DOOM kept the marine's mug. ── */
+[data-rt-theme=doom] :is(.mark[data-logo],img.mark,#brand-logo){--logo-pad:2px;background:#151515;border:3px solid;border-color:var(--d-stone-lo) var(--d-stone-hi) var(--d-stone-hi) var(--d-stone-lo);border-radius:0;image-rendering:pixelated}
+[data-rt-theme=doom] .mark[data-logo]{width:46px;height:46px;margin:-7px 0}
+
+/* ── Icons, dialogs, notifications and tooltips (v2.14) ──
+   Real pixel icons: a 10×10 drawing at whole-pixel sizes with hard edges, in the
+   menu's light grey with red details, yellow for the chosen tab. Messages are
+   bevelled stone panels with red pixel headings and yellow emphasis. */
+[data-rt-theme=doom] .ic{--ic-size:20px;--px-a:currentColor;--px-b:var(--d-red)}
+[data-rt-theme=doom] .ic-v{display:none}
+[data-rt-theme=doom] .ic-p{display:inline}
+[data-rt-theme=doom] button .ic{--ic-size:20px;vertical-align:-5px}
+[data-rt-theme=doom] .tabs button[aria-selected=true] .ic{--px-a:var(--d-yellow)}
+[data-rt-theme=doom] .ic[data-i=success]{--px-a:#6ad46a;--px-b:#0c2a0c}
+[data-rt-theme=doom] .ic[data-i=warning]{--px-a:var(--d-yellow);--px-b:#2a1a00}
+[data-rt-theme=doom] .ic[data-i=error]{--px-a:var(--d-red);--px-b:#2a0000}
+[data-rt-theme=doom] .ic[data-i=info]{--px-a:#9fc2ff;--px-b:#0a1630}
+[data-rt-theme=doom] .tabs button{display:grid;grid-template-columns:auto auto;justify-content:center;align-items:center;column-gap:4px;row-gap:1px}
+[data-rt-theme=doom] .tabs button::before{grid-column:1;grid-row:1}
+[data-rt-theme=doom] .tabs button .ic{grid-column:2;grid-row:1}
+[data-rt-theme=doom] .tabs button .tab-label{grid-column:1/-1;grid-row:2}
+[data-rt-theme=doom] :is(.rt-toast,.rt-dialog){background:var(--d-stone-tex);border:4px solid;border-color:var(--d-bevel);border-radius:0;box-shadow:0 0 0 2px #000,0 10px 30px rgba(0,0,0,.6)}
+[data-rt-theme=doom] :is(.rt-toast-title,.rt-dialog-title){font-family:var(--rt-font-display);font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--d-red);text-shadow:2px 2px 0 #000}
+[data-rt-theme=doom] .rt-dialog-title{font-size:22px}
+[data-rt-theme=doom] :is(.rt-toast-text,.rt-dialog-text,.rt-steps){color:#ececec;text-shadow:1px 1px 0 #000}
+[data-rt-theme=doom] :is(.rt-toast,.rt-dialog)[data-kind=warning] :is(.rt-toast-title,.rt-dialog-title){color:var(--d-yellow)}
+[data-rt-theme=doom] .rt-scrim{background:rgba(48,0,0,.55)}
+[data-rt-theme=doom] .rt-tip{background:#000;color:var(--d-yellow);border:2px solid #5a5a5a;border-radius:0;font-family:var(--rt-font-display);text-transform:uppercase}

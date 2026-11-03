@@ -1,0 +1,45 @@
+ROBOTIC TYLER v2.3.19 - Chrome group music upgrade
+
+INSTALL
+Close Steam web chat tabs. Copy ALL browser-extension contents over the
+SAME existing unpacked extension folder, including neural. Reload that
+extension at chrome://extensions. Reopen Steam chat and Connect & start.
+Do not uninstall or change the folder path/extension ID; settings and keys
+are retained. Re-share the YouTube tab's audio using the existing setup.
+All earlier patches and features are included; Electron/native unchanged.
+
+WHAT CHANGED
+- music skip is a vote: exactly two different detected Steam accounts.
+  One person's repeated votes, including a changed nickname, count once.
+  Votes reset each song. DJ panel has an immediate Skip now button.
+- Three waiting songs per requester, twelve total waiting slots. Playback
+  rotates requesters and keeps each person's own song order.
+- Names appear on queued requests, queue listings and now-playing cards
+  posted directly into Steam chat. No manual names/IDs required.
+- Music panel Sender check reports whether the current sender can vote.
+  Votes need an account key on that message's own author/profile markup;
+  display-name fallback remains available for labels, not votes. An unknown
+  sender cannot cast a counted vote. No raw account IDs are shown in cards.
+- Serial request/control/event processing prevents a skip/end race from
+  starting two songs. Old player events cannot advance the new song.
+  Multiline bot output cannot trigger its own music commands.
+- Switching the connected chat clears the room's queue and votes.
+
+TRY IT
+Have Alex and Sam request different songs with !play artist song. Names
+should appear automatically. Look at Sender check after each new message:
+it should say ready for skip votes. If it says name only or not detected,
+the live reader still needs attention; no manual ID entry is required.
+Alex types music skip: 1/2. Alex types it again: still one vote.
+Sam types music skip: 2/2 and the next song starts.
+Use music now and music queue for named music cards in chat.
+
+TESTING
+98 automated checks pass, plus JavaScript syntax checks.
+Automated tests cover fair ordering, request limits, distinct account votes,
+nickname changes, identical names on different accounts, missing sender
+identity, actual chat controller flow, stale events, emergency stop and bot
+output replay. Live Steam sender markup has not been verified here; the
+visible sender check is included so recognition can be tested directly.
+YouTube search, volume, tab sharing, Premium and playback behavior are
+unchanged. No live messages were sent or account settings changed by tests.

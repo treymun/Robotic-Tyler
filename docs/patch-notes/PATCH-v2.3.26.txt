@@ -1,0 +1,48 @@
+ROBOTIC TYLER v2.3.26 — Five-minute text mute votes (Chrome)
+
+SETUP
+Keep local Steam admin controls enabled with message-deletion permission.
+In Kick & text-mute votes, enable five-minute vote-to-text-mute for this
+Steam group. This is a separate opt-in and defaults off for each group.
+
+CHAT
+!votemute NAME          Start a five-minute text mute ballot.
+!mute yes / !mute no    One vote per identified Steam account.
+!mute status           Ballot status and active mute remaining times.
+!mute cancel           Caller/group owner cancels the pending ballot.
+!modhelp               Moderation command guide.
+
+Three distinct eligible yes voters pass. The caller counts as the first
+yes; a local panel start has no automatic vote. The target and bot cannot
+vote. Owner and bot are protected targets. Ballots expire after 60 seconds.
+Kick and mute ballots share one slot: no simultaneous moderation votes or
+overlapping Steam actions. No cooldown between completed ballots.
+
+The five minutes begin when the vote passes. Only the target's NEW loaded
+messages in the connected text channel are deleted. Earlier messages stay.
+Existing mutes cannot be extended with another vote. Actual account IDs are
+read automatically; repeated messages/nickname changes do not add votes.
+
+Expiry is enforced before each deletion as well as by a UI timer. Delayed
+timers and queued requests cannot keep deleting after the deadline. Use
+Unmute selected member in the local Steam admin panel to end a mute early.
+Disabling mute votes clears timed vote mutes; direct manual mutes remain.
+Disabling local admin controls, changing chats, stopping/reloading Tyler
+or losing the active tab ends all session text mutes. No persistence across
+sessions. This deletes messages after posting: they can appear briefly.
+Existing queue, freshness, sub-second timestamp and permission safeguards
+from v2.3.25 still apply. Voice is unaffected.
+
+ALSO ADDED
+Ballot remaining-time display, active text-mute countdown list, !modhelp,
+and wrong-vote-type guidance (!kick yes cannot count toward a mute ballot).
+
+Existing Chrome settings/features and desktop programs preserved. No new
+Chrome permissions. Steam private UI controls remain experimental; no live
+users were moderated or messages deleted in development.
+
+UPDATE
+Close old Steam chat and Tyler YouTube tabs. Copy ALL browser-extension
+files over the SAME existing loaded extension folder. Reload the existing
+extension, reopen/connect Steam and re-share YouTube music. Do not uninstall
+or change the folder path: that preserves saved settings and keys.

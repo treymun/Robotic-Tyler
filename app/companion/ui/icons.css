@@ -1,0 +1,26 @@
+/*
+ * Icons (v2.14): one meaning per icon, styled by the theme. Source and drawing
+ * rules: tools/icons/icons.mjs. Each icon carries a vector drawing (layers .b body,
+ * .d details, .s strokes) and a 10×10 pixel drawing (.p1/.p2); themes pick one.
+ * Default (Steam): clean outlined symbols with round ends.
+ * Used by the chat panel, the settings page and the Voice Studio.
+ */
+.ic{width:var(--ic-size,16px);height:var(--ic-size,16px);flex-shrink:0;display:inline-block;vertical-align:-3px;overflow:visible;color:var(--ic-color,currentColor);box-sizing:border-box}
+.ic-p{display:none}
+.ic-v .b,.ic-v .d,.ic-v .s{fill:none;stroke:currentColor;stroke-width:var(--ic-w,1.5px);stroke-linecap:var(--ic-cap,round);stroke-linejoin:var(--ic-join,round);vector-effect:non-scaling-stroke}
+.ic-p .p1{fill:var(--px-a,currentColor)}
+.ic-p .p2{fill:var(--px-b,currentColor)}
+/* Status icons carry their meaning in colour as well as shape */
+.ic[data-i=success]{--ic-color:var(--rt-state-ready)}
+.ic[data-i=warning]{--ic-color:var(--rt-state-waiting)}
+.ic[data-i=error]{--ic-color:var(--rt-state-error)}
+.ic[data-i=info]{--ic-color:var(--rt-state-listening)}
+
+/* Icon + label pairs (tabs, nav, buttons): the label stays, the icon leads */
+.with-ic{display:inline-flex;align-items:center;justify-content:center;gap:6px}
+.tabs button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+.tabs button .ic{--ic-size:15px;margin:0;opacity:.85}
+.tabs button[aria-selected=true] .ic{opacity:1}
+button .ic{--ic-size:14px;margin-right:6px;vertical-align:-2px}
+.icon-btn .ic{--ic-size:16px;margin:0}
+.board-tools label>.ic{--ic-size:14px;margin-right:6px;vertical-align:-2px}

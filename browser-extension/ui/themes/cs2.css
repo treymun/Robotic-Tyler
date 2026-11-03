@@ -1,0 +1,183 @@
+/*
+ * ROBOTIC TYLER "Counter-Strike 2 style" theme (v2.9).
+ *
+ * Built from CS2's own menu styles: the dark slate-blue background gradient
+ * (#14202b → #1e2d3d) with a faint dot grid, see-through blurred panels
+ * (rgba(20,20,20,.4)), grey body text (#ccc), white capitals on buttons, the
+ * light-cyan selected-tab colour (#82D8FF), the blue switches (#3281AC), the
+ * green "accept" button with its bright green edge (#4CAF50), and the T / CT
+ * colours (#EABE54 / #96C8FA). Corners are 2–3 px.
+ * Type: "Tyler CS2" = Saira Semi Condensed (OFL), the closest open stand-in for
+ * CS2's squared Stratum type, used for everything like the game does.
+ * Style only: no CS2 logos, artwork, textures or game fonts.
+ */
+[data-rt-theme=cs2]{
+  color-scheme:dark;
+  --cs-bg-a:#14202b;--cs-bg-b:#1e2d3d;--cs-nav:#82d8ff;--cs-blue:#3281ac;--cs-blue-ink:#2b6f94;--cs-blue-dark:#0d354a;
+  --cs-t:#eabe54;--cs-ct:#96c8fa;--cs-green:#2e7d32;--cs-green-edge:#4caf50;--cs-text:#cccccc;--cs-border:#4b4b4b;
+
+  --rt-bar:#111b25;--rt-bg:var(--cs-bg-a);--rt-bg-deep:#0d151d;
+  --rt-surface:var(--cs-bg-b);--rt-surface-2:#253747;--rt-surface-3:#2d4254;
+  --rt-block:rgba(20,20,20,.4);--rt-block-hover:rgba(255,255,255,.05);--rt-input:#0d151d;--rt-select:var(--cs-blue-dark);
+  --rt-line:rgba(255,255,255,.08);--rt-line-soft:rgba(255,255,255,.08);--rt-line-strong:var(--cs-border);
+
+  --rt-ink:var(--cs-text);--rt-ink-strong:#ffffff;--rt-ink-2:#bdbdbd;--rt-ink-3:#a9b1b9;--rt-ink-4:#9aa3ac;--rt-ink-disabled:#828282;
+  --rt-link:var(--cs-nav);--rt-link-hover:#ffffff;
+  --rt-blue:#ffffff;--rt-blue-deep:var(--cs-blue);--rt-active:var(--cs-nav);
+  --rt-blue-fade:rgba(255,255,255,.08);--rt-blue-fade-hover:rgba(255,255,255,.16);
+  --rt-green:var(--cs-green);--rt-green-hover:linear-gradient(var(--cs-green),var(--cs-green));--rt-green-ink:#ffffff;--rt-green-line:var(--cs-green-edge);
+
+  --rt-state-standby:#9aa3ac;--rt-state-ready:#8fbd4a;--rt-state-listening:var(--cs-ct);--rt-state-thinking:var(--cs-t);
+  --rt-state-speaking:#65e46a;--rt-state-waiting:#d4cf4a;--rt-state-error:#f0675b;
+  --rt-danger:#f0675b;--rt-danger-bg:#a8322a;--rt-danger-hover:#bf3a30;--rt-danger-ink:#ffffff;--rt-success:#65e46a;--rt-focus:var(--cs-nav);
+  --rt-accent:var(--cs-nav);--rt-accent-soft:rgba(130,216,255,.12);--rt-accent-line:rgba(130,216,255,.5);
+
+  --rt-on-accent:#ffffff;--rt-accent-fill:var(--cs-blue-ink);
+  --rt-meter:linear-gradient(90deg,var(--cs-blue),var(--cs-nav));--rt-marker:#ffffff;--rt-edge:var(--cs-border);--rt-page-glow:var(--cs-bg-b);
+
+  --rt-font:"Tyler CS2","Segoe UI",Roboto,Arial,sans-serif;
+  --rt-font-display:"Tyler CS2","Bahnschrift SemiCondensed","Segoe UI",Arial,sans-serif;
+  --rt-text-xs:12px;--rt-text-sm:13px;--rt-text-md:14px;--rt-text-lg:15px;
+  --rt-track:.04em;
+  --rt-r-xs:2px;--rt-r-sm:3px;--rt-r-md:3px;--rt-r-lg:3px;
+  --rt-shadow-float:0 0 0 1px rgba(255,255,255,.08),0 20px 60px rgba(0,0,0,.7);
+  --cs-dots:radial-gradient(rgba(255,255,255,.05) 1px,transparent 1.4px) 0 0/7px 7px;
+  --cs-backdrop:linear-gradient(to top left,var(--cs-bg-a),var(--cs-bg-b));
+}
+
+/* ── Slate gradient with the faint dot grid ───────────────────────────── */
+.panel[data-rt-theme=cs2]{background:var(--cs-dots),var(--cs-backdrop)}
+[data-rt-theme=cs2] body{background:var(--cs-dots),var(--cs-backdrop) fixed}
+[data-rt-theme=cs2] main{background:transparent}
+[data-rt-theme=cs2] .side{background:rgba(0,0,0,.28);box-shadow:inset -1px 0 0 rgba(255,255,255,.08)}
+
+/* Everything in the squared sans; titles and buttons in white capitals */
+[data-rt-theme=cs2] :is(h1,h2,.wordmark,.brand-text strong,.sheet-head h2,.card>h2,details.feature>summary,.marquee,button,.tabs button,.section-nav button,nav:not(.tabs) button,.tally-label,.stat dt,.pulse dt,.facts b,.matrix dt){
+  font-family:var(--rt-font-display);text-transform:uppercase}
+[data-rt-theme=cs2] :is(h1,h2,.sheet-head h2,.card>h2){font-weight:600;color:#fff;letter-spacing:.02em}
+[data-rt-theme=cs2] h2{font-size:18px}
+[data-rt-theme=cs2] h1{font-size:30px}
+[data-rt-theme=cs2] .wordmark{font-size:16px;font-weight:600;letter-spacing:.06em;color:#fff}
+[data-rt-theme=cs2] label:not(:has(>input[type=checkbox])):not(.toggle){font-weight:600;font-size:12px;letter-spacing:.06em;color:var(--rt-ink-3)}
+[data-rt-theme=cs2] p{color:var(--rt-ink-3)}
+
+/* Top bar and tabs: CS2's navbar, selected tab in light cyan */
+[data-rt-theme=cs2] .bar{background:rgba(255,255,255,.02);box-shadow:inset 0 -1px 0 rgba(255,255,255,.08)}
+[data-rt-theme=cs2] .tabs{gap:0;padding:0;background:rgba(0,0,0,.25);box-shadow:inset 0 -1px 0 rgba(255,255,255,.08)}
+[data-rt-theme=cs2] .tabs button{padding:12px 2px 10px;font-size:14px;font-weight:600;letter-spacing:.05em;color:#fff;border-bottom:2px solid transparent;
+  box-shadow:inset 1px 0 0 rgba(255,255,255,.1)}
+[data-rt-theme=cs2] .tabs button:first-child{box-shadow:none}
+[data-rt-theme=cs2] .tabs button:hover{background:rgba(255,255,255,.05);color:#fff}
+[data-rt-theme=cs2] .tabs button[aria-selected=true]{color:var(--cs-nav);border-bottom-color:var(--cs-nav);background:rgba(130,216,255,.06)}
+[data-rt-theme=cs2] .foot{background:rgba(0,0,0,.25);box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+[data-rt-theme=cs2] :is(.section-nav button,nav:not(.tabs) button){font-weight:600;letter-spacing:.05em;color:#fff;border-radius:0}
+[data-rt-theme=cs2] :is(.section-nav button,nav:not(.tabs) button):hover{background:rgba(255,255,255,.05);color:#fff}
+[data-rt-theme=cs2] :is(.section-nav button[aria-current=page],nav:not(.tabs) button.active){color:var(--cs-nav);background:rgba(130,216,255,.08);box-shadow:inset 3px 0 0 var(--cs-nav)}
+[data-rt-theme=cs2] :is(.section-nav button[aria-current=page],nav:not(.tabs) button.active) .ic{color:var(--cs-nav)}
+
+/* Buttons: white capitals on glass, the main action is the green accept button */
+[data-rt-theme=cs2] button{font-weight:600;font-size:14px;letter-spacing:.03em;color:#fff;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);box-shadow:none;transition:background-color .1s}
+[data-rt-theme=cs2] button:hover{color:#fff;background:rgba(255,255,255,.16)}
+[data-rt-theme=cs2] :is(.primary,#start,#save){color:#fff;background:var(--cs-green);border:2px solid var(--cs-green-edge);box-shadow:0 0 0 0 rgba(76,175,80,0)}
+[data-rt-theme=cs2] :is(.primary,#start,#save):hover{background:var(--cs-green);box-shadow:0 0 14px rgba(76,175,80,.45)}
+[data-rt-theme=cs2] .danger{color:#fff;background:var(--rt-danger-bg);border-color:#db4437}
+[data-rt-theme=cs2] :is(.ghost,.icon,.icon-btn){background:transparent;border-color:transparent}
+[data-rt-theme=cs2] :is(.ghost,.icon,.icon-btn):hover{background:rgba(255,255,255,.08)}
+[data-rt-theme=cs2] :is(.pad,.friend-card,.preset,.link-btn){text-transform:none;letter-spacing:0}
+[data-rt-theme=cs2] .link-btn{background:none;border:0;color:var(--cs-nav)}
+
+/* See-through blurred panels */
+[data-rt-theme=cs2] :where(details,.callout,.quick-help,.confirm,.deck-entry,.board-tools,.sheet,.card,.route-card,.panel,.stats,.mini-callout>div,.usage-banner,.facts>div,.matrix>div,#setup,.arcade-tickets>div){
+  background:rgba(20,20,20,.4);border:1px solid rgba(255,255,255,.06);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+[data-rt-theme=cs2] details.feature[open]{background:rgba(20,20,20,.5)}
+[data-rt-theme=cs2] details.feature>summary{font-weight:600;font-size:14px;letter-spacing:.04em;color:#fff}
+[data-rt-theme=cs2] :is(.quick-help,.confirm){border-left:3px solid var(--cs-t)}
+[data-rt-theme=cs2] .deck-entry{border-left:3px solid var(--cs-ct)}
+[data-rt-theme=cs2] #setup{border-left:3px solid var(--cs-t)}
+[data-rt-theme=cs2] .tally{background:linear-gradient(90deg,color-mix(in srgb,var(--tone) 14%,transparent),rgba(20,20,20,.4) 70%);border:1px solid rgba(255,255,255,.06)}
+[data-rt-theme=cs2] .tally-label{font-weight:600;letter-spacing:.08em}
+[data-rt-theme=cs2] .stat dt{font-weight:600;font-size:11px;letter-spacing:.08em}
+[data-rt-theme=cs2] .stat dd{font-weight:600;font-size:18px}
+
+/* Fields and CS2's capsule switches */
+[data-rt-theme=cs2] input:where(:not([type=checkbox],[type=radio],[type=range],[type=file])),[data-rt-theme=cs2] :is(textarea,select){
+  color:var(--cs-text);background-color:rgba(0,0,0,.3);border:1px solid var(--cs-border);border-radius:2px;box-shadow:none}
+[data-rt-theme=cs2] :is(input,textarea,select):focus{border-color:var(--cs-nav);box-shadow:none}
+[data-rt-theme=cs2] input[type=range]{accent-color:var(--cs-blue)}
+[data-rt-theme=cs2] input[type=checkbox]{border-radius:4px;background:var(--cs-bg-b);border-color:#000;box-shadow:0 0 2px 1px rgba(0,0,0,.35)}
+[data-rt-theme=cs2] input[type=checkbox]:checked{background:var(--cs-blue-ink);border-color:var(--cs-blue)}
+[data-rt-theme=cs2] .toggle>input[type=checkbox]{width:34px;height:16px;border-radius:4px;background:var(--cs-bg-a);border:0;box-shadow:inset -1px 0 3px #000}
+[data-rt-theme=cs2] .toggle>input[type=checkbox]::after{top:-1px;left:0;width:18px;height:18px;border-radius:4px;background:var(--cs-bg-b);box-shadow:0 0 3px 2px rgba(0,0,0,.4)}
+[data-rt-theme=cs2] .toggle>input[type=checkbox]:checked{background:rgba(50,129,172,.25)}
+[data-rt-theme=cs2] .toggle>input[type=checkbox]:checked::after{top:-1px;left:0;width:18px;height:18px;border-radius:4px;transform:translateX(16px);background:var(--cs-blue);box-shadow:2px 0 3px #000}
+
+/* Tags, meters, pads */
+[data-rt-theme=cs2] .pill{color:var(--cs-t);background:rgba(234,190,84,.12);box-shadow:inset 0 0 0 1px rgba(234,190,84,.35)}
+[data-rt-theme=cs2] .pill.on{color:#65e46a;background:rgba(76,175,80,.14);box-shadow:inset 0 0 0 1px rgba(76,175,80,.4)}
+[data-rt-theme=cs2] :is(.meter,.arcade-progress,.lat-track){background:rgba(0,0,0,.35);box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
+[data-rt-theme=cs2] .pad{background:rgba(20,20,20,.4);border:1px solid rgba(255,255,255,.07)}
+[data-rt-theme=cs2] .pad:hover{background:rgba(255,255,255,.08)}
+[data-rt-theme=cs2] .pad::after{border-left-color:var(--cs-nav)}
+[data-rt-theme=cs2] .pad.playing{background:linear-gradient(90deg,rgba(101,228,106,.18),rgba(20,20,20,.4) 80%);box-shadow:inset 3px 0 0 #65e46a}
+[data-rt-theme=cs2] :is(.step-n,.setup-n,.friend-card .avatar){background:var(--cs-blue-ink);color:#fff}
+[data-rt-theme=cs2] .setup-step[data-done=true] .setup-n{background:var(--cs-green);box-shadow:inset 0 0 0 1px var(--cs-green-edge)}
+[data-rt-theme=cs2] .preset.active{background:var(--cs-blue-dark);color:var(--cs-nav);border-color:var(--cs-nav)}
+[data-rt-theme=cs2] code{color:var(--cs-nav);background:rgba(0,0,0,.35)}
+[data-rt-theme=cs2] .route li{background:rgba(20,20,20,.4);box-shadow:inset 0 0 0 1px rgba(255,255,255,.07)}
+[data-rt-theme=cs2] .route li:last-child{background:linear-gradient(90deg,rgba(76,175,80,.2),rgba(20,20,20,.4) 85%);box-shadow:inset 3px 0 0 var(--cs-green-edge)}
+[data-rt-theme=cs2] :is(.scroll,.content,main){scrollbar-color:#3a4a5a transparent}
+html[data-rt-theme=cs2]{scrollbar-color:#3a4a5a transparent}
+
+/* ── Status strip: matchmaking ──
+   Five player slots like the match-accept screen, a timer bar along the bottom
+   and a small light that blinks like a planted C4, faster and faster, while
+   Tyler thinks. Slots fill green one by one while it talks (match accepted). */
+[data-rt-theme=cs2] .tally{padding:10px 12px 13px 10px;box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+[data-rt-theme=cs2] .tally-light{width:8px;height:8px;flex:0 0 8px;margin-top:5px;border-radius:50%;background:var(--tone);box-shadow:0 0 0 2px rgba(0,0,0,.7),0 0 8px var(--tone)}
+[data-rt-theme=cs2] .tally[data-state=thinking] .tally-light{background:#ff3b30;box-shadow:0 0 0 2px rgba(0,0,0,.7),0 0 10px #ff3b30;animation:cs2-c4 3s steps(1,end) infinite}
+[data-rt-theme=cs2] .tally-wave{gap:4px;height:10px}
+[data-rt-theme=cs2] .tally-wave i:nth-child(n+6){display:none}
+[data-rt-theme=cs2] .tally[data-state] .tally-wave i{width:11px;height:10px;border-radius:0;opacity:1;background:transparent;box-shadow:inset 0 0 0 1px rgba(204,204,204,.4);animation:none}
+[data-rt-theme=cs2] .tally[data-state=ready] .tally-wave i{background:rgba(143,189,74,.55);box-shadow:inset 0 0 0 1px #8fbd4a}
+[data-rt-theme=cs2] .tally[data-state=listening] .tally-wave i{animation:cs2-search 1.6s ease-out infinite}
+[data-rt-theme=cs2] .tally[data-state=thinking] .tally-wave i{box-shadow:inset 0 0 0 1px rgba(234,190,84,.7)}
+[data-rt-theme=cs2] .tally[data-state=speaking] .tally-wave i{background:#4caf50;box-shadow:inset 0 0 0 1px #65e46a;animation:cs2-accept 2.6s steps(1,end) infinite}
+[data-rt-theme=cs2] .tally[data-state=error] .tally-wave i{box-shadow:inset 0 0 0 1px #f0675b;background:rgba(240,103,91,.25)}
+[data-rt-theme=cs2] .tally[data-state] .tally-wave i:nth-child(2){animation-delay:.16s!important}
+[data-rt-theme=cs2] .tally[data-state] .tally-wave i:nth-child(3){animation-delay:.32s!important}
+[data-rt-theme=cs2] .tally[data-state] .tally-wave i:nth-child(4){animation-delay:.48s!important}
+[data-rt-theme=cs2] .tally[data-state] .tally-wave i:nth-child(5){animation-delay:.64s!important}
+[data-rt-theme=cs2] .tally[data-state] .tally-wave i:nth-child(1){animation-delay:0s!important}
+[data-rt-theme=cs2] .tally::after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--tone);opacity:.35;transform-origin:left}
+[data-rt-theme=cs2] .tally[data-state=listening]::after{opacity:1;background:linear-gradient(90deg,transparent,var(--cs-ct),transparent) 0 0/30% 100% no-repeat;animation:cs2-scan 1.6s ease-in-out infinite}
+[data-rt-theme=cs2] .tally[data-state=thinking]::after{opacity:1;background:var(--cs-t);animation:cs2-timer 3s linear infinite}
+[data-rt-theme=cs2] .tally[data-state=speaking]::after{opacity:1;background:linear-gradient(90deg,#2e7d32,#65e46a);box-shadow:0 0 8px rgba(101,228,106,.6);animation:cs2-timer 2.6s linear infinite}
+[data-rt-theme=cs2] .tally[data-state=error]::after{opacity:1}
+[data-rt-theme=cs2] .tally:is([data-state=standby],[data-state=paused])::after{opacity:0}
+@keyframes cs2-c4{0%{opacity:1}5%{opacity:.15}30%{opacity:1}34%{opacity:.15}52%{opacity:1}55%{opacity:.15}68%{opacity:1}70.5%{opacity:.15}80%{opacity:1}82%{opacity:.15}88%{opacity:1}89.5%{opacity:.15}93%{opacity:1}94%{opacity:.15}96%{opacity:1}97%{opacity:.15}98.5%{opacity:1}}
+@keyframes cs2-search{0%{background:rgba(150,200,250,.85);box-shadow:inset 0 0 0 1px #96c8fa}40%,100%{background:transparent;box-shadow:inset 0 0 0 1px rgba(204,204,204,.4)}}
+@keyframes cs2-accept{0%{background:transparent;box-shadow:inset 0 0 0 1px rgba(204,204,204,.4)}12%{background:#4caf50;box-shadow:inset 0 0 0 1px #65e46a,0 0 6px rgba(101,228,106,.6)}88%{background:transparent;box-shadow:inset 0 0 0 1px rgba(204,204,204,.4)}}
+@keyframes cs2-scan{from{background-position:-45% 0}to{background-position:145% 0}}
+@keyframes cs2-timer{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+
+/* ── v2.13: Premier-style rating plates ──
+   The HUD numbers sit on slanted plates with a coloured edge (CT blue, T gold,
+   Premier purple), the selected tab glows cyan underneath, and the logo is a
+   square avatar card like the one in CS2's top-right corner. */
+[data-rt-theme=cs2] .stat dd{display:inline-block;max-width:100%;margin-top:4px;padding:1px 13px 1px 14px;background:linear-gradient(90deg,var(--plate) 0 4px,rgba(0,0,0,.5) 4px);clip-path:polygon(7px 0,100% 0,calc(100% - 7px) 100%,0 100%)}
+[data-rt-theme=cs2] .stat:nth-child(1){--plate:var(--cs-ct)}
+[data-rt-theme=cs2] .stat:nth-child(2){--plate:var(--cs-t)}
+[data-rt-theme=cs2] .stat:nth-child(3){--plate:#b48cff}
+[data-rt-theme=cs2] .tabs button[aria-selected=true]{box-shadow:0 10px 14px -12px var(--cs-nav),inset 0 -2px 0 var(--cs-nav)}
+[data-rt-theme=cs2] :is(.mark[data-logo],img.mark,#brand-logo){--logo-pad:2px;background:rgba(0,0,0,.35);border:1px solid rgba(130,216,255,.45);border-radius:2px}
+
+/* ── Icons, dialogs, notifications and tooltips (v2.14) ──
+   Precise tactical pictograms: thin strokes, square ends, mitred corners.
+   Messages are crisp slate glass panels with a coloured edge and white capitals. */
+[data-rt-theme=cs2] .ic{--ic-w:1.3px;--ic-cap:butt;--ic-join:miter}
+[data-rt-theme=cs2] :is(.rt-toast,.rt-dialog){background:linear-gradient(180deg,rgba(30,45,61,.96),rgba(20,32,43,.96));border:1px solid rgba(255,255,255,.1);border-radius:2px;box-shadow:0 14px 40px rgba(0,0,0,.6);backdrop-filter:blur(6px)}
+[data-rt-theme=cs2] .rt-toast{border-left:3px solid var(--tone)}
+[data-rt-theme=cs2] .rt-dialog{border-top:2px solid var(--tone)}
+[data-rt-theme=cs2] :is(.rt-toast-title,.rt-dialog-title){font-family:var(--rt-font-display);font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#fff}
+[data-rt-theme=cs2] .rt-toast-text,.rt-dialog-text{color:var(--cs-text)}
+[data-rt-theme=cs2] .rt-tip{background:#0d151d;color:#e6eef5;border:1px solid rgba(130,216,255,.35);border-radius:2px}

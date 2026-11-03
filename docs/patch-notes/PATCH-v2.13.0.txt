@@ -1,0 +1,8 @@
+ROBOTIC TYLER PATCH v2.13.0
+
+- Every theme has its own Tyler logo, which swaps in the chat panel, settings, Voice Studio,
+  the Chrome toolbar icon and the desktop window/tray icons when you change theme.
+- The ten logos are aligned so the face stays in the same place when switching.
+- Theme refinements: Steam friends-list header, CS2 Premier-style plates, Portal chamber sign,
+  and a game-style logo frame for every theme.
+- Update Chrome as usual: copy browser-extension/ over the same folder, then Reload.

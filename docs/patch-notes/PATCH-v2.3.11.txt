@@ -1,0 +1,36 @@
+ROBOTIC TYLER v2.3.11 - Incoming voice noise filter
+
+INSTALL
+Close Steam chat tabs. Back up the existing unpacked extension folder.
+Copy all browser-extension contents over the SAME existing extension folder.
+Reload that extension at chrome://extensions, reopen Steam chat, join voice
+and Connect & start. Closing/reopening the chat is important because the
+audio listener starts when the page loads. Keep the same extension ID and
+folder path to preserve settings and keys.
+
+USE
+Conversation > Fine-tune listening & turn-taking now includes
+Filter keyboard clicks and background rumble. It defaults to ON and saves
+automatically when toggled. This is an incoming remote-voice filter, not an
+adjustment to your physical microphone or your friends' Steam settings.
+
+The bot's incoming recording path now uses 120 Hz high-pass and 4200 Hz
+low-pass audio filters. A peak-to-RMS impulse check rejects click-like
+frames. Capture opens after 150 ms of sustained qualifying audio. With
+filtering enabled, recorded qualifying speech must total at least 350 ms
+or the chosen Minimum speech setting, whichever is longer. This reduces
+short-click transcription even when the saved minimum is 0.20 seconds.
+
+This is a lightweight heuristic plus frequency filtering, not neural speech
+isolation. Keyboard sound mixed with speech can remain audible, sustained
+noise can still pass, and quiet/very short words can be missed. If normal
+speech is clipped, toggle the filter off to compare before changing other
+settings. The toggle bypasses click rejection and widens the audio band.
+No extra service, download, microphone capture or API charge is added by
+the filter itself. Existing speech transcription still uses its provider.
+
+Includes all prior updates. Electron and native Steam companion source is unchanged.
+61 automated checks and all extension JavaScript syntax checks pass.
+Tests include synthetic impulsive and sustained signals and the actual
+listener wiring with simulated audio. Real friends' microphones/keyboards
+and live Steam voice have not been tested in this environment.

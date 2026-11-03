@@ -1,0 +1,8 @@
+ROBOTIC TYLER PATCH v2.11.0
+
+- Every theme has its own animated status strip at the top of the panel: Steam presence avatar,
+  classic block progress bar, TF2 UberCharge meter, CS2 match-accept slots with a C4 light,
+  Portal swirl and indicator dots, CS 1.6 radar, HEV AUX POWER, L4D heart monitor, XP progress
+  bar and DOOM keycards with fire.
+- Animations stop when "reduce motion" is on.
+- Update Chrome as usual: copy browser-extension/ over the same folder, then Reload.

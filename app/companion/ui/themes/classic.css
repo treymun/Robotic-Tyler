@@ -1,0 +1,255 @@
+/*
+ * ROBOTIC TYLER "Classic Steam (2004)" theme (v2.7).
+ *
+ * The look of the Steam client around Half-Life 2's release: olive VGUI panels,
+ * tan text, gold highlights, 1px bevels (light top-left, dark bottom-right),
+ * square corners, Tahoma/Verdana and segmented progress bars. Style only:
+ * no Valve logos or artwork.
+ *
+ * One file for every surface:
+ *   - in-chat panel: compiled into ui-template.js after panel.css; the theme
+ *     attribute sits on each .panel element inside the shadow root
+ *   - settings page: <html data-rt-theme>, linked after settings.css
+ *   - Native Voice Studio: <html data-rt-theme>, copied to voice-app/ by tools/build.mjs
+ * Most of the change is token values; the rules below add the bevels and undo
+ * the gradients and glows the modern theme hard-codes.
+ * Text colours were picked for 4.5:1 or better on the surfaces they sit on.
+ */
+[data-rt-theme=classic]{
+  color-scheme:dark;
+  /* VGUI palette */
+  --c-face:#4c5844;            /* window / button face */
+  --c-well:#3e4637;            /* list and content well */
+  --c-deep:#2f3529;            /* text entry, output */
+  --c-raised:#56634c;
+  --c-hi:#889180;              /* bevel: light edge */
+  --c-lo:#282e22;              /* bevel: dark edge */
+  --c-gold:#dccd78;            /* armed / selected text */
+  --c-sel:#7a6f22;             /* selected row */
+
+  --rt-bar:var(--c-face);
+  --rt-bg:var(--c-well);
+  --rt-bg-deep:var(--c-deep);
+  --rt-surface:var(--c-face);
+  --rt-surface-2:var(--c-raised);
+  --rt-surface-3:var(--c-raised);
+  --rt-block:#475240;
+  --rt-block-hover:#4f5b47;
+  --rt-input:var(--c-deep);
+  --rt-select:var(--c-sel);
+  --rt-line:var(--c-lo);
+  --rt-line-soft:#5b6851;
+  --rt-line-strong:var(--c-hi);
+
+  --rt-ink:#d8ded3;
+  --rt-ink-strong:#ffffff;
+  --rt-ink-2:#d0d6c8;
+  --rt-ink-3:#c6cdbb;
+  --rt-ink-4:#bdc5b1;
+  --rt-ink-disabled:#828c76;
+
+  --rt-link:var(--c-gold);
+  --rt-link-hover:#fff3b0;
+  --rt-blue:#d8ded3;
+  --rt-blue-deep:var(--c-hi);
+  --rt-active:var(--c-gold);
+  --rt-blue-fade:var(--c-face);
+  --rt-blue-fade-hover:var(--c-face);
+  --rt-green:var(--c-raised);
+  --rt-green-hover:var(--c-raised);
+  --rt-green-ink:#ffffff;
+  --rt-green-line:var(--c-lo);
+
+  --rt-state-standby:#c3cab8;
+  --rt-state-ready:#a9cfe0;
+  --rt-state-listening:#b4d2ff;
+  --rt-state-thinking:#e9c763;
+  --rt-state-speaking:#bcd977;
+  --rt-state-waiting:#f5b679;
+  --rt-state-error:#ffb8a8;
+  --rt-danger:#ffa592;
+  --rt-danger-bg:#7d3a2f;
+  --rt-danger-hover:#8f4436;
+  --rt-success:#bcd977;
+  --rt-focus:var(--c-gold);
+  --rt-accent:var(--c-gold);
+  --rt-accent-soft:rgba(220,205,120,.16);
+  --rt-accent-line:rgba(220,205,120,.5);
+
+  --rt-font:Tahoma,Verdana,"DejaVu Sans",Geneva,sans-serif;
+  --rt-font-display:Verdana,Tahoma,"DejaVu Sans",Geneva,sans-serif;
+  --rt-font-mono:"Lucida Console","Courier New",monospace;
+  --rt-text-xs:11px;--rt-text-sm:11px;--rt-text-md:12px;--rt-text-lg:13px;
+  --rt-text-xl:16px;--rt-text-2xl:18px;--rt-text-3xl:20px;
+  --rt-track:0;
+  --rt-r-xs:0;--rt-r-sm:0;--rt-r-md:0;--rt-r-lg:0;
+  --rt-shadow-float:0 0 0 1px #000,3px 3px 0 rgba(0,0,0,.45);
+  --rt-fast:0ms;--rt-med:0ms;
+  --rt-danger-ink:#ffffff;--rt-on-accent:#ffffff;--rt-accent-fill:var(--c-raised);
+  --rt-meter:repeating-linear-gradient(90deg,var(--c-gold) 0 6px,transparent 6px 8px);
+  --rt-marker:#ffffff;--rt-edge:var(--c-lo);--rt-page-glow:var(--c-well);
+}
+html[data-rt-theme=classic]{scrollbar-color:#6a7860 var(--c-deep)}
+[data-rt-theme=classic] body{background:var(--rt-bg);-webkit-font-smoothing:auto}
+[data-rt-theme=classic] :focus-visible{outline:1px dotted var(--c-gold)!important;outline-offset:1px!important}
+
+/* ── Type: Verdana bold heads, gold section titles, no tracked capitals ── */
+[data-rt-theme=classic] h1{font:700 var(--rt-text-3xl)/1.2 var(--rt-font-display);letter-spacing:0;text-transform:none;color:#fff}
+[data-rt-theme=classic] h2{font:700 var(--rt-text-lg)/1.3 var(--rt-font-display);letter-spacing:0;text-transform:none;color:var(--c-gold)}
+[data-rt-theme=classic] h3{font-family:var(--rt-font-display);color:#fff}
+[data-rt-theme=classic] label{letter-spacing:0;text-transform:none}
+[data-rt-theme=classic] :is(.ident-sub,.stat dt,.tally-label,.pill,.pad span,.feature-title,.section-kicker,.brand-text small,.pulse dt,.facts b,.matrix dt,.slider-grid label small){letter-spacing:0;text-transform:none}
+[data-rt-theme=classic] code{background:var(--c-deep);color:var(--c-gold)}
+
+/* ── Buttons: raised face, gold text when armed, pressed = sunken ────── */
+[data-rt-theme=classic] button,[data-rt-theme=classic] .btn{
+  color:var(--rt-ink);background:var(--c-face);border:1px solid;border-color:var(--c-hi) var(--c-lo) var(--c-lo) var(--c-hi);
+  border-radius:0;box-shadow:none;font-family:var(--rt-font);text-transform:none;letter-spacing:0;transition:none}
+[data-rt-theme=classic] button:hover,[data-rt-theme=classic] .btn:hover{color:var(--c-gold);background:var(--c-face)}
+[data-rt-theme=classic] button:active{border-color:var(--c-lo) var(--c-hi) var(--c-hi) var(--c-lo);transform:none}
+[data-rt-theme=classic] button:disabled{color:var(--rt-ink-disabled);background:var(--c-face);opacity:1;border-color:var(--c-hi) var(--c-lo) var(--c-lo) var(--c-hi)}
+[data-rt-theme=classic] :is(.primary,#start,#save){color:#fff;font-weight:700;background:var(--c-raised);box-shadow:inset 0 0 0 1px rgba(0,0,0,.25)}
+[data-rt-theme=classic] :is(.primary,#start,#save):hover{color:#fff;background:#5f6d54}
+[data-rt-theme=classic] .danger{color:#fff;background:var(--rt-danger-bg)}
+[data-rt-theme=classic] .danger:hover{color:#fff;background:var(--rt-danger-hover)}
+[data-rt-theme=classic] input[type=file]::file-selector-button{color:var(--rt-ink);background:var(--c-face);border:1px solid;border-color:var(--c-hi) var(--c-lo) var(--c-lo) var(--c-hi);border-radius:0}
+[data-rt-theme=classic] input[type=file]::file-selector-button:hover{color:var(--c-gold);background:var(--c-face)}
+
+/* ── Text entry: sunken well ─────────────────────────────────────────── */
+[data-rt-theme=classic] :is(input:where(:not([type=checkbox],[type=radio],[type=range],[type=file])),textarea,select){
+  color:#fff;background-color:var(--c-deep);border:1px solid;border-color:var(--c-lo) var(--c-hi) var(--c-hi) var(--c-lo);border-radius:0;box-shadow:none;font-family:var(--rt-font);transition:none}
+[data-rt-theme=classic] :is(input,textarea,select):focus{border-color:var(--c-gold);box-shadow:none;outline:none}
+[data-rt-theme=classic] input[type=range]{accent-color:var(--c-gold)}
+
+/* Checkboxes (and the settings page's switches) become VGUI check boxes. */
+[data-rt-theme=classic] input[type=checkbox],[data-rt-theme=classic] .toggle>input[type=checkbox]{
+  width:13px;height:13px;margin:0;background:var(--c-deep);border:1px solid;border-color:var(--c-lo) var(--c-hi) var(--c-hi) var(--c-lo);border-radius:0;box-shadow:none;transition:none}
+[data-rt-theme=classic] input[type=checkbox]:checked,[data-rt-theme=classic] .toggle>input[type=checkbox]:checked{background:var(--c-deep);border-color:var(--c-lo) var(--c-hi) var(--c-hi) var(--c-lo)}
+[data-rt-theme=classic] .toggle>input[type=checkbox]::after{display:none}
+[data-rt-theme=classic] input[type=checkbox]:checked::after,[data-rt-theme=classic] .toggle>input[type=checkbox]:checked::after{
+  display:block;content:"";position:absolute;left:3.5px;top:.5px;width:3px;height:7px;background:none;border:solid var(--c-gold);border-width:0 2px 2px 0;border-radius:0;box-shadow:none;transform:rotate(45deg)}
+[data-rt-theme=classic] input[type=checkbox]:hover{border-color:var(--c-lo) var(--c-gold) var(--c-gold) var(--c-lo)}
+
+/* ── Group boxes: raised panels on the well ──────────────────────────── */
+[data-rt-theme=classic] :where(details,.callout,.quick-help,.confirm,.deck-entry,.board-tools,.sheet,.card,.route-card,.panel,.mini-callout>div,.usage-banner,.facts>div,.matrix>div,.banner,.arcade-tickets>div){
+  background:var(--rt-block);border:1px solid;border-color:var(--c-hi) var(--c-lo) var(--c-lo) var(--c-hi);box-shadow:none}
+[data-rt-theme=classic] details.feature,[data-rt-theme=classic] details.feature[open]{background:var(--rt-block)}
+[data-rt-theme=classic] details details,[data-rt-theme=classic] .raw{background:var(--c-well);border-color:var(--c-lo) var(--c-hi) var(--c-hi) var(--c-lo)}
+[data-rt-theme=classic] details.feature>summary{text-transform:none;letter-spacing:0;color:#fff}
+[data-rt-theme=classic] summary:hover{background:transparent;color:var(--c-gold)}
+[data-rt-theme=classic] details.feature>summary:hover{background:transparent}
+[data-rt-theme=classic] summary::after{border-color:var(--rt-ink)}
+[data-rt-theme=classic] :is(.quick-help,.confirm){box-shadow:inset 3px 0 0 var(--c-gold)}
+[data-rt-theme=classic] .banner{box-shadow:inset 3px 0 0 var(--rt-state-waiting)}
+[data-rt-theme=classic] #setup{background:var(--rt-block);border:1px solid;border-color:var(--c-hi) var(--c-lo) var(--c-lo) var(--c-hi);box-shadow:inset 3px 0 0 var(--rt-state-waiting)}
+[data-rt-theme=classic] .deck-entry{background:var(--rt-block)}
+[data-rt-theme=classic] :is(pre,.output,.v22-log,.response){background:var(--c-deep);border:1px solid;border-color:var(--c-lo) var(--c-hi) var(--c-hi) var(--c-lo);box-shadow:none}
+[data-rt-theme=classic] hr{border-top:1px solid var(--c-lo);box-shadow:0 1px 0 var(--c-hi)}
+
+/* Pills and tags: small sunken labels */
+[data-rt-theme=classic] .pill{color:var(--c-gold);background:var(--c-deep);border:1px solid;border-color:var(--c-lo) var(--c-hi) var(--c-hi) var(--c-lo)}
+[data-rt-theme=classic] .pill.on{color:var(--rt-state-speaking);background:var(--c-deep)}
+[data-rt-theme=classic] .route-hint span{background:var(--c-deep);border:1px solid;border-color:var(--c-lo) var(--c-hi) var(--c-hi) var(--c-lo)}
+
+/* Meters: sunken track, segmented fill like Steam's 2004 download bars */
+[data-rt-theme=classic] :is(.meter,.arcade-progress,.lat-track){background:var(--c-deep);border:1px solid;border-color:var(--c-lo) var(--c-hi) var(--c-hi) var(--c-lo);box-shadow:none}
+[data-rt-theme=classic] #level,[data-rt-theme=classic] .arcade-progress span{background:repeating-linear-gradient(90deg,var(--c-gold) 0 6px,transparent 6px 8px)}
+
+/* ── In-chat panel ───────────────────────────────────────────────────── */
+.panel[data-rt-theme=classic]{border:1px solid;border-color:var(--c-hi) var(--c-lo) var(--c-lo) var(--c-hi);font-family:var(--rt-font);-webkit-font-smoothing:auto}
+[data-rt-theme=classic] .bar{border-bottom:1px solid var(--c-lo)}
+[data-rt-theme=classic] .bar .mark:not([data-logo]){border-radius:0;box-shadow:none;border:1px solid;border-color:var(--c-lo) var(--c-hi) var(--c-hi) var(--c-lo)}
+[data-rt-theme=classic] .wordmark{font:700 13px/1.15 var(--rt-font-display);letter-spacing:.02em;color:#fff}
+[data-rt-theme=classic] .icon-btn{background:transparent;border:1px solid transparent;color:var(--rt-ink)}
+[data-rt-theme=classic] .icon-btn:hover{background:var(--c-face);color:var(--c-gold);border-color:var(--c-hi) var(--c-lo) var(--c-lo) var(--c-hi)}
+[data-rt-theme=classic] .tally{background:linear-gradient(90deg,color-mix(in srgb,var(--tone) 12%,var(--c-deep)),var(--c-deep) 70%);border:1px solid;border-color:var(--c-lo) var(--c-hi) var(--c-hi) var(--c-lo);transition:none}
+[data-rt-theme=classic] .tally-light{width:4px;box-shadow:none!important}
+[data-rt-theme=classic] .stats{background:var(--c-deep);border:1px solid;border-color:var(--c-lo) var(--c-hi) var(--c-hi) var(--c-lo)}
+/* Tabs: raised, the selected one joins the well below it */
+[data-rt-theme=classic] .tabs{gap:2px;padding:6px 6px 0;margin-top:8px;background:var(--c-face);box-shadow:none;border-bottom:1px solid var(--c-hi)}
+[data-rt-theme=classic] .tabs button{padding:6px 2px 5px;margin:0;background:#46513f;color:var(--rt-ink-3);border:1px solid;border-color:var(--c-hi) var(--c-lo) transparent var(--c-hi);border-bottom:0;font:400 11px/1.2 var(--rt-font);text-transform:none;letter-spacing:0}
+[data-rt-theme=classic] .tabs button:hover{background:#46513f;color:var(--c-gold)}
+[data-rt-theme=classic] .tabs button[aria-selected=true]{position:relative;margin-bottom:-1px;padding-bottom:6px;background:var(--rt-bg);color:var(--c-gold);font-weight:700;border-bottom:1px solid var(--rt-bg)}
+[data-rt-theme=classic] .scroll{scrollbar-color:#6a7860 var(--c-deep);scrollbar-width:auto}
+[data-rt-theme=classic] .foot{box-shadow:none;border-top:1px solid var(--c-hi)}
+[data-rt-theme=classic] .foot .owner-dot{border-radius:0;box-shadow:none}
+/* Soundboard pads are buttons */
+[data-rt-theme=classic] .pad{background:var(--c-face);border:1px solid;border-color:var(--c-hi) var(--c-lo) var(--c-lo) var(--c-hi);box-shadow:none}
+[data-rt-theme=classic] .pad:hover{background:var(--c-face)}
+[data-rt-theme=classic] .pad:hover b{color:var(--c-gold)}
+[data-rt-theme=classic] .pad::after{border-left-color:var(--rt-ink)}
+[data-rt-theme=classic] .pad.playing{background:var(--c-deep);border-color:var(--c-lo) var(--c-hi) var(--c-hi) var(--c-lo);box-shadow:inset 3px 0 0 var(--rt-state-speaking)}
+[data-rt-theme=classic] :is(.step-n,.setup-n,.friend-card .avatar){color:var(--c-gold);background:var(--c-face);border:1px solid;border-color:var(--c-hi) var(--c-lo) var(--c-lo) var(--c-hi);box-shadow:none}
+[data-rt-theme=classic] .setup-step[data-done=true] .setup-n{color:var(--rt-state-speaking);background:var(--c-deep);border-color:var(--c-lo) var(--c-hi) var(--c-hi) var(--c-lo)}
+[data-rt-theme=classic] .arcade-achievement.earned{background:var(--c-deep);box-shadow:inset 2px 0 0 var(--c-gold)}
+[data-rt-theme=classic] .lat-first{background:#fff;box-shadow:none}
+
+/* ── Settings page and Voice Studio ──────────────────────────────────── */
+[data-rt-theme=classic] :is(.side,main){box-shadow:none}
+[data-rt-theme=classic] .side{border-right:1px solid var(--c-lo);box-shadow:inset -1px 0 0 var(--c-hi)}
+[data-rt-theme=classic] main{background:var(--rt-bg)}
+[data-rt-theme=classic] .brand-text strong{font-family:var(--rt-font-display);letter-spacing:.02em}
+[data-rt-theme=classic] :is(.section-nav button,nav:not(.tabs) button){background:transparent;border:1px solid transparent;color:var(--rt-ink);box-shadow:none}
+[data-rt-theme=classic] :is(.section-nav button,nav:not(.tabs) button):hover{background:transparent;color:var(--c-gold)}
+[data-rt-theme=classic] :is(.section-nav button[aria-current=page],nav:not(.tabs) button.active){background:var(--c-sel);color:#fff;box-shadow:none;border-color:var(--c-lo) var(--c-hi) var(--c-hi) var(--c-lo)}
+[data-rt-theme=classic] :is(.section-nav button[aria-current=page],nav:not(.tabs) button.active) .ic{color:#fff}
+[data-rt-theme=classic] nav:not(.tabs) button .ic{color:var(--rt-ink-3)}
+[data-rt-theme=classic] .link-btn{background:none;border:0;color:var(--rt-link)}
+[data-rt-theme=classic] .link-btn:hover{background:none;color:var(--rt-link-hover)}
+[data-rt-theme=classic] .sheet-head{background:none;border-bottom:1px solid var(--c-lo);box-shadow:0 1px 0 var(--c-hi)}
+[data-rt-theme=classic] :is(.sheet-head h2,.card>h2){font:700 14px/1.3 var(--rt-font-display);letter-spacing:0;text-transform:none;color:var(--c-gold)}
+[data-rt-theme=classic] :is(.toggle b,.setup-step b,.pulse dd,.mini-callout strong){color:#fff}
+[data-rt-theme=classic] .pulse dd{font-weight:700}
+[data-rt-theme=classic] .toggle-grid .toggle:hover{background:rgba(255,255,255,.04)}
+[data-rt-theme=classic] .preset.active{color:var(--c-gold);background:var(--c-deep);border-color:var(--c-lo) var(--c-hi) var(--c-hi) var(--c-lo)}
+[data-rt-theme=classic] .slider-grid label small{color:var(--c-gold);background:var(--c-deep)}
+[data-rt-theme=classic] .friend-card{background:var(--c-face)}
+[data-rt-theme=classic] .friend-card:hover{background:var(--c-face);color:var(--c-gold)}
+[data-rt-theme=classic] .savebar{box-shadow:none;border-top:1px solid var(--c-hi)}
+[data-rt-theme=classic] :is(.key-dot,.dot){border-radius:0;box-shadow:none}
+[data-rt-theme=classic] .savebar p::before{border-radius:0}
+[data-rt-theme=classic] .route li{background:var(--c-face);border:1px solid;border-color:var(--c-hi) var(--c-lo) var(--c-lo) var(--c-hi);box-shadow:none}
+[data-rt-theme=classic] .route li:last-child{background:var(--c-deep);border-color:var(--c-lo) var(--c-hi) var(--c-hi) var(--c-lo);box-shadow:inset 3px 0 0 var(--rt-state-speaking)}
+[data-rt-theme=classic] :is(.content,.scroll,main){scrollbar-color:#6a7860 var(--c-deep)}
+
+/* ── Status strip: a VGUI progress bar, as in the old "Updating Steam" box ──
+   Chunky blocks in a sunken well: a download that fills block by block while
+   Tyler thinks, a jumpy level meter while it listens, and a lit block marching
+   through a full bar while it talks. */
+[data-rt-theme=classic] .tally{padding:8px 12px 27px 12px}
+[data-rt-theme=classic] .tally-light,[data-rt-theme=classic] .tally-wave{display:none}
+[data-rt-theme=classic] .tally::before{content:"";position:absolute;left:10px;right:10px;bottom:8px;height:13px;background:#262c21;border:1px solid;border-color:var(--c-lo) var(--c-hi) var(--c-hi) var(--c-lo)}
+[data-rt-theme=classic] .tally::after{content:"";position:absolute;left:12px;right:12px;bottom:10px;height:9px;
+  background:linear-gradient(rgba(255,255,255,.75),rgba(255,255,255,.75)) -20px 0/7px 100% no-repeat,repeating-linear-gradient(90deg,var(--tone) 0 7px,transparent 7px 9px);
+  clip-path:inset(0 0 0 0)}
+[data-rt-theme=classic] .tally[data-state=listening]::after{animation:cl-level 1.8s steps(1) infinite}
+[data-rt-theme=classic] .tally[data-state=thinking]::after{animation:cl-download 3.2s steps(36,end) infinite}
+[data-rt-theme=classic] .tally[data-state=speaking]::after{animation:cl-send 2.4s steps(39,end) infinite}
+[data-rt-theme=classic] .tally[data-state=waiting]::after{clip-path:inset(0 50% 0 0)}
+[data-rt-theme=classic] .tally[data-state=error]::after{animation:cl-blink 1s steps(1) infinite}
+[data-rt-theme=classic] .tally:is([data-state=standby],[data-state=paused])::after{clip-path:inset(0 100% 0 0)}
+@keyframes cl-level{0%{clip-path:inset(0 45% 0 0)}14%{clip-path:inset(0 62% 0 0)}28%{clip-path:inset(0 30% 0 0)}42%{clip-path:inset(0 52% 0 0)}57%{clip-path:inset(0 22% 0 0)}71%{clip-path:inset(0 58% 0 0)}85%{clip-path:inset(0 38% 0 0)}}
+@keyframes cl-download{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+@keyframes cl-send{from{background-position:0 0,0 0}to{background-position:351px 0,0 0}}
+@keyframes cl-blink{0%{opacity:1}50%{opacity:.25}}
+
+/* ── v2.13: the logo is a 2004 avatar with its own olive bezel, so it sits bare
+   on the title bar; the bar reads as a VGUI window caption. ── */
+[data-rt-theme=classic] .bar{background:linear-gradient(180deg,#5a6750,var(--c-face) 55%);box-shadow:inset 0 1px 0 var(--c-hi)}
+[data-rt-theme=classic] .ident-sub{color:var(--c-gold)}
+
+/* ── Icons, dialogs, notifications and tooltips (v2.14) ──
+   Small utilitarian VGUI symbols: square ends, hard corners and the bevel's dark
+   lower-right shadow. Messages are compact olive VGUI windows: a darker caption
+   strip, raised bevels, khaki text, no rounded corners. */
+[data-rt-theme=classic] .ic{--ic-w:1.3px;--ic-cap:square;--ic-join:miter;filter:drop-shadow(1px 1px 0 var(--c-lo))}
+[data-rt-theme=classic] :is(.rt-toast,.rt-dialog,.rt-tip){border-radius:0;box-shadow:none;font-family:var(--rt-font)}
+[data-rt-theme=classic] .rt-toast{background:var(--c-face);color:var(--rt-ink);border:1px solid;border-color:var(--c-hi) var(--c-lo) var(--c-lo) var(--c-hi);border-left:4px solid var(--tone)}
+[data-rt-theme=classic] .rt-toast-title{font:700 12px/1.3 var(--rt-font-display);color:#fff}
+[data-rt-theme=classic] .rt-dialog{padding:0 0 12px;gap:10px;background:var(--c-face);border:1px solid;border-color:var(--c-hi) var(--c-lo) var(--c-lo) var(--c-hi)}
+[data-rt-theme=classic] .rt-dialog-head{padding:5px 10px;background:linear-gradient(180deg,#5a6750,var(--c-well));border-bottom:1px solid var(--c-lo)}
+[data-rt-theme=classic] .rt-dialog-head .ic{--ic-size:16px}
+[data-rt-theme=classic] .rt-dialog-title{font:700 12px/1.3 var(--rt-font-display);color:var(--c-gold)}
+[data-rt-theme=classic] :is(.rt-dialog-text,.rt-steps,.rt-dialog-actions){margin-left:12px;margin-right:12px}
+[data-rt-theme=classic] .rt-scrim{background:rgba(20,24,16,.45)}
+[data-rt-theme=classic] .rt-tip{background:var(--c-deep);color:#e4e8dc;border:1px solid;border-color:var(--c-hi) var(--c-lo) var(--c-lo) var(--c-hi)}

@@ -1,0 +1,153 @@
+/*
+ * ROBOTIC TYLER "Counter-Strike 1.6 style" theme (v2.10).
+ * The in-game menus of the 2000s: see-through black boxes over a dusty map,
+ * thin orange-outlined buttons with orange text (the buy and team menus) that
+ * fill orange when hovered, white Verdana text, orange HUD numbers with a soft
+ * glow, and the scoreboard's team colours (CT blue, T red) plus radar green.
+ * Signature: the dust-map sand backdrop, a green radar for the status light,
+ * HUD numbers in chunky squared digits ("Tyler CS16 HUD" = Russo One, OFL) with a
+ * health cross, and tabs numbered like the buy menu (1. 2. 3.).
+ * Type: Verdana and Arial for text, as those menus used (already on Windows).
+ * Style only: no Counter-Strike logos, sprites or artwork.
+ */
+[data-rt-theme=cs16]{
+  color-scheme:dark;
+  --c-orange:#ffb000;--c-ct:#99ccff;--c-t:#ff5a5a;--c-radar:#7fd36a;--c-box:rgba(0,0,0,.62);
+  --c-sand:repeating-linear-gradient(35deg,rgba(255,255,255,.035) 0 2px,transparent 2px 5px),repeating-linear-gradient(-55deg,rgba(80,50,10,.06) 0 3px,transparent 3px 8px),radial-gradient(90% 60% at 20% 10%,#e2c992,transparent 70%),linear-gradient(180deg,#d4b67c,#bf9d62 45%,#9c7a45);
+  --rt-bar:#0b0a08;--rt-bg:#100f0c;--rt-bg-deep:#060605;--rt-surface:#1a1814;--rt-surface-2:#24211b;--rt-surface-3:#2e2a22;
+  --rt-block:rgba(0,0,0,.62);--rt-block-hover:rgba(255,176,0,.08);--rt-input:#060605;--rt-select:#4d3500;
+  --rt-line:#000000;--rt-line-soft:#3a352c;--rt-line-strong:var(--c-orange);
+  --rt-ink:#ececec;--rt-ink-strong:#ffffff;--rt-ink-2:#d8d8d8;--rt-ink-3:#c0c0c0;--rt-ink-4:#aaaaaa;--rt-ink-disabled:#6a6a6a;
+  --rt-link:var(--c-orange);--rt-link-hover:#ffd36b;--rt-blue:var(--c-orange);--rt-blue-deep:var(--c-orange);--rt-active:var(--c-orange);
+  --rt-blue-fade:rgba(0,0,0,.62);--rt-blue-fade-hover:var(--c-orange);--rt-green:var(--c-orange);--rt-green-hover:#ffc433;--rt-green-ink:#000000;--rt-green-line:#000000;
+  --rt-state-standby:#aaaaaa;--rt-state-ready:var(--c-radar);--rt-state-listening:var(--c-ct);--rt-state-thinking:var(--c-orange);--rt-state-speaking:var(--c-radar);--rt-state-waiting:#ff9b4d;--rt-state-error:var(--c-t);
+  --rt-danger:var(--c-t);--rt-danger-bg:#8f1d1d;--rt-danger-hover:#a82424;--rt-danger-ink:#ffffff;--rt-success:var(--c-radar);--rt-focus:var(--c-orange);
+  --rt-accent:var(--c-orange);--rt-accent-soft:rgba(255,176,0,.14);--rt-accent-line:rgba(255,176,0,.55);
+  --rt-on-accent:#000000;--rt-accent-fill:var(--c-orange);--rt-meter:linear-gradient(90deg,#c98a00,var(--c-orange));--rt-marker:#ffffff;--rt-edge:#000000;--rt-page-glow:#2a2416;
+  --rt-font:Verdana,"DejaVu Sans",Tahoma,sans-serif;--rt-font-display:Verdana,"DejaVu Sans",Tahoma,sans-serif;
+  --rt-text-xs:11px;--rt-text-sm:11px;--rt-text-md:12px;--rt-text-lg:13px;--rt-track:0;
+  --rt-r-xs:0;--rt-r-sm:0;--rt-r-md:0;--rt-r-lg:0;--rt-shadow-float:0 0 0 1px rgba(255,176,0,.25),0 18px 50px rgba(0,0,0,.8);
+}
+/* Dust-map sand behind see-through black menus */
+.panel[data-rt-theme=cs16]{background:var(--c-sand);border:1px solid #000}
+[data-rt-theme=cs16] body{background:var(--c-sand) fixed}
+[data-rt-theme=cs16] main{background:rgba(8,7,5,.84)}
+[data-rt-theme=cs16] .scroll{background:rgba(8,7,5,.84);margin:0 8px;scrollbar-color:#ffb000 rgba(0,0,0,.5)}
+[data-rt-theme=cs16] :is(h1,h2,h3,label,.tabs button,.ident-sub,.stat dt,.tally-label,.pill,.pad span,details.feature>summary,.sheet-head h2,.card>h2,.pulse dt,.facts b,.matrix dt,.section-nav button,nav:not(.tabs) button,button){letter-spacing:0;text-transform:none}
+[data-rt-theme=cs16] :is(h1,h2,.sheet-head h2,.card>h2){font-weight:700;color:var(--c-orange)}
+[data-rt-theme=cs16] h2{font-size:15px}
+[data-rt-theme=cs16] h1{font-size:24px}
+[data-rt-theme=cs16] .wordmark{font:700 15px/1.2 Arial,"DejaVu Sans",sans-serif;letter-spacing:.02em;color:#fff;text-shadow:1px 1px 0 #000}
+[data-rt-theme=cs16] .ident-sub{color:var(--c-orange)}
+[data-rt-theme=cs16] label:not(:has(>input[type=checkbox])):not(.toggle){font-weight:700;color:var(--c-orange)}
+[data-rt-theme=cs16] .bar{margin:8px 8px 0;background:rgba(0,0,0,.74);box-shadow:inset 0 -1px 0 rgba(255,176,0,.55)}
+/* Radar: the status light is the round green radar with crosshairs */
+[data-rt-theme=cs16] .tally{margin:8px 8px 0;background:rgba(0,0,0,.74);border:1px solid rgba(255,176,0,.35);align-items:center}
+[data-rt-theme=cs16] .tally-light{flex:0 0 38px;width:38px;height:38px;border-radius:50%;border:2px solid rgba(160,255,120,.75);
+  background:linear-gradient(rgba(160,255,120,.55),rgba(160,255,120,.55)) center/1px 100% no-repeat,linear-gradient(rgba(160,255,120,.55),rgba(160,255,120,.55)) center/100% 1px no-repeat,
+  radial-gradient(circle,var(--tone) 0 3px,transparent 3.5px),radial-gradient(circle,rgba(20,70,20,.9),rgba(0,30,0,.95));box-shadow:0 0 8px rgba(120,255,90,.35)!important}
+/* HUD bar: segment digits, health cross, money */
+[data-rt-theme=cs16] .stats{margin:8px 8px 0;background:rgba(0,0,0,.6);border:0;padding:8px 0}
+[data-rt-theme=cs16] .stat{border-left-color:rgba(255,176,0,.3)}
+[data-rt-theme=cs16] .stat dt,[data-rt-theme=cs16] .pulse dt{color:#d8d8d8}
+[data-rt-theme=cs16] .stat dd,[data-rt-theme=cs16] .pulse dd{font:400 21px/1.2 "Tyler CS16 HUD","Arial Black",sans-serif;color:var(--c-orange);text-shadow:0 0 6px rgba(255,176,0,.6),1px 1px 0 #000;letter-spacing:.02em}
+[data-rt-theme=cs16] .stat:first-child dd::before{content:"";display:inline-block;width:15px;height:15px;margin-right:6px;vertical-align:-1px;
+  background:linear-gradient(var(--c-orange),var(--c-orange)) center/5px 100% no-repeat,linear-gradient(var(--c-orange),var(--c-orange)) center/100% 5px no-repeat;filter:drop-shadow(0 0 3px rgba(255,176,0,.6))}
+[data-rt-theme=cs16] .stat small{color:#c8c8c8;font-size:10px;letter-spacing:-.01em}
+/* Buy-menu buttons: orange outline, fill orange when armed */
+[data-rt-theme=cs16] button{font:700 12px/1.2 var(--rt-font);color:var(--c-orange);background:rgba(0,0,0,.7);border:1px solid var(--c-orange);box-shadow:none;transition:none}
+[data-rt-theme=cs16] button:hover{color:#000;background:var(--c-orange)}
+[data-rt-theme=cs16] button:active{transform:none;background:#c98a00}
+[data-rt-theme=cs16] :is(.primary,#start,#save){color:#000;background:var(--c-orange)}
+[data-rt-theme=cs16] :is(.primary,#start,#save):hover{color:#000;background:#ffc433}
+[data-rt-theme=cs16] .danger{color:#fff;background:#8f1d1d;border-color:var(--c-t)}
+[data-rt-theme=cs16] .danger:hover{color:#fff;background:#a82424}
+[data-rt-theme=cs16] :is(.ghost,.icon,.icon-btn){border-color:transparent;background:transparent}
+[data-rt-theme=cs16] :is(.ghost,.icon,.icon-btn):hover{border-color:var(--c-orange);background:var(--c-orange);color:#000}
+[data-rt-theme=cs16] .link-btn{border:0;background:none;color:var(--c-orange)}
+/* Tabs numbered like the buy menu */
+[data-rt-theme=cs16] .tabs{counter-reset:buy;gap:2px;margin:8px 8px 0;padding:4px;background:rgba(0,0,0,.74);box-shadow:none}
+[data-rt-theme=cs16] .tabs button{counter-increment:buy;font-size:12px;color:var(--c-orange);background:transparent;border:1px solid rgba(255,176,0,.45)}
+[data-rt-theme=cs16] .tabs button::before{content:counter(buy) ". ";color:#fff}
+[data-rt-theme=cs16] .tabs button:hover{color:#000;background:var(--c-orange)}
+[data-rt-theme=cs16] .tabs button:hover::before,[data-rt-theme=cs16] .tabs button[aria-selected=true]::before{color:#000}
+[data-rt-theme=cs16] .tabs button[aria-selected=true]{color:#000;background:var(--c-orange);border-color:var(--c-orange)}
+[data-rt-theme=cs16] .section-nav,[data-rt-theme=cs16] nav:not(.tabs){counter-reset:buy}
+[data-rt-theme=cs16] :is(.section-nav button,nav:not(.tabs) button){counter-increment:buy;color:var(--c-orange);background:transparent;border:0;box-shadow:none}
+[data-rt-theme=cs16] :is(.section-nav button,nav:not(.tabs) button) .ic{--ic-size:16px}
+[data-rt-theme=cs16] :is(.section-nav button,nav:not(.tabs) button)::before{content:counter(buy) ".";color:#fff;min-width:16px}
+[data-rt-theme=cs16] :is(.section-nav button,nav:not(.tabs) button):hover{color:#000;background:var(--c-orange)}
+[data-rt-theme=cs16] :is(.section-nav button[aria-current=page],nav:not(.tabs) button.active){color:#000;background:var(--c-orange);box-shadow:none}
+[data-rt-theme=cs16] :is(.section-nav button,nav:not(.tabs) button):is(:hover,[aria-current=page],.active)::before{color:#000}
+[data-rt-theme=cs16] .side{background:rgba(0,0,0,.78);box-shadow:inset -1px 0 0 rgba(255,176,0,.45)}
+/* See-through menu boxes */
+[data-rt-theme=cs16] :where(details,.callout,.quick-help,.confirm,.deck-entry,.board-tools,.sheet,.card,.route-card,.panel,.mini-callout>div,.usage-banner,.facts>div,.matrix>div,#setup,.arcade-tickets>div){background:rgba(0,0,0,.6);border:1px solid rgba(255,176,0,.3)}
+[data-rt-theme=cs16] details.feature>summary{color:var(--c-orange);font-weight:700}
+[data-rt-theme=cs16] summary:hover,[data-rt-theme=cs16] details[open]>summary{color:#ffd36b;background:rgba(255,176,0,.06)}
+[data-rt-theme=cs16] summary::after{border-color:var(--c-orange)}
+[data-rt-theme=cs16] .deck-entry{border-left:3px solid var(--c-ct)}
+[data-rt-theme=cs16] :is(.quick-help,.confirm,#setup){border-left:3px solid var(--c-orange)}
+[data-rt-theme=cs16] input:where(:not([type=checkbox],[type=radio],[type=range],[type=file])),[data-rt-theme=cs16] :is(textarea,select){color:#fff;background-color:rgba(0,0,0,.75);border:1px solid rgba(255,176,0,.45);box-shadow:none}
+[data-rt-theme=cs16] :is(input,textarea,select):focus{border-color:var(--c-orange);box-shadow:none}
+[data-rt-theme=cs16] input[type=checkbox],[data-rt-theme=cs16] .toggle>input[type=checkbox]{width:14px;height:14px;background:#000;border:1px solid var(--c-orange);border-radius:0;box-shadow:none}
+[data-rt-theme=cs16] input[type=checkbox]:checked,[data-rt-theme=cs16] .toggle>input[type=checkbox]:checked{background:#000;border-color:var(--c-orange)}
+[data-rt-theme=cs16] .toggle>input[type=checkbox]::after{display:none}
+[data-rt-theme=cs16] input[type=checkbox]:checked::after,[data-rt-theme=cs16] .toggle>input[type=checkbox]:checked::after{display:block;content:"";position:absolute;left:2px;top:2px;width:8px;height:8px;background:var(--c-orange);border:0;border-radius:0;box-shadow:none;transform:none}
+[data-rt-theme=cs16] :is(pre,.output,.v22-log,.response){background:rgba(0,0,0,.75);border:1px solid rgba(255,176,0,.3);box-shadow:none}
+[data-rt-theme=cs16] :is(.meter,.arcade-progress,.lat-track){background:#000;box-shadow:inset 0 0 0 1px rgba(255,176,0,.35)}
+[data-rt-theme=cs16] .pill{color:var(--c-orange);background:transparent;box-shadow:inset 0 0 0 1px var(--c-orange)}
+[data-rt-theme=cs16] .pill.on{color:var(--c-radar);box-shadow:inset 0 0 0 1px var(--c-radar)}
+[data-rt-theme=cs16] .pad{color:#fff;background:rgba(0,0,0,.7);border:1px solid rgba(255,176,0,.45)}
+[data-rt-theme=cs16] .pad span{color:var(--c-orange)}
+[data-rt-theme=cs16] .pad b{font-weight:700}
+[data-rt-theme=cs16] .pad:hover{background:rgba(255,176,0,.18)}
+[data-rt-theme=cs16] .pad::after{border-left-color:var(--c-orange)}
+[data-rt-theme=cs16] .pad.playing{background:rgba(127,211,106,.16);box-shadow:inset 3px 0 0 var(--c-radar)}
+[data-rt-theme=cs16] :is(.step-n,.setup-n,.friend-card .avatar){color:#000;background:var(--c-orange)}
+[data-rt-theme=cs16] code{color:var(--c-orange);background:#000}
+[data-rt-theme=cs16] .foot{margin:0 8px 8px;background:rgba(0,0,0,.78);box-shadow:inset 0 1px 0 rgba(255,176,0,.45)}
+[data-rt-theme=cs16] .savebar{background:rgba(0,0,0,.85);box-shadow:inset 0 1px 0 rgba(255,176,0,.45)}
+[data-rt-theme=cs16] .route li{background:rgba(0,0,0,.7);box-shadow:inset 0 0 0 1px rgba(255,176,0,.35)}
+[data-rt-theme=cs16] .route li:last-child{background:rgba(127,211,106,.14);box-shadow:inset 3px 0 0 var(--c-radar)}
+
+/* ── Status strip: the radar sweeps, blips and pings ──
+   The sweep turns slowly when idle and fast while Tyler thinks (orange blip,
+   like the bomb), sends out pings while it talks and goes red on errors.
+   HUD-style label and orange voice bars. */
+[data-rt-theme=cs16] .tally-light{position:relative;overflow:hidden}
+[data-rt-theme=cs16] .tally-light::before{content:"";position:absolute;inset:0;border-radius:50%;background:conic-gradient(transparent 0 62%,rgba(160,255,120,.04) 62%,rgba(170,255,130,.6) 99.5%,rgba(220,255,200,.95) 100%);animation:cs16-sweep 3.6s linear infinite}
+[data-rt-theme=cs16] .tally-light::after{content:"";position:absolute;left:23px;top:8px;width:5px;height:5px;border-radius:50%;background:var(--tone);box-shadow:0 0 5px var(--tone);opacity:0;animation:cs16-blip 3.6s linear infinite}
+[data-rt-theme=cs16] .tally:is([data-state=listening],[data-state=speaking]) .tally-light::before,[data-rt-theme=cs16] .tally:is([data-state=listening],[data-state=speaking]) .tally-light::after{animation-duration:2.2s}
+[data-rt-theme=cs16] .tally[data-state=thinking] .tally-light::before,[data-rt-theme=cs16] .tally[data-state=thinking] .tally-light::after{animation-duration:1.1s}
+[data-rt-theme=cs16] .tally[data-state=thinking] .tally-light::after{background:#ff7a00;box-shadow:0 0 6px #ff7a00}
+[data-rt-theme=cs16] .tally[data-state=speaking] .tally-light::after{left:50%;top:50%;width:30px;height:30px;margin:-15px 0 0 -15px;background:transparent;border:2px solid var(--tone);box-shadow:none;animation:cs16-ping 1.1s ease-out infinite}
+[data-rt-theme=cs16] .tally[data-state=error] .tally-light{border-color:rgba(255,100,90,.85);box-shadow:0 0 8px rgba(255,60,50,.45)!important;
+  background:linear-gradient(rgba(255,140,120,.5),rgba(255,140,120,.5)) center/1px 100% no-repeat,linear-gradient(rgba(255,140,120,.5),rgba(255,140,120,.5)) center/100% 1px no-repeat,radial-gradient(circle,var(--tone) 0 3px,transparent 3.5px),radial-gradient(circle,rgba(90,15,10,.9),rgba(35,0,0,.95))}
+[data-rt-theme=cs16] .tally[data-state=error] .tally-light::before{background:conic-gradient(transparent 0 62%,rgba(255,90,80,.04) 62%,rgba(255,110,90,.6) 99.5%,rgba(255,200,190,.95) 100%)}
+[data-rt-theme=cs16] .tally:is([data-state=standby],[data-state=paused]) .tally-light{opacity:.55}
+[data-rt-theme=cs16] .tally:is([data-state=standby],[data-state=paused]) .tally-light::before{animation:none;opacity:0}
+@keyframes cs16-sweep{to{transform:rotate(1turn)}}
+@keyframes cs16-blip{0%,14%{opacity:0}15%{opacity:1}70%{opacity:.12}100%{opacity:0}}
+@keyframes cs16-ping{from{transform:scale(.15);opacity:1}to{transform:scale(1);opacity:0}}
+[data-rt-theme=cs16] .tally-label{font:400 15px/1.1 "Tyler CS16 HUD","Arial Black",sans-serif;letter-spacing:.02em;text-shadow:0 0 6px color-mix(in srgb,var(--tone) 55%,transparent),1px 1px 0 #000}
+[data-rt-theme=cs16] .tally-wave{gap:2px}
+[data-rt-theme=cs16] .tally-wave i{width:3px;border-radius:0;background:var(--c-orange);box-shadow:0 0 4px rgba(255,176,0,.6);opacity:1}
+
+/* ── v2.13: the logo is a team-select portrait: a black box with a thin orange
+   outline, like the class pictures in the 1.6 team menu. ── */
+[data-rt-theme=cs16] :is(.mark[data-logo],img.mark,#brand-logo){--logo-pad:2px;background:rgba(0,0,0,.6);border:1px solid rgba(255,176,0,.7);border-radius:0}
+
+/* ── Icons, dialogs, notifications and tooltips (v2.14) ──
+   Simple GoldSrc symbols: square-ended amber strokes with the HUD's soft glow.
+   Messages are see-through black menu boxes with a thin amber outline. */
+[data-rt-theme=cs16] .ic{--ic-w:1.4px;--ic-cap:square;--ic-join:miter;filter:drop-shadow(0 0 2px rgba(255,176,0,.55))}
+[data-rt-theme=cs16] :is(.rt-toast,.rt-dialog,.rt-tip){background:rgba(0,0,0,.94);border:1px solid var(--c-orange);border-radius:0;box-shadow:none}
+[data-rt-theme=cs16] .rt-toast{border-left-width:1px}
+[data-rt-theme=cs16] :is(.rt-toast-title,.rt-dialog-title){font:700 13px/1.3 var(--rt-font);color:var(--c-orange)}
+[data-rt-theme=cs16] .rt-dialog-title{font-size:15px}
+[data-rt-theme=cs16] .rt-scrim{background:rgba(0,0,0,.35)}
+[data-rt-theme=cs16] .rt-tip{color:#ececec}
+[data-rt-theme=cs16] .tabs button{display:grid;grid-template-columns:auto auto;justify-content:center;align-items:center;column-gap:4px;row-gap:2px}
+[data-rt-theme=cs16] .tabs button::before{grid-column:1;grid-row:1}
+[data-rt-theme=cs16] .tabs button .ic{grid-column:2;grid-row:1}
+[data-rt-theme=cs16] .tabs button .tab-label{grid-column:1/-1;grid-row:2}

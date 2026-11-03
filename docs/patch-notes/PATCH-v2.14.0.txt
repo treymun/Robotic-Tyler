@@ -1,0 +1,113 @@
+# ROBOTIC TYLER v2.14.0: one Setup EXE, theme gallery, themed icons and messages
+
+## Settings → Appearance: a gallery of all ten themes
+- The theme dropdown is replaced by an **Appearance** page with its own sidebar entry. The sidebar's theme chip also opens it.
+- Each theme is a card with its Tyler logo, its name and a live miniature of the real chat panel in that theme: header, status strip, numbers and tabs. A badge marks the theme in use, and Portal and Windows XP are tagged as light themes.
+- Choosing a card fills a larger preview:
+  - the status strip on air;
+  - the tabs, buttons, a text box and a menu;
+  - a sample notification.
+- Previews use sample text only. They make no AI requests and no chat connections, and save nothing.
+- **Apply** saves the theme for every Tyler window: the chat panel, settings, Voice Studio, toolbar icon and app icons. A notification confirms it, with **Undo**.
+- Keyboard use:
+  - Tab reaches the gallery as one stop;
+  - arrow keys, Home and End move between cards;
+  - Space or Enter picks a card.
+- The gallery is a radio group for screen readers. It reflows down to phone width with no sideways scrolling.
+
+## Themed icons
+- One set of drawn icons now replaces the old mix for navigation, tabs, common actions, settings sections, sound controls and status.
+- No emoji are used, and every icon keeps its text label.
+- Each theme draws them its own way:
+  - **Steam:** clean outlines;
+  - **Classic Steam:** square-cornered VGUI strokes with a bevel shadow;
+  - **TF2:** chunky cream shapes with a brown outline, slightly tilted;
+  - **CS2:** thin, sharp lines;
+  - **Portal:** black pictogram tiles, blue when selected;
+  - **CS 1.6:** amber HUD glyphs with a number on each tab;
+  - **HEV:** glowing amber suit readouts;
+  - **Left 4 Dead:** scratched stencil;
+  - **Windows XP:** coloured Luna-style icons;
+  - **DOOM:** real pixel art (a separate 10×10 drawing for each icon), with a number on each tab.
+
+## Themed notifications, dialogs and tooltips
+- New shared notifications, confirmation dialogs and tooltips for the chat panel, the settings page and the Voice Studio. Each theme gives them its own look:
+  - Steam: a toast;
+  - Classic Steam: a VGUI box;
+  - TF2: a rounded brown panel;
+  - CS2: a slate glass panel;
+  - Portal: numbered test-chamber cards;
+  - CS 1.6: a see-through amber box;
+  - HEV: a suit readout with hazard stripes on warnings;
+  - Left 4 Dead: a torn grime notice;
+  - Windows XP: a tray balloon and Luna message box;
+  - DOOM: a stone panel.
+- Error notifications say what went wrong and offer the next step:
+  - **Try again** after a failed connect;
+  - **Use this tab** when another tab holds Tyler;
+  - **Open settings** for a key problem;
+  - **Open setup** when the chat box can't be found;
+  - **Refresh devices** for a Voice Studio audio problem.
+- Dialogs handle the keyboard properly:
+  - focus moves into the dialog and Tab stays inside it;
+  - Esc cancels, and focus returns where it was;
+  - destructive actions (Emergency stop) start on the safe button and keep a red Stop button.
+- Tyler's own confirmations (posting a reaction to Steam, emergency stop, unlocking automatic features) now use the themed dialog. File pickers and the system's own prompts stay native.
+- Errors are announced to screen readers. Repeats of the same message are merged, at most three show at once, and animations respect *reduce motion*.
+
+## One download: ROBOTIC-TYLER-Setup-2.14.0.exe
+- Releases now live at **github.com/treymun/Robotic-Tyler**, and on Windows **Setup is the only file you need**. It's a native Windows program (about 15 MB, no runtime needed) in the Steam look.
+- Tick any of three parts:
+  - **Chrome extension:** Tyler in Steam web chat. It's packed inside Setup (nothing to download or unzip) and unpacked to `%LOCALAPPDATA%\ROBOTIC TYLER\Chrome extension`. On **Finish**, Setup opens Chrome's extensions page and that folder, and copies the folder path. You turn on Developer mode, click **Load unpacked** and paste the path, once. Chrome only adds extensions from outside its Web Store this way. Running a newer Setup updates the same folder (so Chrome keeps the same extension and its settings) and removes files the old version had; then press **Reload** on Tyler's card.
+  - **Control Center:** Tyler's own Steam chat window.
+  - **Native Steam Companion (Voice Studio):** Tyler talks in Steam voice. It needs a free virtual audio cable set as Steam's microphone.
+- The two apps are downloaded only if ticked, from this version's GitHub release. Setup checks each file's size and SHA-256 before running it; a file that doesn't match is deleted, never run.
+- While it works, each part gets its own progress bar (MB and speed). You can cancel a download, and a failed part shows a clear reason with **Retry**:
+  - no connection;
+  - a file missing from the release;
+  - a checksum mismatch;
+  - an installer that stopped.
+- Run Setup again any time. It detects each part as not installed, out of date (updates it), up to date (repair) or newer (left alone), and preselects what makes sense.
+- Options:
+  - desktop shortcuts for the apps, on or off;
+  - open each app, or Chrome's extensions page, when you click Finish.
+- Each app keeps its own install folder, uninstall entry, Start-menu shortcut (both under *ROBOTIC TYLER*), update channel and, new in this release, its own update download cache. Uninstalling one never touches the other.
+- Settings, keys and themes are kept: Setup never touches the apps' data folders.
+- Per-user installs ask for no admin rights. An existing all-users install is updated in place.
+- The release page leads with the Setup download. `ROBOTIC-TYLER-Chrome-Extension-<version>.zip` stays there for anyone not on Windows. The apps' own installers are now named `ROBOTIC-TYLER-component-…` and sit on the release for Setup and for automatic updates. The portable EXEs are gone; installed apps update themselves.
+- Build: `npm run build:setup` (MinGW-w64), included in `npm run build:win` and the CI release job, which also signs Setup when a certificate is configured. Details in `RELEASING.md` and `tools/setup/README.md`.
+
+## Removed: the Game Request Hub
+- The `!game get` / "Tyler, get me…" requests, cloud download links through TorBox and Premiumize, Hydra-format feed search and the free-games list are gone, with their settings page, panel, background handlers and tests.
+- Their saved keys, feed addresses and queues are deleted from Chrome storage when the extension updates; the Control Center stops reading them.
+- Chrome no longer asks for access to the TorBox, Premiumize, Hydra feed and GitHub hosts.
+- The approved Steam IDs list it used to hold (for game voting, party host, trivia and custom commands) moved to **Settings → Squad & friends → Approved friends**, with the same saved value.
+- The arcade games (`!game trivia`, `play vault` and the rest) are unaffected.
+
+## Tests
+- **New browser tests:**
+  - the gallery's ten live previews, keyboard selection, Apply and Undo, narrow windows and no outside requests;
+  - dialog focus trapping, safe initial focus and focus restore;
+  - notification roles, next-step buttons, merging and the three-message limit;
+  - themed icons in all ten themes (pixel art in DOOM);
+  - panel notifications, dialogs and tooltips;
+  - Voice Studio's audio-problem action.
+- **New unit tests:**
+  - every icon and every use of one;
+  - each theme's skins for the new components;
+  - no HTML parsing of message text;
+  - the setup's contract with the app installers (registry keys, checksums, silent install switches, no data access);
+  - the two-download release layout.
+- **Setup tested under Wine 9 against a local copy of the release.** What was checked:
+  - install the Control Center alone, then add the Voice Studio later, then both at once;
+  - offline install from a file next to Setup;
+  - a tampered download refused;
+  - Retry after a failure and cancel during a download;
+  - keyboard-only use;
+  - uninstalling either app leaves the other installed and working, with shortcuts and settings intact.
+- Setup was also run against the real GitHub address. It reached github.com and reported the missing release clearly, since nothing has been published yet.
+- **Not tested here:**
+  - real Windows 10/11: SmartScreen, Defender, high-DPI monitors, per-machine installs with a UAC prompt;
+  - launching the apps after Finish;
+  - an update from an older installed version;
+  - the CI workflow itself.

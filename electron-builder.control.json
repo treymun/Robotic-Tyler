@@ -1,0 +1,62 @@
+{
+  "appId": "com.robotictyler.controlcenter",
+  "productName": "ROBOTIC TYLER Control Center",
+  "asar": true,
+  "directories": {
+    "app": ".",
+    "output": "dist/control-center",
+    "buildResources": "build"
+  },
+  "files": [
+    "app/**/*",
+    "assets/**/*",
+    "!**/*.map",
+    "!**/node_modules/.cache/**/*",
+    "!app/desktop-overrides/**/*"
+  ],
+  "win": {
+    "icon": "assets/robotic-tyler.ico",
+    "target": [
+      {
+        "target": "nsis",
+        "arch": [
+          "x64"
+        ]
+      }
+    ],
+    "artifactName": "ROBOTIC-TYLER-Control-Center-${version}.${ext}"
+  },
+  "nsis": {
+    "oneClick": false,
+    "perMachine": false,
+    "allowToChangeInstallationDirectory": true,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
+    "menuCategory": "ROBOTIC TYLER",
+    "shortcutName": "ROBOTIC TYLER Control Center",
+    "uninstallDisplayName": "ROBOTIC TYLER Control Center",
+    "installerIcon": "assets/robotic-tyler.ico",
+    "uninstallerIcon": "assets/robotic-tyler.ico",
+    "installerHeaderIcon": "assets/robotic-tyler.ico",
+    "installerSidebar": "build/installer-sidebar-control.bmp",
+    "uninstallerSidebar": "build/installer-sidebar-control.bmp",
+    "installerHeader": "build/installer-header.bmp",
+    "runAfterFinish": true,
+    "deleteAppDataOnUninstall": false,
+    "artifactName": "ROBOTIC-TYLER-component-Control-Center-${version}.${ext}"
+  },
+  "extraMetadata": {
+    "main": "app/main.cjs",
+    "description": "ROBOTIC TYLER Control Center"
+  },
+  "publish": [
+    {
+      "provider": "github",
+      "owner": "treymun",
+      "repo": "Robotic-Tyler",
+      "releaseType": "release",
+      "channel": "control"
+    }
+  ],
+  "copyright": "© 2026 ROBOTIC TYLER"
+}

@@ -1,0 +1,165 @@
+/*
+ * ROBOTIC TYLER "Left 4 Dead style" theme (v2.10).
+ * Grimy charcoal with a red haze, condensed white capitals, blood-red marks
+ * on what's selected, flat dark buttons that flood red when hovered, and the
+ * survivors' health colours (green / yellow / red) for status.
+ * Signature: a foggy green-grey night, torn-edged buttons and boxes, blood-red
+ * brush strokes behind what's selected, and survivor-style health bars
+ * (green / yellow / red) under the three stats.
+ * Type: "Tyler L4D" = Oswald (OFL), a condensed gothic close to the games'
+ * menu capitals; Arial for longer text.
+ * Style only: no Left 4 Dead logos, artwork, textures or game fonts.
+ */
+[data-rt-theme=l4d]{
+  color-scheme:dark;
+  --l-red:#b00000;--l-red-hi:#d41a1a;--l-blood:#7a0000;--l-green:#4ccf4c;--l-yellow:#e6c619;
+  --l-grime:radial-gradient(70% 45% at 25% 12%,rgba(170,190,160,.22),transparent 70%),radial-gradient(60% 40% at 85% 35%,rgba(140,160,135,.14),transparent 70%),radial-gradient(70% 45% at 70% 105%,rgba(120,0,0,.35),transparent 65%),repeating-linear-gradient(115deg,rgba(255,255,255,.02) 0 2px,transparent 2px 7px),linear-gradient(180deg,#2c342e,#171b18 60%,#0e100e);
+  --l-torn:polygon(0 6%,4% 0,22% 5%,38% 0,57% 4%,76% 0,92% 5%,100% 2%,99% 50%,100% 95%,84% 100%,63% 94%,45% 100%,26% 95%,9% 100%,0 94%,1% 50%);
+  --l-brush:radial-gradient(60% 120% at 10% 50%,var(--l-red-hi),transparent 70%),radial-gradient(50% 110% at 55% 60%,var(--l-red),transparent 72%),radial-gradient(45% 100% at 92% 40%,var(--l-blood),transparent 70%);
+  --rt-bar:#0b0b0b;--rt-bg:#111111;--rt-bg-deep:#070707;--rt-surface:#1c1c1c;--rt-surface-2:#262626;--rt-surface-3:#303030;
+  --rt-block:#1a1a1a;--rt-block-hover:#222;--rt-input:#070707;--rt-select:#5c0000;
+  --rt-line:#000000;--rt-line-soft:#2c2c2c;--rt-line-strong:#444;
+  --rt-ink:#e6e6e6;--rt-ink-strong:#ffffff;--rt-ink-2:#d0d0d0;--rt-ink-3:#b8b8b8;--rt-ink-4:#a6a6a6;--rt-ink-disabled:#666;
+  --rt-link:#ff6b6b;--rt-link-hover:#ffffff;--rt-blue:#ffffff;--rt-blue-deep:var(--l-red);--rt-active:var(--l-red-hi);
+  --rt-blue-fade:#262626;--rt-blue-fade-hover:var(--l-red);--rt-green:var(--l-red);--rt-green-hover:var(--l-red-hi);--rt-green-ink:#ffffff;--rt-green-line:#000000;
+  --rt-state-standby:#a6a6a6;--rt-state-ready:var(--l-green);--rt-state-listening:#7fbfff;--rt-state-thinking:var(--l-yellow);--rt-state-speaking:var(--l-green);--rt-state-waiting:#ff9a3c;--rt-state-error:#ff5050;
+  --rt-danger:#ff5050;--rt-danger-bg:#8a0000;--rt-danger-hover:#a80000;--rt-danger-ink:#ffffff;--rt-success:var(--l-green);--rt-focus:#ff5050;
+  --rt-accent:var(--l-red-hi);--rt-accent-soft:rgba(176,0,0,.2);--rt-accent-line:rgba(212,26,26,.6);
+  --rt-on-accent:#ffffff;--rt-accent-fill:var(--l-red);--rt-meter:linear-gradient(90deg,var(--l-green),var(--l-yellow) 70%,#e03030);--rt-marker:#ffffff;--rt-edge:#000000;--rt-page-glow:#2a0606;
+  --rt-font:Arial,"Helvetica Neue","DejaVu Sans",sans-serif;--rt-font-display:"Tyler L4D","Arial Narrow",Impact,sans-serif;
+  --rt-text-xs:12px;--rt-text-sm:12px;--rt-text-md:13px;--rt-text-lg:15px;--rt-track:.05em;
+  --rt-r-xs:0;--rt-r-sm:0;--rt-r-md:0;--rt-r-lg:0;--rt-shadow-float:0 0 0 1px #000,0 20px 60px rgba(0,0,0,.85);
+}
+.panel[data-rt-theme=l4d]{background:var(--l-grime)}
+[data-rt-theme=l4d] body{background:var(--l-grime) fixed}
+[data-rt-theme=l4d] main{background:transparent}
+[data-rt-theme=l4d] :is(h1,h2,h3,.wordmark,.brand-text strong,.sheet-head h2,.card>h2,details.feature>summary,.marquee,button,label,.tally-label,.stat dt,.stat dd,.pulse dt,.pulse dd,.ident-sub,.facts b,.matrix dt,.pad span){font-family:var(--rt-font-display);text-transform:uppercase}
+[data-rt-theme=l4d] :is(h1,h2,.sheet-head h2,.card>h2){font-weight:700;color:#fff;letter-spacing:.04em;text-shadow:0 2px 8px rgba(0,0,0,.9)}
+[data-rt-theme=l4d] h2{font-size:24px;line-height:1.05;padding-bottom:4px;background:linear-gradient(90deg,var(--l-red) 0 48px,transparent 48px) bottom left/100% 3px no-repeat}
+[data-rt-theme=l4d] h1{font-size:40px}
+[data-rt-theme=l4d] .wordmark{font-weight:700;font-size:22px;letter-spacing:.06em}
+[data-rt-theme=l4d] .ident-sub{letter-spacing:.12em;color:#b8b8b8}
+[data-rt-theme=l4d] label:not(:has(>input[type=checkbox])):not(.toggle){font-weight:500;font-size:14px;letter-spacing:.08em;color:var(--rt-ink-3)}
+[data-rt-theme=l4d] label:has(>input[type=checkbox]),[data-rt-theme=l4d] .toggle{font-family:var(--rt-font);text-transform:none}
+[data-rt-theme=l4d] .bar{background:rgba(0,0,0,.55);box-shadow:inset 0 -2px 0 var(--l-blood)}
+/* Tabs: white capitals, a red slash under the open one */
+[data-rt-theme=l4d] .tabs{background:rgba(0,0,0,.55);box-shadow:none}
+[data-rt-theme=l4d] .tabs button{font-weight:500;font-size:16px;letter-spacing:.08em;color:#9a9a9a;border-bottom:3px solid transparent}
+[data-rt-theme=l4d] .tabs button:hover{color:#fff;background:transparent}
+[data-rt-theme=l4d] .tabs button[aria-selected=true]{color:#fff;border-bottom-color:var(--l-red-hi);text-shadow:0 0 10px rgba(212,26,26,.6)}
+/* Buttons: flat dark, flood red on hover */
+[data-rt-theme=l4d] button{font-weight:500;font-size:15px;letter-spacing:.08em;color:#fff;background:#262626;border:1px solid #3a3a3a;box-shadow:none;transition:background-color .08s}
+[data-rt-theme=l4d] button:hover{color:#fff;background:var(--l-red);border-color:var(--l-red-hi)}
+[data-rt-theme=l4d] :is(.primary,#start,#save){font-weight:700;background:var(--l-red);border-color:var(--l-red-hi);box-shadow:0 0 18px rgba(176,0,0,.35)}
+[data-rt-theme=l4d] :is(.primary,#start,#save):hover{background:var(--l-red-hi)}
+[data-rt-theme=l4d] :is(.ghost,.icon,.icon-btn){background:transparent;border-color:transparent}
+[data-rt-theme=l4d] :is(.pad,.friend-card,.preset,.link-btn){font-family:var(--rt-font);text-transform:none;letter-spacing:0;font-size:var(--rt-text-md)}
+[data-rt-theme=l4d] .link-btn{border:0;background:none;color:var(--rt-link)}
+[data-rt-theme=l4d] :is(.section-nav button,nav:not(.tabs) button){font-size:17px;color:#9a9a9a;background:transparent;border:0;box-shadow:none}
+[data-rt-theme=l4d] :is(.section-nav button,nav:not(.tabs) button):hover{color:#fff;background:rgba(176,0,0,.25)}
+[data-rt-theme=l4d] :is(.section-nav button[aria-current=page],nav:not(.tabs) button.active){color:#fff;background:linear-gradient(90deg,rgba(176,0,0,.55),transparent);box-shadow:inset 4px 0 0 var(--l-red-hi)}
+[data-rt-theme=l4d] .side{background:rgba(0,0,0,.5);box-shadow:inset -1px 0 0 #2c2c2c}
+/* Panels and survivor-style status */
+[data-rt-theme=l4d] :where(details,.callout,.quick-help,.confirm,.deck-entry,.board-tools,.sheet,.card,.route-card,.panel,.mini-callout>div,.usage-banner,.facts>div,.matrix>div,#setup,.arcade-tickets>div){background:rgba(16,16,16,.88);border:1px solid #2c2c2c}
+[data-rt-theme=l4d] details.feature>summary{font-weight:500;font-size:16px;letter-spacing:.08em;color:#fff}
+[data-rt-theme=l4d] :is(.quick-help,.confirm,#setup){border-left:4px solid var(--l-red)}
+[data-rt-theme=l4d] .deck-entry{border-left:4px solid var(--l-green)}
+[data-rt-theme=l4d] .tally{background:rgba(0,0,0,.6);border:1px solid #2c2c2c}
+[data-rt-theme=l4d] .tally-light{width:5px}
+[data-rt-theme=l4d] .tally-label{font-weight:700;font-size:16px;letter-spacing:.1em}
+[data-rt-theme=l4d] .stats{background:rgba(0,0,0,.6);border:1px solid #2c2c2c;box-shadow:inset 0 -4px 0 var(--l-green)}
+[data-rt-theme=l4d] .stat dt{font-size:13px;letter-spacing:.1em}
+[data-rt-theme=l4d] .stat dd{font-weight:700;font-size:24px;color:#fff}
+[data-rt-theme=l4d] input:where(:not([type=checkbox],[type=radio],[type=range],[type=file])),[data-rt-theme=l4d] :is(textarea,select){color:#fff;background-color:rgba(0,0,0,.6);border:1px solid #3a3a3a;box-shadow:none}
+[data-rt-theme=l4d] :is(input,textarea,select):focus{border-color:var(--l-red-hi);box-shadow:none}
+[data-rt-theme=l4d] input[type=checkbox]{background:#070707;border:2px solid #d0d0d0;border-radius:0;box-shadow:none}
+[data-rt-theme=l4d] input[type=checkbox]:checked{background:var(--l-red);border-color:var(--l-red-hi)}
+[data-rt-theme=l4d] .toggle>input[type=checkbox]{border-radius:0;background:#262626}
+[data-rt-theme=l4d] .toggle>input[type=checkbox]::after{border-radius:0}
+[data-rt-theme=l4d] .toggle>input[type=checkbox]:checked{background:var(--l-red)}
+[data-rt-theme=l4d] :is(.meter,.arcade-progress,.lat-track){background:#000;box-shadow:inset 0 0 0 1px #333}
+[data-rt-theme=l4d] .pill{color:#fff;background:var(--l-blood)}
+[data-rt-theme=l4d] .pill.on{color:#071a07;background:var(--l-green)}
+[data-rt-theme=l4d] .pad{background:rgba(16,16,16,.9);border:1px solid #2c2c2c}
+[data-rt-theme=l4d] .pad:hover{background:rgba(176,0,0,.35)}
+[data-rt-theme=l4d] .pad.playing{background:rgba(76,207,76,.14);box-shadow:inset 4px 0 0 var(--l-green)}
+[data-rt-theme=l4d] .pad::after{border-left-color:#fff}
+[data-rt-theme=l4d] :is(.step-n,.setup-n,.friend-card .avatar){font-family:var(--rt-font-display);color:#fff;background:var(--l-red)}
+[data-rt-theme=l4d] .setup-step[data-done=true] .setup-n{background:#1f6b1f}
+[data-rt-theme=l4d] code{color:#ff8a8a;background:#000}
+[data-rt-theme=l4d] .savebar{background:rgba(0,0,0,.75);box-shadow:inset 0 2px 0 var(--l-blood)}
+[data-rt-theme=l4d] .foot{background:rgba(0,0,0,.6);box-shadow:inset 0 1px 0 #2c2c2c}
+[data-rt-theme=l4d] .route li{background:rgba(16,16,16,.9);box-shadow:inset 0 0 0 1px #2c2c2c}
+[data-rt-theme=l4d] .route li:last-child{background:rgba(76,207,76,.12);box-shadow:inset 4px 0 0 var(--l-green)}
+[data-rt-theme=l4d] :is(.scroll,.content,main){scrollbar-color:#3a3a3a transparent}
+
+/* ── Fog, torn edges, blood brush, survivor health bars (v2.10.1) ───── */
+[data-rt-theme=l4d] :where(button,.callout,.quick-help,.confirm,.deck-entry,#setup,.tally,.stats,.pad){clip-path:var(--l-torn)}
+[data-rt-theme=l4d] :is(.tabs button,.section-nav button,nav:not(.tabs) button,.icon-btn,.link-btn){clip-path:none}
+[data-rt-theme=l4d] button{border:0;background:rgba(10,12,10,.85)}
+[data-rt-theme=l4d] button:hover{background:var(--l-brush),#3a0000}
+[data-rt-theme=l4d] :is(.primary,#start,#save){background:var(--l-brush),var(--l-blood);box-shadow:none;text-shadow:0 1px 2px #000}
+[data-rt-theme=l4d] :is(.primary,#start,#save):hover{background:var(--l-brush),var(--l-red)}
+[data-rt-theme=l4d] .tabs button[aria-selected=true]{background:var(--l-brush);border-bottom-color:transparent;text-shadow:0 1px 3px #000}
+[data-rt-theme=l4d] :is(.section-nav button[aria-current=page],nav:not(.tabs) button.active){background:var(--l-brush);box-shadow:none;text-shadow:0 1px 3px #000}
+[data-rt-theme=l4d] h2{background:radial-gradient(40% 100% at 18% 55%,rgba(176,0,0,.85),transparent 72%) bottom left/150px 6px no-repeat}
+[data-rt-theme=l4d] .wordmark{text-shadow:0 0 12px rgba(0,0,0,.9),2px 2px 0 var(--l-blood)}
+[data-rt-theme=l4d] .tally,[data-rt-theme=l4d] .stats{background:rgba(5,6,5,.78);border:0}
+[data-rt-theme=l4d] .stats{box-shadow:none;padding-bottom:14px}
+[data-rt-theme=l4d] .stat{position:relative;border-left-color:rgba(255,255,255,.08)}
+[data-rt-theme=l4d] .stat::after{content:"";position:absolute;left:10px;right:10px;bottom:-8px;height:5px;background:linear-gradient(90deg,var(--hp) 0 var(--hp-w),rgba(255,255,255,.12) var(--hp-w));box-shadow:0 0 6px color-mix(in srgb,var(--hp) 60%,transparent)}
+[data-rt-theme=l4d] .stat:nth-child(1){--hp:var(--l-green);--hp-w:92%}
+[data-rt-theme=l4d] .stat:nth-child(2){--hp:var(--l-yellow);--hp-w:58%}
+[data-rt-theme=l4d] .stat:nth-child(3){--hp:#e03030;--hp-w:24%}
+[data-rt-theme=l4d] .bar,[data-rt-theme=l4d] .tabs,[data-rt-theme=l4d] .foot{background:rgba(5,6,5,.6)}
+[data-rt-theme=l4d] :where(details,.board-tools,.sheet,.card,.route-card,.panel,.mini-callout>div,.usage-banner,.facts>div,.matrix>div,.arcade-tickets>div){background:rgba(8,10,8,.82);border:1px solid rgba(160,180,150,.14)}
+.panel[data-rt-theme=l4d]{box-shadow:var(--rt-shadow-float),inset 0 0 80px rgba(0,0,0,.75)}
+[data-rt-theme=l4d] .scroll{background:radial-gradient(120% 80% at 50% 0,rgba(170,190,160,.07),transparent 70%)}
+[data-rt-theme=l4d] :is(.bar,.tabs,.foot){background:rgba(5,6,5,.45)}
+[data-rt-theme=l4d] p{color:#c4c9c2}
+
+/* ── Status strip: a heart monitor ──
+   A glowing trace on a faint grid. Steady green while Tyler listens, a faster
+   yellow beat while it thinks, racing while it talks, and a red flatline on
+   errors (grey flatline on standby). The light pulses with each beat. */
+[data-rt-theme=l4d] .tally{padding:9px 12px 31px 10px}
+[data-rt-theme=l4d] .tally-wave{display:none}
+[data-rt-theme=l4d] .tally-trace{display:block;position:absolute;left:10px;right:10px;bottom:5px;height:22px;overflow:hidden;color:var(--tone);
+  background:linear-gradient(rgba(76,207,76,.09) 1px,transparent 1px) 0 0/100% 5.5px,linear-gradient(90deg,rgba(76,207,76,.09) 1px,transparent 1px) 0 0/11px 100%;
+  -webkit-mask:linear-gradient(90deg,transparent,#000 10%,#000 86%,transparent);mask:linear-gradient(90deg,transparent,#000 10%,#000 86%,transparent)}
+[data-rt-theme=l4d] .tally-trace svg{display:block;width:200%;height:100%;overflow:visible;filter:drop-shadow(0 0 3px currentColor);animation:l4d-scroll var(--beat,2.6s) linear infinite}
+[data-rt-theme=l4d] .tally-trace path{fill:none;stroke:currentColor;stroke-width:2;stroke-linejoin:round;stroke-linecap:round;vector-effect:non-scaling-stroke}
+[data-rt-theme=l4d] .tally[data-state=listening]{--beat:1.7s}
+[data-rt-theme=l4d] .tally[data-state=thinking]{--beat:1.25s}
+[data-rt-theme=l4d] .tally[data-state=speaking]{--beat:.95s}
+[data-rt-theme=l4d] .tally[data-state=waiting]{--beat:2s}
+[data-rt-theme=l4d] .tally:is([data-state=error],[data-state=standby],[data-state=paused]) .tally-trace svg{display:none}
+[data-rt-theme=l4d] .tally:is([data-state=error],[data-state=standby],[data-state=paused]) .tally-trace{background:linear-gradient(currentColor,currentColor) 0 13px/100% 2px no-repeat,linear-gradient(rgba(76,207,76,.09) 1px,transparent 1px) 0 0/100% 5.5px,linear-gradient(90deg,rgba(76,207,76,.09) 1px,transparent 1px) 0 0/11px 100%;filter:drop-shadow(0 0 3px currentColor)}
+[data-rt-theme=l4d] .tally[data-state=error] .tally-trace{animation:l4d-alarm 1s steps(1) infinite}
+[data-rt-theme=l4d] .tally-light{width:6px;flex:0 0 6px;border-radius:0;animation:l4d-beat calc(var(--beat,2.6s) / 2) ease-out infinite}
+[data-rt-theme=l4d] .tally:is([data-state=error],[data-state=standby],[data-state=paused]) .tally-light{animation:none}
+@keyframes l4d-scroll{to{transform:translateX(-50%)}}
+@keyframes l4d-beat{0%,40%,100%{opacity:.45}48%{opacity:1;box-shadow:0 0 12px var(--tone)}}
+@keyframes l4d-alarm{0%{opacity:1}50%{opacity:.3}}
+
+/* ── v2.13: the logo sits on a splash of blood-red paint, poster style. ── */
+[data-rt-theme=l4d] :is(.mark[data-logo],img.mark,#brand-logo){background:radial-gradient(closest-side,rgba(200,10,10,.85),rgba(140,0,0,.65) 62%,transparent 76%) 50% 58%/120% 105% no-repeat;border-radius:0}
+[data-rt-theme=l4d] .mark[data-logo]{width:44px;height:44px;margin:-6px 0}
+
+/* ── Icons, dialogs, notifications and tooltips (v2.14) ──
+   Rough survival stencils: filled off-white silhouettes with stencil cuts and a
+   scratched finish; red marks the chosen tab. Messages are distressed survival
+   notices: torn dark panels, stencil headings and a blood-red brush on errors. */
+[data-rt-theme=l4d] .ic{transform:rotate(-2deg);-webkit-mask:repeating-linear-gradient(-55deg,#000 0 3.2px,rgba(0,0,0,.55) 3.2px 4px);mask:repeating-linear-gradient(-55deg,#000 0 3.2px,rgba(0,0,0,.55) 3.2px 4px)}
+[data-rt-theme=l4d] .ic-v .b{fill:currentColor}
+[data-rt-theme=l4d] .ic-v .d{stroke:#0d0d0d;stroke-width:1.9px}
+[data-rt-theme=l4d] .ic-v .s{stroke-width:2.2px;stroke-linecap:butt}
+[data-rt-theme=l4d] .tabs button[aria-selected=true] .ic{color:var(--l-red-hi)}
+[data-rt-theme=l4d] :is(.rt-toast,.rt-dialog){background:var(--l-grime),rgba(10,11,10,.94);border:0;border-radius:0;clip-path:var(--l-torn);box-shadow:none}
+[data-rt-theme=l4d] .rt-toast{border-left:5px solid var(--tone)}
+[data-rt-theme=l4d] :is(.rt-toast-title,.rt-dialog-title){font-family:var(--rt-font-display);font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#f2f2f2}
+[data-rt-theme=l4d] .rt-dialog-title{font-size:22px}
+[data-rt-theme=l4d] :is(.rt-toast,.rt-dialog)[data-kind=error] :is(.rt-toast-title,.rt-dialog-title){background:var(--l-brush);padding:0 8px;margin-left:-4px}
+[data-rt-theme=l4d] :is(.rt-toast-text,.rt-dialog-text,.rt-steps){color:#c4c9c2}
+[data-rt-theme=l4d] .rt-dialog{padding:22px 18px 16px}
+[data-rt-theme=l4d] .rt-tip{background:#0b0b0b;color:#e6e6e6;border:1px solid #2c2c2c;border-radius:0;font-family:var(--rt-font-display);text-transform:uppercase;letter-spacing:.06em}

@@ -1,0 +1,52 @@
+ROBOTIC TYLER v2.3.22 - Chrome sender component fix + two-person music stop
+
+INSTALL
+Close Steam web chat tabs AND Tyler's dedicated YouTube player tab. Copy ALL
+browser-extension contents over the SAME existing unpacked extension folder,
+including sender-main.js and neural. Reload that extension at
+chrome://extensions. Reopen Steam web chat and Connect & start. Open a fresh
+YouTube music tab from Tyler's Music panel and share that tab's audio again.
+Do not uninstall or change the loaded folder path; saved settings stay.
+Confirm v2.3.22 appears in Tyler DJ and Sender check.
+
+ACTUAL SENDER DATA PATH
+Read-only inspection of Steam's installed steamui/sp.js identified the chat
+renderer's actual msg.unAccountID and context.unAccountIDSender fields. The
+older adapter looked only at props attached directly to DOM nodes, missing
+the React component owning the message. The new adapter follows bounded
+React parent links within that message, reads those sender fields, and stops
+before a different message/history block. It ignores chat.self and mentions.
+The selector helper now explicitly recognizes Steam's actual msgText class.
+
+The shared reader remains connected to music, trivia/arcade, normal typed AI
+replies and other supported Chrome text features. No manual Steam ID entry
+is needed for recognition. It does not guess an account from a display name.
+Sender check now distinguishes a loaded adapter from an old page needing
+to be reopened, and reports ready for skip/stop votes when an account is read.
+
+TWO-PERSON MUSIC STOP
+- music stop / !music stop: exactly two different detected accounts must vote.
+- music reset / !music reset: uses the SAME stop vote, so it cannot bypass stop.
+- Repeating stop/reset or changing a nickname adds no extra vote to that account.
+- Skip votes and stop votes are SEPARATE. One skip + one stop never passes.
+- New tracks clear both counts. Passing a stop vote stops playback, clears
+  waiting songs and pending chat commands, and keeps audio sharing ready.
+- Local Reset music and Stop music & sharing buttons are immediate DJ controls.
+- music clear still empties waiting songs without stopping the current song.
+- Stop/reset votes are exempt from the request-burst cap, but keep the
+  per-person control cooldown. The 10-second cleanup cooldown applies to clear.
+
+VERIFICATION
+119 automated checks passed. New checks reproduce the owning-component
+parent chain and actual field names found in Steam's installed code, sender
+context versus the bot account, quote isolation and message boundaries.
+Music checks cover repeated votes, nickname changes, reset bypass attempts,
+separate skip/stop counts, clearing and fresh votes after a stop.
+All v2.3.21 music spam protections remain, including the local chat-command
+pause button, bounded queues, paced notices and controller timeout.
+
+The installed Steam interface source was inspected; the live Chrome session
+has not been operated or verified. Have two friends send new messages and
+check their names plus ready for skip/stop votes before testing 1/2 then 2/2.
+No messages were sent to real Steam users during these checks. This is a
+Chrome-only patch; Electron and the native companion remain unchanged.

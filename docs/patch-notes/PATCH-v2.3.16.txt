@@ -1,0 +1,21 @@
+ROBOTIC TYLER v2.3.16 - Experimental music request queue / tab-audio relay
+
+See MUSIC-GUIDE.md for setup and limitations. Update all browser-extension
+files in the SAME folder and reload without uninstalling. This build adds
+access to www.youtube.com and a controller content script for the dedicated
+music tab. Existing settings/keys are not cleared. All prior features,
+including neural speech detection and solo/group trivia, are included.
+
+Chat song requests search the visible YouTube tab; its user-shared audio
+is mixed into the existing Steam synthetic microphone. Music has separate
+gain and stop/pause/queue controls so AI can remain text-only. The bot must
+remain connected to Steam voice. No Spotify integration is included.
+
+No music is bundled, downloaded or extracted. An explicit Chrome tab-audio
+share is required each session. Content source restrictions and normal
+YouTube ads/autoplay/consent remain. Song selection is first-result based,
+not guaranteed exact matching. Treat this feature as experimental.
+
+81 automated checks and syntax checks pass. Live browser/source playback
+and actual Steam voice delivery remain unverified. No real songs, music
+accounts or Steam chats were operated during build testing.

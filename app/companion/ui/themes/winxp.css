@@ -1,0 +1,182 @@
+/*
+ * ROBOTIC TYLER "Windows XP style" theme (v2.10), light.
+ * The Luna look: blue gradient title bar with white bold text, beige window
+ * (#ECE9D8), glossy rounded buttons with an orange hover glow, white tabs with
+ * an orange top edge, blue task-pane groups, white text boxes with blue-grey
+ * borders, green check marks and the green block progress bar.
+ * Type: Tahoma, the XP system font (already on Windows). No Microsoft logos.
+ */
+[data-rt-theme=winxp]{
+  color-scheme:light;
+  --x-title:linear-gradient(180deg,#0997ff,#0053ee 8%,#0050ee 40%,#0066ff 88%,#0066ff 93%,#005bff 95%,#003dd7 96%,#003dd7);
+  --x-frame:#0055ea;--x-beige:#ece9d8;--x-edge:#7f9db9;--x-tab:#919b9c;--x-blue:#215dc6;--x-pane:#d6dff7;
+  --x-btn:linear-gradient(180deg,#fff,#ecebe6 86%,#d6d0c5);
+  --x-glow:inset -1px 1px #fff0cf,inset 1px 2px #fdd889,inset -2px 2px #fbc761,inset 2px -2px #e5a01a;
+  --rt-bar:var(--x-beige);--rt-bg:var(--x-beige);--rt-bg-deep:#ffffff;--rt-surface:#ffffff;--rt-surface-2:#f4f3ee;--rt-surface-3:#e3e0d0;
+  --rt-block:#f7f6f1;--rt-block-hover:#fdfcf8;--rt-input:#ffffff;--rt-select:#c1d2ee;
+  --rt-line:#c8c4b4;--rt-line-soft:#d6d2c2;--rt-line-strong:var(--x-edge);
+  --rt-ink:#000000;--rt-ink-strong:#000000;--rt-ink-2:#222;--rt-ink-3:#3d3d3d;--rt-ink-4:#555555;--rt-ink-disabled:#a19f93;
+  --rt-link:#0046d5;--rt-link-hover:#ff6600;--rt-blue:#000000;--rt-blue-deep:#003c74;--rt-active:#e68b2c;
+  --rt-blue-fade:#f4f3ee;--rt-blue-fade-hover:#ffffff;--rt-green:#2f7d32;--rt-green-hover:#348a37;--rt-green-ink:#ffffff;--rt-green-line:#1f5c22;
+  --rt-state-standby:#555555;--rt-state-ready:#1d6e1d;--rt-state-listening:#0046d5;--rt-state-thinking:#7a5400;--rt-state-speaking:#a8410a;--rt-state-waiting:#6b3fa0;--rt-state-error:#b00000;
+  --rt-danger:#b00000;--rt-danger-bg:#b8321b;--rt-danger-hover:#c93d24;--rt-danger-ink:#ffffff;--rt-success:#1d6e1d;--rt-focus:#316ac5;
+  --rt-accent:#e68b2c;--rt-accent-soft:rgba(230,139,44,.15);--rt-accent-line:rgba(230,139,44,.5);
+  --rt-on-accent:#ffffff;--rt-accent-fill:#316ac5;--rt-meter:repeating-linear-gradient(90deg,#2fbf2f 0 8px,transparent 8px 10px);--rt-marker:#000000;--rt-edge:var(--x-edge);--rt-page-glow:var(--x-beige);
+  --rt-font:Tahoma,"Segoe UI",Verdana,"DejaVu Sans",sans-serif;--rt-font-display:Tahoma,"Segoe UI",Verdana,"DejaVu Sans",sans-serif;
+  --rt-text-xs:11px;--rt-text-sm:11px;--rt-text-md:12px;--rt-text-lg:13px;--rt-track:0;
+  --rt-r-xs:2px;--rt-r-sm:3px;--rt-r-md:3px;--rt-r-lg:4px;--rt-shadow-float:2px 2px 12px rgba(0,0,0,.45);
+}
+[data-rt-theme=winxp] :is(h1,h2,h3,label,.tabs button,.ident-sub,.stat dt,.tally-label,.pill,.pad span,details.feature>summary,.sheet-head h2,.card>h2,.pulse dt,.facts b,.matrix dt,.section-nav button,nav:not(.tabs) button,button){text-transform:none;letter-spacing:0}
+.panel[data-rt-theme=winxp]{background:var(--x-beige);border:3px solid var(--x-frame);border-top:0;border-radius:8px 8px 0 0;font-family:var(--rt-font)}
+[data-rt-theme=winxp] .bar{background:var(--x-title);border-radius:7px 7px 0 0;padding:6px 6px 6px 8px}
+[data-rt-theme=winxp] .wordmark{font:700 13px/1.2 var(--rt-font);letter-spacing:0;color:#fff;text-shadow:1px 1px #0f1089}
+[data-rt-theme=winxp] .ident-sub{color:#dfe9ff}
+[data-rt-theme=winxp] .bar .mark:not([data-logo]){width:22px;height:22px;border-radius:3px}
+[data-rt-theme=winxp] .icon-btn{width:21px;height:21px;border:1px solid #fff;border-radius:3px;color:#fff;background:linear-gradient(180deg,#3c8cf3,#1c62e0 60%,#2d6ce8);box-shadow:none}
+[data-rt-theme=winxp] .icon-btn:hover{background:linear-gradient(180deg,#5aa0ff,#2a74f0)}
+[data-rt-theme=winxp] h2{font:700 13px/1.3 var(--rt-font);color:var(--x-blue)}
+[data-rt-theme=winxp] h1{font:700 22px/1.2 var(--rt-font);color:#000}
+[data-rt-theme=winxp] label{font-weight:400;font-size:12px;color:#000}
+/* Buttons */
+[data-rt-theme=winxp] button{color:#000;background:var(--x-btn);border:1px solid #003c74;border-radius:3px;box-shadow:none;font:400 12px/1.2 var(--rt-font);min-height:23px;transition:none}
+[data-rt-theme=winxp] button:hover{color:#000;background:var(--x-btn);box-shadow:var(--x-glow)}
+[data-rt-theme=winxp] button:active{background:linear-gradient(180deg,#cdcac3,#e3e3db 8%,#e5e5de 94%,#f2f2f1);transform:none}
+[data-rt-theme=winxp] :is(.primary,#start,#save){color:#fff;font-weight:700;font-style:italic;background:linear-gradient(180deg,#3c9a3c,#2f7d32 50%,#2a7a2d);border-color:#1f5c22;text-shadow:1px 1px rgba(0,0,0,.35)}
+[data-rt-theme=winxp] :is(.primary,#start,#save):hover{color:#fff;background:linear-gradient(180deg,#46a846,#348a37 50%,#2f7d32);box-shadow:none}
+[data-rt-theme=winxp] .danger{color:#fff;background:linear-gradient(180deg,#e0663f,#b8321b);border-color:#7a1d0d}
+[data-rt-theme=winxp] .danger:hover{color:#fff;background:linear-gradient(180deg,#ea7350,#c93d24);box-shadow:none}
+[data-rt-theme=winxp] :is(.ghost,.icon){background:transparent;border-color:transparent}
+[data-rt-theme=winxp] :is(.ghost,.icon):hover{border-color:#003c74;background:var(--x-btn)}
+[data-rt-theme=winxp] .link-btn{border:0;background:none;color:var(--rt-link);text-decoration:underline}
+/* Property-sheet tabs */
+[data-rt-theme=winxp] .tabs{gap:1px;padding:6px 6px 0;margin-top:8px;background:var(--x-beige);box-shadow:inset 0 -1px 0 var(--x-tab)}
+[data-rt-theme=winxp] .tabs button{flex:1;margin:0;padding:5px 2px 4px;font-size:12px;color:#000;background:linear-gradient(180deg,#fff,#fafaf9 26%,#f0f0ea 95%,#ecebe5);border:1px solid var(--x-tab);border-bottom:0;border-radius:3px 3px 0 0;box-shadow:none;min-height:0}
+[data-rt-theme=winxp] .tabs button:hover{box-shadow:inset 0 2px 0 #ffc83c;color:#000}
+[data-rt-theme=winxp] .tabs button[aria-selected=true]{position:relative;margin-bottom:-1px;padding-bottom:5px;background:#fcfcfe;box-shadow:inset 0 3px 0 #e68b2c;font-weight:700}
+[data-rt-theme=winxp] .scroll{background:#fcfcfe;scrollbar-color:#c1d3fb #eef0f6}
+[data-rt-theme=winxp] .foot{background:var(--x-beige);box-shadow:inset 0 1px 0 #fff,inset 0 2px 0 #d6d2c2}
+/* Group boxes and task-pane groups */
+[data-rt-theme=winxp] :where(.callout,.quick-help,.confirm,.deck-entry,.board-tools,.sheet,.card,.route-card,.panel,.mini-callout>div,.usage-banner,.facts>div,.matrix>div,#setup,.arcade-tickets>div){background:#fff;border:1px solid #d0d0bf;border-radius:4px}
+[data-rt-theme=winxp] details{background:var(--x-pane);border:1px solid #fff;border-radius:3px 3px 0 0;padding:0 10px}
+[data-rt-theme=winxp] details>summary{margin:0 -10px;background:linear-gradient(90deg,#fff,#c6d3f7);color:var(--x-blue);font-weight:700;border-radius:3px 3px 0 0}
+[data-rt-theme=winxp] details>summary::after{border-color:var(--x-blue)}
+[data-rt-theme=winxp] details.feature,[data-rt-theme=winxp] details.feature[open]{background:var(--x-pane)}
+[data-rt-theme=winxp] details.feature>summary{color:var(--x-blue);font-size:12px}
+[data-rt-theme=winxp] summary:hover,[data-rt-theme=winxp] details[open]>summary{color:#428eff;background:linear-gradient(90deg,#fff,#c6d3f7)}
+[data-rt-theme=winxp] :is(.tally,.stats){background:#fff;border:1px solid var(--x-edge);border-radius:0}
+[data-rt-theme=winxp] .tally-light{box-shadow:none!important}
+[data-rt-theme=winxp] .stat dd{font-weight:700}
+/* Fields */
+[data-rt-theme=winxp] input:where(:not([type=checkbox],[type=radio],[type=range],[type=file])),[data-rt-theme=winxp] :is(textarea,select){color:#000;background-color:#fff;border:1px solid var(--x-edge);border-radius:0;box-shadow:none;font-family:var(--rt-font)}
+[data-rt-theme=winxp] :is(input,textarea,select):focus{border-color:#316ac5;box-shadow:none}
+[data-rt-theme=winxp] :is(pre,.output,.v22-log,.response){background:#fff;border:1px solid var(--x-edge);border-radius:0;box-shadow:none;color:#000}
+[data-rt-theme=winxp] input[type=checkbox],[data-rt-theme=winxp] .toggle>input[type=checkbox]{width:13px;height:13px;border:1px solid #1c5180;border-radius:0;background:linear-gradient(135deg,#dcdcd7,#fff);box-shadow:none}
+[data-rt-theme=winxp] input[type=checkbox]:checked,[data-rt-theme=winxp] .toggle>input[type=checkbox]:checked{background:linear-gradient(135deg,#dcdcd7,#fff);border-color:#1c5180}
+[data-rt-theme=winxp] .toggle>input[type=checkbox]::after{display:none}
+[data-rt-theme=winxp] input[type=checkbox]:checked::after,[data-rt-theme=winxp] .toggle>input[type=checkbox]:checked::after{display:block;content:"";position:absolute;left:3.5px;top:0;width:3px;height:7px;background:none;border:solid #21a121;border-width:0 2px 2px 0;border-radius:0;box-shadow:none;transform:rotate(45deg)}
+[data-rt-theme=winxp] :is(.meter,.arcade-progress,.lat-track){background:#fff;border:1px solid #686868;border-radius:3px;box-shadow:none;padding:1px}
+[data-rt-theme=winxp] .pill{color:var(--x-blue);background:#fff;border:1px solid var(--x-edge)}
+[data-rt-theme=winxp] .pad{background:var(--x-btn);border:1px solid #003c74;box-shadow:none}
+[data-rt-theme=winxp] .pad:hover{box-shadow:var(--x-glow)}
+[data-rt-theme=winxp] .pad::after{border-left-color:#21a121}
+[data-rt-theme=winxp] .pad.playing{box-shadow:inset 3px 0 0 #2fbf2f}
+[data-rt-theme=winxp] :is(.step-n,.setup-n,.friend-card .avatar){color:#fff;background:#316ac5;border-radius:50%}
+[data-rt-theme=winxp] code{color:var(--x-blue);background:#fff;border:1px solid #d0d0bf}
+/* Settings and Voice Studio: blue task pane on the left */
+[data-rt-theme=winxp] body{background:var(--x-beige)}
+[data-rt-theme=winxp] main{background:#fcfcfe}
+[data-rt-theme=winxp] .side{background:linear-gradient(180deg,#4b6fd6,#3c56c4);box-shadow:none}
+[data-rt-theme=winxp] .brand-text strong{color:#fff;letter-spacing:0}
+[data-rt-theme=winxp] .brand-text small,[data-rt-theme=winxp] .side-foot{color:#e6edff}
+[data-rt-theme=winxp] :is(.section-nav,nav:not(.tabs)){margin:0 10px;background:var(--x-pane);border:1px solid #fff;border-radius:3px;padding:4px 0}
+[data-rt-theme=winxp] :is(.section-nav button,nav:not(.tabs) button){color:var(--x-blue);background:transparent;border:0;box-shadow:none;font-size:12px}
+[data-rt-theme=winxp] :is(.section-nav button,nav:not(.tabs) button):hover{color:#428eff;background:transparent;text-decoration:underline}
+[data-rt-theme=winxp] :is(.section-nav button[aria-current=page],nav:not(.tabs) button.active){color:#000;font-weight:700;background:#fff;box-shadow:none}
+[data-rt-theme=winxp] :is(.section-nav button,nav:not(.tabs) button) .ic{color:var(--x-blue)}
+[data-rt-theme=winxp] .savebar{background:var(--x-beige);box-shadow:inset 0 1px 0 #fff,inset 0 2px 0 #d6d2c2}
+[data-rt-theme=winxp] .sheet-head{background:none;box-shadow:inset 0 -1px 0 #d0d0bf}
+[data-rt-theme=winxp] :is(.sheet-head h2,.card>h2){color:var(--x-blue);font-weight:700}
+[data-rt-theme=winxp] .route li{background:var(--x-btn);box-shadow:inset 0 0 0 1px #003c74}
+[data-rt-theme=winxp] .route li:last-child{background:#e9f5e9;box-shadow:inset 3px 0 0 #2fbf2f,inset 0 0 0 1px #2f7d32}
+
+/* ── Taskbar, start button, title-bar headings (v2.10.1) ─────────────── */
+[data-rt-theme=winxp] {--x-taskbar:linear-gradient(180deg,#3168d5,#4993e6 3%,#2157d7 10%,#2663e0 90%,#1941a5);--x-tray:linear-gradient(180deg,#0c59b9,#139ee9 6%,#18b5f2 10%,#139beb 14%,#1290e8 19%,#0d8dea 63%,#0d9ff1 81%,#0f9eed 88%,#119be9 91%,#1392e2 94%,#137ed7 97%,#095bc9)}
+[data-rt-theme=winxp] .foot{background:var(--x-taskbar);box-shadow:none;padding:4px 6px 4px 4px;gap:6px}
+[data-rt-theme=winxp] .foot small{order:2;flex:0 1 auto;color:#fff;padding:3px 8px 3px 22px;background:var(--x-tray);border-left:1px solid #1042af;box-shadow:inset 1px 0 1px #18bbff;border-radius:0;font-size:11px;position:relative}
+[data-rt-theme=winxp] .foot .owner-dot{order:2;margin-right:-26px;position:relative;z-index:1;width:9px;height:9px;border-radius:50%;box-shadow:0 0 0 1px #fff!important}
+[data-rt-theme=winxp] .foot button{order:1;color:#fff;background:linear-gradient(180deg,#3c81f3,#2a69e2);border:1px solid #1b4fbf;border-radius:3px;box-shadow:inset 0 1px 0 rgba(255,255,255,.35);font-size:11px;min-height:22px}
+[data-rt-theme=winxp] .foot button:hover{color:#fff;background:linear-gradient(180deg,#53a1ff,#3a7cf0)}
+[data-rt-theme=winxp] .foot .danger{background:linear-gradient(180deg,#e0663f,#b8321b);border-color:#7a1d0d}
+[data-rt-theme=winxp] :is(.primary,#start,#save){border-radius:3px 14px 14px 3px;padding-right:20px;font-size:13px;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),1px 1px 2px rgba(0,0,0,.35)}
+/* Settings and Voice Studio: page headings as XP title bars, a taskbar save bar */
+[data-rt-theme=winxp] .page-head{margin:0 0 16px;padding:8px 12px;background:var(--x-title);border-radius:7px 7px 0 0;box-shadow:inset 0 0 0 1px #0831d9}
+[data-rt-theme=winxp] .page-head :is(h1,p){color:#fff;text-shadow:1px 1px #0f1089}
+[data-rt-theme=winxp] .page-head h1{font-size:15px;margin:0}
+[data-rt-theme=winxp] .page-head p{margin:2px 0 0;font-size:11px;opacity:.9}
+[data-rt-theme=winxp] .savebar{background:var(--x-taskbar);box-shadow:none}
+[data-rt-theme=winxp] .savebar p{color:#fff}
+[data-rt-theme=winxp] .savebar button:not(#save){color:#fff;background:linear-gradient(180deg,#3c81f3,#2a69e2);border-color:#1b4fbf}
+[data-rt-theme=winxp] .savebar button:not(#save):hover{box-shadow:none;background:linear-gradient(180deg,#53a1ff,#3a7cf0)}
+[data-rt-theme=winxp] :is(.sheet,.card,.route-card,.panel){border:3px solid #0055ea;border-top-width:22px;border-radius:7px 7px 0 0;position:relative}
+
+/* ── Status strip: an XP progress bar and a notification-area orb ──
+   Green blocks in a rounded track: they bounce like a volume meter while Tyler
+   listens, slide across like the boot screen's three blue blocks while it
+   thinks, and fill block by block like a file copy while it talks. The orb
+   shows a red X on errors. */
+[data-rt-theme=winxp] .tally{padding:8px 10px 29px 8px;align-items:flex-start}
+[data-rt-theme=winxp] .tally-wave{display:none}
+[data-rt-theme=winxp] .tally-light{width:16px;height:16px;flex:0 0 16px;margin-top:1px;border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#fff 0 1.5px,color-mix(in srgb,var(--tone) 45%,#fff) 3px,var(--tone) 62%,color-mix(in srgb,var(--tone) 65%,#000) 100%);box-shadow:0 1px 1px rgba(0,0,0,.35)!important}
+[data-rt-theme=winxp] .tally[data-state=error] .tally-light::after{content:"";position:absolute;inset:4px;background:linear-gradient(45deg,transparent 40%,#fff 40% 60%,transparent 60%),linear-gradient(-45deg,transparent 40%,#fff 40% 60%,transparent 60%)}
+[data-rt-theme=winxp] .tally[data-state=speaking] .tally-light{animation:xp-orb 1.2s ease-in-out infinite}
+@keyframes xp-orb{0%,100%{box-shadow:0 1px 1px rgba(0,0,0,.35),0 0 0 0 transparent}50%{box-shadow:0 1px 1px rgba(0,0,0,.35),0 0 6px 2px color-mix(in srgb,var(--tone) 60%,transparent)}}
+[data-rt-theme=winxp] .tally::before{content:"";position:absolute;left:8px;right:8px;bottom:8px;height:15px;border:1px solid #686868;border-radius:3px;background:linear-gradient(180deg,#e2e2dc,#fff 35%,#fff 65%,#ececec);box-shadow:inset 1px 1px 1px rgba(0,0,0,.08)}
+[data-rt-theme=winxp] .tally::after{content:"";position:absolute;left:11px;right:11px;bottom:11px;height:9px;
+  background:repeating-linear-gradient(90deg,transparent 0 6px,#fff 6px 8px),linear-gradient(180deg,#d9f7d3,#68d864 30%,#2cb42c 55%,#55cd55 80%,#a9ecaa);
+  clip-path:inset(0 0 0 0)}
+[data-rt-theme=winxp] .tally[data-state=listening]::after{animation:xp-level 1.6s steps(1) infinite}
+[data-rt-theme=winxp] .tally[data-state=thinking]::after{background:repeating-linear-gradient(90deg,transparent 0 6px,#fff 6px 8px),linear-gradient(180deg,#c9dcff,#5a8ff7 30%,#1d55e3 55%,#3f74ef 80%,#a8c4ff) 0 0/24px 100% no-repeat;background-position:0 0,40px 0;animation:xp-marquee 2.2s steps(50,end) infinite}
+[data-rt-theme=winxp] .tally[data-state=speaking]::after{animation:xp-copy 2.6s steps(44,end) infinite}
+[data-rt-theme=winxp] .tally[data-state=waiting]::after{background:repeating-linear-gradient(90deg,transparent 0 6px,#fff 6px 8px),linear-gradient(180deg,#fff4c4,#f2cf3c 40%,#d9a90c 60%,#f0d466);clip-path:inset(0 50% 0 0)}
+[data-rt-theme=winxp] .tally[data-state=error]::after{background:repeating-linear-gradient(90deg,transparent 0 6px,#fff 6px 8px),linear-gradient(180deg,#ffd6d0,#f0625a 35%,#cf1d1d 60%,#e65a50)}
+[data-rt-theme=winxp] .tally:is([data-state=standby],[data-state=paused])::after{clip-path:inset(0 100% 0 0)}
+@keyframes xp-level{0%{clip-path:inset(0 55% 0 0)}14%{clip-path:inset(0 35% 0 0)}28%{clip-path:inset(0 62% 0 0)}42%{clip-path:inset(0 28% 0 0)}57%{clip-path:inset(0 48% 0 0)}71%{clip-path:inset(0 20% 0 0)}85%{clip-path:inset(0 52% 0 0)}}
+@keyframes xp-marquee{from{background-position:0 0,-24px 0}to{background-position:0 0,376px 0}}
+@keyframes xp-copy{from{clip-path:inset(0 100% 0 0)}90%,to{clip-path:inset(0 0 0 0)}}
+
+/* ── v2.13: the logo is the window's icon: bare on the blue title bar with the
+   soft drop shadow XP gave every desktop icon. ── */
+[data-rt-theme=winxp] .mark[data-logo] .mark-art,[data-rt-theme=winxp] :is(img.mark,#brand-logo){filter:drop-shadow(1px 2px 1px rgba(0,0,0,.4))}
+
+/* ── Icons, dialogs, notifications and tooltips (v2.14) ──
+   Small desktop icons in the familiar XP colours (blue, green, yellow, red) with
+   a dark outline and a soft shadow. Notifications are the yellow tray balloon;
+   dialogs are Luna message boxes with the blue title bar and centred buttons. */
+[data-rt-theme=winxp] .ic{--xp:#3a7be0;filter:drop-shadow(1px 1px .5px rgba(0,0,0,.28))}
+[data-rt-theme=winxp] .ic-v .b{fill:var(--xp);stroke:#1c3f94;stroke-width:1px}
+[data-rt-theme=winxp] .ic-v .d{stroke:#fff;stroke-width:1.5px}
+[data-rt-theme=winxp] .ic-v .s{stroke:var(--xp);stroke-width:2px}
+[data-rt-theme=winxp] .ic:is([data-i=play],[data-i=check],[data-i=success],[data-i=sounds],[data-i=checks]){--xp:#2fa52f}
+[data-rt-theme=winxp] .ic:is([data-i=warning],[data-i=ai]){--xp:#f2c12e}
+[data-rt-theme=winxp] .ic:is([data-i=error],[data-i=stop],[data-i=close]){--xp:#d8392b}
+[data-rt-theme=winxp] .ic:is([data-i=room],[data-i=guide]){--xp:#c98a3c}
+[data-rt-theme=winxp] .ic:is([data-i=setup],[data-i=advanced],[data-i=games],[data-i=voice]){--xp:#6f7f90}
+[data-rt-theme=winxp] :is(.icon-btn,.rt-x) .ic{--xp:#fff;filter:none}
+[data-rt-theme=winxp] .ic[data-i=warning] .b{stroke:#8a6a00}
+[data-rt-theme=winxp] .ic[data-i=warning] .d{stroke:#000}
+[data-rt-theme=winxp] .rt-toast{background:#ffffe1;color:#000;border:1px solid #000;border-radius:7px;box-shadow:2px 3px 6px rgba(0,0,0,.35);font-family:var(--rt-font)}
+[data-rt-theme=winxp] .rt-toast-title{font:700 11px/1.3 var(--rt-font);color:#000}
+[data-rt-theme=winxp] .rt-toast-text{font-size:11px;color:#000}
+[data-rt-theme=winxp] .rt-toast .rt-x{color:#000}
+[data-rt-theme=winxp] .rt-dialog{padding:0 0 12px;gap:10px;background:var(--x-beige);color:#000;border:3px solid var(--x-frame);border-top:0;border-radius:8px 8px 0 0;box-shadow:2px 4px 14px rgba(0,0,0,.45)}
+[data-rt-theme=winxp] .rt-dialog-head{padding:5px 8px;background:var(--x-title);border-radius:7px 7px 0 0}
+[data-rt-theme=winxp] .rt-dialog-head .ic{--ic-size:16px}
+[data-rt-theme=winxp] .rt-dialog-title{font:700 13px/1.3 var(--rt-font);color:#fff;text-shadow:1px 1px #0f1089}
+[data-rt-theme=winxp] :is(.rt-dialog-text,.rt-steps,.rt-dialog-actions){margin-left:14px;margin-right:14px;color:#000;font-size:12px}
+[data-rt-theme=winxp] .rt-dialog-actions{justify-content:center}
+[data-rt-theme=winxp] .rt-scrim{background:rgba(0,0,0,.12)}
+[data-rt-theme=winxp] .rt-tip{background:#ffffe1;color:#000;border:1px solid #000;border-radius:0;box-shadow:1px 1px 2px rgba(0,0,0,.3)}
+[data-rt-theme=winxp] .rt-x,[data-rt-theme=winxp] .rt-x:hover{width:18px;height:18px;margin:-2px -2px 0 0;background:transparent;border:1px solid transparent;border-radius:3px;box-shadow:none}
+[data-rt-theme=winxp] .rt-x:hover{border-color:#7f9db9;background:#fff}
+[data-rt-theme=winxp] .rt-x .ic{--xp:#000;--ic-size:11px}

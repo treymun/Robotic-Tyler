@@ -1,0 +1,65 @@
+ROBOTIC TYLER v2.3.13 - Bundled local Silero AI speech detection
+
+UPDATE WITHOUT LOSING SETTINGS
+1. Close every Steam web chat tab.
+2. Back up your existing unpacked extension folder.
+3. Extract this ZIP. Copy ALL contents of ROBOTIC_TYLER_v2.3/browser-extension
+   over the SAME existing extension folder, including the new neural folder.
+4. Reload the EXISTING extension at chrome://extensions. Do not uninstall
+   or use Load unpacked from a different path. Keep the extension ID.
+5. Reopen Steam chat, join voice and use Connect & start.
+6. Conversation > Fine-tune listening & turn-taking: enable
+   AI speech detection - ignore keyboard-only noise.
+
+WHAT CHANGED
+The keyboardFilter preference now enables actual Silero VAD v5 neural
+speech classification through ONNX Runtime Web 1.22.0. Both model and
+runtime are bundled locally using the archives supplied by the user.
+There is no extra application, live CDN download, subscription or extra
+audio upload for this local classification. Accepted speech still uses
+the configured transcription/AI provider, as before.
+
+Incoming remote Steam audio is recorded as a candidate clip. After the
+quiet gap, the audio is converted to 16-kHz PCM and checked locally in an
+extension-owned frame. Only clips classified as speech reach transcription.
+The old high-peak click gate, 150-ms onset delay and strict voiced-duration
+requirement are bypassed while AI speech detection is enabled. Candidate
+recording uses a lower energy threshold, preserving quieter speech. Long
+candidate clips are checked at 12 seconds rather than silently discarded.
+The existing Minimum speech slider applies only with AI detection OFF.
+
+The local model requires at least three speech-positive 32-ms frames,
+including two consecutive frames, and peak speech probability >= 0.65.
+The audio band is widened to 80-7600 Hz while detection is enabled.
+Model loading/classification errors are displayed; noisy audio is not
+silently uploaded as a fallback. Stop/off during loading cancels the start.
+
+TESTING
+64 automated checks pass plus JavaScript syntax checks. Unlike the older
+filter, testing executes the real bundled ONNX model and WASM runtime:
+silence and synthetic keyboard clicks were rejected; locally generated
+speech, and the same speech mixed with synthetic clicks, were accepted.
+This does not prove behavior for every real voice, keyboard or Steam audio
+layout. Live Chrome iframe/model loading and your friends' audio still
+need testing. No actual voice/chat messages or downloads were submitted.
+
+WHAT TO EXPECT
+Startup may briefly say Loading local AI speech detector. During analysis
+it says Checking speech locally. Keyboard-only clips should show Background
+noise ignored rather than sending AI requests. Test by typing silently,
+then speaking a normal sentence. This is speech detection, not source
+separation: typing mixed with actual speech may remain audible. Television,
+music with vocals and other actual speech may also be classified as speech.
+
+All prior feature changes remain included, including replay prevention.
+Electron and native Steam companion source are unchanged. Existing
+experimental integration labels still apply. No settings/keys are cleared.
+
+DEPENDENCIES / PROVENANCE
+Third-party licenses are in browser-extension/neural. Runtime/model files
+are copied from the two user-provided archives, with no code installation
+scripts executed. Archive SHA256:
+onnxruntime-web-1.22.0.tgz
+e293551f9d36d003e293d0f2937fee7b3dfdcef76d71d1449b55e2d4157c7aea
+vad-web-0.0.31.tgz
+d1a211cf1a2ed26297da52cc08de79e75d79838a274bfc6de546feb1f828c940

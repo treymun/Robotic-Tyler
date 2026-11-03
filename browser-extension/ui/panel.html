@@ -1,0 +1,201 @@
+<!--
+  In-chat panel shell. Compiled into ui-template.js by tools/build.mjs.
+  Feature modules mount into the *Mount containers; every id below is part of the
+  module contract (content.js, automatic.js, quick-start.js, soundboard.js …), so
+  rename ids only together with their consumers.
+-->
+<aside class="panel" aria-label="ROBOTIC TYLER control panel">
+  <header class="bar">
+    <div class="mark" aria-hidden="true"><!--@logo: ui/logo-mark.svg, inlined by tools/build.mjs; shown until the theme logo is drawn--><!--@logo--><canvas class="mark-art" width="96" height="96"></canvas></div>
+    <div class="ident">
+      <strong class="wordmark">ROBOTIC TYLER</strong>
+      <span id="platformChip" class="ident-sub">Steam companion</span>
+    </div>
+    <button id="collapse" class="icon-btn" type="button" aria-label="Collapse panel" data-tip="Collapse panel (Ctrl+Shift+U)" aria-expanded="true">
+      <!--@icon:minimize-->
+    </button>
+  </header>
+
+  <div id="leaseBanner" class="banner" hidden>
+    <span>Another Steam tab is running Tyler.</span>
+    <button id="takeover" class="btn sm" type="button">Use this tab</button>
+  </div>
+
+  <div id="activityCard" class="tally" data-state="ready">
+    <span class="tally-light" aria-hidden="true"></span>
+    <div class="tally-body">
+      <div class="tally-head">
+        <span id="activityLabel" class="tally-label">Getting ready</span>
+        <span class="tally-wave" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>
+      </div>
+      <p id="activity" class="tally-text" role="status">Getting ready…</p>
+    </div>
+    <span class="tally-trace" aria-hidden="true"><svg viewBox="0 0 400 20" preserveAspectRatio="none"><path d="M0 13h28q4 -4 8 0h6l3 3l4 -14l4 17l3 -6h8q6 -6 12 0h24h28q4 -4 8 0h6l3 3l4 -14l4 17l3 -6h8q6 -6 12 0h24h28q4 -4 8 0h6l3 3l4 -14l4 17l3 -6h8q6 -6 12 0h24h28q4 -4 8 0h6l3 3l4 -14l4 17l3 -6h8q6 -6 12 0h24"/></svg></span>
+  </div>
+
+  <dl class="stats" id="hud">
+    <div class="stat"><dt>Voice</dt><dd id="hudVoice">Idle</dd><small id="hudVoiceMeta">Bridge not checked</small></div>
+    <div class="stat"><dt>Text spend</dt><dd id="hudSpend">$0.0000</dd><small id="hudSpendMeta">Reported by provider</small></div>
+    <div class="stat"><dt>Last reply</dt><dd id="hudLatency">—</dd><small id="hudLatencyMeta">Waiting for a turn</small></div>
+  </dl>
+
+  <nav class="tabs" role="tablist" aria-label="Companion sections">
+    <button id="tab-conversation" role="tab" aria-controls="view-conversation" data-tab="conversation" aria-selected="true" type="button"><!--@icon:chat--><span class="tab-label">Chat</span></button>
+    <button id="tab-room" role="tab" aria-controls="view-room" data-tab="room" aria-selected="false" type="button" tabindex="-1"><!--@icon:room--><span class="tab-label">Room</span></button>
+    <button id="tab-soundboard" role="tab" aria-controls="view-soundboard" data-tab="soundboard" aria-selected="false" type="button" tabindex="-1"><!--@icon:sounds--><span class="tab-label">Sounds</span></button>
+    <button id="tab-setup" role="tab" aria-controls="view-setup" data-tab="setup" aria-selected="false" type="button" tabindex="-1"><!--@icon:setup--><span class="tab-label">Setup</span></button>
+    <button id="tab-checks" role="tab" aria-controls="view-checks" data-tab="checks" aria-selected="false" type="button" tabindex="-1"><!--@icon:checks--><span class="tab-label">Checks</span></button>
+  </nav>
+
+  <div class="scroll">
+    <section id="view-conversation" class="view" role="tabpanel" aria-labelledby="tab-conversation" data-view="conversation">
+      <div id="quickMount"></div>
+      <div id="automaticMount"></div>
+      <details class="feature">
+        <summary><span class="feature-title">Manual commands</span><span class="feature-meta">Test without chat</span></summary>
+        <div class="feature-body">
+          <label class="field">Command
+            <textarea id="command" rows="2" placeholder="roll · teams Alex, Sam · ask hello" spellcheck="false"></textarea>
+          </label>
+          <div class="btn-row">
+            <button id="run" class="btn" type="button">Run command</button>
+            <button id="send" class="btn" type="button">Send last result</button>
+          </div>
+          <label class="check"><input id="autoSend" type="checkbox"><span>Send manual results to chat</span></label>
+          <label class="check"><input id="speak" type="checkbox"><span>Speak manual AI answers</span></label>
+          <pre id="result" class="output">Command results appear here.</pre>
+          <div class="btn-row">
+            <button id="watch" class="btn" type="button">Watch for !tyler commands</button>
+            <button id="pause" class="btn" type="button">Pause chat commands</button>
+          </div>
+          <button id="reset" class="btn danger" type="button">Clear conversation &amp; poll</button>
+        </div>
+      </details>
+    </section>
+
+    <section id="view-room" class="view" role="tabpanel" aria-labelledby="tab-room" data-view="room" hidden>
+      <div class="view-head">
+        <h2>Room tools</h2>
+        <p>Music, moderation and party features for the connected group. Each one is off until you enable it.</p>
+      </div>
+      <div id="featureMount" class="feature-list"></div>
+    </section>
+
+    <section id="view-soundboard" class="view" role="tabpanel" aria-labelledby="tab-soundboard" data-view="soundboard" hidden>
+      <div id="soundboardMount"></div>
+    </section>
+
+    <section id="view-setup" class="view" role="tabpanel" aria-labelledby="tab-setup" data-view="setup" hidden>
+      <div class="view-head">
+        <h2>Connect Tyler to this chat</h2>
+        <p>Open the Steam chat you want Tyler in, then press Connect &amp; start. Tyler finds the message box, prepares audio and starts. It only asks you to click something when it can't tell which chat you mean.</p>
+      </div>
+      <button id="connect" class="btn primary block" type="button"><!--@icon:play-->Connect &amp; start</button>
+      <p id="setupCheck" class="hint">Tyler only asks for a click when a target is unclear.</p>
+
+      <ol class="steps">
+        <li class="step">
+          <span class="step-n" aria-hidden="true">1</span>
+          <div class="step-body" id="quickOptions">
+            <h3>Choose how Tyler talks</h3>
+            <label class="field">Use Tyler for
+              <select id="setupMode">
+                <option value="auto">Auto: text when alone, voice when friends join</option>
+                <option value="text">Text conversation only</option>
+                <option value="voice">Voice conversation only</option>
+              </select>
+            </label>
+            <small class="hint">Tyler remembers this and the bot name. Press Connect &amp; start again to switch modes. Steam handles login and joining voice.</small>
+          </div>
+        </li>
+        <li class="step">
+          <span class="step-n" aria-hidden="true">2</span>
+          <div class="step-body">
+            <h3>Personality and API key</h3>
+            <p id="aiConnection" class="hint">Checking saved settings…</p>
+            <button id="settings" class="btn" type="button">Open personality &amp; API settings</button>
+          </div>
+        </li>
+        <li class="step">
+          <span class="step-n" aria-hidden="true">3</span>
+          <div class="step-body">
+            <div id="automaticSetupMount" hidden></div>
+            <h3 class="step-fallback">Join voice on the bot account</h3>
+            <small class="hint step-fallback">Use this browser profile for the bot account and keep your main account in the Steam app.</small>
+          </div>
+        </li>
+      </ol>
+
+      <details class="feature" data-capability="voice">
+        <summary><span class="feature-title">Voice and playback</span><span class="feature-meta">Local preview</span></summary>
+        <div class="feature-body">
+          <label class="field">AI voice
+            <select id="previewVoice"><option>rex</option><option>eve</option><option>ara</option><option>sal</option><option>leo</option></select>
+          </label>
+          <button id="preview" class="btn" type="button">Preview on this PC</button>
+          <small class="hint">Preview makes one short speech request.</small>
+          <label class="field">Master volume
+            <input id="volume" type="range" min="0" max="0.7" step="0.05" value="0.35">
+          </label>
+          <label class="check"><input id="monitor" type="checkbox"><span>Hear bot audio on this PC too</span></label>
+          <label class="field">Play a one-off clip <span class="field-note">4 MB / 30 seconds max</span>
+            <input id="clip" type="file" accept="audio/*">
+          </label>
+        </div>
+      </details>
+    </section>
+
+    <section id="view-checks" class="view" role="tabpanel" aria-labelledby="tab-checks" data-view="checks" hidden>
+      <div class="view-head">
+        <h2>Systems check</h2>
+        <p>Checks chat, incoming voice, the audio sender and API access in one pass. Uses one short AI request and one speech preview. If the voice bridge is on, a beep plays in Steam voice.</p>
+      </div>
+      <button id="diagnose" class="btn primary block" type="button"><!--@icon:checks-->Run connection checks</button>
+      <ul id="diagnostics" class="checklist">
+        <li><b>Ready when you are</b><span>Connect your chat and voice first, then run the checks.</span></li>
+      </ul>
+      <div id="hearingConfirm" class="confirm" hidden>
+        <p>Did your main account hear the test beep?</p>
+        <div class="btn-row">
+          <button id="heardYes" class="btn" type="button">Yes, heard it</button>
+          <button id="heardNo" class="btn" type="button">No sound</button>
+        </div>
+      </div>
+      <details class="feature" open data-capability="voice">
+        <summary><span class="feature-title">Voice reply timing</span><span class="feature-meta">Last 8 turns</span></summary>
+        <div class="feature-body">
+          <p id="latencySummary" class="hint">No voice turns yet. Timing appears after Tyler answers someone in voice.</p>
+          <div id="latencyChart" class="lat-chart" aria-live="polite"></div>
+          <div class="lat-legend" aria-hidden="true">
+            <span><i class="seg-stt"></i>Transcribing</span><span><i class="seg-think"></i>Thinking</span><span><i class="seg-speech"></i>Making speech</span><span><i class="seg-other"></i>Other</span><span><b class="lat-key"></b>Starts talking</span>
+          </div>
+        </div>
+      </details>
+      <details class="feature">
+        <summary><span class="feature-title">Signal trail</span><span class="feature-meta">This session</span></summary>
+        <div class="feature-body">
+          <ol id="trail" class="trail"><li class="trail-empty">State changes will appear here.</li></ol>
+        </div>
+      </details>
+      <details class="feature">
+        <summary><span class="feature-title">Individual tests</span><span class="feature-meta">Text, beep, voice</span></summary>
+        <div class="feature-body">
+          <p id="status" class="hint">Set up the companion to get started.</p>
+          <div class="btn-row">
+            <button id="testText" class="btn" type="button">Test AI text</button>
+            <button id="beep" class="btn" type="button" data-capability="voice">Test beep in voice</button>
+            <button id="voiceCheck" class="btn" type="button" data-capability="voice">Refresh voice status</button>
+          </div>
+          <p id="voiceState" class="hint">Connect &amp; start prepares the audio bridge.</p>
+        </div>
+      </details>
+    </section>
+  </div>
+
+  <footer class="foot">
+    <span class="owner-dot" aria-hidden="true"></span>
+    <small id="footerState">Bot account · keep this tab open</small>
+    <button id="quickStop" class="btn ghost sm" type="button"><!--@icon:pause-->Pause AI</button>
+    <button id="stop" class="btn danger sm" type="button" data-capability="voice"><!--@icon:stop-->Stop audio</button>
+  </footer>
+</aside>

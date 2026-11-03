@@ -1,0 +1,4 @@
+(() => {
+ function state(text){const s=String(text||'');if(/standby|another.*tab/i.test(s))return ['standby','Standby'];if(/OFF\s*[—-]|Stopped|Paused|Commands paused/i.test(s))return ['paused','Paused'];if(/RECOVERING|cooldown/i.test(s))return ['waiting','Recovering'];if(/error|failed|unavailable|Could not|NOT selected/i.test(s))return ['error','Needs attention'];if(/preview.*play|Playing.*locally|Sound playing locally/i.test(s))return ['ready','Local audio'];if(/SPEAKING|Playing/i.test(s))return ['speaking','On air'];if(/THINKING|Generating|transcrib|Preparing/i.test(s))return ['thinking','Thinking'];if(/LISTENING|Hearing speech/i.test(s))return ['listening','Listening'];if(/WAITING/i.test(s))return ['waiting','Waiting'];if(/finish Setup|Set up|Getting ready/i.test(s))return ['ready','Setup'];return ['ready','Ready'];}
+ globalThis.TylerUIState=state;
+})();

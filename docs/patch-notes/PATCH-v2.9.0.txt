@@ -1,0 +1,8 @@
+ROBOTIC TYLER PATCH v2.9.0
+
+- Team Fortress 2, Counter-Strike 2 and Portal themes rebuilt from each game's own
+  menu colors and styles, with free look-alike fonts (bundled, open-licensed):
+  TF2: tan buttons that turn orange, brown rounded panels, yellow check boxes, poster capitals.
+  CS2: slate-blue dot-grid background, see-through panels, cyan selected tab, green main button.
+  Portal: tiled white walls, black signage type, glowing blue/orange portal status light.
+- Update Chrome as usual: copy browser-extension/ over the same folder, then Reload.

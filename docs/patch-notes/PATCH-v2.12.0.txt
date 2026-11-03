@@ -1,0 +1,9 @@
+ROBOTIC TYLER PATCH v2.12.0
+
+- Trivia now has 500 questions in 10 categories (new: Music, Animals & Nature), each easy, medium or hard.
+- Choose a mix: play trivia solo gaming hard 5. Also: trivia categories, trivia help.
+- New chat cards: colour-keyed answers, bold headers, a points breakdown, speed and streak bonuses,
+  double points on the final question, and final results with awards.
+- The next question follows by itself 8 seconds after an answer (type next to skip the wait).
+- Squad !trivia uses the same 500 questions.
+- Update Chrome as usual: copy browser-extension/ over the same folder, then Reload.
