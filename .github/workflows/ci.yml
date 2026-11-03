@@ -3,12 +3,12 @@
 #   end-to-end tests in Chromium, screenshots of every surface, and a zipped
 #   Chrome extension as a build artifact.
 # - Pushes to main and manual runs: the Windows setup (ROBOTIC-TYLER-Setup-<version>.exe)
-#   and the two app installers it downloads, as artifacts.
+#   and the desktop app installer it downloads, as artifacts.
 # - Tags like v2.14.0, or Actions → CI → Run workflow with "Publish" ticked: the same
 #   Windows build, signed when a certificate is configured, published as the GitHub
 #   Release v<version from package.json>. The release page offers two downloads
-#   (the Chrome extension zip and the setup); the app installers ("component" files)
-#   sit next to them for the setup to download and for installed apps to update from.
+#   (the Chrome extension zip and the setup); the desktop installer ("component" file)
+#   sits next to them for the setup to download and for the installed app to update from.
 #
 # Optional repository secrets (Settings → Secrets and variables → Actions):
 #   WINDOWS_CERT_P12       base64 of your .pfx code-signing certificate
