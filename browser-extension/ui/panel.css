@@ -142,6 +142,11 @@
 :host(.mini) .foot{order:2}
 :host(.mini) .rt-toasts{position:static;margin:0 10px 10px;gap:4px}
 :host(.mini) .rt-toasts:empty{display:none}
+/* Collapsing and expanding ease the panel in from its corner (themes may swap the motion). */
+@keyframes rt-mini{from{opacity:.4;transform:scale(.98,1.3);transform-origin:100% 100%}to{opacity:1;transform:none}}
+@keyframes rt-unmini{from{opacity:.5;transform:scale(.98,.82);transform-origin:100% 100%}to{opacity:1;transform:none}}
+:host(.mini) .panel{animation:rt-mini .18s ease-out}
+:host(.expanding) .panel{animation:rt-unmini .2s ease-out}
 :host(.mini) .rt-toast{grid-template-columns:auto minmax(0,1fr) auto auto;align-items:center;gap:0 8px;padding-top:6px;padding-bottom:6px}
 :host(.mini) .rt-toast:has(.rt-toast-text) .rt-toast-title{display:none}
 :host(.mini) .rt-toast>.ic{grid-row:1;margin:0}
@@ -391,6 +396,11 @@ button:focus-visible,summary:focus-visible,a:focus-visible,input[type=checkbox]:
   .panel[data-rt-theme=hev] .bar::after{display:none}
   .panel[data-rt-theme=hev] .stat dd{font-size:17px;letter-spacing:.02em}
   .panel[data-rt-theme=cs2] .stat dd{padding:1px 9px 1px 10px;font-size:15px}
+  .panel[data-rt-theme=quake] .stat dd{font-size:17px}
+  .panel[data-rt-theme=pipboy] .stat dd{font-size:21px}
+  .panel[data-rt-theme=deadlock] .stat dd{font-size:16px}
+  .panel[data-rt-theme=minecraft] .stat dd{font-size:12px}
+  .panel[data-rt-theme=minecraft] .stat{padding:5px 5px}
 }
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 

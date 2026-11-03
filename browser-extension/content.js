@@ -121,8 +121,13 @@
  TylerStorage.get('v22Latency').then(({v22Latency})=>renderLatency(v22Latency)).catch(()=>{});
 
  // ── Collapse ────────────────────────────────────────────────────────────
+ // Expanding plays a short theme-neutral motion (panel.css :host(.expanding)); one timer, reset on every toggle.
+ let expandTimer=0;
  function setMini(mini){
+  const was=host.classList.contains('mini');
   host.classList.toggle('mini',mini);
+  clearTimeout(expandTimer);host.classList.remove('expanding');
+  if(was&&!mini){host.classList.add('expanding');expandTimer=setTimeout(()=>host.classList.remove('expanding'),260);}
   const b=$('collapse');b.setAttribute('aria-expanded',String(!mini));
   b.setAttribute('aria-label',mini?'Expand panel':'Collapse panel');
   b.innerHTML=mini?'<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8h9M8 3.5v9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>':'<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8h9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';

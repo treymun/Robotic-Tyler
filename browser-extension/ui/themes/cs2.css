@@ -208,3 +208,9 @@ html[data-rt-theme=cs2]{scrollbar-color:#3a4a5a transparent}
 [data-rt-theme=cs2] .pad:hover{background:radial-gradient(110% 95% at 50% 135%,color-mix(in srgb,var(--rar) 46%,transparent),transparent 75%),rgba(255,255,255,.07)}
 [data-rt-theme=cs2] .pad span{color:color-mix(in srgb,var(--rar) 65%,#fff)}
 [data-rt-theme=cs2] .pad.playing{background:linear-gradient(90deg,rgba(101,228,106,.18),rgba(20,20,20,.4) 80%);box-shadow:inset 3px 0 0 #65e46a,inset 0 -3px 0 var(--rar)}
+
+/* ── v2.17 authenticity: CS2 ──
+   The open tab's underline wipes out from its centre, as the CS2 menu tabs do. */
+[data-rt-theme=cs2] .tabs button{position:relative}
+[data-rt-theme=cs2] .tabs button[aria-selected=true]::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;pointer-events:none;background:var(--cs-nav);box-shadow:0 0 8px rgba(130,216,255,.7);animation:cs2-underline .22s ease-out backwards}
+@keyframes cs2-underline{from{transform:scaleX(0)}to{transform:none}}

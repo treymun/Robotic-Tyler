@@ -43,6 +43,13 @@
 [data-rt-theme=minecraft] :is(h1,h2,h3,.sheet-head h2,.card>h2,.marquee){font-family:var(--rt-font-display);font-weight:400;letter-spacing:0;text-transform:none;color:#404040}
 [data-rt-theme=minecraft] h2{font-size:16px}
 [data-rt-theme=minecraft] h1{font-size:26px}
+/* Page titles sit on the dirt background, white with the hard shadow like the game's menu titles */
+[data-rt-theme=minecraft] .page-head :is(h1,p){color:#ffffff;text-shadow:var(--mc-shadow)}
+[data-rt-theme=minecraft] .page-head{--rt-focus:#ffffff}
+[data-rt-theme=minecraft] .page-head .ghost{color:#ffffff;text-shadow:var(--mc-shadow)}
+[data-rt-theme=minecraft] .page-head .ghost:hover{color:var(--mc-yellow);background:rgba(0,0,0,.25)}
+[data-rt-theme=minecraft] .side .link-btn{color:var(--mc-yellow);text-shadow:var(--mc-shadow)}
+[data-rt-theme=minecraft] .side-foot{color:#ffffff;text-shadow:var(--mc-shadow)}
 [data-rt-theme=minecraft] :is(label,.tally-label,.stat dt,.pulse dt,.facts b,.matrix dt,details.feature>summary,.ident-sub,.tabs button,.section-nav button,nav:not(.tabs) button,button,.pad span){font-family:var(--rt-font);text-transform:none;letter-spacing:0}
 [data-rt-theme=minecraft] label:not(:has(>input[type=checkbox])):not(.toggle){color:#404040;font-size:12px}
 [data-rt-theme=minecraft] details.feature>summary{font-size:13px;color:#303030}

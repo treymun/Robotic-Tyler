@@ -228,3 +228,16 @@ html[data-rt-theme=portal]{scrollbar-color:#9aa1a8 transparent}
 .panel[data-rt-theme=portal]:has(#tab-soundboard[aria-selected=true]) .bar::after{content:"03";--prog:60%}
 .panel[data-rt-theme=portal]:has(#tab-setup[aria-selected=true]) .bar::after{content:"04";--prog:80%}
 .panel[data-rt-theme=portal]:has(#tab-checks[aria-selected=true]) .bar::after{content:"05";--prog:100%}
+
+/* ── v2.17 authenticity: Portal ──
+   The chosen tab is marked by an orange portal that opens under it (hovering a tab shows the
+   blue one), and an expanded section opens with an aperture iris. */
+[data-rt-theme=portal] .tabs button{position:relative;border-bottom-color:transparent}
+[data-rt-theme=portal] .tabs button[aria-selected=true]{border-bottom-color:transparent}
+[data-rt-theme=portal] .tabs button::after{content:"";position:absolute;left:50%;bottom:1px;width:46px;height:9px;margin-left:-23px;border-radius:50%;pointer-events:none;
+  border:2px solid var(--p-blue);box-shadow:0 0 8px rgba(42,157,255,.55),inset 0 0 4px rgba(42,157,255,.4);opacity:0;transform:scaleX(.2);transition:opacity .12s,transform .18s ease-out}
+[data-rt-theme=portal] .tabs button:hover::after{opacity:.75;transform:none}
+[data-rt-theme=portal] .tabs button[aria-selected=true]::after{opacity:1;transform:none;border-color:var(--p-orange);box-shadow:0 0 10px rgba(255,138,0,.7),inset 0 0 5px rgba(255,138,0,.5);animation:p-open .32s cubic-bezier(.2,.8,.3,1.3) backwards}
+@keyframes p-open{0%{transform:scaleX(0) scaleY(.4);opacity:0}100%{transform:none;opacity:1}}
+@keyframes p-aperture{from{clip-path:circle(0 at 50% 0)}to{clip-path:circle(150% at 50% 0)}}
+[data-rt-theme=portal] details.feature[open]>:not(summary){animation:p-aperture .34s ease-out backwards}

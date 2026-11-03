@@ -50,7 +50,7 @@
 /* The header is the pale Civil Protection plate, with the lens slit and a unit code */
 [data-rt-theme=combine] .bar{position:relative;background:var(--cb-armor-plate);box-shadow:inset 0 1px 0 #fff,inset 0 -1px 0 #6b777d,0 2px 0 #000;padding:11px 12px}
 [data-rt-theme=combine] .bar .wordmark{font-weight:600;font-size:17px;letter-spacing:.2em;color:#14181b}
-[data-rt-theme=combine] .bar .ident-sub{color:#3d474d}
+.panel[data-rt-theme=combine] .bar .ident-sub{color:#3d474d}
 [data-rt-theme=combine] .bar .icon-btn{color:#14181b;background:transparent;border:1px solid #6b777d;border-radius:0}
 [data-rt-theme=combine] .bar .icon-btn:hover{color:var(--cb-cyan);background:#14181b}
 [data-rt-theme=combine] .bar::after{content:"CP-17";position:absolute;right:42px;top:50%;margin-top:-6px;font:600 9px/12px var(--rt-font-display);letter-spacing:.22em;color:#56636a;pointer-events:none;

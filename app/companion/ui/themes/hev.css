@@ -190,3 +190,10 @@
 [data-rt-theme=hev] .bar{position:relative;overflow:hidden}
 [data-rt-theme=hev] .bar::after{content:"\03bb";position:absolute;right:46px;top:50%;width:40px;height:40px;margin-top:-24px;display:grid;place-items:center;pointer-events:none;
   border:3px solid rgba(26,12,0,.2);border-radius:50%;font:700 27px/1 Arial,sans-serif;color:rgba(26,12,0,.22);text-shadow:0 1px 0 rgba(255,255,255,.18)}
+
+/* ── v2.17 authenticity: HEV ──
+   Choosing a tab lights its weapon slot in segments, the frame first, then the glow, then the
+   number, as the suit's selector does; checked boxes power up the same way. */
+@keyframes hev-slot{0%{border-color:rgba(255,220,0,.22);box-shadow:none;background:rgba(0,0,0,.45)}33%{border-color:rgba(255,220,0,.6);box-shadow:none;background:rgba(0,0,0,.45)}66%{border-color:#ffdc00;box-shadow:0 0 6px rgba(255,220,0,.2);background:rgba(255,220,0,.08)}100%{border-color:#ffdc00;box-shadow:0 0 10px rgba(255,220,0,.25);background:rgba(255,220,0,.14)}}
+[data-rt-theme=hev] .tabs button[aria-selected=true]{animation:hev-slot .3s steps(1,end) backwards}
+[data-rt-theme=hev] input[type=checkbox]:checked{animation:hev-slot .24s steps(1,end) backwards}

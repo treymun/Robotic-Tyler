@@ -210,3 +210,12 @@ html[data-rt-theme=winxp],[data-rt-theme=winxp] :is(.scroll,.content,main){scrol
 /* On the green buttons the focus rectangle and the icon are light, as XP's inverted focus rect would be. */
 [data-rt-theme=winxp] :is(.primary,#start,#save):focus-visible{outline-color:#fff}
 [data-rt-theme=winxp] :is(.primary,#start,#save) .ic{color:#fff}
+
+/* ── v2.17 authenticity: Windows XP ──
+   Drop-downs get the Luna combo-box button (pale blue, dark arrow), and collapsing the panel
+   shrinks it toward the corner like minimising a window. */
+[data-rt-theme=winxp] select{padding-right:26px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath d='M1.5 2.5 4 5l2.5-2.5' fill='none' stroke='%234d6185' stroke-width='1.6'/%3E%3C/svg%3E"),linear-gradient(180deg,#e6eefc,#c1d3fb 45%,#adc5f6);
+  background-position:right 5px center,right 1px top 1px;background-size:9px 9px,18px calc(100% - 2px);background-repeat:no-repeat}
+[data-rt-theme=winxp] select:hover{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath d='M1.5 2.5 4 5l2.5-2.5' fill='none' stroke='%23264a8f' stroke-width='1.6'/%3E%3C/svg%3E"),linear-gradient(180deg,#f2f6ff,#d4e1fd 45%,#bcd0fa)}
+@keyframes xp-minimise{0%{transform:scale(1.04,1.25);transform-origin:100% 100%;opacity:.6}100%{transform:none;opacity:1}}
+:host(.mini) .panel[data-rt-theme=winxp]{animation:xp-minimise .2s ease-out}

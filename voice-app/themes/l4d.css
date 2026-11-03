@@ -181,3 +181,10 @@
 [data-rt-theme=l4d] :is(.view h2,.sheet-head h2)::before{content:"";display:inline-block;width:20px;height:13px;margin-right:9px;vertical-align:2px;
   background:radial-gradient(70% 90% at 40% 50%,var(--l-red-hi),var(--l-red) 70%,#5a0000);transform:rotate(-7deg);
   clip-path:polygon(0 40%,56% 32%,53% 0,100% 54%,55% 100%,58% 70%,3% 66%)}
+
+/* ── v2.17 authenticity: L4D ──
+   While Tyler listens, a flashlight beam sweeps slowly across the status strip, like a
+   survivor checking a dark corner. */
+[data-rt-theme=l4d] .tally[data-state=listening]::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(closest-side,rgba(255,248,215,.28),rgba(255,248,215,.08) 55%,transparent) no-repeat;background-size:42% 170%;background-position:-40% 50%;animation:l4d-torch 4.4s ease-in-out infinite alternate}
+@keyframes l4d-torch{from{background-position:-40% 50%}to{background-position:140% 50%}}
