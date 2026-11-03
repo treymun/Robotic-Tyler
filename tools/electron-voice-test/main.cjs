@@ -10,25 +10,29 @@
 //
 // Modes: manual (Stage 1: nothing of Tyler's) and bridge (Stage 2B: Tyler's in-page audio files
 // and a beep / listen / echo test bar). Data: %LOCALAPPDATA%\RoboticTylerElectronVoiceTest.
+//
+// 0.1.1 adds the leave fix (web/sdp-repair.js, on by default, switchable in the panel): when someone
+// leaves, Steam's next offer can list a stream in a section the browser still routes elsewhere, the
+// browser rejects it, and Steam ends the bot's call. The fix removes only those colliding lines.
 const {app,BaseWindow,WebContentsView,session,ipcMain,dialog,clipboard,shell,protocol,net}=require('electron');
 const path=require('node:path'),fs=require('node:fs'),os=require('node:os'),{pathToFileURL}=require('node:url');
 
-const VERSION='0.1.0';
+const VERSION='0.1.1';
 const STEAM_CHAT='https://steamcommunity.com/chat/';
-const DATA=path.join(process.env.LOCALAPPDATA||app.getPath('appData'),'RoboticTylerElectronVoiceTest');
+const DATA=process.env.TYLER_TEST_DATA||path.join(process.env.LOCALAPPDATA||app.getPath('appData'),'RoboticTylerElectronVoiceTest');
 app.setPath('userData',path.join(DATA,'Profile'));
 const WEB=path.join(__dirname,'web'),BRIDGE_DIR=path.join(__dirname,'bridge');
 const BRIDGE_FILES=['soundboard-core.js','soundboard-audio.js','live-pcm.js','audio-bridge.js','wav-codec.js','noise-filter.js','voice-listener.js'];
 const STATE=path.join(DATA,'test-state.json');
 const PANEL_WIDTH=470;
-// Hooks for the automated smoke test (tools/electron-voice-test/check.mjs); inert unless set.
+// Hooks for the automated check (tools/electron-voice-test/check.mjs; TYLER_TEST_DATA above too); inert unless set.
 const SMOKE={mock:process.env.TYLER_TEST_MOCK_STEAM||'',report:process.env.TYLER_TEST_REPORT||'',seconds:Number(process.env.TYLER_TEST_SECONDS||0),allow:process.env.TYLER_TEST_AUTO_ALLOW==='1'};
 
 protocol.registerSchemesAsPrivileged([{scheme:'tyler-test',privileges:{standard:true,secure:true,supportFetchAPI:true}}]);
 if(!app.requestSingleInstanceLock()){app.quit();}
 
 let win,steam,panel,steamSession,panelReady=false;const pending=[];
-let state={mode:'manual',identity:'chrome'};
+let state={mode:'manual',identity:'chrome',repair:'on'};
 try{state={...state,...JSON.parse(fs.readFileSync(STATE,'utf8'))};}catch{}
 const save=()=>{try{fs.mkdirSync(DATA,{recursive:true});fs.writeFileSync(STATE,JSON.stringify(state));}catch{}};
 let electronUserAgent='';
@@ -44,7 +48,7 @@ function toPanel(message){
 }
 function sendState(){
  toPanel({type:'host',platform:'electron',app:VERSION,runtime:'Electron '+process.versions.electron+' · Chromium '+process.versions.chrome,sdk:'n/a',
-  os:os.type()+' '+os.release(),arch:process.arch,userAgent:userAgent(),defaultUserAgent:electronUserAgent,profile:DATA,mode:state.mode,identity:state.identity,
+  os:os.type()+' '+os.release(),arch:process.arch,userAgent:userAgent(),defaultUserAgent:electronUserAgent,profile:DATA,mode:state.mode,identity:state.identity,repair:state.repair==='off'?'off':'on',
   modes:['manual','bridge'],extension:{bundled:false,installed:false,enabled:false,id:'',version:'',error:''},bridgeInjected:state.mode==='bridge'});
 }
 function bridgeScript(){
@@ -114,8 +118,8 @@ app.whenReady().then(async()=>{
 // The Steam page asks for its scripts at document start (synchronously, before Steam's own code).
 ipcMain.on('test:scripts',e=>{
  if(e.sender!==steam?.webContents){e.returnValue=null;return;}
- try{e.returnValue={diag:fs.readFileSync(path.join(WEB,'diagnostics.js'),'utf8'),bridge:state.mode==='bridge'?bridgeScript():''};}
- catch(err){e.returnValue={diag:'',bridge:'',error:String(err.message)};}
+ try{e.returnValue={diag:fs.readFileSync(path.join(WEB,'diagnostics.js'),'utf8'),repair:state.repair==='off'?'':fs.readFileSync(path.join(WEB,'sdp-repair.js'),'utf8'),bridge:state.mode==='bridge'?bridgeScript():''};}
+ catch(err){e.returnValue={diag:'',repair:'',bridge:'',error:String(err.message)};}
 });
 ipcMain.on('test:diag',(e,m)=>{
  if(e.sender!==steam?.webContents||!m||typeof m!=='object')return;
@@ -129,6 +133,7 @@ ipcMain.on('test:panel',async(e,m)=>{
   case 'ready':panelReady=true;sendState();for(const p of pending.splice(0))panel.webContents.send('test:to-panel',p);break;
   case 'mode':state.mode=m.mode==='bridge'?'bridge':'manual';save();sendState();steam.webContents.loadURL(STEAM_CHAT);break;
   case 'identity':state.identity=m.identity==='chrome'?'chrome':'default';save();steamSession.setUserAgent(userAgent());sendState();steam.webContents.loadURL(STEAM_CHAT);break;
+  case 'repair':state.repair=m.repair==='off'?'off':'on';save();sendState();steam.webContents.loadURL(STEAM_CHAT);break;
   case 'reload':steam.webContents.loadURL(STEAM_CHAT);break;
   case 'devtools':steam.webContents.openDevTools({mode:'detach'});break;
   case 'open-data':shell.openPath(DATA);break;

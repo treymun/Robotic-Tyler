@@ -1,7 +1,7 @@
 {
   "name": "robotic-tyler-electron-voice-test",
   "productName": "ROBOTIC TYLER Electron voice test",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "description": "Prototype: Steam web voice in Electron with Chrome's user agent. Not part of the desktop app.",
   "main": "main.cjs"

@@ -94,6 +94,7 @@
  function watch(pc, config) {
   const id = ++pcSeq;
   live.set(id, pc); ids.set(pc, id);
+  try { Object.defineProperty(pc, Symbol.for('tyler.diag.id'), { value: id }); } catch (e) {} // for sdp-repair.js's reports
   post('pc-new', { id, iceServers: (config && config.iceServers || []).length, policy: clip(config && config.iceTransportPolicy || 'all', 20) });
   const state = () => post('pc-state', {
    id, signaling: pc.signalingState, ice: pc.iceConnectionState, connection: pc.connectionState, gathering: pc.iceGatheringState,
@@ -113,12 +114,18 @@
   const media = [];
   let cur = null;
   for (const line of desc.sdp.split(/\r?\n/)) {
-   if (line.startsWith('m=')) { cur = { kind: line.slice(2).split(' ')[0], dir: '', codecs: new Set() }; media.push(cur); }
+   if (line.startsWith('m=')) { cur = { kind: line.slice(2).split(' ')[0], port: line.split(' ')[1], dir: '', mid: '', codecs: new Set(), ssrcs: new Set() }; media.push(cur); }
    else if (cur && /^a=(sendrecv|sendonly|recvonly|inactive)$/.test(line)) cur.dir = line.slice(2);
+   else if (cur && line.startsWith('a=mid:')) cur.mid = line.slice(6).trim();
    else if (cur && line.startsWith('a=rtpmap:')) cur.codecs.add((line.split(' ')[1] || '').split('/')[0]);
+   else if (cur && /^a=ssrc:\d+/.test(line)) cur.ssrcs.add(line.slice(7).split(' ')[0]);
   }
-  return { type: desc.type, media: media.slice(0, 12).map(m => m.kind + ' ' + (m.dir || '?') + ' ' + [...m.codecs].slice(0, 4).join('+')) };
+  return { type: desc.type, media: media.slice(0, 12).map(m => (m.mid ? m.mid + ':' : '') + m.kind + ' ' + (m.port === '0' ? 'rejected' : (m.dir || '?')) + ' ' + [...m.codecs].slice(0, 4).join('+') + (m.ssrcs.size ? ' ·' + m.ssrcs.size + ' ssrc' : '')) };
  }
+ // The whole description for the report, without addresses, ICE credentials or certificate fingerprints.
+ const redact = text => String(text).split(/\r?\n/).filter(l => l && !/^a=(candidate|ice-ufrag|ice-pwd|fingerprint|crypto|end-of-candidates)/.test(l))
+  .map(l => /^(c=|o=|a=rtcp:)/.test(l) ? l.replace(/(IN IP[46]) \S+/, '$1 <address>') : l).join('\n').slice(0, 12000);
+ const fullSdp = (info, desc, ok, message) => { if (desc && typeof desc.sdp === 'string') post('pc-sdp', { id: info.id, method: info.method, kind: desc.type, ok, message, text: redact(desc.sdp) }); };
  function caller() {
   const lines = String(new Error().stack || '').split('\n').slice(3, 7);
   return lines.map(l => clip(l.trim().replace(/^at /, '').replace(/https:\/\/[^/]+\//, '').replace(/\?[^:)]*/, ''), 90)).join(' < ');
@@ -130,8 +137,9 @@
   const orig = proto[name];
   if (typeof orig !== 'function') continue;
   proto[name] = function (...args) {
-   const id = ids.get(this) || 0, info = { id, method: name };
-   if (name === 'setRemoteDescription' || name === 'setLocalDescription') info.sdp = sdp(args[0]);
+   const id = ids.get(this) || 0, info = { id, method: name }, pcRef = this;
+   const setDesc = name === 'setRemoteDescription' || name === 'setLocalDescription';
+   if (setDesc) info.sdp = sdp(args[0]);
    if (name === 'close' || name === 'restartIce') info.caller = caller();
    if (name === 'addTransceiver') info.kind = typeof args[0] === 'string' ? args[0] : args[0] && args[0].kind;
    if (name === 'addTrack') info.kind = args[0] && args[0].kind;
@@ -142,8 +150,14 @@
     return result.then(value => {
      if (name === 'addIceCandidate') { if (++iceAdds % 25 === 1) post('pc-call', { ...info, ok: true, count: iceAdds }); }
      else post('pc-call', { ...info, ok: true, sdp: info.sdp || (value && value.sdp ? sdp(value) : undefined) });
+     // setLocalDescription() with no argument: the description it made is now the local one.
+     if (setDesc) fullSdp(info, args[0] && args[0].sdp ? args[0] : pcRef.localDescription && name === 'setLocalDescription' ? pcRef.localDescription : null, true);
      return value;
-    }, e => { post('pc-call', { ...info, ok: false, name: clip(e && e.name, 40), message: clip(e && e.message, 200) }); throw e; });
+    }, e => {
+     post('pc-call', { ...info, ok: false, name: clip(e && e.name, 40), message: clip(e && e.message, 200) });
+     if (setDesc) fullSdp(info, args[0], false, clip(e && e.message, 200));
+     throw e;
+    });
    }
    post('pc-call', { ...info, ok: true });
    return result;

@@ -19,7 +19,8 @@
   support: null, micPermission: '', permissions: [], gum: [], devices: null,
   pcs: new Map(), voiceUi: false, voiceUiOn: 0, voiceUiOff: 0,
   presence: {}, attached: 0, audioStatus: '', events: [], outSpeech: [], inSpeech: [], playing: false, playStart: 0,
-  firsts: {}, peaks: { out: 0, in: 0 }, log: []
+  firsts: {}, peaks: { out: 0, in: 0 }, log: [],
+  sdps: [], repairs: [], repairReady: false, people: new Map()
  };
  const STAGES = [
   ['support', 'Browser support'],
@@ -144,9 +145,44 @@
     break;
    case 'tyler-presence': S.presence = m; log('Tyler in the page: bridge ' + yes(m.bridge) + ', panel ' + yes(m.panel) + ', 2B test bar ' + yes(m.testBar)); break;
    case 'tyler': tyler(m); break;
+   case 'pc-sdp': sdpEvent(m); break;
+   case 'sdp-repair': case 'sdp-repair-ready': repairEvent(m); break;
   }
  }
  const yes = v => v ? 'yes' : 'no';
+
+ // How many other people Steam's server is sending us, from a remote description: the distinct
+ // stream ids (msid) in sections that send to us, or their SSRCs when it lists no msid.
+ function people(text) {
+  const streams = new Set(), ssrcs = new Set();
+  for (const sec of String(text).split(/\n(?=m=)/).slice(1)) {
+   const lines = sec.split('\n'), port = (lines[0].split(' ')[1] || '');
+   const dir = (lines.find(l => /^a=(sendrecv|sendonly|recvonly|inactive)$/.test(l)) || 'a=sendrecv').slice(2);
+   if (port === '0' || dir === 'recvonly' || dir === 'inactive') continue;
+   for (const l of lines) {
+    let m = /^a=msid:(\S+)/.exec(l) || /^a=ssrc:\d+ msid:(\S+)/.exec(l);
+    if (m && m[1] !== '-') streams.add(m[1]);
+    m = /^a=ssrc:(\d+)/.exec(l); if (m) ssrcs.add(m[1]);
+   }
+  }
+  return streams.size || ssrcs.size;
+ }
+ function sdpEvent(m) {
+  S.sdps.push({ ...m, local: now() }); if (S.sdps.length > 16) S.sdps.shift();
+  if (m.method !== 'setRemoteDescription' || m.kind !== 'offer' && m.kind !== 'answer') return;
+  const key = m.doc + '#' + m.id, before = S.people.get(key), count = people(m.text);
+  if (m.ok) S.people.set(key, count);
+  if (before == null || count === before) return;
+  const kind = count < before ? 'someone-left' : 'someone-joined';
+  S.events.push({ kind, at: now(), pc: m.id, doc: m.doc, ok: m.ok, from: before, to: count });
+  log('Connection #' + m.id + ': Steam\'s ' + m.kind + ' says ' + (count < before ? 'someone left' : 'someone joined') + ' (' + before + ' → ' + count + ' other ' + (count === 1 ? 'person' : 'people') + ')' + (m.ok ? '' : ' · the browser REJECTED it: ' + (m.message || '')));
+ }
+ function repairEvent(m) {
+  if (m.type === 'sdp-repair-ready') { S.repairReady = true; return; }
+  S.repairs.push({ ...m, local: now() }); if (S.repairs.length > 20) S.repairs.shift();
+  if (m.error) { log('Leave fix: couldn\'t check Steam\'s ' + m.kind + ' (' + m.error + '); used it unchanged'); return; }
+  for (const c of m.changes || []) log('Leave fix: connection #' + m.id + ', Steam\'s ' + m.kind + ' listed stream ' + c.clash.map(x => x.ssrc).join(', ') + ' in section ' + c.mid + ' while section ' + [...new Set(c.clash.map(x => x.owner))].join(', ') + ' still had it; removed it from section ' + c.mid + ' so the browser accepts the ' + m.kind);
+ }
 
  function stats(m) {
   const p = pc(m), prev = p.stats, dt = prev ? Math.max(.25, (m.at - prev.at) / 1000) : 1;
@@ -257,11 +293,22 @@
   const list = ev('session'), left = ev('left').length + ev('voice-off').length;
   return { count: list.length, rejoined: list.length >= 2 && left > 0, latest: list[list.length - 1] };
  }
+ // After Steam says someone left: did this connection stay up for 10 s?
+ function stayed() {
+  const lefts = ev('someone-left');
+  if (!lefts.length) return ['pending', 'With the bot, your main and your friend in the channel, your friend leaves (the bot and your main stay).'];
+  const last = lefts[lefts.length - 1], p = S.pcs.get(last.doc + '#' + last.pc);
+  if (!last.ok) return ['fail', 'The browser rejected Steam\'s offer after someone left, so Steam ended the bot\'s call.'];
+  if (p && p.closedAt && p.closedAt - last.at < 10000) return ['fail', 'The connection closed ' + Math.round((p.closedAt - last.at) / 1000) + ' s after someone left' + (p.closedBy ? ' (closed by ' + p.closedBy.split(' < ')[0] + ')' : '') + '.'];
+  if (now() - last.at < 10000) return ['active', 'Someone left ' + Math.round((now() - last.at) / 1000) + ' s ago; still connected…'];
+  return ['ok', 'Still connected ' + Math.round((((p && p.closedAt) || now()) - last.at) / 1000) + ' s after someone left' + (S.repairs.some(r => r.changes && r.local >= last.at - 2000 && r.local <= last.at + 2000) ? ' (the leave fix adjusted that offer)' : '') + '.'];
+ }
  function checks() {
   const mode = S.mode, ss = sessions();
   if (mode === 'manual') return [
    ['heard-friend', 'I heard my friend', S.firsts.inSpeech >= S.modeAt ? ['ok', 'Incoming audio had sound in it.'] : ['pending', 'Waiting for incoming sound.']],
-   ['friend-heard', 'My friend heard me', S.firsts.outSpeech >= S.modeAt ? ['ok', 'Outgoing audio had sound in it.'] : ['pending', 'Talk with the microphone on.']]
+   ['friend-heard', 'My friend heard me', S.firsts.outSpeech >= S.modeAt ? ['ok', 'Outgoing audio had sound in it.'] : ['pending', 'Talk with the microphone on.']],
+   ['stayed', 'Someone left; the bot stayed in voice', stayed()]
   ];
   const beeps = ev('beep'), heard = ev('heard'), plays = ev('play-end'), clips = ev('clip');
   const beepOut = beeps.some(b => outSpeechBetween(b.at, b.at + 4000));
@@ -281,6 +328,7 @@
    ['reply', mode === 'tyler' ? 'Friend heard Tyler\'s spoken reply' : 'Friend heard their words echoed back', replyOut ? ['ok', 'Tyler played audio into the call after hearing speech.'] : ['pending', '']]
   ];
   if (mode === 'tyler') list.push(['text', 'Text reply arrived in the same room', ['pending', 'Your friend types a message in the group chat; Tyler answers in text.']]);
+  list.push(['stayed', 'Someone left; the bot stayed in voice', stayed()]);
   list.push(['rejoin', 'Left voice and rejoined once', ss.rejoined ? ['ok', 'Connected ' + ss.count + ' times with a leave in between.'] : ss.count ? ['pending', 'Joined once. Leave the voice channel, then join again.'] : ['pending', '']]);
   list.push(['after', 'After rejoining: beep and reply still work', afterOk ? ['ok', 'Tyler\'s audio went out after the rejoin.'] : ['pending', ss.rejoined ? 'Play the beep and talk to Tyler again.' : '']]);
   return list;
@@ -301,6 +349,15 @@
   for (const b of document.querySelectorAll('.modes button')) b.setAttribute('aria-checked', String(b.dataset.mode === S.mode));
   for (const b of document.querySelectorAll('[data-identity]')) b.setAttribute('aria-checked', String(b.dataset.identity === ((h && h.identity) || 'default')));
   $('settings').hidden = S.mode !== 'tyler';
+  const card = $('repairCard');
+  card.hidden = !electron();
+  if (electron()) {
+   const on = h.repair !== 'off';
+   for (const b of document.querySelectorAll('[data-repair]')) b.setAttribute('aria-checked', String((b.dataset.repair === 'on') === on));
+   const fixed = S.repairs.filter(r => r.changes && r.changes.length).length;
+   $('repairNote').textContent = on ? (S.repairReady ? 'On and loaded in Steam. ' : 'On (loads with Steam chat). ') + (fixed ? 'Adjusted ' + fixed + ' of Steam\'s descriptions so far.' : 'Nothing needed adjusting yet.') + ' It only removes stream ids that would make the browser reject Steam\'s offer when someone leaves.'
+    : 'Off: Steam\'s descriptions reach the browser unchanged (to compare with 0.1.0).';
+  }
   steps();
   const v = verdicts(), list = $('stages');
   list.replaceChildren(...STAGES.map(([key, name]) => {
@@ -335,7 +392,7 @@
   if (box.dataset.mode === key) return;
   box.dataset.mode = key;
   const items = {
-   manual: ['Sign in to the bot account in the Steam window (normal Steam sign-in).', 'Open your group chat and join a voice channel.', 'Allow the microphone when this test asks.', 'Talk with your friend both ways, then tick the two boxes below.', 'Save report and send me the file.'],
+   manual: ['Sign in to the bot account in the Steam window (normal Steam sign-in).', 'Open your group chat and join a voice channel.', 'Allow the microphone when this test asks.', 'Talk with your friend both ways, then tick the two boxes below.', 'Your friend leaves while the bot and your main stay: the bot should stay in voice (checked below by itself). Then they rejoin and leave once more.', 'Save report and send me the file.'],
    tyler: ['Windows sound settings: disable the VB-CABLE devices and mute the physical microphone.', 'Press Tyler settings: add your AI key, then Settings → Voice: tick the listening consent. Save.', 'In Steam chat open the group, then Tyler\'s panel → Connect & start.', 'Join the voice channel. If Windows asks for the microphone, choose No.', 'Tyler panel → Checks → Run connection checks (the beep). Then your friend talks to Tyler, and types a message for a text reply.', 'Leave voice, rejoin, beep and talk once more. Tick what your friend confirms, then Save report.'],
    bridge: [electron() ? 'Tests Tyler\'s audio path (his own voice files) without AI or text.' : 'Use this only if Stage 2 can\'t load Tyler. It tests the audio path without AI or text.', 'Disable the VB-CABLE devices and mute the physical microphone.', 'In the Steam window use the test bar (bottom left): 1 · Enable synthetic mic, then join voice.', '2 · Test beep, then 3 · Listen + echo: your friend speaks, pauses, and hears their own words come back.', 'Leave voice, rejoin, beep and echo once more. Tick what your friend confirms, then Save report.']
   }[mode];
@@ -362,11 +419,32 @@
   const ss = sessions(); lines.push(' Voice sessions: ' + ss.count + (ss.rejoined ? ' (rejoined)' : '') + ' · Steam voice UI on ' + S.voiceUiOn + ' / off ' + S.voiceUiOff + ' times');
   lines.push(' Permission prompts: ' + (S.permissions.map(p => p.kind + '=' + p.state + ' (' + p.mode + ')').join(', ') || 'none') + ' · real microphone requests: ' + S.gum.filter(g => g.audio).length);
   if (S.mode !== 'manual') lines.push(' Tyler: attached senders ' + S.attached + ', beeps ' + ev('beep').length + ', speech turns heard ' + ev('heard').length + ', playbacks ' + ev('play-end').length + ' · last bridge status: ' + (S.audioStatus || '—'));
+  if (electron()) {
+   const fixed = S.repairs.filter(r => r.changes && r.changes.length);
+   lines.push(' Leave fix: ' + (h.repair === 'off' ? 'off' : 'on, ' + (S.repairReady ? 'loaded' : 'NOT seen in the page')) + ' · descriptions adjusted ' + fixed.length + (S.repairs.some(r => r.error) ? ' · errors ' + S.repairs.filter(r => r.error).length : ''));
+   for (const r of fixed) for (const c of r.changes) lines.push('  ' + time(r.local) + ' connection #' + r.id + ' ' + r.kind + ': removed SSRC ' + c.clash.map(x => x.ssrc + ' (held by section ' + x.owner + ')').join(', ') + ' from section ' + c.mid);
+  }
+  const lj = ev('someone-left').length, jj = ev('someone-joined').length;
+  lines.push(' People changes Steam announced: ' + jj + ' joined, ' + lj + ' left');
   lines.push('', 'CONFIRMED BY YOU');
   for (const [key, label, [state, auto]] of checks()) lines.push(' [' + (ticks['ck-' + S.mode + '-' + key] ? 'x' : ' ') + '] ' + label + (auto ? '  (measured: ' + state + ' · ' + auto + ')' : ''));
   lines.push('', 'NOTES', ' ' + ($('notes').value.trim() || '—'));
   lines.push('', 'EVENT LOG (last 300)');
   for (const l of S.log.slice(-300)) lines.push(' ' + time(l.at) + '  ' + l.text);
+  // The descriptions themselves, so a failure can be traced to the exact lines (no addresses,
+  // ICE credentials or certificate fingerprints).
+  const originals = S.repairs.filter(r => r.original);
+  if (S.sdps.length || originals.length) {
+   lines.push('', 'SESSION DESCRIPTIONS (last ' + S.sdps.length + ', addresses and keys removed)');
+   for (const d of S.sdps) {
+    lines.push('', '--- ' + time(d.local) + ' connection #' + d.id + ' ' + d.method + '(' + d.kind + ') ' + (d.ok ? 'ok' : 'FAILED: ' + (d.message || '')));
+    for (const l of d.text.split('\n')) lines.push('  ' + l);
+   }
+   for (const r of originals.slice(-4)) {
+    lines.push('', '--- ' + time(r.local) + ' connection #' + r.id + ' Steam\'s original ' + r.kind + ' before the leave fix');
+    for (const l of r.original.split('\n')) lines.push('  ' + l);
+   }
+  }
   return lines.join('\r\n');
  }
 
@@ -382,6 +460,13 @@
   S.pcs.forEach(p => { if (!p.closedAt) p.closedAt = now(); });
   resetForMode(S.mode);
   send({ action: 'identity', identity: b.dataset.identity });
+ });
+ for (const b of document.querySelectorAll('[data-repair]')) b.addEventListener('click', () => {
+  if (!S.host || (S.host.repair !== 'off') === (b.dataset.repair === 'on')) return;
+  log('Turning the leave fix ' + b.dataset.repair + ' (Steam reloads)…');
+  S.pcs.forEach(p => { if (!p.closedAt) p.closedAt = now(); });
+  resetForMode(S.mode);
+  send({ action: 'repair', repair: b.dataset.repair });
  });
  $('save').addEventListener('click', () => send({ action: 'save-report', text: report() }));
  $('copy').addEventListener('click', () => send({ action: 'copy', text: report() }));

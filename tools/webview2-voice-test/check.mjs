@@ -67,6 +67,7 @@ const lines=report.split('\r\n');console.log(lines.slice(0,30).join('\n'));
 await b.close();server.close();
 // Every stage and every measured check must pass in this mock call.
 const stages=lines.filter(l=>/^ \[(OK|CHECK|FAIL|PARTIAL|WAITING)\]/.test(l)),checks=lines.filter(l=>/\(measured: /.test(l));
-const bad=[...stages.filter(l=>!l.startsWith(' [OK]')),...checks.filter(l=>!/measured: ok/.test(l)&&!/Text reply/.test(l))];
+// (One friend here, so nobody leaves: tools/electron-voice-test/check.mjs covers someone leaving.)
+const bad=[...stages.filter(l=>!l.startsWith(' [OK]')),...checks.filter(l=>!/measured: ok/.test(l)&&!/Text reply|Someone left/.test(l))];
 if(MODE==='bridge'&&!log.some(l=>/friend energy during beep \+0\.00[1-9]/.test(l)))bad.push('the friend did not receive the beep');
 if(bad.length){console.error('FAILED:\n'+bad.join('\n'));process.exit(1);}console.log('PASS ('+MODE+')');

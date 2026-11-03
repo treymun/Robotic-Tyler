@@ -27,7 +27,7 @@ for f in os.listdir(os.path.join(top, 'locales')):
 app = os.path.join(top, 'resources', 'app'); os.makedirs(os.path.join(app, 'web')); os.makedirs(os.path.join(app, 'bridge'))
 for f in ('package.json', 'main.cjs', 'preload-steam.cjs', 'preload-panel.cjs'): shutil.copy(os.path.join(HERE, f), app)
 web = os.path.join(ROOT, 'tools', 'webview2-voice-test', 'web')
-for f in ('panel.html', 'panel.css', 'panel.js', 'diagnostics.js', 'bridge-only.js', 'tyler.png'): shutil.copy(os.path.join(web, f), os.path.join(app, 'web'))
+for f in ('panel.html', 'panel.css', 'panel.js', 'diagnostics.js', 'sdp-repair.js', 'bridge-only.js', 'tyler.png'): shutil.copy(os.path.join(web, f), os.path.join(app, 'web'))
 for f in ('soundboard-core.js', 'soundboard-audio.js', 'live-pcm.js', 'audio-bridge.js', 'wav-codec.js', 'noise-filter.js', 'voice-listener.js'):
     shutil.copy(os.path.join(ROOT, 'browser-extension', f), os.path.join(app, 'bridge'))
 shutil.copy(os.path.join(HERE, 'README.md'), top)
