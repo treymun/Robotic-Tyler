@@ -153,8 +153,9 @@ if(!app.requestSingleInstanceLock()){app.quit();}else{
 // remove it, after its settings were imported. Its data folder is left alone.
 async function offerOldVoiceRemoval(){
  if(process.platform!=='win32')return;
- const query=hive=>new Promise(resolve=>execFile('reg',['query',hive+'\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{'+OLD_VOICE_GUID+'}','/v','UninstallString'],{windowsHide:true},(e,out)=>resolve(e?null:(/UninstallString\s+REG_\w+\s+(.+)/.exec(String(out))||[])[1]?.trim()||null)));
- const uninstall=await query('HKCU')||await query('HKLM');if(!uninstall)return;
+ // electron-builder writes the key as the bare GUID (seen under Wine with the 2.14.1 Voice Studio); braces are tried too.
+ const query=(hive,key)=>new Promise(resolve=>execFile('reg',['query',hive+'\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\'+key,'/v','UninstallString'],{windowsHide:true},(e,out)=>resolve(e?null:(/UninstallString\s+REG_\w+\s+(.+)/.exec(String(out))||[])[1]?.trim()||null)));
+ let uninstall=null;for(const hive of ['HKCU','HKLM'])for(const key of [OLD_VOICE_GUID,'{'+OLD_VOICE_GUID+'}'])uninstall=uninstall||await query(hive,key);if(!uninstall)return;
  const v=vault,{voiceRemovalAsked}=await v.get('voiceRemovalAsked');if(voiceRemovalAsked)return;
  await new Promise(r=>setTimeout(r,4000));
  const r=await dialog.showMessageBox({type:'question',title:'Remove the old Voice Studio?',message:'The old ROBOTIC TYLER Native Steam Companion (Voice Studio) is still installed.',detail:'Its voice features are part of this app now: open Voice from the tray icon or the ROBOTIC TYLER menu. Its settings were imported. Remove the old app and its shortcut? Its settings folder is kept.',buttons:['Remove it','Keep it'],defaultId:0,cancelId:1,noLink:true});
