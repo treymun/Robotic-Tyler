@@ -25,14 +25,20 @@ test('Steam-style legacy microphone request gets the synthetic microphone once e
    const steamAsk=()=>new Promise(resolve=>{const t=navigator;t.getUserMedia=t.getUserMedia||t.webkitGetUserMedia;
     t.getUserMedia({audio:{optional:[{googHighpassFilter:true},{googAudioMirroring:false}]},video:false},s=>{const tr=s.getAudioTracks()[0];resolve({ok:true,label:tr&&tr.label});for(const x of s.getTracks())x.stop();},e=>resolve({ok:false,name:e&&e.name}));});
    const before=await steamAsk();
+   // A connection Steam opened before Tyler's voice was on and has since closed (a leave) is skipped
+   // quietly when voice is enabled, instead of reporting "attachment failed".
+   const statuses=[];window.addEventListener('message',e=>{if(e.data?.source==='tyler-audio-status')statuses.push(e.data);});
+   const ac=new AudioContext(),dst=ac.createMediaStreamDestination(),old=new RTCPeerConnection();old.addTrack(dst.stream.getAudioTracks()[0],dst.stream);old.close();
    window.postMessage({source:'tyler-audio-command',type:'enable'},location.origin);await new Promise(r=>setTimeout(r,400));
    const after=await steamAsk();
+   const closedPeerError=statuses.some(m=>/attachment failed/i.test(m.text||''));
    let webkit=null;if(typeof navigator.webkitGetUserMedia==='function')webkit=await new Promise(resolve=>navigator.webkitGetUserMedia({audio:true},s=>resolve(s.getAudioTracks()[0].label),e=>resolve('error '+e.name)));
-   return {before,after,webkit};
+   return {before,after,webkit,closedPeerError};
   });
   assert.deepEqual(errors,[]);
   assert.equal(r.before.ok,true);assert.match(r.before.label,/fake/i,'before enabling: the request is unchanged (the capture device)');
   assert.equal(r.after.ok,true);assert.doesNotMatch(r.after.label,/fake/i,'after enabling: no capture device');
   if(r.webkit!==null)assert.doesNotMatch(r.webkit,/fake/i);
+  assert.equal(r.closedPeerError,false,'no "attachment failed" for a connection Steam already closed');
  }finally{await browser.close();server.close();}
 });

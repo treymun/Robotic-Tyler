@@ -41,7 +41,10 @@
  }
  // Steam may hold a previously captured/cached microphone. Also attach at the outgoing WebRTC sender.
  function synthetic(){setup();return destination.stream.getAudioTracks()[0].clone();}
- async function attach(peer){if(!enabled)return;for(const sender of peer.getSenders()){if(sender.track?.kind!=='audio'||replaced.has(sender))continue;const track=synthetic();try{await sender.replaceTrack(track);replaced.add(sender);attached++;announce('Synthetic audio attached to an outgoing Steam audio sender. Confirm with Test beep and Steam meter.');}catch(e){track.stop();announce('Steam audio attachment failed: '+e.message,false);}}}
+ // A connection Steam already closed (after a leave or a rejoin) is skipped and forgotten: only live
+ // calls get the synthetic microphone, and the old one can't raise a false "attachment failed".
+ const closed=peer=>peer.signalingState==='closed'||peer.connectionState==='closed';
+ async function attach(peer){if(!enabled)return;if(closed(peer)){peers.delete(peer);return;}for(const sender of peer.getSenders()){if(sender.track?.kind!=='audio'||replaced.has(sender))continue;const track=synthetic();try{await sender.replaceTrack(track);replaced.add(sender);attached++;announce('Synthetic audio attached to an outgoing Steam audio sender. Confirm with Test beep and Steam meter.');}catch(e){track.stop();if(closed(peer)){peers.delete(peer);continue;}announce('Steam audio attachment failed: '+e.message,false);}}}
  const OriginalPeer=window.RTCPeerConnection;
  if(OriginalPeer){
   const proto=OriginalPeer.prototype,addTrack=proto.addTrack,addTransceiver=proto.addTransceiver,setLocal=proto.setLocalDescription;

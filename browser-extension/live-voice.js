@@ -8,6 +8,8 @@
 // restarts on its own and no other engine is started instead.
 (() => {
  'use strict';
+ // The desktop app in "Through VB-CABLE" mode runs Live from its Voice window instead.
+ if(globalThis.TylerPlatform?.voice===false)return;
  const api=globalThis.TylerCompanion,mount=api?.getMount?.();if(!mount)return;
  const icon=n=>globalThis.TylerIcons?.svg(n)||'';
  const root=document.createElement('section');root.className='live-card';root.hidden=true;mount.append(root);

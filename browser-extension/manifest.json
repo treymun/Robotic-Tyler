@@ -37,6 +37,7 @@
         "https://steamcommunity.com/chat/*"
       ],
       "js": [
+        "steam-voice-fix.js",
         "sender-main.js",
         "steam-chat-main.js",
         "soundboard-core.js",

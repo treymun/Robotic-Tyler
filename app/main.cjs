@@ -1,20 +1,23 @@
 'use strict';
 // ROBOTIC TYLER desktop app (v2.15): Steam text chat (the embedded Steam web chat window) and Steam
-// voice (the Windows audio helper) in one app, with one tray icon and one updater. It replaces the
-// separate Control Center and Native Steam Companion (Voice Studio).
+// voice in one app, with one tray icon and one updater. It replaces the separate Control Center and
+// Native Steam Companion (Voice Studio). Since v2.19 voice runs in the Steam chat window itself, like
+// the Chrome extension (steam-voice.cjs); Settings → Voice can switch back to the Windows audio
+// helper and VB-CABLE (native-voice.cjs).
 //
 // The shared extension background (browser-extension/background.js) runs in this main process
 // behind a small chrome.* stand-in, so text chat, Standard voice and Gemini Live use the same
 // conversation engine, rules, memory and settings as the Chrome extension.
-const {app,BrowserWindow,ipcMain,Menu,shell,safeStorage,webContents,Tray,nativeImage,dialog}=require('electron');
+const {app,BrowserWindow,ipcMain,Menu,shell,safeStorage,webContents,Tray,nativeImage,dialog,session,protocol}=require('electron');
 const path=require('node:path'),fs=require('node:fs'),{pathToFileURL}=require('node:url'),{execFile,spawn}=require('node:child_process');
 const {setupUpdates}=require('./updates.cjs'),{Vault,memoryStorage}=require('./vault.cjs'),{isChat,isSteam,isLocal,settingsKeys,sanitizeSettings}=require('./guards.cjs');
-const {NativeVoice}=require('./native-voice.cjs'),{importVoiceStudio}=require('./migrate.cjs');
+const {NativeVoice}=require('./native-voice.cjs'),{importVoiceStudio}=require('./migrate.cjs'),steamVoice=require('./steam-voice.cjs');
+steamVoice.registerScheme(protocol);
 // Same data folder as the Control Center, so its users keep settings, keys and memory as they are.
 const root=path.join(process.env.LOCALAPPDATA||app.getPath('appData'),'RoboticTylerHydraCloudV12');fs.mkdirSync(path.join(root,'Data'),{recursive:true});app.setPath('userData',path.join(root,'Data'));
 const OLD_VOICE_DIR=path.join(app.getPath('appData'),'RoboticTylerNativeSteamCompanion');
 const OLD_VOICE_GUID='b0b8de7d-76bb-5d6f-99fa-c8a2fe9a49c6'; // electron-builder key for com.robotictyler.nativesteamcompanion
-let bot,options,voiceWin,listener,tray,voice,updates,vault,quitting=false;const removed=[];const activity=[];function eventLog(kind,details=''){activity.unshift({at:Date.now(),kind,details:String(details).slice(0,140)});if(activity.length>120)activity.pop();}
+let bot,options,voiceWin,listener,tray,voice,updates,vault,windowVoice=true,steamWindow,quitting=false;const removed=[];const activity=[];function eventLog(kind,details=''){activity.unshift({at:Date.now(),kind,details:String(details).slice(0,140)});if(activity.length>120)activity.pop();}
 const icon=path.join(__dirname,'..','assets','robotic-tyler.png');
 function helperPath(){const p=app.isPackaged?path.join(process.resourcesPath,'windows-audio-bridge','RoboticTylerAudio.exe'):path.join(__dirname,'..','windows-audio-bridge','publish','RoboticTylerAudio.exe');if(!fs.existsSync(p))throw Error('The Windows audio helper is missing. Reinstall ROBOTIC TYLER (or build it with BUILD-WINDOWS-EXE.cmd).');return p;}
 function helperOut(args,input,timeout=15000){return new Promise((resolve,reject)=>{const c=execFile(helperPath(),args,{windowsHide:true,timeout,maxBuffer:4_000_000},(error,stdout,stderr)=>error?reject(Error(String(stderr||error.message).trim())):resolve(String(stdout).trim()));if(input!==undefined){c.stdin.end(input);}});}
@@ -29,7 +32,7 @@ if(!app.requestSingleInstanceLock()){app.quit();}else{
  const windowDefaults={show:false,backgroundColor:'#14171c',autoHideMenuBar:true,webPreferences:{nodeIntegration:false,contextIsolation:true,sandbox:true,webSecurity:true,allowRunningInsecureContent:false,webviewTag:false}};
  function configure(win,local=null){win.webContents.setWindowOpenHandler(({url})=>{if(/^https:\/\//.test(url)){if(isSteam(url)&&!local)bot.loadURL(url);else shell.openExternal(url);}return {action:'deny'};});win.webContents.on('will-navigate',(event,url)=>{if(local?!isLocal(url,local):!isSteam(url)){event.preventDefault();if(/^https:\/\//.test(url))shell.openExternal(url);}});win.webContents.session.setPermissionRequestHandler((_wc,permission,callback)=>callback(permission!=='media'&&permission!=='audioCapture'&&permission!=='videoCapture'));win.webContents.session.setPermissionCheckHandler((_wc,permission)=>!['media','audioCapture','videoCapture'].includes(permission));win.once('ready-to-show',()=>win.show());}
  async function openSettings(section){if(options&&!options.isDestroyed()){options.focus();if(section)options.webContents.executeJavaScript('location.hash='+JSON.stringify('#'+section)).catch(()=>{});return;}options=new BrowserWindow({...windowDefaults,width:1040,height:860,title:'ROBOTIC TYLER · Settings',icon,webPreferences:{...windowDefaults.webPreferences,preload:path.join(__dirname,'options-preload.cjs')}});configure(options,settingsPath);options.on('closed',()=>options=null);await options.loadFile(settingsPath,section?{hash:section}:undefined);}
- async function openVoice(){if(voiceWin&&!voiceWin.isDestroyed()){voiceWin.show();voiceWin.focus();return;}voiceWin=new BrowserWindow({...windowDefaults,width:1130,height:810,minWidth:760,minHeight:560,title:'ROBOTIC TYLER · Voice',icon,webPreferences:{...windowDefaults.webPreferences,preload:path.join(__dirname,'..','voice-app','native-preload.cjs')}});configure(voiceWin,voicePath);voiceWin.on('closed',()=>voiceWin=null);await voiceWin.loadFile(voicePath);}
+ async function openVoice(){if(windowVoice){bot?.show();bot?.focus();const r=await dialog.showMessageBox(bot,{type:'info',title:'ROBOTIC TYLER · Voice',message:'Voice runs in the Steam chat window.',detail:'Open Tyler\'s panel in Steam chat and press Connect & start (or Start live voice for Gemini Live), then join the voice channel. No VB-CABLE needed.\n\nPrefer the old way through VB-CABLE and the Steam desktop app? Change it in Settings → Voice.',buttons:['OK','Voice settings'],defaultId:0,cancelId:0,noLink:true});if(r.response===1)await openSettings('voice');return;}if(voiceWin&&!voiceWin.isDestroyed()){voiceWin.show();voiceWin.focus();return;}voiceWin=new BrowserWindow({...windowDefaults,width:1130,height:810,minWidth:760,minHeight:560,title:'ROBOTIC TYLER · Voice',icon,webPreferences:{...windowDefaults.webPreferences,preload:path.join(__dirname,'..','voice-app','native-preload.cjs')}});configure(voiceWin,voicePath);voiceWin.on('closed',()=>voiceWin=null);await voiceWin.loadFile(voicePath);}
 
  // chrome.* stand-in for the shared extension background (browser-extension/background.js).
  // storage.onChanged lets the background push non-secret changes (usage, emergency stop…) to the
@@ -46,7 +49,14 @@ if(!app.requestSingleInstanceLock()){app.quit();}else{
  const steamTab=()=>bot&&!bot.isDestroyed()&&!bot.webContents.isDestroyed()?{id:bot.webContents.id,url:bot.webContents.getURL()}:null;
  // Window and tray icons follow Settings → Theme (background.js calls this; logos are in companion/ui/logos).
  globalThis.tylerThemeIcon=theme=>{try{const file=t=>path.join(__dirname,'companion','ui','logos',t),img=nativeImage.createFromPath(file(theme+'.png'));if(img.isEmpty())return;for(const w of [bot,options,voiceWin])if(w&&!w.isDestroyed())w.setIcon(img);const small=nativeImage.createFromPath(file(theme+'-32.png'));if(!small.isEmpty())tray?.setImage(small.resize({width:16,height:16}));voiceWin?.webContents.send('tyler:voice-theme');}catch{}};
- globalThis.chrome={action:{onClicked:{addListener(){}}},runtime:{onMessage:{addListener(fn){listener=fn;}},openOptionsPage:()=>openSettings()},
+ // Voice in the Steam window (v2.19): read the mode before the window loads, then set up its session
+ // (Chrome's user agent, blocked physical microphone, the speech detector page, Live voice's port).
+ windowVoice=(await vault.get('desktopVoice')).desktopVoice!=='cable';
+ const isChatFrame=event=>!!bot&&event.sender===bot.webContents&&event.senderFrame===event.sender.mainFrame&&isChat(event.senderFrame?.url);
+ let micNoticeShown=false;
+ steamWindow=steamVoice.setupSteamVoice({session:session.fromPartition('persist:robotic-tyler-steam'),ipcMain,extensionDir:path.join(__dirname,'..','browser-extension'),chromeVersion:process.versions.chrome,
+  isVoiceWindow:()=>windowVoice,isChatFrame,log:eventLog,onBlockedMicrophone:()=>{if(micNoticeShown)return;micNoticeShown=true;void dialog.showMessageBox(bot,{type:'info',title:'ROBOTIC TYLER',message:'ROBOTIC TYLER kept your microphone off.',detail:'Steam asked for a microphone before Tyler\'s voice was ready. Leave the voice channel, wait a few seconds and join again: Tyler\'s own voice answers Steam then.',noLink:true});}});
+ globalThis.chrome={action:{onClicked:{addListener(){}}},runtime:{onMessage:{addListener(fn){listener=fn;}},onConnect:steamWindow.onConnect,openOptionsPage:()=>openSettings()},
   storage:{local,session:sessionStore,onChanged:{addListener(fn){changeListeners.push(fn);}}},
   tabs:{get:async id=>{if(id===-1)return {id,url:'https://steamcommunity.com/chat/'};const wc=webContents.fromId(id);if(!wc||wc.isDestroyed())throw Error('Tab closed');return {id,url:wc.getURL()};},
    query:async({url}={})=>{const tab=steamTab();if(!tab)return [];if(url&&!/steamcommunity\.com\/chat/.test(String(url)))return [];return isChat(tab.url)?[tab]:[];},
@@ -62,14 +72,17 @@ if(!app.requestSingleInstanceLock()){app.quit();}else{
  voice.on('status',s=>{try{voiceWin?.webContents.send('tyler:voice-status',s);}catch{}buildTray();});
  changeListeners.push(changes=>{if(changes.v22EmergencyStop?.newValue===true&&voice.mode!=='off')void voice.stop('Emergency stop.');});
  const beep=path.join(__dirname,'..','voice-app','beep.wav');
- async function startVoice(){const {voiceEngine}=await vault.get('voiceEngine');return voiceEngine==='live'?voice.startLive():voice.startStandard();}
+ async function startVoice(){if(windowVoice)throw Error('Voice runs in the Steam chat window: open Tyler\'s panel there and press Connect & start (or Start live voice). To use VB-CABLE instead, change Settings → Voice → Where Tyler joins voice.');const {voiceEngine}=await vault.get('voiceEngine');return voiceEngine==='live'?voice.startLive():voice.startStandard();}
+ // Switching Settings → Voice → Where Tyler joins voice reloads the Steam window in the new mode.
+ changeListeners.push(changes=>{if(!('desktopVoice' in changes))return;const next=changes.desktopVoice.newValue!=='cable';if(next===windowVoice)return;windowVoice=next;if(windowVoice&&voice.mode!=='off')void voice.stop('Voice moved to the Steam chat window.');steamWindow.applyMode();eventLog('Voice mode',windowVoice?'Steam chat window':'VB-CABLE');if(bot&&!bot.isDestroyed())bot.loadURL('https://steamcommunity.com/chat/');buildTray();});
 
  // ── Tray: the one ROBOTIC TYLER tray icon ────────────────────────────────
  function buildTray(){
   if(!tray)return;const on=voice&&voice.mode!=='off';
   tray.setToolTip('ROBOTIC TYLER'+(on?' · '+voice.state:''));
-  tray.setContextMenu(Menu.buildFromTemplate([{label:'Open Steam chat',click:()=>{bot?.show();bot?.focus();}},{label:'Open Voice',click:()=>void openVoice()},
-   on?{label:'Stop voice',click:()=>void voice.stop('Voice stopped from the tray.')}:{label:'Start voice',click:()=>startVoice().catch(e=>{tray.displayBalloon?.({title:'Voice didn\'t start',content:e.message});void openVoice();})},
+  const voiceItems=windowVoice?[{label:'Voice: Tyler\'s panel in Steam chat',click:()=>{bot?.show();bot?.focus();}}]:[{label:'Open Voice',click:()=>void openVoice()},
+   on?{label:'Stop voice',click:()=>void voice.stop('Voice stopped from the tray.')}:{label:'Start voice',click:()=>startVoice().catch(e=>{tray.displayBalloon?.({title:'Voice didn\'t start',content:e.message});void openVoice();})}];
+  tray.setContextMenu(Menu.buildFromTemplate([{label:'Open Steam chat',click:()=>{bot?.show();bot?.focus();}},...voiceItems,
    {label:'Settings',click:()=>void openSettings()},{label:'Pause text replies',click:()=>{eventLog('Pause requested');bot?.webContents.send('tyler:message',{type:'v22:stop'});}},{type:'separator'},
    {label:'Check for updates…',click:()=>updates.check(bot)},{label:'Quit ROBOTIC TYLER',click:()=>{quitting=true;app.quit();}}]));
  }
@@ -136,7 +149,9 @@ if(!app.requestSingleInstanceLock()){app.quit();}else{
   if(result.unreadable?.length)eventLog('Voice Studio keys not imported','Enter them again in Settings: '+result.unreadable.join(', '));
  }catch(error){eventLog('Voice Studio import failed',error.message);}
 
- bot=new BrowserWindow({...windowDefaults,width:1380,height:920,minWidth:850,minHeight:620,title:'ROBOTIC TYLER',icon,webPreferences:{...windowDefaults.webPreferences,partition:'persist:robotic-tyler-steam',backgroundThrottling:false,preload:path.join(__dirname,'steam-preload.cjs')}});configure(bot);
+ bot=new BrowserWindow({...windowDefaults,width:1380,height:920,minWidth:850,minHeight:620,title:'ROBOTIC TYLER',icon,webPreferences:{...windowDefaults.webPreferences,partition:'persist:robotic-tyler-steam',backgroundThrottling:false,autoplayPolicy:'no-user-gesture-required',preload:path.join(__dirname,'steam-preload.cjs')}});configure(bot);
+ // configure() set the generic window rules; the Steam window's session keeps steam-voice.cjs's handlers.
+ steamWindow.applyPermissions();steamWindow.watch(bot.webContents);
  // While voice runs, closing the chat window keeps Tyler in the tray instead of quitting.
  bot.on('close',event=>{if(!quitting&&voice.mode!=='off'){event.preventDefault();bot.hide();tray?.displayBalloon?.({title:'ROBOTIC TYLER is still in voice chat',content:'Stop voice or quit from the tray icon.'});}});
  bot.on('closed',()=>{quitting=true;app.quit();});const botId=bot.webContents.id;bot.webContents.on('destroyed',()=>{for(const fn of removed)fn(botId);});

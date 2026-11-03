@@ -27,6 +27,9 @@ function show(){
  $('standardVoiceNote').textContent=provider==='gemini'?'Your text provider is Google Gemini, so speech uses Gemini text-to-speech with one of Google\'s voices.':'Speech uses Grok Voice through OpenRouter, with Voxtral as the fallback if Grok is busy.';
  $('liveModelNote').textContent=LIVE_MODELS.find(m=>m.id===$('liveModel').value)?.note||'';
  $('liveSilenceLabel').textContent=(Number($('liveSilenceMs').value)/1000).toFixed(2)+' s';
+ // Desktop: the device list is for the VB-CABLE route only.
+ if(desktop&&$('desktopVoice')){const cable=$('desktopVoice').value==='cable';document.body.dataset.voiceRoute=cable?'cable':'window';$('voiceDevices').style.display=cable?'':'none';
+  $('desktopVoiceNote').textContent=cable?'Choose the cable and the device Steam plays voice through below, set Steam\'s microphone to CABLE Output, then start voice from the Voice window or the tray icon.':'Start voice from Tyler\'s panel in Steam chat (Connect & start, or Start live voice), then join the voice channel. Tyler\'s own synthetic microphone talks into the call; your physical microphone is never used.';}
 }
 async function keyState(){
  try{
@@ -90,6 +93,7 @@ async function test(){
 fill();
 for(const r of document.querySelectorAll('input[name=voiceEnginePick]'))r.addEventListener('change',()=>{if(!r.checked)return;$('voiceEngine').value=r.value;$('voiceEngine').dispatchEvent(new Event('input',{bubbles:true}));show();void keyState();});
 for(const id of ['aiProvider','liveModel','liveSilenceMs'])$(id).addEventListener('input',()=>{show();void keyState();});
+if(desktop&&$('desktopVoice'))$('desktopVoice').addEventListener('change',show);
 $('aiProvider').addEventListener('change',()=>{show();void keyState();});
 $('voiceTest').addEventListener('click',()=>void test());
 if(native){

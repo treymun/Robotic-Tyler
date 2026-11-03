@@ -13,12 +13,15 @@ const root=path.resolve(import.meta.dirname,'..');
 const require=createRequire(import.meta.url);
 
 function fakeElectron(){
- const handlers=new Map(),windows=[],sent=[];let readyResolve;const ready=new Promise(r=>readyResolve=r);
+ const handlers=new Map(),onHandlers=new Map(),windows=[],sent=[];let readyResolve;const ready=new Promise(r=>readyResolve=r);
+ // One session per partition, like Electron (the Steam window's carries the voice setup, v2.19).
+ const sessions=new Map(),sessionFor=name=>{if(!sessions.has(name))sessions.set(name,{agent:'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) robotic-tyler/2.19.0 Chrome/156.0.8078.75 Electron/45.2.1 Safari/537.36',
+  getUserAgent(){return this.agent;},setUserAgent(a){this.agent=a;},setPermissionRequestHandler(fn){this.request=fn;},setPermissionCheckHandler(fn){this.check=fn;},protocol:{handled:new Map(),handle(scheme,fn){this.handled.set(scheme,fn);}}});return sessions.get(name);};
  let nextId=1;const contents=new Map();
  class BrowserWindow{
   constructor(options){this.options=options;this.destroyed=false;const id=nextId++;const self=this;
    this.webContents={id,url:'',isDestroyed:()=>self.destroyed,getURL(){return this.url;},send:(channel,message)=>sent.push({id,channel,message}),
-    setWindowOpenHandler(){},on(){},once(){},reload(){},mainFrame:{},session:{setPermissionRequestHandler(){},setPermissionCheckHandler(){}}};
+    setWindowOpenHandler(){},on(){},once(){},reload(){},mainFrame:{},session:options?.webPreferences?.partition?sessionFor(options.webPreferences.partition):{setPermissionRequestHandler(){},setPermissionCheckHandler(){}}};
    contents.set(id,this.webContents);windows.push(this);}
   loadURL(url){this.webContents.url=url;return Promise.resolve();}
   loadFile(file){this.webContents.url='file://'+file;return Promise.resolve();}
@@ -26,13 +29,14 @@ function fakeElectron(){
  }
  const electron={
   app:{requestSingleInstanceLock:()=>true,on(){},whenReady:()=>ready,getPath:()=>os.tmpdir(),setPath(){},quit(){},isPackaged:false,getVersion:()=>'2.15.0'},
-  BrowserWindow,ipcMain:{handle:(name,fn)=>handlers.set(name,fn)},
+  BrowserWindow,ipcMain:{handle:(name,fn)=>handlers.set(name,fn),on:(name,fn)=>onHandlers.set(name,fn)},
+  session:{fromPartition:sessionFor},protocol:{registerSchemesAsPrivileged(){}},
   Menu:{buildFromTemplate:t=>t,setApplicationMenu(){}},shell:{openExternal:async()=>{}},
   safeStorage:{isEncryptionAvailable:()=>true,encryptString:s=>Buffer.from('enc:'+s),decryptString:b=>String(b).slice(4)},
   webContents:{fromId:id=>contents.get(id)},Tray:class{setToolTip(){}setContextMenu(){}on(){}setImage(){}displayBalloon(){}},
   nativeImage:{createFromPath:()=>({resize:()=>({})})},dialog:{showErrorBox:(t,m)=>{throw Error(t+': '+m);},showMessageBox:async()=>({response:0})},
  };
- return {electron,handlers,windows,sent,start:()=>readyResolve()};
+ return {electron,handlers,onHandlers,sessions,windows,sent,start:()=>readyResolve()};
 }
 
 test('desktop main process boots the shared background and relays storage changes to Steam',async()=>{
@@ -72,5 +76,29 @@ test('desktop main process boots the shared background and relays storage change
   assert.equal(fake.sent.some(s=>JSON.stringify(s).includes('sk-or-test')),false);
   const disk=fs.readFileSync(path.join(tmp,'RoboticTylerHydraCloudV12','Data','Companion','settings.json'),'utf8');
   assert.equal(disk.includes('sk-or-test'),false,'API key is stored encrypted');
+
+  // v2.19 voice in the Steam window: Chrome's user agent, voice mode for the preload, blocked microphone.
+  const steamSession=fake.sessions.get('persist:robotic-tyler-steam');
+  assert.match(steamSession.agent,/^Mozilla\/5\.0 \(Windows NT 10\.0; Win64; x64\) AppleWebKit\/537\.36 \(KHTML, like Gecko\) Chrome\/\d+\.0\.0\.0 Safari\/537\.36$/);
+  const mode={sender:bot.webContents,senderFrame:frame};fake.onHandlers.get('tyler:desktop-mode')(mode);assert.deepEqual(mode.returnValue,{voice:true});
+  const other={sender:{id:-5},senderFrame:frame};fake.onHandlers.get('tyler:desktop-mode')(other);assert.deepEqual(other.returnValue,{voice:false});
+  let allowed=null;steamSession.request(bot.webContents,'media',v=>allowed=v,{mediaTypes:['audio']});assert.equal(allowed,false,'physical microphone stays blocked');
+  assert.equal(bot.options.webPreferences.autoplayPolicy,'no-user-gesture-required');
+  // The speech detector page is served from the app; nothing else is.
+  const serve=steamSession.protocol.handled.get('tyler-app');
+  assert.equal((await serve({url:'tyler-app://companion/neural-host.html'})).status,200);
+  assert.equal((await serve({url:'tyler-app://companion/background.js'})).status,404);
+  assert.equal((await serve({url:'tyler-app://companion/neural/..%2F..%2Fapp%2Fmain.cjs'})).status,404);
+  // Live voice's port reaches the shared background and its replies come back to the window.
+  const portEvent={sender:bot.webContents,senderFrame:frame};fake.sent.length=0;
+  fake.onHandlers.get('tyler:port')(portEvent,{op:'open',id:1,name:'tyler-live'});
+  fake.onHandlers.get('tyler:port')(portEvent,{op:'message',id:1,message:{type:'start'}});
+  for(let i=0;i<100&&!fake.sent.some(s=>s.channel==='tyler:port');i++)await new Promise(r=>setTimeout(r,10));
+  const reply=fake.sent.find(s=>s.channel==='tyler:port');assert.ok(reply,'Live port answers');assert.equal(reply.message.id,1);assert.equal(reply.message.message.type,'error');assert.match(reply.message.message.text,/Gemini Live|key/i);
+  fake.onHandlers.get('tyler:port')(portEvent,{op:'close',id:1});
+  // Settings → Voice → VB-CABLE switches the window back to text only, with Electron's own name.
+  await globalThis.chrome.storage.local.set({desktopVoice:'cable'});
+  for(let i=0;i<50&&/Chrome\/\d+\.0\.0\.0 Safari/.test(steamSession.agent);i++)await new Promise(r=>setTimeout(r,10));
+  assert.match(steamSession.agent,/Electron\//);fake.onHandlers.get('tyler:desktop-mode')(mode);assert.deepEqual(mode.returnValue,{voice:false});
  }finally{Module._load=originalLoad;}
 });

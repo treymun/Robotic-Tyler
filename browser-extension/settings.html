@@ -288,7 +288,21 @@
     </label>
   </div>
   <p class="hint">Changes here apply the next time you start a live session. A running session keeps the settings it started with; stop and start it again to switch.</p>
-  <p class="hint"><span class="only-chrome">Start and stop live sessions from the Gemini Live card in Tyler's panel in Steam. Tyler hears only the Steam voice call in that tab, never your microphone.</span><span class="only-desktop">Start and stop live sessions in the Voice window or from the tray icon. Tyler hears only the device you choose below.</span></p>
+  <p class="hint"><span class="only-chrome">Start and stop live sessions from the Gemini Live card in Tyler's panel in Steam. Tyler hears only the Steam voice call in that tab, never your microphone.</span><span class="only-desktop">Start and stop live sessions from the Gemini Live card in Tyler's panel in Steam chat. With the VB-CABLE route, use the Voice window or the tray icon instead; Tyler then hears only the device you choose below.</span></p>
+</section>
+
+<section class="sheet only-desktop" id="voiceRoute" data-ui-zone="voice">
+  <div class="sheet-head">
+    <h2>Where Tyler joins voice</h2>
+    <p>Tyler can join Steam voice right in this app's Steam chat window, like the Chrome extension: no VB-CABLE, no Steam desktop app. Or the older way, through a virtual audio cable and the Steam desktop app.</p>
+  </div>
+  <label>Voice route
+    <select id="desktopVoice">
+      <option value="window">In this app's Steam chat window (recommended, no VB-CABLE)</option>
+      <option value="cable">Through VB-CABLE and the Steam desktop app</option>
+    </select>
+    <small class="hint" id="desktopVoiceNote">Start voice from Tyler's panel in Steam chat (Connect &amp; start, or Start live voice), then join the voice channel. Tyler's own synthetic microphone talks into the call; your physical microphone is never used.</small>
+  </label>
 </section>
 
 <section class="sheet only-desktop" id="voiceDevices" data-ui-zone="voice">
