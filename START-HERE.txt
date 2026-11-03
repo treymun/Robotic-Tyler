@@ -1,16 +1,26 @@
-ROBOTIC TYLER — v2.14.1
+ROBOTIC TYLER — v2.15.0
 
 JUST WANT TO USE IT?
-  Download ROBOTIC-TYLER-Setup-2.14.1.exe from
-  github.com/treymun/Robotic-Tyler/releases/latest and run it. Tick any of:
-    Chrome extension      → Setup unpacks it and opens Chrome's extensions page;
-                            turn on Developer mode, click Load unpacked, paste the path
-    Control Center        → Tyler's own Steam chat window
-    Native Steam Companion (Voice Studio) → Tyler talks in Steam voice
+  Download ROBOTIC-TYLER-Setup-2.15.0.exe from
+  github.com/treymun/Robotic-Tyler/releases/latest and run it. Two parts:
+    Desktop app        → Steam text chat and Steam voice on Windows, no Chrome needed
+                         (voice: Standard or Gemini Live, through a virtual audio cable)
+    Chrome extension   → Setup unpacks it and opens Chrome's extensions page;
+                         turn on Developer mode, click Load unpacked, paste the path
   Run Setup again later to add or update a part. Settings and keys are kept.
+  The desktop app replaces the old Control Center (upgraded in place) and Voice
+  Studio (its settings are imported on first start; it then offers to remove it).
   Pick a look in Settings → Appearance: Steam, Classic Steam (2004), Team Fortress 2,
   Counter-Strike 2, Portal, Counter-Strike 1.6, Half-Life HEV suit, Left 4 Dead,
   Windows XP or DOOM (classic).
+
+VOICE ON THE DESKTOP:
+  1. Install VB-CABLE (vb-audio.com/Cable) and restart if asked.
+  2. Settings → Voice: pick the engine, then "Tyler speaks into" = CABLE Input and
+     "Tyler listens to" = the headset/speakers Steam plays voice chat through.
+     Tick the box once everyone in the call knows Tyler is listening.
+  3. In Steam: Settings → Voice → microphone = CABLE Output.
+  4. Open Voice (tray icon or Ctrl+Shift+V), play the test tone, then Start.
 
 UPDATING CHROME FROM THIS FOLDER:
   Copy browser-extension/ over the same folder you loaded before, then click
@@ -20,31 +30,6 @@ EDITING THE CODE:
   Change files in browser-extension/ only, then run
     node tools/build.mjs     (regenerates the desktop copies and ui-template.js)
     npm run test:all         (build check, unit tests, end-to-end tests)
+  BUILD-WINDOWS-EXE.cmd builds the desktop installer and Setup on Windows.
   CHANGES.md has every release (newest first); RELEASING.md covers releases,
   installers, auto-updates and code signing. Guides live in docs/.
-
-------------------------------------------------------------------------------
-
-ROBOTIC TYLER — CHROME PATCH v2.3.26 / THREE PROGRAMS
-
-UPDATING AN EXISTING CHROME INSTALLATION:
-Close Steam chat and Tyler's YouTube player tabs. Copy ALL browser-extension
-files over the SAME existing loaded extension folder, then Reload the existing
-extension in chrome://extensions. Reopen Steam, connect Tyler and re-share
-YouTube music. Do not uninstall or change the extension folder path: this
-preserves the extension identity, settings and saved keys.
-
-New: Steam admin panel (ban/unban, single-message deletion, local log),
-prospective session-only text mute, no five-minute delay between kick votes.
-Also new: three-voter five-minute text mute, countdowns and !modhelp.
-See docs/patch-notes/PATCH-v2.3.26.txt and docs/MODERATION-GUIDE.md. Private Steam controls remain
-experimental and need the corresponding Steam role permissions.
-
-FIRST INSTALL / DESKTOP BUILD:
-
-1) To build both separate Windows EXEs, run BUILD-BOTH-WINDOWS-EXES.cmd on Windows with Node.js LTS installed.
-2) Electron text-only Control Center => dist/control-center
-3) Native Steam Companion (voice) => dist/native-steam-companion (experimental)
-4) Chrome extension => load browser-extension via chrome://extensions.
-
-Read docs/README-THREE-VERSIONS.md for important Steam voice testing instructions.

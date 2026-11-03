@@ -237,11 +237,13 @@ button:focus-visible,a:focus-visible,summary:focus-visible,input[type=checkbox]:
 .engine-pick{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:12px;margin:14px 0 6px}
 .engine-card{display:flex;gap:12px;align-items:flex-start;margin:0;padding:14px 16px;border:1px solid var(--rt-line-soft);border-radius:var(--rt-r-md);background:var(--rt-surface);cursor:pointer;font-weight:400;text-transform:none;letter-spacing:0;transition:border-color var(--rt-fast),background-color var(--rt-fast)}
 .engine-card:hover{background:var(--rt-surface-2)}
-.engine-card:has(input:checked){border-color:var(--rt-active);background:var(--rt-surface-2);box-shadow:inset 3px 0 0 var(--rt-active)}
+.engine-card:has(input:checked){border-color:var(--rt-focus);background:var(--rt-surface-2);box-shadow:inset 3px 0 0 var(--rt-focus)}
 .engine-card:has(input:focus-visible){outline:2px solid var(--rt-focus);outline-offset:2px}
 .engine-card>input{margin:3px 0 0;flex-shrink:0;accent-color:var(--rt-active)}
 .engine-card>span{display:flex;flex-direction:column;gap:4px;min-width:0}
 .engine-card b{color:var(--rt-ink-strong);font-size:15px;font-weight:600}
-.engine-card small{display:block}
+/* The card is a <label> around a radio, which themes style as a field caption; the text inside reads like a toggle's instead. */
+.engine-card small{display:block;font-family:var(--rt-font);font-size:13px;font-weight:400;text-transform:none;letter-spacing:normal;line-height:1.45;color:var(--rt-ink-3)}
+.engine-card b{text-transform:none}
 body[data-voice-engine=standard] [data-engine=live],body[data-voice-engine=live] [data-engine=standard]{display:none!important}
 body[data-voice-provider=gemini] #voiceStandard [data-provider=openrouter],body:not([data-voice-provider=gemini]) #voiceStandard [data-provider=gemini]{display:none!important}

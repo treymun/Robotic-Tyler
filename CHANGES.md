@@ -1,3 +1,44 @@
+# ROBOTIC TYLER v2.15.0: one desktop app, and Gemini Live voice
+
+## Two ways to use Tyler
+- **Desktop app** (Windows) and **Chrome extension**. `ROBOTIC-TYLER-Setup-2.15.0.exe` installs either or both. The separate Control Center and Native Steam Companion (Voice Studio) are retired.
+- The desktop app does **Steam text chat** (the embedded Steam web chat window: replies, commands, trivia, arcade, party host, votes, moderation within the bot account's Steam permissions, soundboard chat triggers) and **Steam voice** (the Windows audio helper with the Steam desktop client), all without Chrome. It has one window for chat, a **Voice** window, one tray icon and one updater.
+- Desktop and Chrome share one conversation engine (the extension's background runs inside the desktop app), so personality, memory, approved friends, rules and providers behave the same in both.
+
+## Gemini Live (optional, new)
+- Settings → Voice now picks the engine: **Standard** (unchanged, still the default) or **Gemini Live** (`gemini-3.8-live`, Google's current Live model; the 2.5 native-audio preview is offered for keys without 3.8).
+- Real bidirectional streaming: the voice call goes up in 40 ms frames while people talk; Tyler's reply plays as its audio arrives, at most 20 s ahead. Google's turn detection decides when to answer; when someone talks over Tyler he stops at once and the rest of that reply is dropped.
+- Tyler only hears the Steam call (Chrome) or the one output device you pick (desktop), never a microphone, and only after you confirm everyone knows. Silence isn't streamed.
+- A dropped connection resumes the same session without resending old audio, and a reply cut off by the drop isn't spoken twice. Bad keys, missing access and quota errors stop the session with the reason; nothing else (and nothing billable) starts instead. Stop ends capture, playback, queued audio, reconnects and the connection. Starting one engine stops the other.
+- Your personality, reply length, talkativeness and language rules apply; people in the call can't change them (takeover lines get a reminder to the model and are never remembered). Live turns go into the same memory as text chat.
+- Your Google key stays in the extension background or the desktop main process. Steam pages, the page DOM, logs and exported settings never see it.
+
+## Voice fixes
+- No more 300-character speech cutoff: long replies are spoken in full, in sentence-sized requests.
+- Voices follow the provider: Grok voices for OpenRouter, Google's 30 voices for Gemini speech and Live. A Grok name is never sent to Gemini. People who never picked a Gemini voice keep the one they had (rex → Charon, eve → Kore, ara → Aoede, sal → Puck, leo → Fenrir).
+- Gemini speech can use Gemini 2.5 Flash TTS (as before) or the 3.8 Flash-Lite / Flash TTS models.
+- Desktop voice is no longer "Rex only, 5 seconds at a time": continuous listening (Standard and Live), plus *Listen 5 seconds* and typed test messages. The audio helper gained continuous capture, streamed playback with instant flush, and no 60-second playback limit.
+
+## One Voice settings page
+- Engine, model and voice for each engine, key status, a **Test voice** button (plays locally), turn-taking (interruptions, start/end-of-speech sensitivity, pause length), and on desktop the two audio devices and the listening-consent box. Only what the chosen engine and provider support is shown, and changes that need a new live session say so.
+
+## Moving from 2.14
+- A **Control Center** upgrades in place (same app id, data folder and update channel): settings, keys, themes and memory are kept.
+- A **Voice Studio**'s settings, API keys (decrypted with its own Windows-protected key) and device choices are imported on the desktop app's first start. Settings both apps had with different values are not overwritten: you choose which app's to keep, or decide later. The app then offers to uninstall the old Voice Studio (its settings folder is left). Listening consent is asked again.
+- Setup has two parts. `/components=control` or `voice` still select the desktop app.
+
+## Theme review
+- Checked the new and changed surfaces (Voice settings, Voice window, Gemini Live card) in all ten themes at 1180 px and at 420 px with 2× scaling: no clipping or horizontal overflow, theme fonts and colours apply.
+- Fixed: the engine cards' descriptions picked up some themes' field-caption style (all caps or display fonts in TF2, HEV, Left 4 Dead, DOOM, CS 1.6); they now read like toggle descriptions. The selected card uses each theme's focus colour, which made it clearly visible in TF2 (the accent red was 1.6:1 on its card).
+- Also fixed: the settings page showed a "Settings saved" notice when it opened with a key saved.
+- Left alone: the rest of the panel, settings and dialogs were reviewed in 2.13/2.14 and nothing new stood out. Portal's focus orange is 2.6:1 on its light cards; the checked radio and the side bar still mark the choice, so the theme's colour was kept.
+
+## What was tested, and how
+- **Mocked** (225 unit and integration tests, plus 11 end-to-end tests in real Chromium): the Live protocol and session rules against a scripted stand-in for Google's socket; the Chrome background's live port with the real background script; desktop voice and the Voice Studio import against a stand-in for the Windows audio helper; Setup, release and theme checks.
+- **Real**: Google's Live endpoint was reached from this build and returned its real error for an invalid key (close 1007, stopped with no retry). The audio helper compiles for win-x64 with the .NET 8 SDK.
+- **Not tested here**: a real Gemini Live conversation (no Google key was available), real Windows audio devices and VB-CABLE, a real Steam voice call, and the Voice Studio key import on real Windows. No latency was measured on a real call; the Voice page's Test voice button and the live card show measured first-audio times when you run them.
+
+---
 # ROBOTIC TYLER v2.14.1: friends in chat can't reprogram Tyler
 
 ## The problem

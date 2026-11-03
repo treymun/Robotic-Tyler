@@ -65,7 +65,7 @@
       "from": "windows-audio-bridge/publish",
       "to": "windows-audio-bridge",
       "filter": [
-        "RoboticTylerAudio.exe"
+        "**/*"
       ]
     }
   ]

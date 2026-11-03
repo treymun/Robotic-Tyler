@@ -5,19 +5,31 @@
 
 ## Download
 
-**Download one file:** `ROBOTIC-TYLER-Setup-<version>.exe` from the **[latest release](https://github.com/treymun/Robotic-Tyler/releases/latest)**, and run it. Tick what you want:
+**Download one file:** `ROBOTIC-TYLER-Setup-<version>.exe` from the **[latest release](https://github.com/treymun/Robotic-Tyler/releases/latest)**, and run it. There are two ways to use Tyler, and Setup installs either or both:
 
 | Part | What it is |
 |---|---|
-| **Chrome extension** | Voice and chat inside Steam web chat. Setup unpacks it to `%LOCALAPPDATA%\ROBOTIC TYLER\Chrome extension`, then opens Chrome's extensions page and copies the folder path. In Chrome, turn on **Developer mode**, click **Load unpacked** and paste the path. That's a one-time step: Chrome only installs extensions from outside its Web Store this way. |
-| **Control Center** | Tyler's own Steam chat window on Windows, no Chrome needed. |
-| **Native Steam Companion (Voice Studio)** | Tyler talks in Steam voice from Windows. Needs a free virtual audio cable such as VB-Audio CABLE as Steam's microphone. |
+| **Desktop app** | Tyler on Windows, no Chrome needed: Steam text chat in its own window, and Steam voice through a free virtual audio cable (VB-CABLE) set as Steam's microphone. Voice uses **Standard** voice or **Gemini Live**. |
+| **Chrome extension** | Tyler inside Steam web chat, voice and text. Setup unpacks it to `%LOCALAPPDATA%\ROBOTIC TYLER\Chrome extension`, opens Chrome's extensions page and copies the folder path. Turn on **Developer mode**, click **Load unpacked** and paste the path (a one-time step: Chrome only adds extensions from outside its Web Store this way). |
 
-Nothing needs unzipping. The Chrome extension is inside Setup; the two apps are downloaded only if you tick them, from the same release, and each file's SHA-256 is checked before it runs. Run Setup again later to add a part, update or repair one. Each app keeps its own folder, Start-menu shortcut (under *ROBOTIC TYLER*), automatic updates and uninstaller, so removing one never affects the other. Settings, keys and themes are kept. If Windows says *"Windows protected your PC"*, Setup isn't code-signed yet: choose **More info → Run anyway**.
+Nothing needs unzipping. The desktop app is downloaded from the same release and its SHA-256 is checked before it runs. It updates itself. Settings, keys, themes and memory are kept. If Windows says *"Windows protected your PC"*, Setup isn't code-signed: choose **More info → Run anyway**.
 
-**Updating the Chrome extension:** run the newer Setup with *Chrome extension* ticked, then press **Reload** on Tyler's card in `chrome://extensions`. Already loading Tyler from a folder of your own? Keep updating that folder from the zip, or switch to Setup's folder: Chrome sees it as a new extension, so move your settings with **Settings → Advanced → Export safe settings / Import settings** (API keys aren't exported; add them again).
+**Coming from 2.14 or older?** The desktop app replaces the separate *Control Center* and *Native Steam Companion (Voice Studio)*:
+- A **Control Center** is upgraded in place (same settings, keys and memory), by Setup or by its own automatic update.
+- A **Voice Studio**'s settings, keys and device choices are imported the first time the desktop app starts. If both old apps had different settings, the app asks which to keep instead of overwriting either. It then offers to remove the old Voice Studio. Tick the listening-consent box again in Settings → Voice.
 
-Also on the release page: `ROBOTIC-TYLER-Chrome-Extension-<version>.zip`, the same extension for anyone not on Windows (unzip it and open *How to install.html*), and the `ROBOTIC-TYLER-component-…` files, which are the apps' own installers that Setup and the apps' automatic updates use. You don't need to download those.
+**Updating the Chrome extension:** run the newer Setup with *Chrome extension* ticked, then press **Reload** on Tyler's card in `chrome://extensions`.
+
+Also on the release page: `ROBOTIC-TYLER-Chrome-Extension-<version>.zip`, the same extension for anyone not on Windows (unzip it and open *How to install.html*), and the `ROBOTIC-TYLER-component-Desktop-…` installer, which Setup and the app's automatic updates use. You don't need to download it.
+
+## Voice: Standard or Gemini Live
+
+Settings → Voice picks the engine. Each keeps its own voice and model choices.
+
+- **Standard** waits for a pause, writes a reply with your AI provider (OpenRouter or Gemini) and speaks it: Grok voices through OpenRouter, or Google's voices with a Gemini key. Long replies are spoken in full.
+- **Gemini Live** is a real-time voice conversation with Google (`gemini-3.8-live`): Tyler hears the call as people talk, answers in about a second and stops when someone talks over him. It needs a Google AI key and Google bills for the audio while a session runs, so you start and stop each session yourself (in Tyler's panel in Steam, or the desktop Voice window). Your personality, reply length and rules still apply; people in the call can't change them.
+
+Tyler only ever hears the Steam voice call (Chrome) or the one output device you pick (desktop), never your microphone, and only after you confirm everyone knows he's listening.
 
 ## Quick start (Chrome)
 
@@ -28,7 +40,7 @@ Also on the release page: `ROBOTIC-TYLER-Chrome-Extension-<version>.zip`, the sa
 
 ## Themes
 
-Settings → Appearance shows every theme as a live preview card (logo, tabs, buttons, status strip and a sample notification). Pick one and press **Apply** to change every Tyler window at once: **Steam** (default), **Classic Steam (2004)**, **Team Fortress 2**, **Counter-Strike 2**, **Portal** (light), **Counter-Strike 1.6**, **Half-Life HEV suit**, **Left 4 Dead**, **Windows XP** (light) and **DOOM (classic)**. The game themes follow each game's own menu colors and shapes and use free look-alike fonts (bundled, SIL Open Font License). Each theme also has its own Tyler logo (a TF2 hard hat, a CS 1.6 balaclava, a DOOM pixel portrait and so on) that swaps in the panel, the settings, the Voice Studio and the toolbar icon, plus its own animated status strip that changes as Tyler listens, thinks and talks. No game fonts are included. The HEV, Windows XP and Portal logos show those games' and Windows' own symbols, so check them before publishing the app (see `tools/logos/README.md`).
+Settings → Appearance shows every theme as a live preview card (logo, tabs, buttons, status strip and a sample notification). Pick one and press **Apply** to change every Tyler window at once: **Steam** (default), **Classic Steam (2004)**, **Team Fortress 2**, **Counter-Strike 2**, **Portal** (light), **Counter-Strike 1.6**, **Half-Life HEV suit**, **Left 4 Dead**, **Windows XP** (light) and **DOOM (classic)**. The game themes follow each game's own menu colors and shapes and use free look-alike fonts (bundled, SIL Open Font License). Each theme also has its own Tyler logo (a TF2 hard hat, a CS 1.6 balaclava, a DOOM pixel portrait and so on) that swaps in the panel, the settings, the Voice window and the toolbar icon, plus its own animated status strip that changes as Tyler listens, thinks and talks. No game fonts are included. The HEV, Windows XP and Portal logos show those games' and Windows' own symbols, so check them before publishing the app (see `tools/logos/README.md`).
 
 ## Trivia
 
@@ -39,12 +51,13 @@ Type `play trivia` in chat for a 10-question group race: 500 questions across 10
 | Path | What it is |
 |---|---|
 | `browser-extension/` | The source for everything. Chrome loads this folder as-is. |
-| `app/`, `voice-app/` | The two Windows apps (parts of them are generated from `browser-extension/`). |
+| `app/`, `voice-app/` | The desktop app: main process, Voice window (parts are generated from `browser-extension/`). |
+| `windows-audio-bridge/` | The Windows audio helper the desktop app uses for voice (C#, NAudio). |
 | `docs/` | Feature guides (arcade, trivia, music, moderation) and older patch notes. |
 | `CHANGES.md` | What changed in each release, newest first. |
 | `RELEASING.md` | Tests, releases, automatic updates and code signing. |
 | `START-HERE.txt` | Notes for updating an existing install. |
-| `Start ROBOTIC TYLER.cmd`, `BUILD-*.cmd` | Double-click helpers for Windows: run from source, or build the installers. |
+| `Start ROBOTIC TYLER.cmd`, `BUILD-WINDOWS-EXE.cmd` | Double-click helpers for Windows: run from source, or build the installers. |
 
 ## For developers
 
@@ -52,6 +65,6 @@ Type `play trivia` in chat for a 10-question group race: 500 questions across 10
 npm install
 node tools/build.mjs          # regenerate the desktop copies after editing browser-extension/
 npm run test:all              # build check, unit tests, end-to-end tests in Chromium
-npm run build:win             # Windows: both app installers, then the setup (needs MinGW-w64)
+npm run build:win             # Windows: the desktop installer, then the setup (needs .NET 8 and MinGW-w64)
 npm run package:release       # dist/release/: Chrome zip, setup, install guide, notes, checksums
 ```

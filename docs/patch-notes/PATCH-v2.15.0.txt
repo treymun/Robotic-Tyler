@@ -1,0 +1,10 @@
+ROBOTIC TYLER v2.15.0
+
+- One Windows desktop app: Steam text chat and Steam voice without Chrome. It replaces the
+  Control Center (upgraded in place) and the Voice Studio (settings imported, then it offers
+  to remove it). Setup installs the desktop app and/or the Chrome extension.
+- Optional Gemini Live voice (gemini-3.8-live) in Chrome and on desktop: real-time, stops when
+  someone talks over Tyler, explicit Start/Stop, your Google key stays private.
+- Voice fixes: no 300-character cutoff, provider-correct voices, continuous listening on desktop.
+- One Voice settings page for both engines, devices, consent and a voice test.
+- See CHANGES.md for details and for what was and wasn't tested.
