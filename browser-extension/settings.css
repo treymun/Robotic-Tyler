@@ -255,3 +255,6 @@ body[data-voice-provider=gemini] #voiceStandard [data-provider=openrouter],body:
 /* Notifications stack above the sticky save bar, so they never cover Save settings (v2.16). */
 body .rt-fixed .rt-toasts{bottom:84px}
 @media (max-width:700px){body .rt-fixed .rt-toasts{bottom:132px}}
+
+/* v2.17: fan-project and font credit under the theme gallery */
+.tg-credit{margin:14px 0 0;max-width:72ch}

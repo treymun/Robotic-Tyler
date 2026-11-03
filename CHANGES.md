@@ -1,3 +1,44 @@
+# ROBOTIC TYLER v2.17.0: fifteen themes
+
+## Five new themes
+Settings → Appearance now offers fifteen themes. Each new one has its own colours, type, controls, status strip, notifications and motion, and its own Tyler mascot.
+- **Quake (1996):** dark stone, rusted iron plates held by bronze rivets, gothic bronze lettering. A chosen tab drops and seats into its iron frame like a heavy switch; the status strip is a molten channel that flows while Tyler talks.
+- **Fallout Pip-Boy:** one phosphor green on black glass with scan lines, inverted highlight bars and the STAT/INV/DATA tab strip. Screens and opened sections draw in with a terminal sweep; the status strip is the RADIO oscilloscope.
+- **Half-Life 2 Combine:** pale Civil Protection armour on charcoal, cyan optics, corner brackets and a unit code on the header plate. A narrow cyan scanner line crosses the status display when Tyler starts listening.
+- **Deadlock:** occult noir with brass, parchment notes, city-sign headlines and a spectral teal. An ink border draws itself around an opened section or chosen tab, then a brief spectral flare passes over it; the status strip is a row of marquee bulbs.
+- **Minecraft:** the inventory window, stone buttons whose letters turn yellow under the mouse, black text fields, a grass-block header and the hotbar as tabs. The white hotbar selector snaps onto the chosen tab; the status strip is the experience bar; notifications are advancement toasts.
+
+Fonts, all bundled under the SIL Open Font License: Grenze Gotisch and Grenze (Quake), Roboto Condensed and VT323 (Pip-Boy), Chakra Petch (Combine), Limelight and Cinzel (Deadlock), Monocraft (Minecraft).
+
+## The new mascots
+- The supplied logos are used as given, aligned the same way as the other ten so the glasses and the mechanical eye sit in the same place in every theme; switching themes swaps the outfit, not the face's position. Combine keeps its right-facing three-quarter pose, swept pale hair, rectangular glasses with the narrow cyan eye, red valve eye, angular mask and two-piece respirator (its alignment uses the near edge of the mask, since the glasses are foreshortened).
+- Minecraft is drawn without smoothing everywhere (chat panel, settings, Voice window), like DOOM.
+- Each mascot switches with the theme in the chat panel, settings, compact mode, the Voice window, the Chrome toolbar icon and the desktop window and tray icons, and is restored after a restart. The original masters and the pack's manifest are kept in `assets/theme-logos/` (left out of the installers).
+
+## The original ten, revisited
+- **Classic Steam** and **Windows XP:** drop-downs are now real VGUI and Luna combo boxes (a bevelled or pale-blue arrow button) instead of a modern chevron.
+- **Team Fortress 2:** a control-point ring fills beside the status while Tyler thinks (BLU) or waits to reconnect (RED).
+- **Counter-Strike 2:** the open tab's underline wipes out from its centre.
+- **Portal:** an orange portal opens under the chosen tab (hovering shows the blue one), and sections open with an aperture.
+- **Half-Life HEV:** choosing a tab lights its weapon slot in segments; checked boxes power up the same way.
+- **Left 4 Dead:** a flashlight beam sweeps the status strip while Tyler listens.
+- **DOOM:** the screen flashes red once on an error, like taking damage, and gold on a success, like a pickup.
+- **Steam:** success messages look like the achievement pop-up.
+- **Windows XP:** collapsing the panel shrinks it toward the corner like minimising a window.
+- Every theme: the panel eases in and out of compact mode.
+
+## Status effects follow what's actually happening
+- The speaking effect now ends the moment playback stops (or you press **Stop audio**) instead of half a second later, when the microphone hold is released.
+- All effects come from the panel's real state (listening, thinking, speaking, waiting, error), stop when their part of the panel is hidden or the theme changes, and switch off with the system's reduce-motion setting. Every state also has static feedback (label, colour and a still strip).
+
+## Tested
+- 237 unit and integration tests and 11 end-to-end tests in Chromium, including all fifteen themes' text contrast (4.5:1), fonts, logos, the gallery and live theme switching.
+- Rendered and checked in a browser: every theme expanded, collapsed, in a 320 px window and at 2× density; keyboard focus with a real keyboard; hover; the settings page and Voice window; signature motion sampled frame by frame.
+- Switching through all fifteen themes rapidly leaves only the chosen theme's animations running, starts no timers, and the logo always matches the theme. With reduce motion on, no panel animation runs in any theme.
+- The Chrome extension keeps the chosen theme, logo and font after a browser restart.
+- Not tested in a real Steam chat or on Windows, so the Windows-only fonts and the real voice timing of the speaking effect weren't seen live.
+
+---
 # ROBOTIC TYLER v2.16.1: the name tag setting now sticks
 
 ## Fixed

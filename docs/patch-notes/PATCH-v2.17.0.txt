@@ -1,0 +1,9 @@
+ROBOTIC TYLER v2.17.0
+
+- Five new themes: Quake (1996), Fallout Pip-Boy, Half-Life 2 Combine, Deadlock and Minecraft,
+  each with its own type, controls, status strip, notifications, signature motion and Tyler mascot.
+- The original ten revisited: VGUI and Luna combo boxes, a TF2 capture ring, CS2 tab wipes,
+  Portal tab portals and aperture sections, HEV segmented slots, an L4D flashlight, DOOM damage
+  and pickup flashes, a Steam achievement-style success message, XP minimise.
+- The speaking effect stops the moment audio stops. Reduce motion turns every effect off.
+- Includes everything in 2.16.1. See CHANGES.md.
