@@ -1,6 +1,6 @@
 // Settings → Appearance: the theme gallery (v2.14).
 //
-// Ten cards, one per theme, each with the theme's Tyler logo and a miniature of the
+// One card per theme (fifteen), each with the theme's Tyler logo and a miniature of the
 // real chat panel. Choosing a card updates a larger preview (status strip, tabs,
 // buttons, an input, a notification); Apply saves it for every Tyler window
 // through theme.js. Previews are built from the panel's own markup and stylesheet
@@ -11,6 +11,8 @@
  'use strict';
  const gallery=document.getElementById('themeGallery'),stage=document.getElementById('themeStage');
  const T=globalThis.TylerTheme,UI=globalThis.TylerUI;
+ // Pixel-art logos keep hard edges (the panel's canvas does the same, see ui-logos.js).
+ const PIXEL=new Set(globalThis.TylerLogos?.pixel||['doom','minecraft']);
  if(!gallery||!stage||!T||!UI)return;
  const icon=n=>globalThis.TylerIcons?.svg(n)||'';
  const kit=()=>globalThis.TylerKit?.page();
@@ -22,7 +24,7 @@
 .panel .scroll{flex:none!important;overflow:visible!important}
 .rt-static{position:relative!important;animation:none!important;box-shadow:none}
 .mark[data-logo] img.mark-art{display:block}
-.panel[data-rt-theme=doom] img.mark-art{image-rendering:pixelated}
+.panel:is([data-rt-theme=doom],[data-rt-theme=minecraft]) img.mark-art{image-rendering:pixelated}
 :host([data-card]) *,:host([data-card]) *::before,:host([data-card]) *::after{animation-play-state:paused!important;transition:none!important}
 .preview-note{margin:2px 0 10px}`;
  function styles(){
@@ -71,7 +73,7 @@
   const card=document.createElement('div');card.className='tg-card';card.dataset.theme=theme;card.setAttribute('role','radio');
   const shot=document.createElement('div');shot.className='tg-shot';const host=document.createElement('div');host.className='tg-host';host.dataset.card='';shot.append(host);
   const meta=document.createElement('div');meta.className='tg-meta';
-  const logo=document.createElement('img');logo.className='tg-logo';logo.alt='';logo.src='ui/logos/'+theme+'.png';if(theme==='doom')logo.style.imageRendering='pixelated';
+  const logo=document.createElement('img');logo.className='tg-logo';logo.alt='';logo.src='ui/logos/'+theme+'.png';if(PIXEL.has(theme))logo.style.imageRendering='pixelated';
   const title=document.createElement('span');title.className='tg-name';title.textContent=name;
   const badge=document.createElement('span');badge.className='tg-badge';badge.textContent='In use';
   meta.append(logo,title);if(light){const tag=document.createElement('span');tag.className='tg-tag';tag.textContent='Light';meta.append(tag);}meta.append(badge);
@@ -101,7 +103,7 @@
   }
   const [name,desc,light]=T.info[selected];
   $('tgName').textContent=name;$('tgDesc').textContent=desc+(light?' Light theme.':'');
-  const logo=$('tgLogo');logo.src='ui/logos/'+selected+'.png';logo.style.imageRendering=selected==='doom'?'pixelated':'';
+  const logo=$('tgLogo');logo.src='ui/logos/'+selected+'.png';logo.style.imageRendering=PIXEL.has(selected)?'pixelated':'';
   const same=selected===applied;apply.disabled=same;
   apply.querySelector('.lbl').textContent=same?'In use':'Apply '+name;
   state.textContent=same?'This is the theme every Tyler window uses now.':'Previewing '+name+'. Nothing changes until you press Apply.';

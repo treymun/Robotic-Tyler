@@ -1,0 +1,176 @@
+/*
+ * ROBOTIC TYLER "Fallout Pip-Boy style" theme (v2.17).
+ * The wrist computer's screen: one phosphor green on near-black glass, every icon and
+ * line drawn in the same green, scan lines and a soft CRT bloom. Lists highlight by
+ * inverting (a solid green bar with dark text), headings run into a ruled line, and the
+ * tab row is the STAT / INV / DATA strip with the open tab bracketed above the rule.
+ * Signature: panels and sections open with a short terminal sweep, a bright line
+ * running down the screen as it draws; the status strip is the RADIO oscilloscope.
+ * Type: "Tyler Pip-Boy" = Roboto Condensed (OFL), the condensed sans of the Fallout 4
+ * Pip-Boy; "Tyler Pip-Boy Terminal" = VT323 (OFL) for terminal readouts.
+ * Style only: original drawings; no Fallout logos, Vault Boy art or game fonts.
+ */
+[data-rt-theme=pipboy]{
+  color-scheme:dark;
+  --pb:#3dff8c;--pb-hi:#d4ffe2;--pb-mid:#2ad977;--pb-dim:#17914f;--pb-faint:#0b4527;--pb-glass:#041208;
+  --rt-bar:#03100a;--rt-bg:#041208;--rt-bg-deep:#020a05;--rt-surface:#072014;--rt-surface-2:#0a2a19;--rt-surface-3:#0d331f;
+  --rt-block:#05190e;--rt-block-hover:#0a2a18;--rt-input:#020a05;--rt-select:#0f5a32;
+  --rt-line:#17914f;--rt-line-soft:#0d4a29;--rt-line-strong:#3dff8c;
+  --rt-ink:#7dffae;--rt-ink-strong:#d4ffe2;--rt-ink-2:#6ff0a0;--rt-ink-3:#55db8e;--rt-ink-4:#45c47c;--rt-ink-disabled:#1f6b40;
+  --rt-link:#a8ffc9;--rt-link-hover:#d4ffe2;--rt-blue:#3dff8c;--rt-blue-deep:#2ad977;--rt-active:#3dff8c;
+  --rt-blue-fade:#062614;--rt-blue-fade-hover:#0c3a20;
+  --rt-green:#3dff8c;--rt-green-hover:#8affb8;--rt-green-ink:#021208;--rt-green-line:#2ad977;
+  --rt-state-standby:#45c47c;--rt-state-ready:#a8ffc9;--rt-state-listening:#3dff8c;--rt-state-thinking:#d4ffe2;--rt-state-speaking:#8affb8;--rt-state-waiting:#e6dc6a;--rt-state-error:#ff8a5c;
+  --rt-danger:#ff8a5c;--rt-danger-bg:#7a1a0e;--rt-danger-hover:#952414;--rt-danger-ink:#ffffff;--rt-success:#a8ffc9;--rt-focus:#d4ffe2;
+  --rt-accent:#3dff8c;--rt-accent-soft:rgba(61,255,140,.12);--rt-accent-line:rgba(61,255,140,.45);
+  --rt-on-accent:#021208;--rt-accent-fill:#3dff8c;--rt-meter:repeating-linear-gradient(90deg,#3dff8c 0 6px,transparent 6px 8px);--rt-marker:#d4ffe2;--rt-edge:rgba(61,255,140,.3);--rt-page-glow:#06301a;
+  --rt-font:"Tyler Pip-Boy","Roboto Condensed","Arial Narrow",Arial,sans-serif;--rt-font-display:"Tyler Pip-Boy","Roboto Condensed","Arial Narrow",Arial,sans-serif;
+  --pb-term:"Tyler Pip-Boy Terminal","Consolas","Courier New",monospace;
+  --rt-text-xs:12px;--rt-text-sm:13px;--rt-text-md:14px;--rt-text-lg:16px;--rt-track:.08em;
+  --rt-r-xs:0;--rt-r-sm:0;--rt-r-md:0;--rt-r-lg:6px;--rt-shadow-float:0 0 0 1px #0d4a29,0 0 30px rgba(61,255,140,.12),0 20px 50px rgba(0,0,0,.8);
+  --pb-scan:repeating-linear-gradient(0deg,rgba(0,0,0,.2) 0 1px,transparent 1px 3px);
+  --pb-glow:0 0 6px rgba(61,255,140,.55);
+  --pb-bloom:radial-gradient(120% 90% at 50% 40%,rgba(61,255,140,.07),transparent 70%);
+}
+.panel[data-rt-theme=pipboy]{background:var(--pb-bloom),radial-gradient(140% 100% at 50% 50%,transparent 60%,rgba(0,0,0,.55)),#041208;border:1px solid var(--pb-dim);box-shadow:var(--rt-shadow-float),inset 0 0 40px rgba(0,0,0,.6)}
+/* Scan lines over the whole screen; the logo sits above them so its artwork stays untouched */
+.panel[data-rt-theme=pipboy]::after{content:"";position:absolute;inset:0;pointer-events:none;background:var(--pb-scan);z-index:45}
+.panel[data-rt-theme=pipboy] .mark{z-index:46}
+[data-rt-theme=pipboy] body{background:var(--pb-bloom) fixed,#041208}
+[data-rt-theme=pipboy] body::after{content:"";position:fixed;inset:0;pointer-events:none;background:var(--pb-scan);z-index:2147482000}
+[data-rt-theme=pipboy] main{background:transparent}
+[data-rt-theme=pipboy] :is(h1,h2,h3,.wordmark,.brand-text strong,.sheet-head h2,.card>h2,details.feature>summary,.marquee,button,label,.tally-label,.stat dt,.pulse dt,.ident-sub,.facts b,.matrix dt,.pad span,.tabs button,.section-nav button,nav:not(.tabs) button){font-family:var(--rt-font-display);text-transform:uppercase}
+[data-rt-theme=pipboy] :is(h1,h2,.sheet-head h2,.card>h2,.wordmark,.brand-text strong){font-weight:700;color:var(--pb);letter-spacing:.08em;text-shadow:var(--pb-glow)}
+[data-rt-theme=pipboy] h2{font-size:18px}
+[data-rt-theme=pipboy] h1{font-size:30px}
+/* Headings run into a ruled line, like the Pip-Boy's section headers */
+[data-rt-theme=pipboy] :is(.view-head h2,.sheet-head h2,.card>h2){display:flex;align-items:center;gap:10px}
+[data-rt-theme=pipboy] :is(.view-head h2,.sheet-head h2,.card>h2)::after{content:"";flex:1;height:2px;background:var(--pb-dim);box-shadow:0 0 4px rgba(61,255,140,.35)}
+[data-rt-theme=pipboy] .wordmark{font-size:18px;letter-spacing:.14em}
+[data-rt-theme=pipboy] :is(.ident-sub,.stat dt,.pulse dt,label:not(:has(>input[type=checkbox])):not(.toggle)){font-weight:400;letter-spacing:.12em;color:var(--rt-ink-3)}
+[data-rt-theme=pipboy] label:has(>input[type=checkbox]),[data-rt-theme=pipboy] .toggle{text-transform:none;letter-spacing:0}
+[data-rt-theme=pipboy] :is(p,small,.hint,.tally-text){text-shadow:0 0 3px rgba(61,255,140,.3)}
+[data-rt-theme=pipboy] .stat dd,[data-rt-theme=pipboy] .pulse dd{font-family:var(--pb-term);font-weight:400;font-size:26px;line-height:.95;letter-spacing:.02em;color:var(--pb-hi);text-shadow:var(--pb-glow)}
+[data-rt-theme=pipboy] .stat small{color:var(--rt-ink-4)}
+/* Glass boxes edged in dim green */
+[data-rt-theme=pipboy] .bar{background:transparent;border-bottom:2px solid var(--pb-dim);box-shadow:0 2px 6px rgba(61,255,140,.12)}
+[data-rt-theme=pipboy] .bar .icon-btn{color:var(--pb);border:1px solid var(--pb-dim);background:transparent;border-radius:0}
+[data-rt-theme=pipboy] :where(details,.callout,.quick-help,.confirm,.deck-entry,.board-tools,.sheet,.card,.route-card,.panel,.mini-callout>div,.usage-banner,.facts>div,.matrix>div,#setup,.arcade-tickets>div){background:rgba(61,255,140,.03);border:1px solid var(--pb-faint);border-radius:0}
+[data-rt-theme=pipboy] :is(.quick-help,.confirm,#setup,.deck-entry){border-left:3px solid var(--pb)}
+[data-rt-theme=pipboy] details.feature>summary{font-size:14px;font-weight:700;letter-spacing:.1em;color:var(--pb)}
+[data-rt-theme=pipboy] details.feature>summary:hover{color:var(--rt-green-ink);background:var(--pb);text-shadow:none}
+[data-rt-theme=pipboy] details.feature>summary:hover :is(.feature-meta,.ic){color:var(--rt-green-ink)}
+[data-rt-theme=pipboy] .stats{background:transparent;gap:6px;padding:0}
+[data-rt-theme=pipboy] .stat{padding:6px 8px;border:1px solid var(--pb-faint);background:rgba(61,255,140,.04)}
+[data-rt-theme=pipboy] .stat:first-child{border-left:1px solid var(--pb-faint)}
+/* The STAT / INV / DATA strip: a rule under the tabs, the open tab bracketed above it */
+[data-rt-theme=pipboy] .tabs{gap:2px;padding:6px 8px 0;background:transparent;box-shadow:none;border-bottom:2px solid var(--pb)}
+[data-rt-theme=pipboy] .tabs button{padding:6px 2px 5px;margin-bottom:-2px;font-size:13px;font-weight:700;letter-spacing:.1em;color:var(--pb-dim);background:transparent;border:2px solid transparent;border-bottom:0;border-radius:0}
+[data-rt-theme=pipboy] .tabs button .ic{--ic-size:13px;opacity:.8}
+[data-rt-theme=pipboy] .tabs button:hover{color:var(--pb);background:rgba(61,255,140,.06)}
+[data-rt-theme=pipboy] .tabs button[aria-selected=true]{color:var(--pb-hi);background:var(--rt-bg);border-color:var(--pb);text-shadow:var(--pb-glow)}
+[data-rt-theme=pipboy] .side{background:rgba(0,0,0,.3);box-shadow:inset -2px 0 0 var(--pb-dim)}
+[data-rt-theme=pipboy] :is(.section-nav button,nav:not(.tabs) button){font-size:14px;font-weight:700;letter-spacing:.08em;color:var(--pb-mid);background:transparent;border:0;border-radius:0;box-shadow:none}
+[data-rt-theme=pipboy] :is(.section-nav button,nav:not(.tabs) button):hover{color:var(--rt-green-ink);background:var(--pb-mid)}
+[data-rt-theme=pipboy] :is(.section-nav button,nav:not(.tabs) button):hover .ic{color:var(--rt-green-ink)}
+[data-rt-theme=pipboy] :is(.section-nav button[aria-current=page],nav:not(.tabs) button.active){color:var(--rt-green-ink);background:var(--pb);text-shadow:none;box-shadow:0 0 10px rgba(61,255,140,.4)}
+[data-rt-theme=pipboy] :is(.section-nav button[aria-current=page],nav:not(.tabs) button.active) .ic{color:var(--rt-green-ink)}
+/* Buttons: outlined; the highlight inverts to a solid green bar */
+[data-rt-theme=pipboy] button{font-size:13px;font-weight:700;letter-spacing:.1em;color:var(--pb);background:transparent;border:1px solid var(--pb-dim);border-radius:0;box-shadow:none;text-shadow:var(--pb-glow)}
+[data-rt-theme=pipboy] button:hover{color:var(--rt-green-ink);background:var(--pb);border-color:var(--pb);text-shadow:none;box-shadow:0 0 12px rgba(61,255,140,.45)}
+[data-rt-theme=pipboy] button:hover .ic{color:var(--rt-green-ink)}
+[data-rt-theme=pipboy] button:active:not(:disabled){background:var(--pb-hi);transform:none}
+[data-rt-theme=pipboy] :is(.primary,#start,#save){color:var(--rt-green-ink);background:var(--pb);border-color:var(--pb);text-shadow:none}
+[data-rt-theme=pipboy] :is(.primary,#start,#save) .ic{color:var(--rt-green-ink)}
+[data-rt-theme=pipboy] :is(.primary,#start,#save):hover{background:var(--pb-hi);border-color:var(--pb-hi)}
+[data-rt-theme=pipboy] .danger{color:#ffd0bd;background:transparent;border-color:#ff8a5c;text-shadow:0 0 6px rgba(255,138,92,.5)}
+[data-rt-theme=pipboy] .danger:hover{color:#ffffff;background:var(--rt-danger-bg);border-color:#ff8a5c}
+[data-rt-theme=pipboy] :is(.ghost,.icon,.icon-btn){background:transparent;border-color:transparent}
+[data-rt-theme=pipboy] :is(.pad,.friend-card,.preset,.link-btn){font-family:var(--rt-font);text-transform:none;letter-spacing:.02em;font-weight:400}
+[data-rt-theme=pipboy] .link-btn{border:0;background:none;color:var(--rt-link)}
+[data-rt-theme=pipboy] button:disabled{color:var(--rt-ink-disabled);background:transparent;border-color:var(--pb-faint);text-shadow:none;box-shadow:none}
+/* Fields: black glass with a green edge and caret */
+[data-rt-theme=pipboy] input:where(:not([type=checkbox],[type=radio],[type=range],[type=file])),[data-rt-theme=pipboy] :is(textarea,select){color:var(--pb-hi);caret-color:var(--pb);background-color:#020a05;border:1px solid var(--pb-dim);border-radius:0;box-shadow:inset 0 0 10px rgba(61,255,140,.06);font-family:var(--rt-font)}
+[data-rt-theme=pipboy] select{background-image:linear-gradient(45deg,transparent 50%,var(--pb) 50%),linear-gradient(135deg,var(--pb) 50%,transparent 50%)}
+[data-rt-theme=pipboy] :is(input,textarea,select):focus{border-color:var(--pb);box-shadow:0 0 0 1px var(--pb),0 0 12px rgba(61,255,140,.3)}
+[data-rt-theme=pipboy] input::placeholder,[data-rt-theme=pipboy] textarea::placeholder{color:#2f9c5f}
+[data-rt-theme=pipboy] input[type=checkbox],[data-rt-theme=pipboy] .toggle>input[type=checkbox]{width:16px;height:16px;background:transparent;border:2px solid var(--pb);border-radius:0;box-shadow:none}
+[data-rt-theme=pipboy] .toggle>input[type=checkbox]::after{display:none}
+/* Checked = the small filled square the Pip-Boy shows beside an equipped item */
+[data-rt-theme=pipboy] input[type=checkbox]:checked,[data-rt-theme=pipboy] .toggle>input[type=checkbox]:checked{background:transparent;border-color:var(--pb)}
+[data-rt-theme=pipboy] input[type=checkbox]:checked::after,[data-rt-theme=pipboy] .toggle>input[type=checkbox]:checked::after{display:block;content:"";position:absolute;inset:2px;width:auto;height:auto;background:var(--pb);border:0;border-radius:0;transform:none;box-shadow:0 0 6px rgba(61,255,140,.8)}
+[data-rt-theme=pipboy] input[type=range]{accent-color:var(--pb)}
+[data-rt-theme=pipboy] :is(pre,.output,.v22-log,.response){font-family:var(--pb-term);font-size:16px;line-height:1.2;color:var(--pb);background:#020a05;border:1px solid var(--pb-faint);box-shadow:none}
+[data-rt-theme=pipboy] :is(.meter,.arcade-progress,.lat-track){background:#020a05;border-radius:0;box-shadow:inset 0 0 0 1px var(--pb-dim)}
+[data-rt-theme=pipboy] .pill{color:var(--pb);background:transparent;border-radius:0;box-shadow:inset 0 0 0 1px var(--pb-dim)}
+/* Soundboard rows are inventory entries: hover inverts, the playing one is "equipped" */
+[data-rt-theme=pipboy] .pad{background:transparent;border:1px solid var(--pb-faint);border-radius:0}
+[data-rt-theme=pipboy] .pad b{color:var(--pb-hi)}
+[data-rt-theme=pipboy] .pad span{color:var(--pb-dim)}
+[data-rt-theme=pipboy] .pad::after{border-left-color:var(--pb)}
+[data-rt-theme=pipboy] .pad:hover{background:var(--pb);border-color:var(--pb)}
+[data-rt-theme=pipboy] .pad:hover :is(b,span){color:var(--rt-green-ink);text-shadow:none}
+[data-rt-theme=pipboy] .pad:hover::after{border-left-color:var(--rt-green-ink)}
+[data-rt-theme=pipboy] .pad.playing{background:rgba(61,255,140,.12);box-shadow:inset 6px 0 0 -2px var(--pb)}
+[data-rt-theme=pipboy] :is(.step-n,.setup-n,.friend-card .avatar){font-family:var(--pb-term);font-size:18px;color:var(--rt-green-ink);background:var(--pb);border-radius:0}
+[data-rt-theme=pipboy] code{font-family:var(--pb-term);font-size:1.15em;color:var(--pb-hi);background:#020a05}
+[data-rt-theme=pipboy] .savebar,[data-rt-theme=pipboy] .foot{background:#020d07;box-shadow:inset 0 2px 0 var(--pb-dim)}
+[data-rt-theme=pipboy] .foot small{color:var(--rt-ink-3)}
+[data-rt-theme=pipboy] .route li{background:transparent;box-shadow:inset 0 0 0 1px var(--pb-faint)}
+[data-rt-theme=pipboy] .route li:last-child{background:rgba(61,255,140,.1);box-shadow:inset 3px 0 0 var(--pb)}
+[data-rt-theme=pipboy] :is(.scroll,.content,main){scrollbar-color:var(--pb-dim) #020a05}
+html[data-rt-theme=pipboy]{scrollbar-color:var(--pb-dim) #020a05}
+
+/* ── Status strip: the RADIO oscilloscope ──
+   A graticule screen under the status line with the radio waveform on it: a gentle wave
+   while Tyler listens, a tall fast signal while he talks, a scanning dash while he thinks,
+   and a blinking flat line on an error. Idle is a still, flat trace. */
+[data-rt-theme=pipboy] .tally{background:transparent;border:1px solid var(--pb-dim);border-radius:0;padding-bottom:34px;box-shadow:inset 0 0 18px rgba(61,255,140,.06)}
+[data-rt-theme=pipboy] .tally-light{width:10px;height:10px;align-self:flex-start;margin-top:3px;border-radius:0;background:var(--tone);box-shadow:0 0 8px var(--tone)!important}
+[data-rt-theme=pipboy] .tally-label{font-weight:700;letter-spacing:.14em;color:var(--tone);text-shadow:0 0 6px color-mix(in srgb,var(--tone) 60%,transparent)}
+[data-rt-theme=pipboy] .tally-wave{display:none}
+[data-rt-theme=pipboy] .tally::before{content:"";position:absolute;left:10px;right:10px;bottom:7px;height:20px;pointer-events:none;
+  background:linear-gradient(var(--pb-faint),var(--pb-faint)) 0 50%/100% 1px no-repeat,repeating-linear-gradient(90deg,rgba(61,255,140,.14) 0 1px,transparent 1px 20px);border:1px solid var(--pb-faint)}
+[data-rt-theme=pipboy] .tally::after{content:"";position:absolute;left:11px;right:11px;bottom:8px;height:18px;pointer-events:none;filter:drop-shadow(0 0 3px rgba(61,255,140,.8));
+  background:linear-gradient(var(--tone),var(--tone)) 0 50%/100% 2px no-repeat}
+[data-rt-theme=pipboy] .tally[data-state=listening]::after{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='18'%3E%3Cpath d='M0 9 Q5 5 10 9 T20 9 T30 9 T40 9' fill='none' stroke='%233dff8c' stroke-width='1.6'/%3E%3C/svg%3E") 0 0/40px 18px repeat-x;animation:pb-scope 2.4s linear infinite}
+[data-rt-theme=pipboy] .tally[data-state=speaking]::after{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='18'%3E%3Cpath d='M0 9 Q3 0 6 9 T12 9 T18 9 T24 9' fill='none' stroke='%238affb8' stroke-width='1.8'/%3E%3C/svg%3E") 0 0/24px 18px repeat-x;animation:pb-scope-fast .45s linear infinite}
+[data-rt-theme=pipboy] .tally[data-state=thinking]::after{background:linear-gradient(90deg,transparent 0 45%,var(--pb-hi) 45% 55%,transparent 55%) 0 50%/40% 2px no-repeat,linear-gradient(var(--pb-faint),var(--pb-faint)) 0 50%/100% 2px no-repeat;animation:pb-seek 1.2s ease-in-out infinite alternate}
+[data-rt-theme=pipboy] .tally[data-state=error]::after{background:linear-gradient(#ff8a5c,#ff8a5c) 0 50%/100% 2px no-repeat;filter:drop-shadow(0 0 3px rgba(255,138,92,.9));animation:pb-blink .8s steps(1) infinite}
+@keyframes pb-scope{from{background-position:0 0}to{background-position:-40px 0}}
+@keyframes pb-scope-fast{from{background-position:0 0}to{background-position:-24px 0}}
+@keyframes pb-seek{from{background-position:0 50%,0 50%}to{background-position:100% 50%,0 50%}}
+@keyframes pb-blink{0%{opacity:1}50%{opacity:.2}}
+
+/* The logo sits behind the screen's bezel, above the scan lines */
+[data-rt-theme=pipboy] :is(.mark[data-logo],img.mark,#brand-logo){--logo-pad:2px;background:radial-gradient(circle at 50% 45%,#0b3a20,#020a05 75%);border:1px solid var(--pb-dim);border-radius:0;box-shadow:0 0 8px rgba(61,255,140,.25)}
+[data-rt-theme=pipboy] .mark[data-logo]{width:40px;height:40px;margin:-5px 0}
+
+/* ── Icons, dialogs, notifications and tooltips ──
+   One-colour line icons in the screen's green. Messages are terminal printouts: black glass,
+   a green rule, a ">" prompt before the title. */
+[data-rt-theme=pipboy] .ic{--ic-w:1.7px;--ic-cap:square;--ic-join:miter;--ic-color:currentColor;color:currentColor;filter:drop-shadow(0 0 2px rgba(61,255,140,.6))}
+[data-rt-theme=pipboy] .ic[data-i] {--ic-color:currentColor}
+[data-rt-theme=pipboy] :is(.rt-toast,.rt-dialog){background:var(--pb-scan),#020d07;border:1px solid var(--pb);border-radius:0;box-shadow:0 0 18px rgba(61,255,140,.22),0 14px 34px rgba(0,0,0,.7)}
+[data-rt-theme=pipboy] .rt-toast{border-left:4px solid var(--tone)}
+[data-rt-theme=pipboy] :is(.rt-toast,.rt-dialog)[data-kind=error]{border-color:#ff8a5c}
+[data-rt-theme=pipboy] :is(.rt-toast-title,.rt-dialog-title){font-family:var(--rt-font-display);font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--pb-hi);text-shadow:var(--pb-glow)}
+[data-rt-theme=pipboy] :is(.rt-toast-title,.rt-dialog-title)::before{content:"> ";color:var(--pb)}
+[data-rt-theme=pipboy] :is(.rt-toast-text,.rt-dialog-text,.rt-steps){color:var(--rt-ink)}
+[data-rt-theme=pipboy] .rt-tip{background:#020d07;color:var(--pb);border:1px solid var(--pb-dim);border-radius:0;font-family:var(--rt-font);letter-spacing:.04em}
+
+/* ── Motion: Pip-Boy ──
+   Signature: a screen, settings section or opened panel draws in from the top in a few
+   quick steps while a bright scan line sweeps down it, the way the Pip-Boy redraws a page.
+   Notifications print in the same way, the highlight snaps instantly (no fades), and the
+   logo's bezel glows with the signal while Tyler talks. */
+@keyframes pb-draw{0%{clip-path:inset(0 0 100% 0)}100%{clip-path:inset(0 0 0 0)}}
+@keyframes pb-sweep{0%{top:0;opacity:1}90%{opacity:1}100%{top:100%;opacity:0}}
+@keyframes pb-signal{0%,100%{box-shadow:0 0 6px rgba(61,255,140,.25)}50%{box-shadow:0 0 16px rgba(61,255,140,.75)}}
+[data-rt-theme=pipboy] :is(.view,.sheet,section[data-view]){position:relative}
+[data-rt-theme=pipboy] :is(.view:not([hidden]),.sheet,section[data-view]:not([hidden])){animation:pb-draw .32s steps(8,end) backwards}
+[data-rt-theme=pipboy] :is(.view:not([hidden]),section[data-view]:not([hidden]))::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;opacity:0;pointer-events:none;z-index:5;
+  background:var(--pb-hi);box-shadow:0 0 10px var(--pb),0 0 22px rgba(61,255,140,.6);animation:pb-sweep .32s linear}
+[data-rt-theme=pipboy] details.feature[open]>:not(summary){animation:pb-draw .24s steps(6,end) backwards}
+[data-rt-theme=pipboy] .rt-toast:not(.rt-leaving){animation:pb-draw .28s steps(7,end) backwards}
+[data-rt-theme=pipboy] .panel:has(.tally[data-state=speaking]) .mark[data-logo],.panel[data-rt-theme=pipboy]:has(.tally[data-state=speaking]) .mark[data-logo]{animation:pb-signal .9s ease-in-out infinite}

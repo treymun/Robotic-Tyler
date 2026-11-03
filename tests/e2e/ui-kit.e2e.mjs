@@ -11,7 +11,7 @@ import {createRequire} from 'node:module';
 const require=createRequire(import.meta.url);
 const {chromium}=require('playwright');
 const ROOT=path.resolve(import.meta.dirname,'../..');
-const THEMES=['steam','classic','tf2','cs2','portal','cs16','hev','l4d','winxp','doom'];
+const THEMES=['steam','classic','tf2','cs2','portal','cs16','hev','l4d','winxp','doom','quake','pipboy','combine','deadlock','minecraft'];
 const types={'.html':'text/html','.js':'text/javascript','.mjs':'text/javascript','.css':'text/css','.json':'application/json','.svg':'image/svg+xml','.png':'image/png','.webp':'image/webp','.woff2':'font/woff2'};
 const serve=()=>http.createServer((req,res)=>{
  const file=path.join(ROOT,decodeURIComponent(new URL(req.url,'http://x').pathname));
@@ -23,13 +23,13 @@ const mock=theme=>{const store={uiTheme:theme};window.__writes=[];
  window.chrome={storage:{local:{get:async()=>({...store}),set:async v=>{window.__writes.push(v);Object.assign(store,v);},remove:async()=>{}}},tabs:{create:()=>{},query:async()=>[]}};
  window.tylerSettings={storage:{local:window.chrome.storage.local},tabs:{create:async()=>{}},verifyKey:async()=>true,activity:async()=>[]};};
 
-test('Settings → Appearance: ten live previews, keyboard selection, Apply and Undo, no outside requests',async()=>{
+test('Settings → Appearance: fifteen live previews, keyboard selection, Apply and Undo, no outside requests',async()=>{
  const server=serve(),browser=await chromium.launch(),base='http://127.0.0.1:'+server.address().port;
  try{
   const page=await browser.newPage({viewport:{width:1360,height:900}});const errors=[],outside=[];
   page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>{if(!r.url().startsWith(base)&&!r.url().startsWith('data:'))outside.push(r.url());});
   await page.addInitScript(mock,'cs2');await page.goto(base+'/browser-extension/settings.html#appearance');
-  await page.waitForFunction(()=>document.querySelectorAll('#themeGallery .tg-card').length===10);
+  await page.waitForFunction(()=>document.querySelectorAll('#themeGallery .tg-card').length===15);
   // One card per theme, each a radio with its logo and a real panel preview in its own shadow root.
   const cards=await page.evaluate(()=>[...document.querySelectorAll('#themeGallery .tg-card')].map(c=>({theme:c.dataset.theme,role:c.getAttribute('role'),checked:c.getAttribute('aria-checked'),tab:c.tabIndex,
    preview:c.querySelector('.tg-host').shadowRoot?.querySelector('.panel')?.dataset.rtTheme,inert:c.querySelector('.tg-host').inert,label:c.getAttribute('aria-label')})));
@@ -48,20 +48,20 @@ test('Settings → Appearance: ten live previews, keyboard selection, Apply and 
    stage:document.querySelector('#themeStage .tg-host').shadowRoot.querySelector('.panel').dataset.rtTheme,page:document.documentElement.dataset.rtTheme,
    apply:document.getElementById('tgApply').textContent.trim(),disabled:document.getElementById('tgApply').disabled}));
   assert.deepEqual(await sel(),{selected:'portal',focus:'portal',stage:'portal',page:'cs2',apply:'Apply Portal',disabled:false});
-  await page.keyboard.press('End');assert.equal((await sel()).selected,'doom');
+  await page.keyboard.press('End');assert.equal((await sel()).selected,'minecraft');
   await page.keyboard.press('Home');assert.equal((await sel()).selected,'steam');
-  await page.keyboard.press('ArrowLeft');assert.equal((await sel()).selected,'doom','arrows wrap around');
+  await page.keyboard.press('ArrowLeft');assert.equal((await sel()).selected,'minecraft','arrows wrap around');
   // The large preview shows tabs, buttons, an input, the status strip and a notification.
   const stage=await page.evaluate(()=>{const r=document.querySelector('#themeStage .tg-host').shadowRoot;return {tabs:r.querySelectorAll('.tabs button').length,input:!!r.querySelector('input'),buttons:r.querySelectorAll('.btn').length>=2,strip:r.querySelector('.tally')?.dataset.state,toast:!!r.querySelector('.rt-toast'),pixelIcons:getComputedStyle(r.querySelector('.tabs .ic-p')).display!=='none'};});
   assert.deepEqual(stage,{tabs:5,input:true,buttons:true,strip:'speaking',toast:true,pixelIcons:true});
   assert.equal(await page.evaluate(()=>window.__writes.length),0,'previewing saves nothing');
   // Apply with the keyboard (Tab to the button), then Undo from the notification.
   await page.focus('#tgApply');await page.keyboard.press('Enter');
-  await page.waitForFunction(()=>document.documentElement.dataset.rtTheme==='doom');
-  assert.deepEqual(await page.evaluate(()=>window.__writes.at(-1)),{uiTheme:'doom'});
+  await page.waitForFunction(()=>document.documentElement.dataset.rtTheme==='minecraft');
+  assert.deepEqual(await page.evaluate(()=>window.__writes.at(-1)),{uiTheme:'minecraft'});
   const after=await page.evaluate(()=>({badge:document.querySelector('.tg-card[data-applied=true]').dataset.theme,chip:document.getElementById('uiThemeName').textContent,disabled:document.getElementById('tgApply').disabled,
    toast:document.querySelector('.rt-toast[data-kind=success] .rt-toast-title')?.textContent,role:document.querySelector('.rt-toast')?.getAttribute('role')}));
-  assert.deepEqual(after,{badge:'doom',chip:'DOOM (classic)',disabled:true,toast:'Theme applied',role:'status'});
+  assert.deepEqual(after,{badge:'minecraft',chip:'Minecraft',disabled:true,toast:'Theme applied',role:'status'});
   await page.click('.rt-toast .rt-toast-actions button');
   await page.waitForFunction(()=>document.documentElement.dataset.rtTheme==='cs2');
   assert.deepEqual(await page.evaluate(()=>window.__writes.at(-1)),{uiTheme:'cs2'});
@@ -132,9 +132,10 @@ test('the chat panel: themed icons in every theme, notifications, dialogs and to
      return {name:ic.dataset.i,label:b.querySelector('.tab-label').textContent,size:box.width>=12&&box.height>=12,mode:getComputedStyle(p).display!=='none'?'pixel':getComputedStyle(v).display!=='none'?'vector':'none'};});});
    assert.deepEqual(icons.map(i=>i.name),['chat','room','sounds','setup','checks'],theme);
    assert.ok(icons.every(i=>i.size&&i.label),theme+': every tab keeps its label and a visible icon');
-   assert.deepEqual([...new Set(icons.map(i=>i.mode))],[theme==='doom'?'pixel':'vector'],theme+' icon style');
+   assert.deepEqual([...new Set(icons.map(i=>i.mode))],[theme==='doom'||theme==='minecraft'?'pixel':'vector'],theme+' icon style');
   }
   // Notifications and dialogs are built inside the panel, so the theme applies to them.
+  await page.evaluate(()=>{for(const fn of listeners)fn({type:'storage:changed',changes:{uiTheme:{newValue:'doom'}}});});
   await page.evaluate(()=>TylerCompanion.notify({kind:'error',title:'Couldn’t connect',text:'Try again.',action:{label:'Try again',run(){}}}));
   const toast=await page.evaluate(()=>{const r=document.getElementById('tyler-companion-root').shadowRoot,t=r.querySelector('.panel .rt-toast');return {inside:!!t,role:t?.getAttribute('role'),bg:getComputedStyle(t).backgroundImage};});
   assert.equal(toast.inside,true);assert.equal(toast.role,'alert');assert.notEqual(toast.bg,'none','the DOOM skin paints the notification in stone');

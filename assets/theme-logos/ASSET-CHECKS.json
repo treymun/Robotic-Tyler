@@ -1,0 +1,107 @@
+[
+  {
+    "theme": "quake",
+    "masterSize": [
+      1254,
+      1254
+    ],
+    "masterMode": "RGBA",
+    "alphaVerified": true,
+    "exportSizes": [
+      16,
+      24,
+      32,
+      48,
+      64,
+      128,
+      256,
+      512,
+      1024
+    ],
+    "sha256": "2b8d7ef47d916160267b9abe4e8c87f105303eaea8d6e7f8826af6687518f1e2"
+  },
+  {
+    "theme": "pipboy",
+    "masterSize": [
+      1254,
+      1254
+    ],
+    "masterMode": "RGBA",
+    "alphaVerified": true,
+    "exportSizes": [
+      16,
+      24,
+      32,
+      48,
+      64,
+      128,
+      256,
+      512,
+      1024
+    ],
+    "sha256": "2b14b9a4228130f381122dd1f2a594ea9ce3b43b702294aa9c3472d37105026c"
+  },
+  {
+    "theme": "combine",
+    "masterSize": [
+      1254,
+      1254
+    ],
+    "masterMode": "RGBA",
+    "alphaVerified": true,
+    "exportSizes": [
+      16,
+      24,
+      32,
+      48,
+      64,
+      128,
+      256,
+      512,
+      1024
+    ],
+    "sha256": "7cec365d6f4b65eac86eb5b24705d31e6bad54c18aac3d82a9191bef1a1b1a8b"
+  },
+  {
+    "theme": "deadlock",
+    "masterSize": [
+      1254,
+      1254
+    ],
+    "masterMode": "RGBA",
+    "alphaVerified": true,
+    "exportSizes": [
+      16,
+      24,
+      32,
+      48,
+      64,
+      128,
+      256,
+      512,
+      1024
+    ],
+    "sha256": "ba168bb19bf21a2749a5a04b408b70f5f1582c4ab0f8ab3842896ce783df67c7"
+  },
+  {
+    "theme": "minecraft",
+    "masterSize": [
+      1254,
+      1254
+    ],
+    "masterMode": "RGBA",
+    "alphaVerified": true,
+    "exportSizes": [
+      16,
+      24,
+      32,
+      48,
+      64,
+      128,
+      256,
+      512,
+      1024
+    ],
+    "sha256": "5ba1adf90e581eb9b3ef0405558aa2ae54b0a9eb2e9a8ade53e503dc150e8e28"
+  }
+]

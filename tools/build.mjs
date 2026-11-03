@@ -110,7 +110,7 @@ export function compileFonts(){
 // panel, so the panel decodes embedded bytes with createImageBitmap (no request,
 // so no page policy applies) and draws them on a canvas. Steam is the fallback.
 export const LOGO_THEMES=['steam',...THEMES.map(t=>t.replace(/\.css$/,''))];
-export const PIXEL_LOGOS=['doom'];
+export const PIXEL_LOGOS=['doom','minecraft'];
 export function compileLogos(){
  const dir=path.join(EXT,'ui','logos'),data={};
  for(const t of LOGO_THEMES){

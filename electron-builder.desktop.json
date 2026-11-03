@@ -11,6 +11,7 @@
     "app/**/*",
     "voice-app/**/*",
     "assets/**/*",
+    "!assets/theme-logos/**/*",
     "!**/*.map",
     "!**/node_modules/.cache/**/*",
     "!app/desktop-overrides/**/*"

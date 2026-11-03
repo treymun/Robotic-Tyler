@@ -9,7 +9,7 @@
 (() => {
  'use strict';
  const store=globalThis.tylerSettings?.storage?.local||globalThis.chrome?.storage?.local;
- const THEMES=['steam','classic','tf2','cs2','portal','cs16','hev','l4d','winxp','doom'];
+ const THEMES=['steam','classic','tf2','cs2','portal','cs16','hev','l4d','winxp','doom','quake','pipboy','combine','deadlock','minecraft'];
  // [name, one-line description, light?]
  const INFO={
   steam:['Steam','Today’s Steam: navy panels, blue highlights and a friends-list header.',false],
@@ -22,6 +22,11 @@
   l4d:['Left 4 Dead','Grimy survival notices, stencil type and a heart monitor.',false],
   winxp:['Windows XP','Luna blue title bars, beige windows and green progress bars.',true],
   doom:['DOOM (classic)','Stone and metal panels, red pixel lettering and keycard status.',false],
+  quake:['Quake (1996)','Weathered bronze on dark stone, rusted iron plates and carved runes.',false],
+  pipboy:['Fallout Pip-Boy','A phosphor-green terminal: monochrome icons, scan lines and a screen sweep.',false],
+  combine:['Half-Life 2 Combine','Pale Civil Protection armour, charcoal panels and a cyan scanner line.',false],
+  deadlock:['Deadlock','Occult noir: brass, parchment, vintage city signs and a spectral teal glow.',false],
+  minecraft:['Minecraft','Inventory slots, square buttons, pixel letters and a hotbar highlight.',true],
  };
  const clean=v=>THEMES.includes(v)?v:'steam';
  const root=document.documentElement;

@@ -25,3 +25,25 @@
 @font-face{font-family:"Tyler HEV";src:url("hev-400.woff2") format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
 /*   Tyler CS16 HUD  Russo One (Latin)      chunky squared HUD numbers */
 @font-face{font-family:"Tyler CS16 HUD";src:url("cs16-hud-400.woff2") format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
+/* v2.17, the five new themes:
+ *   Tyler Quake            Grenze Gotisch (Latin)     gothic-industrial capitals, like the 1996 title lettering
+ *   Tyler Quake Text       Grenze (Latin)             the readable serif sibling for text and buttons
+ *   Tyler Pip-Boy          Roboto Condensed (Latin)   the condensed sans of the Fallout 4 Pip-Boy screens
+ *   Tyler Pip-Boy Terminal VT323 (Latin)              phosphor terminal readouts
+ *   Tyler Combine          Chakra Petch (Latin)       chamfered, clinical Overwatch signage
+ *   Tyler Deadlock         Limelight (Latin)          vintage city-sign headlines
+ *   Tyler Deadlock Caps    Cinzel (Latin)             engraved capitals for labels and tabs
+ *   Tyler Minecraft        Monocraft (Latin subset)   blocky pixel letters in the Minecraft style
+ */
+@font-face{font-family:"Tyler Quake";src:url("quake-700.woff2") format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
+@font-face{font-family:"Tyler Quake Text";src:url("quake-text-400.woff2") format("woff2");font-weight:100 500;font-style:normal;font-display:swap}
+@font-face{font-family:"Tyler Quake Text";src:url("quake-text-600.woff2") format("woff2");font-weight:600 900;font-style:normal;font-display:swap}
+@font-face{font-family:"Tyler Pip-Boy";src:url("pipboy-400.woff2") format("woff2");font-weight:100 500;font-style:normal;font-display:swap}
+@font-face{font-family:"Tyler Pip-Boy";src:url("pipboy-700.woff2") format("woff2");font-weight:600 900;font-style:normal;font-display:swap}
+@font-face{font-family:"Tyler Pip-Boy Terminal";src:url("pipboy-terminal-400.woff2") format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
+@font-face{font-family:"Tyler Combine";src:url("combine-400.woff2") format("woff2");font-weight:100 500;font-style:normal;font-display:swap}
+@font-face{font-family:"Tyler Combine";src:url("combine-600.woff2") format("woff2");font-weight:600 900;font-style:normal;font-display:swap}
+@font-face{font-family:"Tyler Deadlock";src:url("deadlock-400.woff2") format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
+@font-face{font-family:"Tyler Deadlock Caps";src:url("deadlock-caps-600.woff2") format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
+@font-face{font-family:"Tyler Minecraft";src:url("minecraft-400.woff2") format("woff2");font-weight:100 500;font-style:normal;font-display:swap}
+@font-face{font-family:"Tyler Minecraft";src:url("minecraft-700.woff2") format("woff2");font-weight:600 900;font-style:normal;font-display:swap}

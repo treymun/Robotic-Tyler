@@ -8,7 +8,7 @@ body{background:var(--rt-bg);color:var(--rt-ink);font:400 14px/1.5 var(--rt-font
 .side{display:flex;flex-direction:column;gap:20px;padding:18px 0 14px;background:var(--rt-bar);box-shadow:inset -1px 0 0 var(--rt-edge)}
 .brand{display:flex;align-items:center;gap:10px;padding:0 16px}
 .brand img{width:40px;height:40px;margin:-4px 0;object-fit:contain;padding:var(--logo-pad,0)}
-.brand img[data-theme=doom]{image-rendering:pixelated}
+.brand img[data-theme=doom],.brand img[data-theme=minecraft]{image-rendering:pixelated}
 .brand-text{display:flex;flex-direction:column;line-height:1.2}
 .brand-text strong{font:700 14px/1.2 var(--rt-font-display);letter-spacing:.08em;color:var(--rt-ink-strong)}
 .brand-text small{font-size:11px;color:var(--rt-ink-3);margin-top:3px;text-transform:uppercase;letter-spacing:var(--rt-track)}

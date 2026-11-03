@@ -16,7 +16,7 @@ body[data-desktop=true] .only-chrome,body:not([data-desktop=true]) .only-desktop
 .side{position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:18px;padding:18px 0 14px;background:var(--rt-bar);box-shadow:inset -1px 0 0 var(--rt-edge)}
 .brand{display:flex;align-items:center;gap:10px;padding:0 16px}
 .mark{display:block;width:40px;height:40px;margin:-4px 0;flex-shrink:0;object-fit:contain;padding:var(--logo-pad,0)}
-.mark[data-theme=doom]{image-rendering:pixelated}
+.mark[data-theme=doom],.mark[data-theme=minecraft]{image-rendering:pixelated}
 .brand-text{display:flex;flex-direction:column;line-height:1.2}
 .brand-text strong{font:700 14px/1.2 var(--rt-font-display);letter-spacing:.08em;color:var(--rt-ink-strong)}
 .brand-text small{font-size:11px;color:var(--rt-ink-3);margin-top:3px;text-transform:uppercase;letter-spacing:var(--rt-track)}

@@ -1,0 +1,187 @@
+/*
+ * ROBOTIC TYLER "Minecraft style" theme (v2.17).
+ * The vanilla inventory screen: a light grey window with a hard black outline, white
+ * top-left and dark grey bottom-right bevels, recessed slots, square stone buttons with
+ * shadowed white letters that turn yellow under the mouse, and black text fields. The
+ * header is a grass block (a green pixel edge over dirt), the tabs are the hotbar, and the
+ * status strip is the green experience bar.
+ * Signature: the white hotbar selector snaps onto the chosen tab in two hard frames.
+ * Type: "Tyler Minecraft" = Monocraft (OFL), pixel letters in the Minecraft style, drawn
+ * without smoothing and with the game's hard drop shadow on light text.
+ * Style only: original CSS textures; no Minecraft logos, textures, items or game fonts.
+ */
+[data-rt-theme=minecraft]{
+  color-scheme:light;
+  --mc-gui:#c6c6c6;--mc-hi:#ffffff;--mc-lo:#555555;--mc-slot:#8b8b8b;--mc-slot-lo:#373737;--mc-stone:#6f6f6f;--mc-outline:#000000;
+  --mc-grass:#5d9b3a;--mc-grass-lo:#3f7a24;--mc-dirt:#866043;--mc-xp:#80ff20;--mc-yellow:#ffffa0;
+  --rt-bar:#866043;--rt-bg:#c6c6c6;--rt-bg-deep:#bcbcbc;--rt-surface:#d0d0d0;--rt-surface-2:#dadada;--rt-surface-3:#e2e2e2;
+  --rt-block:#bebebe;--rt-block-hover:#d2d2d2;--rt-input:#000000;--rt-select:#a8b6ff;
+  --rt-line:#000000;--rt-line-soft:#8b8b8b;--rt-line-strong:#373737;
+  --rt-ink:#303030;--rt-ink-strong:#101010;--rt-ink-2:#383838;--rt-ink-3:#404040;--rt-ink-4:#454545;--rt-ink-disabled:#7a7a7a;
+  --rt-link:#173f80;--rt-link-hover:#0b2a5c;--rt-blue:#173f80;--rt-blue-deep:#0b2a5c;--rt-active:#367a23;
+  --rt-blue-fade:#b0b0b0;--rt-blue-fade-hover:#a6a6a6;
+  --rt-green:#367a23;--rt-green-hover:#42922b;--rt-green-ink:#ffffff;--rt-green-line:#1d4d13;
+  --rt-state-standby:#4a4a4a;--rt-state-ready:#1b5410;--rt-state-listening:#173f80;--rt-state-thinking:#5c4300;--rt-state-speaking:#7a3300;--rt-state-waiting:#5a2f8f;--rt-state-error:#8f1717;
+  --rt-danger:#8f1717;--rt-danger-bg:#8f1717;--rt-danger-hover:#a51d1d;--rt-danger-ink:#ffffff;--rt-success:#1b5410;--rt-focus:#1a1a1a;
+  --rt-accent:#173f80;--rt-accent-soft:rgba(23,63,128,.12);--rt-accent-line:rgba(23,63,128,.45);
+  --rt-on-accent:#ffffff;--rt-accent-fill:#367a23;--rt-meter:linear-gradient(180deg,#b5ff50,#80ff20 50%,#4f9e10);--rt-marker:#ffffff;--rt-edge:#ffffff;--rt-page-glow:#8bb46a;
+  --rt-font:"Tyler Minecraft","Courier New",monospace;--rt-font-display:"Tyler Minecraft","Courier New",monospace;
+  --rt-text-xs:11px;--rt-text-sm:12px;--rt-text-md:13px;--rt-text-lg:15px;--rt-track:0;
+  --rt-r-xs:0;--rt-r-sm:0;--rt-r-md:0;--rt-r-lg:3px;--rt-shadow-float:0 0 0 2px #000,6px 8px 0 rgba(0,0,0,.35);
+  --mc-shadow:2px 2px 0 #3f3f3f;
+  --mc-raised:inset 2px 2px 0 #ffffff,inset -2px -2px 0 #555555;
+  --mc-sunk:inset 2px 2px 0 #373737,inset -2px -2px 0 #ffffff;
+  --mc-dirt-tex:linear-gradient(90deg,rgba(0,0,0,.14) 50%,transparent 0) 0 0/8px 4px,linear-gradient(rgba(255,255,255,.07) 50%,transparent 0) 0 0/4px 12px,linear-gradient(90deg,transparent 66%,rgba(0,0,0,.16) 0) 0 0/12px 8px,linear-gradient(transparent 50%,rgba(60,35,20,.18) 0) 2px 0/16px 8px,#866043;
+  --mc-stone-tex:linear-gradient(90deg,rgba(0,0,0,.08) 50%,transparent 0) 0 0/6px 4px,linear-gradient(rgba(255,255,255,.06) 50%,transparent 0) 0 0/4px 10px,#6f6f6f;
+  --mc-grass-edge:linear-gradient(#6fae45,#5d9b3a) 0 0/100% 5px no-repeat,linear-gradient(90deg,#4f8c2f 50%,transparent 0) 0 5px/8px 3px repeat-x,linear-gradient(90deg,transparent 30%,#4f8c2f 30% 60%,transparent 60%) 0 8px/12px 2px repeat-x;
+}
+[data-rt-theme=minecraft] *{-webkit-font-smoothing:none;font-smooth:never}
+/* The inventory window: black outline, white top-left and grey bottom-right bevels */
+.panel[data-rt-theme=minecraft]{background:var(--mc-gui);border:2px solid #000;border-radius:4px;box-shadow:var(--rt-shadow-float),var(--mc-raised)}
+[data-rt-theme=minecraft] body{background:var(--mc-dirt-tex) fixed}
+[data-rt-theme=minecraft] main{background:transparent}
+[data-rt-theme=minecraft] :is(h1,h2,h3,.sheet-head h2,.card>h2,.marquee){font-family:var(--rt-font-display);font-weight:400;letter-spacing:0;text-transform:none;color:#404040}
+[data-rt-theme=minecraft] h2{font-size:16px}
+[data-rt-theme=minecraft] h1{font-size:26px}
+[data-rt-theme=minecraft] :is(label,.tally-label,.stat dt,.pulse dt,.facts b,.matrix dt,details.feature>summary,.ident-sub,.tabs button,.section-nav button,nav:not(.tabs) button,button,.pad span){font-family:var(--rt-font);text-transform:none;letter-spacing:0}
+[data-rt-theme=minecraft] label:not(:has(>input[type=checkbox])):not(.toggle){color:#404040;font-size:12px}
+[data-rt-theme=minecraft] details.feature>summary{font-size:13px;color:#303030}
+/* The header is a grass block: a green pixel edge over dirt, white shadowed letters */
+[data-rt-theme=minecraft] .bar{background:var(--mc-grass-edge),var(--mc-dirt-tex);padding:16px 10px 10px 12px;border-bottom:2px solid #000;border-radius:2px 2px 0 0}
+[data-rt-theme=minecraft] :is(.wordmark,.brand-text strong){font-family:var(--rt-font-display);font-weight:700;font-size:16px;letter-spacing:0;color:#ffffff;text-shadow:var(--mc-shadow)}
+[data-rt-theme=minecraft] .ident-sub{color:#e0e0e0;text-shadow:2px 2px 0 #3f3f3f;font-size:10px}
+[data-rt-theme=minecraft] .bar .icon-btn{color:#fff;background:var(--mc-stone-tex);border:2px solid #000;border-radius:0;box-shadow:inset 2px 2px 0 #aaa,inset -2px -2px 0 #555}
+[data-rt-theme=minecraft] .bar .icon-btn:hover{color:var(--mc-yellow);box-shadow:inset 2px 2px 0 #bdc6ff,inset -2px -2px 0 #59639a;background:#7b86bd}
+[data-rt-theme=minecraft] :is(.bar,.foot,.tabs,.side,.savebar,.rt-toast,.rt-dialog,.rt-tip){--rt-focus:#ffffff}
+/* Sections are recessed panels inside the window */
+[data-rt-theme=minecraft] :where(details,.callout,.quick-help,.confirm,.deck-entry,.board-tools,.sheet,.card,.route-card,.panel,.mini-callout>div,.usage-banner,.facts>div,.matrix>div,#setup,.arcade-tickets>div){background:var(--mc-gui);border:2px solid #000;border-radius:2px;box-shadow:var(--mc-raised)}
+[data-rt-theme=minecraft] :is(.quick-help,.confirm,#setup){box-shadow:var(--mc-raised),inset 4px 0 0 var(--mc-grass)}
+[data-rt-theme=minecraft] .deck-entry{box-shadow:var(--mc-raised),inset 4px 0 0 #3c8527}
+[data-rt-theme=minecraft] details.feature[open]{background:var(--mc-gui)}
+[data-rt-theme=minecraft] details.feature[open]>summary{color:#101010;box-shadow:inset 0 -2px 0 #8b8b8b}
+/* Stats are hotbar slots with white item-count numbers */
+[data-rt-theme=minecraft] .stats{gap:4px;padding:4px;background:#1e1e1e;border:2px solid #000;border-radius:0}
+[data-rt-theme=minecraft] .stat{padding:5px 7px;background:rgba(139,139,139,.18);border:0;box-shadow:inset 0 0 0 2px #5a5a5a}
+[data-rt-theme=minecraft] .stat:first-child{border:0}
+[data-rt-theme=minecraft] .stat dt{font-size:10px;color:#c6c6c6}
+[data-rt-theme=minecraft] .stat dd{font-size:16px;color:#ffffff;text-shadow:var(--mc-shadow)}
+[data-rt-theme=minecraft] .stat small{color:#bdbdbd;font-size:10px}
+[data-rt-theme=minecraft] .pulse dd{color:#303030}
+/* Tabs are the hotbar: dark slots, and the white selector on the chosen one */
+[data-rt-theme=minecraft] .tabs{gap:3px;padding:5px;margin:8px 10px 0;background:#1e1e1e;border:2px solid #000;box-shadow:none}
+[data-rt-theme=minecraft] .tabs button{position:relative;padding:7px 2px 6px;font-size:11px;color:#e0e0e0;text-shadow:var(--mc-shadow);background:rgba(139,139,139,.18);border:0;border-radius:0;box-shadow:inset 0 0 0 2px #5a5a5a}
+[data-rt-theme=minecraft] .tabs button:hover{color:var(--mc-yellow);background:rgba(139,139,139,.32)}
+[data-rt-theme=minecraft] .tabs button[aria-selected=true]{z-index:1;color:#ffffff;background:rgba(255,255,255,.1);box-shadow:0 0 0 3px #eaeaea,0 0 0 5px #000,inset 0 0 0 2px #000}
+[data-rt-theme=minecraft] .tabs button .ic{opacity:1}
+[data-rt-theme=minecraft] .side{background:var(--mc-dirt-tex);box-shadow:inset -2px 0 0 #000}
+[data-rt-theme=minecraft] .side :is(.brand-text small,.side-foot,.side-foot span,.side-foot label,small,p){color:#e0e0e0;text-shadow:var(--mc-shadow)}
+/* Buttons: square stone with a bevel; letters turn yellow under the mouse */
+[data-rt-theme=minecraft] button{font-size:12px;color:#e0e0e0;text-shadow:var(--mc-shadow);background:var(--mc-stone-tex);border:2px solid #000;border-radius:0;box-shadow:inset 2px 2px 0 #aaaaaa,inset -2px -3px 0 #555555}
+[data-rt-theme=minecraft] button:hover{color:var(--mc-yellow);background:#7b86bd;box-shadow:inset 2px 2px 0 #bdc6ff,inset -2px -3px 0 #59639a}
+[data-rt-theme=minecraft] button:active:not(:disabled){transform:none;box-shadow:inset 2px 2px 0 #59639a,inset -2px -2px 0 #bdc6ff}
+/* The main action is the green "Play" button of the newer menus */
+[data-rt-theme=minecraft] :is(.primary,#start,#save){color:#ffffff;background:#367a23;box-shadow:inset 2px 2px 0 #6cc349,inset -2px -3px 0 #1d4d13}
+[data-rt-theme=minecraft] :is(.primary,#start,#save):hover{color:var(--mc-yellow);background:#42922b;box-shadow:inset 2px 2px 0 #8de06a,inset -2px -3px 0 #1d4d13}
+[data-rt-theme=minecraft] .danger{color:#ffffff;background:#8f1717;box-shadow:inset 2px 2px 0 #d24a4a,inset -2px -3px 0 #4a0808}
+[data-rt-theme=minecraft] .danger:hover{color:var(--mc-yellow);background:#a51d1d}
+[data-rt-theme=minecraft] :is(.ghost,.icon){background:transparent;border-color:transparent;box-shadow:none;color:#303030;text-shadow:none}
+[data-rt-theme=minecraft] :is(.ghost,.icon):hover{color:#173f80;background:rgba(0,0,0,.08)}
+[data-rt-theme=minecraft] .link-btn{border:0;background:none;box-shadow:none;color:var(--rt-link);text-shadow:none}
+[data-rt-theme=minecraft] button:disabled{color:#a0a0a0;background:#2c2c2c;box-shadow:inset 2px 2px 0 #3c3c3c,inset -2px -2px 0 #1c1c1c;text-shadow:none}
+[data-rt-theme=minecraft] .side :is(.section-nav button,nav:not(.tabs) button){width:100%;margin:2px 0}
+[data-rt-theme=minecraft] :is(.section-nav button,nav:not(.tabs) button) .ic{color:currentColor}
+[data-rt-theme=minecraft] :is(.section-nav button[aria-current=page],nav:not(.tabs) button.active){color:#ffffff;background:#4a4a4a;box-shadow:0 0 0 2px #eaeaea,inset 2px 2px 0 #777,inset -2px -2px 0 #2a2a2a}
+/* Fields: black boxes with a light grey edge and white text */
+[data-rt-theme=minecraft] input:where(:not([type=checkbox],[type=radio],[type=range],[type=file])),[data-rt-theme=minecraft] :is(textarea,select){color:#ffffff;caret-color:#ffffff;background-color:#000;border:2px solid #a0a0a0;border-radius:0;box-shadow:none;font-family:var(--rt-font)}
+[data-rt-theme=minecraft] select{background-image:linear-gradient(45deg,transparent 50%,#e0e0e0 50%),linear-gradient(135deg,#e0e0e0 50%,transparent 50%)}
+[data-rt-theme=minecraft] select option{color:#fff;background:#1e1e1e}
+[data-rt-theme=minecraft] :is(input,textarea,select):focus{border-color:#ffffff;box-shadow:0 0 0 2px #000}
+[data-rt-theme=minecraft] input::placeholder,[data-rt-theme=minecraft] textarea::placeholder{color:#a0a0a0}
+[data-rt-theme=minecraft] input[type=checkbox]{width:16px;height:16px;background:#000;border:2px solid #a0a0a0;border-radius:0;box-shadow:none}
+[data-rt-theme=minecraft] input[type=checkbox]:checked{background:#000;border-color:#ffffff}
+[data-rt-theme=minecraft] input[type=checkbox]:checked::after{left:3px;top:0;width:4px;height:8px;border-color:#ffffff;border-width:0 3px 3px 0}
+/* Switches are the newer menus' on/off toggle: a green track with a square bevelled knob */
+[data-rt-theme=minecraft] .toggle>input[type=checkbox]{width:40px;height:20px;background:#3c3c3c;border:2px solid #000;border-radius:0;box-shadow:inset 2px 2px 0 #1e1e1e}
+[data-rt-theme=minecraft] .toggle>input[type=checkbox]::after{top:0;left:0;width:16px;height:16px;border-radius:0;background:#d0d0d0;box-shadow:inset 2px 2px 0 #fff,inset -2px -2px 0 #555;transform:none}
+[data-rt-theme=minecraft] .toggle>input[type=checkbox]:checked{background:#367a23;border-color:#000}
+[data-rt-theme=minecraft] .toggle>input[type=checkbox]:checked::after{top:0;left:0;width:16px;height:16px;border-radius:0;background:#d0d0d0;transform:translateX(20px);box-shadow:inset 2px 2px 0 #fff,inset -2px -2px 0 #555}
+[data-rt-theme=minecraft] input[type=range]{accent-color:#367a23}
+[data-rt-theme=minecraft] :is(pre,.output,.v22-log,.response){color:#ffffff;background:#000;border:2px solid #a0a0a0;box-shadow:none}
+[data-rt-theme=minecraft] :is(.meter,.arcade-progress,.lat-track){background:#2b2b2b;border-radius:0;box-shadow:inset 0 0 0 2px #000}
+[data-rt-theme=minecraft] .pill{color:#ffffff;background:#373737;border-radius:0;text-shadow:var(--mc-shadow);box-shadow:inset 0 0 0 2px #000}
+/* Soundboard pads are stone buttons; the playing one is lit green like a powered rail */
+[data-rt-theme=minecraft] .pad{background:var(--mc-stone-tex);border:2px solid #000;border-radius:0;box-shadow:inset 2px 2px 0 #aaa,inset -2px -3px 0 #555}
+[data-rt-theme=minecraft] .pad b{color:#ffffff;text-shadow:var(--mc-shadow)}
+[data-rt-theme=minecraft] .pad span{color:#e0e0e0;text-shadow:var(--mc-shadow)}
+[data-rt-theme=minecraft] .pad::after{border-left-color:#ffffff}
+[data-rt-theme=minecraft] .pad:hover{background:#7b86bd;box-shadow:inset 2px 2px 0 #bdc6ff,inset -2px -3px 0 #59639a}
+[data-rt-theme=minecraft] .pad:hover b{color:var(--mc-yellow)}
+[data-rt-theme=minecraft] .pad.playing{background:#367a23;box-shadow:inset 2px 2px 0 #6cc349,inset -2px -3px 0 #1d4d13}
+[data-rt-theme=minecraft] .pad.playing::after{background:var(--mc-yellow)}
+[data-rt-theme=minecraft] :is(.step-n,.setup-n,.friend-card .avatar){color:#fff;text-shadow:var(--mc-shadow);background:var(--mc-slot);border-radius:0;box-shadow:var(--mc-sunk)}
+[data-rt-theme=minecraft] code{color:#ffffff;background:#000;border-radius:0}
+[data-rt-theme=minecraft] .foot{background:var(--mc-dirt-tex);border-top:2px solid #000;border-radius:0 0 2px 2px}
+[data-rt-theme=minecraft] .foot small{color:#ffffff;text-shadow:var(--mc-shadow)}
+[data-rt-theme=minecraft] .foot :is(.ghost,.icon){color:#ffffff;text-shadow:var(--mc-shadow)}
+[data-rt-theme=minecraft] .foot :is(.ghost,.icon):hover{color:var(--mc-yellow);background:rgba(0,0,0,.25)}
+[data-rt-theme=minecraft] .savebar{background:var(--mc-dirt-tex);border-top:2px solid #000}
+[data-rt-theme=minecraft] .savebar p{color:#ffffff;text-shadow:var(--mc-shadow)}
+[data-rt-theme=minecraft] .route li{background:var(--mc-slot);color:#fff;text-shadow:var(--mc-shadow);box-shadow:var(--mc-sunk)}
+[data-rt-theme=minecraft] .route li:last-child{background:#367a23;box-shadow:inset 2px 2px 0 #1d4d13,inset -2px -2px 0 #6cc349}
+[data-rt-theme=minecraft] :is(.scroll,.content,main){scrollbar-color:#6f6f6f #8b8b8b}
+html[data-rt-theme=minecraft]{scrollbar-color:#6f6f6f #8b8b8b}
+
+/* ── Status strip: the experience bar ──
+   The green XP bar under the status line, on a black track with segment ticks. It shimmers
+   while Tyler listens, fills in orb-sized jumps while he talks, a single segment travels
+   along it while he thinks, and it flashes damage red on an error. Empty when idle. */
+[data-rt-theme=minecraft] .tally{background:var(--mc-gui);border:2px solid #000;border-radius:2px;box-shadow:var(--mc-raised);padding-bottom:24px}
+[data-rt-theme=minecraft] .tally-light{width:8px;height:8px;align-self:flex-start;margin-top:3px;border-radius:0;background:var(--tone);box-shadow:inset -2px -2px 0 rgba(0,0,0,.35)!important}
+[data-rt-theme=minecraft] .tally-label{font-size:12px;color:var(--tone)}
+[data-rt-theme=minecraft] .tally-text{color:#303030}
+[data-rt-theme=minecraft] .tally-wave{display:none}
+[data-rt-theme=minecraft] .tally::before{content:"";position:absolute;left:10px;right:10px;bottom:8px;height:8px;pointer-events:none;background:repeating-linear-gradient(90deg,transparent 0 16px,#000 16px 18px),#2b2b2b;box-shadow:0 0 0 2px #000}
+[data-rt-theme=minecraft] .tally::after{content:"";position:absolute;left:10px;bottom:8px;height:8px;width:0;pointer-events:none;background:repeating-linear-gradient(90deg,transparent 0 16px,rgba(0,0,0,.65) 16px 18px),linear-gradient(180deg,#c8ff70,#80ff20 50%,#4f9e10)}
+[data-rt-theme=minecraft] .tally[data-state=ready]::after{width:calc(100% - 20px)}
+[data-rt-theme=minecraft] .tally[data-state=listening]::after{width:calc(60% - 12px);animation:mc-shimmer 1.6s steps(2,end) infinite}
+[data-rt-theme=minecraft] .tally[data-state=speaking]::after{animation:mc-orbs 1.4s steps(6,end) infinite}
+[data-rt-theme=minecraft] .tally[data-state=thinking]::after{width:10%;animation:mc-seek 1.5s steps(9,end) infinite}
+[data-rt-theme=minecraft] .tally[data-state=waiting]::after{width:calc(30% - 6px)}
+[data-rt-theme=minecraft] .tally[data-state=error]::after{width:calc(100% - 20px);background:repeating-linear-gradient(90deg,transparent 0 16px,rgba(0,0,0,.65) 16px 18px),linear-gradient(180deg,#ff7070,#e01010 50%,#8a0000);animation:mc-hurt .6s steps(1) infinite}
+@keyframes mc-shimmer{0%,100%{filter:none}50%{filter:brightness(1.35)}}
+@keyframes mc-orbs{0%{width:0}100%{width:calc(100% - 20px)}}
+@keyframes mc-seek{0%{transform:translateX(0)}100%{transform:translateX(calc(900%))}}
+@keyframes mc-hurt{0%{opacity:1}50%{opacity:.35}}
+
+/* The logo sits in an inventory slot, drawn without smoothing */
+[data-rt-theme=minecraft] :is(.mark[data-logo],img.mark,#brand-logo){--logo-pad:2px;background:var(--mc-slot);border:0;border-radius:0;box-shadow:inset 2px 2px 0 #373737,inset -2px -2px 0 #ffffff,0 0 0 2px #000;image-rendering:pixelated}
+[data-rt-theme=minecraft] .mark[data-logo]{width:40px;height:40px;margin:-5px 0}
+
+/* ── Icons, dialogs, notifications and tooltips ──
+   Icons use the pixel drawings. Notifications are advancement toasts: a dark rounded box
+   with a yellow title (red for errors), sliding in from the side as they do in game.
+   Tooltips are the inventory's dark purple-edged tooltip. */
+[data-rt-theme=minecraft] .ic-v{display:none}
+[data-rt-theme=minecraft] .ic-p{display:inline}
+[data-rt-theme=minecraft] .ic{--px-a:currentColor;--px-b:rgba(0,0,0,.35);image-rendering:pixelated;shape-rendering:crispEdges}
+[data-rt-theme=minecraft] :is(.rt-toast,.rt-dialog){color:#ffffff;background:#212121;border:2px solid #000;border-radius:4px;box-shadow:inset 2px 2px 0 #555,inset -2px -2px 0 #111,4px 5px 0 rgba(0,0,0,.4)}
+[data-rt-theme=minecraft] .rt-toast{border-left:2px solid #000}
+[data-rt-theme=minecraft] :is(.rt-toast-title,.rt-dialog-title){font-family:var(--rt-font-display);font-weight:400;color:#ffff55;text-shadow:2px 2px 0 #3f3f15}
+[data-rt-theme=minecraft] :is(.rt-toast,.rt-dialog)[data-kind=error] :is(.rt-toast-title,.rt-dialog-title){color:#ff5555;text-shadow:2px 2px 0 #3f1515}
+[data-rt-theme=minecraft] :is(.rt-toast,.rt-dialog)[data-kind=success] :is(.rt-toast-title,.rt-dialog-title){color:#55ff55;text-shadow:2px 2px 0 #153f15}
+[data-rt-theme=minecraft] :is(.rt-toast-text,.rt-dialog-text,.rt-steps){color:#ffffff;text-shadow:var(--mc-shadow)}
+[data-rt-theme=minecraft] :is(.rt-toast,.rt-dialog) .rt-x{color:#e0e0e0}
+[data-rt-theme=minecraft] .rt-tip{color:#ffffff;background:#100010;border:2px solid #100010;border-radius:2px;box-shadow:inset 0 0 0 1px #2d0a63,inset 0 0 0 2px #25015b;text-shadow:var(--mc-shadow);font-family:var(--rt-font)}
+
+/* ── Motion: Minecraft ──
+   Signature: the white hotbar selector snaps onto the chosen tab in two hard frames (one
+   frame a size too big, then exact), the way it jumps when you scroll the hotbar.
+   Menus appear at once, as in game; advancement toasts slide in from the right; buttons
+   flip their bevel when clicked; and the logo bobs like a dropped item while Tyler talks. */
+@keyframes mc-snap{0%{transform:scale(1.18)}50%{transform:scale(1.08)}100%{transform:none}}
+@keyframes mc-toast{0%{transform:translateX(110%)}100%{transform:none}}
+@keyframes mc-bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+[data-rt-theme=minecraft] .tabs button[aria-selected=true]{animation:mc-snap .1s steps(2,end)}
+[data-rt-theme=minecraft] :is(.section-nav button[aria-current=page],nav:not(.tabs) button.active){animation:mc-snap .1s steps(2,end)}
+[data-rt-theme=minecraft] .rt-toast:not(.rt-leaving){animation:mc-toast .3s cubic-bezier(.2,.8,.3,1) backwards}
+[data-rt-theme=minecraft] .panel:has(.tally[data-state=speaking]) .mark[data-logo],.panel[data-rt-theme=minecraft]:has(.tally[data-state=speaking]) .mark[data-logo]{animation:mc-bob 1.2s steps(4,end) infinite}

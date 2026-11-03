@@ -37,7 +37,7 @@ test('the theme setting is readable by the chat panel but only the settings page
 const THEMES=['steam',...fs.readdirSync(path.join(ROOT,'browser-extension/ui/themes')).filter(f=>f.endsWith('.css')).map(f=>f.slice(0,-4)).sort()];
 
 test('every theme ships to all three surfaces and every theme list agrees',()=>{
- assert.deepEqual([...THEMES].sort(),['classic','cs16','cs2','doom','hev','l4d','portal','steam','tf2','winxp']);
+ assert.deepEqual([...THEMES].sort(),['classic','combine','cs16','cs2','deadlock','doom','hev','l4d','minecraft','pipboy','portal','quake','steam','tf2','winxp']);
  const ui=read('browser-extension/ui-template.js'),settings=read('browser-extension/settings.html'),voice=read('voice-app/native.html');
  for(const t of THEMES.filter(t=>t!=='steam')){
   assert.ok(ui.includes('[data-rt-theme='+t+']{color-scheme:'),t+' compiled into the chat panel');
@@ -137,9 +137,9 @@ test('every theme ships its own logo to every surface',()=>{
   hashes.add(fs.readFileSync(path.join(ROOT,'browser-extension/ui/logos/'+t+'.png')).toString('base64'));
  }
  assert.equal(hashes.size,THEMES.length,'no two themes share a logo');
- assert.match(logos,/const PIXEL=new Set\(\["doom"\]\)/,'DOOM is drawn without smoothing');
- assert.match(read('browser-extension/settings.css'),/\.mark\[data-theme=doom\]\{image-rendering:pixelated\}/);
- assert.match(read('voice-app/native.css'),/img\[data-theme=doom\]\{image-rendering:pixelated\}/);
+ assert.match(logos,/const PIXEL=new Set\(\["doom","minecraft"\]\)/,'DOOM and Minecraft are drawn without smoothing');
+ assert.match(read('browser-extension/settings.css'),/\.mark\[data-theme=doom\],\.mark\[data-theme=minecraft\]\{image-rendering:pixelated\}/);
+ assert.match(read('voice-app/native.css'),/img\[data-theme=doom\],\.brand img\[data-theme=minecraft\]\{image-rendering:pixelated\}/);
  // The panel loads the logos right after the fonts; the desktop preload picks them up from the manifest.
  const iso=JSON.parse(read('browser-extension/manifest.json')).content_scripts.find(c=>c.world!=='MAIN').js;
  assert.equal(iso.indexOf('ui-logos.js'),iso.indexOf('ui-fonts.js')+1);

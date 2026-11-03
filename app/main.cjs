@@ -122,7 +122,7 @@ if(!app.requestSingleInstanceLock()){app.quit();}else{
   if(req.action==='chat'){bot?.show();bot?.focus();return true;}
   if(req.action==='steam'){await shell.openExternal('steam://open/friends');return true;}
   if(req.action==='updates'){const s=await updates.check(voiceWin);return {status:s.status,version:s.version};}
-  if(req.action==='theme'){const THEMES=['steam','classic','tf2','cs2','portal','cs16','hev','l4d','winxp','doom'],v=(await vault.get(['uiTheme'])).uiTheme;return THEMES.includes(v)?v:'steam';}
+  if(req.action==='theme'){const THEMES=['steam','classic','tf2','cs2','portal','cs16','hev','l4d','winxp','doom','quake','pipboy','combine','deadlock','minecraft'],v=(await vault.get(['uiTheme'])).uiTheme;return THEMES.includes(v)?v:'steam';}
   throw Error('Unknown command');
  });
 

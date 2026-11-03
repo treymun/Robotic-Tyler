@@ -1,0 +1,168 @@
+/*
+ * ROBOTIC TYLER "Half-Life 2 Combine / Civil Protection style" theme (v2.17).
+ * City 17's occupation hardware: charcoal panels and pale, slightly blue armour plates,
+ * cyan optics, a red alert light, and spare industrial markings: thin rules, L-shaped
+ * corner brackets and small unit codes. Everything is square, clinical and quiet.
+ * Signature: a narrow cyan scanner line crosses the status display when Tyler starts
+ * listening, like a City Scanner's sweep; the header is the pale Civil Protection plate
+ * with a narrow cyan lens slit.
+ * Type: "Tyler Combine" = Chakra Petch (OFL) for chamfered Overwatch signage, with
+ * Verdana/Tahoma for text, as Half-Life 2's menus use.
+ * Style only: original shapes; no Combine insignia, Half-Life logos, textures or game fonts.
+ */
+[data-rt-theme=combine]{
+  color-scheme:dark;
+  --cb-cyan:#4fe3ff;--cb-cyan-dim:#1c7f93;--cb-red:#ff4a3a;--cb-armor:#cdd6da;--cb-armor-hi:#eef3f5;--cb-armor-lo:#8f9ba1;
+  --cb-char:#15191c;--cb-plate:#1f2529;--cb-plate-2:#262d32;--cb-rule:#3a4348;
+  --rt-bar:#101316;--rt-bg:#15191c;--rt-bg-deep:#0c0f11;--rt-surface:#1f2529;--rt-surface-2:#262d32;--rt-surface-3:#2e363b;
+  --rt-block:#1a1f23;--rt-block-hover:#232a2f;--rt-input:#0c0f11;--rt-select:#1d4c57;
+  --rt-line:#3a4348;--rt-line-soft:#2a3136;--rt-line-strong:#8f9ba1;
+  --rt-ink:#d5dde1;--rt-ink-strong:#f2f6f8;--rt-ink-2:#c4cdd2;--rt-ink-3:#a9b5bb;--rt-ink-4:#95a2a9;--rt-ink-disabled:#566168;
+  --rt-link:#7fecff;--rt-link-hover:#d8f9ff;--rt-blue:#7fecff;--rt-blue-deep:#4fe3ff;--rt-active:#4fe3ff;
+  --rt-blue-fade:#1f2529;--rt-blue-fade-hover:#2a3439;
+  --rt-green:#cdd6da;--rt-green-hover:#eef3f5;--rt-green-ink:#101316;--rt-green-line:#8f9ba1;
+  --rt-state-standby:#95a2a9;--rt-state-ready:#9be59b;--rt-state-listening:#4fe3ff;--rt-state-thinking:#e7edf0;--rt-state-speaking:#7fecff;--rt-state-waiting:#e8c86a;--rt-state-error:#ff6a5c;
+  --rt-danger:#ff6a5c;--rt-danger-bg:#a3221a;--rt-danger-hover:#bd2a20;--rt-danger-ink:#ffffff;--rt-success:#9be59b;--rt-focus:#4fe3ff;
+  --rt-accent:#4fe3ff;--rt-accent-soft:rgba(79,227,255,.1);--rt-accent-line:rgba(79,227,255,.45);
+  --rt-on-accent:#f2f6f8;--rt-accent-fill:#1d4c57;--rt-meter:linear-gradient(90deg,#1c7f93,#4fe3ff);--rt-marker:#f2f6f8;--rt-edge:rgba(205,214,218,.18);--rt-page-glow:#0f2a33;
+  --rt-font:Verdana,Tahoma,"DejaVu Sans",sans-serif;--rt-font-display:"Tyler Combine","Bahnschrift","Arial Narrow",sans-serif;
+  --rt-text-xs:11px;--rt-text-sm:12px;--rt-text-md:13px;--rt-text-lg:15px;--rt-track:.14em;
+  --rt-r-xs:0;--rt-r-sm:0;--rt-r-md:0;--rt-r-lg:0;--rt-shadow-float:0 0 0 1px #000,0 20px 50px rgba(0,0,0,.8);
+  --cb-armor-plate:linear-gradient(180deg,#eef3f5,#cdd6da 45%,#b3bec4 80%,#9aa7ad);
+  --cb-brackets:linear-gradient(var(--cb-k,#4fe3ff),var(--cb-k,#4fe3ff)) 0 0/9px 1px no-repeat,linear-gradient(var(--cb-k,#4fe3ff),var(--cb-k,#4fe3ff)) 0 0/1px 9px no-repeat,
+    linear-gradient(var(--cb-k,#4fe3ff),var(--cb-k,#4fe3ff)) 100% 100%/9px 1px no-repeat,linear-gradient(var(--cb-k,#4fe3ff),var(--cb-k,#4fe3ff)) 100% 100%/1px 9px no-repeat;
+  --cb-grid:repeating-linear-gradient(0deg,rgba(79,227,255,.035) 0 1px,transparent 1px 4px);
+}
+.panel[data-rt-theme=combine]{background:var(--cb-grid),linear-gradient(180deg,#191e21,#111416);border:1px solid #3a4348;box-shadow:var(--rt-shadow-float),inset 0 0 0 1px #000}
+[data-rt-theme=combine] body{background:var(--cb-grid),radial-gradient(80% 40% at 50% 0,rgba(79,227,255,.06),transparent 60%) fixed,#121518}
+[data-rt-theme=combine] main{background:transparent}
+/* Overwatch signage: spare, tracked capitals */
+[data-rt-theme=combine] :is(h1,h2,h3,.wordmark,.brand-text strong,.sheet-head h2,.card>h2,details.feature>summary,.marquee,button,label,.tally-label,.stat dt,.stat dd,.pulse dt,.pulse dd,.ident-sub,.facts b,.matrix dt,.pad span,.tabs button,.section-nav button,nav:not(.tabs) button){font-family:var(--rt-font-display);text-transform:uppercase}
+[data-rt-theme=combine] :is(h1,h2,.sheet-head h2,.card>h2,.brand-text strong){font-weight:600;color:var(--rt-ink-strong);letter-spacing:.16em}
+[data-rt-theme=combine] h2{font-size:17px}
+[data-rt-theme=combine] h1{font-size:28px}
+[data-rt-theme=combine] :is(.view-head h2,.sheet-head h2,.card>h2){padding-left:12px;box-shadow:inset 3px 0 0 var(--cb-cyan)}
+[data-rt-theme=combine] :is(.ident-sub,.stat dt,.pulse dt,label:not(:has(>input[type=checkbox])):not(.toggle)){font-weight:400;letter-spacing:.18em;color:var(--rt-ink-3);font-size:11px}
+[data-rt-theme=combine] label:has(>input[type=checkbox]),[data-rt-theme=combine] .toggle{font-family:var(--rt-font);text-transform:none;letter-spacing:0;font-size:13px}
+[data-rt-theme=combine] .stat dd,[data-rt-theme=combine] .pulse dd{font-weight:600;font-size:19px;letter-spacing:.06em;color:var(--rt-ink-strong)}
+[data-rt-theme=combine] .stat:first-child dd{color:var(--cb-cyan);text-shadow:0 0 8px rgba(79,227,255,.45)}
+[data-rt-theme=combine] .stat small{color:var(--rt-ink-4);font-family:var(--rt-font);font-size:10.5px;letter-spacing:0;text-transform:none}
+/* The header is the pale Civil Protection plate, with the lens slit and a unit code */
+[data-rt-theme=combine] .bar{position:relative;background:var(--cb-armor-plate);box-shadow:inset 0 1px 0 #fff,inset 0 -1px 0 #6b777d,0 2px 0 #000;padding:11px 12px}
+[data-rt-theme=combine] .bar .wordmark{font-weight:600;font-size:17px;letter-spacing:.2em;color:#14181b}
+[data-rt-theme=combine] .bar .ident-sub{color:#3d474d}
+[data-rt-theme=combine] .bar .icon-btn{color:#14181b;background:transparent;border:1px solid #6b777d;border-radius:0}
+[data-rt-theme=combine] .bar .icon-btn:hover{color:var(--cb-cyan);background:#14181b}
+[data-rt-theme=combine] .bar::after{content:"CP-17";position:absolute;right:42px;top:50%;margin-top:-6px;font:600 9px/12px var(--rt-font-display);letter-spacing:.22em;color:#56636a;pointer-events:none;
+  padding-left:22px;background:linear-gradient(90deg,#062a33,var(--cb-cyan) 40%,#062a33) 0 50%/16px 3px no-repeat}
+[data-rt-theme=combine] :where(details,.callout,.quick-help,.confirm,.deck-entry,.board-tools,.sheet,.card,.route-card,.panel,.mini-callout>div,.usage-banner,.facts>div,.matrix>div,#setup,.arcade-tickets>div){
+  --cb-k:rgba(79,227,255,.55);background:var(--cb-brackets),linear-gradient(180deg,#1f2529,#1a1f23);border:1px solid #2e363b;border-radius:0}
+[data-rt-theme=combine] :is(.quick-help,.confirm,#setup,.deck-entry){border-left:2px solid var(--cb-armor-lo)}
+[data-rt-theme=combine] details.feature>summary{font-size:12px;font-weight:600;letter-spacing:.18em;color:var(--rt-ink-2)}
+[data-rt-theme=combine] details.feature[open]>summary{color:var(--cb-cyan)}
+[data-rt-theme=combine] .stats{background:#101316;border:1px solid #2e363b;padding:7px 0}
+[data-rt-theme=combine] .stat{border-left:1px solid #2e363b}
+/* Tabs: dark slots; the open one is a pale plate with a lit lens under it */
+[data-rt-theme=combine] .tabs{gap:2px;padding:6px;background:#0f1214;box-shadow:inset 0 1px 0 #000,inset 0 -1px 0 #2e363b}
+[data-rt-theme=combine] .tabs button{position:relative;padding:8px 2px 7px;font-size:11px;font-weight:600;letter-spacing:.16em;color:var(--rt-ink-4);background:#1a1f23;border:1px solid #2e363b;border-radius:0}
+[data-rt-theme=combine] .tabs button:hover{color:var(--rt-ink-strong);background:#232a2f}
+[data-rt-theme=combine] .tabs button[aria-selected=true]{color:#14181b;background:var(--cb-armor-plate);border-color:#eef3f5;box-shadow:inset 0 -3px 0 var(--cb-cyan),0 0 10px rgba(79,227,255,.18)}
+[data-rt-theme=combine] .tabs button[aria-selected=true] .ic{color:#14181b}
+[data-rt-theme=combine] .side{background:var(--cb-grid),#111416;box-shadow:inset -1px 0 0 #2e363b}
+[data-rt-theme=combine] :is(.section-nav button,nav:not(.tabs) button){font-size:12px;letter-spacing:.16em;color:var(--rt-ink-3);background:transparent;border:0;border-radius:0;box-shadow:none}
+[data-rt-theme=combine] :is(.section-nav button,nav:not(.tabs) button):hover{color:var(--rt-ink-strong);background:#1f2529}
+[data-rt-theme=combine] :is(.section-nav button[aria-current=page],nav:not(.tabs) button.active){color:#14181b;background:var(--cb-armor-plate);box-shadow:inset 3px 0 0 var(--cb-cyan)}
+[data-rt-theme=combine] :is(.section-nav button[aria-current=page],nav:not(.tabs) button.active) .ic{color:#14181b}
+/* Buttons: square charcoal keys with a pale edge; the main action is pale armour */
+[data-rt-theme=combine] button{font-size:12px;font-weight:600;letter-spacing:.16em;color:var(--rt-ink);background:#1f2529;border:1px solid #56636a;border-radius:0;box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+[data-rt-theme=combine] button:hover{color:var(--rt-ink-strong);background:#262d32;border-color:var(--cb-cyan);box-shadow:inset 0 0 0 1px rgba(79,227,255,.25),0 0 10px rgba(79,227,255,.18)}
+[data-rt-theme=combine] button:active:not(:disabled){transform:translateY(1px);background:#14181b}
+[data-rt-theme=combine] :is(.primary,#start,#save){color:#101316;background:var(--cb-armor-plate);border-color:#eef3f5;box-shadow:inset 0 -2px 0 #8f9ba1}
+[data-rt-theme=combine] :is(.primary,#start,#save):hover{color:#101316;background:var(--cb-armor-plate);border-color:var(--cb-cyan);box-shadow:inset 0 -2px 0 var(--cb-cyan),0 0 12px rgba(79,227,255,.3)}
+[data-rt-theme=combine] :is(.primary,#start,#save) .ic{color:#101316}
+[data-rt-theme=combine] .danger{color:#fff;background:var(--rt-danger-bg);border-color:var(--cb-red)}
+[data-rt-theme=combine] .danger:hover{color:#fff;background:var(--rt-danger-hover);border-color:#ff8a7c}
+[data-rt-theme=combine] :is(.ghost,.icon,.icon-btn){background:transparent;border-color:transparent;box-shadow:none}
+[data-rt-theme=combine] :is(.pad,.friend-card,.preset,.link-btn){font-family:var(--rt-font);text-transform:none;letter-spacing:0;font-weight:400;font-size:var(--rt-text-md)}
+[data-rt-theme=combine] .link-btn{border:0;background:none;color:var(--rt-link);box-shadow:none}
+[data-rt-theme=combine] button:disabled{color:var(--rt-ink-disabled);background:#15191c;border-color:#2a3136;box-shadow:none}
+/* Fields */
+[data-rt-theme=combine] input:where(:not([type=checkbox],[type=radio],[type=range],[type=file])),[data-rt-theme=combine] :is(textarea,select){color:var(--rt-ink-strong);background-color:#0c0f11;border:1px solid #3a4348;border-radius:0;box-shadow:inset 0 1px 3px rgba(0,0,0,.6)}
+[data-rt-theme=combine] select{background-image:linear-gradient(45deg,transparent 50%,var(--cb-cyan) 50%),linear-gradient(135deg,var(--cb-cyan) 50%,transparent 50%)}
+[data-rt-theme=combine] :is(input,textarea,select):focus{border-color:var(--cb-cyan);box-shadow:inset 0 1px 3px rgba(0,0,0,.6),0 0 0 1px rgba(79,227,255,.35)}
+[data-rt-theme=combine] input[type=checkbox]{width:15px;height:15px;background:#0c0f11;border:1px solid #8f9ba1;border-radius:0;box-shadow:none}
+[data-rt-theme=combine] input[type=checkbox]:checked{background:#1d4c57;border-color:var(--cb-cyan)}
+[data-rt-theme=combine] input[type=checkbox]:checked::after{left:4px;top:1px;border-color:var(--cb-cyan)}
+/* Switches are square sliders with a pale armour knob */
+[data-rt-theme=combine] .toggle>input[type=checkbox]{width:36px;height:18px;background:#0c0f11;border:1px solid #56636a;border-radius:0;box-shadow:inset 0 1px 3px #000}
+[data-rt-theme=combine] .toggle>input[type=checkbox]::after{top:2px;left:2px;width:12px;height:12px;border-radius:0;background:var(--cb-armor-lo);box-shadow:none}
+[data-rt-theme=combine] .toggle>input[type=checkbox]:checked{background:#1d4c57;border-color:var(--cb-cyan)}
+[data-rt-theme=combine] .toggle>input[type=checkbox]:checked::after{top:2px;left:2px;width:12px;height:12px;border-radius:0;transform:translateX(18px);background:var(--cb-armor-hi);box-shadow:0 0 6px rgba(79,227,255,.6)}
+[data-rt-theme=combine] input[type=range]{accent-color:var(--cb-cyan)}
+[data-rt-theme=combine] :is(pre,.output,.v22-log,.response){background:#0c0f11;border:1px solid #2e363b;box-shadow:none}
+[data-rt-theme=combine] :is(.meter,.arcade-progress,.lat-track){background:#0c0f11;border-radius:0;box-shadow:inset 0 0 0 1px #2e363b}
+[data-rt-theme=combine] .pill{color:var(--cb-cyan);background:transparent;border-radius:0;box-shadow:inset 0 0 0 1px var(--cb-cyan-dim)}
+[data-rt-theme=combine] .pad{--cb-k:rgba(79,227,255,.0);background:var(--cb-brackets),#1a1f23;border:1px solid #2e363b;border-radius:0}
+[data-rt-theme=combine] .pad b{color:var(--rt-ink-strong)}
+[data-rt-theme=combine] .pad::after{border-left-color:var(--cb-cyan)}
+[data-rt-theme=combine] .pad:hover{--cb-k:#4fe3ff;background:var(--cb-brackets),#232a2f}
+[data-rt-theme=combine] .pad.playing{--cb-k:#4fe3ff;background:var(--cb-brackets),linear-gradient(90deg,rgba(79,227,255,.16),transparent 75%),#1a1f23;box-shadow:inset 2px 0 0 var(--cb-cyan)}
+[data-rt-theme=combine] :is(.step-n,.setup-n,.friend-card .avatar){font-family:var(--rt-font-display);font-weight:600;color:#101316;background:var(--cb-armor);border-radius:0}
+[data-rt-theme=combine] code{color:var(--cb-cyan);background:#0c0f11;border-radius:0}
+[data-rt-theme=combine] .savebar,[data-rt-theme=combine] .foot{background:#101316;box-shadow:inset 0 1px 0 #3a4348}
+[data-rt-theme=combine] .foot small{color:var(--rt-ink-3)}
+[data-rt-theme=combine] .route li{background:#1a1f23;box-shadow:inset 0 0 0 1px #2e363b}
+[data-rt-theme=combine] .route li:last-child{background:rgba(79,227,255,.1);box-shadow:inset 2px 0 0 var(--cb-cyan)}
+[data-rt-theme=combine] :is(.scroll,.content,main){scrollbar-color:#56636a #0c0f11}
+html[data-rt-theme=combine]{scrollbar-color:#56636a #0c0f11}
+
+/* ── Status strip: the Overwatch scanner display ──
+   A dark readout with faint scan rows. A narrow cyan scanner line crosses it once each time
+   Tyler starts listening, then sweeps quietly every few seconds while he keeps listening;
+   thin cyan level bars move while he talks; a pale dash scrolls while he thinks; and the
+   red alert light pulses on an error. */
+[data-rt-theme=combine] .tally{--cb-k:rgba(79,227,255,.6);background:var(--cb-brackets),var(--cb-grid),#0e1113;border:1px solid #2e363b;border-radius:0;overflow:hidden}
+[data-rt-theme=combine] .tally-light{width:6px;height:6px;align-self:flex-start;margin-top:5px;border-radius:0;background:var(--tone);box-shadow:0 0 8px var(--tone)!important;transform:rotate(45deg)}
+[data-rt-theme=combine] .tally[data-state=error] .tally-light{animation:cb-alert .7s steps(1) infinite}
+[data-rt-theme=combine] .tally-label{font-weight:600;letter-spacing:.2em;color:var(--tone)}
+[data-rt-theme=combine] .tally-wave{gap:2px;height:12px;align-items:flex-end}
+[data-rt-theme=combine] .tally-wave i{width:2px;border-radius:0;background:var(--cb-cyan);box-shadow:0 0 4px rgba(79,227,255,.6);opacity:.35}
+[data-rt-theme=combine] .tally[data-state=speaking] .tally-wave i{opacity:1}
+[data-rt-theme=combine] .tally::after{content:"";position:absolute;top:0;bottom:0;left:0;width:2px;opacity:0;pointer-events:none;
+  background:linear-gradient(180deg,transparent,#d8f9ff 20%,#4fe3ff 50%,#d8f9ff 80%,transparent);box-shadow:0 0 10px #4fe3ff,0 0 22px rgba(79,227,255,.55)}
+[data-rt-theme=combine] .tally[data-state=listening]::after{animation:cb-scan .9s cubic-bezier(.4,0,.2,1) 1,cb-patrol 5.5s linear .9s infinite}
+[data-rt-theme=combine] .tally[data-state=thinking]::before{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;pointer-events:none;
+  background:linear-gradient(90deg,transparent 0 40%,#e7edf0 40% 60%,transparent 60%) 0 0/50% 100% repeat-x;animation:cb-process 1s linear infinite}
+[data-rt-theme=combine] .tally[data-state=error]{box-shadow:inset 0 0 0 1px rgba(255,74,58,.6),inset 0 0 18px rgba(255,74,58,.15)}
+@keyframes cb-scan{0%{left:0;opacity:0}8%{opacity:1}92%{opacity:1}100%{left:calc(100% - 2px);opacity:0}}
+@keyframes cb-patrol{0%,78%{left:0;opacity:0}80%{opacity:.6}98%{opacity:.6}100%{left:calc(100% - 2px);opacity:0}}
+@keyframes cb-process{from{background-position:0 0}to{background-position:100% 0}}
+@keyframes cb-alert{0%{opacity:1}50%{opacity:.25}}
+
+/* The logo sits in a charcoal optic housing with cyan corner brackets */
+[data-rt-theme=combine] :is(.mark[data-logo],img.mark,#brand-logo){--logo-pad:2px;--cb-k:#4fe3ff;background:var(--cb-brackets),radial-gradient(circle at 50% 40%,#2a3136,#0c0f11 75%);border:1px solid #3a4348;border-radius:0}
+[data-rt-theme=combine] .mark[data-logo]{width:42px;height:42px;margin:-6px 0}
+[data-rt-theme=combine] .bar .mark[data-logo]{border-color:#6b777d}
+
+/* ── Icons, dialogs, notifications and tooltips ──
+   Thin, square-ended line icons. Messages are dispatch panels: charcoal with corner brackets,
+   a cyan title rule; errors carry the red alert edge. */
+[data-rt-theme=combine] .ic{--ic-w:1.3px;--ic-cap:butt;--ic-join:miter}
+[data-rt-theme=combine] :is(.rt-toast,.rt-dialog){--cb-k:#4fe3ff;background:var(--cb-brackets),linear-gradient(180deg,#1f2529,#15191c);border:1px solid #3a4348;border-radius:0;box-shadow:0 0 0 1px #000,0 14px 34px rgba(0,0,0,.65)}
+[data-rt-theme=combine] .rt-toast{border-left:3px solid var(--tone)}
+[data-rt-theme=combine] :is(.rt-toast,.rt-dialog)[data-kind=error]{--cb-k:#ff4a3a;border-color:#6b2a24}
+[data-rt-theme=combine] :is(.rt-toast-title,.rt-dialog-title){font-family:var(--rt-font-display);font-weight:600;text-transform:uppercase;letter-spacing:.18em;color:var(--rt-ink-strong)}
+[data-rt-theme=combine] :is(.rt-toast-text,.rt-dialog-text,.rt-steps){color:var(--rt-ink-2)}
+[data-rt-theme=combine] .rt-tip{background:#0c0f11;color:var(--rt-ink-strong);border:1px solid #3a4348;border-radius:0;font-family:var(--rt-font-display);letter-spacing:.1em;text-transform:uppercase;font-size:10px}
+
+/* ── Motion: Combine ──
+   Signature: the scanner sweep above. Screens wipe in top to bottom with a one-frame flicker
+   like a Combine monitor coming up, notifications slide in from the right like a dispatch,
+   keys depress a pixel, and the logo's brackets glow cyan while Tyler talks. */
+@keyframes cb-on{0%{opacity:0;clip-path:inset(0 0 100% 0)}60%{opacity:1;clip-path:inset(0 0 0 0)}70%{opacity:.6}80%{opacity:1}100%{clip-path:inset(0 0 0 0)}}
+@keyframes cb-dispatch{0%{opacity:0;transform:translateX(16px)}100%{opacity:1;transform:none}}
+@keyframes cb-optic{0%,100%{box-shadow:0 0 0 1px #000,0 0 4px rgba(79,227,255,.25)}50%{box-shadow:0 0 0 1px #000,0 0 14px rgba(79,227,255,.8)}}
+[data-rt-theme=combine] :is(.view:not([hidden]),.sheet,section[data-view]:not([hidden])){animation:cb-on .3s steps(6,end) backwards}
+[data-rt-theme=combine] .rt-toast:not(.rt-leaving){animation:cb-dispatch .22s ease-out backwards}
+[data-rt-theme=combine] .panel:has(.tally[data-state=speaking]) .mark[data-logo],.panel[data-rt-theme=combine]:has(.tally[data-state=speaking]) .mark[data-logo]{animation:cb-optic 1.1s ease-in-out infinite}
+@media (max-width:400px){[data-rt-theme=combine] .bar::after{display:none}}

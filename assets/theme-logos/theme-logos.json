@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "packType": "five-theme-addon",
+  "note": "These are asset IDs. Match them to the actual app theme keys; keep the previous ten theme assets.",
+  "themes": {
+    "quake": {
+      "name": "Quake",
+      "defaultPng": "png/256/quake.png",
+      "png": {
+        "16": "png/16/quake.png",
+        "24": "png/24/quake.png",
+        "32": "png/32/quake.png",
+        "48": "png/48/quake.png",
+        "64": "png/64/quake.png",
+        "128": "png/128/quake.png",
+        "256": "png/256/quake.png",
+        "512": "png/512/quake.png",
+        "1024": "png/1024/quake.png"
+      },
+      "master": "masters/quake.png",
+      "ico": "ico/quake.ico",
+      "pixelArt": false,
+      "imageRendering": "auto"
+    },
+    "pipboy": {
+      "name": "Fallout Pip-Boy",
+      "defaultPng": "png/256/pipboy.png",
+      "png": {
+        "16": "png/16/pipboy.png",
+        "24": "png/24/pipboy.png",
+        "32": "png/32/pipboy.png",
+        "48": "png/48/pipboy.png",
+        "64": "png/64/pipboy.png",
+        "128": "png/128/pipboy.png",
+        "256": "png/256/pipboy.png",
+        "512": "png/512/pipboy.png",
+        "1024": "png/1024/pipboy.png"
+      },
+      "master": "masters/pipboy.png",
+      "ico": "ico/pipboy.ico",
+      "pixelArt": false,
+      "imageRendering": "auto"
+    },
+    "combine": {
+      "name": "Half-Life 2 Combine",
+      "defaultPng": "png/256/combine.png",
+      "png": {
+        "16": "png/16/combine.png",
+        "24": "png/24/combine.png",
+        "32": "png/32/combine.png",
+        "48": "png/48/combine.png",
+        "64": "png/64/combine.png",
+        "128": "png/128/combine.png",
+        "256": "png/256/combine.png",
+        "512": "png/512/combine.png",
+        "1024": "png/1024/combine.png"
+      },
+      "master": "masters/combine.png",
+      "ico": "ico/combine.ico",
+      "pixelArt": false,
+      "imageRendering": "auto"
+    },
+    "deadlock": {
+      "name": "Deadlock",
+      "defaultPng": "png/256/deadlock.png",
+      "png": {
+        "16": "png/16/deadlock.png",
+        "24": "png/24/deadlock.png",
+        "32": "png/32/deadlock.png",
+        "48": "png/48/deadlock.png",
+        "64": "png/64/deadlock.png",
+        "128": "png/128/deadlock.png",
+        "256": "png/256/deadlock.png",
+        "512": "png/512/deadlock.png",
+        "1024": "png/1024/deadlock.png"
+      },
+      "master": "masters/deadlock.png",
+      "ico": "ico/deadlock.ico",
+      "pixelArt": false,
+      "imageRendering": "auto"
+    },
+    "minecraft": {
+      "name": "Minecraft",
+      "defaultPng": "png/256/minecraft.png",
+      "png": {
+        "16": "png/16/minecraft.png",
+        "24": "png/24/minecraft.png",
+        "32": "png/32/minecraft.png",
+        "48": "png/48/minecraft.png",
+        "64": "png/64/minecraft.png",
+        "128": "png/128/minecraft.png",
+        "256": "png/256/minecraft.png",
+        "512": "png/512/minecraft.png",
+        "1024": "png/1024/minecraft.png"
+      },
+      "master": "masters/minecraft.png",
+      "ico": "ico/minecraft.ico",
+      "pixelArt": true,
+      "imageRendering": "pixelated"
+    }
+  }
+}

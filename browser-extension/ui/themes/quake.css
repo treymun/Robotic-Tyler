@@ -1,0 +1,180 @@
+/*
+ * ROBOTIC TYLER "Quake (1996) style" theme (v2.17).
+ * id Software's gothic-industrial look: dark rough stone, rusted iron plates held by
+ * bronze rivets, weathered bronze lettering cut deep with black shadows, ember-orange
+ * highlights and blood red for danger. The status bar is the brown HUD strip with big
+ * bronze numbers; buttons and tabs are heavy plates that seat into their frames.
+ * Signature: a selected tab drops and seats into its iron frame like a heavy switch;
+ * the status strip is a molten slipgate channel cut into the stone.
+ * Type: "Tyler Quake" = Grenze Gotisch (OFL) for the gothic capitals;
+ * "Tyler Quake Text" = Grenze (OFL) for text and buttons.
+ * Style only: original textures and shapes; no Quake logos, textures or game fonts.
+ */
+[data-rt-theme=quake]{
+  color-scheme:dark;
+  --q-bronze:#c08a4a;--q-bronze-hi:#e9b874;--q-bronze-lo:#6b4420;--q-rust:#8a4320;--q-blood:#a3201a;--q-ember:#ffa53a;
+  --q-iron:#2e2b28;--q-iron-hi:#5f5a53;--q-iron-lo:#0b0a09;
+  --rt-bar:#1a1511;--rt-bg:#17120e;--rt-bg-deep:#0d0a08;--rt-surface:#231c16;--rt-surface-2:#2c231b;--rt-surface-3:#372b20;
+  --rt-block:#1f1913;--rt-block-hover:#2a2118;--rt-input:#0e0b09;--rt-select:#5a3a1c;
+  --rt-line:#000000;--rt-line-soft:#3a2d20;--rt-line-strong:#6b4420;
+  --rt-ink:#e8d9bf;--rt-ink-strong:#fff1d6;--rt-ink-2:#dccba9;--rt-ink-3:#cbb48e;--rt-ink-4:#b89f78;--rt-ink-disabled:#6d5c46;
+  --rt-link:#e9b874;--rt-link-hover:#fff1d6;--rt-blue:#e9b874;--rt-blue-deep:#c08a4a;--rt-active:#c08a4a;
+  --rt-blue-fade:#2a2017;--rt-blue-fade-hover:#3a2b1c;
+  --rt-green:linear-gradient(180deg,#dba25a,#a8703a 55%,#7d4f26);--rt-green-hover:linear-gradient(180deg,#f0b76a,#bd8040 55%,#8a5a2a);--rt-green-ink:#1a0f06;--rt-green-line:#3b2410;
+  --rt-state-standby:#b89f78;--rt-state-ready:#a6d273;--rt-state-listening:#86c6e8;--rt-state-thinking:#e9b874;--rt-state-speaking:#ff9f55;--rt-state-waiting:#d7a6ff;--rt-state-error:#ff6d58;
+  --rt-danger:#ff6d58;--rt-danger-bg:#8a1d12;--rt-danger-hover:#a3241a;--rt-danger-ink:#ffffff;--rt-success:#a6d273;--rt-focus:var(--q-ember);
+  --rt-accent:#e9b874;--rt-accent-soft:rgba(233,184,116,.12);--rt-accent-line:rgba(233,184,116,.45);
+  --rt-on-accent:#fff1d6;--rt-accent-fill:#6b4420;--rt-meter:linear-gradient(90deg,#6b4420,#c08a4a 60%,#ffa53a);--rt-marker:#fff1d6;--rt-edge:rgba(233,184,116,.22);--rt-page-glow:#2a1608;
+  --rt-font:"Tyler Quake Text",Georgia,"Times New Roman",serif;--rt-font-display:"Tyler Quake","Tyler Quake Text",Georgia,serif;
+  --rt-text-xs:12px;--rt-text-sm:13px;--rt-text-md:14px;--rt-text-lg:16px;--rt-track:.06em;
+  --rt-r-xs:0;--rt-r-sm:1px;--rt-r-md:2px;--rt-r-lg:2px;--rt-shadow-float:0 0 0 1px #000,0 0 0 3px #3a2d20,0 22px 60px rgba(0,0,0,.85);
+  --q-stone:radial-gradient(circle at 30% 40%,rgba(255,240,210,.035) 0 1.5px,transparent 2.5px) 0 0/19px 23px,radial-gradient(circle at 60% 70%,rgba(0,0,0,.32) 0 2px,transparent 3px) 0 0/27px 17px,radial-gradient(circle at 80% 20%,rgba(120,80,40,.06) 0 3px,transparent 4px) 0 0/41px 37px;
+  --q-plate:linear-gradient(180deg,rgba(255,255,255,.06),transparent 40%,rgba(0,0,0,.35)),repeating-linear-gradient(97deg,rgba(255,255,255,.025) 0 1px,transparent 1px 6px),linear-gradient(180deg,#4a4540,#2f2c29 55%,#211f1d);
+  --q-bronze-plate:repeating-linear-gradient(100deg,rgba(255,255,255,.06) 0 1px,transparent 1px 5px),linear-gradient(180deg,#e7b06c,#b97f40 42%,#8f5d2c 72%,#6b4420);
+  --q-rivet:radial-gradient(circle,#f6cf8e 0 1px,#b07a3c 1.6px,#3b2410 2.6px,transparent 3.2px);
+  --q-bevel:#6a645c #0b0a09 #0b0a09 #6a645c;
+  --q-letter:linear-gradient(180deg,#ffe0a8,#d9a05a 48%,#9a6630 72%,#6b4420);
+}
+[data-rt-theme=quake] *{-webkit-font-smoothing:antialiased}
+.panel[data-rt-theme=quake]{background:var(--q-stone),radial-gradient(120% 50% at 50% 0,rgba(140,70,20,.18),transparent 60%),linear-gradient(180deg,#1d1712,#0f0c0a);border:4px solid;border-color:var(--q-bevel)}
+[data-rt-theme=quake] body{background:var(--q-stone),radial-gradient(90% 45% at 50% 0,rgba(140,70,20,.16),transparent 60%) fixed,#120e0b}
+[data-rt-theme=quake] main{background:transparent}
+/* Bronze lettering cut into the metal */
+[data-rt-theme=quake] :is(h1,h2,.wordmark,.brand-text strong,.sheet-head h2,.card>h2,.marquee){font-family:var(--rt-font-display);font-weight:700;letter-spacing:.03em;text-transform:none;
+  background:var(--q-letter);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 2px 0 #000) drop-shadow(0 0 1px #000)}
+[data-rt-theme=quake] h2{font-size:23px;line-height:1.05}
+[data-rt-theme=quake] h1{font-size:36px}
+[data-rt-theme=quake] .wordmark{font-size:22px;letter-spacing:.05em}
+[data-rt-theme=quake] :is(label,.tally-label,.stat dt,.pulse dt,.facts b,.matrix dt,details.feature>summary,.ident-sub,.tabs button,.section-nav button,nav:not(.tabs) button,button){font-family:var(--rt-font);font-weight:600;text-transform:uppercase;letter-spacing:.08em}
+[data-rt-theme=quake] label:not(:has(>input[type=checkbox])):not(.toggle){color:var(--q-bronze-hi);font-size:12px}
+[data-rt-theme=quake] label:has(>input[type=checkbox]),[data-rt-theme=quake] .toggle{text-transform:none;letter-spacing:0;font-weight:400}
+[data-rt-theme=quake] .ident-sub{color:var(--rt-ink-3)}
+/* Rusted iron frames held by bronze rivets */
+[data-rt-theme=quake] .bar{background:var(--q-rivet) 7px 7px/8px 8px no-repeat,var(--q-rivet) calc(100% - 7px) 7px/8px 8px no-repeat,var(--q-rivet) 7px calc(100% - 7px)/8px 8px no-repeat,var(--q-rivet) calc(100% - 7px) calc(100% - 7px)/8px 8px no-repeat,var(--q-plate);
+  border-bottom:3px solid;border-color:var(--q-bevel);padding:12px 12px 12px 18px;box-shadow:inset 0 -1px 0 rgba(233,184,116,.15)}
+[data-rt-theme=quake] .foot{background:var(--q-rivet) 7px 50%/8px 8px no-repeat,var(--q-rivet) calc(100% - 7px) 50%/8px 8px no-repeat,var(--q-plate);border-top:3px solid;border-color:#6a645c;padding-left:18px;padding-right:16px}
+[data-rt-theme=quake] .foot small{color:var(--rt-ink-2)}
+[data-rt-theme=quake] :where(details,.callout,.quick-help,.confirm,.deck-entry,.board-tools,.sheet,.card,.route-card,.panel,.mini-callout>div,.usage-banner,.facts>div,.matrix>div,#setup,.arcade-tickets>div){
+  background:var(--q-stone),linear-gradient(180deg,#221b15,#1a1410);border:2px solid;border-color:#0b0a09 #4a4038 #4a4038 #0b0a09;border-radius:var(--rt-r-md);box-shadow:inset 0 0 18px rgba(0,0,0,.45)}
+[data-rt-theme=quake] :is(.quick-help,.confirm,#setup){border-left:3px solid var(--q-bronze)}
+[data-rt-theme=quake] .deck-entry{border-left:3px solid var(--q-ember)}
+[data-rt-theme=quake] details.feature>summary{font-size:13px;color:var(--q-bronze-hi)}
+[data-rt-theme=quake] details.feature[open]>summary{color:var(--rt-ink-strong);box-shadow:inset 0 -1px 0 rgba(233,184,116,.18)}
+/* The HUD strip: big bronze numbers over small labels */
+[data-rt-theme=quake] .stats{background:var(--q-plate);border:3px solid;border-color:#0b0a09 #6a645c #6a645c #0b0a09;padding:7px 0}
+[data-rt-theme=quake] .stat{border-left:2px solid #0b0a09;box-shadow:-1px 0 0 #4a4038}
+[data-rt-theme=quake] .stat:first-child{border-left:0;box-shadow:none}
+[data-rt-theme=quake] .stat dt{font-size:11px;color:var(--rt-ink-3)}
+[data-rt-theme=quake] .stat dd{font-family:var(--rt-font);font-weight:600;font-size:22px;line-height:1.05;letter-spacing:.02em;background:var(--q-letter);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 2px 0 #000)}
+[data-rt-theme=quake] .stat small{color:var(--rt-ink-4)}
+[data-rt-theme=quake] .pulse dd{color:var(--q-bronze-hi);text-shadow:0 2px 0 #000}
+/* Tabs: iron plates; the open one is bronze, seated into its frame */
+[data-rt-theme=quake] .tabs{gap:4px;padding:6px;margin-top:8px;background:#0e0b09;box-shadow:inset 0 2px 6px rgba(0,0,0,.8);border-top:2px solid #0b0a09;border-bottom:2px solid #4a4038}
+[data-rt-theme=quake] .tabs button{position:relative;padding:8px 2px 6px;font-size:11px;color:var(--rt-ink-3);background:var(--q-plate);border:2px solid;border-color:var(--q-bevel);border-radius:0;box-shadow:0 2px 0 #000}
+[data-rt-theme=quake] .tabs button::before,[data-rt-theme=quake] .tabs button::after{content:"";position:absolute;top:3px;width:5px;height:5px;background:var(--q-rivet) center/6px 6px no-repeat;opacity:.85}
+[data-rt-theme=quake] .tabs button::before{left:3px}
+[data-rt-theme=quake] .tabs button::after{right:3px}
+[data-rt-theme=quake] .tabs button:hover{color:var(--q-bronze-hi);background:var(--q-plate);filter:brightness(1.15)}
+[data-rt-theme=quake] .tabs button[aria-selected=true]{color:#1a0f06;background:var(--q-bronze-plate);border-color:#3b2410 #f0c27e #f0c27e #3b2410;box-shadow:inset 0 3px 4px rgba(0,0,0,.45);transform:translateY(2px);text-shadow:0 1px 0 rgba(255,230,180,.45)}
+[data-rt-theme=quake] .tabs button[aria-selected=true] .ic{color:#1a0f06}
+[data-rt-theme=quake] .side{background:var(--q-stone),linear-gradient(180deg,#1c1612,#100d0a);box-shadow:inset -3px 0 0 #0b0a09,inset -5px 0 0 #4a4038}
+[data-rt-theme=quake] :is(.section-nav button,nav:not(.tabs) button){color:var(--rt-ink-3);background:transparent;border:2px solid transparent;border-radius:0;box-shadow:none}
+[data-rt-theme=quake] :is(.section-nav button,nav:not(.tabs) button):hover{color:var(--q-bronze-hi);background:rgba(233,184,116,.06)}
+[data-rt-theme=quake] :is(.section-nav button[aria-current=page],nav:not(.tabs) button.active){color:#1a0f06;background:var(--q-bronze-plate);border-color:#3b2410 #f0c27e #f0c27e #3b2410;box-shadow:inset 0 2px 3px rgba(0,0,0,.4)}
+[data-rt-theme=quake] :is(.section-nav button[aria-current=page],nav:not(.tabs) button.active) .ic{color:#1a0f06}
+/* Buttons: iron plates edged in bronze; the main action is a bronze plate */
+[data-rt-theme=quake] button{font-size:12px;color:var(--q-bronze-hi);background:var(--q-plate);border:2px solid;border-color:var(--q-bevel);border-radius:0;box-shadow:0 2px 0 #000}
+[data-rt-theme=quake] button:hover{color:var(--rt-ink-strong);background:var(--q-plate);filter:brightness(1.18);box-shadow:0 2px 0 #000,0 0 0 1px rgba(255,165,58,.35)}
+[data-rt-theme=quake] button:active:not(:disabled){transform:translateY(2px);box-shadow:inset 0 2px 4px rgba(0,0,0,.7);border-color:#0b0a09 #6a645c #6a645c #0b0a09}
+[data-rt-theme=quake] :is(.primary,#start,#save){color:#1a0f06;background:var(--q-bronze-plate);border-color:#f0c27e #3b2410 #3b2410 #f0c27e;text-shadow:0 1px 0 rgba(255,230,180,.5)}
+[data-rt-theme=quake] :is(.primary,#start,#save):hover{color:#1a0f06;background:var(--q-bronze-plate);filter:brightness(1.12);box-shadow:0 2px 0 #000,0 0 12px rgba(255,165,58,.45)}
+[data-rt-theme=quake] :is(.primary,#start,#save) .ic{color:#1a0f06}
+[data-rt-theme=quake] .danger{color:#fff1d6;background:linear-gradient(180deg,#b02a1c,#7a140c);border-color:#e05a40 #3a0806 #3a0806 #e05a40}
+[data-rt-theme=quake] .danger:hover{color:#fff;background:linear-gradient(180deg,#c43220,#8a1a10)}
+[data-rt-theme=quake] :is(.ghost,.icon,.icon-btn){background:transparent;border-color:transparent;box-shadow:none}
+[data-rt-theme=quake] .icon-btn{color:var(--q-bronze-hi)}
+[data-rt-theme=quake] :is(.pad,.friend-card,.preset,.link-btn){text-transform:none;letter-spacing:0;font-weight:400}
+[data-rt-theme=quake] .link-btn{border:0;background:none;color:var(--q-bronze-hi);box-shadow:none}
+[data-rt-theme=quake] button:disabled{color:var(--rt-ink-disabled);background:#1d1915;filter:none;box-shadow:none}
+/* Fields: recessed stone wells */
+[data-rt-theme=quake] input:where(:not([type=checkbox],[type=radio],[type=range],[type=file])),[data-rt-theme=quake] :is(textarea,select){
+  color:var(--rt-ink-strong);background-color:#0b0907;border:2px solid;border-color:#000 #3a3029 #3a3029 #000;border-radius:0;box-shadow:inset 0 2px 6px rgba(0,0,0,.8);font-family:var(--rt-font)}
+[data-rt-theme=quake] select{background-image:linear-gradient(45deg,transparent 50%,var(--q-bronze-hi) 50%),linear-gradient(135deg,var(--q-bronze-hi) 50%,transparent 50%)}
+[data-rt-theme=quake] :is(input,textarea,select):focus{border-color:var(--q-bronze) #6b4420 #6b4420 var(--q-bronze);box-shadow:inset 0 2px 6px rgba(0,0,0,.8),0 0 0 1px rgba(255,165,58,.5)}
+[data-rt-theme=quake] input::placeholder,[data-rt-theme=quake] textarea::placeholder{color:#8f7a5c}
+[data-rt-theme=quake] input[type=checkbox],[data-rt-theme=quake] .toggle>input[type=checkbox]{width:17px;height:17px;background:#0b0907;border:2px solid;border-color:#000 #6a645c #6a645c #000;border-radius:0;box-shadow:inset 0 1px 3px rgba(0,0,0,.8)}
+[data-rt-theme=quake] .toggle>input[type=checkbox]::after{display:none}
+[data-rt-theme=quake] input[type=checkbox]:checked,[data-rt-theme=quake] .toggle>input[type=checkbox]:checked{background:var(--q-bronze-plate);border-color:#3b2410 #f0c27e #f0c27e #3b2410}
+[data-rt-theme=quake] input[type=checkbox]:checked::after,[data-rt-theme=quake] .toggle>input[type=checkbox]:checked::after{display:block;content:"";position:absolute;left:4px;top:0;width:4px;height:9px;background:none;border:solid #1a0f06;border-width:0 3px 3px 0;border-radius:0;box-shadow:none;transform:rotate(45deg)}
+[data-rt-theme=quake] input[type=range]{accent-color:var(--q-bronze)}
+[data-rt-theme=quake] :is(pre,.output,.v22-log,.response){background:#0b0907;border:2px solid;border-color:#000 #3a3029 #3a3029 #000;box-shadow:inset 0 2px 6px rgba(0,0,0,.8)}
+[data-rt-theme=quake] :is(.meter,.arcade-progress,.lat-track){background:#0b0907;box-shadow:inset 0 1px 3px #000,0 0 0 1px #3a3029;border-radius:0}
+[data-rt-theme=quake] .pill{color:var(--q-bronze-hi);background:#1a130d;border-radius:0;box-shadow:inset 0 0 0 1px #6b4420}
+[data-rt-theme=quake] .pad{background:var(--q-plate);border:2px solid;border-color:var(--q-bevel);border-radius:0}
+[data-rt-theme=quake] .pad b{color:var(--rt-ink-strong)}
+[data-rt-theme=quake] .pad span{color:var(--q-bronze-hi)}
+[data-rt-theme=quake] .pad::after{border-left-color:var(--q-ember)}
+[data-rt-theme=quake] .pad:hover{background:var(--q-plate);filter:brightness(1.18)}
+[data-rt-theme=quake] .pad.playing{background:linear-gradient(90deg,rgba(255,165,58,.25),transparent 75%),var(--q-plate);box-shadow:inset 3px 0 0 var(--q-ember)}
+[data-rt-theme=quake] :is(.step-n,.setup-n,.friend-card .avatar){font-family:var(--rt-font);font-weight:600;color:#1a0f06;background:var(--q-bronze-plate);border-radius:0;box-shadow:inset 0 0 0 1px #3b2410}
+[data-rt-theme=quake] code{color:var(--q-bronze-hi);background:#0b0907;border-radius:0}
+[data-rt-theme=quake] .savebar{background:var(--q-plate);border-top:3px solid;border-color:#6a645c;box-shadow:0 -6px 18px rgba(0,0,0,.6)}
+[data-rt-theme=quake] .savebar p{color:var(--rt-ink-2)}
+[data-rt-theme=quake] .route li{background:#1a1410;box-shadow:inset 0 0 0 1px #3a2d20}
+[data-rt-theme=quake] .route li:last-child{background:rgba(192,138,74,.16);box-shadow:inset 3px 0 0 var(--q-bronze)}
+[data-rt-theme=quake] :is(.scroll,.content,main){scrollbar-color:#6b4420 #0b0907}
+html[data-rt-theme=quake]{scrollbar-color:#6b4420 #0b0907}
+
+/* ── Status strip: the slipgate channel ──
+   A groove cut along the bottom of the status stone. Molten bronze flows through it while
+   Tyler talks, embers breathe while he listens, a rune glint runs along it while he thinks,
+   and it runs blood red on an error. Cold iron when idle. */
+[data-rt-theme=quake] .tally{background:var(--q-stone),linear-gradient(180deg,#1b1511,#120e0b);border:2px solid;border-color:#000 #4a4038 #4a4038 #000;border-radius:0;padding-bottom:20px;box-shadow:inset 0 0 18px rgba(0,0,0,.6)}
+[data-rt-theme=quake] .tally-light{width:8px;border-radius:0;background:var(--tone);box-shadow:0 0 8px var(--tone),inset 0 0 0 1px rgba(0,0,0,.5)!important;clip-path:polygon(50% 0,100% 20%,100% 80%,50% 100%,0 80%,0 20%)}
+[data-rt-theme=quake] .tally-label{font-size:13px;color:var(--tone);text-shadow:0 1px 0 #000,0 0 8px color-mix(in srgb,var(--tone) 45%,transparent)}
+[data-rt-theme=quake] .tally-wave{display:none}
+[data-rt-theme=quake] .tally::after{content:"";position:absolute;left:10px;right:10px;bottom:6px;height:6px;border-radius:0;
+  background:linear-gradient(90deg,#2c2620,#4a4038 50%,#2c2620);box-shadow:inset 0 2px 3px #000,0 1px 0 rgba(233,184,116,.12)}
+[data-rt-theme=quake] .tally[data-state=speaking]::after{background:repeating-linear-gradient(90deg,#7d2a08 0 6px,#ff8a2a 14px,#ffe0a0 18px,#ff8a2a 22px,#7d2a08 30px);background-size:60px 100%;box-shadow:inset 0 1px 2px rgba(0,0,0,.6),0 0 10px rgba(255,138,42,.55);animation:qk-flow .9s linear infinite}
+[data-rt-theme=quake] .tally[data-state=listening]::after{background:linear-gradient(90deg,#3b1a08,#c25a1a 50%,#3b1a08);animation:qk-ember 2.2s ease-in-out infinite}
+[data-rt-theme=quake] .tally[data-state=thinking]::after{background:linear-gradient(90deg,transparent 0 40%,#ffe0a0 50%,transparent 60%) no-repeat,linear-gradient(90deg,#2c2620,#4a4038 50%,#2c2620);background-size:30% 100%,100% 100%;animation:qk-glint 1.3s ease-in-out infinite}
+[data-rt-theme=quake] .tally[data-state=waiting]::after{background:linear-gradient(90deg,#3b2a14,#8a6a3a 50%,#3b2a14);animation:qk-ember 3.4s ease-in-out infinite}
+[data-rt-theme=quake] .tally[data-state=error]::after{background:linear-gradient(90deg,#3a0604,#c0241a 50%,#3a0604);box-shadow:inset 0 1px 2px #000,0 0 10px rgba(192,36,26,.55);animation:qk-ember .9s steps(2,end) infinite}
+[data-rt-theme=quake] .tally[data-state=ready]::after{background:linear-gradient(90deg,#2c2620,#7a6a40 50%,#2c2620)}
+@keyframes qk-flow{from{background-position:0 0}to{background-position:60px 0}}
+@keyframes qk-ember{0%,100%{opacity:.55;filter:brightness(.8)}50%{opacity:1;filter:brightness(1.35)}}
+@keyframes qk-glint{0%{background-position:-40% 0,0 0}100%{background-position:140% 0,0 0}}
+
+/* The logo hangs in a riveted iron plate */
+[data-rt-theme=quake] :is(.mark[data-logo],img.mark,#brand-logo){--logo-pad:2px;background:radial-gradient(circle at 50% 38%,#3a2e22,#120e0b 72%);border:2px solid;border-color:#6a645c #0b0a09 #0b0a09 #6a645c;border-radius:0;box-shadow:0 0 0 1px #000}
+[data-rt-theme=quake] .mark[data-logo]{width:42px;height:42px;margin:-6px 0}
+
+/* ── Icons, dialogs, notifications and tooltips ──
+   Icons are solid bronze castings with a dark edge. Messages are iron plaques bolted at the
+   corners, bronze gothic titles; errors are rimmed in blood red. */
+[data-rt-theme=quake] .ic{--ic-w:1.6px;--ic-cap:square;--ic-join:miter;color:var(--q-bronze-hi)}
+[data-rt-theme=quake] .ic-v .b{fill:currentColor;fill-opacity:.85;stroke:#120b05;stroke-width:1.6px;paint-order:stroke}
+[data-rt-theme=quake] .ic-v .d{stroke:#120b05;stroke-width:1.6px}
+[data-rt-theme=quake] .tabs button .ic{color:var(--rt-ink-3)}
+[data-rt-theme=quake] :is(.rt-toast,.rt-dialog){background:var(--q-rivet) 5px 5px/8px 8px no-repeat,var(--q-rivet) calc(100% - 5px) 5px/8px 8px no-repeat,var(--q-rivet) 5px calc(100% - 5px)/8px 8px no-repeat,var(--q-rivet) calc(100% - 5px) calc(100% - 5px)/8px 8px no-repeat,var(--q-plate);
+  border:3px solid;border-color:var(--q-bevel);border-radius:0;box-shadow:0 0 0 1px #000,0 14px 36px rgba(0,0,0,.7)}
+[data-rt-theme=quake] .rt-toast{border-left:5px solid var(--tone);padding-left:14px}
+[data-rt-theme=quake] :is(.rt-toast,.rt-dialog)[data-kind=error]{border-color:#e05a40 #3a0806 #3a0806 #e05a40}
+[data-rt-theme=quake] :is(.rt-toast-title,.rt-dialog-title){font-family:var(--rt-font-display);font-weight:700;font-size:17px;letter-spacing:.03em;background:var(--q-letter);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 1px 0 #000)}
+[data-rt-theme=quake] :is(.rt-toast-text,.rt-dialog-text,.rt-steps){color:var(--rt-ink)}
+[data-rt-theme=quake] .rt-tip{background:#120e0b;color:var(--q-bronze-hi);border:2px solid;border-color:#4a4038 #000 #000 #4a4038;border-radius:0;font-family:var(--rt-font);font-weight:600}
+
+/* ── Motion: Quake ──
+   Signature: the selected tab drops a few pixels and seats into its frame, with a short
+   recoil, like throwing a heavy iron switch. Screens fall in and settle like a dropped plate,
+   notifications clank down onto their bolts, buttons press into their bevel, and the logo's
+   plate glows ember-hot while Tyler talks. */
+@keyframes qk-seat{0%{transform:translateY(-3px)}55%{transform:translateY(3px)}75%{transform:translateY(1px)}100%{transform:translateY(2px)}}
+@keyframes qk-drop{0%{opacity:0;transform:translateY(-10px)}60%{opacity:1;transform:translateY(2px)}100%{transform:none}}
+@keyframes qk-clank{0%{opacity:0;transform:translateY(-14px)}55%{opacity:1;transform:translateY(2px)}75%{transform:translateY(-1px)}100%{transform:none}}
+@keyframes qk-heat{0%,100%{box-shadow:0 0 0 1px #000,0 0 4px rgba(255,138,42,.25)}50%{box-shadow:0 0 0 1px #000,0 0 14px rgba(255,138,42,.85)}}
+[data-rt-theme=quake] .tabs button[aria-selected=true]{animation:qk-seat .32s cubic-bezier(.3,.7,.4,1) both}
+[data-rt-theme=quake] :is(.section-nav button[aria-current=page],nav:not(.tabs) button.active){animation:qk-seat .32s cubic-bezier(.3,.7,.4,1)}
+[data-rt-theme=quake] :is(.view:not([hidden]),.sheet,section[data-view]:not([hidden])){animation:qk-drop .3s cubic-bezier(.25,.8,.35,1) backwards}
+[data-rt-theme=quake] .rt-toast:not(.rt-leaving){animation:qk-clank .34s cubic-bezier(.25,.8,.35,1) backwards}
+[data-rt-theme=quake] .panel:has(.tally[data-state=speaking]) .mark[data-logo],.panel[data-rt-theme=quake]:has(.tally[data-state=speaking]) .mark[data-logo]{animation:qk-heat 1s ease-in-out infinite}

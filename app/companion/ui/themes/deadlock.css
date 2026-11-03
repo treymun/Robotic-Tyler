@@ -1,0 +1,183 @@
+/*
+ * ROBOTIC TYLER "Deadlock style" theme (v2.17).
+ * Occult noir in a city of old signage: lacquered near-black panels, brass hairlines in
+ * art-deco doubles, parchment cards inked in brown, an oxblood accent like a hat band and
+ * a muted spectral teal for anything supernatural (focus, listening, the hover glow).
+ * Signature: when a panel opens (an expanded section, the chosen tab, a settings page),
+ * an ink border draws itself around it from opposite corners and a brief spectral flare
+ * passes over it; the status strip is a row of marquee bulbs on a city sign.
+ * Type: "Tyler Deadlock" = Limelight (OFL) for vintage-sign headlines;
+ * "Tyler Deadlock Caps" = Cinzel (OFL) for engraved labels; Georgia for text.
+ * Style only: original ornaments; no Deadlock logos, hero art or game fonts.
+ */
+[data-rt-theme=deadlock]{
+  color-scheme:dark;
+  --dl-brass:#c9a45c;--dl-brass-hi:#ecd08f;--dl-brass-lo:#7a5f2e;--dl-teal:#6fd3c0;--dl-teal-dim:#2f6f66;--dl-blood:#9b2c22;
+  --dl-parch:#e9dcbf;--dl-parch-2:#d9c7a0;--dl-ink:#2a2118;--dl-lacquer:#171415;
+  --rt-bar:#120f10;--rt-bg:#141112;--rt-bg-deep:#0c0a0a;--rt-surface:#1e1a19;--rt-surface-2:#26211f;--rt-surface-3:#2f2926;
+  --rt-block:#191516;--rt-block-hover:#231e1c;--rt-input:#0c0a0a;--rt-select:#4a3a1e;
+  --rt-line:#3a3026;--rt-line-soft:#2a231d;--rt-line-strong:#7a5f2e;
+  --rt-ink:#e6d8bb;--rt-ink-strong:#fff4dc;--rt-ink-2:#d9c9a8;--rt-ink-3:#c9b68f;--rt-ink-4:#b5a07a;--rt-ink-disabled:#6a5c46;
+  --rt-link:#7fdcca;--rt-link-hover:#c4f2e8;--rt-blue:#ecd08f;--rt-blue-deep:#c9a45c;--rt-active:#c9a45c;
+  --rt-blue-fade:#221d17;--rt-blue-fade-hover:#30281d;
+  --rt-green:linear-gradient(180deg,#f0d698,#c9a45c 52%,#94743a);--rt-green-hover:linear-gradient(180deg,#f8e2ad,#d8b46c 52%,#a3803f);--rt-green-ink:#1a140c;--rt-green-line:#5a4420;
+  --rt-state-standby:#b5a07a;--rt-state-ready:#a9d48a;--rt-state-listening:#6fd3c0;--rt-state-thinking:#ecd08f;--rt-state-speaking:#f2b46c;--rt-state-waiting:#c7a6ff;--rt-state-error:#ff7a66;
+  --rt-danger:#ff7a66;--rt-danger-bg:#8a2018;--rt-danger-hover:#a3281e;--rt-danger-ink:#ffffff;--rt-success:#a9d48a;--rt-focus:var(--dl-teal);
+  --rt-accent:#ecd08f;--rt-accent-soft:rgba(236,208,143,.1);--rt-accent-line:rgba(236,208,143,.45);
+  --rt-on-accent:#fff4dc;--rt-accent-fill:#7a5f2e;--rt-meter:linear-gradient(90deg,#2f6f66,#6fd3c0 55%,#ecd08f);--rt-marker:#fff4dc;--rt-edge:rgba(201,164,92,.25);--rt-page-glow:#10231f;
+  --rt-font:Georgia,"Times New Roman",serif;--rt-font-display:"Tyler Deadlock",Georgia,serif;
+  --dl-caps:"Tyler Deadlock Caps","Trajan Pro",Georgia,serif;
+  --rt-text-xs:12px;--rt-text-sm:13px;--rt-text-md:14px;--rt-text-lg:16px;--rt-track:.1em;
+  --rt-r-xs:0;--rt-r-sm:1px;--rt-r-md:2px;--rt-r-lg:3px;--rt-shadow-float:0 0 0 1px #000,0 0 0 4px #1e1a19,0 0 0 5px rgba(201,164,92,.35),0 24px 60px rgba(0,0,0,.85);
+  --dl-deco:inset 0 0 0 1px rgba(201,164,92,.5),inset 0 0 0 3px #141112,inset 0 0 0 4px rgba(201,164,92,.22);
+  --dl-grain:radial-gradient(circle at 30% 30%,rgba(255,240,210,.025) 0 1px,transparent 1.5px) 0 0/9px 11px,radial-gradient(circle at 70% 60%,rgba(0,0,0,.25) 0 1px,transparent 1.5px) 0 0/13px 7px;
+  --dl-brass-plate:linear-gradient(180deg,#f0d698,#c9a45c 50%,#94743a);
+  --dl-ink-line:#ecd08f;
+}
+.panel[data-rt-theme=deadlock]{background:var(--dl-grain),radial-gradient(110% 55% at 50% 0,rgba(111,211,192,.07),transparent 60%),linear-gradient(180deg,#1a1617,#0f0c0d);border:1px solid #000;box-shadow:var(--rt-shadow-float)}
+[data-rt-theme=deadlock] body{background:var(--dl-grain),radial-gradient(80% 45% at 50% 0,rgba(111,211,192,.06),transparent 60%) fixed,#110e0f}
+[data-rt-theme=deadlock] main{background:transparent}
+/* City-sign headlines, engraved labels */
+[data-rt-theme=deadlock] :is(h1,h2,.wordmark,.brand-text strong,.sheet-head h2,.card>h2,.marquee){font-family:var(--rt-font-display);font-weight:400;letter-spacing:.04em;text-transform:none;color:var(--dl-brass-hi);text-shadow:0 1px 0 #000,0 0 14px rgba(236,208,143,.18)}
+[data-rt-theme=deadlock] h2{font-size:21px;line-height:1.1}
+[data-rt-theme=deadlock] h1{font-size:34px}
+[data-rt-theme=deadlock] .wordmark{font-size:19px;letter-spacing:.06em}
+[data-rt-theme=deadlock] :is(label,.tally-label,.stat dt,.pulse dt,.facts b,.matrix dt,details.feature>summary,.ident-sub,.tabs button,.section-nav button,nav:not(.tabs) button,button,.pad span){font-family:var(--dl-caps);font-weight:600;text-transform:uppercase;letter-spacing:.12em}
+[data-rt-theme=deadlock] label:not(:has(>input[type=checkbox])):not(.toggle){color:var(--dl-brass);font-size:11px}
+[data-rt-theme=deadlock] label:has(>input[type=checkbox]),[data-rt-theme=deadlock] .toggle{font-family:var(--rt-font);font-weight:400;text-transform:none;letter-spacing:0}
+[data-rt-theme=deadlock] .ident-sub{color:var(--rt-ink-3);font-size:10px}
+/* Lacquer panels framed in double brass hairlines */
+[data-rt-theme=deadlock] .bar{background:linear-gradient(180deg,#221c1a,#141112);border-bottom:1px solid var(--dl-brass-lo);box-shadow:inset 0 -3px 0 #141112,inset 0 -4px 0 rgba(201,164,92,.3)}
+[data-rt-theme=deadlock] .bar .icon-btn{color:var(--dl-brass-hi);background:transparent;border:1px solid var(--dl-brass-lo);border-radius:0}
+[data-rt-theme=deadlock] :where(details,.callout,.quick-help,.confirm,.deck-entry,.board-tools,.sheet,.card,.route-card,.panel,.mini-callout>div,.usage-banner,.facts>div,.matrix>div,#setup,.arcade-tickets>div){background:linear-gradient(180deg,#1e1a19,#181415);border:0;border-radius:var(--rt-r-md);box-shadow:var(--dl-deco)}
+[data-rt-theme=deadlock] :is(.quick-help,.confirm,#setup){box-shadow:var(--dl-deco),inset 3px 0 0 var(--dl-blood)}
+[data-rt-theme=deadlock] .deck-entry{box-shadow:var(--dl-deco),inset 3px 0 0 var(--dl-teal)}
+[data-rt-theme=deadlock] details.feature{position:relative}
+[data-rt-theme=deadlock] details.feature>summary{font-size:12px;color:var(--dl-brass-hi)}
+[data-rt-theme=deadlock] details.feature>summary:hover{color:var(--rt-ink-strong);text-shadow:0 0 10px rgba(111,211,192,.45)}
+[data-rt-theme=deadlock] .stats{background:linear-gradient(180deg,#1b1716,#120f10);box-shadow:var(--dl-deco);border-radius:var(--rt-r-md);padding:8px 0}
+[data-rt-theme=deadlock] .stat{border-left:1px solid rgba(201,164,92,.25)}
+[data-rt-theme=deadlock] .stat dt{font-size:10px;color:var(--dl-brass)}
+[data-rt-theme=deadlock] .stat dd{font-family:var(--rt-font-display);font-weight:400;font-size:20px;letter-spacing:.03em;color:var(--dl-parch)}
+[data-rt-theme=deadlock] .stat small{color:var(--rt-ink-4);font-style:italic}
+[data-rt-theme=deadlock] .pulse dd{font-family:var(--rt-font-display);color:var(--dl-parch)}
+/* Tabs: engraved brass captions; the chosen one is inked underneath */
+[data-rt-theme=deadlock] .tabs{gap:2px;padding:6px 6px 4px;background:#100d0e;box-shadow:inset 0 1px 0 rgba(201,164,92,.25),inset 0 -1px 0 rgba(201,164,92,.25)}
+[data-rt-theme=deadlock] .tabs button{position:relative;padding:8px 2px 8px;font-size:10px;color:var(--rt-ink-4);background:transparent;border:0;border-radius:0}
+[data-rt-theme=deadlock] .tabs button:hover{color:var(--dl-brass-hi);background:rgba(201,164,92,.06);text-shadow:0 0 8px rgba(111,211,192,.4)}
+[data-rt-theme=deadlock] .tabs button[aria-selected=true]{color:var(--dl-parch);background:linear-gradient(180deg,rgba(236,208,143,.12),rgba(236,208,143,.02))}
+[data-rt-theme=deadlock] .tabs button[aria-selected=true] .ic{color:var(--dl-brass-hi)}
+[data-rt-theme=deadlock] .side{background:var(--dl-grain),linear-gradient(180deg,#191516,#0f0c0d);box-shadow:inset -1px 0 0 rgba(201,164,92,.4),inset -4px 0 0 #0f0c0d,inset -5px 0 0 rgba(201,164,92,.18)}
+[data-rt-theme=deadlock] :is(.section-nav button,nav:not(.tabs) button){position:relative;font-size:11px;color:var(--rt-ink-3);background:transparent;border:0;border-radius:0;box-shadow:none}
+[data-rt-theme=deadlock] :is(.section-nav button,nav:not(.tabs) button):hover{color:var(--dl-brass-hi);background:rgba(201,164,92,.06)}
+[data-rt-theme=deadlock] :is(.section-nav button[aria-current=page],nav:not(.tabs) button.active){color:var(--dl-parch);background:linear-gradient(90deg,rgba(236,208,143,.14),transparent);box-shadow:inset 2px 0 0 var(--dl-blood)}
+[data-rt-theme=deadlock] :is(.section-nav button[aria-current=page],nav:not(.tabs) button.active) .ic{color:var(--dl-brass-hi)}
+/* Buttons: lacquer with a brass rule; the main action is a polished brass plate */
+[data-rt-theme=deadlock] button{font-size:11px;color:var(--dl-brass-hi);background:linear-gradient(180deg,#26211f,#1a1617);border:1px solid var(--dl-brass-lo);border-radius:var(--rt-r-sm);box-shadow:inset 0 1px 0 rgba(255,240,210,.06)}
+[data-rt-theme=deadlock] button:hover{color:var(--rt-ink-strong);background:linear-gradient(180deg,#2f2926,#1e1a19);border-color:var(--dl-brass);box-shadow:inset 0 1px 0 rgba(255,240,210,.08),0 0 12px rgba(111,211,192,.22)}
+[data-rt-theme=deadlock] button:active:not(:disabled){transform:translateY(1px);box-shadow:inset 0 2px 4px rgba(0,0,0,.6)}
+[data-rt-theme=deadlock] :is(.primary,#start,#save){color:#1a140c;background:var(--dl-brass-plate);border-color:#5a4420;box-shadow:inset 0 1px 0 rgba(255,250,230,.55),0 1px 0 #000}
+[data-rt-theme=deadlock] :is(.primary,#start,#save):hover{color:#1a140c;background:linear-gradient(180deg,#f8e2ad,#d8b46c 52%,#a3803f);box-shadow:inset 0 1px 0 rgba(255,250,230,.6),0 0 14px rgba(236,208,143,.35)}
+[data-rt-theme=deadlock] :is(.primary,#start,#save) .ic{color:#1a140c}
+[data-rt-theme=deadlock] .danger{color:#fff4dc;background:linear-gradient(180deg,#a83226,#7a1c14);border-color:#3a0c08}
+[data-rt-theme=deadlock] .danger:hover{color:#fff;background:linear-gradient(180deg,#bd3a2c,#8a2018)}
+[data-rt-theme=deadlock] :is(.ghost,.icon,.icon-btn){background:transparent;border-color:transparent;box-shadow:none}
+[data-rt-theme=deadlock] :is(.pad,.friend-card,.preset,.link-btn){font-family:var(--rt-font);text-transform:none;letter-spacing:0;font-weight:400}
+[data-rt-theme=deadlock] .link-btn{border:0;background:none;color:var(--rt-link);box-shadow:none}
+[data-rt-theme=deadlock] button:disabled{color:var(--rt-ink-disabled);background:#171415;border-color:#2a231d;box-shadow:none}
+/* Fields: black wells with a brass edge; the caret and focus are spectral teal */
+[data-rt-theme=deadlock] input:where(:not([type=checkbox],[type=radio],[type=range],[type=file])),[data-rt-theme=deadlock] :is(textarea,select){color:var(--dl-parch);caret-color:var(--dl-teal);background-color:#0c0a0a;border:1px solid #4a3d2a;border-radius:var(--rt-r-sm);box-shadow:inset 0 1px 4px rgba(0,0,0,.7)}
+[data-rt-theme=deadlock] select{background-image:linear-gradient(45deg,transparent 50%,var(--dl-brass) 50%),linear-gradient(135deg,var(--dl-brass) 50%,transparent 50%)}
+[data-rt-theme=deadlock] :is(input,textarea,select):focus{border-color:var(--dl-teal);box-shadow:inset 0 1px 4px rgba(0,0,0,.7),0 0 0 1px rgba(111,211,192,.35),0 0 12px rgba(111,211,192,.2)}
+[data-rt-theme=deadlock] input::placeholder,[data-rt-theme=deadlock] textarea::placeholder{color:#8c7a5c;font-style:italic}
+[data-rt-theme=deadlock] input[type=checkbox]{width:15px;height:15px;background:#0c0a0a;border:1px solid var(--dl-brass);border-radius:0;box-shadow:none;transform:rotate(45deg) scale(.85)}
+[data-rt-theme=deadlock] input[type=checkbox]:checked{background:radial-gradient(circle,var(--dl-teal) 0 2.5px,transparent 3.5px),#10231f;border-color:var(--dl-teal);box-shadow:0 0 8px rgba(111,211,192,.45)}
+[data-rt-theme=deadlock] input[type=checkbox]:checked::after{display:none}
+/* Switches: a brass lever track with a lacquer knob; on, it glows spectral */
+[data-rt-theme=deadlock] .toggle>input[type=checkbox]{width:38px;height:18px;transform:none;background:#0c0a0a;border:1px solid var(--dl-brass-lo);border-radius:9px;box-shadow:inset 0 1px 3px #000}
+[data-rt-theme=deadlock] .toggle>input[type=checkbox]::after{display:block;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:var(--dl-brass-plate);box-shadow:0 1px 2px #000}
+[data-rt-theme=deadlock] .toggle>input[type=checkbox]:checked{background:#10231f;border-color:var(--dl-teal);box-shadow:inset 0 1px 3px #000,0 0 10px rgba(111,211,192,.35)}
+[data-rt-theme=deadlock] .toggle>input[type=checkbox]:checked::after{display:block;top:2px;left:2px;width:12px;height:12px;border-radius:50%;transform:translateX(20px);background:radial-gradient(circle at 40% 35%,#c4f2e8,var(--dl-teal) 60%,#2f6f66)}
+[data-rt-theme=deadlock] input[type=range]{accent-color:var(--dl-brass)}
+[data-rt-theme=deadlock] :is(pre,.output,.v22-log,.response){background:#0c0a0a;border:1px solid #2a231d;box-shadow:none}
+[data-rt-theme=deadlock] :is(.meter,.arcade-progress,.lat-track){background:#0c0a0a;border-radius:0;box-shadow:inset 0 0 0 1px #3a3026}
+[data-rt-theme=deadlock] .pill{color:var(--dl-brass-hi);background:transparent;border-radius:0;box-shadow:inset 0 0 0 1px var(--dl-brass-lo)}
+/* Soundboard pads are calling cards with brass corners */
+[data-rt-theme=deadlock] .pad{background:linear-gradient(135deg,var(--dl-brass) 0 6px,transparent 6px),linear-gradient(-45deg,var(--dl-brass) 0 6px,transparent 6px),linear-gradient(180deg,#221d1b,#181415);border:1px solid #3a3026;border-radius:0}
+[data-rt-theme=deadlock] .pad b{color:var(--dl-parch)}
+[data-rt-theme=deadlock] .pad span{color:var(--dl-brass);font-size:9px}
+[data-rt-theme=deadlock] .pad::after{border-left-color:var(--dl-teal)}
+[data-rt-theme=deadlock] .pad:hover{background:linear-gradient(135deg,var(--dl-brass-hi) 0 6px,transparent 6px),linear-gradient(-45deg,var(--dl-brass-hi) 0 6px,transparent 6px),linear-gradient(180deg,#2a2421,#1e1a19);box-shadow:0 0 12px rgba(111,211,192,.2)}
+[data-rt-theme=deadlock] .pad.playing{background:linear-gradient(135deg,var(--dl-teal) 0 6px,transparent 6px),linear-gradient(-45deg,var(--dl-teal) 0 6px,transparent 6px),linear-gradient(90deg,rgba(111,211,192,.16),transparent 75%),#181415;box-shadow:inset 2px 0 0 var(--dl-teal)}
+[data-rt-theme=deadlock] :is(.step-n,.setup-n,.friend-card .avatar){font-family:var(--dl-caps);font-weight:600;color:#1a140c;background:var(--dl-brass-plate);border-radius:50%}
+[data-rt-theme=deadlock] code{color:var(--dl-brass-hi);background:#0c0a0a;border-radius:0}
+[data-rt-theme=deadlock] .savebar,[data-rt-theme=deadlock] .foot{background:linear-gradient(180deg,#141112,#1e1a19);box-shadow:inset 0 1px 0 rgba(201,164,92,.35),inset 0 3px 0 #141112,inset 0 4px 0 rgba(201,164,92,.16)}
+[data-rt-theme=deadlock] .foot small{color:var(--rt-ink-3);font-style:italic}
+[data-rt-theme=deadlock] .route li{background:#191516;box-shadow:inset 0 0 0 1px #3a3026}
+[data-rt-theme=deadlock] .route li:last-child{background:rgba(111,211,192,.1);box-shadow:inset 2px 0 0 var(--dl-teal)}
+[data-rt-theme=deadlock] :is(.scroll,.content,main){scrollbar-color:#7a5f2e #0c0a0a}
+html[data-rt-theme=deadlock]{scrollbar-color:#7a5f2e #0c0a0a}
+
+/* ── Status strip: a marquee of bulbs on a city sign ──
+   A brass-framed sign with a row of bulbs under the status. They chase along the sign while
+   Tyler talks, breathe a spectral teal while he listens, flicker unevenly while he thinks,
+   and go red on an error. Idle, they're dark glass. */
+[data-rt-theme=deadlock] .tally{background:var(--dl-grain),linear-gradient(180deg,#1b1716,#110e0f);border:0;border-radius:var(--rt-r-md);box-shadow:var(--dl-deco);padding-bottom:24px}
+[data-rt-theme=deadlock] .tally-light{width:3px;border-radius:0;background:var(--tone);box-shadow:0 0 10px var(--tone)!important}
+[data-rt-theme=deadlock] .tally-label{font-size:12px;color:var(--tone);text-shadow:0 0 10px color-mix(in srgb,var(--tone) 50%,transparent)}
+[data-rt-theme=deadlock] .tally-wave{display:none}
+[data-rt-theme=deadlock] .tally::after{content:"";position:absolute;left:12px;right:12px;bottom:8px;height:8px;pointer-events:none;--bulb:#3a3026;
+  background:radial-gradient(circle,var(--bulb) 0 2.4px,transparent 3px) 0 50%/14px 8px repeat-x}
+[data-rt-theme=deadlock] .tally[data-state=speaking]::after{--bulb:#f6d48f;background:radial-gradient(circle,#fff0c8 0 2.4px,transparent 3px) 0 50%/42px 8px repeat-x,radial-gradient(circle,#6a4a1e 0 2.4px,transparent 3px) 0 50%/14px 8px repeat-x;filter:drop-shadow(0 0 3px rgba(246,212,143,.9));animation:dl-chase .45s steps(3,end) infinite}
+[data-rt-theme=deadlock] .tally[data-state=listening]::after{--bulb:#6fd3c0;filter:drop-shadow(0 0 3px rgba(111,211,192,.8));animation:dl-breathe 2.6s ease-in-out infinite}
+[data-rt-theme=deadlock] .tally[data-state=thinking]::after{--bulb:#ecd08f;animation:dl-flicker 1.7s steps(1) infinite}
+[data-rt-theme=deadlock] .tally[data-state=waiting]::after{--bulb:#c7a6ff;animation:dl-breathe 3.6s ease-in-out infinite}
+[data-rt-theme=deadlock] .tally[data-state=error]::after{--bulb:#ff5a46;filter:drop-shadow(0 0 3px rgba(255,90,70,.85));animation:dl-flicker .8s steps(1) infinite}
+[data-rt-theme=deadlock] .tally[data-state=ready]::after{--bulb:#a9d48a}
+@keyframes dl-chase{from{background-position:0 50%,0 50%}to{background-position:42px 50%,0 50%}}
+@keyframes dl-breathe{0%,100%{opacity:.45}50%{opacity:1}}
+@keyframes dl-flicker{0%,100%{opacity:1}12%{opacity:.35}18%{opacity:.9}46%{opacity:.5}52%{opacity:1}78%{opacity:.7}}
+
+/* The logo hangs in a double brass frame */
+[data-rt-theme=deadlock] :is(.mark[data-logo],img.mark,#brand-logo){--logo-pad:3px;background:radial-gradient(circle at 50% 40%,#2a2421,#0c0a0a 75%);border:1px solid var(--dl-brass);border-radius:0;box-shadow:inset 0 0 0 2px #0c0a0a,inset 0 0 0 3px rgba(201,164,92,.35),0 0 0 1px #000}
+[data-rt-theme=deadlock] .mark[data-logo]{width:42px;height:42px;margin:-6px 0}
+
+/* ── Icons, dialogs, notifications and tooltips ──
+   Icons are engraved brass. Messages are parchment notes inked in brown, pinned with a
+   brass rule; errors are underlined in oxblood. */
+[data-rt-theme=deadlock] .ic{--ic-w:1.4px;--ic-cap:square;--ic-join:miter;color:var(--dl-brass)}
+[data-rt-theme=deadlock] .ic-v .b{fill:currentColor;fill-opacity:.25}
+[data-rt-theme=deadlock] .tabs button .ic{color:var(--rt-ink-4)}
+[data-rt-theme=deadlock] :is(.rt-toast,.rt-dialog){color:var(--dl-ink);background:radial-gradient(120% 90% at 30% 20%,#f3e8cf,#e2d2ad 70%,#cdb98d);border:1px solid #5a4420;border-radius:var(--rt-r-sm);box-shadow:inset 0 0 0 3px #e9dcbf,inset 0 0 0 4px rgba(90,68,32,.4),0 14px 34px rgba(0,0,0,.65)}
+[data-rt-theme=deadlock] .rt-toast{border-left:4px solid var(--tone)}
+[data-rt-theme=deadlock] :is(.rt-toast,.rt-dialog)[data-kind=error]{border-bottom:3px solid var(--dl-blood)}
+[data-rt-theme=deadlock] :is(.rt-toast,.rt-dialog)[data-kind=success]{--tone:#3f7a2a}
+[data-rt-theme=deadlock] :is(.rt-toast,.rt-dialog)[data-kind=warning]{--tone:#8a5a0a}
+[data-rt-theme=deadlock] :is(.rt-toast,.rt-dialog):not([data-kind]),[data-rt-theme=deadlock] :is(.rt-toast,.rt-dialog)[data-kind=info]{--tone:#2f6f66}
+[data-rt-theme=deadlock] :is(.rt-toast,.rt-dialog)[data-kind=error]{--tone:#9b2c22}
+[data-rt-theme=deadlock] :is(.rt-toast-title,.rt-dialog-title){font-family:var(--rt-font-display);font-weight:400;font-size:16px;letter-spacing:.03em;color:#2a2118;text-shadow:none}
+[data-rt-theme=deadlock] :is(.rt-toast-text,.rt-dialog-text,.rt-steps){color:#3a2e22}
+[data-rt-theme=deadlock] :is(.rt-toast,.rt-dialog) .ic{color:var(--tone)}
+[data-rt-theme=deadlock] :is(.rt-toast,.rt-dialog) .rt-x{color:#5a4420}
+[data-rt-theme=deadlock] :is(.rt-toast,.rt-dialog) button:not(.rt-x):not(.primary){color:#2a2118;background:transparent;border-color:#5a4420}
+[data-rt-theme=deadlock] .rt-tip{background:#e9dcbf;color:#2a2118;border:1px solid #5a4420;border-radius:var(--rt-r-sm);font-family:var(--rt-font);font-style:italic}
+
+/* ── Motion: Deadlock ──
+   Signature: an ink border resolves around whatever just opened (an expanded section, the
+   chosen tab, a settings page): two strokes draw out from opposite corners and meet, then a
+   spectral teal flare passes over and fades. Screens fade up out of the dark like a figure
+   stepping into lamplight, notes slide in tilted and settle, and the logo's frame glows
+   spectral while Tyler talks. */
+@keyframes dl-ink{0%{background-size:0 1px,1px 0,0 1px,1px 0}55%{background-size:100% 1px,1px 0,100% 1px,1px 0}100%{background-size:100% 1px,1px 100%,100% 1px,1px 100%}}
+@keyframes dl-spectre{0%,100%{box-shadow:0 0 0 rgba(111,211,192,0)}35%{box-shadow:0 0 16px rgba(111,211,192,.5),inset 0 0 12px rgba(111,211,192,.18)}}
+@keyframes dl-lamp{0%{opacity:0;filter:brightness(.4)}100%{opacity:1;filter:none}}
+@keyframes dl-note{0%{opacity:0;transform:translateY(10px) rotate(-1.5deg)}100%{opacity:1;transform:none}}
+@keyframes dl-haunt{0%,100%{box-shadow:inset 0 0 0 2px #0c0a0a,inset 0 0 0 3px rgba(201,164,92,.35),0 0 0 1px #000,0 0 4px rgba(111,211,192,.2)}50%{box-shadow:inset 0 0 0 2px #0c0a0a,inset 0 0 0 3px rgba(111,211,192,.5),0 0 0 1px #000,0 0 16px rgba(111,211,192,.7)}}
+[data-rt-theme=deadlock] :is(details.feature[open],.tabs button[aria-selected=true],.section-nav button[aria-current=page],nav:not(.tabs) button.active){position:relative}
+[data-rt-theme=deadlock] :is(details.feature[open],.tabs button[aria-selected=true],.section-nav button[aria-current=page],nav:not(.tabs) button.active)::after{content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;
+  background:linear-gradient(var(--dl-ink-line),var(--dl-ink-line)) 0 0/100% 1px no-repeat,linear-gradient(var(--dl-ink-line),var(--dl-ink-line)) 100% 100%/1px 100% no-repeat,
+    linear-gradient(var(--dl-ink-line),var(--dl-ink-line)) 100% 100%/100% 1px no-repeat,linear-gradient(var(--dl-ink-line),var(--dl-ink-line)) 0 0/1px 100% no-repeat;
+  animation:dl-ink .5s cubic-bezier(.5,0,.2,1) backwards,dl-spectre 1s .35s ease-out backwards}
+[data-rt-theme=deadlock] :is(.view:not([hidden]),.sheet,section[data-view]:not([hidden])){animation:dl-lamp .36s ease-out backwards}
+[data-rt-theme=deadlock] .rt-toast:not(.rt-leaving){animation:dl-note .3s cubic-bezier(.2,.8,.3,1) backwards}
+[data-rt-theme=deadlock] .panel:has(.tally[data-state=speaking]) .mark[data-logo],.panel[data-rt-theme=deadlock]:has(.tally[data-state=speaking]) .mark[data-logo]{animation:dl-haunt 1.6s ease-in-out infinite}
