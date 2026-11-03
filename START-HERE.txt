@@ -1,7 +1,7 @@
-ROBOTIC TYLER — v2.14.0
+ROBOTIC TYLER — v2.14.1
 
 JUST WANT TO USE IT?
-  Download ROBOTIC-TYLER-Setup-2.14.0.exe from
+  Download ROBOTIC-TYLER-Setup-2.14.1.exe from
   github.com/treymun/Robotic-Tyler/releases/latest and run it. Tick any of:
     Chrome extension      → Setup unpacks it and opens Chrome's extensions page;
                             turn on Developer mode, click Load unpacked, paste the path

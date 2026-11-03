@@ -1,6 +1,6 @@
 {
   "name": "robotic-tyler-control-center",
-  "version": "2.14.0",
+  "version": "2.14.1",
   "private": true,
   "description": "Text-only Control Center, native Steam audio companion, and Chrome extension",
   "main": "app/main.cjs",
