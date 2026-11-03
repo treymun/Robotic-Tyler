@@ -98,19 +98,14 @@
   - no HTML parsing of message text;
   - the setup's contract with the app installers (registry keys, checksums, silent install switches, no data access);
   - the two-download release layout.
-- **Setup tested under Wine 9 against a local copy of the release.** What was checked:
-  - install the Control Center alone, then add the Voice Studio later, then both at once;
-  - offline install from a file next to Setup;
-  - a tampered download refused;
-  - Retry after a failure and cancel during a download;
-  - keyboard-only use;
-  - uninstalling either app leaves the other installed and working, with shortcuts and settings intact.
-- Setup was also run against the real GitHub address. It reached github.com and reported the missing release clearly, since nothing has been published yet.
+- **Setup tested under Wine 9:**
+  - against a local copy of the release: install the Control Center alone, then add the Voice Studio later, then both at once; offline install from a file next to Setup; a tampered download refused; Retry after a failure and cancel during a download; keyboard-only use; uninstalling either app leaves the other installed and working, with shortcuts and settings intact;
+  - the Chrome extension: unpacked byte for byte, updated in place over an older version (old files removed);
+  - **the published release:** the Setup built and published by GitHub Actions, run in a fresh Windows environment, downloaded both apps from github.com/treymun/Robotic-Tyler, verified them and installed all three parts.
 - **Not tested here:**
   - real Windows 10/11: SmartScreen, Defender, high-DPI monitors, per-machine installs with a UAC prompt;
-  - launching the apps after Finish;
-  - an update from an older installed version;
-  - the CI workflow itself.
+  - Finish opening the apps and Chrome's extensions page (no Chrome in the test environment);
+  - an update from an older installed version of the apps.
 
 ---
 
