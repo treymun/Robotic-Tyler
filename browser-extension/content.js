@@ -185,7 +185,8 @@
  function rememberEcho(text){for(const line of text.split('\n'))echoes.add(line.trim());while(echoes.size>200)echoes.delete(echoes.values().next().value);}
  function send(text){
   if(!composer?.isConnected)throw Error('Choose the Steam message box first.');
-  const formatted='[ROBOTIC TYLER] '+text.slice(0,1800);composer.focus();
+  // One formatting layer (chat-tag.js): any legacy prefix is cleaned off and the owner's name tag added once, or not at all.
+  const formatted=TylerChatTag.format(String(text).slice(0,1800));if(!formatted)throw Error('Nothing to send.');composer.focus();
   if(composer.matches('textarea,input')){
    if(composer.value.trim())throw Error('The selected message box contains a draft. Clear it before sending.');
    const proto=composer.tagName==='TEXTAREA'?HTMLTextAreaElement.prototype:HTMLInputElement.prototype;
@@ -194,7 +195,7 @@
    if(composer.textContent.trim())throw Error('The selected message box contains a draft. Clear it first.');
    document.execCommand('insertText',false,formatted);composer.dispatchEvent(new InputEvent('input',{bubbles:true,inputType:'insertText',data:formatted}));
   }
-  rememberEcho(formatted);
+  rememberEcho(formatted);TylerChatTag.remember(formatted);
   composer.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',code:'Enter',keyCode:13,which:13,bubbles:true}));
   composer.dispatchEvent(new KeyboardEvent('keyup',{key:'Enter',code:'Enter',keyCode:13,which:13,bubbles:true}));
   status('Submitted to the chosen message box. Confirm it appears in Steam; if it stays as a draft, press Enter manually.');
@@ -216,7 +217,7 @@
  function pause(){if(autoActive)globalThis.TylerCompanion.stopAutomatic?.('Paused while setup changes');armed=false;globalThis.TylerCommands?.set('tyler',{enabled:false});epoch++;observer?.disconnect();observer=null;status('Commands paused. In-flight results will be ignored.');}
 
  // ── Chat targets ────────────────────────────────────────────────────────
- async function checkAI(){try{const r=await ask({type:'connection'});$('aiConnection').textContent=r.keyConfigured?(r.provider||'OpenRouter')+' key saved. Brain: '+r.model+'. Speech: '+r.speechVoice+'.':'No key saved for the selected provider. Open personality & API settings.';const pick=$('previewVoice');if(Array.isArray(r.voices)&&r.voices.length){pick.replaceChildren(...r.voices.map(v=>{const o=document.createElement('option');o.value=v.value;o.textContent=v.label;return o;}));}pick.value=r.speechVoice||pick.options[0]?.value||'';}catch(e){$('aiConnection').textContent=e.message;}}
+ async function checkAI(){try{const r=await ask({type:'connection'});if(r.chatTag)TylerChatTag.set(r.chatTag);$('aiConnection').textContent=r.keyConfigured?(r.provider||'OpenRouter')+' key saved. Brain: '+r.model+'. Speech: '+r.speechVoice+'.':'No key saved for the selected provider. Open personality & API settings.';const pick=$('previewVoice');if(Array.isArray(r.voices)&&r.voices.length){pick.replaceChildren(...r.voices.map(v=>{const o=document.createElement('option');o.value=v.value;o.textContent=v.label;return o;}));}pick.value=r.speechVoice||pick.options[0]?.value||'';}catch(e){$('aiConnection').textContent=e.message;}}
  function locateChat(){
   if(TylerSetup.visible(composer)&&TylerSetup.visible(region)&&sampleElement?.isConnected)return true;
   const found=TylerSelection.discover(document,lastChatFocus,chatHint);discovery={ambiguous:!!found.ambiguous,empty:!!found.empty};
@@ -279,7 +280,7 @@
    for(const record of records)for(const n of record.addedNodes){const element=n.nodeType===1?n:n.parentElement;if(element&&!nodes.some(x=>x===element||x.contains(element)))nodes.push(element);}
    for(const n of nodes){
     const text=globalThis.TylerChatBus?.text(n)??(n.innerText||n.textContent||'').trim();if(lastNodes.get(n)===text)continue;lastNodes.set(n,text);
-    const meta=globalThis.TylerIdentity?.meta?.(n);if(meta?.self||(meta?.at&&meta.at<armedAt-5000))continue;
+    const meta=globalThis.TylerIdentity?.meta?.(n);if(meta?.self||(meta?.at&&meta.at<armedAt-5000)||TylerChatTag.own(globalThis.TylerChatBus?.text(n)??n.textContent,meta))continue;
     if(text.length>2000){pause();status('Large history change detected. Commands paused to avoid replaying old messages. Reconnect this chat.');return;}
     for(const line of text.split('\n').map(s=>s.trim()))if(/^!tyler\s+/i.test(line)&&!echoes.has(line))run(line,true);
    }
@@ -321,6 +322,9 @@
  $('heardYes').onclick=()=>note('✓ Steam transmission confirmed by you');
  $('heardNo').onclick=()=>note('! Beep not received — enable bridge, rejoin voice, and check Steam mute/output settings.');
 
+ // The name-tag settings follow Settings without a reload (they're among the non-secret keys relayed here).
+ globalThis.TylerStorage?.onChanged?.addListener((changes,area)=>{if(area==='local'&&(changes.chatTagEnabled||changes.chatTagName)){const c=TylerChatTag.current;TylerChatTag.set({chatTagEnabled:changes.chatTagEnabled?changes.chatTagEnabled.newValue:c.enabled,chatTagName:changes.chatTagName?changes.chatTagName.newValue:c.name});}});
+ chrome.runtime.sendMessage({type:'connection'}).then(r=>{if(r?.chatTag)TylerChatTag.set(r.chatTag);}).catch(()=>{});
  globalThis.TylerCompanion={send,pause,bridge,connect,
   getMount:()=>$('automaticMount'),getFeatureMount:()=>$('featureMount'),getSoundboardMount:()=>$('soundboardMount'),getSetupMount:()=>$('automaticSetupMount'),
   getQuickMount:()=>$('quickMount'),getQuickOptions:()=>$('quickOptions'),getStyleSheet:()=>sheet,themeElement,getTheme:()=>uiTheme,

@@ -1,7 +1,7 @@
 (()=>{
  const valid=id=>/^7656119\d{10}$/.test(String(id||''));
  const clean=s=>String(s||'').replace(/[\u0000-\u001f\u007f-\u009f\u202a-\u202e\u2066-\u2069]/g,' ').replace(/\s+/g,' ').trim().slice(0,80);
- function parse(text){const s=String(text||'').trim();if(!s||s.length>180||/^\[ROBOTIC TYLER\]/i.test(s))return null;if(/^!modhelp$/i.test(s))return {action:'help'};const c=/^!(kick|votekick|mute|votemute)(?:\s+(yes|no|status|cancel|help))?$/i.exec(s);if(c)return {action:(c[2]||'help').toLowerCase(),...(c[1].toLowerCase().includes('mute')?{kind:'mute'}:{})};const m=/^!(votekick|votemute)\s+(.{1,80})$/i.exec(s);return m?{action:'start',target:clean(m[2]).replace(/^@/,''),...(m[1].toLowerCase()==='votemute'?{kind:'mute'}:{})}:null;}
+ function parse(text){const s=String(text||'').trim();if(!s||s.length>180||(globalThis.TylerChatTag?globalThis.TylerChatTag.tagged(s):/^\s*\[ROBOTIC TYLER\]/i.test(s)))return null;if(/^!modhelp$/i.test(s))return {action:'help'};const c=/^!(kick|votekick|mute|votemute)(?:\s+(yes|no|status|cancel|help))?$/i.exec(s);if(c)return {action:(c[2]||'help').toLowerCase(),...(c[1].toLowerCase().includes('mute')?{kind:'mute'}:{})};const m=/^!(votekick|votemute)\s+(.{1,80})$/i.exec(s);return m?{action:'start',target:clean(m[2]).replace(/^@/,''),...(m[1].toLowerCase()==='votemute'?{kind:'mute'}:{})}:null;}
  function create(){
   let poll=null,serial=0;
   const snapshot=()=>poll?{...poll,yes:[...poll.yes],no:[...poll.no],eligible:[...poll.eligible]}:null;

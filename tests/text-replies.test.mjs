@@ -8,10 +8,10 @@ test('addressed Steam text triggers reply on character changes; bot output stays
  const elements=new Map(),observers=[],timers=[],sent=[];
  const el=id=>{if(!elements.has(id))elements.set(id,{value:'50',checked:true,style:{},textContent:'',closest(){return this;}});return elements.get(id);};
  const region={isConnected:true},sample={isConnected:true};
- const api={getMount:()=>({append(){}}),getRegion:()=>region,getSample:()=>sample,getComposer:()=>({isConnected:true}),isOwner:()=>true,getEpoch:()=>1,getVoiceState:()=>({}),pause(){},bridge(){},send:text=>sent.push(text),getChatScope:()=> 'test',request:async()=>({ok:true,text:'Hello there!'})};
+ const api={getMount:()=>({append(){}}),getRegion:()=>region,getSample:()=>sample,getComposer:()=>({isConnected:true}),isOwner:()=>true,getEpoch:()=>1,getVoiceState:()=>({}),pause(){},bridge(){},send:text=>{sent.push(text);box.TylerChatTag.remember(box.TylerChatTag.format(text));},getChatScope:()=> 'test',request:async()=>({ok:true,text:'Hello there!'})}; // send() mimics content.js: format, then remember
  const box={console,performance,Date,clearTimeout(){},setTimeout:(fn,ms)=>{timers.push({fn,ms});return timers.length;},setInterval(){},document:{createElement:()=>({querySelector:s=>el(s.slice(1))})},window:{postMessage(){},addEventListener(){}},location:{origin:'https://steamcommunity.com'},MutationObserver:class{constructor(fn){this.fn=fn;observers.push(this);}observe(_r,opts){this.opts=opts;}disconnect(){}},TylerCompanion:api,TylerSelection:{readiness:()=> 'READY',selector:()=> '.message'},TylerIdentity:{speaker:()=>null},TylerStorage:{get:async()=>({}),onChanged:{addListener(){}}},chrome:{runtime:{sendMessage:async()=>({ok:true,noiseLevel:'balanced'}),onMessage:{addListener(){}}}}};
  vm.runInNewContext(read('auto-policy.js'),box);
- vm.runInNewContext(read('automatic.js'),box);
+ vm.runInNewContext(read('chat-tag.js'),box);vm.runInNewContext(read('automatic.js'),box);
  await api.prepareAutomatic();api.setRoutingMode('text');api.confirmNotice(true);
  assert.equal(await api.startAutomatic(),true);
  const observer=observers.at(-1);assert.equal(observer.opts.characterData,true);
@@ -24,6 +24,15 @@ test('addressed Steam text triggers reply on character changes; bot output stays
  node.innerText='[ROBOTIC TYLER] Hello there!';
  observer.fn([{type:'characterData',target:{nodeType:3,parentElement:node}}]);
  assert.equal(timers.length,timerCount,'own bracketed output is not queued');
+ // v2.16: with the name tag off, Tyler's plain message is still recognised as his own (what he just sent).
+ box.TylerChatTag.set({chatTagEnabled:false});api.send('Ready for round two?');assert.equal(sent.at(-1),'Ready for round two?');
+ node.innerText='Ready for round two?';observer.fn([{type:'characterData',target:{nodeType:3,parentElement:node}}]);
+ assert.equal(timers.length,timerCount,'Tyler’s own untagged message is not answered');
+ box.TylerChatTag.set({chatTagEnabled:true,chatTagName:'SQUAD BOT'});
+ node.innerText='(SQUAD BOT) Tyler, anything else?';observer.fn([{type:'characterData',target:{nodeType:3,parentElement:node}}]);
+ assert.equal(timers.length,timerCount,'a custom tag marks Tyler’s output too');
+ node.innerText='Tyler, are we playing again?';observer.fn([{type:'characterData',target:{nodeType:3,parentElement:node}}]);
+ assert.ok(timers.length>timerCount,'a friend’s message is still answered');
 });
 
 test('normal AI replies receive the same screenshot-style message sender used by arcade/music',async()=>{
@@ -31,7 +40,7 @@ test('normal AI replies receive the same screenshot-style message sender used by
  const el=id=>{if(!elements.has(id))elements.set(id,{value:'50',checked:true,style:{},textContent:'',closest(){return this;}});return elements.get(id);};
  const api={getMount:()=>({append(){}}),getRegion:()=>g.region,getSample:()=>g.body,getComposer:()=>({isConnected:true}),isOwner:()=>true,getEpoch:()=>1,getVoiceState:()=>({}),pause(){},bridge(){},send(){},getChatScope:()=> 'test',request:async m=>{requests.push(m);return {ok:true,text:'Hello Alex'};}};
  const box={URL,Event,console,performance,Date,clearTimeout(){},setTimeout:(fn,ms)=>{timers.push({fn,ms});return timers.length;},setInterval(){},document:{createElement:()=>({querySelector:s=>el(s.slice(1))})},window:{postMessage(){},addEventListener(){}},location:{origin:'https://steamcommunity.com'},MutationObserver:class{constructor(fn){this.fn=fn;observers.push(this);}observe(){}disconnect(){}},TylerCompanion:api,TylerSelection:{readiness:()=> 'READY',selector:()=> '.msg_Text'},TylerStorage:{get:async()=>({}),onChanged:{addListener(){}}},chrome:{runtime:{sendMessage:async()=>({ok:true,noiseLevel:'balanced'}),onMessage:{addListener(){}}}}};
- for(const f of ['identity.js','auto-policy.js','automatic.js'])vm.runInNewContext(read(f),box);
+ for(const f of ['chat-tag.js','identity.js','auto-policy.js','automatic.js'])vm.runInNewContext(read(f),box);
  await api.prepareAutomatic();api.setRoutingMode('text');api.confirmNotice(true);await api.startAutomatic();
  g.body.text='ROBOTIC TYLER are you there?';observers.at(-1).fn([{type:'characterData',target:{nodeType:3,parentElement:g.body}}]);
  timers.find(t=>t.ms===350).fn();await new Promise(resolve=>setImmediate(resolve));

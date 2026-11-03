@@ -18,6 +18,7 @@ import {Speech,VOICES} from './speech.mjs';
 import {acceptableScope,replyCap,localBudgetReached,routeComplexity} from './quality.mjs';
 const speech=new Speech((...args)=>fetch(...args));
 import './wav-codec.js';
+import './chat-tag.js';
 import {Host} from './host.mjs';
 const hosts=new Map(),busy=new Set(),last=new Map(),histories=new Map();
 const memory=new Memory(chrome.storage.local);
@@ -99,7 +100,7 @@ async function handleGameUnlocked(message,sender){
   }else if(action!=='status')throw Error('Unknown roast command.');
   const lines=['That play had all the confidence and none of the accuracy.','Your cooldowns came back before your strategy did.','The scoreboard is filing a formal complaint.','Even the minions asked for a different plan.','That was an ambitious interpretation of teamwork.','You found a new route: straight back to spawn.'];
   await chrome.storage.local.set({v23RoastState:state});
-  return {message:action==='join'?'ROBOTIC TYLER: Roast battle opt-in saved ('+state.members.length+'/2). Both players must !roast join.':action==='start'?'ROBOTIC TYLER: Roast battle started! Players can type !roast next for a playful gaming roast.':action==='next'?'ROBOTIC TYLER: '+lines[(state.round-1)%lines.length]:action==='stop'||action==='leave'?'ROBOTIC TYLER: Roast battle ended.':'ROBOTIC TYLER: Roast battle '+(state.active?'active, round '+state.round:'waiting')+' ('+state.members.length+'/2 opted in).'};
+  return {message:action==='join'?'Roast battle opt-in saved ('+state.members.length+'/2). Both players must !roast join.':action==='start'?'Roast battle started! Players can type !roast next for a playful gaming roast.':action==='next'?lines[(state.round-1)%lines.length]:action==='stop'||action==='leave'?'Roast battle ended.':'Roast battle '+(state.active?'active, round '+state.round:'waiting')+' ('+state.members.length+'/2 opted in).'};
  }
  if(message.type==='v23:custom'){
   const st=await chrome.storage.local.get(['v23Commands','v23CommandsEnabled','v22EmergencyStop','libraryAllowedIds']);
@@ -109,7 +110,7 @@ async function handleGameUnlocked(message,sender){
   const name=String(message.name||'').toLowerCase();const cmds=Array.isArray(st.v23Commands)?st.v23Commands:[];
   const entry=cmds.find(c=>c.name===name);if(!entry)throw Error('Unknown custom command.');
   if(!/^![a-z][a-z0-9_-]{1,24}$/.test(entry.name)||typeof entry.reply!=='string'||entry.reply.length>250)throw Error('Invalid custom command.');
-  return {message:'ROBOTIC TYLER: '+entry.reply};
+  return {message:entry.reply};
  }
  if(message.type==='settings'){await chrome.runtime.openOptionsPage();return {};}
  if(message.type?.startsWith('suite:')&&!await lease.check(tab))throw Error('Another Steam tab owns the bot.');
@@ -122,7 +123,7 @@ async function handleGameUnlocked(message,sender){
   const state=await chrome.storage.local.get(['suiteParty','suiteOptions','libraryAllowedIds','suiteXp']);
   if(state.suiteOptions?.partyEnabled!==true)throw Error('Party host is disabled in Squad settings.');
   const allowed=new Set(String(state.libraryAllowedIds||'').match(/7656119\d{10}/g)||[]);if(!allowed.has(sp.id))throw Error('Only approved Steam friends can use party commands.');
-  const result=partyCommand(state.suiteParty,message.action,sp);await chrome.storage.local.set({suiteParty:result.party});return {message:'ROBOTIC TYLER: '+result.message};
+  const result=partyCommand(state.suiteParty,message.action,sp);await chrome.storage.local.set({suiteParty:result.party});return {message:result.message};
  }
  if(message.type==='suite:trivia'){
   const sp=TylerIdentity.valid(message.speaker);if(!sp||!safeSteamId(sp.id))throw Error('Verified Steam ID required.');
@@ -168,7 +169,7 @@ async function handleGameUnlocked(message,sender){
   if(!['win','loss','achievement'].includes(message.event))throw Error('Unsupported event');
   const s=await chrome.storage.local.get(['suiteEvents','suiteOptions']);if(s.suiteOptions?.eventsEnabled!==true)throw Error('Events disabled');
   const events=capHistory([...(s.suiteEvents||[]),{at:Date.now(),event:message.event}],60);
-  await chrome.storage.local.set({suiteEvents:events});return {message:{win:'ROBOTIC TYLER: GG! Another W for the squad.',loss:'ROBOTIC TYLER: Tough match. Run it back.',achievement:'ROBOTIC TYLER: Achievement unlocked! Nice work.'}[message.event]};
+  await chrome.storage.local.set({suiteEvents:events});return {message:{win:'GG! Another W for the squad.',loss:'Tough match. Run it back.',achievement:'Achievement unlocked! Nice work.'}[message.event]};
  }
 
  if(message.type==='activity:check'){
@@ -220,10 +221,10 @@ async function handleGameUnlocked(message,sender){
  if(message.type==='soundboard:rename'){const label=String(message.name||'').trim().slice(0,50);if(!TylerSoundboard.slug(label)||/^\d+$/.test(label))throw Error('Enter a name with letters or numbers.');const key=TylerSoundboard.slug(label);if(TylerSoundboard.names.some((name,i)=>i+1!==slot&&TylerSoundboard.slug(name)===key)||Object.entries(soundboardLabels).some(([n,name])=>Number(n)!==slot&&TylerSoundboard.slug(name)===key))throw Error('Choose a unique sound name.');soundboardLabels[slot]=label;await write({soundboardLabels});return {};}
  if(message.type==='soundboard:save'){if(!TylerSoundboard.validClip(message.clip))throw Error('Clip must be at most 512 KB and 12 seconds.');soundboardSlots[slot]=message.clip;}else if(message.type==='soundboard:clear'){delete soundboardSlots[slot];delete soundboardLabels[slot];delete soundboardTriggers[slot];}else throw Error('Unknown soundboard action');await write({soundboardSlots,soundboardLabels,soundboardTriggers,boardFavorites:message.type==='soundboard:clear'&&slot>10?favorites.filter(n=>n!==slot):favorites});return {};}
 
- const settings=await chrome.storage.local.get(['openrouterKey','geminiKey','aiProvider','personality','length','brain','noiseLevel','roastMode','speechVoice','voiceThreshold','minVoiced','replyPause','talkativeness','voiceControls','keyboardFilter','callbackGap','nicknameAliases','insideJokes','callbackState','quickSetup','usage','textSpeed','spendingCapUSD','streamAI','friendMemory','voiceBargeIn','voiceBargeDelay','smartRouting','suiteProfiles','suiteOptions','v23Persona','fastSpeech','geminiVoice','geminiTtsModel','voiceEngine']);
+ const settings=await chrome.storage.local.get(['openrouterKey','geminiKey','aiProvider','personality','length','brain','noiseLevel','roastMode','speechVoice','voiceThreshold','minVoiced','replyPause','talkativeness','voiceControls','keyboardFilter','callbackGap','nicknameAliases','insideJokes','callbackState','quickSetup','usage','textSpeed','spendingCapUSD','streamAI','friendMemory','voiceBargeIn','voiceBargeDelay','smartRouting','suiteProfiles','suiteOptions','v23Persona','fastSpeech','geminiVoice','geminiTtsModel','voiceEngine','chatTagEnabled','chatTagName']);
  const google=settings.aiProvider==='gemini', selectedKey=google?settings.geminiKey:settings.openrouterKey;
  if(message.automatic===true){const st=await chrome.storage.local.get('v22EmergencyStop');if(st.v22EmergencyStop===true)throw Error('Emergency stop is active. Disable it in settings.');}
- if(message.type==='connection')return {keyConfigured:!!selectedKey,provider:google?'Gemini':'OpenRouter',model:google?geminiModel:settings.smartRouting===true?'Auto: Mistral Small / Llama 3.3':settings.brain==='budget'?MODEL:'meta-llama/llama-3.3-70b-instruct',speechModel:google?geminiTtsModel(settings.geminiTtsModel):'x-ai/grok-voice-tts-1.0',brain:settings.brain||'fast',noiseLevel:settings.noiseLevel||'balanced',speechVoice:google?geminiVoiceFor(settings):VOICES.includes(settings.speechVoice)?settings.speechVoice:'rex',voices:voiceChoices(google),voiceEngine:settings.voiceEngine==='live'?'live':'standard',voiceThreshold:settings.voiceThreshold??null,minVoiced:settings.minVoiced??null,replyPause:settings.replyPause??null,talkativeness:settings.talkativeness||'active',voiceControls:settings.voiceControls!==false,keyboardFilter:settings.keyboardFilter!==false,voiceBargeIn:settings.voiceBargeIn===true,voiceBargeDelay:[350,500,750,1000].includes(settings.voiceBargeDelay)?settings.voiceBargeDelay:500,textSpeed:settings.textSpeed||'balanced',quickSetup:settings.quickSetup||{}};
+ if(message.type==='connection')return {keyConfigured:!!selectedKey,provider:google?'Gemini':'OpenRouter',model:google?geminiModel:settings.smartRouting===true?'Auto: Mistral Small / Llama 3.3':settings.brain==='budget'?MODEL:'meta-llama/llama-3.3-70b-instruct',speechModel:google?geminiTtsModel(settings.geminiTtsModel):'x-ai/grok-voice-tts-1.0',brain:settings.brain||'fast',noiseLevel:settings.noiseLevel||'balanced',speechVoice:google?geminiVoiceFor(settings):VOICES.includes(settings.speechVoice)?settings.speechVoice:'rex',chatTag:TylerChatTag.config(settings),voices:voiceChoices(google),voiceEngine:settings.voiceEngine==='live'?'live':'standard',voiceThreshold:settings.voiceThreshold??null,minVoiced:settings.minVoiced??null,replyPause:settings.replyPause??null,talkativeness:settings.talkativeness||'active',voiceControls:settings.voiceControls!==false,keyboardFilter:settings.keyboardFilter!==false,voiceBargeIn:settings.voiceBargeIn===true,voiceBargeDelay:[350,500,750,1000].includes(settings.voiceBargeDelay)?settings.voiceBargeDelay:500,textSpeed:settings.textSpeed||'balanced',quickSetup:settings.quickSetup||{}};
  if(message.type==='setup:save'){const old=settings.quickSetup||{},input=message.values||{},next={...old};if(typeof input.botName==='string')next.botName=input.botName.trim().slice(0,80);if(['auto','text','voice'].includes(input.mode))next.mode=input.mode;if(['text','voice-room'].includes(input.chatKind))next.chatKind=input.chatKind;if(typeof input.noticeScope==='string'&&input.noticeScope.length<=160&&input.noticeScope.startsWith('chat:'))next.notices=[...new Set([...(old.notices||[]),input.noticeScope])].slice(-30);await chrome.storage.local.set({quickSetup:next});return {};}
  if(message.type==='preferences'){const input=message.values||{},values={};for(const [key,lo,hi]of [['voiceThreshold',.001,.06],['minVoiced',150,1000],['replyPause',400,1800]])if(Number.isFinite(input[key]))values[key]=Math.max(lo,Math.min(hi,input[key]));if(['quiet','occasional','active'].includes(input.talkativeness))values.talkativeness=input.talkativeness;if(VOICES.includes(input.speechVoice))values.speechVoice=input.speechVoice;if(typeof input.voice==='string'){if(google&&GEMINI_VOICES.some(v=>v.name===input.voice))values.geminiVoice=input.voice;else if(!google&&VOICES.includes(input.voice))values.speechVoice=input.voice;else throw Error('That voice isn\'t available for '+(google?'Gemini':'Grok')+' speech.');}if(typeof input.keyboardFilter==='boolean')values.keyboardFilter=input.keyboardFilter;if(typeof input.voiceControls==='boolean')values.voiceControls=input.voiceControls;if(typeof input.voiceBargeIn==='boolean')values.voiceBargeIn=input.voiceBargeIn;if([350,500,750,1000].includes(Number(input.voiceBargeDelay)))values.voiceBargeDelay=Number(input.voiceBargeDelay);await chrome.storage.local.set(values);return {};}
  if(message.type==='reset'){await memory.clear(tab);await chrome.storage.local.remove('conversationMemory');if(settings.friendMemory===true)await chrome.storage.local.remove('friendConversationMemory');hosts.delete(tab);histories.delete(tab);histories.delete(tab+':voice');histories.delete(tab+':text');return {text:'Conversation and poll reset for this tab.'};}
@@ -302,7 +303,7 @@ async function handleGameUnlocked(message,sender){
      if(this.sentence!==null)return;
      if(/^\s*\[/.test(content)){this.sentence='';return;}
      const m=/^\s*([\s\S]{16,160}?[.!?])(?=\s)/.exec(content);if(!m)return;
-     const candidate=freshReply(m[1].trim(),history);
+     const candidate=freshReply(TylerChatTag.strip(m[1].trim(),TylerChatTag.config(settings)).trim(),history);
      if(!candidate||candidate.length<12){this.sentence='';return;}
      this.sentence=candidate;timings.firstSentenceMs=Date.now()-thinkStarted;
      this.promise=speech.generate(candidate,settings.openrouterKey,settings.speechVoice,controller.signal).then(spoken=>{
@@ -312,6 +313,8 @@ async function handleGameUnlocked(message,sender){
     }};
    }
    reply=await generate(request.messages,early?content=>early.feed(content):undefined);
+   // The app adds the name tag (chat-tag.js); a tag the model wrote itself is removed so it never appears twice or gets spoken.
+   reply=TylerChatTag.strip(reply,TylerChatTag.config(settings)).trim()||reply;
    if(/^\[\[SKIP\]\]$/i.test(reply)&&allowSkip){reply='';ignoreReason='Skipped by '+settings.talkativeness+' mode — select Active for regular replies.';}
    else {const cleaned=freshReply(reply,history);if(/^\[\[SKIP\]\]$/i.test(reply)||!cleaned){progress('Preparing a fresh reply…');reply=await generate([...request.messages,{role:'system',content:'Reply to the latest chat message with a fresh, brief conversational answer, following the RULES. Do not output a skip marker or repeat an earlier answer. The person is talking to you even if their identity is unknown.'}]);if(/^\[\[SKIP\]\]$/i.test(reply))throw Error('Model refused to produce a conversational reply after one retry. Try another conversation model.');}else reply=cleaned;}
    if(message.modality==='voice'&&reply.length>(settings.length==='detailed'?420:settings.length==='short'?170:270)){const cut=reply.slice(0,settings.length==='detailed'?420:settings.length==='short'?170:270);const ends=[...cut.matchAll(/[.!?](?=\s|$)/g)];const end=ends.at(-1)?.index;reply=end>=30?cut.slice(0,end+1):cut.slice(0,Math.max(1,cut.lastIndexOf(' ')))+'.';}else reply=reply.slice(0,1800);

@@ -85,9 +85,11 @@
    for(const record of records){for(const node of record.addedNodes||[])collect(node);if(record.type==='characterData')collect(record.target);else{const parent=record.target?.closest?.(selector);if(parent)nodes.add(parent);}}
    for(const n of nodes){
     const text=(globalThis.TylerChatBus?.text(n)??(n.innerText||n.textContent||'').trim());if(!text||text.length>2000||seen.get(n)===text)continue;seen.set(n,text);
+    // Tyler's own cards and replies are never read back as answers (Steam's sender record, what he just sent, or his tag).
+    if(TylerChatTag.own(text,globalThis.TylerIdentity?.meta?.(n)))continue;
     const handled=handledLines.get(n)||new Set();handledLines.set(n,handled);
     for(const line of text.split('\n').map(s=>s.trim())){
-     if(!line||line.length>240||handled.has(line)||/^\[ROBOTIC TYLER\]/i.test(line))continue;
+     if(!line||line.length>240||handled.has(line)||TylerChatTag.own(line))continue;
      handled.add(line);const id=stable(n),key=id+'|'+line;if(id&&messageLines.has(key))continue;if(id)messageLines.add(key);while(messageLines.size>2000)messageLines.delete(messageLines.values().next().value);enqueue(line,globalThis.TylerIdentity?.speaker(n,watched)||null,true,globalThis.TylerTriviaIdentity?.identify(n,watched)||null,()=>globalThis.TylerTriviaIdentity?.identify(n,region)||null);
     }
    }

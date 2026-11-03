@@ -181,6 +181,21 @@
   </div>
 </section>
 
+<section class="sheet" id="chatTagSheet" data-ui-zone="ai">
+  <div class="sheet-head">
+    <h2>Name tag in chat</h2>
+    <p>An optional name printed at the start of Tyler's messages, so friends can tell his messages apart. It doesn't change the Steam account's name, which Steam shows as usual.</p>
+  </div>
+  <div class="toggle-grid">
+    <label class="toggle"><input id="chatTagEnabled" type="checkbox" checked><span><b>Show name tag in chat messages</b><small>Off: Tyler's messages are sent without a tag. Your custom name is kept for when you turn it back on.</small></span></label>
+  </div>
+  <label class="narrow">Chat display name
+    <input id="chatTagName" type="text" maxlength="64" value="ROBOTIC TYLER" autocomplete="off" spellcheck="false" aria-describedby="chatTagHelp">
+  </label>
+  <p class="hint" id="chatTagHelp">Up to 32 characters, shown exactly as typed (capitals, accents and emoji are fine). No line breaks.</p>
+  <p class="chat-tag-preview" aria-live="polite"><span class="hint">Preview:</span> <span id="chatTagPreview">(ROBOTIC TYLER) Anyone up for another round?</span></p>
+</section>
+
 <section class="sheet" id="playground" data-ui-zone="ai">
   <div class="sheet-head">
     <h2>Preview a reply</h2>
@@ -396,6 +411,7 @@
 <script src="ui-icons.js"></script>
 <script src="ui-kit.js"></script>
 <script src="ui-template.js"></script>
+<script src="chat-tag.js"></script>
 <script src="settings.js"></script>
 <script src="v22-settings.js"></script>
 <script src="settings-navigation.js"></script>

@@ -247,3 +247,7 @@ button:focus-visible,a:focus-visible,summary:focus-visible,input[type=checkbox]:
 .engine-card b{text-transform:none}
 body[data-voice-engine=standard] [data-engine=live],body[data-voice-engine=live] [data-engine=standard]{display:none!important}
 body[data-voice-provider=gemini] #voiceStandard [data-provider=openrouter],body:not([data-voice-provider=gemini]) #voiceStandard [data-provider=gemini]{display:none!important}
+
+/* Name tag preview (v2.16) */
+.chat-tag-preview{margin:10px 0 0;padding:10px 12px;border-radius:var(--rt-r-sm);background:var(--rt-surface);color:var(--rt-ink-strong);overflow-wrap:anywhere}
+#chatTagName[aria-invalid=true]{border-color:var(--rt-danger,#e5534b)}

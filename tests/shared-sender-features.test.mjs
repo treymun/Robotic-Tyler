@@ -42,7 +42,7 @@ test('Squad Suite character updates send votes, parties, roasts and custom comma
  const api={getMount:()=>({append(){}}),getRegion:()=>g.region,getSample:()=>g.body,getChatScope:()=> 'room:test',isOwner:()=>true,send(){},bridge(){}};
  const panel={querySelector:s=>el(s.slice(1)),addEventListener(){}};
  const box={URL,Event,setTimeout,setInterval:(fn,ms)=>intervals.push({fn,ms}),document:{createElement:()=>panel},TylerCompanion:api,TylerSelection:{selector:()=>'.msg_Text'},MutationObserver:class{constructor(fn){this.fn=fn;observers.push(this);}observe(){}disconnect(){}},chrome:{runtime:{sendMessage:async m=>{sent.push(m);return {ok:true,message:'Saved',diagnostics:{},options:{}};}}}};
- vm.runInNewContext(source('identity.js'),box);vm.runInNewContext(source('commands.js'),box);vm.runInNewContext(source('squad-suite.js'),box);intervals.find(x=>x.ms===1400).fn();
+ vm.runInNewContext(source('identity.js'),box);vm.runInNewContext(source('commands.js'),box);vm.runInNewContext(source('chat-tag.js'),box);vm.runInNewContext(source('squad-suite.js'),box);intervals.find(x=>x.ms===1400).fn();
  const types=['suite:vote','suite:party','v23:roast','v23:custom'];
  for(const [i,line] of ['!vote Portal','!party join','!roast join','!cheer'].entries()){
   g.body.text=line;observers.at(-1).fn([{type:'characterData',target:{nodeType:3,parentElement:g.body}}]);await new Promise(resolve=>setTimeout(resolve,5));

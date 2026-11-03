@@ -1,7 +1,7 @@
 (()=>{
  const reserved=/^(?:vault|scramble|trivia|hangman|math|riddle|reverse|rps|again)(?:\s|$)/i;
  function parse(text){
-  const value=String(text||'').trim();if(!value||value.length>240||/^\[ROBOTIC TYLER\]/i.test(value))return null;
+  const value=String(text||'').trim();if(!value||value.length>240||(globalThis.TylerChatTag?globalThis.TylerChatTag.tagged(value):/^\s*\[ROBOTIC TYLER\]/i.test(value)))return null;
   const request=/^(?:!play|music play|tyler play|robotic tyler play)\s+(.+)$/i.exec(value);
   if(request){const query=request[1].trim();if(reserved.test(query))return null;return query.length>=2&&query.length<=160?{action:'play',query}:null;}
   const control=/^(?:!music|music)\s+(skip|pause|resume|stop|clear|reset|queue|now|help)$/i.exec(value);

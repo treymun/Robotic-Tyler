@@ -51,7 +51,7 @@
   if(!active())return;
   if(!speaker)return say('Sender not identified for this command. Check Sender check in the Music panel; names alone do not grant account access.');
   const id=speaker.id;
-  if(help){api.send('ROBOTIC TYLER: '+(C?C.helpText():'Commands: !trivia, !answer 1-4, !party join/status, !vote GAME.'));return;}
+  if(help){api.send((C?C.helpText():'Commands: !trivia, !answer 1-4, !party join/status, !vote GAME.'));return;}
   const key=id+'|'+line;if(recently.has(key)&&Date.now()-recently.get(key)<90000)return;recently.set(key,Date.now());
   const r=await send(match?{type:'suite:vote',speaker,title:match[1]}:party?{type:'suite:party',speaker,action:(party[1]||'help').toLowerCase()}:roast?{type:'v23:roast',speaker,action:(roast[1]||'status').toLowerCase()}:custom?{type:'v23:custom',speaker,name:custom}:{type:'suite:trivia',speaker,...trivia});
   if(active()){api.send(r.message);void refresh();}
@@ -65,8 +65,8 @@
   observer=new (globalThis.TylerChatBus?.Observer||MutationObserver)(records=>{
    const nodes=new Set(),collect=raw=>{const n=raw.nodeType===1?raw:raw.parentElement;if(!n)return;if(n.matches?.(selector))nodes.add(n);for(const child of n.querySelectorAll?.(selector)||[])nodes.add(child);const parent=n.closest?.(selector);if(parent)nodes.add(parent);};
    for(const record of records){for(const raw of record.addedNodes||[])collect(raw);if(record.type==='characterData')collect(record.target);else {const parent=record.target?.closest?.(selector);if(parent)nodes.add(parent);}}
-   for(const node of nodes){const line=(globalThis.TylerChatBus?.text(node)??(node.innerText||node.textContent||'').trim());if(!line||readMessages.get(node)===line)continue;readMessages.set(node,line);if(/^(?:ROBOTIC TYLER:|\[ROBOTIC TYLER\])/i.test(line))continue;lastMessageAt=Date.now();const bound=region,epoch=watchEpoch;suiteTasks=suiteTasks.catch(()=>{}).then(()=>suiteMessage(line,node,bound,epoch)).catch(e=>say('Command skipped: '+e.message));}
+   for(const node of nodes){const line=(globalThis.TylerChatBus?.text(node)??(node.innerText||node.textContent||'').trim());if(!line||readMessages.get(node)===line)continue;readMessages.set(node,line);if(TylerChatTag.own(line,globalThis.TylerIdentity?.meta?.(node)))continue;lastMessageAt=Date.now();const bound=region,epoch=watchEpoch;suiteTasks=suiteTasks.catch(()=>{}).then(()=>suiteMessage(line,node,bound,epoch)).catch(e=>say('Command skipped: '+e.message));}
   });observer.observe(region,{subtree:true,childList:true,characterData:true});
  }
- panel.addEventListener('toggle',()=>{if(panel.open)void refresh();});setInterval(watch,1400);setInterval(()=>{if(panel.open)void refresh();if(featureFlags.nudgesEnabled===true&&api.isOwner?.()&&region?.isConnected&&api.getChatScope?.()===chatScope&&lastMessageAt&&Date.now()-lastMessageAt>=720000&&Date.now()-lastMessageAt<=840000&&Date.now()-lastNudge>=3600000){lastNudge=Date.now();api.send('ROBOTIC TYLER: Quiet lobby! Want a quick trivia round? Type !trivia.');}for(const [k,at] of recently)if(Date.now()-at>120000)recently.delete(k);},20000);
+ panel.addEventListener('toggle',()=>{if(panel.open)void refresh();});setInterval(watch,1400);setInterval(()=>{if(panel.open)void refresh();if(featureFlags.nudgesEnabled===true&&api.isOwner?.()&&region?.isConnected&&api.getChatScope?.()===chatScope&&lastMessageAt&&Date.now()-lastMessageAt>=720000&&Date.now()-lastMessageAt<=840000&&Date.now()-lastNudge>=3600000){lastNudge=Date.now();api.send('Quiet lobby! Want a quick trivia round? Type !trivia.');}for(const [k,at] of recently)if(Date.now()-at>120000)recently.delete(k);},20000);
 })();

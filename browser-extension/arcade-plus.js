@@ -14,7 +14,7 @@
  const sorted=t=>[...t].sort().join('');
  const aliases={numbers:'vault',scrambled:'scramble',quiz:'trivia',hangman:'hangman',math:'math',riddle:'riddle',reverse:'reverse',vault:'vault',scramble:'scramble',trivia:'trivia',rps:'rps'};
  function command(text){
-  let t=clean(text);if(/^\[robotic tyler\]/.test(t))return '';
+  let t=clean(text);if((globalThis.TylerChatTag?globalThis.TylerChatTag.tagged(String(text)):/^\s*\[ROBOTIC TYLER\]/i.test(String(text))))return '';
   if(t==='!trivia')return t; // Reserved for the existing Squad Suite multiplayer game.
   t=t.replace(/^(?:robotic )?tyler[, ]+play /,'play ');
   const m=/^(?:play |start |arcade |!arcade |!)(vault|numbers|scramble|trivia|quiz|hangman|math|riddle|reverse|rps)$/.exec(t);

@@ -61,7 +61,7 @@ function harness(){
  const win={addEventListener:(_event,fn)=>messageHandlers.push(fn)};
  const api={getMount:()=>({append(){}}),getRegion:()=>region,getSample:()=>({isConnected:true}),getChatScope:()=>room,isOwner:()=>owner,send:text=>posts.push(text),bridge:(...args)=>bridges.push(args)};
  const box={console,URL,Date:Clock,setTimeout:setTimer,clearTimeout:clearTimer,setInterval:(fn,ms)=>intervals.push({fn,ms}),location:{origin:'https://steamcommunity.com'},window:win,document:{createElement:()=>root},TylerCompanion:api,TylerSelection:{selector:()=>'.message'},TylerTriviaIdentity:{identify:node=>node?.author,identifyAccount:node=>/^7656119\d{10}$/.test(node?.author?.id||'')?node.author:null},MutationObserver:class{constructor(fn){observer=fn;}observe(){}disconnect(){}},chrome:{runtime:{sendMessage:async m=>{commands.push(m);if(stuckPlay&&m.action==='play'){stuckPlay=false;return new Promise(()=>{});}return {ok:true};},onMessage:{addListener:fn=>receive=fn}}}};
- vm.runInNewContext(source('music-core.js'),box);vm.runInNewContext(source('music.js'),box);
+ vm.runInNewContext(source('music-core.js'),box);vm.runInNewContext(source('chat-tag.js'),box);vm.runInNewContext(source('music.js'),box);
  box.TylerSteamChat={request:async()=>voice};
  const settle=()=>new Promise(resolve=>setTimeout(resolve,15));
  const bind=()=>intervals.find(i=>i.ms===1000).fn();bind();

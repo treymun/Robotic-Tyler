@@ -2,7 +2,7 @@
 'use strict';
 const $=id=>document.getElementById(id);
 let noiseChanged=false;
-const fields=['aiProvider','personality','length','brain','noiseLevel','roastMode','speechVoice','talkativeness','insideJokes','callbackGap','nicknameAliases','textSpeed','spendingCapUSD','streamAI','friendMemory','smartRouting','libraryAllowedIds','activityEnabled','activitySteamIds','fastSpeech','voiceEngine','geminiVoice','geminiTtsModel','liveModel','liveVoice','liveInterrupt','liveSilenceMs','liveStartSensitivity','liveEndSensitivity'];
+const fields=['aiProvider','personality','length','brain','noiseLevel','roastMode','speechVoice','talkativeness','insideJokes','callbackGap','nicknameAliases','textSpeed','spendingCapUSD','streamAI','friendMemory','smartRouting','libraryAllowedIds','activityEnabled','activitySteamIds','fastSpeech','voiceEngine','geminiVoice','geminiTtsModel','liveModel','liveVoice','liveInterrupt','liveSilenceMs','liveStartSensitivity','liveEndSensitivity','chatTagEnabled','chatTagName'];
 const sliderIds=['humorLevel','edgeLevel','helpLevel','chaosLevel'];
 const sliderLabels={humorLevel:['Dry','Light','High','Unhinged'],edgeLevel:['Soft','Spicy','Rowdy','Savage'],helpLevel:['Low','Balanced','Helpful','Coach mode'],chaosLevel:['Controlled','Loose','Chaotic','Gremlin']};
 const presetMap={
@@ -59,6 +59,8 @@ async function load(){
   }
   $('status').textContent=(s.settingsDraft?'Unfinished edits restored · ':'')+'OpenRouter key '+(s.openrouterKey?'saved':'empty')+' · Gemini key '+(s.geminiKey?'saved':'empty');
   $('easyStatus').textContent=(s.openrouterKey||s.geminiKey?'✓ AI key saved':'Step 1: add an AI key below')+' · Chrome handles Steam voice; Electron is optional.';  usageSummary(s.usage||{});
+  // No saved preference: the checkbox starts on (settings.html) with ROBOTIC TYLER.
+  if(!$('chatTagName').value.trim())$('chatTagName').value=TylerChatTag.DEFAULT;chatTagPreview();
   for(const id of sliderIds)sliderLabel(id);showFriendCards();
 }
 
@@ -91,6 +93,8 @@ $('friendErase').onclick=()=>{
 };
 $('nicknameAliases').addEventListener('input',showFriendCards);
 
+function chatTagPreview(){const enabled=$('chatTagEnabled').checked,tag=TylerChatTag.validate($('chatTagName').value);$('chatTagName').setAttribute('aria-invalid',String(enabled&&!tag.ok));$('chatTagPreview').textContent=enabled?(tag.ok?TylerChatTag.format('Anyone up for another round?',{enabled:true,name:tag.name}):tag.error):'Anyone up for another round?';}
+for(const id of ['chatTagEnabled','chatTagName'])$(id).addEventListener('input',chatTagPreview);
 $('noiseLevel').onchange=()=>{noiseChanged=true;saveDraft('noiseLevel');};
 for(const id of sliderIds){$(id).addEventListener('input',()=>{sliderLabel(id);});}
 for(const key of fields)$(key).addEventListener('input',()=>saveDraft(key));
@@ -153,6 +157,9 @@ $('save').onclick=async()=>{
   try{
     const s=Object.fromEntries(fields.map(k=>[k,getFieldValue(k)]));s.suiteOptions=readSuite();
     s.personality=s.personality.slice(0,1500);
+    // Name tag: checked here as plain text (chat-tag.js). Off with an unusable name keeps the saved one.
+    const tag=TylerChatTag.validate(s.chatTagName);
+    if(tag.ok)s.chatTagName=tag.name;else if(s.chatTagEnabled){$('chatTagName').focus();throw Error(tag.error);}else delete s.chatTagName;
     s.insideJokes=s.insideJokes.slice(0,3600);
     s.nicknameAliases=s.nicknameAliases.slice(0,2400);
     s.callbackGap=Math.max(3,Math.min(30,Number(s.callbackGap)||6));
