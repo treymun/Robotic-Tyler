@@ -1,20 +1,20 @@
 /*
  * ROBOTIC TYLER Setup: the one Windows download.
  *
- * A native Win32 program (no runtime to install). It lets you pick the Chrome extension,
- * the Control Center, the Native Steam Companion (Voice Studio) or any mix. The Chrome
+ * A native Win32 program (no runtime to install). It installs either or both ways to use
+ * ROBOTIC TYLER: the Chrome extension and the desktop app (Steam text chat and Steam voice
+ * in one app since v2.15, replacing the Control Center and the Voice Studio). The Chrome
  * extension is packed inside this EXE and unpacked to a permanent folder that you add
- * to Chrome once. The two apps are downloaded (only the ones you pick) from this
- * version's GitHub release, checked against the SHA-256 recorded when this setup was
- * built, and installed silently. Each app keeps its own
- * install folder, shortcuts, uninstaller, settings and update feed, so either can be
- * added later, updated by itself or uninstalled without touching the other.
+ * to Chrome once. The desktop app is downloaded from this version's GitHub release,
+ * checked against the SHA-256 recorded when this setup was built, and installed silently.
+ * It updates a Control Center in place (same app id); on first start it imports and offers
+ * to remove an old Voice Studio.
  *
  * Built by tools/setup/build-setup.mjs, which generates payloads.h (file names, sizes,
  * hashes, registry keys, download address) and the resources (icon, logo, manifest).
  *
  * Command line (all optional):
- *   /components=chrome,control,voice  preselect parts  /nodesktop   no desktop shortcuts
+ *   /components=chrome,desktop  preselect parts (control or voice also mean desktop)  /nodesktop  no desktop shortcuts
  *   /source=<url or folder>    download from a mirror or a folder instead of the release
  *   /auto                      start right away, close when finished (exit code 0 = all installed)
  *   /log=<file>                log here (default: %TEMP%\ROBOTIC TYLER Setup <version>\setup.log)
@@ -80,8 +80,8 @@
 #define C_BTN_HOT RGB(0x3a,0x52,0x6b)
 
 /* ── Controls ────────────────────────────────────────────────────────────── */
-#define NCOMP 3
-enum { K_CHROME, K_CONTROL, K_VOICE };
+#define NCOMP 2
+enum { K_CHROME, K_DESKTOP };
 enum { IDC_CARD0=1001, IDC_DESKTOP=1010, IDC_RETRY0=1011, IDC_LAUNCH0=1021 };
 #define INRANGE(id,base) ((id)>=(base)&&(id)<(base)+NCOMP)
 enum { WM_APP_PROGRESS=WM_APP+1, WM_APP_ROW, WM_APP_DONE };
@@ -104,12 +104,9 @@ static Comp g_comp[NCOMP]={
  {.key=L"chrome",.title=L"Chrome extension",.tag=L"STEAM WEB CHAT",
   .desc=L"Tyler inside Steam web chat with voice and text; Setup unpacks it to a folder you add to Chrome once (Developer mode, then Load unpacked).",
   .file=L"",.guid=L"",.display=L"",.exe=L"",.sha="",.size=CHROME_PACK_SIZE,.chrome=TRUE},
- {.key=L"control",.title=L"Control Center",.tag=L"ELECTRON CLIENT",
-  .desc=L"Tyler's own Steam chat window on Windows: text chat, room tools, Squad features and every setting, no Chrome needed.",
-  .file=CONTROL_FILE,.guid=CONTROL_GUID,.display=CONTROL_DISPLAY,.exe=CONTROL_EXE,.sha=CONTROL_SHA256,.size=CONTROL_SIZE},
- {.key=L"voice",.title=L"Native Steam Companion (Voice Studio)",.tag=L"VOICE",
-  .desc=L"Lets Tyler talk in Steam voice from Windows; it needs a free virtual audio cable (VB-Audio CABLE) chosen as Steam's microphone.",
-  .file=VOICE_FILE,.guid=VOICE_GUID,.display=VOICE_DISPLAY,.exe=VOICE_EXE,.sha=VOICE_SHA256,.size=VOICE_SIZE},
+ {.key=L"desktop",.title=L"Desktop app",.tag=L"WINDOWS",
+  .desc=L"Steam text chat and Steam voice (Standard or Gemini Live) in one app, no Chrome needed. Voice uses a free virtual audio cable (VB-CABLE) as Steam's microphone.",
+  .file=DESKTOP_FILE,.guid=DESKTOP_GUID,.display=DESKTOP_DISPLAY,.exe=DESKTOP_EXE,.sha=DESKTOP_SHA256,.size=DESKTOP_SIZE},
 };
 
 static HINSTANCE g_inst; static HWND g_wnd,g_ok,g_cancelBtn,g_desktop;
@@ -123,7 +120,7 @@ static wchar_t g_preselect[64],g_chromeDir[MAX_PATH],g_chromeList[MAX_PATH];
 
 #define S(v) MulDiv((v),g_dpi,96)
 #define W_LOGICAL 680
-#define H_LOGICAL 628
+#define H_LOGICAL 524
 
 /* ── Small helpers ───────────────────────────────────────────────────────── */
 static void logLine(const wchar_t *fmt,...){
@@ -527,14 +524,14 @@ static void paint(HDC dc,RECT cl){
   for(int i=0;i<NCOMP;i++)if(g_comp[i].inRun){anyFail|=g_comp[i].state==S_FAILED;anyDone|=g_comp[i].state==S_DONE;anyCancel|=g_comp[i].state==S_CANCELLED;}
   const wchar_t *h=busy?(g_cancel?L"Cancelling\x2026":L"Installing\x2026"):anyFail?L"Something didn't install":anyCancel&&!anyDone?L"Cancelled":L"All set";
   text(dc,f_h1,C_WHITE,rc(32,108,616,32),h,DT_SINGLELINE|DT_VCENTER);
-  Comp *ch=&g_comp[K_CHROME],*vo=&g_comp[K_VOICE];
+  Comp *ch=&g_comp[K_CHROME],*vo=&g_comp[K_DESKTOP];
   const wchar_t *sub2=busy?L"App downloads come from the ROBOTIC TYLER release on GitHub and are checked before they run.":
    anyFail?L"The details are below. Retry tries that part again; anything already installed stays installed.":
    !anyDone?L"Nothing was changed on this PC.":
    (ch->inRun&&ch->state==S_DONE&&ch->before)?L"In Chrome, press Reload on Tyler's card so it uses the new files. Finish opens the extensions page.":
    (ch->inRun&&ch->state==S_DONE&&!ch->before)?L"Last step for Chrome: Finish opens its extensions page. Turn on Developer mode, click Load unpacked and paste the folder path (Setup copies it).":
-   (vo->inRun&&vo->state==S_DONE)?L"Find the apps in the Start menu under ROBOTIC TYLER. For voice, Voice Studio's Setup guide walks you through the audio cable.":
-   L"Find the apps in the Start menu under ROBOTIC TYLER. Run Setup again any time to add or repair a part.";
+   (vo->inRun&&vo->state==S_DONE)?L"Find ROBOTIC TYLER in the Start menu. For voice, the Setup guide in its Voice window walks you through the audio cable.":
+   L"Find ROBOTIC TYLER in the Start menu. Run Setup again any time to add or repair a part.";
   text(dc,f_body,C_INK2,rc(32,142,616,40),sub2,DT_WORDBREAK);
   int slot=0;
   for(int i=0;i<NCOMP;i++){Comp *c=&g_comp[i];if(!c->inRun)continue;int y=rowTop(slot++);
@@ -626,7 +623,7 @@ static void onInstall(void){
  if(!any)return;
  g_runDesktop=Button_GetCheck(g_desktop)==BST_CHECKED;
  if(!confirmRunning())return;
- logLine(L"install: chrome=%d control=%d voice=%d desktop=%d",g_comp[K_CHROME].selected,g_comp[K_CONTROL].selected,g_comp[K_VOICE].selected,g_runDesktop);
+ logLine(L"install: chrome=%d desktop-app=%d shortcuts=%d",g_comp[K_CHROME].selected,g_comp[K_DESKTOP].selected,g_runDesktop);
  startRun(-1);
 }
 static void copyText(const wchar_t *t){
@@ -689,17 +686,17 @@ static LRESULT CALLBACK wndProc(HWND h,UINT m,WPARAM w,LPARAM l){
   g_wnd=h;darkTitle(h);g_dpi=dpiOf(h);makeFonts();
   for(int i=0;i<NCOMP;i++){Comp *c=&g_comp[i];
    c->card=mk(WC_BUTTONW,c->title,BS_AUTOCHECKBOX|BS_MULTILINE,IDC_CARD0+i);}
-  g_desktop=mk(WC_BUTTONW,L"Add desktop shortcuts for the apps",BS_AUTOCHECKBOX,IDC_DESKTOP);
+  g_desktop=mk(WC_BUTTONW,L"Add a desktop shortcut",BS_AUTOCHECKBOX,IDC_DESKTOP);
   for(int i=0;i<NCOMP;i++){Comp *c=&g_comp[i];c->retry=mk(WC_BUTTONW,L"Retry",BS_PUSHBUTTON,IDC_RETRY0+i);c->launch=mk(WC_BUTTONW,L"Open",BS_AUTOCHECKBOX,IDC_LAUNCH0+i);Button_SetCheck(c->launch,BST_CHECKED);}
   g_cancelBtn=mk(WC_BUTTONW,L"Cancel",BS_PUSHBUTTON,IDCANCEL);
   g_ok=mk(WC_BUTTONW,L"Install",BS_DEFPUSHBUTTON,IDOK);
   refreshDetection();
-  /* Preselect: /components=…, else what's out of date, else what's missing, else the Chrome extension and the Control Center. */
+  /* Preselect: /components=…, else what's out of date, else what's missing, else both. */
   BOOL any=FALSE,outdated=FALSE;for(int i=0;i<NCOMP;i++){any|=g_comp[i].installed;outdated|=g_comp[i].installed&&vercmp(g_comp[i].instVersion,SETUP_VERSION)<0;}
   for(int i=0;i<NCOMP;i++){Comp *c=&g_comp[i];BOOL on;
-   if(g_preselect[0])on=wcsstr(g_preselect,c->key)!=NULL;
+   if(g_preselect[0])on=wcsstr(g_preselect,c->key)!=NULL||(i==K_DESKTOP&&(wcsstr(g_preselect,L"control")||wcsstr(g_preselect,L"voice")));
    else if(c->installed)on=vercmp(c->instVersion,SETUP_VERSION)<0;  /* update what's out of date */
-   else on=any?!outdated:i!=K_VOICE;
+   else on=any?!outdated:TRUE;
    Button_SetCheck(c->card,on&&IsWindowEnabled(c->card)?BST_CHECKED:BST_UNCHECKED);}
   Button_SetCheck(g_desktop,g_noDesktop?BST_UNCHECKED:BST_CHECKED);
   layout();return 0;}

@@ -9,11 +9,15 @@ const read=f=>fs.readFileSync(path.join(ROOT,f),'utf8');
 const {nsisGuid}=await import(path.join(ROOT,'tools/setup/nsis-guid.mjs'));
 const src=read('tools/setup/setup.c'),build=read('tools/setup/build-setup.mjs');
 
-test('the setup finds each app where its electron-builder installer registers it',()=>{
- // Seen in the registry after installing the 2.14.0 Control Center (Wine 9, per-user).
+test('the setup finds the desktop app where its electron-builder installer registers it',()=>{
+ // Seen in the registry after installing the 2.14.0 Control Center (Wine 9, per-user). The v2.15
+ // desktop app keeps that app id, so Setup and the installer upgrade a Control Center in place.
  assert.equal(nsisGuid('com.robotictyler.controlcenter'),'427ca8a0-13da-510b-a4a9-d5d9a855230f');
- const voice=JSON.parse(read('electron-builder.voice.json')),control=JSON.parse(read('electron-builder.control.json'));
- assert.notEqual(nsisGuid(voice.appId),nsisGuid(control.appId));
+ const desktop=JSON.parse(read('electron-builder.desktop.json'));
+ assert.equal(desktop.appId,'com.robotictyler.controlcenter');assert.equal(desktop.productName,'ROBOTIC TYLER');
+ assert.ok(!fs.existsSync(path.join(ROOT,'electron-builder.voice.json')),'no separate Voice Studio build any more');
+ // The desktop app knows the old Voice Studio's key, to offer removing it once its settings are imported.
+ assert.equal(nsisGuid('com.robotictyler.nativesteamcompanion'),'b0b8de7d-76bb-5d6f-99fa-c8a2fe9a49c6');assert.match(read('app/main.cjs'),/b0b8de7d-76bb-5d6f-99fa-c8a2fe9a49c6/);
  assert.ok(src.includes('L"Software\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Uninstall\\\\"'),'uninstall entries');assert.ok(src.includes('L"Software\\\\%ls",c->guid'),'the app\'s own key (InstallLocation)');
  assert.match(src,/HKEY_CURRENT_USER[\s\S]*HKEY_LOCAL_MACHINE,KEY_WOW64_64KEY[\s\S]*KEY_WOW64_32KEY/,'per-user and per-machine installs');
  for(const key of ['artifactName','appId','uninstallDisplayName','productName','directories.output'])assert.ok(build.includes(key.split('.').pop()),key+' read from the electron-builder config');
@@ -37,8 +41,9 @@ test('the setup is keyboard accessible, names each part with its role and opens 
  assert.match(src,/IsDialogMessageW\(g_wnd,&msg\)/);
  assert.match(src,/WS_TABSTOP/);assert.match(src,/UISF_HIDEFOCUS/);assert.match(src,/DM_GETDEFID/);
  assert.match(src,/\.title=L"Chrome extension",\.tag=L"STEAM WEB CHAT"[\s\S]*Load unpacked/);
- assert.match(src,/\.title=L"Control Center",\.tag=L"ELECTRON CLIENT"/);
- assert.match(src,/\.title=L"Native Steam Companion \(Voice Studio\)",\.tag=L"VOICE"[\s\S]*virtual audio cable/);
+ assert.match(src,/\.title=L"Desktop app",\.tag=L"WINDOWS"[\s\S]*virtual audio cable/);
+ assert.match(src,/#define NCOMP 2\nenum \{ K_CHROME, K_DESKTOP \};/,'two parts: the Chrome extension and the desktop app');
+ assert.match(src,/wcsstr\(g_preselect,L"control"\)\|\|wcsstr\(g_preselect,L"voice"\)/,'old /components=control,voice still pick the desktop app');
  assert.match(src,/chrome:\/\/extensions\//,'Finish opens Chrome\'s extensions page');
  assert.match(src,/Not affiliated with or endorsed by Valve/);
  for(const s of ['S_DOWNLOAD','S_VERIFY','S_INSTALL','S_DONE','S_FAILED','S_CANCELLED'])assert.ok(src.includes(s),s);
@@ -52,7 +57,7 @@ test('a built setup (when present) is a 64-bit Windows GUI program that asks for
  const pe=b.readUInt32LE(0x3c);assert.equal(b.toString('ascii',pe,pe+4),'PE\0\0');
  assert.equal(b.readUInt16LE(pe+4),0x8664,'x64');assert.equal(b.readUInt16LE(pe+24+68),2,'GUI subsystem');
  assert.ok(b.includes(Buffer.from('asInvoker')),'manifest embedded');
- assert.ok(b.includes(Buffer.from('ROBOTIC-TYLER-component-Control-Center-'+version+'.exe','utf16le')));
+ assert.ok(b.includes(Buffer.from('ROBOTIC-TYLER-component-Desktop-'+version+'.exe','utf16le')));
 });
 
 test('the Chrome extension ships inside the setup and unpacks to one fixed folder',()=>{

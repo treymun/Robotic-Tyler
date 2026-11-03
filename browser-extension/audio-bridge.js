@@ -16,7 +16,7 @@
  function livePlay(b64,gen){if(gen<=liveFlushed)return;const pcm=TylerLivePcm.fromBase64(b64);if(!pcm.length)return;const buf=ctx.createBuffer(1,pcm.length,24000),data=buf.getChannelData(0);for(let i=0;i<pcm.length;i++)data[i]=pcm[i]/32768;
   const now=ctx.currentTime;if(liveNext<now+.03)liveNext=now+.06;if(liveNext-now>20)return;const src=ctx.createBufferSource();src.buffer=buf;src.connect(gain);src.start(liveNext);liveNext+=buf.duration;const node={src,gen};liveNodes.push(node);playing(true);
   src.onended=()=>{src.disconnect();liveNodes=liveNodes.filter(n=>n!==node);if(!liveNodes.length&&!active.length)playing(false);};}
- function liveFlush(gen){liveFlushed=Math.max(liveFlushed,gen);for(const n of liveNodes)if(n.gen<=gen){try{n.src.onended=null;n.src.stop();n.src.disconnect();}catch{}}liveNodes=liveNodes.filter(n=>n.gen>gen);liveNext=0;if(!liveNodes.length&&!active.length)playing(false);}
+ function liveFlush(gen){liveFlushed=Math.max(liveFlushed,gen);const had=liveNodes.length;for(const n of liveNodes)if(n.gen<=gen){try{n.src.onended=null;n.src.stop();n.src.disconnect();}catch{}}liveNodes=liveNodes.filter(n=>n.gen>gen);liveNext=0;if(had&&!liveNodes.length&&!active.length)playing(false);}
  function stop(all=true){if(all)board?.stop();liveFlush(Number.MAX_SAFE_INTEGER-1);liveFlushed=0;try{previewNode?.stop();previewNode?.disconnect();}catch{}previewNode=null;for(const node of active){try{node.stop();node.disconnect();}catch{}}active=[];queued=[];playing(false);}
  // Plays one decoded clip; a clip queued with {queue:true} starts the moment this one ends, with no
  // playing(false) gap in between, so the panel keeps treating the reply as one continuous turn.

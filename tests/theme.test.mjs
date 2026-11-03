@@ -56,7 +56,7 @@ test('every theme ships to all three surfaces and every theme list agrees',()=>{
  assert.doesNotMatch(settings,/id="uiTheme"/,'the old theme dropdown is gone');
  assert.match(settings,/id="themeGallery"[^>]*role="radiogroup"/);
  assert.ok(settings.indexOf('src="ui-template.js"')<settings.indexOf('src="theme-gallery.js"'),'previews need the panel template first');
- for(const f of ['browser-extension/content.js','browser-extension/theme.js','voice-app/native-main.cjs','voice-app/native.js']){
+ for(const f of ['browser-extension/content.js','browser-extension/theme.js','app/main.cjs','voice-app/native.js']){
   const list=read(f).match(/\['steam'(?:,'[a-z0-9]+')*\]/);assert.ok(list,f);assert.deepEqual(JSON.parse(list[0].replace(/'/g,'"')).sort(),[...THEMES].sort(),f);
  }
 });
@@ -145,14 +145,13 @@ test('every theme ships its own logo to every surface',()=>{
  assert.equal(iso.indexOf('ui-logos.js'),iso.indexOf('ui-fonts.js')+1);
  assert.match(read('app/steam-preload.cjs'),/\/\* ui-logos\.js \*\//);
  // Every place that switches the logo knows every theme, and falls back to Steam.
- for(const f of ['browser-extension/background.js','voice-app/native.js','voice-app/native-main.cjs']){
+ for(const f of ['browser-extension/background.js','voice-app/native.js','app/main.cjs']){
   const list=read(f).match(/\['steam'(?:,'[a-z0-9]+')*\]/);assert.ok(list,f);assert.deepEqual(JSON.parse(list[0].replace(/'/g,'"')).sort(),[...THEMES].sort(),f);
  }
  assert.match(read('browser-extension/background.js'),/setIcon\?\.\(\{path:\{16:'ui\/logos\/'\+t\+'-16\.png',32:'ui\/logos\/'\+t\+'-32\.png'\}\}\)/,'toolbar icon follows the theme');
  assert.match(read('browser-extension/theme.js'),/img\.src='ui\/logos\/steam\.png'/,'settings falls back to the Steam logo');
- assert.match(read('app/main.cjs'),/globalThis\.tylerThemeIcon=/,'Control Center window and tray icons follow the theme');
- assert.match(read('voice-app/native-main.cjs'),/win\?\.setIcon\?\.\(img\)/,'Voice Studio window icon follows the theme');
+ assert.match(read('app/main.cjs'),/globalThis\.tylerThemeIcon=/,'window and tray icons follow the theme');
+ assert.match(read('app/main.cjs'),/for\(const w of \[bot,options,voiceWin\]\)if\(w&&!w\.isDestroyed\(\)\)w\.setIcon\(img\)/,'the Voice window icon follows the theme too');
  // Packaged builds include the folders the logos live in.
- assert.ok(JSON.parse(read('electron-builder.control.json')).files.includes('app/**/*'));
- const voice=JSON.parse(read('electron-builder.voice.json')).files;assert.ok(voice.includes('voice-app/**/*')&&voice.includes('app/**/*'));
+ const files=JSON.parse(read('electron-builder.desktop.json')).files;assert.ok(files.includes('voice-app/**/*')&&files.includes('app/**/*'));
 });

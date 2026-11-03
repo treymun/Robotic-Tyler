@@ -29,9 +29,9 @@ test('Chrome only screen picker, no hidden capture and an explicit stop',()=>{
  const manifest=JSON.parse(read('browser-extension/manifest.json'));
  assert.ok(manifest.content_scripts.some(c=>c.js.includes('screen-awareness.js')));
 });
-test('text-only Electron and desktop companion preserved with safe canned commands',()=>{
- assert.ok(read('app/main.cjs').includes('Text Control Center'));
- assert.ok(read('voice-app/native-main.cjs').length>0);
+test('the desktop app runs the shared engine, with safe canned commands',()=>{
+ assert.match(read('app/main.cjs'),/'companion','background\.js'/,'the desktop app runs the shared background');
+ assert.ok(read('app/native-voice.cjs').length>0);
  const b=read('browser-extension/background.js');
  assert.match(b,/v23:roast/);assert.match(b,/v23:custom/);
  assert.match(b,/Only an opted-in player/);

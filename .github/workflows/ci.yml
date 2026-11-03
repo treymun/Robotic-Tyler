@@ -108,7 +108,7 @@ jobs:
           dotnet-version: '8.0.x'
       - name: Build the Windows audio bridge
         if: steps.published.outputs.skip != 'true'
-        run: dotnet publish windows-audio-bridge/RoboticTylerAudio.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o windows-audio-bridge/publish
+        run: dotnet publish windows-audio-bridge/RoboticTylerAudio.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:EnableCompressionInSingleFile=true -o windows-audio-bridge/publish
       - name: Install dependencies
         if: steps.published.outputs.skip != 'true'
         run: npm install --no-audit --no-fund
@@ -130,9 +130,9 @@ jobs:
             echo "CSC_IDENTITY_AUTO_DISCOVERY=false" >> "$GITHUB_ENV"
             echo "::warning::No WINDOWS_CERT_P12 secret: building unsigned installers."
           fi
-      - name: Build the app installers
+      - name: Build the desktop app installer
         if: env.PUBLISH != 'true'
-        run: npm run build:both
+        run: npm run build:desktop
       # electron-builder can race itself creating a missing release, so the release exists
       # (as a draft, hidden until everything is uploaded) before it runs.
       - name: Prepare the release as a draft while it builds
@@ -146,7 +146,7 @@ jobs:
           else
             gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --draft --target "$GITHUB_SHA" --title "ROBOTIC TYLER ${TAG#v}" --notes "Building the downloads..."
           fi
-      - name: Build and publish the app installers to the release
+      - name: Build and publish the desktop app installer to the release
         if: env.PUBLISH == 'true' && steps.published.outputs.skip != 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -159,7 +159,7 @@ jobs:
             choco install mingw -y --no-progress
             'C:\ProgramData\mingw64\mingw64\bin' | Out-File -FilePath $env:GITHUB_PATH -Append
           }
-      - name: Build the setup (records each app installer's SHA-256)
+      - name: Build the setup (records the desktop installer's SHA-256)
         if: steps.published.outputs.skip != 'true'
         run: npm run build:setup
       - name: Sign the setup (optional)

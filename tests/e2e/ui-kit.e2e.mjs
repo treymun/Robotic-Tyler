@@ -152,21 +152,24 @@ test('the chat panel: themed icons in every theme, notifications, dialogs and to
  }finally{await browser.close();server.close();}
 });
 
-test('Voice Studio: themed icons and an audio problem offers Refresh devices',async()=>{
+test('Voice window: themed icons, a readiness checklist, and an audio problem points to Voice settings',async()=>{
  const server=serve(),browser=await chromium.launch(),base='http://127.0.0.1:'+server.address().port;
  try{
   const page=await browser.newPage();const errors=[];page.on('pageerror',e=>errors.push(e.message));
-  await page.addInitScript(()=>{let calls=0;window.__deviceCalls=()=>calls;window.tylerNative={theme:async()=>'l4d',devices:async()=>{calls++;return [{kind:'output',id:'a',name:'CABLE Input (VB-Audio Virtual Cable)'}];},openSettings:async()=>{},openSteam:async()=>{},checkUpdates:async()=>({}),
-   playTest:async()=>{throw new Error('The output device "CABLE Input" is not available.');},speak:async()=>'ok',record:async()=>'ok'};});
+  await page.addInitScript(()=>{let opened=0;window.__opened=()=>opened;window.tylerNative={theme:async()=>'l4d',status:async()=>({mode:'off',state:'',engine:'live',bridge:true,keyForEngine:true,devicesChosen:true,consent:false,version:'2.15.0'}),
+   start:async()=>({}),stop:async()=>({}),say:async()=>({}),listen:async()=>({}),openSettings:async()=>{opened++;},checkUpdates:async()=>({}),onStatus(){},onTheme(){},
+   tone:async()=>{throw new Error('The output device "CABLE Input" is not available.');}};});
   await page.goto(base+'/voice-app/native.html');
   await page.waitForFunction(()=>document.documentElement.dataset.rtTheme==='l4d');
-  assert.deepEqual(await page.evaluate(()=>[...document.querySelectorAll('nav button svg.ic')].map(i=>i.dataset.i)),['overview','voice','apps','guide']);
-  await page.click('nav button[data-page=voice]');await page.click('#test');
+  assert.deepEqual(await page.evaluate(()=>[...document.querySelectorAll('nav button svg.ic')].map(i=>i.dataset.i)),['voice','guide','apps']);
+  await page.waitForFunction(()=>document.querySelectorAll('#checklist li').length===4);
+  const state=await page.evaluate(()=>({engine:document.getElementById('engine-name').textContent,start:document.getElementById('start').disabled,label:document.querySelector('#start .lbl').textContent,
+   checks:[...document.querySelectorAll('#checklist li')].map(l=>l.dataset.ok)}));
+  assert.deepEqual(state,{engine:'Gemini Live',start:true,label:'Start Gemini Live',checks:['true','true','true','false']},'no consent yet: Start stays off');
+  await page.click('#tone');
   await page.waitForSelector('.rt-toast[data-kind=error]');
-  assert.deepEqual(await page.evaluate(()=>{const t=document.querySelector('.rt-toast[data-kind=error]');return {title:t.querySelector('.rt-toast-title').textContent,action:t.querySelector('.rt-toast-actions button').textContent};}),{title:'Audio problem',action:'Refresh devices'});
-  const before=await page.evaluate(()=>window.__deviceCalls());
-  await page.click('.rt-toast .rt-toast-actions button');
-  await page.waitForFunction(n=>window.__deviceCalls()>n,before);
+  assert.equal(await page.evaluate(()=>document.querySelector('.rt-toast[data-kind=error] .rt-toast-actions button').textContent),'Voice settings');
+  await page.click('.rt-toast .rt-toast-actions button');await page.waitForFunction(()=>window.__opened()>0);
   assert.deepEqual(errors,[]);
  }finally{await browser.close();server.close();}
 });

@@ -4,12 +4,12 @@
 //   ROBOTIC-TYLER-Chrome-Extension-<version>.zip
 //       ROBOTIC TYLER Chrome extension/   ← the folder to "Load unpacked"
 //       How to install.html               ← one-page guide with the logo
-//   ROBOTIC-TYLER-Setup-<version>.exe     ← Windows: installs the Control Center and/or
-//                                           the Native Steam Companion (if built)
+//   ROBOTIC-TYLER-Setup-<version>.exe     ← Windows: installs the desktop app (Steam text
+//                                           chat and voice) and/or this extension (if built)
 //
 // plus, for the GitHub release (not for people to pick):
-//   components/ROBOTIC-TYLER-component-*-<version>.exe  ← each app's own installer; the
-//       setup downloads these and the installed apps update from them (if built)
+//   components/ROBOTIC-TYLER-component-Desktop-<version>.exe  ← the desktop app's own installer;
+//       the setup downloads it and the installed app updates from it (if built)
 //   RELEASE-NOTES.md   ← GitHub release text: which file to pick + what's new
 //   SHA256SUMS.txt
 //
@@ -26,7 +26,7 @@ const EXT=path.join(ROOT,'browser-extension');
 const OUT=path.join(ROOT,'dist','release');
 const read=f=>fs.readFileSync(path.join(ROOT,f),'utf8');
 const version=JSON.parse(read('browser-extension/manifest.json')).version;
-const PUB=JSON.parse(read('electron-builder.control.json')).publish?.[0]||{},OWNER_REPO=`${PUB.owner}/${PUB.repo}`;
+const PUB=JSON.parse(read('electron-builder.desktop.json')).publish?.[0]||{},OWNER_REPO=`${PUB.owner}/${PUB.repo}`;
 const pkgVersion=JSON.parse(read('package.json')).version;
 if(version!==pkgVersion)throw Error(`Version mismatch: manifest ${version}, package.json ${pkgVersion}`);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -93,11 +93,10 @@ ${step(5,'Open Steam chat',`Go to <code>steamcommunity.com/chat</code>, open you
 </ol></div>
 <div class="card note"><b>Updating later:</b> copy the new version’s files over the same folder, then click <b>Reload</b> on Tyler’s card in <code>chrome://extensions</code>. Using the same folder keeps your settings and keys.</div>
 
-<h2>Windows apps (optional)</h2>
-<div class="card"><p style="margin:0 0 10px">On Windows, <code>ROBOTIC-TYLER-Setup-${esc(version)}.exe</code> from the same release page does all of this for you: it can unpack this extension too. Tick any of:</p><table>
-<tr><td>Control Center</td><td>Tyler’s own Steam chat window on Windows: text chat, room tools and settings, no Chrome needed.</td></tr>
-<tr><td>Native Steam Companion (Voice Studio)</td><td>Tyler talks in Steam voice from Windows. Needs a free virtual audio cable (VB-Audio CABLE) chosen as Steam’s microphone.</td></tr>
-</table><p style="margin:10px 0 0;color:var(--ink3)">Setup downloads only what you tick, checks each file and installs it. Run it again any time to add the other app. Each app updates itself and uninstalls separately.</p></div>
+<h2>Windows desktop app (optional)</h2>
+<div class="card"><p style="margin:0 0 10px">On Windows, <code>ROBOTIC-TYLER-Setup-${esc(version)}.exe</code> from the same release page does all of this for you, and can also install the desktop app:</p><table>
+<tr><td>Desktop app</td><td>Steam text chat and Steam voice (Standard or Gemini Live) in one app, no Chrome needed. Voice needs a free virtual audio cable (VB-CABLE) chosen as Steam’s microphone.</td></tr>
+</table><p style="margin:10px 0 0;color:var(--ink3)">Setup checks the download before installing it. The desktop app updates itself. It replaces the old Control Center and Voice Studio: it upgrades a Control Center in place and imports a Voice Studio’s settings.</p></div>
 <div class="card note">If Windows shows <b>“Windows protected your PC”</b>, Setup isn’t code-signed yet. Click <b>More info → Run anyway</b>.</div>
 
 <footer>Settings, keys and themes are shared by every Tyler window on the same computer. Pick a look under Settings → Appearance.</footer>
@@ -118,12 +117,11 @@ ${hasSetup?`
 **That's the only file you need on Windows.** Run it and tick what you want:
 
 - **Chrome extension:** Tyler in Steam web chat with voice and text. Setup unpacks it and opens Chrome's extensions page. Turn on *Developer mode*, click *Load unpacked* and paste the folder path Setup copied (a one-time step; Chrome only adds extensions from outside its Web Store this way).
-- **Control Center:** Tyler's own Steam chat window.
-- **Native Steam Companion (Voice Studio):** Tyler talks in Steam voice. It needs a free virtual audio cable as Steam's microphone.
+- **Desktop app:** Steam text chat and Steam voice in one app, no Chrome needed. Voice uses a free virtual audio cable as Steam's microphone. It replaces the old Control Center (upgraded in place) and Voice Studio (its settings are imported, then it offers to remove it).
 
 Run Setup again any time to add, update or repair a part. Settings and keys are kept. If Windows says *“Windows protected your PC”*, Setup isn't code-signed: choose **More info → Run anyway**.
 `:''}
-Not on Windows? \`ROBOTIC-TYLER-Chrome-Extension-${version}.zip\` is the same Chrome extension: unzip it and open *How to install.html*. The other files (\`ROBOTIC-TYLER-component-…\`, \`.yml\`, \`.blockmap\`) are used by Setup and by the apps' automatic updates; you don't need them.
+Not on Windows? \`ROBOTIC-TYLER-Chrome-Extension-${version}.zip\` is the same Chrome extension: unzip it and open *How to install.html*. The other files (\`ROBOTIC-TYLER-component-…\`, \`.yml\`, \`.blockmap\`) are used by Setup and by the desktop app's automatic updates; you don't need them.
 
 ## What's new in ${version}
 
@@ -144,7 +142,7 @@ const setup=`ROBOTIC-TYLER-Setup-${version}.exe`,setupPath=path.join(ROOT,'dist'
 const primary=[chromeZip];
 if(fs.existsSync(setupPath)){fs.copyFileSync(setupPath,path.join(OUT,setup));primary.push(setup);}
 const components=[];
-for(const dir of ['dist/control-center','dist/native-steam-companion']){
+for(const dir of ['dist/desktop']){
  const abs=path.join(ROOT,dir);if(!fs.existsSync(abs))continue;
  for(const f of fs.readdirSync(abs))if(f.startsWith('ROBOTIC-TYLER-component-')&&f.endsWith(`-${version}.exe`)){
   fs.mkdirSync(path.join(OUT,'components'),{recursive:true});fs.copyFileSync(path.join(abs,f),path.join(OUT,'components',f));components.push('components/'+f);}

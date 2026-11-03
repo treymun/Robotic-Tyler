@@ -40,10 +40,10 @@ test('the Chrome download is one folder to load plus an install guide, with note
   assert.equal(crypto.createHash('sha256').update(fs.readFileSync(f)).digest('hex'),hash,file);}
 });
 
-test('both app installers are branded, NSIS-only "component" files with separate identities',()=>{
+test('the desktop installer is a branded, NSIS-only "component" file that upgrades the Control Center',()=>{
  const bmp=f=>{const b=fs.readFileSync(path.join(ROOT,f));assert.equal(b.toString('ascii',0,2),'BM',f);return [b.readInt32LE(18),Math.abs(b.readInt32LE(22)),b.readUInt16LE(28)];};
  const seen={};
- for(const [file,slug] of [['electron-builder.control.json','Control-Center'],['electron-builder.voice.json','Native-Steam-Companion']]){
+ for(const [file,slug] of [['electron-builder.desktop.json','Desktop']]){
   const cfg=JSON.parse(read(file)),n=cfg.nsis;
   assert.equal(n.artifactName,`ROBOTIC-TYLER-component-${slug}-\${version}.\${ext}`);
   assert.deepEqual(cfg.win.target,[{target:'nsis',arch:['x64']}],'no portable build: one setup, apps that update themselves');
@@ -52,17 +52,19 @@ test('both app installers are branded, NSIS-only "component" files with separate
   for(const k of ['installerIcon','uninstallerIcon','installerHeaderIcon'])assert.equal(n[k],'assets/robotic-tyler.ico');
   assert.deepEqual(bmp(n.installerSidebar),[164,314,24]);assert.deepEqual(bmp(n.installerHeader),[150,57,24]);
   assert.equal(cfg.directories.buildResources,'build');assert.ok(cfg.files.includes('assets/**/*'));
-  // Nothing two apps could share by accident: app id, folder/shortcut name, uninstall entry,
-  // update channel, and the updater cache folder (named after package "name").
-  const name=cfg.extraMetadata.name||JSON.parse(read('package.json')).name;
-  for(const [k,v] of Object.entries({appId:cfg.appId,product:cfg.productName,shortcut:n.shortcutName,uninstall:n.uninstallDisplayName,channel:cfg.publish[0].channel,name})){
-   assert.ok(!(seen[k]||[]).includes(v),k+' '+v+' is shared by both apps');(seen[k]=seen[k]||[]).push(v);}
+  // Same app id and update channel as the Control Center, so its installs upgrade in place;
+  // one product name, shortcut and uninstall entry; the audio helper ships inside.
+  assert.equal(cfg.appId,'com.robotictyler.controlcenter');assert.equal(cfg.publish[0].channel,'control');
+  assert.equal(cfg.productName,'ROBOTIC TYLER');assert.equal(n.shortcutName,'ROBOTIC TYLER');assert.equal(n.uninstallDisplayName,'ROBOTIC TYLER');
+  assert.ok(cfg.files.includes('voice-app/**/*')&&cfg.files.includes('app/**/*'));assert.ok(cfg.extraResources.some(x=>x.from==='windows-audio-bridge/publish'));
+  assert.equal(cfg.extraMetadata.main,'app/main.cjs');void seen;
  }
- const pkg=JSON.parse(read('package.json'));assert.equal(pkg.build.nsis.artifactName,JSON.parse(read('electron-builder.control.json')).nsis.artifactName);
+ const pkg=JSON.parse(read('package.json'));assert.equal(pkg.build,undefined,'one desktop config, in electron-builder.desktop.json');
  assert.equal(pkg.scripts['package:release'],'node tools/package-release.mjs');
  assert.equal(pkg.scripts['build:setup'],'node tools/setup/build-setup.mjs');
- assert.match(pkg.scripts['build:win'],/build:both.*build:setup/);
- for(const k of ['build:control','build:voice','release:control','release:voice'])assert.doesNotMatch(pkg.scripts[k],/portable/,k);
+ assert.match(pkg.scripts['build:win'],/build:desktop.*build:setup/);
+ for(const k of ['build:desktop','release'])assert.doesNotMatch(pkg.scripts[k],/portable/,k);
+ for(const k of ['build:control','build:voice','build:both','start:voice'])assert.equal(pkg.scripts[k],undefined,k+' retired');
 });
 
 test('the release notes lead with the one Setup download and the CI publishes it',()=>{

@@ -25,12 +25,12 @@ function fakeElectron(){
   on(){}once(){}show(){}focus(){}setTitle(){}isDestroyed(){return this.destroyed;}isMinimized(){return false;}
  }
  const electron={
-  app:{requestSingleInstanceLock:()=>true,on(){},whenReady:()=>ready,getPath:()=>os.tmpdir(),setPath(){},quit(){}},
+  app:{requestSingleInstanceLock:()=>true,on(){},whenReady:()=>ready,getPath:()=>os.tmpdir(),setPath(){},quit(){},isPackaged:false,getVersion:()=>'2.15.0'},
   BrowserWindow,ipcMain:{handle:(name,fn)=>handlers.set(name,fn)},
   Menu:{buildFromTemplate:t=>t,setApplicationMenu(){}},shell:{openExternal:async()=>{}},
   safeStorage:{isEncryptionAvailable:()=>true,encryptString:s=>Buffer.from('enc:'+s),decryptString:b=>String(b).slice(4)},
-  webContents:{fromId:id=>contents.get(id)},Tray:class{setToolTip(){}setContextMenu(){}on(){}},
-  nativeImage:{createFromPath:()=>({resize:()=>({})})},dialog:{showErrorBox:(t,m)=>{throw Error(t+': '+m);}},
+  webContents:{fromId:id=>contents.get(id)},Tray:class{setToolTip(){}setContextMenu(){}on(){}setImage(){}displayBalloon(){}},
+  nativeImage:{createFromPath:()=>({resize:()=>({})})},dialog:{showErrorBox:(t,m)=>{throw Error(t+': '+m);},showMessageBox:async()=>({response:0})},
  };
  return {electron,handlers,windows,sent,start:()=>readyResolve()};
 }
@@ -41,8 +41,8 @@ test('desktop main process boots the shared background and relays storage change
  Module._load=function(request,...rest){return request==='electron'?fake.electron:originalLoad.call(this,request,...rest);};
  try{
   require(path.join(root,'app','main.cjs'));fake.start();
-  for(let i=0;i<200&&!fake.windows.some(w=>w.options.title?.includes('Control Center'));i++)await new Promise(r=>setTimeout(r,10));
-  const bot=fake.windows.find(w=>w.options.title?.includes('Control Center'));assert.ok(bot,'Steam window opens');
+  for(let i=0;i<200&&!fake.windows.some(w=>w.options.title==='ROBOTIC TYLER');i++)await new Promise(r=>setTimeout(r,10));
+  const bot=fake.windows.find(w=>w.options.title==='ROBOTIC TYLER');assert.ok(bot,'Steam window opens');
   assert.equal(bot.webContents.url,'https://steamcommunity.com/chat/');
   const frame={url:'https://steamcommunity.com/chat/'};bot.webContents.mainFrame=frame;
   const event={sender:bot.webContents,senderFrame:frame};

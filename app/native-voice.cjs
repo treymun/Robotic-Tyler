@@ -48,11 +48,11 @@ class Segmenter{
 class Capture extends EventEmitter{
  constructor(exe,device){super();this.carry=Buffer.alloc(0);this.last=Date.now();
   this.child=spawn(exe,['capture',device],{windowsHide:true,stdio:['pipe','pipe','pipe']});this.err='';
-  this.child.stdout.on('data',chunk=>{this.last=Date.now();this.carry=Buffer.concat([this.carry,chunk]);while(this.carry.length>=FRAME*2){const f=new Int16Array(FRAME);for(let i=0;i<FRAME;i++)f[i]=this.carry.readInt16LE(i*2);this.carry=this.carry.subarray(FRAME*2);this.emit('frame',f);}});
+  this.child.stdout.on('data',chunk=>{if(this.stopping)return;this.last=Date.now();this.carry=Buffer.concat([this.carry,chunk]);while(this.carry.length>=FRAME*2){const f=new Int16Array(FRAME);for(let i=0;i<FRAME;i++)f[i]=this.carry.readInt16LE(i*2);this.carry=this.carry.subarray(FRAME*2);this.emit('frame',f);}});
   this.child.stderr.on('data',d=>{this.err+=d;});
   this.child.on('error',e=>this._end('The Windows audio helper could not start: '+e.message));
   this.child.on('exit',code=>this._end(this.stopping?null:code===3?'The listening device was disconnected: '+this.err.trim():'Listening stopped unexpectedly'+(this.err?': '+this.err.trim():' (code '+code+')')+'.'));
-  this.filler=setInterval(()=>{if(Date.now()-this.last>120){this.last=Date.now()-80;this.emit('frame',new Int16Array(FRAME));}},40);
+  this.filler=setInterval(()=>{if(!this.stopping&&Date.now()-this.last>120){this.last=Date.now()-80;this.emit('frame',new Int16Array(FRAME));}},40);
  }
  _end(problem){if(this.done)return;this.done=true;clearInterval(this.filler);this.emit('end',problem);}
  stop(){this.stopping=true;clearInterval(this.filler);try{this.child.stdin.end();}catch{}const c=this.child;setTimeout(()=>{try{c.kill();}catch{}},1500).unref?.();}
