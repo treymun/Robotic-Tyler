@@ -251,3 +251,7 @@ body[data-voice-provider=gemini] #voiceStandard [data-provider=openrouter],body:
 /* Name tag preview (v2.16) */
 .chat-tag-preview{margin:10px 0 0;padding:10px 12px;border-radius:var(--rt-r-sm);background:var(--rt-surface);color:var(--rt-ink-strong);overflow-wrap:anywhere}
 #chatTagName[aria-invalid=true]{border-color:var(--rt-danger,#e5534b)}
+
+/* Notifications stack above the sticky save bar, so they never cover Save settings (v2.16). */
+body .rt-fixed .rt-toasts{bottom:84px}
+@media (max-width:700px){body .rt-fixed .rt-toasts{bottom:132px}}

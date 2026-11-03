@@ -1,0 +1,8 @@
+ROBOTIC TYLER v2.16.0
+
+- Optional name tag in Tyler's chat messages: "(ROBOTIC TYLER) …" by default, your own name,
+  or none (Settings → AI & personality → Name tag in chat). One formatting layer adds it once to
+  every message; Tyler still recognises his own messages with the tag off or renamed.
+- Polish: panel footer no longer cuts its status off, Open setup is a real button in every theme,
+  notifications no longer cover the settings save bar; theme fonts verified to load everywhere.
+- Includes everything in 2.15.0 (one desktop app, Gemini Live, one Voice page). See CHANGES.md.

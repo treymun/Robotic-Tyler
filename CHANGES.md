@@ -1,3 +1,23 @@
+# ROBOTIC TYLER v2.16.0: a name tag you control, and a polish pass
+
+## Name tag in chat messages
+- New in **Settings → AI & personality → Name tag in chat**: *Show name tag in chat messages* and *Chat display name*. Tyler's messages read `(ROBOTIC TYLER) Anyone up for another round?` by default, `(SQUAD BOT) …` with a custom name, or just the message with the tag off.
+- The name is plain text: trimmed, up to 32 characters (counted as characters, so emoji and accents are fine), capitals kept, no line breaks or hidden control characters. It is remembered while the tag is off, kept through restarts, and included in *Export safe settings*. It only changes the text inside Tyler's messages: the Steam account's name and the ROBOTIC TYLER branding stay as they are.
+- One formatting layer adds the tag exactly once to everything Tyler sends: AI replies, trivia and arcade, party host, votes, music, moderation, events and custom commands. The old hardcoded `[ROBOTIC TYLER]` / `ROBOTIC TYLER:` prefixes are gone, and a tag the AI writes itself is removed (it's also told not to add one). Names, quotes and trivia text inside messages are never touched; only a tag at the very start is.
+- Tyler still recognises his own messages with the tag off or renamed: by Steam's own record of the sender, by remembering exactly what he just sent, and by any Tyler tag. So he doesn't answer himself, read his own trivia cards as answers, or trigger his own commands or sounds. A tag never grants anything: permissions still come from verified Steam accounts.
+
+## Polish pass
+- Rendered every theme on the chat panel (all tabs and compact mode), settings (including Appearance, Voice and dialogs), the Voice window, notifications and a 420 px window, and measured which fonts actually render.
+- Fonts: every bundled theme font (TF2, CS2, Portal, CS 1.6 HUD, HEV, Left 4 Dead, DOOM) loads in the settings page, the Voice window and the in-Steam panel (checked by measuring rendered text, not just the declared font). Classic Steam, CS 1.6, Windows XP and the body text of TF2 and HEV use Windows' own Tahoma, Verdana and Trebuchet MS, as those games and Windows did; those come with Windows and weren't changed. Steam's own Motiva Sans isn't licensed for redistribution, so outside Steam's page (where Steam provides it) the Steam theme falls back to Arial, as before.
+- Fixed: the panel footer cut its status off ("This tab runs th…") next to the wider theme buttons in CS 1.6, HEV, Left 4 Dead and DOOM, in the panel and compact mode. It now wraps to two lines.
+- Fixed: *Open setup* looked like a section heading in most themes (it was styled as an icon button). It's now a real themed button.
+- Fixed: settings notifications covered the save bar's buttons. They now sit above it.
+- Left as they were: theme colours, borders, logos (sizes and DOOM's pixel rendering were already consistent), the Appearance gallery, dialogs and the Voice window. They already matched each theme and nothing else stood out at normal, high-DPI and narrow sizes. Left 4 Dead keeps its text-only secondary buttons, which match its menus.
+
+## Tested
+- 231 unit and integration tests (including the name tag on, off, custom, Unicode, legacy prefixes, the real background, and Tyler ignoring his own untagged messages) and 11 end-to-end tests in Chromium. Screenshots of all ten themes were compared before and after. Not tested in a real Steam chat.
+
+---
 # ROBOTIC TYLER v2.15.0: one desktop app, and Gemini Live voice
 
 ## Two ways to use Tyler
