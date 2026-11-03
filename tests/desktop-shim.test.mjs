@@ -16,7 +16,7 @@ function fakeElectron(){
  const handlers=new Map(),onHandlers=new Map(),windows=[],sent=[];let readyResolve;const ready=new Promise(r=>readyResolve=r);
  // One session per partition, like Electron (the Steam window's carries the voice setup, v2.19).
  const sessions=new Map(),sessionFor=name=>{if(!sessions.has(name))sessions.set(name,{agent:'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) robotic-tyler/2.19.0 Chrome/156.0.8078.75 Electron/45.2.1 Safari/537.36',
-  getUserAgent(){return this.agent;},setUserAgent(a){this.agent=a;},setPermissionRequestHandler(fn){this.request=fn;},setPermissionCheckHandler(fn){this.check=fn;},protocol:{handled:new Map(),handle(scheme,fn){this.handled.set(scheme,fn);}}});return sessions.get(name);};
+  getUserAgent(){return this.agent;},setUserAgent(a){this.agent=a;},setPermissionRequestHandler(fn){this.request=fn;},setPermissionCheckHandler(fn){this.check=fn;},setDisplayMediaRequestHandler(fn){this.display=fn;},protocol:{handled:new Map(),handle(scheme,fn){this.handled.set(scheme,fn);}}});return sessions.get(name);};
  let nextId=1;const contents=new Map();
  class BrowserWindow{
   constructor(options){this.options=options;this.destroyed=false;const id=nextId++;const self=this;
@@ -96,6 +96,17 @@ test('desktop main process boots the shared background and relays storage change
   for(let i=0;i<100&&!fake.sent.some(s=>s.channel==='tyler:port');i++)await new Promise(r=>setTimeout(r,10));
   const reply=fake.sent.find(s=>s.channel==='tyler:port');assert.ok(reply,'Live port answers');assert.equal(reply.message.id,1);assert.equal(reply.message.message.type,'error');assert.match(reply.message.message.text,/Gemini Live|key/i);
   fake.onHandlers.get('tyler:port')(portEvent,{op:'close',id:1});
+  // Music DJ: YouTube opens in the app's own Music window, which may only ask for its music state.
+  const yt=await globalThis.chrome.tabs.create({url:'https://www.youtube.com/',active:true});
+  const ytWin=fake.windows.find(w=>w.options.title==='ROBOTIC TYLER · Music (YouTube)');assert.ok(ytWin,'Music window opens');assert.equal(yt.id,ytWin.webContents.id);
+  assert.equal(ytWin.options.webPreferences.partition,'persist:robotic-tyler-youtube');
+  const ytFrame={url:'https://www.youtube.com/'};ytWin.webContents.mainFrame=ytFrame;
+  const fromYt=fake.handlers.get('tyler:youtube');
+  const pending=await fromYt({sender:ytWin.webContents,senderFrame:ytFrame},{type:'music:pending'});assert.equal(pending.ok,true,pending.error);assert.equal(pending.command,undefined,'nothing to play yet');
+  await assert.rejects(fromYt({sender:ytWin.webContents,senderFrame:ytFrame},{type:'lease:claim'}),/Invalid request/);
+  await assert.rejects(fromYt(event,{type:'music:pending'}),/Only the Music window/);
+  // Screen/music sharing: only the Steam chat window may ask; music shares only the YouTube window.
+  let shared=null;await steamSession.display({frame:{url:'https://example.com/',processId:1,routingId:1},audioRequested:true},v=>shared=v);assert.deepEqual(shared,{});
   // Settings → Voice → VB-CABLE switches the window back to text only, with Electron's own name.
   await globalThis.chrome.storage.local.set({desktopVoice:'cable'});
   for(let i=0;i<50&&/Chrome\/\d+\.0\.0\.0 Safari/.test(steamSession.agent);i++)await new Promise(r=>setTimeout(r,10));

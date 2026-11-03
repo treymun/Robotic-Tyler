@@ -1,10 +1,12 @@
 (()=>{'use strict';
+// The desktop app's text-only (VB-CABLE) mode doesn't offer screen sharing here.
+if(globalThis.TylerPlatform?.screen===false)return;
 const api=globalThis.TylerCompanion,mount=(api?.getFeatureMount?.()||api?.getMount?.());if(!mount||!navigator.mediaDevices?.getDisplayMedia)return;
 const card=document.createElement('details');card.className='feature';card.innerHTML=`<summary><span class="feature-title">Screen awareness</span><span class="feature-meta">Opt-in</span></summary>
 <p>Share a game/window on purpose. Screenshots are sent to your selected OpenRouter vision model only when you press Analyze, or automatically while the optional banter mode is enabled. Don't share sensitive windows.</p>
 <div class="btn-row"><button id="v23Start">Choose screen/window</button><button id="v23Analyze">Analyze once</button><button id="v23Stop">Stop sharing</button></div>
 <label><input id="v23Auto" type="checkbox"> Analyze every 45 seconds and comment on clearly visible Deadlock events (if enabled in settings)</label>
-<label><input id="v23Voice" type="checkbox"> Speak confirmed banter using Chrome Steam voice bridge (may incur TTS fees)</label>
+<label><input id="v23Voice" type="checkbox"> Speak confirmed banter in the Steam voice call (may incur TTS fees)</label>
 <p id="v23Status" role="status">Nothing is being captured.</p><div id="v23Result"></div><small>Requires OpenRouter vision credits. A death must be visible; the AI may still be mistaken. Cooldown 2 minutes. Never captures audio, never saves screenshots, never records the screen continuously.</small>`;
 mount.append(card);const $=id=>card.querySelector('#'+id);let stream=null,video=null,busy=false,interval=null,lastEvent='',lastAt=0,lastScene='';
 const report=t=>$('v23Status').textContent=t;

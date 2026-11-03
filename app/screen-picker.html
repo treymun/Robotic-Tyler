@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src data:">
+<title>ROBOTIC TYLER · Choose what Tyler sees</title>
+<link rel="stylesheet" href="screen-picker.css">
+</head>
+<body>
+<header>
+  <h1>Choose what Tyler sees</h1>
+  <p>Tyler takes a still picture of it only when you press Analyze (or every 45 seconds if you turn that on). No sound, no recording. Pick a game window rather than a whole screen when you can.</p>
+</header>
+<nav role="tablist" aria-label="Kind">
+  <button role="tab" id="tabWindow" aria-selected="true" data-kind="window">Windows</button>
+  <button role="tab" id="tabScreen" aria-selected="false" data-kind="screen">Entire screen</button>
+</nav>
+<main id="grid" role="listbox" aria-label="Screens and windows"></main>
+<p id="empty" hidden>Nothing to show here.</p>
+<footer>
+  <button id="cancel" type="button">Cancel</button>
+  <button id="share" type="button" class="primary" disabled>Share</button>
+</footer>
+<script src="screen-picker.js"></script>
+</body>
+</html>

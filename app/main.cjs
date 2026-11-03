@@ -8,16 +8,16 @@
 // The shared extension background (browser-extension/background.js) runs in this main process
 // behind a small chrome.* stand-in, so text chat, Standard voice and Gemini Live use the same
 // conversation engine, rules, memory and settings as the Chrome extension.
-const {app,BrowserWindow,ipcMain,Menu,shell,safeStorage,webContents,Tray,nativeImage,dialog,session,protocol}=require('electron');
+const {app,BrowserWindow,ipcMain,Menu,shell,safeStorage,webContents,Tray,nativeImage,dialog,session,protocol,desktopCapturer}=require('electron');
 const path=require('node:path'),fs=require('node:fs'),{pathToFileURL}=require('node:url'),{execFile,spawn}=require('node:child_process');
 const {setupUpdates}=require('./updates.cjs'),{Vault,memoryStorage}=require('./vault.cjs'),{isChat,isSteam,isLocal,settingsKeys,sanitizeSettings}=require('./guards.cjs');
-const {NativeVoice}=require('./native-voice.cjs'),{importVoiceStudio}=require('./migrate.cjs'),steamVoice=require('./steam-voice.cjs');
+const {NativeVoice}=require('./native-voice.cjs'),{importVoiceStudio}=require('./migrate.cjs'),steamVoice=require('./steam-voice.cjs'),{setupDesktopMedia,isYouTube}=require('./desktop-media.cjs');
 steamVoice.registerScheme(protocol);
 // Same data folder as the Control Center, so its users keep settings, keys and memory as they are.
 const root=path.join(process.env.LOCALAPPDATA||app.getPath('appData'),'RoboticTylerHydraCloudV12');fs.mkdirSync(path.join(root,'Data'),{recursive:true});app.setPath('userData',path.join(root,'Data'));
 const OLD_VOICE_DIR=path.join(app.getPath('appData'),'RoboticTylerNativeSteamCompanion');
 const OLD_VOICE_GUID='b0b8de7d-76bb-5d6f-99fa-c8a2fe9a49c6'; // electron-builder key for com.robotictyler.nativesteamcompanion
-let bot,options,voiceWin,listener,tray,voice,updates,vault,windowVoice=true,steamWindow,quitting=false;const removed=[];const activity=[];function eventLog(kind,details=''){activity.unshift({at:Date.now(),kind,details:String(details).slice(0,140)});if(activity.length>120)activity.pop();}
+let bot,options,voiceWin,listener,tray,voice,updates,vault,windowVoice=true,steamWindow,media,quitting=false;const removed=[];const activity=[];function eventLog(kind,details=''){activity.unshift({at:Date.now(),kind,details:String(details).slice(0,140)});if(activity.length>120)activity.pop();}
 const icon=path.join(__dirname,'..','assets','robotic-tyler.png');
 function helperPath(){const p=app.isPackaged?path.join(process.resourcesPath,'windows-audio-bridge','RoboticTylerAudio.exe'):path.join(__dirname,'..','windows-audio-bridge','publish','RoboticTylerAudio.exe');if(!fs.existsSync(p))throw Error('The Windows audio helper is missing. Reinstall ROBOTIC TYLER (or build it with BUILD-WINDOWS-EXE.cmd).');return p;}
 function helperOut(args,input,timeout=15000){return new Promise((resolve,reject)=>{const c=execFile(helperPath(),args,{windowsHide:true,timeout,maxBuffer:4_000_000},(error,stdout,stderr)=>error?reject(Error(String(stderr||error.message).trim())):resolve(String(stdout).trim()));if(input!==undefined){c.stdin.end(input);}});}
@@ -56,13 +56,17 @@ if(!app.requestSingleInstanceLock()){app.quit();}else{
  let micNoticeShown=false;
  steamWindow=steamVoice.setupSteamVoice({session:session.fromPartition('persist:robotic-tyler-steam'),ipcMain,extensionDir:path.join(__dirname,'..','browser-extension'),chromeVersion:process.versions.chrome,
   isVoiceWindow:()=>windowVoice,isChatFrame,log:eventLog,onBlockedMicrophone:()=>{if(micNoticeShown)return;micNoticeShown=true;void dialog.showMessageBox(bot,{type:'info',title:'ROBOTIC TYLER',message:'ROBOTIC TYLER kept your microphone off.',detail:'Steam asked for a microphone before Tyler\'s voice was ready. Leave the voice channel, wait a few seconds and join again: Tyler\'s own voice answers Steam then.',noLink:true});}});
+ // Music DJ's YouTube window and screen sharing for the Steam window (desktop-media.cjs).
+ media=setupDesktopMedia({BrowserWindow,desktopCapturer,ipcMain,shell,steamSession:session.fromPartition('persist:robotic-tyler-steam'),windowDefaults,icon,dir:__dirname,
+  isVoiceWindow:()=>windowVoice,isSteamFrame:frame=>{const top=bot&&!bot.webContents.isDestroyed()?bot.webContents.mainFrame:null;return !!frame&&!!top&&!frame.parent&&frame.processId===top.processId&&frame.routingId===top.routingId&&isChat(frame.url);},parent:()=>bot,log:eventLog,onClosed:id=>{for(const fn of removed)fn(id);}});
  globalThis.chrome={action:{onClicked:{addListener(){}}},runtime:{onMessage:{addListener(fn){listener=fn;}},onConnect:steamWindow.onConnect,openOptionsPage:()=>openSettings()},
   storage:{local,session:sessionStore,onChanged:{addListener(fn){changeListeners.push(fn);}}},
   tabs:{get:async id=>{if(id===-1)return {id,url:'https://steamcommunity.com/chat/'};const wc=webContents.fromId(id);if(!wc||wc.isDestroyed())throw Error('Tab closed');return {id,url:wc.getURL()};},
    query:async({url}={})=>{const tab=steamTab();if(!tab)return [];if(url&&!/steamcommunity\.com\/chat/.test(String(url)))return [];return isChat(tab.url)?[tab]:[];},
    sendMessage:async(id,message)=>{if(id===-1){voice?.backgroundMessage(message);return;}const wc=webContents.fromId(id);if(!wc||wc.isDestroyed())throw Error('Tab closed');wc.send('tyler:message',message);},
-   create:async({url}={})=>{if(/^https:\/\//.test(String(url||'')))await shell.openExternal(url);return {id:-2};},
-   update:async()=>({}),
+   // YouTube opens in the app's Music window (Music DJ); anything else in the normal browser.
+   create:async({url}={})=>{if(windowVoice&&isYouTube(url))return media.openYouTube(url);if(/^https:\/\//.test(String(url||'')))await shell.openExternal(url);return {id:-2};},
+   update:async(id,props={})=>{media.update(id,props);return {id};},
    onRemoved:{addListener(fn){removed.push(fn);}}}};
  await import(pathToFileURL(path.join(__dirname,'companion','background.js')).href);
 
@@ -89,6 +93,8 @@ if(!app.requestSingleInstanceLock()){app.quit();}else{
  try{tray=new Tray(nativeImage.createFromPath(path.join(__dirname,'..','assets','robotic-tyler-tray.png')).resize({width:16,height:16}));tray.on('double-click',()=>bot?.show());buildTray();}catch(err){eventLog('Tray unavailable',err.message);}
 
  ipcMain.handle('tyler:request',(event,message)=>{if(!bot||event.sender.id!==bot.webContents.id||event.senderFrame!==event.sender.mainFrame||!isChat(event.senderFrame.url))throw Error('Only the Steam chat window can use the companion.');if(!message||typeof message!=='object'||JSON.stringify(message).length>2200000)throw Error('Invalid request');eventLog('Steam text request',String(message.type||'unknown'));return new Promise(resolve=>listener(message,{url:event.senderFrame.url,tab:{id:event.sender.id}},resolve));});
+ // The Music window may only ask for its own music state and report what its player does.
+ ipcMain.handle('tyler:youtube',async(event,message)=>{if(!media.isYouTubeFrame(event))throw Error('Only the Music window can use this.');if(!['music:pending','music:event'].includes(message?.type)||JSON.stringify(message).length>4000)throw Error('Invalid request');return new Promise(resolve=>listener(message,{url:event.senderFrame.url,tab:{id:event.sender.id}},resolve));});
  ipcMain.handle('tyler:settings',async(event,request)=>{if(!options||event.sender.id!==options.webContents.id||event.senderFrame!==event.sender.mainFrame||!isLocal(event.senderFrame.url,settingsPath))throw Error('Settings are available only in the local settings window.');
   if(request.action==='activity'){return activity.slice(0,60);}
   if(request.action==='verify'){

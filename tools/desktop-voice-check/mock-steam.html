@@ -4,6 +4,29 @@
 // bot joins, so their audio first arrives on section 0; then they're listed in their own section,
 // leave (section inactive), rejoin and leave again. Steam asks for the microphone with the old
 // callback API, and ends the call when a description is rejected.
+// Music DJ and screen sharing, started by a (simulated) click.
+window.__shareChecks=async()=>{
+ const out={},wait=ms=>new Promise(r=>setTimeout(r,ms));
+ // What the audio bridge does for "Share that window's audio".
+ try{
+  const s=await navigator.mediaDevices.getDisplayMedia({video:true,audio:true,selfBrowserSurface:'exclude',systemAudio:'exclude'});
+  const v=s.getVideoTracks()[0],a=s.getAudioTracks();
+  const ac=new AudioContext(),an=ac.createAnalyser();an.fftSize=2048;if(a.length)ac.createMediaStreamSource(new MediaStream(a)).connect(an);
+  let peak=0;const buf=new Float32Array(2048);for(let i=0;i<30;i++){await wait(50);an.getFloatTimeDomainData(buf);for(const x of buf)peak=Math.max(peak,Math.abs(x));}
+  out.music={audioTracks:a.length,surface:v?.getSettings?.().displaySurface||'',label:v?.label||'',peak:Math.round(peak*1000)/1000};
+  for(const t of s.getTracks())t.stop();
+ }catch(e){out.music={error:e.name+': '+e.message};}
+ // The bridge itself: its music-capture command and the status it reports.
+ const statuses=[];const onMsg=e=>{if(e.data?.source==='tyler-music-status')statuses.push(e.data.text);};window.addEventListener('message',onMsg);
+ window.postMessage({source:'tyler-audio-command',type:'music-capture',volume:.35},location.origin);await wait(2500);window.postMessage({source:'tyler-audio-command',type:'music-disconnect'},location.origin);await wait(300);
+ window.removeEventListener('message',onMsg);out.musicBridge=statuses;
+ // Screen awareness: a picture only.
+ try{
+  const s=await navigator.mediaDevices.getDisplayMedia({video:{frameRate:1},audio:false});
+  const v=s.getVideoTracks()[0];out.screen={surface:v?.getSettings?.().displaySurface||'',audioTracks:s.getAudioTracks().length};for(const t of s.getTracks())t.stop();
+ }catch(e){out.screen={error:e.name+': '+e.message};}
+ return out;
+};
 window.__checkDone=(async()=>{
  const out={ua:navigator.userAgent,steps:[]};const step=s=>out.steps.push(s);
  const wait=ms=>new Promise(r=>setTimeout(r,ms));

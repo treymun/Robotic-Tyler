@@ -1,0 +1,5 @@
+<!doctype html><meta charset="utf-8"><title>Mock YouTube (desktop voice check)</title><body><h1>Mock YouTube</h1>
+<script>
+// Stands in for a playing YouTube video: a steady tone through the page's own audio output.
+const ac=new AudioContext(),o=ac.createOscillator(),g=ac.createGain();o.frequency.value=440;g.gain.value=.5;o.connect(g);g.connect(ac.destination);o.start();
+</script>

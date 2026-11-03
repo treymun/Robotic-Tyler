@@ -3,7 +3,9 @@
 //   ELECTRON=/path/to/electron node tools/desktop-voice-check/check.mjs
 // Checks: Steam sees Chrome's user agent; Steam's old-style microphone request gets Tyler's
 // synthetic microphone with no device and no permission prompt; the local speech detector loads
-// under a strict page CSP; and the bot stays in a call through two leaves and a rejoin.
+// under a strict page CSP; the bot stays in a call through two leaves and a rejoin; Music DJ shares
+// exactly the app's YouTube window (its sound reaches Tyler's audio bridge); and screen awareness
+// gets a picture only, of what the picker chose.
 import fs from 'node:fs';import path from 'node:path';import os from 'node:os';import {spawnSync} from 'node:child_process';import {createRequire} from 'node:module';import {fileURLToPath} from 'node:url';
 const HERE=path.dirname(fileURLToPath(import.meta.url)),ROOT=path.resolve(HERE,'..','..');
 let ELECTRON=process.env.ELECTRON;if(!ELECTRON){try{ELECTRON=createRequire(path.join(ROOT,'package.json'))('electron');}catch{}}
@@ -20,5 +22,9 @@ if(!res.mic?.ok)bad.push('Steam\'s microphone request failed: '+JSON.stringify(r
 if(res.mainLog.some(l=>/blocked-mic|physical microphone/i.test(l)))bad.push('a physical microphone request reached the app');
 if(res.neural!=='ready')bad.push('speech detector: '+res.neural);
 if(!/^stayed/.test(res.call))bad.push('call: '+res.call);
+if(res.music?.error||res.music?.audioTracks!==1||res.music?.surface!=='browser'||!(res.music?.peak>0.05))bad.push('music share: '+JSON.stringify(res.music));
+if(!res.musicBridge?.some(t=>/YouTube audio is shared/.test(t)))bad.push('the audio bridge did not take the YouTube window\'s sound: '+JSON.stringify(res.musicBridge));
+if(res.screen?.error||res.screen?.audioTracks!==0)bad.push('screen share: '+JSON.stringify(res.screen));
+if(!res.picked?.length)bad.push('the screen picker was not asked');
 if(bad.length){console.error('FAILED:\n'+bad.join('\n'));process.exit(1);}
 console.log('PASS (mock Steam page in Electron)');
