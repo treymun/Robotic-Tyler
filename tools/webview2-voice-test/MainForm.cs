@@ -71,20 +71,24 @@ public sealed class MainForm : Form
         {
             var options = new CoreWebView2EnvironmentOptions { AreBrowserExtensionsEnabled = true };
             env = await CoreWebView2Environment.CreateAsync(null, Path.Combine(dataDir, "Profile"), options);
+            await panel.EnsureCoreWebView2Async(env);
         }
-        catch (WebView2RuntimeNotFoundException)
+        catch (WebView2RuntimeNotFoundException ex)
         {
-            MessageBox.Show(this, "The Microsoft Edge WebView2 Runtime (Evergreen) isn't installed.\n\nInstall it from https://developer.microsoft.com/microsoft-edge/webview2/ (Evergreen Bootstrapper), then start this test again.",
-                Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
-            Close(); return;
+            StartupFailed(ex, "The Microsoft Edge WebView2 Runtime isn't installed on this PC.",
+                "Install the Evergreen runtime (the Evergreen Bootstrapper or Standalone Installer x64) from Microsoft's WebView2 page, then start this test again.");
+            return;
         }
         catch (Exception ex)
         {
-            MessageBox.Show(this, "WebView2 couldn't start: " + ex.Message, Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
-            Close(); return;
+            StartupFailed(ex, "WebView2 is installed, but Windows couldn't load its files, so the test can't start. This is a problem with the Microsoft Edge WebView2 Runtime on this PC, not with Steam or Tyler.",
+                "1. Restart Windows. A WebView2 update may be half-installed; the restart finishes it.\n" +
+                "2. Still failing? Settings → Apps → Installed apps → Microsoft Edge WebView2 Runtime → ⋯ → Modify → Repair.\n" +
+                "3. No Repair option? Download the Evergreen Standalone Installer (x64) from Microsoft's WebView2 page and run it.\n" +
+                "Then start this test again.");
+            return;
         }
 
-        await panel.EnsureCoreWebView2Async(env);
         panel.CoreWebView2.SetVirtualHostNameToFolderMapping(PanelHost, Path.Combine(appDir, "web"), CoreWebView2HostResourceAccessKind.Deny);
         panel.CoreWebView2.Settings.IsStatusBarEnabled = false;
         panel.CoreWebView2.WebMessageReceived += OnPanelMessage;
@@ -102,6 +106,80 @@ public sealed class MainForm : Form
         await core.AddScriptToExecuteOnDocumentCreatedAsync(ReadWeb("diagnostics.js"));
         await ApplyModeAsync(mode, reload: false);
         core.Navigate(SteamChat);
+    }
+
+    // ── Startup problems ─────────────────────────────────────────────────
+    // Program.cs turns off Windows' own "bad image" pop-up, so a broken runtime ends up here
+    // instead of freezing the window. The details go to a text file on the desktop to send.
+    void StartupFailed(Exception ex, string what, string fix)
+    {
+        string file = "";
+        try
+        {
+            var folder = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+            if (string.IsNullOrEmpty(folder) || !Directory.Exists(folder)) folder = dataDir;
+            file = Path.Combine(folder, $"RoboticTyler-WebView2-startup-{DateTime.Now:yyyyMMdd-HHmmss}.txt");
+            File.WriteAllText(file, RuntimeReport(ex), new UTF8Encoding(false));
+        }
+        catch { file = ""; }
+        var settings = new TaskDialogButton("Open Installed apps");
+        var download = new TaskDialogButton("Open the WebView2 download page");
+        var page = new TaskDialogPage
+        {
+            Caption = Text,
+            Heading = "WebView2 didn't start",
+            Text = what + "\n\n" + fix + (file != "" ? "\n\nDetails were saved to " + file + " (send it to me if the fix doesn't help)." : ""),
+            Icon = TaskDialogIcon.Error,
+            Buttons = { settings, download, TaskDialogButton.Close },
+            Expander = new TaskDialogExpander($"{ex.GetType().Name} 0x{ex.HResult:X8}: {ex.Message}"),
+        };
+        var answer = TaskDialog.ShowDialog(this, page);
+        if (answer == settings) OpenExternal("ms-settings:appsfeatures");
+        else if (answer == download) OpenExternal("https://developer.microsoft.com/microsoft-edge/webview2/");
+        Close();
+    }
+
+    // Which runtime WebView2 picked and the state of each installed runtime version.
+    static string RuntimeReport(Exception? ex)
+    {
+        var sb = new StringBuilder();
+        sb.AppendLine("ROBOTIC TYLER · WebView2 voice test 0.1.1 · startup problem");
+        sb.AppendLine("Time: " + DateTime.Now.ToString("u"));
+        sb.AppendLine("Windows: " + RuntimeInformation.OSDescription + " · " + RuntimeInformation.OSArchitecture + " · process " + RuntimeInformation.ProcessArchitecture);
+        try { sb.AppendLine("Runtime WebView2 chose: " + CoreWebView2Environment.GetAvailableBrowserVersionString()); }
+        catch (Exception e) { sb.AppendLine("Runtime lookup failed: " + e.Message); }
+        if (ex != null) sb.AppendLine($"Error: {ex.GetType().Name} 0x{ex.HResult:X8}: {ex.Message}");
+        var roots = new[] { Environment.SpecialFolder.ProgramFilesX86, Environment.SpecialFolder.ProgramFiles, Environment.SpecialFolder.LocalApplicationData }
+            .Select(Environment.GetFolderPath).Where(r => !string.IsNullOrEmpty(r)).Distinct();
+        foreach (var root in roots)
+        {
+            var app = Path.Combine(root, "Microsoft", "EdgeWebView", "Application");
+            if (!Directory.Exists(app)) continue;
+            sb.AppendLine("Runtime folder: " + app);
+            try
+            {
+                foreach (var dir in Directory.GetDirectories(app).OrderBy(d => d))
+                {
+                    var dll = Path.Combine(dir, "EBWebView", "x64", "EmbeddedBrowserWebView.dll");
+                    string info;
+                    try
+                    {
+                        if (!File.Exists(dll)) info = "EBWebView\\x64\\EmbeddedBrowserWebView.dll is missing";
+                        else
+                        {
+                            var fi = new FileInfo(dll);
+                            string ver;
+                            try { ver = FileVersionInfo.GetVersionInfo(dll).FileVersion ?? "?"; } catch (Exception e) { ver = "unreadable (" + e.Message + ")"; }
+                            info = $"EmbeddedBrowserWebView.dll {fi.Length:N0} bytes, version {ver}, attributes {fi.Attributes}, modified {fi.LastWriteTime:u}";
+                        }
+                    }
+                    catch (Exception e) { info = "couldn't read: " + e.Message; }
+                    sb.AppendLine("  " + Path.GetFileName(dir) + ": " + info);
+                }
+            }
+            catch (Exception e) { sb.AppendLine("  couldn't list: " + e.Message); }
+        }
+        return sb.ToString();
     }
 
     // ── Modes ────────────────────────────────────────────────────────────
@@ -289,7 +367,7 @@ public sealed class MainForm : Form
         ToPanel(new JsonObject
         {
             ["type"] = "host",
-            ["app"] = "0.1.0",
+            ["app"] = "0.1.1",
             ["runtime"] = env.BrowserVersionString,
             ["sdk"] = sdk,
             ["os"] = RuntimeInformation.OSDescription,

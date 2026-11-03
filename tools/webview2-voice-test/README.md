@@ -1,4 +1,4 @@
-# ROBOTIC TYLER · WebView2 voice test (prototype 0.1)
+# ROBOTIC TYLER · WebView2 voice test (prototype 0.1.1)
 
 A small, separate Windows app that answers one question before any production change: **can
 Steam web voice, and then Tyler's own audio bridge, work inside Microsoft Edge WebView2?** If they
@@ -23,13 +23,19 @@ do, the desktop app could talk in Steam voice without VB-CABLE.
 
 ## Start
 
-1. Unzip `RoboticTyler-WebView2-VoiceTest-0.1.0-win-x64.zip` anywhere (Desktop is fine).
+1. Unzip `RoboticTyler-WebView2-VoiceTest-0.1.1-win-x64.zip` anywhere (Desktop is fine).
 2. Run `RoboticTyler-WebView2-VoiceTest.exe`. It isn't code-signed: if Windows says *"Windows
    protected your PC"*, choose **More info → Run anyway**.
    (The `-small` zip is the same app without .NET inside; Windows offers to install the .NET 8
    Desktop Runtime the first time.)
 3. Steam web chat opens on the left. Sign in to the **bot account** the normal way (QR code or
    password and Steam Guard). The sign-in is remembered in the test folder only.
+
+If the test says **WebView2 didn't start** (for example Windows couldn't load
+`EmbeddedBrowserWebView.dll`, error 0xc0000020), the WebView2 runtime on this PC is damaged or a
+runtime update is half-installed. Restart Windows; if that doesn't fix it, repair it in *Settings →
+Apps → Installed apps → Microsoft Edge WebView2 Runtime → ⋯ → Modify → Repair*, or run Microsoft's
+Evergreen Standalone Installer (x64). The test saves the details to a text file on your Desktop.
 
 ## Stage 1 · a normal call (no Tyler)
 

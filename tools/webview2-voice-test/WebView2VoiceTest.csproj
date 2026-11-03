@@ -9,7 +9,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>RoboticTyler.WebView2VoiceTest</RootNamespace>
     <AssemblyName>RoboticTyler-WebView2-VoiceTest</AssemblyName>
-    <Version>0.1.0</Version>
+    <Version>0.1.1</Version>
     <Product>ROBOTIC TYLER WebView2 voice test</Product>
     <Company>ROBOTIC TYLER (fan project)</Company>
     <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
