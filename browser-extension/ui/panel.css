@@ -136,6 +136,18 @@
 :host(.mini) .panel{height:auto}
 :host(.mini) .stats,:host(.mini) .tabs,:host(.mini) .scroll{display:none}
 :host(.mini) .tally{margin-bottom:10px}
+/* Collapsed, a notification is one compact row between the status strip and the footer (the panel
+   grows to fit it), so it never covers the header or the status it refers to. */
+:host(.mini) .rt-layer{position:static;order:1}
+:host(.mini) .foot{order:2}
+:host(.mini) .rt-toasts{position:static;margin:0 10px 10px;gap:4px}
+:host(.mini) .rt-toasts:empty{display:none}
+:host(.mini) .rt-toast{grid-template-columns:auto minmax(0,1fr) auto auto;align-items:center;gap:0 8px;padding-top:6px;padding-bottom:6px}
+:host(.mini) .rt-toast:has(.rt-toast-text) .rt-toast-title{display:none}
+:host(.mini) .rt-toast>.ic{grid-row:1;margin:0}
+:host(.mini) :is(.rt-toast-title,.rt-toast-text){grid-column:2;grid-row:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+:host(.mini) .rt-toast-actions{grid-column:3;grid-row:1;margin:0;flex-wrap:nowrap}
+:host(.mini) .rt-toast .rt-x{grid-column:4;grid-row:1;margin:0}
 
 /* ── Type: Steam section heads are tracked uppercase ─── */
 h2{font:400 var(--rt-text-lg)/1.3 var(--rt-font-display);letter-spacing:.06em;text-transform:uppercase;margin:4px 0 10px;color:var(--rt-ink-strong)}
@@ -252,8 +264,9 @@ pre:empty{display:none}
 .quick-status{font-size:var(--rt-text-sm);color:var(--rt-ink-3);margin:8px 0 12px}
 
 /* Entry row: "Just here for the sounds?" style prompts */
-.deck-entry{display:flex;align-items:center;gap:12px;margin:0 0 10px;padding:11px 12px;border-radius:var(--rt-r-sm);background:linear-gradient(90deg,rgba(103,193,245,.12),rgba(0,0,0,.2) 75%)}
-.deck-entry>div{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.deck-entry{display:flex;flex-wrap:wrap;align-items:center;gap:10px 12px;margin:0 0 10px;padding:11px 12px;border-radius:var(--rt-r-sm);background:linear-gradient(90deg,rgba(103,193,245,.12),rgba(0,0,0,.2) 75%)}
+/* The button drops below the text when a wide theme font would squeeze the text column. */
+.deck-entry>div{flex:1 1 170px;min-width:0;display:flex;flex-direction:column;gap:2px}
 .deck-entry small{margin:0;font-size:var(--rt-text-xs);color:var(--rt-ink-3)}
 .deck-entry b{font-size:var(--rt-text-md)}
 .deck-entry span{font-size:var(--rt-text-xs);color:var(--rt-ink-3);line-height:1.45}
@@ -359,7 +372,7 @@ pre:empty{display:none}
 .panel[data-voice=false] [data-capability=voice]{display:none!important}
 
 /* Focus & motion */
-button:focus-visible,summary:focus-visible,a:focus-visible,input[type=checkbox]:focus-visible,input[type=range]:focus-visible,input[type=file]:focus-visible{outline:1px solid var(--rt-focus);outline-offset:2px}
+button:focus-visible,summary:focus-visible,a:focus-visible,input[type=checkbox]:focus-visible,input[type=range]:focus-visible,input[type=file]:focus-visible{outline:var(--rt-focus-w,2px) var(--rt-focus-style,solid) var(--rt-focus);outline-offset:var(--rt-focus-offset,2px)}
 @media (max-height:640px){.panel{height:94vh;bottom:8px;right:8px}.stats{display:none}}
 @media (max-width:460px){.panel{right:8px;bottom:8px;width:calc(100vw - 16px);max-width:none;height:min(680px,92dvh)}}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}

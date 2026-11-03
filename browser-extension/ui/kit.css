@@ -77,4 +77,9 @@
 [data-rt-theme=steam] :is(.view:not([hidden]),.sheet,section[data-view]:not([hidden])){animation:st-enter .18s ease-out backwards}
 [data-rt-theme=steam] .rt-toast:not(.rt-leaving){animation:st-pop .32s cubic-bezier(.2,.8,.3,1) backwards,st-sheen .9s .25s ease-out 1 both;background-image:linear-gradient(105deg,transparent 35%,rgba(255,255,255,.10) 50%,transparent 65%);background-size:200% 100%;background-repeat:no-repeat}
 [data-rt-theme=steam] .panel:has(.tally[data-state=speaking]) .mark[data-logo],.panel[data-rt-theme=steam]:has(.tally[data-state=speaking]) .mark[data-logo]{animation:st-glow 1.4s ease-in-out infinite}
+/* ── v2.16 polish: Steam ──
+   Text spend reads like a Steam store price (the green discount block) and keyboard focus glows the
+   way Big Picture and the Steam Deck light up the selected control. */
+[data-rt-theme=steam] #hudSpend{display:inline-block;max-width:100%;padding:0 6px;border-radius:2px;background:#4c6b22;color:#beee11}
+[data-rt-theme=steam] :is(button,summary,a):focus-visible{box-shadow:0 0 0 1px rgba(255,255,255,.18),0 0 14px rgba(102,192,244,.55)}
 @media (prefers-reduced-motion:reduce){.rt-toast,.rt-toast.rt-leaving,.rt-scrim,.rt-dialog,.rt-tip{animation:none!important}}

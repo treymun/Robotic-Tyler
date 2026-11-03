@@ -91,7 +91,8 @@
 }
 html[data-rt-theme=classic]{scrollbar-color:#6a7860 var(--c-deep)}
 [data-rt-theme=classic] body{background:var(--rt-bg);-webkit-font-smoothing:auto}
-[data-rt-theme=classic] :focus-visible{outline:1px dotted var(--c-gold)!important;outline-offset:1px!important}
+/* VGUI marks keyboard focus with a dotted rectangle just inside the control. */
+[data-rt-theme=classic] :focus-visible{outline:2px dotted var(--c-gold)!important;outline-offset:1px!important}
 
 /* ── Type: Verdana bold heads, gold section titles, no tracked capitals ── */
 [data-rt-theme=classic] h1{font:700 var(--rt-text-3xl)/1.2 var(--rt-font-display);letter-spacing:0;text-transform:none;color:#fff}
@@ -261,3 +262,16 @@ html[data-rt-theme=classic]{scrollbar-color:#6a7860 var(--c-deep)}
 [data-rt-theme=classic] :is(button,.btn):active:not(:disabled){border-color:var(--c-lo) var(--c-hi) var(--c-hi) var(--c-lo)!important;transform:translate(1px,1px)}
 [data-rt-theme=classic] .rt-toast:not(.rt-leaving){animation:cl-tray .25s steps(5,end) backwards}
 [data-rt-theme=classic] .panel:has(.tally[data-state=speaking]) .mark[data-logo],.panel[data-rt-theme=classic]:has(.tally[data-state=speaking]) .mark[data-logo]{outline:1px dotted #c4b550;outline-offset:1px}
+
+/* ── v2.16 polish: Classic ──
+   The 2004 VGUI scrollbar: an olive well with a raised, bevelled thumb and boxed arrow buttons. */
+html[data-rt-theme=classic],[data-rt-theme=classic] :is(.scroll,.content,main){scrollbar-color:auto;scrollbar-width:auto}
+[data-rt-theme=classic] ::-webkit-scrollbar,html[data-rt-theme=classic]::-webkit-scrollbar{width:15px;height:15px;background:var(--c-well)}
+[data-rt-theme=classic] ::-webkit-scrollbar-track,html[data-rt-theme=classic]::-webkit-scrollbar-track{background:var(--c-well);box-shadow:inset 1px 1px 0 var(--c-lo)}
+[data-rt-theme=classic] ::-webkit-scrollbar-thumb,html[data-rt-theme=classic]::-webkit-scrollbar-thumb{min-height:24px;background:var(--c-raised);border:1px solid;border-color:var(--c-hi) var(--c-lo) var(--c-lo) var(--c-hi)}
+[data-rt-theme=classic] ::-webkit-scrollbar-thumb:hover,html[data-rt-theme=classic]::-webkit-scrollbar-thumb:hover{background:#627058}
+[data-rt-theme=classic] ::-webkit-scrollbar-button:single-button,html[data-rt-theme=classic]::-webkit-scrollbar-button:single-button{display:block;width:15px;height:15px;background-color:var(--c-face);background-repeat:no-repeat;background-position:center;background-size:8px;border:1px solid;border-color:var(--c-hi) var(--c-lo) var(--c-lo) var(--c-hi)}
+[data-rt-theme=classic] ::-webkit-scrollbar-button:single-button:active,html[data-rt-theme=classic]::-webkit-scrollbar-button:single-button:active{border-color:var(--c-lo) var(--c-hi) var(--c-hi) var(--c-lo)}
+[data-rt-theme=classic] ::-webkit-scrollbar-button:single-button:vertical:decrement,html[data-rt-theme=classic]::-webkit-scrollbar-button:single-button:vertical:decrement{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath d='M1 6h6L4 2z' fill='%23b8bfa8'/%3E%3C/svg%3E")}
+[data-rt-theme=classic] ::-webkit-scrollbar-button:single-button:vertical:increment,html[data-rt-theme=classic]::-webkit-scrollbar-button:single-button:vertical:increment{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath d='M1 2h6L4 6z' fill='%23b8bfa8'/%3E%3C/svg%3E")}
+[data-rt-theme=classic] ::-webkit-scrollbar-corner{background:var(--c-face)}

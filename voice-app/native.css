@@ -78,7 +78,7 @@ textarea::placeholder{color:var(--rt-ink-4)}
 .steps li::marker{color:var(--rt-blue);font-variant-numeric:tabular-nums}
 footer{margin-top:18px;font-size:12px;color:var(--rt-ink-4)}
 
-button:focus-visible{outline:1px solid var(--rt-focus);outline-offset:2px}
+button:focus-visible,summary:focus-visible,a:focus-visible,input[type=checkbox]:focus-visible,input[type=range]:focus-visible{outline:var(--rt-focus-w,2px) var(--rt-focus-style,solid) var(--rt-focus);outline-offset:var(--rt-focus-offset,2px)}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 @media (max-width:820px){
   .app{grid-template-columns:180px 1fr}

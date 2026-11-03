@@ -179,7 +179,7 @@ summary:hover,details[open]>summary{color:var(--rt-ink-strong)}
 .fineprint{margin:0;padding:10px 0 24px;font-size:12px;color:var(--rt-ink-4)}
 
 /* Focus & motion */
-button:focus-visible,a:focus-visible,summary:focus-visible,input[type=checkbox]:focus-visible,input[type=range]:focus-visible{outline:1px solid var(--rt-focus);outline-offset:2px}
+button:focus-visible,a:focus-visible,summary:focus-visible,input[type=checkbox]:focus-visible,input[type=range]:focus-visible{outline:var(--rt-focus-w,2px) var(--rt-focus-style,solid) var(--rt-focus);outline-offset:var(--rt-focus-offset,2px)}
 /* ── Appearance: theme gallery (v2.14) ─────────────────── */
 .tg-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,410px);gap:18px;align-items:start}
 .tg-grid{display:grid;grid-template-columns:repeat(auto-fill,188px);justify-content:start;gap:12px}
