@@ -14,6 +14,19 @@
 - Fixed: settings notifications covered the save bar's buttons. They now sit above it.
 - Left as they were: theme colours, borders, logos (sizes and DOOM's pixel rendering were already consistent), the Appearance gallery, dialogs and the Voice window. They already matched each theme and nothing else stood out at normal, high-DPI and narrow sizes. Left 4 Dead keeps its text-only secondary buttons, which match its menus.
 
+## Each theme moves its own way
+Every theme now has its own motion for three moments: a screen appearing (switching tabs in the panel, sections in Settings, pages in the Voice window), a notification arriving, and Tyler's logo while he talks. All of it uses only transforms, opacity and clipping, finishes in under half a second (the logo loops only while Tyler is talking), and switches off with the system's *reduce motion* setting.
+- **Steam:** screens ease up like the client's library pages; notifications rise from the corner like a friend or achievement pop-up, with one sheen across; the logo glows green while Tyler talks.
+- **Classic Steam (2004):** VGUI didn't animate, so screens still appear at once. Buttons now press in (the bevel flips) and notifications slide up like the old tray pop-up.
+- **Team Fortress 2:** screens drop in like a poster slapped on the wall; notifications slide in from the right like the kill feed; buttons squash when pressed; the logo bobs its hard hat while Tyler talks.
+- **Counter-Strike 2:** screens wipe in from the left; notifications slide in with a draining timer bar like *MATCH FOUND*; the logo gets a pulsing cyan scan frame.
+- **Portal:** screens open like a portal, an iris from the middle; notifications slide down like a test chamber sign; the logo gets a portal ring, blue while Tyler listens and orange while he talks.
+- **Counter-Strike 1.6:** menus snap open with a one-frame flash; notifications type in like a HUD hint; the logo blinks amber like the bomb carrier icon.
+- **Half-Life HEV suit:** screens power on like the HUD (a CRT line that opens, then a flicker); notifications flash like a suit warning; the logo charges amber.
+- **Left 4 Dead:** screens flicker on like a dying flashlight; warnings and errors jolt in like a horde alert; the logo beats like a heartbeat.
+- **Windows XP:** screens open with XP's quick zoom-and-fade; notifications pop up like a system-tray balloon; the logo glows like the Start button.
+- **DOOM:** screens arrive with DOOM's screen melt, pixel columns sliding down at their own speeds; notifications flash like a pickup message; buttons press in by whole pixels; the logo jolts like the status-bar face.
+
 ## Tested
 - 231 unit and integration tests (including the name tag on, off, custom, Unicode, legacy prefixes, the real background, and Tyler ignoring his own untagged messages) and 11 end-to-end tests in Chromium. Screenshots of all ten themes were compared before and after. Not tested in a real Steam chat.
 

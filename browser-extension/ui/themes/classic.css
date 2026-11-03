@@ -253,3 +253,11 @@ html[data-rt-theme=classic]{scrollbar-color:#6a7860 var(--c-deep)}
 [data-rt-theme=classic] :is(.rt-dialog-text,.rt-steps,.rt-dialog-actions){margin-left:12px;margin-right:12px}
 [data-rt-theme=classic] .rt-scrim{background:rgba(20,24,16,.45)}
 [data-rt-theme=classic] .rt-tip{background:var(--c-deep);color:#e4e8dc;border:1px solid;border-color:var(--c-hi) var(--c-lo) var(--c-lo) var(--c-hi)}
+
+/* ── v2.17 motion: Classic Steam (2004) ──
+   VGUI didn't animate, so screens still appear at once. What it did have: buttons that press in
+   (the bevel flips) and a tray pop-up that slid up from the corner. */
+@keyframes cl-tray{from{transform:translateY(110%)}to{transform:none}}
+[data-rt-theme=classic] :is(button,.btn):active:not(:disabled){border-color:var(--c-lo) var(--c-hi) var(--c-hi) var(--c-lo)!important;transform:translate(1px,1px)}
+[data-rt-theme=classic] .rt-toast:not(.rt-leaving){animation:cl-tray .25s steps(5,end) backwards}
+[data-rt-theme=classic] .panel:has(.tally[data-state=speaking]) .mark[data-logo],.panel[data-rt-theme=classic]:has(.tally[data-state=speaking]) .mark[data-logo]{outline:1px dotted #c4b550;outline-offset:1px}

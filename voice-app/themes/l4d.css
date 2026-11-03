@@ -163,3 +163,15 @@
 [data-rt-theme=l4d] :is(.rt-toast-text,.rt-dialog-text,.rt-steps){color:#c4c9c2}
 [data-rt-theme=l4d] .rt-dialog{padding:22px 18px 16px}
 [data-rt-theme=l4d] .rt-tip{background:#0b0b0b;color:#e6e6e6;border:1px solid #2c2c2c;border-radius:0;font-family:var(--rt-font-display);text-transform:uppercase;letter-spacing:.06em}
+
+/* ── v2.17 motion: Left 4 Dead ──
+   Screens flicker on like a dying flashlight; errors and warnings jolt in like the Director
+   spawning a horde; the logo's pulse beats like a heartbeat while Tyler talks. */
+@keyframes l4d-flicker{0%{opacity:0}15%{opacity:.9}22%{opacity:.25}34%{opacity:1}42%{opacity:.6}55%,100%{opacity:1}}
+@keyframes l4d-jolt{0%{opacity:0;transform:translateX(0)}20%{opacity:1;transform:translateX(-5px)}40%{transform:translateX(4px)}60%{transform:translateX(-2px)}80%,100%{transform:none}}
+@keyframes l4d-heart{0%,100%{transform:scale(1)}12%{transform:scale(1.09)}24%{transform:scale(.98)}36%{transform:scale(1.06)}52%{transform:scale(1)}}
+[data-rt-theme=l4d] :is(.view:not([hidden]),.sheet,section[data-view]:not([hidden])){animation:l4d-flicker .42s linear backwards}
+[data-rt-theme=l4d] .rt-toast:not(.rt-leaving){animation:rt-toast-in .2s ease-out backwards}
+[data-rt-theme=l4d] .rt-toast:not(.rt-leaving):is([data-kind=error],[data-kind=warning]){animation:l4d-jolt .38s ease-out backwards}
+[data-rt-theme=l4d] :is(button,.btn):active:not(:disabled){transform:translateY(1px) skewX(-3deg)}
+[data-rt-theme=l4d] .panel:has(.tally[data-state=speaking]) .mark[data-logo],.panel[data-rt-theme=l4d]:has(.tally[data-state=speaking]) .mark[data-logo]{animation:l4d-heart 1s ease-in-out infinite}

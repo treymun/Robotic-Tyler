@@ -173,3 +173,14 @@
 [data-rt-theme=hev] :is(.rt-toast-title,.rt-dialog-title){font-family:var(--rt-font-display);font-weight:400;text-transform:uppercase;letter-spacing:.16em;color:var(--h-yellow);text-shadow:var(--h-glow)}
 [data-rt-theme=hev] :is(.rt-toast-text,.rt-dialog-text,.rt-steps){color:#e9dfb8}
 [data-rt-theme=hev] .rt-tip{background:rgba(8,7,4,.92);color:var(--h-yellow);border:1px solid var(--h-edge);border-radius:6px;font-family:var(--rt-font-display);letter-spacing:.06em}
+
+/* ── v2.17 motion: Half-Life HEV suit ──
+   Screens power on like the HEV HUD (a CRT line that opens, then a flicker); notifications
+   flash in like a suit warning; the logo charges amber while Tyler talks. */
+@keyframes hev-on{0%{opacity:0;transform:scaleY(.04)}30%{opacity:1;transform:scaleY(1)}45%{opacity:.55}60%{opacity:1}75%{opacity:.8}100%{opacity:1;transform:none}}
+@keyframes hev-warn{0%,40%,80%{opacity:1}20%,60%{opacity:.35}100%{opacity:1}}
+@keyframes hev-charge{0%,100%{box-shadow:0 0 0 2px #ffdc00,0 0 4px rgba(255,220,0,.3)}50%{box-shadow:0 0 0 2px #ffdc00,0 0 14px rgba(255,220,0,.8)}}
+[data-rt-theme=hev] :is(.view:not([hidden]),.sheet,section[data-view]:not([hidden])){animation:hev-on .36s ease-out backwards;transform-origin:50% 0}
+[data-rt-theme=hev] .rt-toast:not(.rt-leaving){animation:rt-toast-in .2s ease-out backwards,hev-warn .5s .2s steps(2,end) both}
+[data-rt-theme=hev] :is(button,.btn):active:not(:disabled){transform:translateY(1px);filter:brightness(1.2)}
+[data-rt-theme=hev] .panel:has(.tally[data-state=speaking]) .mark[data-logo],.panel[data-rt-theme=hev]:has(.tally[data-state=speaking]) .mark[data-logo]{animation:hev-charge .9s ease-in-out infinite}

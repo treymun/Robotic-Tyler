@@ -151,3 +151,14 @@
 [data-rt-theme=cs16] .tabs button::before{grid-column:1;grid-row:1}
 [data-rt-theme=cs16] .tabs button .ic{grid-column:2;grid-row:1}
 [data-rt-theme=cs16] .tabs button .tab-label{grid-column:1/-1;grid-row:2}
+
+/* ── v2.17 motion: Counter-Strike 1.6 ──
+   GoldSrc menus snapped open, so screens appear at once with a one-frame flash; notifications
+   type in like a HUD hint; the logo blinks amber like the bomb carrier icon while Tyler talks. */
+@keyframes cs16-snap{0%{opacity:.35}100%{opacity:1}}
+@keyframes cs16-hint{from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0 0 0)}}
+@keyframes cs16-carrier{0%,49%{box-shadow:0 0 0 2px #ffb000}50%,100%{box-shadow:0 0 0 2px rgba(255,176,0,.15)}}
+[data-rt-theme=cs16] :is(.view:not([hidden]),.sheet,section[data-view]:not([hidden])){animation:cs16-snap .08s steps(2,end) backwards}
+[data-rt-theme=cs16] .rt-toast:not(.rt-leaving){animation:cs16-hint .35s steps(14,end) backwards}
+[data-rt-theme=cs16] :is(button,.btn):active:not(:disabled){transform:translate(1px,1px)}
+[data-rt-theme=cs16] .panel:has(.tally[data-state=speaking]) .mark[data-logo],.panel[data-rt-theme=cs16]:has(.tally[data-state=speaking]) .mark[data-logo]{animation:cs16-carrier .8s steps(1,end) infinite}

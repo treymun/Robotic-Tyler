@@ -186,3 +186,14 @@ html[data-rt-theme=tf2]{scrollbar-color:var(--tf-tan) var(--tf-dark-brown)}
 [data-rt-theme=tf2] .rt-dialog{background:linear-gradient(180deg,#3b3630,#2a2624);border:3px solid #4a433c;border-top:6px solid var(--tone);border-radius:14px;box-shadow:0 6px 0 rgba(0,0,0,.5)}
 [data-rt-theme=tf2] .rt-dialog-title{font-size:24px}
 [data-rt-theme=tf2] .rt-tip{background:#2b2522;color:var(--tf-tan-light);border:2px solid #6c6256;border-radius:6px;font-weight:700}
+
+/* ── v2.17 motion: Team Fortress 2 ──
+   Screens drop in like a poster slapped on the wall; notifications slide in from the right like
+   the kill feed; buttons squash when pressed; the logo bobs its hard hat while Tyler talks. */
+@keyframes tf-drop{0%{opacity:0;transform:translateY(-12px) rotate(-1.4deg)}60%{opacity:1;transform:translateY(2px) rotate(.5deg)}100%{transform:none}}
+@keyframes tf-feed{0%{opacity:0;transform:translateX(40px)}70%{opacity:1;transform:translateX(-4px)}100%{transform:none}}
+@keyframes tf-bob{0%,100%{transform:translateY(0) rotate(0)}25%{transform:translateY(-2px) rotate(-4deg)}75%{transform:translateY(1px) rotate(3deg)}}
+[data-rt-theme=tf2] :is(.view:not([hidden]),.sheet,section[data-view]:not([hidden])){animation:tf-drop .3s cubic-bezier(.2,.9,.3,1.2) backwards}
+[data-rt-theme=tf2] .rt-toast:not(.rt-leaving){animation:tf-feed .28s ease-out backwards}
+[data-rt-theme=tf2] :is(button,.btn):active:not(:disabled){transform:scale(.95,.9)}
+[data-rt-theme=tf2] .panel:has(.tally[data-state=speaking]) .mark[data-logo],.panel[data-rt-theme=tf2]:has(.tally[data-state=speaking]) .mark[data-logo]{animation:tf-bob .7s ease-in-out infinite}

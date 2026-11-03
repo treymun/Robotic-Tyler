@@ -5,4 +5,6 @@ ROBOTIC TYLER v2.16.0
   every message; Tyler still recognises his own messages with the tag off or renamed.
 - Polish: panel footer no longer cuts its status off, Open setup is a real button in every theme,
   notifications no longer cover the settings save bar; theme fonts verified to load everywhere.
+- Each theme moves its own way: screen entrances (DOOM's screen melt, a Portal iris, TF2's
+  poster drop…), notifications and Tyler's logo while he talks. Off with reduce motion.
 - Includes everything in 2.15.0 (one desktop app, Gemini Live, one Voice page). See CHANGES.md.

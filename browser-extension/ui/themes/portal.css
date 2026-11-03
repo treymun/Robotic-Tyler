@@ -207,3 +207,15 @@ html[data-rt-theme=portal]{scrollbar-color:#9aa1a8 transparent}
 [data-rt-theme=portal] .rt-steps li::before{content:counter(step,decimal-leading-zero);font:300 20px/1 var(--rt-font-display);color:#000}
 [data-rt-theme=portal] .rt-scrim{background:rgba(236,239,241,.6)}
 [data-rt-theme=portal] .rt-tip{background:#000;color:#fff;border:0;border-radius:2px;letter-spacing:.04em}
+
+/* ── v2.17 motion: Portal ──
+   Screens open like a portal (an iris from the middle); notifications slide down like a test
+   chamber sign; the logo gets a portal ring, blue while Tyler listens and orange while he talks. */
+@keyframes p-iris{from{clip-path:ellipse(0% 0% at 50% 40%)}to{clip-path:ellipse(150% 150% at 50% 40%)}}
+@keyframes p-sign{0%{opacity:0;transform:translateY(-14px)}100%{opacity:1;transform:none}}
+@keyframes p-ring{0%,100%{box-shadow:0 0 0 2px var(--ring),0 0 6px 1px var(--ring)}50%{box-shadow:0 0 0 3px var(--ring),0 0 14px 3px var(--ring)}}
+[data-rt-theme=portal] :is(.view:not([hidden]),.sheet,section[data-view]:not([hidden])){animation:p-iris .34s cubic-bezier(.4,0,.2,1) backwards}
+[data-rt-theme=portal] .rt-toast:not(.rt-leaving){animation:p-sign .24s ease-out backwards}
+[data-rt-theme=portal] :is(button,.btn):active:not(:disabled){transform:translateY(1px)}
+[data-rt-theme=portal] .panel:has(.tally[data-state=speaking]) .mark[data-logo],.panel[data-rt-theme=portal]:has(.tally[data-state=speaking]) .mark[data-logo]{--ring:#ff8a00;border-radius:50%;animation:p-ring 1.1s ease-in-out infinite}
+[data-rt-theme=portal] .panel:has(.tally[data-state=listening]) .mark[data-logo],.panel[data-rt-theme=portal]:has(.tally[data-state=listening]) .mark[data-logo]{--ring:#00a2ff;border-radius:50%;animation:p-ring 1.8s ease-in-out infinite}

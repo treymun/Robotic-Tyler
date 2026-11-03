@@ -180,3 +180,13 @@
 [data-rt-theme=winxp] .rt-x,[data-rt-theme=winxp] .rt-x:hover{width:18px;height:18px;margin:-2px -2px 0 0;background:transparent;border:1px solid transparent;border-radius:3px;box-shadow:none}
 [data-rt-theme=winxp] .rt-x:hover{border-color:#7f9db9;background:#fff}
 [data-rt-theme=winxp] .rt-x .ic{--xp:#000;--ic-size:11px}
+
+/* ── v2.17 motion: Windows XP ──
+   Screens open with XP's quick zoom-and-fade window animation; notifications pop up like a
+   system-tray balloon with a little bounce; the logo glows like the Start button while Tyler talks. */
+@keyframes xp-open{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:none}}
+@keyframes xp-balloon{0%{opacity:0;transform:translateY(10px) scale(.96)}70%{opacity:1;transform:translateY(-2px) scale(1.01)}100%{transform:none}}
+@keyframes xp-start{0%,100%{box-shadow:0 0 0 1px #1d8a1d,0 0 2px rgba(88,180,60,.4)}50%{box-shadow:0 0 0 1px #1d8a1d,0 0 9px rgba(88,180,60,.9)}}
+[data-rt-theme=winxp] :is(.view:not([hidden]),.sheet,section[data-view]:not([hidden])){animation:xp-open .16s ease-out backwards;transform-origin:50% 0}
+[data-rt-theme=winxp] .rt-toast:not(.rt-leaving){animation:xp-balloon .3s ease-out backwards}
+[data-rt-theme=winxp] .panel:has(.tally[data-state=speaking]) .mark[data-logo],.panel[data-rt-theme=winxp]:has(.tally[data-state=speaking]) .mark[data-logo]{border-radius:4px;animation:xp-start 1.3s ease-in-out infinite}
