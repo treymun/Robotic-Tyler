@@ -21,6 +21,7 @@
 - Ordinary chat isn't affected. Lines such as *"ignore him"*, *"ignore my last message"*, *"you are now in first place"* and *"how do you say hello in Hindi?"* get normal replies.
 
 ## Tests
+- The published 2.14.1 Setup updated a 2.14.0 install (Chrome extension, Control Center and Voice Studio) to 2.14.1 from the GitHub release, in a Windows environment under Wine.
 - New tests check 22 takeover lines and 16 ordinary lines. They also run the real background script with a stand-in AI and check four things: a normal turn sends the rules first and the chat wrapped as data; a takeover gets a refusal with no AI request and isn't remembered; an older steered memory is cut at the takeover; and earlier normal chat is kept.
 
 ---
@@ -132,7 +133,6 @@
 - **Not tested here:**
   - real Windows 10/11: SmartScreen, Defender, high-DPI monitors, per-machine installs with a UAC prompt;
   - Finish opening the apps and Chrome's extensions page (no Chrome in the test environment);
-  - an update from an older installed version of the apps.
 
 ---
 
