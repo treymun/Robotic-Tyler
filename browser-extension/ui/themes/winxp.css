@@ -190,3 +190,23 @@
 [data-rt-theme=winxp] :is(.view:not([hidden]),.sheet,section[data-view]:not([hidden])){animation:xp-open .16s ease-out backwards;transform-origin:50% 0}
 [data-rt-theme=winxp] .rt-toast:not(.rt-leaving){animation:xp-balloon .3s ease-out backwards}
 [data-rt-theme=winxp] .panel:has(.tally[data-state=speaking]) .mark[data-logo],.panel[data-rt-theme=winxp]:has(.tally[data-state=speaking]) .mark[data-logo]{border-radius:4px;animation:xp-start 1.3s ease-in-out infinite}
+
+/* ── v2.16 polish: Windows XP ──
+   Luna scrollbars (blue rounded thumb with grip lines, blue arrow buttons on a pale track) and the
+   XP focus cue: a dotted rectangle just inside the control, with the blue inner glow on buttons. */
+html[data-rt-theme=winxp],[data-rt-theme=winxp] :is(.scroll,.content,main){scrollbar-color:auto;scrollbar-width:auto}
+[data-rt-theme=winxp] ::-webkit-scrollbar,html[data-rt-theme=winxp]::-webkit-scrollbar{width:17px;height:17px;background:#f3f1ec}
+[data-rt-theme=winxp] ::-webkit-scrollbar-track,html[data-rt-theme=winxp]::-webkit-scrollbar-track{background:linear-gradient(90deg,#f3f1ec,#fefefe 45%,#fefefe 55%,#f3f1ec)}
+[data-rt-theme=winxp] ::-webkit-scrollbar-thumb,html[data-rt-theme=winxp]::-webkit-scrollbar-thumb{min-height:26px;border:1px solid #9fb5e6;border-radius:3px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M0 .5h7M0 2.5h7M0 4.5h7M0 6.5h7' stroke='%23eef3fe'/%3E%3Cpath d='M1 1.5h7M1 3.5h7M1 5.5h7M1 7.5h7' stroke='%238ca5dc'/%3E%3C/svg%3E") center/8px 8px no-repeat,linear-gradient(90deg,#cad8fc,#bccff9 45%,#b0c4f4);box-shadow:inset 1px 1px 0 #f5f8ff,inset -1px -1px 0 #a6bdf0}
+[data-rt-theme=winxp] ::-webkit-scrollbar-thumb:hover,html[data-rt-theme=winxp]::-webkit-scrollbar-thumb:hover{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M0 .5h7M0 2.5h7M0 4.5h7M0 6.5h7' stroke='%23eef3fe'/%3E%3Cpath d='M1 1.5h7M1 3.5h7M1 5.5h7M1 7.5h7' stroke='%238ca5dc'/%3E%3C/svg%3E") center/8px 8px no-repeat,linear-gradient(90deg,#dbe6fe,#cbdafc 45%,#bfd1f8)}
+[data-rt-theme=winxp] ::-webkit-scrollbar-button:single-button,html[data-rt-theme=winxp]::-webkit-scrollbar-button:single-button{display:block;width:17px;height:17px;border:1px solid #9fb5e6;border-radius:3px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath d='M1.5 5.5 4 3l2.5 2.5' fill='none' stroke='%234d6185' stroke-width='1.6'/%3E%3C/svg%3E") center/8px 8px no-repeat,linear-gradient(90deg,#cad8fc,#bccff9 45%,#b0c4f4)}
+[data-rt-theme=winxp] ::-webkit-scrollbar-button:single-button:vertical:increment,html[data-rt-theme=winxp]::-webkit-scrollbar-button:single-button:vertical:increment{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath d='M1.5 2.5 4 5l2.5-2.5' fill='none' stroke='%234d6185' stroke-width='1.6'/%3E%3C/svg%3E") center/8px 8px no-repeat,linear-gradient(90deg,#cad8fc,#bccff9 45%,#b0c4f4)}
+[data-rt-theme=winxp] ::-webkit-scrollbar-button:single-button:hover,html[data-rt-theme=winxp]::-webkit-scrollbar-button:single-button:hover{filter:brightness(1.06)}
+[data-rt-theme=winxp] ::-webkit-scrollbar-corner,html[data-rt-theme=winxp]::-webkit-scrollbar-corner{background:#ece9d8}
+[data-rt-theme=winxp]{--rt-focus-w:1px;--rt-focus-style:dotted;--rt-focus-offset:-4px}
+[data-rt-theme=winxp] :is(button,summary):focus-visible{outline-color:#000}
+[data-rt-theme=winxp] :is(.btn,.ghost,.sm,.rt-dialog-actions button):not(.primary,#start,#save):focus-visible{box-shadow:inset 0 0 0 2px #98b8ea,inset 0 -1px 0 #7da2ce}
+[data-rt-theme=winxp] .tabs button:focus-visible{outline-offset:-3px}
+/* On the green buttons the focus rectangle and the icon are light, as XP's inverted focus rect would be. */
+[data-rt-theme=winxp] :is(.primary,#start,#save):focus-visible{outline-color:#fff}
+[data-rt-theme=winxp] :is(.primary,#start,#save) .ic{color:#fff}

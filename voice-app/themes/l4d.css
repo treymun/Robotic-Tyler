@@ -23,7 +23,7 @@
   --rt-link:#ff6b6b;--rt-link-hover:#ffffff;--rt-blue:#ffffff;--rt-blue-deep:var(--l-red);--rt-active:var(--l-red-hi);
   --rt-blue-fade:#262626;--rt-blue-fade-hover:var(--l-red);--rt-green:var(--l-red);--rt-green-hover:var(--l-red-hi);--rt-green-ink:#ffffff;--rt-green-line:#000000;
   --rt-state-standby:#a6a6a6;--rt-state-ready:var(--l-green);--rt-state-listening:#7fbfff;--rt-state-thinking:var(--l-yellow);--rt-state-speaking:var(--l-green);--rt-state-waiting:#ff9a3c;--rt-state-error:#ff5050;
-  --rt-danger:#ff5050;--rt-danger-bg:#8a0000;--rt-danger-hover:#a80000;--rt-danger-ink:#ffffff;--rt-success:var(--l-green);--rt-focus:#ff5050;
+  --rt-danger:#ff5050;--rt-danger-bg:#8a0000;--rt-danger-hover:#a80000;--rt-danger-ink:#ffffff;--rt-success:var(--l-green);--rt-focus:#f2eee2;
   --rt-accent:var(--l-red-hi);--rt-accent-soft:rgba(176,0,0,.2);--rt-accent-line:rgba(212,26,26,.6);
   --rt-on-accent:#ffffff;--rt-accent-fill:var(--l-red);--rt-meter:linear-gradient(90deg,var(--l-green),var(--l-yellow) 70%,#e03030);--rt-marker:#ffffff;--rt-edge:#000000;--rt-page-glow:#2a0606;
   --rt-font:Arial,"Helvetica Neue","DejaVu Sans",sans-serif;--rt-font-display:"Tyler L4D","Arial Narrow",Impact,sans-serif;
