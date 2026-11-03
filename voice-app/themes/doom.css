@@ -81,7 +81,7 @@
 [data-rt-theme=doom] .deck-entry{border-left:4px solid #1f5fff}
 /* Fields */
 [data-rt-theme=doom] input:where(:not([type=checkbox],[type=radio],[type=range],[type=file])),[data-rt-theme=doom] :is(textarea,select){color:#fff;background-color:#0a0504;border:2px solid;border-color:var(--d-stone-lo) var(--d-stone-hi) var(--d-stone-hi) var(--d-stone-lo);box-shadow:none}
-[data-rt-theme=doom] :is(input,textarea,select):focus{border-color:var(--d-yellow);box-shadow:none}
+[data-rt-theme=doom] :is(input,textarea,select):focus{border-color:var(--d-yellow);box-shadow:0 0 0 1px var(--d-yellow)}
 [data-rt-theme=doom] input[type=checkbox],[data-rt-theme=doom] .toggle>input[type=checkbox]{width:16px;height:16px;background:#0a0504;border:2px solid;border-color:var(--d-stone-lo) var(--d-stone-hi) var(--d-stone-hi) var(--d-stone-lo);border-radius:0;box-shadow:none}
 [data-rt-theme=doom] input[type=checkbox]:checked,[data-rt-theme=doom] .toggle>input[type=checkbox]:checked{background:#0a0504}
 [data-rt-theme=doom] .toggle>input[type=checkbox]::after{display:none}

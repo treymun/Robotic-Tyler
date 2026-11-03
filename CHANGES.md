@@ -1,3 +1,14 @@
+# ROBOTIC TYLER v2.18.1: clearer keyboard focus on text fields
+
+## Fixed
+- In Team Fortress 2, Counter-Strike 2, Counter-Strike 1.6, Left 4 Dead, Windows XP and DOOM, a focused text box or drop-down (for example the soundboard's sound bank) only changed its 1 px border colour. It now gets a 2 px ring in the theme's focus colour, like every other control.
+
+## Tested
+- Tabbing through the chat panel in all twenty themes: every focused control shows a ring. 244 unit and integration tests and 11 end-to-end tests pass (Chromium, mocked Chrome APIs). Not tested in a real Steam chat or on Windows.
+
+Includes everything in 2.18.0 below.
+
+---
 # ROBOTIC TYLER v2.18.0: twenty themes
 
 ## Five new themes

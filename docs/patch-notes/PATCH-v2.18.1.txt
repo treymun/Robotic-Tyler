@@ -1,0 +1,6 @@
+ROBOTIC TYLER v2.18.1 — patch notes
+
+Fixed
+- Text boxes and drop-downs in the TF2, CS2, CS 1.6, Left 4 Dead, Windows XP and DOOM themes now show a 2 px focus ring when you reach them with the keyboard (they only changed a 1 px border before).
+
+Tested in Chromium with mocked Steam/Chrome APIs (244 unit + 11 end-to-end tests; every focused control in all 20 themes shows a ring). Not tested in a real Steam chat or on Windows.

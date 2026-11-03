@@ -102,7 +102,7 @@
 /* Fields and CS2's capsule switches */
 [data-rt-theme=cs2] input:where(:not([type=checkbox],[type=radio],[type=range],[type=file])),[data-rt-theme=cs2] :is(textarea,select){
   color:var(--cs-text);background-color:rgba(0,0,0,.3);border:1px solid var(--cs-border);border-radius:2px;box-shadow:none}
-[data-rt-theme=cs2] :is(input,textarea,select):focus{border-color:var(--cs-nav);box-shadow:none}
+[data-rt-theme=cs2] :is(input,textarea,select):focus{border-color:var(--cs-nav);box-shadow:0 0 0 1px var(--cs-nav)}
 [data-rt-theme=cs2] input[type=range]{accent-color:var(--cs-blue)}
 [data-rt-theme=cs2] input[type=checkbox]{border-radius:4px;background:var(--cs-bg-b);border-color:#000;box-shadow:0 0 2px 1px rgba(0,0,0,.35)}
 [data-rt-theme=cs2] input[type=checkbox]:checked{background:var(--cs-blue-ink);border-color:var(--cs-blue)}

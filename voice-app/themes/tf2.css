@@ -110,7 +110,7 @@
 /* Fields */
 [data-rt-theme=tf2] input:where(:not([type=checkbox],[type=radio],[type=range],[type=file])),[data-rt-theme=tf2] :is(textarea,select){
   color:var(--tf-tan-light);background-color:#1e1b1a;border:2px solid #4a433c;border-radius:var(--rt-r-sm);box-shadow:none}
-[data-rt-theme=tf2] :is(input,textarea,select):focus{border-color:var(--tf-unique);box-shadow:none}
+[data-rt-theme=tf2] :is(input,textarea,select):focus{border-color:var(--tf-unique);box-shadow:0 0 0 1px var(--tf-unique)}
 [data-rt-theme=tf2] input[type=range]{accent-color:var(--tf-orange)}
 
 /* TF2's yellow check boxes (the settings switches become them too) */

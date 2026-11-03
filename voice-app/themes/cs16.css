@@ -88,7 +88,7 @@
 [data-rt-theme=cs16] .deck-entry{border-left:3px solid var(--c-ct)}
 [data-rt-theme=cs16] :is(.quick-help,.confirm,#setup){border-left:3px solid var(--c-orange)}
 [data-rt-theme=cs16] input:where(:not([type=checkbox],[type=radio],[type=range],[type=file])),[data-rt-theme=cs16] :is(textarea,select){color:#fff;background-color:rgba(0,0,0,.75);border:1px solid rgba(255,176,0,.45);box-shadow:none}
-[data-rt-theme=cs16] :is(input,textarea,select):focus{border-color:var(--c-orange);box-shadow:none}
+[data-rt-theme=cs16] :is(input,textarea,select):focus{border-color:var(--c-orange);box-shadow:0 0 0 1px var(--c-orange)}
 [data-rt-theme=cs16] input[type=checkbox],[data-rt-theme=cs16] .toggle>input[type=checkbox]{width:14px;height:14px;background:#000;border:1px solid var(--c-orange);border-radius:0;box-shadow:none}
 [data-rt-theme=cs16] input[type=checkbox]:checked,[data-rt-theme=cs16] .toggle>input[type=checkbox]:checked{background:#000;border-color:var(--c-orange)}
 [data-rt-theme=cs16] .toggle>input[type=checkbox]::after{display:none}

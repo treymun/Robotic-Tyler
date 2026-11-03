@@ -68,7 +68,7 @@
 [data-rt-theme=winxp] .stat dd{font-weight:700}
 /* Fields */
 [data-rt-theme=winxp] input:where(:not([type=checkbox],[type=radio],[type=range],[type=file])),[data-rt-theme=winxp] :is(textarea,select){color:#000;background-color:#fff;border:1px solid var(--x-edge);border-radius:0;box-shadow:none;font-family:var(--rt-font)}
-[data-rt-theme=winxp] :is(input,textarea,select):focus{border-color:#316ac5;box-shadow:none}
+[data-rt-theme=winxp] :is(input,textarea,select):focus{border-color:#316ac5;box-shadow:0 0 0 1px #316ac5}
 [data-rt-theme=winxp] :is(pre,.output,.v22-log,.response){background:#fff;border:1px solid var(--x-edge);border-radius:0;box-shadow:none;color:#000}
 [data-rt-theme=winxp] input[type=checkbox],[data-rt-theme=winxp] .toggle>input[type=checkbox]{width:13px;height:13px;border:1px solid #1c5180;border-radius:0;background:linear-gradient(135deg,#dcdcd7,#fff);box-shadow:none}
 [data-rt-theme=winxp] input[type=checkbox]:checked,[data-rt-theme=winxp] .toggle>input[type=checkbox]:checked{background:linear-gradient(135deg,#dcdcd7,#fff);border-color:#1c5180}

@@ -71,7 +71,7 @@
 [data-rt-theme=l4d] .stat dt{font-size:13px;letter-spacing:.1em}
 [data-rt-theme=l4d] .stat dd{font-weight:700;font-size:24px;color:#fff}
 [data-rt-theme=l4d] input:where(:not([type=checkbox],[type=radio],[type=range],[type=file])),[data-rt-theme=l4d] :is(textarea,select){color:#fff;background-color:rgba(0,0,0,.6);border:1px solid #3a3a3a;box-shadow:none}
-[data-rt-theme=l4d] :is(input,textarea,select):focus{border-color:var(--l-red-hi);box-shadow:none}
+[data-rt-theme=l4d] :is(input,textarea,select):focus{border-color:var(--l-red-hi);box-shadow:0 0 0 1px var(--l-red-hi)}
 [data-rt-theme=l4d] input[type=checkbox]{background:#070707;border:2px solid #d0d0d0;border-radius:0;box-shadow:none}
 [data-rt-theme=l4d] input[type=checkbox]:checked{background:var(--l-red);border-color:var(--l-red-hi)}
 [data-rt-theme=l4d] .toggle>input[type=checkbox]{border-radius:0;background:#262626}
