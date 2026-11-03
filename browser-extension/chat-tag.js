@@ -59,5 +59,9 @@
   */
  function own(line,meta){return meta?.self===true||recent(line)||tagged(line);}
  globalThis.TylerChatTag=Object.freeze({DEFAULT,MAX,validate,config,strip,format,tagged,remember,recent,own,
-  get current(){return current;},set(s){current=config(s);return current;}});
+  get current(){return current;},
+  // Accepts saved settings ({chatTagEnabled,chatTagName}) or a config() result ({enabled,name}),
+  // which is what the background's connection reply carries. Reading the second shape as the
+  // first used to reset the tag to (ROBOTIC TYLER) on every connection check (fixed in 2.16.1).
+  set(s){const v=s&&typeof s==='object'&&('enabled' in s||'name' in s)&&!('chatTagEnabled' in s||'chatTagName' in s)?{chatTagEnabled:s.enabled,chatTagName:s.name}:s;current=config(v||{});return current;}});
 })();

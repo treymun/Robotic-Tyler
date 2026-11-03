@@ -1,3 +1,15 @@
+# ROBOTIC TYLER v2.16.1: the name tag setting now sticks
+
+## Fixed
+- Turning the name tag off, or giving it your own name, didn't reach Steam chat: Tyler kept starting his messages with `(ROBOTIC TYLER)`. Settings saved correctly, but each time the Steam chat tab checked its connection it read the saved tag the wrong way and fell back to the default. It now applies exactly what you saved, live, and a reload of Steam chat is not needed.
+- With a custom name, Tyler also recognises his own messages by that name again (2.16.0 kept looking for the default tag).
+
+## Tested
+- New tests feed the real background's connection reply into the Steam chat side and check that a disabled or renamed tag stays that way. 232 unit and integration tests and 11 end-to-end tests pass. Not yet re-tested in a real Steam chat.
+
+Includes everything in 2.16.0 below.
+
+---
 # ROBOTIC TYLER v2.16.0: a name tag you control, and a polish pass for every theme
 
 ## Name tag in chat messages

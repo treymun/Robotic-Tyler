@@ -78,7 +78,19 @@ test('the real background: a tag the AI writes is removed, feature replies are b
  const send=m=>new Promise(r=>listener(m,{tab:{id:4},url:'https://steamcommunity.com/chat/'},r));
  await send({type:'lease:claim'});
  const c=await send({type:'connection'});assert.deepEqual(c.chatTag,{enabled:false,name:'SQUAD BOT'});
+ // The panel applies that reply as is (2.16.0 read it as settings and fell back to the default tag).
+ const panel=load();panel.TylerChatTag.set(c.chatTag);assert.equal(panel.TylerChatTag.format('hi'),'hi','tag off stays off after the connection check');
+ panel.TylerChatTag.set({...c.chatTag,enabled:true});assert.equal(panel.TylerChatTag.format('hi'),'(SQUAD BOT) hi','the custom name survives the connection check');
  const r=await send({type:'command',text:'ask Bro lost',chatScope:'data-chat-group-id:1',automatic:true});
  assert.equal(r.text,'Ha, that round was rough.','the model’s own legacy prefix is gone; the send layer decides the tag');
  const e=await send({type:'suite:event',event:'win'});assert.equal(e.message,'GG! Another W for the squad.');
+});
+
+test('set() takes saved settings or a config, and the connection check never resets a custom or disabled tag',()=>{
+ const {TylerChatTag:T}=load();
+ T.set({chatTagEnabled:false,chatTagName:'SQUAD BOT'});assert.equal(T.format('gg'),'gg');
+ T.set(T.config({chatTagEnabled:true,chatTagName:'SQUAD BOT'}));assert.equal(T.format('gg'),'(SQUAD BOT) gg');
+ T.set({enabled:false,name:'SQUAD BOT'});assert.equal(T.format('gg'),'gg');assert.equal(T.current.name,'SQUAD BOT');
+ T.set({enabled:true,name:'bad\nname'});assert.equal(T.format('gg'),'(ROBOTIC TYLER) gg','an unusable name falls back to the default');
+ T.set({});assert.equal(T.format('gg'),'(ROBOTIC TYLER) gg','no saved preference: on, with ROBOTIC TYLER');
 });
