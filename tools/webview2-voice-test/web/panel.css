@@ -1,0 +1,55 @@
+:root{color-scheme:dark;--bg:#12171d;--card:#1a2129;--line:#2b3641;--ink:#e3e9ef;--muted:#9aa8b5;--ok:#5cc96b;--warn:#e6b84a;--fail:#ef6b5f;--wait:#6d7b88;--accent:#58a6ff}
+*{box-sizing:border-box}
+body{margin:0;padding:12px;background:var(--bg);color:var(--ink);font:13px/1.45 "Segoe UI",system-ui,sans-serif}
+h2{margin:0 0 8px;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+p{margin:4px 0}
+.muted{color:var(--muted)}
+.small{font-size:12px}
+.top .title{display:flex;align-items:center;gap:8px;font-size:16px}
+.tag{font-size:10px;text-transform:uppercase;letter-spacing:.08em;padding:1px 6px;border-radius:3px;background:#2f3b48;color:var(--muted)}
+#hostLine{font-size:11.5px;word-break:break-word}
+.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin:10px 0}
+.modes button{display:flex;flex-direction:column;align-items:flex-start;gap:1px;padding:7px 9px;border:1px solid var(--line);border-radius:6px;background:var(--card);color:var(--ink);font:inherit;cursor:pointer;text-align:left}
+.modes button b{font-size:12px}
+.modes button span{font-size:11px;color:var(--muted)}
+.modes button[aria-checked=true]{border-color:var(--accent);background:#173048;box-shadow:inset 0 0 0 1px var(--accent)}
+.modes button:focus-visible,button:focus-visible,textarea:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.card{margin:0 0 10px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--card)}
+.steps ol{margin:0;padding-left:18px}
+.steps li{margin:3px 0}
+.steps .warnbox{margin-top:6px;padding:6px 8px;border-radius:5px;background:#3a2d12;color:#f3d48c}
+.stages{list-style:none;margin:0;padding:0}
+.stages li{display:grid;grid-template-columns:14px 1fr auto;gap:2px 8px;align-items:start;padding:6px 0;border-top:1px solid var(--line)}
+.stages li:first-child{border-top:0}
+.dot{width:10px;height:10px;margin-top:4px;border-radius:50%;background:var(--wait)}
+[data-state=ok] .dot{background:var(--ok)}
+[data-state=warn] .dot{background:var(--warn)}
+[data-state=fail] .dot{background:var(--fail)}
+[data-state=active] .dot{background:var(--accent);animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.35}}
+@media (prefers-reduced-motion:reduce){[data-state=active] .dot{animation:none}}
+.stages b{font-weight:600}
+.stages .verdict{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+[data-state=ok] .verdict{color:var(--ok)}[data-state=warn] .verdict{color:var(--warn)}[data-state=fail] .verdict{color:var(--fail)}
+.stages .detail{grid-column:2/4;font-size:12px;color:var(--muted);word-break:break-word}
+.meters{display:grid;gap:5px;margin:10px 0 4px}
+.meter{display:grid;grid-template-columns:28px 1fr 150px;gap:8px;align-items:center;font-size:12px}
+.meter i{position:relative;height:8px;border-radius:4px;background:#0d1217;overflow:hidden}
+.meter b{position:absolute;inset:0 auto 0 0;width:0;background:linear-gradient(90deg,#3e9b55,#5cc96b 70%,#e6b84a);transition:width .25s}
+.meter em{font-style:normal;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap}
+.checks{list-style:none;margin:0;padding:0}
+.checks li{display:grid;grid-template-columns:20px 1fr;gap:2px 8px;padding:6px 0;border-top:1px solid var(--line)}
+.checks li:first-child{border-top:0}
+.checks input{margin:2px 0 0;width:15px;height:15px;accent-color:var(--ok)}
+.checks label{font-weight:600}
+.checks .auto{grid-column:2;font-size:12px;color:var(--muted)}
+.checks .auto[data-state=ok]{color:var(--ok)}.checks .auto[data-state=warn]{color:var(--warn)}.checks .auto[data-state=fail]{color:var(--fail)}
+textarea{width:100%;padding:7px 8px;border:1px solid var(--line);border-radius:5px;background:#0f1419;color:var(--ink);font:inherit;resize:vertical}
+.actions{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.actions button{padding:6px 10px;border:1px solid var(--line);border-radius:5px;background:#24303c;color:var(--ink);font:inherit;cursor:pointer}
+.actions button.primary{border-color:#2f6fb3;background:#1f5fa0}
+.actions button:hover{filter:brightness(1.15)}
+.log summary{cursor:pointer;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+.log ol{list-style:none;margin:8px 0 0;padding:0;max-height:260px;overflow:auto;font:11.5px/1.45 Consolas,"Cascadia Mono",monospace;color:#c6d0d9}
+.log li{padding:1px 0;border-top:1px solid #222b34;word-break:break-word}
+.log time{color:var(--muted);margin-right:6px}

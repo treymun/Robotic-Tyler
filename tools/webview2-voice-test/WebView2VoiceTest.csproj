@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- ROBOTIC TYLER WebView2 voice test (prototype). Standalone: not referenced by the desktop app,
+       its installers, the Chrome extension or CI. See README.md. -->
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>RoboticTyler.WebView2VoiceTest</RootNamespace>
+    <AssemblyName>RoboticTyler-WebView2-VoiceTest</AssemblyName>
+    <Version>0.1.0</Version>
+    <Product>ROBOTIC TYLER WebView2 voice test</Product>
+    <Company>ROBOTIC TYLER (fan project)</Company>
+    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+    <ApplicationIcon>web\tyler.ico</ApplicationIcon>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <!-- The package ships a WPF control too; this app only uses the WinForms one. -->
+    <NoWarn>$(NoWarn);MSB3277</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- 1.0.2210.55 or later is needed for browser extensions (AreBrowserExtensionsEnabled). -->
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3537.50" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="web\**\*" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

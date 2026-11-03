@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'">
+<title>WebView2 voice test</title>
+<link rel="stylesheet" href="panel.css">
+</head>
+<body>
+<header class="top">
+  <div class="title"><strong>WebView2 voice test</strong><span class="tag">prototype</span></div>
+  <p id="hostLine" class="muted">Starting WebView2…</p>
+</header>
+
+<nav class="modes" role="radiogroup" aria-label="Test stage">
+  <button type="button" role="radio" data-mode="manual" aria-checked="true"><b>Stage 1</b><span>Manual call</span></button>
+  <button type="button" role="radio" data-mode="tyler" aria-checked="false"><b>Stage 2</b><span>Tyler (extension)</span></button>
+  <button type="button" role="radio" data-mode="bridge" aria-checked="false"><b>Stage 2B</b><span>Bridge only</span></button>
+</nav>
+
+<section class="card steps" id="steps"></section>
+
+<section class="card">
+  <h2>Stages</h2>
+  <ol class="stages" id="stages"></ol>
+  <div class="meters">
+    <div class="meter"><span>Out</span><i><b id="outBar"></b></i><em id="outText">—</em></div>
+    <div class="meter"><span>In</span><i><b id="inBar"></b></i><em id="inText">—</em></div>
+  </div>
+  <p id="joins" class="muted small">Not in a call yet.</p>
+</section>
+
+<section class="card" id="checkCard">
+  <h2 id="checkTitle">Confirm with your friend</h2>
+  <ul class="checks" id="checks"></ul>
+</section>
+
+<section class="card">
+  <h2>Notes</h2>
+  <textarea id="notes" rows="3" placeholder="Anything you saw or heard: echo, delay, robotic sound, Steam messages, errors…"></textarea>
+  <div class="actions">
+    <button type="button" id="save" class="primary">Save report</button>
+    <button type="button" id="copy">Copy report</button>
+    <button type="button" id="reload">Reload Steam</button>
+    <button type="button" id="settings" hidden>Tyler settings</button>
+    <button type="button" id="devtools">DevTools</button>
+    <button type="button" id="data">Data folder</button>
+  </div>
+  <p id="notice" class="muted small" role="status"></p>
+</section>
+
+<details class="card log">
+  <summary>Event log</summary>
+  <ol id="log"></ol>
+</details>
+<script src="panel.js"></script>
+</body>
+</html>
