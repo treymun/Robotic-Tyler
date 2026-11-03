@@ -375,6 +375,23 @@ pre:empty{display:none}
 button:focus-visible,summary:focus-visible,a:focus-visible,input[type=checkbox]:focus-visible,input[type=range]:focus-visible,input[type=file]:focus-visible{outline:var(--rt-focus-w,2px) var(--rt-focus-style,solid) var(--rt-focus);outline-offset:var(--rt-focus-offset,2px)}
 @media (max-height:640px){.panel{height:94vh;bottom:8px;right:8px}.stats{display:none}}
 @media (max-width:460px){.panel{right:8px;bottom:8px;width:calc(100vw - 16px);max-width:none;height:min(680px,92dvh)}}
+/* Narrow windows (panel under ~385px): the footer note gets its own line, stat captions step aside
+   and the widest theme faces shrink a little so values aren't cut off. */
+@media (max-width:400px){
+  .foot{flex-wrap:wrap;row-gap:4px}
+  .foot small{flex:1 0 calc(100% - 14px);-webkit-line-clamp:1}
+  .stat{padding:0 7px}
+  .stat small{display:none}
+  .panel[data-rt-theme=doom] .stat dd{font-size:20px}
+  .panel[data-rt-theme=cs16] .stat dd{font-size:17px}
+  .panel[data-rt-theme=tf2] .stat dd{font-size:19px}
+  .panel[data-rt-theme=portal] .stat dd{font-size:20px}
+  .panel[data-rt-theme=portal] .wordmark{font-size:16px;letter-spacing:.08em;white-space:nowrap}
+  .panel[data-rt-theme=doom] .wordmark{font-size:21px;letter-spacing:.02em}
+  .panel[data-rt-theme=hev] .bar::after{display:none}
+  .panel[data-rt-theme=hev] .stat dd{font-size:17px;letter-spacing:.02em}
+  .panel[data-rt-theme=cs2] .stat dd{padding:1px 9px 1px 10px;font-size:15px}
+}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 
 /* ── Steam (v2.13): your own entry at the top of the Steam friends list ──
