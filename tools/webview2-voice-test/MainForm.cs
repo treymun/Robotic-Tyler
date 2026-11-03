@@ -143,7 +143,7 @@ public sealed class MainForm : Form
     static string RuntimeReport(Exception? ex)
     {
         var sb = new StringBuilder();
-        sb.AppendLine("ROBOTIC TYLER · WebView2 voice test 0.1.1 · startup problem");
+        sb.AppendLine("ROBOTIC TYLER · WebView2 voice test 0.1.2 · startup problem");
         sb.AppendLine("Time: " + DateTime.Now.ToString("u"));
         sb.AppendLine("Windows: " + RuntimeInformation.OSDescription + " · " + RuntimeInformation.OSArchitecture + " · process " + RuntimeInformation.ProcessArchitecture);
         try { sb.AppendLine("Runtime WebView2 chose: " + CoreWebView2Environment.GetAvailableBrowserVersionString()); }
@@ -367,7 +367,7 @@ public sealed class MainForm : Form
         ToPanel(new JsonObject
         {
             ["type"] = "host",
-            ["app"] = "0.1.1",
+            ["app"] = "0.1.2",
             ["runtime"] = env.BrowserVersionString,
             ["sdk"] = sdk,
             ["os"] = RuntimeInformation.OSDescription,

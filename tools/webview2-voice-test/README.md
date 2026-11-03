@@ -1,4 +1,4 @@
-# ROBOTIC TYLER · WebView2 voice test (prototype 0.1.1)
+# ROBOTIC TYLER · WebView2 voice test (prototype 0.1.2)
 
 A small, separate Windows app that answers one question before any production change: **can
 Steam web voice, and then Tyler's own audio bridge, work inside Microsoft Edge WebView2?** If they
@@ -10,8 +10,9 @@ do, the desktop app could talk in Steam voice without VB-CABLE.
   ROBOTIC TYLER desktop app, its settings, keys and Steam sign-in are never touched, and nothing
   here is part of its installers.
 - The right-hand panel only measures: API support, microphone requests, WebRTC connection
-  states, audio levels and packet counts. It never reads chat text or records audio. The report
-  stays on your PC until you send it.
+  states and negotiation steps (types, directions and codec names, no addresses), audio levels and
+  packet counts, script errors and Steam's own console lines about voice. It never reads chat text
+  or records audio. The report stays on your PC until you send it.
 
 ## You need
 
@@ -23,7 +24,7 @@ do, the desktop app could talk in Steam voice without VB-CABLE.
 
 ## Start
 
-1. Unzip `RoboticTyler-WebView2-VoiceTest-0.1.1-win-x64.zip` anywhere (Desktop is fine).
+1. Unzip `RoboticTyler-WebView2-VoiceTest-0.1.2-win-x64.zip` anywhere (Desktop is fine).
 2. Run `RoboticTyler-WebView2-VoiceTest.exe`. It isn't code-signed: if Windows says *"Windows
    protected your PC"*, choose **More info → Run anyway**.
    (The `-small` zip is the same app without .NET inside; Windows offers to install the .NET 8

@@ -114,7 +114,19 @@
     if (before !== [p.signaling, p.ice, p.connection, p.remote].join('/')) log('Connection #' + m.id + ': ' + m.signaling + ' · ICE ' + m.ice + ' · ' + m.connection + (m.remote ? ' · remote ' + m.remote : ''));
     break;
    }
-   case 'pc-track': log('Connection #' + m.id + ' received a remote ' + m.kind + ' track'); break;
+   case 'pc-track': { const p = pc(m); p.tracks = (p.tracks || 0) + 1; log('Connection #' + m.id + ' received a remote ' + m.kind + ' track' + (m.mid != null ? ' (mid ' + m.mid + ')' : '') + (m.muted ? ', muted' : '')); break; }
+   case 'pc-track-ended': log('Connection #' + m.id + ': a remote ' + m.kind + ' track ended'); break;
+   case 'pc-track-mute': log('Connection #' + m.id + ': remote track ' + (m.muted ? 'muted (no packets)' : 'unmuted')); break;
+   case 'pc-call': {
+    const p = pc(m), what = 'Connection #' + m.id + ' ' + m.method;
+    if (!m.ok) { p.callErrors = (p.callErrors || 0) + 1; S.events.push({ kind: 'call-error', at: now() }); log(what + ' FAILED: ' + m.name + ' · ' + m.message); }
+    else if (m.method === 'close') { p.closedBy = m.caller || 'Steam'; log(what + ' called by Steam: ' + (m.caller || '?')); }
+    else if (m.method === 'addIceCandidate') log(what + ' ok (' + m.count + ' so far)');
+    else log(what + ' ok' + (m.kind ? ' (' + m.kind + ')' : '') + (m.sdp ? ' · ' + m.sdp.type + ': ' + m.sdp.media.join(' | ') : '') + (m.caller ? ' · from ' + m.caller : ''));
+    break;
+   }
+   case 'page-error': S.events.push({ kind: 'page-error', at: now() }); log('Page error' + (m.kind ? ' (' + m.kind + ')' : '') + ': ' + m.message + (m.file ? ' [' + m.file + ':' + m.line + ']' : '')); break;
+   case 'console': log('Steam console ' + m.level + ': ' + m.text); break;
    case 'pc-closed': { const p = pc(m); p.closedAt = now(); S.events.push({ kind: 'left', at: now(), pc: p.id }); log('Connection #' + m.id + ' closed'); break; }
    case 'pc-stats': stats(m); break;
    case 'voice-ui':
@@ -191,6 +203,10 @@
    else if (lastReal && lastReal.result && !lastReal.result.ok) v.permission = ['fail', 'Steam couldn\'t open the microphone: ' + lastReal.result.name + ' · ' + lastReal.result.message];
    else if (lastReal && lastReal.result && lastReal.result.ok) v.permission = ['ok', 'Microphone open: ' + (((lastReal.result.tracks || []).find(t => t.kind === 'audio') || {}).label || 'unnamed device') + (micReq.length ? ' (allowed in the prompt)' : ' (already allowed)')];
    else if (lastReal) v.permission = ['active', 'Steam asked for the microphone; waiting for the answer…'];
+   else if (micReq.some(p => p.state === 'allowed') || live.some(p => (p.senders || []).some(x => x.label))) {
+    const label = (live.flatMap(p => p.senders || []).find(x => x.label) || {}).label;
+    v.permission = ['ok', 'Microphone in use' + (label ? ': ' + label : '') + (micReq.some(p => p.state === 'allowed') ? ' (allowed in the prompt)' : '') + '. Steam opened it without the usual API call.'];
+   }
    else v.permission = ['pending', 'Join a voice channel; Steam will ask for the microphone.'];
   } else {
    if (lastReal) v.permission = ['fail', 'The physical microphone was requested (' + (lastReal.result ? (lastReal.result.ok ? 'opened' : lastReal.result.name) : 'pending') + '): Tyler\'s bridge didn\'t take over Steam\'s microphone.'];
@@ -208,7 +224,10 @@
    const pr = cur.pair || {};
    v.peer = ['ok', 'Connected' + (pr.local ? ' via ' + pr.local + '→' + pr.remote + ' ' + (pr.protocol || '').toUpperCase() : '') + (pr.rtt != null ? ', round trip ' + Math.round(pr.rtt * 1000) + ' ms' : '')];
   } else if (all.some(p => p.failed) && !live.some(p => p.connectedAt)) v.peer = ['fail', 'ICE failed: Steam\'s voice server couldn\'t be reached (firewall, VPN or proxy?).'];
-  else if (connected.length) v.peer = ['warn', 'Connected earlier; that connection is closed now (left voice?).'];
+  else if (connected.length) {
+   const last = connected[connected.length - 1];
+   v.peer = ['warn', 'Connected earlier; that connection is closed now' + (last.closedBy ? ': Steam\'s own code closed it (' + last.closedBy.split(' < ')[0] + ').' : ' (left voice?).') + (last.callErrors ? ' ' + last.callErrors + ' negotiation step(s) failed first — see the log.' : '')];
+  }
   else if (all.length) v.peer = ['active', 'Connecting… (ICE ' + all[all.length - 1].ice + ')'];
   else v.peer = ['pending', 'No connection yet.'];
   // 5
@@ -322,15 +341,15 @@
   for (const [key, name] of STAGES) lines.push(' [' + { ok: 'OK', warn: 'CHECK', fail: 'FAIL', active: 'PARTIAL', pending: 'WAITING' }[v[key][0]] + '] ' + name + ': ' + v[key][1]);
   lines.push('', 'MEASURED');
   lines.push(' Peak outgoing level ' + S.peaks.out.toFixed(2) + ' · peak incoming level ' + S.peaks.in.toFixed(2));
-  for (const p of pcs()) lines.push(' Connection #' + p.id + ': ' + p.connection + ', ICE ' + p.ice + (p.connectedAt ? ', connected ' + time(p.connectedAt) : '') + (p.closedAt ? ', closed ' + time(p.closedAt) : '') + (p.pair ? ', path ' + p.pair.local + '→' + p.pair.remote + ' ' + p.pair.protocol + ', rtt ' + Math.round((p.pair.rtt || 0) * 1000) + ' ms' : '') + (p.stats ? ', sent ' + p.stats.out.packets + ' / received ' + p.stats.in.packets + ' packets, lost ' + p.stats.in.lost : '') + (p.senders && p.senders.length ? ', outgoing track "' + (p.senders[0].label || 'unnamed') + '"' : ''));
+  for (const p of pcs()) lines.push(' Connection #' + p.id + ': ' + p.connection + ', ICE ' + p.ice + (p.connectedAt ? ', connected ' + time(p.connectedAt) : '') + (p.closedAt ? ', closed ' + time(p.closedAt) : '') + (p.pair ? ', path ' + p.pair.local + '→' + p.pair.remote + ' ' + p.pair.protocol + ', rtt ' + Math.round((p.pair.rtt || 0) * 1000) + ' ms' : '') + (p.stats ? ', sent ' + p.stats.out.packets + ' / received ' + p.stats.in.packets + ' packets, lost ' + p.stats.in.lost : '') + (p.senders && p.senders.length ? ', outgoing track "' + (p.senders[0].label || 'unnamed') + '"' : '') + ', remote tracks ' + (p.tracks || 0) + (p.callErrors ? ', FAILED steps ' + p.callErrors : '') + (p.closedBy ? ', closed by ' + p.closedBy : ''));
   const ss = sessions(); lines.push(' Voice sessions: ' + ss.count + (ss.rejoined ? ' (rejoined)' : '') + ' · Steam voice UI on ' + S.voiceUiOn + ' / off ' + S.voiceUiOff + ' times');
   lines.push(' Permission prompts: ' + (S.permissions.map(p => p.kind + '=' + p.state + ' (' + p.mode + ')').join(', ') || 'none') + ' · real microphone requests: ' + S.gum.filter(g => g.audio).length);
   if (S.mode !== 'manual') lines.push(' Tyler: attached senders ' + S.attached + ', beeps ' + ev('beep').length + ', speech turns heard ' + ev('heard').length + ', playbacks ' + ev('play-end').length + ' · last bridge status: ' + (S.audioStatus || '—'));
   lines.push('', 'CONFIRMED BY YOU');
   for (const [key, label, [state, auto]] of checks()) lines.push(' [' + (ticks['ck-' + S.mode + '-' + key] ? 'x' : ' ') + '] ' + label + (auto ? '  (measured: ' + state + ' · ' + auto + ')' : ''));
   lines.push('', 'NOTES', ' ' + ($('notes').value.trim() || '—'));
-  lines.push('', 'EVENT LOG (last 120)');
-  for (const l of S.log.slice(-120)) lines.push(' ' + time(l.at) + '  ' + l.text);
+  lines.push('', 'EVENT LOG (last 300)');
+  for (const l of S.log.slice(-300)) lines.push(' ' + time(l.at) + '  ' + l.text);
   return lines.join('\r\n');
  }
 

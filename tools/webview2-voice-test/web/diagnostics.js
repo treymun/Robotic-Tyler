@@ -60,6 +60,17 @@
    });
   };
  }
+ // Older callback forms, in case Steam uses them in this browser.
+ for (const name of ['webkitGetUserMedia', 'getUserMedia']) {
+  const legacy = navigator[name];
+  if (typeof legacy !== 'function') continue;
+  navigator[name] = function (constraints, ok, fail) {
+   const id = ++gumSeq, audio = !!(constraints && constraints.audio);
+   post('gum-request', { id, audio, video: !!(constraints && constraints.video), legacy: name });
+   return legacy.call(this, constraints, s => { post('gum-result', { id, ok: true, audio, tracks: s.getTracks().map(t => ({ kind: t.kind, label: clip(t.label, 80), state: t.readyState })) }); ok && ok(s); },
+    e => { post('gum-result', { id, ok: false, audio, name: clip(e && e.name, 40), message: clip(e && e.message) }); fail && fail(e); });
+  };
+ }
  function listDevices() {
   try {
    navigator.mediaDevices.enumerateDevices().then(list => post('devices', {
@@ -82,14 +93,61 @@
  }
  function watch(pc, config) {
   const id = ++pcSeq;
-  live.set(id, pc);
+  live.set(id, pc); ids.set(pc, id);
   post('pc-new', { id, iceServers: (config && config.iceServers || []).length, policy: clip(config && config.iceTransportPolicy || 'all', 20) });
   const state = () => post('pc-state', {
    id, signaling: pc.signalingState, ice: pc.iceConnectionState, connection: pc.connectionState, gathering: pc.iceGatheringState,
    local: pc.localDescription ? pc.localDescription.type : '', remote: pc.remoteDescription ? pc.remoteDescription.type : ''
   });
   for (const ev of ['signalingstatechange', 'iceconnectionstatechange', 'connectionstatechange', 'icegatheringstatechange']) pc.addEventListener(ev, state);
-  pc.addEventListener('track', e => post('pc-track', { id, kind: e.track && e.track.kind }));
+  pc.addEventListener('track', e => {
+   const t = e.track;
+   post('pc-track', { id, kind: t && t.kind, muted: t && t.muted, mid: e.transceiver && e.transceiver.mid });
+   if (t) { t.addEventListener('ended', () => post('pc-track-ended', { id, kind: t.kind })); t.addEventListener('mute', () => post('pc-track-mute', { id, muted: true })); t.addEventListener('unmute', () => post('pc-track-mute', { id, muted: false })); }
+  });
+ }
+ // Every negotiation step Steam takes and how it ends (types, directions and codec names only; no
+ // addresses). close() also records which Steam script called it, so a drop shows who closed it.
+ function sdp(desc) {
+  if (!desc || typeof desc.sdp !== 'string') return undefined;
+  const media = [];
+  let cur = null;
+  for (const line of desc.sdp.split(/\r?\n/)) {
+   if (line.startsWith('m=')) { cur = { kind: line.slice(2).split(' ')[0], dir: '', codecs: new Set() }; media.push(cur); }
+   else if (cur && /^a=(sendrecv|sendonly|recvonly|inactive)$/.test(line)) cur.dir = line.slice(2);
+   else if (cur && line.startsWith('a=rtpmap:')) cur.codecs.add((line.split(' ')[1] || '').split('/')[0]);
+  }
+  return { type: desc.type, media: media.slice(0, 12).map(m => m.kind + ' ' + (m.dir || '?') + ' ' + [...m.codecs].slice(0, 4).join('+')) };
+ }
+ function caller() {
+  const lines = String(new Error().stack || '').split('\n').slice(3, 7);
+  return lines.map(l => clip(l.trim().replace(/^at /, '').replace(/https:\/\/[^/]+\//, '').replace(/\?[^:)]*/, ''), 90)).join(' < ');
+ }
+ const ids = new WeakMap();
+ const proto = typeof Native === 'function' ? Native.prototype : null;
+ let iceAdds = 0;
+ if (proto) for (const name of ['createOffer', 'createAnswer', 'setLocalDescription', 'setRemoteDescription', 'addIceCandidate', 'close', 'restartIce', 'addTrack', 'addTransceiver', 'removeTrack']) {
+  const orig = proto[name];
+  if (typeof orig !== 'function') continue;
+  proto[name] = function (...args) {
+   const id = ids.get(this) || 0, info = { id, method: name };
+   if (name === 'setRemoteDescription' || name === 'setLocalDescription') info.sdp = sdp(args[0]);
+   if (name === 'close' || name === 'restartIce') info.caller = caller();
+   if (name === 'addTransceiver') info.kind = typeof args[0] === 'string' ? args[0] : args[0] && args[0].kind;
+   if (name === 'addTrack') info.kind = args[0] && args[0].kind;
+   let result;
+   try { result = orig.apply(this, args); }
+   catch (e) { post('pc-call', { ...info, ok: false, name: clip(e && e.name, 40), message: clip(e && e.message, 200) }); throw e; }
+   if (result && typeof result.then === 'function') {
+    return result.then(value => {
+     if (name === 'addIceCandidate') { if (++iceAdds % 25 === 1) post('pc-call', { ...info, ok: true, count: iceAdds }); }
+     else post('pc-call', { ...info, ok: true, sdp: info.sdp || (value && value.sdp ? sdp(value) : undefined) });
+     return value;
+    }, e => { post('pc-call', { ...info, ok: false, name: clip(e && e.name, 40), message: clip(e && e.message, 200) }); throw e; });
+   }
+   post('pc-call', { ...info, ok: true });
+   return result;
+  };
  }
  const kindOf = s => s.kind || s.mediaType;
  async function sample(id, pc) {
@@ -126,6 +184,23 @@
   const presence = JSON.stringify({ bridge: window.__roboticTylerAudioInstalled === true, panel: !!document.getElementById('tyler-companion-root'), testBar: !!document.getElementById('tyler-wv2-bridge-bar') });
   if (presence !== lastPresence) { lastPresence = presence; post('tyler-presence', JSON.parse(presence)); }
  }, 1000);
+
+ // ── Script errors on the page, and Steam's own console lines about voice ──
+ let errors = 0, lines = 0;
+ window.addEventListener('error', e => { if (errors++ < 60) post('page-error', { message: clip(e.message, 200), file: clip(String(e.filename || '').split('/').pop().split('?')[0], 60), line: e.lineno }); }, true);
+ window.addEventListener('unhandledrejection', e => { if (errors++ < 60) post('page-error', { message: clip(e.reason && (e.reason.message || e.reason), 200), kind: 'promise' }); });
+ const VOICE = /voice|webrtc|rtc|peer|ice|sdp|audio|microphone|getusermedia|kick|disconnect/i;
+ for (const level of ['error', 'warn', 'log', 'info']) {
+  const orig = console[level];
+  if (typeof orig !== 'function') continue;
+  console[level] = function (...args) {
+   try {
+    const text = args.map(a => typeof a === 'string' ? a : a && a.message ? a.message : '').join(' ');
+    if ((level === 'error' || VOICE.test(text)) && lines++ < 300) post('console', { level, text: clip(text, 220) });
+   } catch (e) {}
+   return orig.apply(this, args);
+  };
+ }
 
  // ── Tyler's own status messages (Stage 2). Types and short status texts only: no audio, no transcripts. ──
  let pcmCount = 0;
