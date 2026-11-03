@@ -119,6 +119,16 @@ function resize({w,h,rgba},size){ // area-average in premultiplied space
 const logo=decodePng(path.join(ROOT,'browser-extension/ui/logos/steam.png'));
 const SIZES=[64,80,96,128];
 for(const s of SIZES)fs.writeFileSync(path.join(WORK,`logo-${s}.bgra`),resize(logo,s));
+// Artwork (v2.19, art/*.png from tools/setup/render-art.mjs): the header banner and the two part
+// icons at 100/150/200 %. Each resource is an 8-byte header (width, height) and premultiplied BGRA.
+const ART=[['icon-chrome',310],['icon-desktop',320]],artRc=[];
+for(const [name,id] of ART)[100,150,200].forEach((pct,i)=>{
+ const file=path.join(HERE,'art',`${name}-${pct}.png`);
+ if(!fs.existsSync(file))throw Error(`Missing ${path.relative(ROOT,file)}. Run node tools/setup/render-art.mjs.`);
+ const img=decodePng(file),out=Buffer.alloc(8+img.w*img.h*4);out.writeUInt32LE(img.w,0);out.writeUInt32LE(img.h,4);
+ for(let p=0;p<img.w*img.h;p++){const a=img.rgba[p*4+3];out[8+p*4]=Math.round(img.rgba[p*4+2]*a/255);out[9+p*4]=Math.round(img.rgba[p*4+1]*a/255);out[10+p*4]=Math.round(img.rgba[p*4]*a/255);out[11+p*4]=a;}
+ fs.writeFileSync(path.join(WORK,`art-${id+i}.bgra`),out);artRc.push(`${id+i} RCDATA "art-${id+i}.bgra"`);
+});
 fs.copyFileSync(path.join(ROOT,'assets/robotic-tyler.ico'),path.join(WORK,'robotic-tyler.ico'));
 fs.copyFileSync(path.join(HERE,'setup.c'),path.join(WORK,'setup.c'));
 
@@ -150,6 +160,7 @@ fs.writeFileSync(path.join(WORK,'setup.rc'),`#include <windows.h>
 1 RT_MANIFEST "setup.manifest"
 ${SIZES.map(s=>`${s} RCDATA "logo-${s}.bgra"`).join('\n')}
 200 RCDATA "chrome-extension.pack"
+${artRc.join('\n')}
 VS_VERSION_INFO VERSIONINFO
 FILEVERSION ${maj},${min},${pat},0
 PRODUCTVERSION ${maj},${min},${pat},0

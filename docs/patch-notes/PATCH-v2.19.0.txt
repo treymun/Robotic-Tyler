@@ -1,0 +1,17 @@
+ROBOTIC TYLER v2.19.0 — patch notes
+
+New
+- Desktop app: Steam voice right in its own Steam chat window, like the Chrome extension. No VB-CABLE, no Steam desktop app: Tyler's panel → Connect & start (or Start live voice), then join the voice channel. Tyler's synthetic microphone is on as soon as Steam chat loads; the physical microphone stays blocked.
+- Desktop app: spoken and text replies, soundboard, Gemini Live, built-in speech detection, Music DJ (its own YouTube window; only that window's sound is shared) and screen-aware commentary (its own picker) now all work in the Steam window.
+- Settings → Voice → Where Tyler joins voice: the Steam chat window (default) or the older VB-CABLE route.
+- Setup, the desktop installer sidebar and the GitHub page now use the app's own Steam theme.
+
+Fixed
+- The bot no longer drops out of group voice when someone leaves (Chrome and desktop).
+- With Tyler's voice on, Steam's microphone request gets Tyler's synthetic microphone instead of opening your real one (Chrome and desktop).
+- No false "Steam audio attachment failed … peer connection is closed" after a rejoin.
+
+Tested
+- Live with real Steam (Electron voice test app, Chromium 156): voice join, two-way speech, the bot staying through leaves and rejoins, Tyler's beep and echo.
+- Mocks: the desktop Steam window in Electron against a mock Steam page, the leave fix in Chromium, 245 unit and 13 end-to-end tests.
+- Not tested yet: the installed desktop app on Windows with real Steam, Music DJ and screen commentary with real Steam, the new Setup on real Windows (checked under Wine).

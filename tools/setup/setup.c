@@ -55,29 +55,46 @@
 #define WM_DPICHANGED 0x02E0
 #endif
 
-/* ── Steam-style palette ─────────────────────────────────────────────────── */
-#define C_HEADER  RGB(0x17,0x1a,0x21)
-#define C_BODY    RGB(0x1b,0x28,0x38)
-#define C_FOOT    RGB(0x14,0x1c,0x26)
-#define C_CARD    RGB(0x16,0x20,0x2d)
-#define C_CARD_HOT RGB(0x1d,0x2b,0x3c)
-#define C_CARD_ON RGB(0x1c,0x33,0x4a)
-#define C_LINE    RGB(0x2a,0x3f,0x5a)
-#define C_INK     RGB(0xc7,0xd5,0xe0)
-#define C_INK2    RGB(0xac,0xb2,0xb8)
-#define C_INK3    RGB(0x8f,0x98,0xa0)
+/* ── Palette (v2.19): the app's own Steam theme (browser-extension/ui/tokens.css) ─────────────
+   Navy canvas, the panel header's store gradient, #c7d5e0 text, online blue, Steam's install green
+   for the main action, 2 px corners, Arial (what the app shows on Windows) and tracked capitals. */
+#define C_HEAD_A  RGB(0x2a,0x47,0x5e)   /* panel header: store gradient #2a475e -> #1b2838 */
+#define C_BODY    RGB(0x1b,0x28,0x38)   /* --rt-bg */
+#define C_FOOT    RGB(0x17,0x1a,0x21)   /* --rt-bar (the settings save bar) */
+#define C_EDGE    RGB(0x00,0x00,0x00)   /* --rt-edge */
+#define C_CARD    RGB(0x16,0x20,0x2d)   /* --rt-block on the canvas */
+#define C_CARD_HOT RGB(0x1e,0x2b,0x3b)  /* --rt-surface-2 */
+#define C_LINE    RGB(0x0f,0x16,0x1f)   /* --rt-line on the canvas */
+#define C_LINE_HOT RGB(0x3d,0x44,0x50)  /* --rt-line-strong */
+#define C_SOFT    RGB(0x2a,0x3f,0x5a)   /* --rt-line-soft */
+#define C_INK     RGB(0xc7,0xd5,0xe0)   /* --rt-ink */
+#define C_INK2    RGB(0xac,0xb2,0xb8)   /* --rt-ink-2 */
+#define C_INK3    RGB(0x8f,0x98,0xa0)   /* --rt-ink-3 */
 #define C_WHITE   RGB(0xff,0xff,0xff)
-#define C_LINK    RGB(0x66,0xc0,0xf4)
-#define C_BLUE_A  RGB(0x47,0xbf,0xff)
-#define C_BLUE_B  RGB(0x1a,0x44,0xc2)
-#define C_GREEN_A RGB(0x75,0xb0,0x22)
-#define C_GREEN_B RGB(0x58,0x8a,0x1b)
-#define C_GREEN   RGB(0xa4,0xd0,0x07)
-#define C_RED     RGB(0xff,0x80,0x73)
-#define C_RED_BAR RGB(0xc1,0x3a,0x2e)
-#define C_TRACK   RGB(0x0e,0x14,0x1b)
-#define C_BTN     RGB(0x2a,0x3a,0x4c)
-#define C_BTN_HOT RGB(0x3a,0x52,0x6b)
+#define C_LINK    RGB(0x66,0xc0,0xf4)   /* --rt-link */
+#define C_ACTIVE  RGB(0x1a,0x9f,0xff)   /* --rt-active: a chosen card */
+#define C_FRAME   RGB(0x53,0xa4,0xc4)   /* Tyler's avatar frame */
+#define C_NAME    RGB(0x6d,0xcf,0xf6)   /* the wordmark in the panel header */
+#define C_NAME_SUB RGB(0x7f,0xb6,0xcf)
+#define C_BLUE_D  RGB(0x41,0x7a,0x9b)   /* --rt-accent-fill, dark end */
+#define C_BLUE_L  RGB(0x67,0xc1,0xf5)   /*                   light end */
+#define C_GREEN_T RGB(0x5c,0x7e,0x10)   /* --rt-green */
+#define C_GREEN_B RGB(0x4c,0x6b,0x22)
+#define C_GREEN_HT RGB(0x6b,0x96,0x1b)  /* --rt-green-hover */
+#define C_GREEN_HB RGB(0x55,0x7a,0x14)
+#define C_GREEN_LN RGB(0x3e,0x5a,0x10)
+#define C_LIME    RGB(0xbe,0xee,0x11)   /* Steam's green tag text */
+#define C_SUCCESS RGB(0x90,0xba,0x3c)   /* --rt-success */
+#define C_RED     RGB(0xec,0x6b,0x6b)   /* --rt-state-error */
+#define C_RED_INK RGB(0xff,0x8a,0x8a)   /* --rt-danger-ink */
+#define C_RED_BG  RGB(0x3d,0x26,0x2f)   /* --rt-danger-bg on a card */
+#define C_RED_D   RGB(0x8c,0x2a,0x2a)
+#define C_RED_L   RGB(0xc9,0x4a,0x4a)
+#define C_TRACK   RGB(0x10,0x18,0x22)   /* --rt-input */
+#define C_TAG     RGB(0x3d,0x44,0x50)   /* --rt-select (the gallery's tags) */
+#define C_BLUE_TAG RGB(0x26,0x40,0x55)  /* --rt-blue-fade on a card */
+#define C_BTN_FOOT RGB(0x2a,0x2c,0x33)  /* .secondary on the save bar */
+#define C_BTN_CARD RGB(0x29,0x32,0x3e)  /* .secondary on a card */
 
 /* ── Controls ────────────────────────────────────────────────────────────── */
 #define NCOMP 2
@@ -101,17 +118,17 @@ typedef struct {
 } Comp;
 
 static Comp g_comp[NCOMP]={
- {.key=L"chrome",.title=L"Chrome extension",.tag=L"STEAM WEB CHAT",
-  .desc=L"Tyler inside Steam web chat with voice and text; Setup unpacks it to a folder you add to Chrome once (Developer mode, then Load unpacked).",
+ {.key=L"chrome",.title=L"Chrome extension",.tag=L"IN GOOGLE CHROME",
+  .desc=L"Tyler inside Steam web chat in Chrome: text, voice, soundboard and music. Setup unpacks it to a folder you add to Chrome once (Developer mode, Load unpacked).",
   .file=L"",.guid=L"",.display=L"",.exe=L"",.sha="",.size=CHROME_PACK_SIZE,.chrome=TRUE},
- {.key=L"desktop",.title=L"Desktop app",.tag=L"WINDOWS",
-  .desc=L"Steam text chat and Steam voice (Standard or Gemini Live) in one app, no Chrome needed. Voice uses a free virtual audio cable (VB-CABLE) as Steam's microphone.",
+ {.key=L"desktop",.title=L"Desktop app",.tag=L"WINDOWS APP",
+  .desc=L"Everything in one app, no Chrome needed: Steam chat, voice right in its Steam window (no VB-CABLE), soundboard, music and screen commentary. Updates itself.",
   .file=DESKTOP_FILE,.guid=DESKTOP_GUID,.display=DESKTOP_DISPLAY,.exe=DESKTOP_EXE,.sha=DESKTOP_SHA256,.size=DESKTOP_SIZE},
 };
 
 static HINSTANCE g_inst; static HWND g_wnd,g_ok,g_cancelBtn,g_desktop;
 static int g_dpi=96,g_page=P_CHOOSE,g_anim=0,g_exitCode=2;
-static HFONT f_title,f_sub,f_h1,f_body,f_bold,f_small,f_btn,f_tag;
+static HFONT f_title,f_sub,f_h1,f_body,f_body14,f_label,f_bold,f_small,f_btn,f_tag;
 static CRITICAL_SECTION g_lock; static volatile LONG g_cancel=0,g_busy=0;
 static HANDLE g_log=INVALID_HANDLE_VALUE;
 static wchar_t g_setupDir[MAX_PATH],g_tempDir[MAX_PATH],g_source[1024],g_base[1024];
@@ -119,8 +136,10 @@ static BOOL g_auto=FALSE,g_noDesktop=FALSE,g_sourceIsFolder=FALSE,g_runDesktop=T
 static wchar_t g_preselect[64],g_chromeDir[MAX_PATH],g_chromeList[MAX_PATH];
 
 #define S(v) MulDiv((v),g_dpi,96)
-#define W_LOGICAL 680
-#define H_LOGICAL 524
+#define W_LOGICAL 760
+#define H_LOGICAL 556
+#define HEAD_H 88
+#define FOOT_H 72
 
 /* ── Small helpers ───────────────────────────────────────────────────────── */
 static void logLine(const wchar_t *fmt,...){
@@ -414,7 +433,55 @@ static void cross(HDC dc,int x,int y,int size,COLORREF c){
  MoveToEx(dc,x+size/4,y+size/4,NULL);LineTo(dc,x+size*3/4,y+size*3/4);MoveToEx(dc,x+size*3/4,y+size/4,NULL);LineTo(dc,x+size/4,y+size*3/4);
  SelectObject(dc,o);DeleteObject(p);
 }
-static void focusRing(HDC dc,RECT r){InflateRect(&r,-S(3),-S(3));frame(dc,r,C_WHITE,1);}
+/* Steam's focus outline (--rt-focus), dotted so it reads as a keyboard ring. */
+static void focusRing(HDC dc,RECT r){InflateRect(&r,-S(3),-S(3));HPEN p=CreatePen(PS_DOT,1,C_LINK);HGDIOBJ op=SelectObject(dc,p),ob=SelectObject(dc,GetStockObject(NULL_BRUSH));Rectangle(dc,r.left,r.top,r.right,r.bottom);SelectObject(dc,op);SelectObject(dc,ob);DeleteObject(p);}
+/* Steam is nearly square (2-3 px corners): a 1 px notch at each corner reads as that radius. */
+static void box(HDC dc,RECT r,COLORREF fillc,COLORREF border,int bw){
+ if(bw>0){fill(dc,r,border);InflateRect(&r,-bw,-bw);}fill(dc,r,fillc);
+}
+static void notch(HDC dc,RECT r,COLORREF bg){int n=S(1);RECT c[4]={{r.left,r.top,r.left+n,r.top+n},{r.right-n,r.top,r.right,r.top+n},{r.left,r.bottom-n,r.left+n,r.bottom},{r.right-n,r.bottom-n,r.right,r.bottom}};for(int i=0;i<4;i++)fill(dc,c[i],bg);}
+/* A diagonal fill like CSS linear-gradient(-60deg, dark, light): light at the top left. */
+static void diag(HDC dc,RECT r,COLORREF dark,COLORREF light){
+ COLORREF mid=RGB((GetRValue(dark)+GetRValue(light))/2,(GetGValue(dark)+GetGValue(light))/2,(GetBValue(dark)+GetBValue(light))/2);
+ #define TV(x,y,c) {x,y,GetRValue(c)<<8,GetGValue(c)<<8,GetBValue(c)<<8,0xff00}
+ TRIVERTEX v[4]={TV(r.left,r.top,light),TV(r.right,r.top,mid),TV(r.right,r.bottom,dark),TV(r.left,r.bottom,mid)};
+ #undef TV
+ GRADIENT_TRIANGLE t[2]={{0,1,2},{0,2,3}};GradientFill(dc,v,4,t,2,GRADIENT_FILL_TRIANGLE);
+}
+/* Translucent drawing through a 1-pixel premultiplied bitmap and AlphaBlend. */
+static DWORD pm(COLORREF c,int a){return ((DWORD)a<<24)|((DWORD)(GetRValue(c)*a/255)<<16)|((DWORD)(GetGValue(c)*a/255)<<8)|(DWORD)(GetBValue(c)*a/255);}
+static void alphaFill(HDC dc,RECT r,COLORREF c,int a){int w=r.right-r.left,h=r.bottom-r.top;if(w<=0||h<=0)return;DWORD one=pm(c,a);
+ BITMAPINFO bi={{sizeof(BITMAPINFOHEADER),1,-1,1,32,BI_RGB}};void *bits;HBITMAP bmp=CreateDIBSection(dc,&bi,DIB_RGB_COLORS,&bits,NULL,0);if(!bmp)return;
+ *(DWORD*)bits=one;HDC m=CreateCompatibleDC(dc);HGDIOBJ o=SelectObject(m,bmp);BLENDFUNCTION bf={AC_SRC_OVER,0,255,AC_SRC_ALPHA};AlphaBlend(dc,r.left,r.top,w,h,m,0,0,1,1,bf);SelectObject(m,o);DeleteDC(m);DeleteObject(bmp);}
+/* Tracked capitals (Steam's letter-spaced labels): extra space per letter, in hundredths of an em. */
+static int track(int px,int em100){return MulDiv(px*em100,g_dpi,9600);}
+static int textT(HDC dc,HFONT f,COLORREF c,RECT r,const wchar_t *s,UINT fmt,int extra){int old=SetTextCharacterExtra(dc,extra);int h=text(dc,f,c,r,s,fmt);SetTextCharacterExtra(dc,old);return h;}
+static int measureT(HDC dc,HFONT f,const wchar_t *s,int extra){int old=SetTextCharacterExtra(dc,extra);int w=measure(dc,f,s);SetTextCharacterExtra(dc,old);return w;}
+/* Artwork resources from build-setup.mjs (the PNGs in art/): 8-byte header (width, height), premultiplied
+   BGRA, at 100/150/200 % (ids base, base+1, base+2). Kept as bitmaps after the first use. */
+static HBITMAP g_art[64];static int g_artW[64],g_artH[64];
+static void drawArt(HDC dc,int base,int x,int y,int w,int h){
+ int pct=MulDiv(100,g_dpi,96),id=base+(pct<=100?0:pct<=150?1:2),slot=(id-300)&63;
+ if(!g_art[slot]){
+  HRSRC r=FindResourceW(g_inst,MAKEINTRESOURCEW(id),(LPCWSTR)RT_RCDATA);if(!r)return;const BYTE *res=LockResource(LoadResource(g_inst,r));if(!res)return;
+  int iw,ih;memcpy(&iw,res,4);memcpy(&ih,res+4,4);if(iw<=0||ih<=0||iw>4000||ih>4000)return;
+  BITMAPINFO bi={{sizeof(BITMAPINFOHEADER),iw,-ih,1,32,BI_RGB}};void *bits;HBITMAP bmp=CreateDIBSection(NULL,&bi,DIB_RGB_COLORS,&bits,NULL,0);if(!bmp)return;
+  memcpy(bits,res+8,(size_t)iw*ih*4);g_art[slot]=bmp;g_artW[slot]=iw;g_artH[slot]=ih;
+ }
+ HDC m=CreateCompatibleDC(dc);HGDIOBJ o=SelectObject(m,g_art[slot]);BLENDFUNCTION bf={AC_SRC_OVER,0,255,AC_SRC_ALPHA};
+ AlphaBlend(dc,x,y,w,h,m,0,0,g_artW[slot],g_artH[slot],bf);SelectObject(m,o);DeleteDC(m);
+}
+/* A small tag like the theme gallery's (10 px bold tracked capitals on a 2 px chip). Returns its right edge. */
+static int tag(HDC dc,int x,int y,const wchar_t *s,COLORREF ink,COLORREF bg){
+ int ex=track(10,4),w=measureT(dc,f_tag,s,ex)+S(12);RECT r={x,y,x+w,y+S(16)};fill(dc,r,bg);
+ RECT t=r;t.left+=S(6);textT(dc,f_tag,ink,t,s,DT_SINGLELINE|DT_VCENTER,ex);return r.right;
+}
+/* Steam's tick box: an inset dark well, or the blue fill with a white tick. */
+static void tickBox(HDC dc,RECT b,BOOL on,BOOL hot,BOOL dis,COLORREF bg){
+ if(on){fill(dc,b,dis?C_SOFT:C_BLUE_D);RECT in=b;InflateRect(&in,-1,-1);if(dis)fill(dc,in,C_SOFT);else diag(dc,in,C_BLUE_D,C_BLUE_L);tick(dc,b.left,b.top,b.right-b.left,dis?C_INK3:C_WHITE);}
+ else{fill(dc,b,hot&&!dis?C_LINK:C_EDGE);RECT in=b;InflateRect(&in,-1,-1);fill(dc,in,C_TRACK);RECT sh={in.left,in.top,in.right,in.top+S(2)};alphaFill(dc,sh,C_EDGE,90);}
+ notch(dc,b,bg);
+}
 
 /* The logo is stored premultiplied BGRA at a few sizes (resource id = size in px). */
 static void drawLogo(HDC dc,int x,int y,int size){
@@ -424,7 +491,7 @@ static void drawLogo(HDC dc,int x,int y,int size){
  BITMAPINFO bi={{sizeof(BITMAPINFOHEADER),pick,-pick,1,32,BI_RGB}};void *bits;
  HBITMAP bmp=CreateDIBSection(dc,&bi,DIB_RGB_COLORS,&bits,NULL,0);if(!bmp)return;memcpy(bits,px,pick*pick*4);
  HDC m=CreateCompatibleDC(dc);HGDIOBJ o=SelectObject(m,bmp);
- BLENDFUNCTION bf={AC_SRC_OVER,0,255,AC_SRC_ALPHA};AlphaBlend(dc,x,y,size,size,m,0,0,pick,pick,bf);
+ int oldMode=SetStretchBltMode(dc,HALFTONE);BLENDFUNCTION bf={AC_SRC_OVER,0,255,AC_SRC_ALPHA};AlphaBlend(dc,x,y,size,size,m,0,0,pick,pick,bf);SetStretchBltMode(dc,oldMode);
  SelectObject(m,o);DeleteDC(m);DeleteObject(bmp);
 }
 
@@ -434,56 +501,67 @@ static void cardStatus(Comp *c,wchar_t *out,size_t n,COLORREF *color){
  if(c->chrome){
   if(!c->installed)swprintf(out,n,L"Not unpacked yet  \x00b7  %ls, already inside this Setup (no download)",size);
   else if(vercmp(c->instVersion,SETUP_VERSION)<0){swprintf(out,n,L"Version %ls in your folder  \x2192  updates to %ls  \x00b7  then press Reload on Tyler in Chrome",c->instVersion,SETUP_VERSION);*color=C_LINK;}
-  else if(!vercmp(c->instVersion,SETUP_VERSION)){swprintf(out,n,L"Unpacked and up to date (%ls). Tick to repair the folder.",c->instVersion);*color=C_GREEN;}
+  else if(!vercmp(c->instVersion,SETUP_VERSION)){swprintf(out,n,L"Unpacked and up to date (%ls). Tick to repair the folder.",c->instVersion);*color=C_SUCCESS;}
   else swprintf(out,n,L"Version %ls is in the folder, which is newer than this setup.",c->instVersion);
   return;
  }
  if(!c->installed)swprintf(out,n,L"Not installed  \x00b7  %ls download",size);
  else if(vercmp(c->instVersion,SETUP_VERSION)<0){swprintf(out,n,L"Installed: version %ls  \x2192  updates to %ls  \x00b7  settings and keys are kept",c->instVersion,SETUP_VERSION);*color=C_LINK;}
- else if(!vercmp(c->instVersion,SETUP_VERSION)){swprintf(out,n,L"Installed and up to date (%ls). Tick to repair or reinstall it.",c->instVersion);*color=C_GREEN;}
+ else if(!vercmp(c->instVersion,SETUP_VERSION)){swprintf(out,n,L"Installed and up to date (%ls). Tick to repair or reinstall it.",c->instVersion);*color=C_SUCCESS;}
  else swprintf(out,n,L"Version %ls is installed, which is newer than this setup.",c->instVersion);
  if(c->running&&!(c->installed&&vercmp(c->instVersion,SETUP_VERSION)>0)){size_t l=wcslen(out);swprintf(out+l,n-l,L"  \x00b7  Open now: Setup closes it first.");}
 }
+/* A part to install, like a card in the app's theme gallery: chosen = Steam's active blue outline. */
 static void drawCard(HDC dc,HWND h,RECT r,UINT st){
- Comp *c=&g_comp[compIndex(GetDlgCtrlID(h))];BOOL on=Button_GetCheck(h)==BST_CHECKED,dis=!IsWindowEnabled(h),hot=(st&CDIS_HOT)!=0;
- fill(dc,r,on?C_CARD_ON:hot?C_CARD_HOT:C_CARD);
- frame(dc,r,on?C_LINK:C_LINE,on?S(2):1);
- /* check box */
- RECT b={r.left+S(18),r.top+S(16),r.left+S(40),r.top+S(38)};
- if(on){grad(dc,b,C_BLUE_A,C_BLUE_B,TRUE);tick(dc,b.left,b.top,S(22),C_WHITE);}
- else{fill(dc,b,C_TRACK);frame(dc,b,dis?C_LINE:RGB(0x4b,0x61,0x7a),1);}
- int x=r.left+S(56);
- RECT t={x,r.top+S(10),r.right-S(16),r.top+S(34)};
- text(dc,f_bold,dis?C_INK3:C_WHITE,t,c->title,DT_SINGLELINE|DT_VCENTER);
- RECT tag={t.left+measure(dc,f_bold,c->title)+S(10),t.top+S(4),0,t.bottom-S(4)};
- tag.right=tag.left+measure(dc,f_tag,c->tag)+S(12);fill(dc,tag,RGB(0x23,0x3c,0x51));text(dc,f_tag,C_LINK,tag,c->tag,DT_SINGLELINE|DT_VCENTER|DT_CENTER);
- RECT d={x,r.top+S(38),r.right-S(18),r.top+S(72)};text(dc,f_body,dis?C_INK3:C_INK2,d,c->desc,DT_WORDBREAK);
+ Comp *c=&g_comp[compIndex(GetDlgCtrlID(h))];BOOL on=Button_GetCheck(h)==BST_CHECKED,dis=!IsWindowEnabled(h),hot=(st&CDIS_HOT)!=0&&!dis;
+ fill(dc,r,C_BODY);
+ RECT card=r;InflateRect(&card,-S(2),-S(2));
+ if(on){RECT ring=r;fill(dc,ring,C_ACTIVE);InflateRect(&ring,-S(3),-S(3));fill(dc,ring,hot?C_CARD_HOT:C_CARD);notch(dc,r,C_BODY);}
+ else{box(dc,card,hot?C_CARD_HOT:C_CARD,hot?C_LINE_HOT:C_LINE,1);notch(dc,card,C_BODY);}
+ COLORREF bg=hot?C_CARD_HOT:C_CARD;
+ int L=r.left+S(20),R=r.right-S(20);
+ drawArt(dc,c->chrome?310:320,L,r.top+S(20),S(48),S(48));
+ RECT b={R-S(18),r.top+S(22),R,r.top+S(40)};tickBox(dc,b,on,hot,dis,bg);
+ int X=L+S(62);
+ RECT t={X,r.top+S(20),b.left-S(8),r.top+S(42)};text(dc,f_bold,dis?C_INK3:C_WHITE,t,c->title,DT_SINGLELINE|DT_VCENTER|DT_END_ELLIPSIS);
+ int x=tag(dc,X,r.top+S(48),c->tag,C_INK3,C_TAG);
+ if(!c->chrome)tag(dc,x+S(6),r.top+S(48),L"RECOMMENDED",C_LIME,C_GREEN_B);
+ RECT d={L,r.top+S(86),R,r.bottom-S(56)};text(dc,f_body,dis?C_INK3:C_INK2,d,c->desc,DT_WORDBREAK|DT_END_ELLIPSIS);
  wchar_t s[300];COLORREF col;cardStatus(c,s,300,&col);
- RECT q={x,r.top+S(72),r.right-S(18),r.bottom-S(6)};text(dc,f_small,dis?C_INK3:col,q,s,DT_SINGLELINE|DT_END_ELLIPSIS);
+ RECT line={L,r.bottom-S(48),R,r.bottom-S(47)};grad(dc,line,C_SOFT,bg,FALSE);
+ RECT q={L,r.bottom-S(40),R,r.bottom-S(8)};text(dc,f_small,dis?C_INK3:col,q,s,DT_WORDBREAK|DT_END_ELLIPSIS);
  if(st&CDIS_FOCUS&&!(SendMessageW(h,WM_QUERYUISTATE,0,0)&UISF_HIDEFOCUS))focusRing(dc,r);
 }
 static void drawCheck(HDC dc,HWND h,RECT r,UINT st,COLORREF bg){
  BOOL on=Button_GetCheck(h)==BST_CHECKED,hot=(st&CDIS_HOT)!=0;fill(dc,r,bg);
- int bs=S(18),y=r.top+(r.bottom-r.top-bs)/2;RECT b={r.left+S(2),y,r.left+S(2)+bs,y+bs};
- if(on){grad(dc,b,C_BLUE_A,C_BLUE_B,TRUE);tick(dc,b.left,b.top,bs,C_WHITE);}else{fill(dc,b,C_TRACK);frame(dc,b,hot?C_LINK:RGB(0x4b,0x61,0x7a),1);}
+ int bs=S(16),y=r.top+(r.bottom-r.top-bs)/2;RECT b={r.left+S(2),y,r.left+S(2)+bs,y+bs};
+ tickBox(dc,b,on,hot,FALSE,bg);
  wchar_t s[200];GetWindowTextW(h,s,200);RECT t={b.right+S(10),r.top,r.right,r.bottom};
- text(dc,f_body,hot?C_WHITE:C_INK,t,s,DT_SINGLELINE|DT_VCENTER|DT_END_ELLIPSIS);
+ text(dc,f_label,hot?C_WHITE:C_INK,t,s,DT_SINGLELINE|DT_VCENTER|DT_END_ELLIPSIS);
  if(st&CDIS_FOCUS&&!(SendMessageW(h,WM_QUERYUISTATE,0,0)&UISF_HIDEFOCUS)){
-  RECT ring={b.left-S(3),r.top+S(1),min(r.right,t.left+measure(dc,f_body,s)+S(4)),r.bottom-S(1)};frame(dc,ring,C_INK3,1);}
+  RECT ring={b.left-S(3),r.top+S(1),min(r.right,t.left+measure(dc,f_label,s)+S(4)),r.bottom-S(1)};frame(dc,ring,C_INK3,1);}
 }
+/* Buttons as in the app: Steam's green for the main action, the quiet .secondary for the rest; both
+   take Steam's blue fade on hover. */
 static void drawButton(HDC dc,HWND h,RECT r,UINT st){
  int id=GetDlgCtrlID(h);BOOL hot=(st&CDIS_HOT)!=0,down=(st&CDIS_SELECTED)!=0,dis=(st&CDIS_DISABLED)!=0;
  wchar_t s[120];GetWindowTextW(h,s,120);
- HWND parent=GetParent(h);RECT pr;GetClientRect(parent,&pr);POINT pt={0,0};MapWindowPoints(h,parent,&pt,1);
- fill(dc,r,pt.y>S(H_LOGICAL-70)?C_FOOT:C_CARD);
- RECT b=r;
- BOOL anyDone=FALSE;for(int i=0;i<NCOMP;i++)anyDone|=g_comp[i].inRun&&g_comp[i].state==S_DONE;
- BOOL primary=id==IDOK,finish=primary&&g_page==P_WORK&&!g_busy&&anyDone;
- if(dis){fill(dc,b,RGB(0x24,0x2e,0x3a));}
- else if(primary){COLORREF a=finish?C_GREEN_A:C_BLUE_A,z=finish?C_GREEN_B:C_BLUE_B;if(hot&&!down){a=finish?RGB(0x8e,0xd0,0x2c):RGB(0x6c,0xcf,0xff);}grad(dc,b,down?z:a,down?a:z,TRUE);}
- else fill(dc,b,down?C_BTN:hot?C_BTN_HOT:C_BTN);
- text(dc,f_btn,dis?C_INK3:(primary||hot)?C_WHITE:C_INK,b,s,DT_SINGLELINE|DT_VCENTER|DT_CENTER);
- if(st&CDIS_FOCUS&&!(SendMessageW(h,WM_QUERYUISTATE,0,0)&UISF_HIDEFOCUS))focusRing(dc,b);
+ HWND parent=GetParent(h);POINT pt={0,0};MapWindowPoints(h,parent,&pt,1);
+ BOOL inFoot=pt.y>S(H_LOGICAL-FOOT_H);COLORREF bg=inFoot?C_FOOT:C_CARD;
+ fill(dc,r,bg);
+ RECT b=r;COLORREF ink;
+ if(id==IDOK){
+  if(dis){box(dc,b,RGB(0x32,0x42,0x1e),RGB(0x2b,0x37,0x1c),1);ink=RGB(0x7f,0x81,0x86);}
+  else{COLORREF t=hot?C_GREEN_HT:C_GREEN_T,u=hot?C_GREEN_HB:C_GREEN_B;fill(dc,b,C_GREEN_LN);RECT in=b;InflateRect(&in,-1,-1);grad(dc,in,down?u:t,down?t:u,TRUE);ink=C_WHITE;}
+ }else{
+  if(dis){fill(dc,b,inFoot?C_BTN_FOOT:C_BTN_CARD);ink=C_INK3;}
+  else if(hot||down){diag(dc,b,C_BLUE_D,C_BLUE_L);ink=C_WHITE;}
+  else{fill(dc,b,inFoot?C_BTN_FOOT:C_BTN_CARD);ink=C_INK;}
+ }
+ notch(dc,b,bg);
+ if(down){OffsetRect(&b,0,S(1));}
+ text(dc,f_btn,ink,b,s,DT_SINGLELINE|DT_VCENTER|DT_CENTER);
+ if(st&CDIS_FOCUS&&!(SendMessageW(h,WM_QUERYUISTATE,0,0)&UISF_HIDEFOCUS))focusRing(dc,r);
 }
 
 static void rowStatus(Comp *c,wchar_t *s,size_t n,COLORREF *col){
@@ -497,79 +575,93 @@ static void rowStatus(Comp *c,wchar_t *s,size_t n,COLORREF *col){
   case S_INSTALL:if(c->chrome){swprintf(s,n,L"Unpacking to %ls",g_chromeDir);*col=C_INK;break;}
    swprintf(s,n,c->installed?L"Updating  \x00b7  your settings, keys and themes stay as they are":L"Installing");*col=C_INK;break;
   case S_DONE:if(c->chrome)swprintf(s,n,c->before?L"Updated to %ls  \x00b7  now press Reload on Tyler in Chrome":L"Unpacked  \x00b7  %ls  \x00b7  one last step in Chrome (Finish opens it)",c->instVersion);
-   else swprintf(s,n,L"Installed  \x00b7  version %ls",c->instVersion);*col=C_GREEN;break;
+   else swprintf(s,n,L"Installed  \x00b7  version %ls",c->instVersion);*col=C_SUCCESS;break;
   case S_FAILED:if(c->chrome&&c->installed)swprintf(s,n,L"Not finished  \x00b7  Retry unpacks it again");else if(c->installed)swprintf(s,n,L"Not changed  \x00b7  version %ls is still installed",c->instVersion);else swprintf(s,n,L"Not installed");*col=C_RED;break;
   case S_CANCELLED:swprintf(s,n,L"Cancelled  \x00b7  nothing was changed");*col=C_INK3;break;
   default:s[0]=0;
  }
 }
-static int rowTop(int slot){return 184+slot*112;}
+static int rowTop(int slot){return 184+slot*124;}
+/* A progress bar like the app's meters: dark inset track, Steam's blue fill (--rt-meter). */
+static void bar(HDC dc,RECT track,double frac,COLORREF a,COLORREF b,BOOL sheen){
+ fill(dc,track,C_EDGE);RECT in=track;InflateRect(&in,-1,-1);fill(dc,in,C_TRACK);
+ if(frac<=0)return;if(frac>1)frac=1;RECT f=in;f.right=f.left+(LONG)((in.right-in.left)*frac);if(f.right<=f.left)return;
+ grad(dc,f,a,b,FALSE);
+ if(sheen){int w=f.right-f.left,seg=S(60),pos=(g_anim*S(5))%(w+seg)-seg;RECT g={max(f.left,f.left+pos),f.top,min(f.right,f.left+pos+seg),f.bottom};if(g.right>g.left)alphaFill(dc,g,C_WHITE,50);}
+}
 static void paint(HDC dc,RECT cl){
- /* Header */
- RECT head={0,0,cl.right,S(92)};fill(dc,head,C_HEADER);
- RECT glow={0,S(90),cl.right,S(92)};grad(dc,glow,C_BLUE_A,C_HEADER,FALSE);
- drawLogo(dc,S(26),S(14),S(64));
- text(dc,f_title,C_WHITE,rc(106,14,420,40),L"ROBOTIC TYLER",DT_SINGLELINE|DT_VCENTER);
- wchar_t sub[80];swprintf(sub,80,L"SETUP  \x00b7  VERSION %ls",SETUP_VERSION);
- text(dc,f_tag,C_INK3,rc(108,54,420,20),sub,DT_SINGLELINE|DT_VCENTER);
- text(dc,f_tag,RGB(0x5b,0x6d,0x7c),rc(420,18,234,18),L"UNOFFICIAL FAN PROJECT",DT_SINGLELINE|DT_RIGHT);
+ /* Header: Tyler's own entry, as at the top of the panel in Steam chat: the store gradient, the
+    framed avatar, the name in online blue and a tracked line under it. */
+ RECT head={0,0,cl.right,S(HEAD_H)};grad(dc,head,C_HEAD_A,C_BODY,TRUE);
+ RECT av=rc(32,16,56,56);fill(dc,av,C_FRAME);RECT avIn=av;InflateRect(&avIn,-S(2),-S(2));fill(dc,avIn,C_BODY);notch(dc,av,C_HEAD_A);
+ drawLogo(dc,av.left+S(4),av.top+S(4),S(48));
+ textT(dc,f_title,C_NAME,rc(104,20,560,28),L"ROBOTIC TYLER",DT_SINGLELINE|DT_VCENTER,track(21,8));
+ wchar_t ver[60];swprintf(ver,60,L"SETUP  \x00b7  VERSION %ls  \x00b7  WINDOWS 10 AND 11",SETUP_VERSION);
+ textT(dc,f_sub,C_NAME_SUB,rc(105,50,560,18),ver,DT_SINGLELINE|DT_VCENTER,track(11,6));
  /* Body */
- RECT body={0,S(92),cl.right,S(H_LOGICAL-68)};fill(dc,body,C_BODY);
+ RECT body={0,S(HEAD_H),cl.right,S(H_LOGICAL-FOOT_H)};fill(dc,body,C_BODY);
  if(g_page==P_CHOOSE){
-  text(dc,f_h1,C_WHITE,rc(32,108,616,32),L"Choose what to install",DT_SINGLELINE|DT_VCENTER);
-  text(dc,f_body,C_INK2,rc(32,142,616,40),L"Pick any of them. Each part installs and updates on its own, and you can add the others later by running Setup again.",DT_WORDBREAK);
-  text(dc,f_small,C_INK3,rc(32,524,616,18),L"The apps' Start-menu shortcuts go in a ROBOTIC TYLER folder. Settings, keys and themes on this PC are kept.",DT_SINGLELINE|DT_END_ELLIPSIS);
+  textT(dc,f_h1,C_WHITE,rc(32,100,696,34),L"CHOOSE WHAT TO INSTALL",DT_SINGLELINE|DT_VCENTER,track(26,2));
+  text(dc,f_body14,C_INK3,rc(32,136,696,40),L"Pick one or both. Each installs and updates on its own, and you can run Setup again to add the other.",DT_WORDBREAK);
+  text(dc,f_small,C_INK3,rc(360,436,368,24),L"Settings, keys and themes on this PC are kept.",DT_SINGLELINE|DT_VCENTER|DT_RIGHT|DT_END_ELLIPSIS);
  }else{
   BOOL busy=g_busy,anyFail=FALSE,anyDone=FALSE,anyCancel=FALSE;
   for(int i=0;i<NCOMP;i++)if(g_comp[i].inRun){anyFail|=g_comp[i].state==S_FAILED;anyDone|=g_comp[i].state==S_DONE;anyCancel|=g_comp[i].state==S_CANCELLED;}
-  const wchar_t *h=busy?(g_cancel?L"Cancelling\x2026":L"Installing\x2026"):anyFail?L"Something didn't install":anyCancel&&!anyDone?L"Cancelled":L"All set";
-  text(dc,f_h1,C_WHITE,rc(32,108,616,32),h,DT_SINGLELINE|DT_VCENTER);
+  const wchar_t *h=busy?(g_cancel?L"CANCELLING\x2026":L"INSTALLING\x2026"):anyFail?L"SOMETHING DIDN'T INSTALL":anyCancel&&!anyDone?L"CANCELLED":L"YOU'RE ALL SET";
+  int hx=32;
+  if(!busy&&!anyFail&&anyDone){RECT ok=rc(32,104,26,26);fill(dc,ok,C_GREEN_LN);RECT in=ok;InflateRect(&in,-1,-1);grad(dc,in,C_GREEN_T,C_GREEN_B,TRUE);notch(dc,ok,C_BODY);tick(dc,ok.left+S(2),ok.top+S(2),S(22),C_WHITE);hx=70;}
+  textT(dc,f_h1,C_WHITE,rc(hx,100,696-(hx-32),34),h,DT_SINGLELINE|DT_VCENTER,track(26,2));
   Comp *ch=&g_comp[K_CHROME],*vo=&g_comp[K_DESKTOP];
-  const wchar_t *sub2=busy?L"App downloads come from the ROBOTIC TYLER release on GitHub and are checked before they run.":
+  const wchar_t *sub2=busy?L"App downloads come from the ROBOTIC TYLER release on GitHub and are checked against this version's SHA-256 before they run.":
    anyFail?L"The details are below. Retry tries that part again; anything already installed stays installed.":
    !anyDone?L"Nothing was changed on this PC.":
    (ch->inRun&&ch->state==S_DONE&&ch->before)?L"In Chrome, press Reload on Tyler's card so it uses the new files. Finish opens the extensions page.":
    (ch->inRun&&ch->state==S_DONE&&!ch->before)?L"Last step for Chrome: Finish opens its extensions page. Turn on Developer mode, click Load unpacked and paste the folder path (Setup copies it).":
-   (vo->inRun&&vo->state==S_DONE)?L"Find ROBOTIC TYLER in the Start menu. For voice, the Setup guide in its Voice window walks you through the audio cable.":
+   (vo->inRun&&vo->state==S_DONE)?L"Find ROBOTIC TYLER in the Start menu. For voice, open Tyler's panel in its Steam chat and press Connect & start, then join a voice channel. No VB-CABLE needed.":
    L"Find ROBOTIC TYLER in the Start menu. Run Setup again any time to add or repair a part.";
-  text(dc,f_body,C_INK2,rc(32,142,616,40),sub2,DT_WORDBREAK);
+  text(dc,f_body14,C_INK3,rc(32,136,696,40),sub2,DT_WORDBREAK);
   int slot=0;
   for(int i=0;i<NCOMP;i++){Comp *c=&g_comp[i];if(!c->inRun)continue;int y=rowTop(slot++);
-   RECT row=rc(32,y,616,104);fill(dc,row,C_CARD);frame(dc,row,C_LINE,1);
-   RECT badge=rc(50,y+12,22,22);
-   if(c->state==S_DONE){grad(dc,badge,C_GREEN_A,C_GREEN_B,TRUE);tick(dc,badge.left,badge.top,S(22),C_WHITE);}
-   else if(c->state==S_FAILED){fill(dc,badge,C_RED_BAR);cross(dc,badge.left,badge.top,S(22),C_WHITE);}
-   else{fill(dc,badge,C_TRACK);frame(dc,badge,C_LINE,1);}
-   RECT t=rc(84,y+10,440,26);text(dc,f_bold,C_WHITE,t,c->title,DT_SINGLELINE|DT_VCENTER|DT_END_ELLIPSIS);
+   RECT row=rc(32,y,696,112);box(dc,row,C_CARD,C_LINE,1);notch(dc,row,C_BODY);
+   /* the state as a bar down the left edge, like the selected page in the app's sidebar */
+   COLORREF edge=c->state==S_DONE?C_SUCCESS:c->state==S_FAILED?C_RED:c->state==S_CANCELLED||c->state==S_QUEUED?C_LINE_HOT:C_ACTIVE;
+   RECT lb=rc(32,y,3,112);fill(dc,lb,edge);
+   drawArt(dc,c->chrome?310:320,S(52),S(y+18),S(48),S(48));
+   RECT t=rc(120,y+14,440,26);text(dc,f_bold,C_WHITE,t,c->title,DT_SINGLELINE|DT_VCENTER|DT_END_ELLIPSIS);
+   const wchar_t *badge=c->state==S_DONE?L"DONE":c->state==S_FAILED?L"FAILED":c->state==S_CANCELLED?L"CANCELLED":c->state==S_QUEUED?L"WAITING":L"WORKING";
+   int bx=S(120)+measure(dc,f_bold,c->title)+S(10),by=S(y+19);
+   if(c->state==S_DONE)tag(dc,bx,by,badge,C_LIME,C_GREEN_B);else if(c->state==S_FAILED)tag(dc,bx,by,badge,C_RED_INK,C_RED_BG);
+   else if(c->state==S_CANCELLED||c->state==S_QUEUED)tag(dc,bx,by,badge,C_INK3,C_TAG);else tag(dc,bx,by,badge,C_LINK,C_BLUE_TAG);
    wchar_t s[300];COLORREF col;EnterCriticalSection(&g_lock);rowStatus(c,s,300,&col);LeaveCriticalSection(&g_lock);
-   text(dc,f_body,col,rc(84,y+36,450,20),s,DT_SINGLELINE|DT_VCENTER|DT_END_ELLIPSIS);
-   /* bar */
-   RECT bar=rc(84,y+62,546,8);fill(dc,bar,C_TRACK);
-   double frac=c->total>0?(double)c->got/(double)c->total:0;if(frac>1)frac=1;
-   RECT f=bar;
-   if(c->state==S_DONE){grad(dc,f,C_GREEN_A,C_GREEN,FALSE);}
-   else if(c->state==S_DOWNLOAD||c->state==S_VERIFY){f.right=f.left+(LONG)((f.right-f.left)*frac);if(f.right>f.left)grad(dc,f,c->state==S_VERIFY?C_LINK:C_BLUE_B,c->state==S_VERIFY?C_WHITE:C_BLUE_A,FALSE);}
-   else if(c->state==S_INSTALL||c->state==S_LOCATE){int w=bar.right-bar.left,seg=w/4,pos=(g_anim*S(6))%(w+seg)-seg;
-    RECT m={max(bar.left,bar.left+pos),bar.top,min(bar.right,bar.left+pos+seg),bar.bottom};if(m.right>m.left)grad(dc,m,C_BLUE_B,C_BLUE_A,FALSE);}
-   else if(c->state==S_FAILED){f.right=f.left+(LONG)((f.right-f.left)*frac);if(f.right>f.left)fill(dc,f,C_RED_BAR);}
-   if(c->state==S_FAILED){EnterCriticalSection(&g_lock);text(dc,f_small,C_RED,rc(84,y+74,546,30),c->error,DT_WORDBREAK|DT_END_ELLIPSIS);LeaveCriticalSection(&g_lock);}
+   text(dc,f_body,col,rc(120,y+40,480,20),s,DT_SINGLELINE|DT_VCENTER|DT_END_ELLIPSIS);
+   RECT trk=rc(120,y+66,592,8);
+   double frac=c->total>0?(double)c->got/(double)c->total:0;
+   if(c->state==S_DONE)bar(dc,trk,1,C_GREEN_T,C_SUCCESS,FALSE);
+   else if(c->state==S_DOWNLOAD||c->state==S_VERIFY)bar(dc,trk,frac,C_BLUE_D,C_BLUE_L,TRUE);
+   else if(c->state==S_INSTALL||c->state==S_LOCATE){bar(dc,trk,0,C_BLUE_D,C_BLUE_L,FALSE);RECT in=trk;InflateRect(&in,-1,-1);int w=in.right-in.left,seg=w/4,pos=(g_anim*S(6))%(w+seg)-seg;
+    RECT m={max(in.left,in.left+pos),in.top,min(in.right,in.left+pos+seg),in.bottom};if(m.right>m.left)grad(dc,m,C_BLUE_D,C_BLUE_L,FALSE);}
+   else if(c->state==S_FAILED)bar(dc,trk,frac>0?frac:1,C_RED_D,C_RED_L,FALSE);
+   else bar(dc,trk,0,C_BLUE_D,C_BLUE_L,FALSE);
+   if(c->state==S_FAILED){EnterCriticalSection(&g_lock);text(dc,f_small,C_RED,rc(120,y+78,592,32),c->error,DT_WORDBREAK|DT_END_ELLIPSIS);LeaveCriticalSection(&g_lock);}
   }
  }
- /* Footer */
- RECT foot={0,S(H_LOGICAL-68),cl.right,cl.bottom};fill(dc,foot,C_FOOT);
- RECT line={0,S(H_LOGICAL-68),cl.right,S(H_LOGICAL-67)};fill(dc,line,RGB(0x23,0x30,0x40));
- text(dc,f_small,RGB(0x5b,0x6d,0x7c),rc(32,H_LOGICAL-50,330,40),L"Not affiliated with or endorsed by Valve.\nSteam is a trademark of Valve Corporation.",DT_WORDBREAK);
+ /* Footer: the settings page's save bar */
+ RECT foot={0,S(H_LOGICAL-FOOT_H),cl.right,cl.bottom};fill(dc,foot,C_FOOT);
+ RECT line={0,S(H_LOGICAL-FOOT_H),cl.right,S(H_LOGICAL-FOOT_H)+1};fill(dc,line,C_EDGE);
+ text(dc,f_small,C_INK3,rc(32,H_LOGICAL-56,400,40),L"Unofficial fan project. Not affiliated with or endorsed by Valve.\nSteam is a trademark of Valve Corporation.",DT_WORDBREAK);
 }
 
 /* ── Layout, fonts, pages ────────────────────────────────────────────────── */
 static HFONT font(int px,int weight,const wchar_t *face){
  return CreateFontW(-S(px),0,0,0,weight,0,0,0,DEFAULT_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,CLEARTYPE_QUALITY,DEFAULT_PITCH|FF_SWISS,face);
 }
+/* Arial, as the app shows on Windows (its Steam theme asks for "Motiva Sans", Arial: Steam's own
+   face only exists inside Steam). */
 static void makeFonts(void){
- HFONT *all[]={&f_title,&f_sub,&f_h1,&f_body,&f_bold,&f_small,&f_btn,&f_tag};for(int i=0;i<8;i++)if(*all[i]){DeleteObject(*all[i]);*all[i]=NULL;}
- f_title=font(30,FW_LIGHT,L"Segoe UI Light");f_sub=font(13,FW_NORMAL,L"Segoe UI");f_h1=font(22,FW_LIGHT,L"Segoe UI Light");
- f_body=font(13,FW_NORMAL,L"Segoe UI");f_bold=font(16,FW_SEMIBOLD,L"Segoe UI Semibold");f_small=font(12,FW_NORMAL,L"Segoe UI");
- f_btn=font(14,FW_SEMIBOLD,L"Segoe UI Semibold");f_tag=font(11,FW_BOLD,L"Segoe UI");
+ HFONT *all[]={&f_title,&f_sub,&f_h1,&f_body,&f_body14,&f_label,&f_bold,&f_small,&f_btn,&f_tag};for(int i=0;i<10;i++)if(*all[i]){DeleteObject(*all[i]);*all[i]=NULL;}
+ f_title=font(21,FW_BOLD,L"Arial");f_sub=font(11,FW_NORMAL,L"Arial");f_h1=font(26,FW_NORMAL,L"Arial");
+ f_body=font(13,FW_NORMAL,L"Arial");f_body14=font(14,FW_NORMAL,L"Arial");f_label=font(14,FW_NORMAL,L"Arial");f_bold=font(15,FW_BOLD,L"Arial");
+ f_small=font(12,FW_NORMAL,L"Arial");f_btn=font(14,FW_NORMAL,L"Arial");f_tag=font(10,FW_BOLD,L"Arial");
  for(int i=0;i<NCOMP;i++){HWND k[3]={g_comp[i].card,g_comp[i].retry,g_comp[i].launch};for(int j=0;j<3;j++)if(k[j])SendMessageW(k[j],WM_SETFONT,(WPARAM)f_body,FALSE);}
  HWND kids[]={g_desktop,g_ok,g_cancelBtn};for(int i=0;i<3;i++)if(kids[i])SendMessageW(kids[i],WM_SETFONT,(WPARAM)f_body,FALSE);
 }
@@ -577,22 +669,22 @@ static void place(HWND h,int x,int y,int w,int hgt,BOOL show){SetWindowPos(h,NUL
 static void cardName(Comp *c){wchar_t s[700],st[300];COLORREF col;cardStatus(c,st,300,&col);swprintf(s,700,L"%ls (%ls). %ls %ls",c->title,c->tag,c->desc,st);SetWindowTextW(c->card,s);}
 static void layout(void){
  BOOL choose=g_page==P_CHOOSE,done=!g_busy;
- for(int i=0;i<NCOMP;i++){place(g_comp[i].card,32,180+i*104,616,96,choose);cardName(&g_comp[i]);}
- place(g_desktop,32,496,616,24,choose);
+ for(int i=0;i<NCOMP;i++){place(g_comp[i].card,32+i*356,184,340,236,choose);cardName(&g_comp[i]);}
+ place(g_desktop,32,436,360,24,choose);
  int slot=0;
  for(int i=0;i<NCOMP;i++){Comp *c=&g_comp[i];BOOL row=!choose&&c->inRun;int y=rowTop(row?slot:0);if(row)slot++;
   BOOL failed=row&&done&&c->state==S_FAILED;
-  place(c->retry,544,y+8,92,30,failed);
+  place(c->retry,624,y+12,88,30,failed);
   BOOL ok=row&&done&&c->state==S_DONE;wchar_t lt[160];
   if(c->chrome)swprintf(lt,160,L"Open Chrome's extensions page and this folder when I click Finish");else swprintf(lt,160,L"Open %ls when I click Finish",c->title);
   SetWindowTextW(c->launch,lt);
-  place(c->launch,84,y+74,540,24,ok);
+  place(c->launch,120,y+80,560,24,ok);
  }
- if(choose){SetWindowTextW(g_ok,L"Install");SetWindowTextW(g_cancelBtn,L"Cancel");place(g_cancelBtn,410,H_LOGICAL-52,112,36,TRUE);place(g_ok,536,H_LOGICAL-52,112,36,TRUE);
+ if(choose){SetWindowTextW(g_ok,L"Install");SetWindowTextW(g_cancelBtn,L"Cancel");place(g_cancelBtn,476,H_LOGICAL-54,116,36,TRUE);place(g_ok,604,H_LOGICAL-54,124,36,TRUE);
   BOOL any=FALSE;for(int i=0;i<NCOMP;i++)any|=Button_GetCheck(g_comp[i].card)==BST_CHECKED;EnableWindow(g_ok,any);}
- else if(!done){SetWindowTextW(g_cancelBtn,g_cancel?L"Cancelling\x2026":L"Cancel");EnableWindow(g_cancelBtn,!g_cancel);place(g_cancelBtn,536,H_LOGICAL-52,112,36,TRUE);place(g_ok,536,H_LOGICAL-52,112,36,FALSE);}
+ else if(!done){SetWindowTextW(g_cancelBtn,g_cancel?L"Cancelling\x2026":L"Cancel");EnableWindow(g_cancelBtn,!g_cancel);place(g_cancelBtn,612,H_LOGICAL-54,116,36,TRUE);place(g_ok,604,H_LOGICAL-54,124,36,FALSE);}
  else{BOOL any=FALSE;for(int i=0;i<NCOMP;i++)any|=g_comp[i].inRun&&g_comp[i].state==S_DONE;
-  SetWindowTextW(g_ok,any?L"Finish":L"Close");EnableWindow(g_ok,TRUE);place(g_cancelBtn,410,H_LOGICAL-52,112,36,FALSE);place(g_ok,536,H_LOGICAL-52,112,36,TRUE);}
+  SetWindowTextW(g_ok,any?L"Finish":L"Close");EnableWindow(g_ok,TRUE);place(g_cancelBtn,476,H_LOGICAL-54,116,36,FALSE);place(g_ok,604,H_LOGICAL-54,124,36,TRUE);}
  InvalidateRect(g_wnd,NULL,FALSE);
  /* Screen readers: the window title carries the overall state. */
  wchar_t title[400]=L"ROBOTIC TYLER Setup";
@@ -673,7 +765,7 @@ static HWND mk(const wchar_t *cls,const wchar_t *txt,DWORD style,int id){
 static void darkTitle(HWND h){
  HMODULE d=LoadLibraryW(L"dwmapi.dll");if(!d)return;
  typedef HRESULT (WINAPI *Set)(HWND,DWORD,LPCVOID,DWORD);Set set=(Set)(void*)GetProcAddress(d,"DwmSetWindowAttribute");
- if(set){BOOL on=TRUE;set(h,20,&on,sizeof on);COLORREF cap=C_HEADER;set(h,35,&cap,sizeof cap);}
+ if(set){BOOL on=TRUE;set(h,20,&on,sizeof on);COLORREF cap=C_HEAD_A;set(h,35,&cap,sizeof cap);}
 }
 static int dpiOf(HWND h){
  typedef UINT (WINAPI *Get)(HWND);static Get get=NULL;static BOOL tried=FALSE;
@@ -712,28 +804,27 @@ static LRESULT CALLBACK wndProc(HWND h,UINT m,WPARAM w,LPARAM l){
   break;}
  case WM_COMMAND:{
   int id=LOWORD(w);
-  if(INRANGE(id,IDC_CARD0)){layout();InvalidateRect((HWND)l,NULL,TRUE);}
+  if(INRANGE(id,IDC_CARD0)){layout();InvalidateRect((HWND)l,NULL,TRUE);InvalidateRect(h,NULL,FALSE);}
   else if(id==IDC_DESKTOP||INRANGE(id,IDC_LAUNCH0))InvalidateRect((HWND)l,NULL,TRUE);
   else if(INRANGE(id,IDC_RETRY0)){int i=id-IDC_RETRY0;logLine(L"%ls: retry",g_comp[i].key);startRun(i);}
   else if(id==IDOK){if(g_page==P_CHOOSE){if(IsWindowEnabled(g_ok))onInstall();}else if(!g_busy)finish();}
   else if(id==IDCANCEL){if(g_page==P_CHOOSE)DestroyWindow(h);else if(g_busy)askStop();else finish();}
   return 0;}
- case WM_APP_PROGRESS:{RECT r=rc(0,180,W_LOGICAL,340);InvalidateRect(h,&r,FALSE);
+ case WM_APP_PROGRESS:{RECT r=rc(0,HEAD_H,W_LOGICAL,H_LOGICAL-FOOT_H-HEAD_H);InvalidateRect(h,&r,FALSE);
   if(g_page==P_WORK){wchar_t t[200]=L"ROBOTIC TYLER Setup";for(int i=0;i<NCOMP;i++){Comp *c=&g_comp[i];if(c->inRun&&(c->state==S_DOWNLOAD||c->state==S_VERIFY)&&c->total){size_t n=wcslen(t);swprintf(t+n,200-n,L" \x2014 %ls %d%%",c->title,(int)(c->got*100/c->total));}}SetWindowTextW(h,t);}
   return 0;}
  case WM_APP_ROW:layout();return 0;
  case WM_APP_DONE:{
-  KillTimer(h,TIMER_ANIM);
   BOOL anyFail=FALSE,anyDone=FALSE;for(int i=0;i<NCOMP;i++)if(g_comp[i].inRun){anyFail|=g_comp[i].state!=S_DONE;anyDone|=g_comp[i].state==S_DONE;}
   g_exitCode=anyFail?(g_cancel?2:1):0;logLine(L"finished: exit code %d",g_exitCode);
-  layout();
+  KillTimer(h,TIMER_ANIM);layout();
   HWND first=NULL;for(int i=0;i<NCOMP&&!first;i++)if(g_comp[i].inRun&&g_comp[i].state==S_FAILED)first=g_comp[i].retry;
   SetFocus(first?first:g_ok);
   if(g_auto)SetTimer(h,TIMER_AUTOCLOSE,1500,NULL);
   FLASHWINFO fw={sizeof fw,h,FLASHW_TRAY|FLASHW_TIMERNOFG,3,0};FlashWindowEx(&fw);
   (void)anyDone;return 0;}
  case WM_TIMER:
-  if(w==TIMER_ANIM){g_anim++;RECT r=rc(0,180,W_LOGICAL,340);InvalidateRect(h,&r,FALSE);}
+  if(w==TIMER_ANIM){g_anim++;if(g_page==P_WORK){RECT r=rc(0,HEAD_H,W_LOGICAL,H_LOGICAL-FOOT_H-HEAD_H);InvalidateRect(h,&r,FALSE);}}
   else if(w==TIMER_AUTOCLOSE){KillTimer(h,TIMER_AUTOCLOSE);DestroyWindow(h);}
   return 0;
  case DM_GETDEFID:{ /* Enter presses the focused button (Retry, Cancel); otherwise the main action */

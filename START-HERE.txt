@@ -1,26 +1,28 @@
-ROBOTIC TYLER — v2.18.1
+ROBOTIC TYLER — v2.19.0
 
 JUST WANT TO USE IT?
-  Download ROBOTIC-TYLER-Setup-2.18.1.exe from
+  Download ROBOTIC-TYLER-Setup-2.19.0.exe from
   github.com/treymun/Robotic-Tyler/releases/latest and run it. Two parts:
-    Desktop app        → Steam text chat and Steam voice on Windows, no Chrome needed
-                         (voice: Standard or Gemini Live, through a virtual audio cable)
+    Desktop app        → Steam chat and Steam voice on Windows, no Chrome needed
+                         (voice: Standard or Gemini Live, right in its Steam window)
     Chrome extension   → Setup unpacks it and opens Chrome's extensions page;
                          turn on Developer mode, click Load unpacked, paste the path
   Run Setup again later to add or update a part. Settings and keys are kept.
   The desktop app replaces the old Control Center (upgraded in place) and Voice
   Studio (its settings are imported on first start; it then offers to remove it).
-  Pick a look in Settings → Appearance: Steam, Classic Steam (2004), Team Fortress 2,
-  Counter-Strike 2, Portal, Counter-Strike 1.6, Half-Life HEV suit, Left 4 Dead,
-  Windows XP or DOOM (classic).
+  Pick a look in Settings → Appearance: 20 themes, from Steam, Team Fortress 2,
+  Counter-Strike 2 and Portal to DOOM, Deadlock, PAYDAY 2 and Day of Defeat.
 
-VOICE ON THE DESKTOP:
-  1. Install VB-CABLE (vb-audio.com/Cable) and restart if asked.
-  2. Settings → Voice: pick the engine, then "Tyler speaks into" = CABLE Input and
-     "Tyler listens to" = the headset/speakers Steam plays voice chat through.
-     Tick the box once everyone in the call knows Tyler is listening.
-  3. In Steam: Settings → Voice → microphone = CABLE Output.
-  4. Open Voice (tray icon or Ctrl+Shift+V), play the test tone, then Start.
+VOICE ON THE DESKTOP (v2.19):
+  1. Sign in to the bot's Steam account in the app's Steam chat window.
+  2. Settings: add your AI key; Settings → Voice: pick Standard or Gemini Live.
+  3. In Steam chat, open the group, then Tyler's panel → Connect & start (or
+     Start live voice), and join the voice channel. No VB-CABLE needed: Tyler
+     talks through his own synthetic microphone.
+  Prefer the older route through VB-CABLE and the Steam desktop app? Settings →
+  Voice → Where Tyler joins voice → "Through VB-CABLE", then set Tyler speaks
+  into = CABLE Input, Tyler listens to = your headset, and Steam's microphone =
+  CABLE Output, and start voice from the Voice window (Ctrl+Shift+V).
 
 UPDATING CHROME FROM THIS FOLDER:
   Copy browser-extension/ over the same folder you loaded before, then click

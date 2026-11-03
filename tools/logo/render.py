@@ -98,7 +98,7 @@ def header(rel):
     d.text((8, 29), 'TYLER', font=font(BOLD, 12), fill=(23, 26, 33))
     img.save(os.path.join(ROOT, rel), 'BMP')
 
-sidebar(['Control Center'], 'build/installer-sidebar-control.bmp')
-sidebar(['Native Steam', 'Companion'], 'build/installer-sidebar-voice.bmp')
+# Since v2.19 the desktop installer's sidebar comes from tools/setup/art/nsis-sidebar.html
+# (node tools/setup/render-art.mjs). The old Voice Studio sidebar is no longer used.
 header('build/installer-header.bmp')
 print('Logo files and installer artwork written.')

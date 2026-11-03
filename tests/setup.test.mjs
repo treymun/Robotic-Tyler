@@ -40,8 +40,14 @@ test('only verified files run, silently, and nothing touches the apps\' data',()
 test('the setup is keyboard accessible, names each part with its role and opens Chrome’s extensions page',()=>{
  assert.match(src,/IsDialogMessageW\(g_wnd,&msg\)/);
  assert.match(src,/WS_TABSTOP/);assert.match(src,/UISF_HIDEFOCUS/);assert.match(src,/DM_GETDEFID/);
- assert.match(src,/\.title=L"Chrome extension",\.tag=L"STEAM WEB CHAT"[\s\S]*Load unpacked/);
- assert.match(src,/\.title=L"Desktop app",\.tag=L"WINDOWS"[\s\S]*virtual audio cable/);
+ assert.match(src,/\.title=L"Chrome extension",\.tag=L"IN GOOGLE CHROME"[\s\S]*Load unpacked/);
+ // v2.19: desktop voice joins in the app's own Steam window, without VB-CABLE.
+ assert.match(src,/\.title=L"Desktop app",\.tag=L"WINDOWS APP"[\s\S]*no VB-CABLE/);
+ // v2.19: the app's own Steam theme (tokens.css): navy, the panel header's store gradient, Steam's
+ // green for Install, Arial; the part icons come from art/ as resources, drawn with AlphaBlend.
+ assert.match(src,/drawArt\(dc,c->chrome\?310:320,/);
+ for(const c of ['C_HEAD_A  RGB(0x2a,0x47,0x5e)','C_BODY    RGB(0x1b,0x28,0x38)','C_LINK    RGB(0x66,0xc0,0xf4)','C_GREEN_T RGB(0x5c,0x7e,0x10)','C_FRAME   RGB(0x53,0xa4,0xc4)'])assert.ok(src.includes(c),c);
+ assert.match(src,/f_title=font\(21,FW_BOLD,L"Arial"\)/);assert.doesNotMatch(src,/Segoe UI Black|glow\(/);
  assert.match(src,/#define NCOMP 2\nenum \{ K_CHROME, K_DESKTOP \};/,'two parts: the Chrome extension and the desktop app');
  assert.match(src,/wcsstr\(g_preselect,L"control"\)\|\|wcsstr\(g_preselect,L"voice"\)/,'old /components=control,voice still pick the desktop app');
  assert.match(src,/chrome:\/\/extensions\//,'Finish opens Chrome\'s extensions page');
@@ -70,4 +76,11 @@ test('the Chrome extension ships inside the setup and unpacks to one fixed folde
  if(fs.existsSync(exe)){const b=fs.readFileSync(exe),i=b.indexOf(Buffer.from('RTPK1\0\0\0','latin1'));assert.ok(i>0,'pack embedded');
   // The embedded manifest is the extension's own, byte for byte.
   assert.ok(b.includes(fs.readFileSync(path.join(ROOT,'browser-extension/manifest.json'))));}
+});
+
+test('the setup artwork exists at 100, 150 and 200 % with the sizes setup.c draws it at',()=>{
+ const dims=f=>{const b=fs.readFileSync(path.join(ROOT,'tools/setup/art',f));assert.equal(b.toString('ascii',1,4),'PNG',f);return [b.readUInt32BE(16),b.readUInt32BE(20),b[25]];};
+ for(const [name,w,h] of [['icon-chrome',48,48],['icon-desktop',48,48]])for(const pct of [100,150,200]){
+  const [iw,ih,type]=dims(`${name}-${pct}.png`);assert.equal(iw,Math.round(w*pct/100),name+pct);assert.equal(ih,Math.round(h*pct/100),name+pct);assert.ok([2,6].includes(type),'RGB or RGBA');}
+ const bmp=fs.readFileSync(path.join(ROOT,'build/installer-sidebar-control.bmp'));assert.equal(bmp.toString('ascii',0,2),'BM');assert.deepEqual([bmp.readInt32LE(18),Math.abs(bmp.readInt32LE(22))],[164,314]);
 });

@@ -95,7 +95,7 @@ ${step(5,'Open Steam chat',`Go to <code>steamcommunity.com/chat</code>, open you
 
 <h2>Windows desktop app (optional)</h2>
 <div class="card"><p style="margin:0 0 10px">On Windows, <code>ROBOTIC-TYLER-Setup-${esc(version)}.exe</code> from the same release page does all of this for you, and can also install the desktop app:</p><table>
-<tr><td>Desktop app</td><td>Steam text chat and Steam voice (Standard or Gemini Live) in one app, no Chrome needed. Voice needs a free virtual audio cable (VB-CABLE) chosen as Steam’s microphone.</td></tr>
+<tr><td>Desktop app</td><td>Steam chat and Steam voice (Standard or Gemini Live) in one app, no Chrome needed. Voice joins right in its Steam window: no virtual audio cable.</td></tr>
 </table><p style="margin:10px 0 0;color:var(--ink3)">Setup checks the download before installing it. The desktop app updates itself. It replaces the old Control Center and Voice Studio: it upgrades a Control Center in place and imports a Voice Studio’s settings.</p></div>
 <div class="card note">If Windows shows <b>“Windows protected your PC”</b>, Setup isn’t code-signed yet. Click <b>More info → Run anyway</b>.</div>
 
@@ -110,14 +110,20 @@ function notes(files){
  const row=(file,what)=>files.includes(file)?`| \`${file}\` | ${what} |\n`:'';
  const dl=f=>`https://github.com/${OWNER_REPO}/releases/download/v${version}/${f}`;
  const hasSetup=files.includes(`ROBOTIC-TYLER-Setup-${version}.exe`);
+ // The README's artwork, from this version's tag (so an old release keeps its own pictures).
+ const art=f=>`https://raw.githubusercontent.com/${OWNER_REPO}/v${version}/assets/readme/${f}`;
  return `## Download
+
+<p align="center"><img src="${art('hero.png')}" width="100%" alt="ROBOTIC TYLER, AI squadmate for Steam chat and voice, next to his panel in Steam chat"></p>
 ${hasSetup?`
+<p align="center"><a href="${dl(`ROBOTIC-TYLER-Setup-${version}.exe`)}"><img src="${art('download.png')}" width="430" alt="Download for Windows: ROBOTIC-TYLER-Setup-${version}.exe"></a></p>
+
 ### ⬇️ [ROBOTIC-TYLER-Setup-${version}.exe](${dl(`ROBOTIC-TYLER-Setup-${version}.exe`)})
 
 **That's the only file you need on Windows.** Run it and tick what you want:
 
-- **Chrome extension:** Tyler in Steam web chat with voice and text. Setup unpacks it and opens Chrome's extensions page. Turn on *Developer mode*, click *Load unpacked* and paste the folder path Setup copied (a one-time step; Chrome only adds extensions from outside its Web Store this way).
-- **Desktop app:** Steam text chat and Steam voice in one app, no Chrome needed. Voice uses a free virtual audio cable as Steam's microphone. It replaces the old Control Center (upgraded in place) and Voice Studio (its settings are imported, then it offers to remove it).
+- **Desktop app** (recommended): everything in one app, no Chrome needed. Steam chat, voice right in its Steam window (no VB-CABLE), soundboard, Music DJ and screen commentary. It updates itself, and replaces the old Control Center (upgraded in place) and Voice Studio (its settings are imported, then it offers to remove it).
+- **Chrome extension:** Tyler in Steam web chat in Chrome, with voice and text. Setup unpacks it and opens Chrome's extensions page. Turn on *Developer mode*, click *Load unpacked* and paste the folder path Setup copied (a one-time step; Chrome only adds extensions from outside its Web Store this way).
 
 Run Setup again any time to add, update or repair a part. Settings and keys are kept. If Windows says *“Windows protected your PC”*, Setup isn't code-signed: choose **More info → Run anyway**.
 `:''}

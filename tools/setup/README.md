@@ -22,6 +22,8 @@ its settings. Files an older version had are removed, using the list kept in
 | `setup.c` | The program: plain Win32 + WinHTTP + Windows CNG, nothing to install. |
 | `build-setup.mjs` | Builds it after the component installers exist. Run it with `npm run build:setup`. |
 | `nsis-guid.mjs` | The registry key electron-builder's installer uses for an app id. Setup looks for installed apps there. |
+| `art/` | The two part icons (v2.19), in the app's Steam theme, designed as HTML and rendered to PNGs at 100/150/200 % by `render-art.mjs` (Playwright); `build-setup.mjs` embeds them. Everything else in the window is drawn by `setup.c` with the app's own colours (`browser-extension/ui/tokens.css`). `art/nsis-sidebar.html` is the desktop installer's sidebar (`build/installer-sidebar-control.bmp`). |
+| `render-art.mjs` | Renders `art/` after a design change: `node tools/setup/render-art.mjs`. |
 
 ## Building
 

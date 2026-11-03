@@ -1,0 +1,18 @@
+/* README artwork in the app's own Steam theme (v2.19): the same tokens as the panel and settings
+   (browser-extension/ui/tokens.css): navy canvas, the store gradient, online blue, Steam's green,
+   2-3 px corners, Arial and tracked capitals. No effects the app itself doesn't use. */
+@import url("../../browser-extension/ui/tokens.css");
+html,body{margin:0;background:transparent;-webkit-font-smoothing:antialiased;font-family:var(--rt-font)}
+.bg{position:relative;overflow:hidden;border-radius:var(--rt-r-md);background:var(--rt-bg);box-shadow:inset 0 0 0 1px #000}
+/* Tyler's avatar in its Steam presence frame, as in the panel header */
+.avatar{display:block;box-sizing:border-box;padding:2px;background:#1b2838;border:2px solid #53a4c4;border-radius:2px}
+.wordmark{font-weight:700;letter-spacing:.08em;color:#6dcff6}
+.ident-sub{text-transform:uppercase;letter-spacing:var(--rt-track);color:#7fb6cf}
+/* tags: the theme gallery's (.tg-tag) and the panel's blue and green chips */
+.tag{display:inline-block;padding:2px 8px;border-radius:var(--rt-r-xs);font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;line-height:18px}
+.tag.blue{color:var(--rt-blue);background:var(--rt-blue-fade)}
+.tag.grey{color:var(--rt-ink-3);background:var(--rt-select)}
+.tag.green{color:#beee11;background:#4c6b22}
+.tag.accent{color:var(--rt-on-accent);background:var(--rt-accent-fill)}
+/* a real panel screenshot (filled in by render.mjs) floating like the panel does in Steam chat */
+.shot{display:block;box-shadow:var(--rt-shadow-float);border-radius:2px}

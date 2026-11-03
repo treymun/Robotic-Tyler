@@ -57,8 +57,10 @@ function setupDesktopMedia({BrowserWindow,desktopCapturer,ipcMain,shell,steamSes
    if(picking)return deny('a picker is already open');
    picking=true;
    try{
-    const sources=(await desktopCapturer.getSources({types:['screen','window'],thumbnailSize:{width:320,height:180},fetchWindowIcons:false}))
-     .filter(s=>!/^ROBOTIC TYLER/.test(s.name));
+    // Screens and windows are listed separately: when one list fails (windows can't always be listed
+    // on Linux), asking for both at once returns nothing at all, not even the screens.
+    const list=async type=>{try{return await desktopCapturer.getSources({types:[type],thumbnailSize:{width:320,height:180},fetchWindowIcons:false});}catch(error){log('Could not list '+type+'s',error.message);return [];}};
+    const sources=[...await list('screen'),...await list('window')].filter(s=>!/^ROBOTIC TYLER/.test(s.name));
     const id=await pick(sources);
     const source=sources.find(s=>s.id===id);
     if(!source)return deny('nothing chosen');
