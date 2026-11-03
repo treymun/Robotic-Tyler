@@ -7,7 +7,7 @@ import fs from 'node:fs';import http from 'node:http';import path from 'node:pat
 const HERE=path.dirname(fileURLToPath(import.meta.url)),ROOT=path.resolve(HERE,'..','..'),OUT=path.join(ROOT,'assets','readme');
 const {chromium}=createRequire(path.join(ROOT,'package.json'))('playwright');
 fs.mkdirSync(OUT,{recursive:true});
-const SCALE={hero:1.25,themes:1.25,icons:2,button:2};
+const SCALE={hero:1.25,themes:1.25,features:1.25,icons:2,button:2};
 const only=process.argv.slice(2);
 const jobs=fs.readdirSync(HERE).filter(f=>f.endsWith('.html')&&(!only.length||only.includes(f.slice(0,-5))));
 
@@ -21,21 +21,45 @@ const base='http://127.0.0.1:'+server.address().port;
 const browser=await chromium.launch();
 
 const SPEAKING='SPEAKING — say “stop” or “hold on” to interrupt';
-// A real panel screenshot: its top `height` CSS pixels, at `scale`.
-async function panel({theme='steam',tab='conversation',state=SPEAKING,height=420,scale=2}){
- const page=await browser.newPage({viewport:{width:1280,height:900},deviceScaleFactor:scale});
- await page.goto(base+'/tools/preview/panel.html?platform=chrome&theme='+theme);
+// A real panel screenshot, from the top of the panel down `height` CSS pixels.
+//   tab, state (status line), theme, platform (chrome, desktop-voice), open (a Room feature to
+//   expand, by its title), scroll (CSS px to scroll the panel's content), height, scale.
+async function panel({theme='steam',platform='chrome',tab='conversation',state=SPEAKING,open='',scroll=0,height=420,scale=2}){
+ const page=await browser.newPage({viewport:{width:1280,height:900},deviceScaleFactor:Number(scale)});
+ await page.goto(base+'/tools/preview/panel.html?platform='+platform+'&theme='+theme);
  await page.waitForFunction(()=>window.__tylerReady===true);await page.evaluate(()=>document.fonts.ready);
  await page.evaluate(([t,s])=>{TylerCompanion.showTab(t);TylerCompanion.setActivity(s);},[tab,state]);
- await page.waitForTimeout(450);
+ if(open)await page.evaluate(name=>{const r=document.getElementById('tyler-companion-root').shadowRoot;for(const d of r.querySelectorAll('details.feature'))d.open=d.querySelector('.feature-title')?.textContent.trim()===name;},open);
+ await page.waitForTimeout(350);
+ if(scroll)await page.evaluate(y=>{document.getElementById('tyler-companion-root').shadowRoot.querySelector('.scroll').scrollTop=y;},Number(scroll));
+ await page.waitForTimeout(150);
  const box=await page.evaluate(()=>{const b=document.getElementById('tyler-companion-root').shadowRoot.querySelector('.panel').getBoundingClientRect();return {x:b.x,y:b.y,width:b.width,height:b.height};});
- const png=await page.screenshot({clip:{x:box.x,y:box.y,width:box.width,height:Math.min(height,box.height)},animations:'disabled'});
+ const png=await page.screenshot({clip:{x:box.x,y:box.y,width:box.width,height:Math.min(Number(height),box.height)},animations:'disabled'});
  await page.close();
  return 'data:image/png;base64,'+png.toString('base64');
 }
+// A real settings page screenshot: the given sheets (CSS selectors, comma separated) on the given
+// page (zone), from the Chrome options page or the desktop app's settings window, in a window
+// `width` CSS pixels wide.
+async function settings({zone='overview',sheets='',desktop='',width=1280,scale=2,theme='steam'}){
+ const page=await browser.newPage({viewport:{width:Number(width),height:1400},deviceScaleFactor:Number(scale)});
+ await page.addInitScript(theme=>{window.chrome={storage:{local:{get:async()=>({uiTheme:theme,usage:{requests:42,promptTokens:18234,completionTokens:5120,reportedCostUSD:0.0314,speechResponses:9}}),set:async()=>{},remove:async()=>{}}},tabs:{create:()=>{},query:async()=>[]}};window.tylerSettings={storage:{local:window.chrome.storage.local},tabs:{create:async()=>{}},verifyKey:async()=>true,activity:async()=>[]};window.tylerNative={devices:async()=>[{kind:'output',id:'a',name:'CABLE Input (VB-Audio Virtual Cable)'},{kind:'output',id:'b',name:'Speakers (Realtek Audio)'}],status:async()=>({ok:true}),openSettings:async()=>{},openSteam:async()=>{},theme:async()=>theme};},theme);
+ await page.goto(base+(desktop?'/app/companion/settings.html':'/browser-extension/settings.html')+'#'+zone);
+ await page.waitForTimeout(600);await page.evaluate(()=>document.fonts.ready);
+ const box=await page.evaluate(list=>{const els=list.split(',').map(s=>document.querySelector(s.trim())).filter(Boolean);if(!els.length)throw Error('no '+list);
+  const r=els.map(e=>e.getBoundingClientRect());const x=Math.min(...r.map(b=>b.left)),y=Math.min(...r.map(b=>b.top));return {x,y,width:Math.max(...r.map(b=>b.right))-x,height:Math.max(...r.map(b=>b.bottom))-y};},sheets);
+ const png=await page.screenshot({clip:box,animations:'disabled'});
+ await page.close();
+ return 'data:image/png;base64,'+png.toString('base64');
+}
+// [data-panel] keys: "hero", "theme:<name>", "panel:<query>" or "settings:<query>".
 const cache=new Map();
 async function source(key){
- if(!cache.has(key))cache.set(key,key==='hero'?panel({tab:'soundboard',height:440,scale:2.5}):panel({theme:key.slice(6),height:230,scale:1.5}));
+ if(!cache.has(key)){
+  const q=k=>Object.fromEntries(new URLSearchParams(key.slice(k.length+1)));
+  cache.set(key,key==='hero'?panel({tab:'soundboard',height:440,scale:2.5}):key.startsWith('theme:')?panel({theme:key.slice(6),height:230,scale:1.5})
+   :key.startsWith('panel:')?panel(q('panel')):key.startsWith('settings:')?settings(q('settings')):Promise.reject(Error('unknown '+key)));
+ }
  return cache.get(key);
 }
 

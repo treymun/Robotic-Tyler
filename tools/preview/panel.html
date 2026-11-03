@@ -3,7 +3,7 @@
   Visual preview of the in-chat panel outside Steam. Loads the real isolated-world
   scripts from browser-extension/ against a mocked chrome.runtime and a fake
   Steam chat page. Serve the project root over HTTP (node tools/preview/shoot.mjs
-  does this) and open /tools/preview/panel.html?platform=chrome|desktop.
+  does this) and open /tools/preview/panel.html?platform=chrome|desktop|desktop-voice.
   Preview only: shadow roots are forced open so screenshots can drive the UI.
 -->
 <html lang="en">
@@ -34,6 +34,8 @@
   Element.prototype.attachShadow=function(options){return nativeAttach.call(this,{...options,mode:'open'});};
   const params=new URLSearchParams(location.search);
   if(params.get('platform')==='desktop')window.__TYLER_DESKTOP_TEXT_ONLY=true;
+  // v2.19: the desktop app's Steam window in voice mode (the default), with Music DJ and screen sharing.
+  if(params.get('platform')==='desktop-voice'){window.__TYLER_DESKTOP_VOICE=true;window.__TYLER_DESKTOP_MUSIC=true;window.__TYLER_DESKTOP_SCREEN=true;}
   // Sample voice-turn timings for the Checks tab chart (older turns first).
   const latency=[[620,1450,1310,false],[580,1380,1250,false],[700,1620,1400,false],[610,1290,640,true],[560,1210,590,true],[650,1500,700,true],[590,1340,610,true],[600,1260,560,true]].map(([stt,think,speech,early],i)=>{const total=stt+think+speech+180;return {at:Date.now()-(8-i)*95000,sttMs:stt,thinkMs:think,speechMs:speech,totalMs:total,firstAudioMs:early?stt+Math.round(think*.42)+520:total,early};});
   const usage={requests:42,promptTokens:18234,completionTokens:5120,reportedCostUSD:0.0314,speechResponses:9};

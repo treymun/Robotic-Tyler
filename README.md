@@ -34,6 +34,15 @@
 </tr>
 </table>
 
+## A closer look
+
+<p align="center"><img src="assets/readme/feature-voice.png" width="100%" alt="Voice: Settings → Voice with the Standard and Gemini Live engines, and Tyler's panel listening in Steam chat."></p>
+<p align="center"><img src="assets/readme/feature-personality.png" width="100%" alt="Personality: presets, humor, edginess, helpfulness and chaos sliders, a written description, roast intensity, reply length, speed and talkativeness."></p>
+<p align="center"><img src="assets/readme/feature-room.png" width="100%" alt="Room tools: the panel's Room tab with Music DJ open, and the Sounds tab with its soundboard pads."></p>
+<p align="center"><img src="assets/readme/feature-desktop.png" width="100%" alt="The desktop app: Tyler's panel on air in the app's own Steam chat window, and its settings for where Tyler joins voice and getting started."></p>
+
+<sub>Screenshots of the real panel and settings with sample data (the text spend and names are examples).</sub>
+
 ## Get going in a few minutes
 
 1. **[Download Setup](https://github.com/treymun/Robotic-Tyler/releases/latest)** (`ROBOTIC-TYLER-Setup-<version>.exe`) and run it. Tick the **Desktop app** (recommended), the **Chrome extension**, or both.

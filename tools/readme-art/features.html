@@ -1,0 +1,74 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="common.css"><style>
+/* README feature cards (v2.19), one image each: a short write-up next to real screenshots of the app
+   in its Steam theme. render.mjs fills every [data-panel] from tools/preview/panel.html (the real
+   panel with sample data) or the real settings pages, and saves each [data-shot] as a PNG. */
+body{display:flex;flex-direction:column;gap:40px;padding:20px}
+.bg{width:1280px;height:560px;flex-shrink:0;background:var(--rt-bg) linear-gradient(180deg,var(--rt-page-glow) 0,var(--rt-bg) 340px) no-repeat}
+.copy{position:absolute;top:64px;width:430px}
+.left .copy{left:60px}.right .copy{right:56px}
+h2{margin:16px 0 14px;font-size:34px;line-height:1.12;font-weight:300;letter-spacing:.02em;text-transform:uppercase;color:var(--rt-ink-strong)}
+p{margin:0 0 16px;font-size:17px;line-height:1.5;color:var(--rt-ink)}
+ul{margin:0;padding:0;list-style:none}
+li{position:relative;padding:9px 0 9px 22px;font-size:15px;line-height:1.45;color:var(--rt-ink-2);box-shadow:inset 0 1px 0 var(--rt-line-soft)}
+li:first-child{box-shadow:none}
+li:before{content:"";position:absolute;left:2px;top:16px;width:7px;height:7px;border-radius:1px;background:var(--rt-link)}
+li b{color:var(--rt-ink-strong);font-weight:700}
+code{font-family:var(--rt-font-mono);font-size:13px;color:var(--rt-link);background:var(--rt-bg-deep);padding:1px 5px;border-radius:2px}
+.m{position:absolute}
+.m img{display:block;width:100%}
+.cut{overflow:hidden}
+.cut .fade{position:absolute;left:0;right:0;bottom:0;height:80px;background:linear-gradient(180deg,rgba(27,40,56,0),#1b2838 88%)}
+.cap{position:absolute;font-size:11px;font-weight:700;letter-spacing:var(--rt-track);text-transform:uppercase;color:var(--rt-ink-3)}
+</style></head><body>
+
+<!-- 1. Voice -->
+<div class="bg left" data-shot="feature-voice">
+ <div class="copy"><span class="tag blue">Voice</span>
+  <h2>Talks in your voice channel</h2>
+  <p>Tyler joins the call on his own microphone and answers out loud, in the voice you pick.</p>
+  <ul><li><b>Standard</b> waits for a pause, writes a reply with your AI provider and speaks it.</li>
+   <li><b>Gemini Live</b> answers in about a second and stops when someone talks over him.</li>
+   <li>He only hears the call he's in, after you confirm everyone knows.</li></ul></div>
+ <div class="m shot" style="left:560px;top:56px;width:664px"><img data-panel="settings:zone=voice&sheets=%23voice" alt=""></div>
+ <div class="m cut shot" style="left:868px;top:236px;width:356px;height:324px"><img data-panel="panel:tab=conversation&state=LISTENING — speak normally, then pause&height=440" alt=""><div class="fade"></div></div>
+</div>
+
+<!-- 2. Personality -->
+<div class="bg right" data-shot="feature-personality">
+ <div class="m cut shot" style="left:56px;top:56px;width:640px;height:504px"><img data-panel="settings:zone=ai&sheets=%23personalitySheet" alt=""><div class="fade"></div></div>
+ <div class="copy"><span class="tag blue">Personality</span>
+  <h2>He's your guy, your way</h2>
+  <p>Start from a preset, then shape him with sliders or write him up in your own words.</p>
+  <ul><li><b>Presets:</b> Rowdy squad, Helpful coach, Chaos goblin, Chill wingman.</li>
+   <li>Roast level, reply length, speed and how talkative he is.</li>
+   <li>Preview a reply before you save. People in chat can't change his rules.</li></ul></div>
+</div>
+
+<!-- 3. Room tools and soundboard -->
+<div class="bg left" data-shot="feature-room">
+ <div class="copy"><span class="tag blue">Room tools</span>
+  <h2>Music, sounds and squad games</h2>
+  <p>Everything is off until you switch it on in Tyler's panel, and friends use it from chat.</p>
+  <ul><li><b>Music DJ:</b> <code>!play artist song</code>, a fair queue and skip votes.</li>
+   <li><b>Soundboard:</b> clip pads straight into the call, no API key needed.</li>
+   <li><b>Squad:</b> trivia races, the arcade, game votes, party host and XP.</li></ul></div>
+ <div class="m cut shot" style="left:552px;top:48px;width:324px;height:512px"><img data-panel="panel:tab=room&state=THINKING — preparing a typed reply…&open=Music DJ&height=700" alt=""><div class="fade"></div></div>
+ <div class="m cut shot" style="left:900px;top:48px;width:324px;height:512px"><img data-panel="panel:tab=soundboard&height=700&scroll=404" alt=""><div class="fade"></div></div>
+</div>
+
+<!-- 4. Desktop app -->
+<div class="bg right" data-shot="feature-desktop">
+ <div class="m cut shot" style="left:56px;top:48px;width:324px;height:512px"><img data-panel="panel:platform=desktop-voice&tab=conversation&height=700" alt=""><div class="fade"></div></div>
+ <div class="m shot" style="left:404px;top:118px;width:360px"><img data-panel="settings:desktop=1&zone=voice&width=960&sheets=%23voiceRoute" alt=""></div>
+ <div class="cap" style="left:404px;top:92px">Settings → Voice</div>
+ <div class="m cut shot" style="left:404px;top:352px;width:360px;height:208px"><img data-panel="settings:desktop=1&zone=overview&width=960&sheets=%23quickStart" alt=""><div class="fade"></div></div>
+ <div class="cap" style="left:404px;top:326px">Settings → Overview</div>
+ <div class="copy"><span class="tag green">Desktop app</span>
+  <h2>One app, no Chrome needed</h2>
+  <p>Its own Steam chat window with Tyler's panel, the same as in Chrome.</p>
+  <ul><li><b>Voice right in that window:</b> no VB-CABLE, no Steam desktop app.</li>
+   <li>Its own YouTube window for music and its own screen picker for commentary.</li>
+   <li>Keys encrypted by Windows. Updates itself.</li></ul></div>
+</div>
+
+</body></html>

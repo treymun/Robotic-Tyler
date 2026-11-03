@@ -10,6 +10,7 @@ Fixed
 - The bot no longer drops out of group voice when someone leaves (Chrome and desktop).
 - With Tyler's voice on, Steam's microphone request gets Tyler's synthetic microphone instead of opening your real one (Chrome and desktop).
 - No false "Steam audio attachment failed … peer connection is closed" after a rejoin.
+- Desktop settings text updated: voice starts from Tyler's panel in the app's Steam chat, not the Chrome extension or the Voice window.
 
 Tested
 - Live with real Steam (Electron voice test app, Chromium 156): voice join, two-way speech, the bot staying through leaves and rejoins, Tyler's beep and echo.
