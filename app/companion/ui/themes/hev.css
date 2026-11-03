@@ -184,3 +184,9 @@
 [data-rt-theme=hev] .rt-toast:not(.rt-leaving){animation:rt-toast-in .2s ease-out backwards,hev-warn .5s .2s steps(2,end) both}
 [data-rt-theme=hev] :is(button,.btn):active:not(:disabled){transform:translateY(1px);filter:brightness(1.2)}
 [data-rt-theme=hev] .panel:has(.tally[data-state=speaking]) .mark[data-logo],.panel[data-rt-theme=hev]:has(.tally[data-state=speaking]) .mark[data-logo]{animation:hev-charge .9s ease-in-out infinite}
+
+/* ── v2.16 polish: HEV ──
+   A lambda stencilled into the suit plate behind the header, like the mark on the HEV chest piece. */
+[data-rt-theme=hev] .bar{position:relative;overflow:hidden}
+[data-rt-theme=hev] .bar::after{content:"\03bb";position:absolute;right:46px;top:50%;width:40px;height:40px;margin-top:-24px;display:grid;place-items:center;pointer-events:none;
+  border:3px solid rgba(26,12,0,.2);border-radius:50%;font:700 27px/1 Arial,sans-serif;color:rgba(26,12,0,.22);text-shadow:0 1px 0 rgba(255,255,255,.18)}

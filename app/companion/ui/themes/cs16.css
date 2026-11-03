@@ -162,3 +162,20 @@
 [data-rt-theme=cs16] .rt-toast:not(.rt-leaving){animation:cs16-hint .35s steps(14,end) backwards}
 [data-rt-theme=cs16] :is(button,.btn):active:not(:disabled){transform:translate(1px,1px)}
 [data-rt-theme=cs16] .panel:has(.tally[data-state=speaking]) .mark[data-logo],.panel[data-rt-theme=cs16]:has(.tally[data-state=speaking]) .mark[data-logo]{animation:cs16-carrier .8s steps(1,end) infinite}
+
+/* ── v2.16 polish: CS1.6 ──
+   The tally carries the classic dynamic crosshair: tight and still while Tyler listens, kicking
+   open with every "shot" while he talks, amber while thinking and red on an error. It takes the
+   place of the level bars (the radar on the left already shows activity). */
+[data-rt-theme=cs16] .tally{padding-right:58px}
+[data-rt-theme=cs16] .tally-wave{display:none}
+[data-rt-theme=cs16] .tally::after{content:"";position:absolute;right:30px;top:50%;width:22px;height:22px;transform:translate(50%,-50%);pointer-events:none;--x:#50f050;
+  background:linear-gradient(var(--x),var(--x)) 50% 0/2px 7px no-repeat,linear-gradient(var(--x),var(--x)) 50% 100%/2px 7px no-repeat,
+    linear-gradient(var(--x),var(--x)) 0 50%/7px 2px no-repeat,linear-gradient(var(--x),var(--x)) 100% 50%/7px 2px no-repeat;
+  filter:drop-shadow(1px 1px 0 rgba(0,0,0,.85))}
+[data-rt-theme=cs16] .tally[data-state=thinking]::after{--x:var(--c-orange);animation:cs16-sway 1.4s ease-in-out infinite}
+[data-rt-theme=cs16] .tally[data-state=speaking]::after{animation:cs16-spray .42s ease-out infinite}
+[data-rt-theme=cs16] .tally[data-state=error]::after{--x:#ff5a4a}
+[data-rt-theme=cs16] .tally:is([data-state=standby],[data-state=paused])::after{opacity:.4}
+@keyframes cs16-spray{0%{width:22px;height:22px}18%{width:36px;height:36px}100%{width:22px;height:22px}}
+@keyframes cs16-sway{0%,100%{width:24px;height:24px}50%{width:28px;height:28px}}
