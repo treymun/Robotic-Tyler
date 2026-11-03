@@ -195,3 +195,19 @@ html[data-rt-theme=dreamcast]{scrollbar-color:#cfcac1 transparent}
 [data-rt-theme=dreamcast] :is(.view:not([hidden]),.sheet,section[data-view]:not([hidden])){animation:dc-glide .3s cubic-bezier(.2,.8,.3,1) backwards}
 [data-rt-theme=dreamcast] .rt-toast:not(.rt-leaving){animation:dc-glide .26s ease-out backwards}
 [data-rt-theme=dreamcast] .panel:has(.tally[data-state=speaking]) .mark[data-logo],.panel[data-rt-theme=dreamcast]:has(.tally[data-state=speaking]) .mark[data-logo]{animation:dc-glow 1.2s ease-in-out infinite}
+
+/* ── v2.18 visual pass: Dreamcast checks ── each line sits beside a menu dot: orange when it passed, red when it needs attention. */
+[data-rt-theme=dreamcast] .checklist li{position:relative;padding:9px 0 9px 24px}
+[data-rt-theme=dreamcast] .checklist li::before{content:"";position:absolute;left:3px;top:12px;width:11px;height:11px;border-radius:50%;background:#d9d6d0}
+[data-rt-theme=dreamcast] .checklist li[data-result=ok]::before{background:var(--dc-orange)}
+[data-rt-theme=dreamcast] .checklist li[data-result=fail]::before{background:#c0281e}
+
+/* ── v2.18 motion: Dreamcast ──
+   A playing tile breathes orange; an arriving vote resolves its marker with the swirl; menu dots
+   pop in beside new check lines. */
+[data-rt-theme=dreamcast] .pad.playing{animation:dc-breathe 1.4s ease-in-out infinite}
+@keyframes dc-breathe{50%{box-shadow:0 0 0 3px rgba(240,106,29,.35),0 6px 16px rgba(240,106,29,.2)}}
+[data-rt-theme=dreamcast] .vote[data-arrived] .vote-marker{animation:dc-spin .5s cubic-bezier(.2,.9,.3,1)}
+@keyframes dc-spin{from{transform:rotate(-1turn) scale(.4);opacity:0}}
+[data-rt-theme=dreamcast] .checklist li::before{animation:dc-dot .3s cubic-bezier(.3,1.6,.6,1) backwards}
+@keyframes dc-dot{from{transform:scale(0)}}

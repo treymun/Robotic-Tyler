@@ -188,3 +188,38 @@
 [data-rt-theme=l4d] .tally[data-state=listening]::after{content:"";position:absolute;inset:0;pointer-events:none;
   background:radial-gradient(closest-side,rgba(255,248,215,.28),rgba(255,248,215,.08) 55%,transparent) no-repeat;background-size:42% 170%;background-position:-40% 50%;animation:l4d-torch 4.4s ease-in-out infinite alternate}
 @keyframes l4d-torch{from{background-position:-40% 50%}to{background-position:140% 50%}}
+
+/* ── v2.18 visual pass: Left 4 Dead ──
+   Pads are torn tape tiles three across with the slot number painted big; the playing clip gets
+   the survivor-green outline. Votes are tallied the way survivors mark a safe-room wall: four
+   strokes and a slash through them. Checks are written on the wall with red marks. */
+[data-rt-theme=l4d] .pads{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+[data-rt-theme=l4d] .pad{min-height:62px;padding:30px 8px 7px;justify-content:flex-end}
+[data-rt-theme=l4d] .pad::before{content:attr(data-slot);position:absolute;left:8px;top:2px;font:400 28px/1 var(--rt-font-display);color:#fff;text-shadow:2px 2px 0 var(--l-red)}
+[data-rt-theme=l4d] .pad span{display:none}
+[data-rt-theme=l4d] .pad b{font-family:var(--rt-font-display);font-size:14px;letter-spacing:.03em;text-transform:uppercase}
+[data-rt-theme=l4d] .pad::after{top:14px;margin-top:0}
+[data-rt-theme=l4d] .pad.playing{box-shadow:inset 0 0 0 2px var(--l-green)}
+[data-rt-theme=l4d] .pad.playing::before{text-shadow:2px 2px 0 #1d5c1d;color:var(--l-green)}
+[data-rt-theme=l4d] .vote{grid-template-columns:auto minmax(0,1fr) auto;padding:7px 9px;border-radius:0;background:rgba(16,16,16,.9);border:1px solid #2c2c2c}
+[data-rt-theme=l4d] .vote-marker{font:400 18px/1 var(--rt-font-display);color:var(--l-red-hi)}
+[data-rt-theme=l4d] .vote-title{font-family:var(--rt-font-display);font-size:15px;letter-spacing:.03em;text-transform:uppercase}
+[data-rt-theme=l4d] .vote-discs{display:flex;align-items:center;gap:3px;grid-column:2/4;height:16px;padding-left:2px}
+[data-rt-theme=l4d] .vote-discs i{flex:0 0 2px;height:15px;background:#e6e6e6;border-radius:1px;transform:rotate(5deg)}
+[data-rt-theme=l4d] .vote-discs i:nth-child(5n){flex-basis:24px;height:2px;margin:0 6px 0 -26px;transform:rotate(-24deg);background:var(--l-red-hi)}
+[data-rt-theme=l4d] .vote[data-leader=true]{box-shadow:inset 4px 0 0 var(--l-red)}
+[data-rt-theme=l4d] .checklist li{position:relative;padding:7px 0 7px 26px;border-color:#2c2c2c}
+[data-rt-theme=l4d] .checklist li::before{position:absolute;left:2px;top:4px;font:400 20px/1 var(--rt-font-display);color:var(--l-red-hi)}
+[data-rt-theme=l4d] .checklist li[data-result=ok]::before{content:"✓";color:var(--l-green)}
+[data-rt-theme=l4d] .checklist li[data-result=fail]::before{content:"✗"}
+[data-rt-theme=l4d] .checklist li[data-result=unknown]::before{content:"?";color:var(--l-yellow)}
+
+/* ── v2.18 motion: Left 4 Dead ──
+   Each new vote is a stroke painted down the wall (the fifth slashes across); the number on a
+   playing tile flickers like a failing safe-room light; check lines jolt in. */
+[data-rt-theme=l4d] .vote-discs i.new{transform-origin:50% 0;animation:l4d-stroke .22s ease-out backwards;animation-delay:calc(var(--k,0) * 120ms)}
+[data-rt-theme=l4d] .vote-discs i.new:nth-child(5n){transform-origin:0 50%;animation-name:l4d-slash}
+@keyframes l4d-stroke{from{transform:rotate(5deg) scaleY(0)}to{transform:rotate(5deg)}}
+@keyframes l4d-slash{from{transform:rotate(-24deg) scaleX(0)}to{transform:rotate(-24deg)}}
+[data-rt-theme=l4d] .pad.playing::before{animation:l4d-flicker 1.6s linear infinite}
+[data-rt-theme=l4d] .checklist li{animation:l4d-jolt .35s ease-out backwards}

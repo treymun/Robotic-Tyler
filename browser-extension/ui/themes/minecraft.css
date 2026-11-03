@@ -192,3 +192,37 @@ html[data-rt-theme=minecraft]{scrollbar-color:#6f6f6f #8b8b8b}
 [data-rt-theme=minecraft] :is(.section-nav button[aria-current=page],nav:not(.tabs) button.active){animation:mc-snap .1s steps(2,end)}
 [data-rt-theme=minecraft] .rt-toast:not(.rt-leaving){animation:mc-toast .3s cubic-bezier(.2,.8,.3,1) backwards}
 [data-rt-theme=minecraft] .panel:has(.tally[data-state=speaking]) .mark[data-logo],.panel[data-rt-theme=minecraft]:has(.tally[data-state=speaking]) .mark[data-logo]{animation:mc-bob 1.2s steps(4,end) infinite}
+
+/* ── v2.18 visual pass: Minecraft ──
+   The soundboard is an inventory: square slots in a grey GUI panel, the name on the item and the
+   slot number as the stack count in the corner; the clip that is playing has the hotbar's white
+   selection frame. Votes show their count as a stack beside each row; checks print like chat. */
+[data-rt-theme=minecraft] .pads{grid-template-columns:repeat(5,minmax(0,1fr));gap:0;padding:5px;background:var(--mc-gui);border:2px solid #000;box-shadow:inset 2px 2px 0 #fff,inset -2px -2px 0 var(--mc-lo)}
+[data-rt-theme=minecraft] .pad{aspect-ratio:1;min-height:0;margin:1px;padding:4px 3px;align-items:center;justify-content:center;text-align:center;background:var(--mc-slot);border:0;border-radius:0;box-shadow:inset 2px 2px 0 var(--mc-slot-lo),inset -2px -2px 0 #fff}
+[data-rt-theme=minecraft] .pad b{font-size:10px;line-height:1.15;white-space:normal;color:#fff;text-shadow:var(--mc-shadow);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+[data-rt-theme=minecraft] .pad::before{content:attr(data-slot);position:absolute;right:3px;bottom:1px;font-size:12px;color:#fff;text-shadow:2px 2px 0 #3f3f3f}
+[data-rt-theme=minecraft] .pad span{display:none}
+[data-rt-theme=minecraft] .pad::after{display:none}
+[data-rt-theme=minecraft] .pad:hover{background:#a8a8a8;box-shadow:inset 2px 2px 0 var(--mc-slot-lo),inset -2px -2px 0 #fff}
+[data-rt-theme=minecraft] .pad:hover b{color:var(--mc-yellow)}
+[data-rt-theme=minecraft] .pad.playing{background:var(--mc-slot);box-shadow:0 0 0 2px #fff,0 0 0 4px #000,inset 2px 2px 0 var(--mc-slot-lo);z-index:1}
+[data-rt-theme=minecraft] .vote{padding:4px 6px 4px 44px;min-height:38px;border-radius:0;background:var(--mc-gui);box-shadow:inset 2px 2px 0 #fff,inset -2px -2px 0 var(--mc-lo)}
+[data-rt-theme=minecraft] .vote::before{content:attr(data-count);position:absolute;left:5px;top:50%;width:30px;height:30px;margin-top:-15px;box-sizing:border-box;padding:12px 3px 0 0;text-align:right;font-size:12px;color:#fff;text-shadow:2px 2px 0 #3f3f3f;
+  background:var(--mc-slot);box-shadow:inset 2px 2px 0 var(--mc-slot-lo),inset -2px -2px 0 #fff}
+[data-rt-theme=minecraft] .vote-marker{display:none}
+[data-rt-theme=minecraft] :is(.vote-title,.vote-count){color:#3f3f3f;text-shadow:none}
+[data-rt-theme=minecraft] .vote[data-leader=true]::before{box-shadow:0 0 0 2px #fff,inset 2px 2px 0 var(--mc-slot-lo)}
+[data-rt-theme=minecraft] .checklist{padding:6px 8px;background:rgba(0,0,0,.55)}
+[data-rt-theme=minecraft] .checklist li{padding:2px 0;border:0;color:#fff;text-shadow:2px 2px 0 #3f3f3f}
+[data-rt-theme=minecraft] .checklist li :is(b,span){color:#fff;font-weight:400}
+[data-rt-theme=minecraft] .checklist li span{color:#aaaaaa}
+[data-rt-theme=minecraft] .checklist li[data-result=ok] b{color:#55ff55}
+[data-rt-theme=minecraft] .checklist li[data-result=fail] b{color:#ff5555}
+[data-rt-theme=minecraft] .checklist li[data-result=unknown] b{color:#ffff55}
+
+/* ── v2.18 motion: Minecraft ──
+   The selection frame snaps onto a clip when it starts; an arriving vote's stack pops like an
+   item being picked up; chat lines just appear, as chat does. */
+[data-rt-theme=minecraft] .pad.playing{animation:mc-snap .16s steps(2)}
+[data-rt-theme=minecraft] .vote[data-arrived]::before{animation:mc-pop .25s steps(3)}
+@keyframes mc-pop{0%{transform:scale(1.25)}100%{transform:none}}

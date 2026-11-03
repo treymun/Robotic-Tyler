@@ -282,3 +282,37 @@ html[data-rt-theme=classic],[data-rt-theme=classic] :is(.scroll,.content,main){s
 [data-rt-theme=classic] select{padding-right:26px;background-image:conic-gradient(from -32deg at 50% 88%,#b8bfa8 64deg,transparent 0),linear-gradient(90deg,var(--c-hi) 0 1px,var(--c-face) 1px calc(100% - 1px),var(--c-lo) calc(100% - 1px));
   background-position:right 5px center,right 1px top 1px;background-size:8px 8px,17px calc(100% - 2px);background-repeat:no-repeat}
 [data-rt-theme=classic] select:hover{background-image:conic-gradient(from -32deg at 50% 88%,#dccd78 64deg,transparent 0),linear-gradient(90deg,var(--c-hi) 0 1px,var(--c-raised) 1px calc(100% - 1px),var(--c-lo) calc(100% - 1px))}
+
+/* ── v2.18 visual pass: Classic Steam ──
+   The soundboard is a block of VGUI push-buttons, three across with centred captions; the clip
+   that is playing stays pushed in. Votes and checks are VGUI list views: a column header, flat
+   rows, the leading game as the selected row. */
+[data-rt-theme=classic] .pads{grid-template-columns:repeat(3,minmax(0,1fr));gap:3px}
+[data-rt-theme=classic] .pad{min-height:46px;padding:5px 6px;align-items:center;text-align:center;border-width:2px}
+[data-rt-theme=classic] .pad b{font-size:12px}
+[data-rt-theme=classic] .pad span{font-size:9px}
+[data-rt-theme=classic] .pad::after{display:none}
+[data-rt-theme=classic] .pad.playing{background:var(--c-deep);border-color:var(--c-lo) var(--c-hi) var(--c-hi) var(--c-lo);box-shadow:none}
+[data-rt-theme=classic] .pad.playing b{color:var(--c-gold)}
+[data-rt-theme=classic] .pad.playing>*{transform:translate(1px,1px)}
+[data-rt-theme=classic] .vote-board .votes{position:relative;gap:0;padding-top:19px;border:1px solid;border-color:var(--c-lo) var(--c-hi) var(--c-hi) var(--c-lo);background:var(--c-deep)}
+[data-rt-theme=classic] .vote-board .votes::before,[data-rt-theme=classic] .vote-board .votes::after{position:absolute;top:0;height:18px;line-height:18px;font-size:11px;color:var(--rt-ink);background:var(--c-face);box-shadow:inset 1px 1px 0 var(--c-hi),inset -1px -1px 0 var(--c-lo)}
+[data-rt-theme=classic] .vote-board .votes::before{content:"Game";left:0;right:64px;padding-left:30px}
+[data-rt-theme=classic] .vote-board .votes::after{content:"Votes";right:0;width:64px;padding-left:8px}
+[data-rt-theme=classic] .vote{padding:3px 8px;border-radius:0;background:transparent}
+[data-rt-theme=classic] .vote-count{min-width:48px}
+[data-rt-theme=classic] .vote[data-leader=true]{background:var(--c-sel)}
+[data-rt-theme=classic] .vote[data-leader=true] :is(.vote-title,.vote-count,.vote-marker){color:#fff}
+[data-rt-theme=classic] .checklist{padding:0;border:1px solid;border-color:var(--c-lo) var(--c-hi) var(--c-hi) var(--c-lo);background:var(--c-deep)}
+[data-rt-theme=classic] .checklist li{padding:5px 8px;border-top:1px solid #4a5542}
+[data-rt-theme=classic] .checklist li[data-result=ok] b{color:#b9d27a}
+[data-rt-theme=classic] .checklist li[data-result=fail] b{color:var(--c-gold)}
+
+/* ── v2.18 motion: Classic Steam ──
+   The pushed-in pad shows the old download bar filling along its foot while the clip plays; a
+   vote that arrives makes its row flash the selection colour twice, and each check line simply
+   appears, as list views did. */
+[data-rt-theme=classic] .pad.playing{background:linear-gradient(var(--c-gold),var(--c-gold)) 4px calc(100% - 4px)/0 3px no-repeat,var(--c-deep);animation:cl-pad 2.4s linear infinite}
+@keyframes cl-pad{to{background-size:calc(100% - 8px) 3px,auto}}
+[data-rt-theme=classic] .vote[data-arrived]{animation:cl-vote .5s steps(1) 2}
+@keyframes cl-vote{0%{background:var(--c-sel)}50%{background:transparent}}

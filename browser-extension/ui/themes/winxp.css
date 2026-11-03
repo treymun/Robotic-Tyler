@@ -219,3 +219,36 @@ html[data-rt-theme=winxp],[data-rt-theme=winxp] :is(.scroll,.content,main){scrol
 [data-rt-theme=winxp] select:hover{background-image:conic-gradient(from -32deg at 50% 88%,#264a8f 64deg,transparent 0),linear-gradient(180deg,#f2f6ff,#d4e1fd 45%,#bcd0fa)}
 @keyframes xp-minimise{0%{transform:scale(1.04,1.25);transform-origin:100% 100%;opacity:.6}100%{transform:none;opacity:1}}
 :host(.mini) .panel[data-rt-theme=winxp]{animation:xp-minimise .2s ease-out}
+
+/* ── v2.18 visual pass: Windows XP ──
+   The soundboard is an Explorer window in Tiles view: a white pane, a sound-file icon, the name
+   and "Sound N" in grey; hover is the pale blue hot-track and the playing clip is selected in
+   XP blue. Votes get the segmented green progress bar; checks use Security Center's status icons. */
+[data-rt-theme=winxp] .pads{gap:2px;padding:4px;background:#fff;border:1px solid #7f9db9}
+[data-rt-theme=winxp] .pad{min-height:44px;padding:5px 6px 5px 42px;color:#000;background:transparent;border:1px solid transparent;border-radius:0;box-shadow:none}
+[data-rt-theme=winxp] .pad::before{content:"";position:absolute;left:8px;top:50%;width:24px;height:28px;margin-top:-14px;border:1px solid #8a9bb8;border-radius:1px;
+  background:radial-gradient(circle at 9px 20px,#2a5bd7 0 3.4px,transparent 3.9px),linear-gradient(#2a5bd7,#2a5bd7) 11px 7px/2px 13px no-repeat,linear-gradient(135deg,transparent 0 70%,#c7d3ea 70%) 100% 0/8px 8px no-repeat,linear-gradient(#ffffff,#e7edf7)}
+[data-rt-theme=winxp] .pad b{order:1;font-size:12px;color:#000}
+[data-rt-theme=winxp] .pad span{order:2;font-weight:400;text-transform:none;letter-spacing:0;color:#6d6d6d}
+[data-rt-theme=winxp] .pad::after{display:none}
+[data-rt-theme=winxp] .pad:hover{background:#eef3fb;border-color:#c1d2ee;box-shadow:none}
+[data-rt-theme=winxp] .pad.playing{background:#316ac5;border-color:#316ac5;box-shadow:none}
+[data-rt-theme=winxp] .pad.playing :is(b,span){color:#fff}
+[data-rt-theme=winxp] .vote-board .votes{gap:0;padding:2px;background:#fff;border:1px solid #7f9db9}
+[data-rt-theme=winxp] .vote{grid-template-columns:auto minmax(0,1fr) auto;padding:5px 8px 12px;border-radius:0;
+  background:repeating-linear-gradient(90deg,#2fbf2f 0 7px,transparent 7px 9px) 30px calc(100% - 4px)/calc((100% - 40px)*var(--share,0)) 5px no-repeat,#fff}
+[data-rt-theme=winxp] .vote+.vote{border-top:1px solid #ece9d8}
+[data-rt-theme=winxp] .vote[data-leader=true] .vote-title{color:#003399}
+[data-rt-theme=winxp] .checklist li{position:relative;padding:7px 0 7px 26px}
+[data-rt-theme=winxp] .checklist li::before{content:"";position:absolute;left:0;top:8px;width:17px;height:17px;border-radius:50%;box-shadow:inset 0 -2px 3px rgba(0,0,0,.25)}
+[data-rt-theme=winxp] .checklist li[data-result=ok]::before{background:radial-gradient(circle at 40% 30%,#9be27b,#2c9a1a 70%)}
+[data-rt-theme=winxp] .checklist li[data-result=fail]::before{background:radial-gradient(circle at 40% 30%,#ff8d7a,#c4210e 70%)}
+[data-rt-theme=winxp] .checklist li[data-result=unknown]::before{border-radius:2px;background:radial-gradient(circle at 40% 30%,#fff3a0,#e0a800 70%)}
+
+/* ── v2.18 motion: Windows XP ──
+   An arriving vote's green blocks copy across like the file-copy bar; a check line pops up the
+   way a notification balloon does; the selected tile's icon bounces once when its clip starts. */
+[data-rt-theme=winxp] .vote[data-arrived]{animation:xp-copy .6s steps(8,end)}
+[data-rt-theme=winxp] .checklist li{animation:xp-balloon .28s ease-out backwards}
+[data-rt-theme=winxp] .pad.playing::before{animation:xp-hop .3s ease-out}
+@keyframes xp-hop{40%{transform:translateY(-4px)}}

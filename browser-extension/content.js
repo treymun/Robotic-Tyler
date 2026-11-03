@@ -301,7 +301,9 @@
  $('diagnose').onclick=async()=>{
   const inputSnapshot=incomingReport;const button=$('diagnose');globalThis.TylerCompanion.stopAutomatic?.('Paused for connection checks');
   button.disabled=true;$('diagnostics').replaceChildren();$('hearingConfirm').hidden=true;
-  const row=(title,detail)=>{const li=document.createElement('li'),b=document.createElement('b'),span=document.createElement('span');b.textContent=title;span.textContent=detail;li.append(b,span);$('diagnostics').append(li);};
+  // data-result (v2.18) lets a theme mark each line: ok (✓), fail (!) or unknown (?).
+  const result=t=>t.startsWith('✓')?'ok':t.startsWith('!')?'fail':'unknown';
+  const row=(title,detail)=>{const li=document.createElement('li'),b=document.createElement('b'),span=document.createElement('span');li.dataset.result=result(title);b.textContent=title;span.textContent=detail;li.append(b,span);$('diagnostics').append(li);};
   try{
    row(owner?'✓ Active tab':'! Standby tab',owner?'Only this tab may answer or play clips.':'Take over this tab before testing AI/audio.');
    const ready=TylerSelection.readiness(globalThis.TylerCompanion);row(ready.startsWith('READY')?'✓ Chat reader ready':'! Chat needs setup',ready);
@@ -323,7 +325,7 @@
   }catch(e){row('! Check stopped',e.message);}
   finally{button.disabled=false;}
  };
- const note=text=>{$('hearingConfirm').hidden=true;const li=document.createElement('li');li.textContent=text;$('diagnostics').append(li);};
+ const note=text=>{$('hearingConfirm').hidden=true;const li=document.createElement('li');li.dataset.result=text.startsWith('✓')?'ok':'fail';li.textContent=text;$('diagnostics').append(li);};
  $('heardYes').onclick=()=>note('✓ Steam transmission confirmed by you');
  $('heardNo').onclick=()=>note('! Beep not received — enable bridge, rejoin voice, and check Steam mute/output settings.');
 

@@ -214,3 +214,28 @@ html[data-rt-theme=cs2]{scrollbar-color:#3a4a5a transparent}
 [data-rt-theme=cs2] .tabs button{position:relative}
 [data-rt-theme=cs2] .tabs button[aria-selected=true]::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:2px;pointer-events:none;background:var(--cs-nav);box-shadow:0 0 8px rgba(130,216,255,.7);animation:cs2-underline .22s ease-out backwards}
 @keyframes cs2-underline{from{transform:scaleX(0)}to{transform:none}}
+
+/* ── v2.18 visual pass: Counter-Strike 2 ──
+   Pads become inventory tiles three across (name at the foot, rarity glow rising behind it). Votes
+   are a map vote: glass rows, the count large on the right, the leader marked with a T-side star.
+   Checks are the lobby's readiness list with round status marks. */
+[data-rt-theme=cs2] .pads{grid-template-columns:repeat(3,minmax(0,1fr));gap:4px}
+[data-rt-theme=cs2] .pad{min-height:66px;padding:8px 8px 9px;justify-content:flex-end}
+[data-rt-theme=cs2] .pad::after{top:10px;margin-top:0;right:8px}
+[data-rt-theme=cs2] .pad b{font-size:12px}
+[data-rt-theme=cs2] .vote{padding:8px 10px;border-radius:2px;background:linear-gradient(90deg,rgba(130,216,255,.16) calc(var(--share,0)*100%),rgba(20,20,20,.45) 0);border:1px solid rgba(255,255,255,.07)}
+[data-rt-theme=cs2] .vote-count{font-size:15px;font-weight:700;color:#fff}
+[data-rt-theme=cs2] .vote[data-leader=true]{border-color:var(--cs-t);box-shadow:inset 3px 0 0 var(--cs-t)}
+[data-rt-theme=cs2] .vote[data-leader=true] .vote-marker::before{content:"★ ";color:var(--cs-t)}
+[data-rt-theme=cs2] .checklist li{position:relative;padding:8px 0 8px 26px}
+[data-rt-theme=cs2] .checklist li::before{content:"";position:absolute;left:2px;top:10px;width:14px;height:14px;border-radius:50%;border:2px solid #8a8a8a;box-sizing:border-box}
+[data-rt-theme=cs2] .checklist li[data-result=ok]::before{border-color:#65e46a;background:radial-gradient(circle,#65e46a 0 3px,transparent 3.5px)}
+[data-rt-theme=cs2] .checklist li[data-result=fail]::before{border-color:#eb4b4b;background:radial-gradient(circle,#eb4b4b 0 3px,transparent 3.5px)}
+
+/* ── v2.18 motion: Counter-Strike 2 ──
+   A playing item's rarity glow breathes; an arriving vote wipes its row in from the left and the
+   count with it; check lines wipe in as they are written. */
+[data-rt-theme=cs2] .pad.playing{animation:cs2-rarity 1.2s ease-in-out infinite}
+@keyframes cs2-rarity{50%{box-shadow:inset 3px 0 0 #65e46a,inset 0 -3px 0 var(--rar),inset 0 -22px 22px -14px var(--rar)}}
+[data-rt-theme=cs2] .vote[data-arrived]{animation:cs2-wipe .3s ease-out}
+[data-rt-theme=cs2] .checklist li{animation:cs2-wipe .25s ease-out backwards}

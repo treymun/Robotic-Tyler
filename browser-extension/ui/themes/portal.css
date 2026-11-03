@@ -241,3 +241,33 @@ html[data-rt-theme=portal]{scrollbar-color:#9aa1a8 transparent}
 @keyframes p-open{0%{transform:scaleX(0) scaleY(.4);opacity:0}100%{transform:none;opacity:1}}
 @keyframes p-aperture{from{clip-path:circle(0 at 50% 0)}to{clip-path:circle(150% at 50% 0)}}
 [data-rt-theme=portal] details.feature[open]>:not(summary){animation:p-aperture .34s ease-out backwards}
+
+/* ── v2.18 visual pass: Portal ──
+   Each pad is a test-chamber sign: the slot number large and light at the top, a rule, the name
+   underneath; the playing clip gets an orange portal ring. Votes keep the clean white rows with
+   chamber-progress counts; checks sit beside blue (passed) and orange (attention) rings. */
+[data-rt-theme=portal] .pads{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+[data-rt-theme=portal] .pad{min-height:84px;padding:40px 9px 8px;justify-content:flex-start;border-radius:3px;
+  background:linear-gradient(var(--p-ink),var(--p-ink)) 9px 35px/calc(100% - 18px) 1px no-repeat,#fff}
+[data-rt-theme=portal] .pad::before{content:attr(data-n);position:absolute;left:8px;top:4px;font:300 27px/1 var(--rt-font-display);letter-spacing:-.02em;color:var(--p-ink)}
+[data-rt-theme=portal] .pad::after{top:16px;margin-top:0;right:10px}
+[data-rt-theme=portal] .pad span{order:2;font-size:9px}
+[data-rt-theme=portal] .pad b{font-size:12px}
+[data-rt-theme=portal] .pad.playing{box-shadow:0 0 0 2px var(--p-orange),0 0 0 6px rgba(255,138,0,.18)}
+[data-rt-theme=portal] .pad.playing::before{color:var(--p-orange-ink)}
+[data-rt-theme=portal] .vote{padding:8px 10px;border-radius:3px;background:linear-gradient(90deg,rgba(42,157,255,.14) calc(var(--share,0)*100%),#fff 0);border:1px solid var(--rt-line)}
+[data-rt-theme=portal] .vote-marker{font:300 18px/1 var(--rt-font-display);color:var(--p-ink)}
+[data-rt-theme=portal] .vote-count{font-weight:600;color:var(--p-ink)}
+[data-rt-theme=portal] .vote[data-leader=true] .vote-marker{width:24px;height:24px;line-height:20px;border-radius:50%;box-sizing:border-box;border:2px solid var(--p-blue)}
+[data-rt-theme=portal] .checklist li{position:relative;padding:8px 0 8px 26px}
+[data-rt-theme=portal] .checklist li::before{content:"";position:absolute;left:0;top:9px;width:14px;height:18px;border-radius:50%;box-sizing:border-box;border:3px solid #b9c2c9}
+[data-rt-theme=portal] .checklist li[data-result=ok]::before{border-color:var(--p-blue)}
+[data-rt-theme=portal] .checklist li[data-result=fail]::before{border-color:var(--p-orange)}
+
+/* ── v2.18 motion: Portal ──
+   The ring round a playing sign pulses like an open portal; an arriving vote flips its marker
+   ring from orange to blue; check lines tick in. */
+[data-rt-theme=portal] .pad.playing{--ring:var(--p-orange);animation:p-ring 1.4s ease-in-out infinite}
+[data-rt-theme=portal] .vote[data-arrived] .vote-marker{animation:p-flip .6s steps(1) 2}
+[data-rt-theme=portal] .vote[data-arrived]:not([data-leader]) .vote-marker{border-radius:50%;box-shadow:0 0 0 2px var(--p-blue)}
+[data-rt-theme=portal] .checklist li{animation:p-tick .3s ease-out backwards}

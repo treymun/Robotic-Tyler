@@ -181,3 +181,31 @@ html[data-rt-theme=deadlock]{scrollbar-color:#7a5f2e #0c0a0a}
 [data-rt-theme=deadlock] :is(.view:not([hidden]),.sheet,section[data-view]:not([hidden])){animation:dl-lamp .36s ease-out backwards}
 [data-rt-theme=deadlock] .rt-toast:not(.rt-leaving){animation:dl-note .3s cubic-bezier(.2,.8,.3,1) backwards}
 [data-rt-theme=deadlock] .panel:has(.tally[data-state=speaking]) .mark[data-logo],.panel[data-rt-theme=deadlock]:has(.tally[data-state=speaking]) .mark[data-logo]{animation:dl-haunt 1.6s ease-in-out infinite}
+
+/* ── v2.18 visual pass: Deadlock ──
+   The soundboard is the shop: tall item cards three across, each topped with its category's
+   colour (weapon orange, vitality green, spirit violet) inside the brass corners. Votes are
+   lacquered rows with brass numerals; checks are typed on the parchment dossier. */
+[data-rt-theme=deadlock] .pads{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+[data-rt-theme=deadlock] .pad{--dl-cat:#d08a3a;min-height:70px;padding:16px 8px 8px;justify-content:flex-end;box-shadow:inset 0 4px 0 var(--dl-cat),inset 0 0 0 1px rgba(201,164,92,.35)}
+[data-rt-theme=deadlock] .pad:nth-child(3n+2){--dl-cat:#7cbb48}
+[data-rt-theme=deadlock] .pad:nth-child(3n){--dl-cat:#a771d8}
+[data-rt-theme=deadlock] .pad b{font-size:13px;white-space:normal;line-height:1.15;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+[data-rt-theme=deadlock] .pad span{order:-1;color:var(--dl-cat)}
+[data-rt-theme=deadlock] .pad::after{top:14px;margin-top:0}
+[data-rt-theme=deadlock] .pad.playing{box-shadow:inset 0 4px 0 var(--dl-cat),inset 0 0 0 1px var(--dl-teal),0 0 12px rgba(111,211,192,.3)}
+[data-rt-theme=deadlock] .vote{padding:7px 10px;border-radius:0;background:linear-gradient(90deg,rgba(201,164,92,.16) calc(var(--share,0)*100%),#1a1617 0);border:1px solid rgba(201,164,92,.3)}
+[data-rt-theme=deadlock] .vote-marker,[data-rt-theme=deadlock] .vote-count{font-family:var(--rt-font-display);color:var(--dl-brass-hi)}
+[data-rt-theme=deadlock] .vote-title{font-family:var(--rt-font)}
+[data-rt-theme=deadlock] .vote[data-leader=true]{border-color:var(--dl-brass)}
+[data-rt-theme=deadlock] .checklist{padding:6px 12px;background:var(--dl-parch);box-shadow:0 2px 8px rgba(0,0,0,.4)}
+[data-rt-theme=deadlock] .checklist li{border-color:rgba(42,33,24,.2);color:var(--dl-ink);font-family:"Courier New",monospace}
+[data-rt-theme=deadlock] .checklist li :is(b,span){color:var(--dl-ink);font-family:inherit}
+[data-rt-theme=deadlock] .checklist li[data-result=fail] b{color:var(--dl-blood)}
+
+/* ── v2.18 motion: Deadlock ──
+   A playing card is haunted by the spectral glow; an arriving vote is inked in; dossier lines
+   settle onto the page. */
+[data-rt-theme=deadlock] .pad.playing{animation:dl-spectre 1.8s ease-in-out infinite}
+[data-rt-theme=deadlock] .vote[data-arrived]{animation:dl-lamp .5s ease-out}
+[data-rt-theme=deadlock] .checklist li{animation:dl-note .3s ease-out backwards}

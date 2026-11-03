@@ -186,3 +186,18 @@ html[data-rt-theme=payday]{scrollbar-color:#2c3b4b #06090d}
 [data-rt-theme=payday] .view:not([hidden]) :is(.quick-help,.deck-entry,#setup){animation:pd-pin .3s .08s cubic-bezier(.2,.8,.3,1.2) backwards}
 [data-rt-theme=payday] .rt-toast:not(.rt-leaving){animation:pd-pop .2s ease-out backwards}
 [data-rt-theme=payday] .panel:has(.tally[data-state=speaking]) .mark[data-logo],.panel[data-rt-theme=payday]:has(.tally[data-state=speaking]) .mark[data-logo]{animation:pd-crew 1s ease-in-out infinite}
+
+/* ── v2.18 visual pass: PAYDAY 2 checks ──
+   Connection checks are planning annotations on the map: a blue marker for each line that
+   passed, a red one with a strike-through note for anything that needs attention. */
+[data-rt-theme=payday] .checklist li{position:relative;padding:7px 0 7px 26px;border-color:rgba(143,208,255,.12)}
+[data-rt-theme=payday] .checklist li::before{content:"";position:absolute;left:2px;top:9px;width:12px;height:12px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:#3fa0ff;box-shadow:0 0 8px rgba(63,160,255,.6)}
+[data-rt-theme=payday] .checklist li[data-result=fail]::before{background:#ff4a3a;box-shadow:0 0 8px rgba(255,74,58,.6)}
+[data-rt-theme=payday] .checklist li[data-result=unknown]::before{background:#8a95a3;box-shadow:none}
+
+/* ── v2.18 motion: PAYDAY 2 ──
+   A playing clip's card carries a pulsing contract marker; check annotations drop onto the map. */
+[data-rt-theme=payday] .pad.playing{animation:pd-asset 1.2s ease-in-out infinite}
+@keyframes pd-asset{50%{box-shadow:inset 3px 0 0 #3fa0ff,0 0 12px rgba(63,160,255,.45)}}
+[data-rt-theme=payday] .checklist li::before{animation:pd-pin .3s cubic-bezier(.3,1.6,.6,1) backwards}
+@keyframes pd-pin{from{transform:rotate(-45deg) translate(6px,-10px);opacity:0}}

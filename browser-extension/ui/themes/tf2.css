@@ -215,3 +215,32 @@ html[data-rt-theme=tf2]{scrollbar-color:var(--tf-tan) var(--tf-dark-brown)}
 [data-rt-theme=tf2] .tally:is([data-state=thinking],[data-state=waiting]) .tally-light{--cap:var(--tf-blu);display:block;width:20px;height:20px;flex:0 0 20px;align-self:flex-start;border-radius:50%;
   background:conic-gradient(var(--cap) 0 60%,#1a1617 0);box-shadow:inset 0 0 0 2px #2e2b2a,0 0 0 2px #c8bba1!important;animation:tf-cap 2.4s linear infinite}
 [data-rt-theme=tf2] .tally[data-state=waiting] .tally-light{--cap:var(--tf-red);animation-duration:3.6s}
+
+/* ── v2.18 visual pass: Team Fortress 2 ──
+   The soundboard is the loadout: square item slots three across, the name in TF2 Build, a
+   favourite's name in Unique quality gold, and the playing clip equipped in team red. Votes use
+   the vote panel's dark rows with a red share bar; checks read like the achievements list. */
+[data-rt-theme=tf2] .pads{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
+[data-rt-theme=tf2] .pad{min-height:70px;padding:8px 6px 18px;align-items:center;justify-content:center;text-align:center;border-radius:4px;
+  background:radial-gradient(90% 75% at 50% 42%,#867b6c,var(--tf-tan) 72%);box-shadow:inset 0 0 0 2px #514a40,inset 0 -3px 0 rgba(0,0,0,.25)}
+[data-rt-theme=tf2] .pad b{font-size:15px;line-height:1.05;color:var(--tf-off-white);white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+[data-rt-theme=tf2] .pad[data-fav=true] b{color:var(--tf-unique)}
+[data-rt-theme=tf2] .pad span{position:absolute;left:0;right:0;bottom:4px;font-size:9px;opacity:.8}
+[data-rt-theme=tf2] .pad::after{display:none}
+[data-rt-theme=tf2] .pad:hover{background:radial-gradient(90% 75% at 50% 42%,#988b79,#7a6f61 72%)}
+[data-rt-theme=tf2] .pad.playing{background:radial-gradient(90% 75% at 50% 42%,#c75a4b,var(--tf-red) 75%);box-shadow:inset 0 0 0 2px var(--tf-unique),0 3px 0 rgba(0,0,0,.35)}
+[data-rt-theme=tf2] .pad.playing b{color:#fff}
+[data-rt-theme=tf2] .vote{padding:7px 10px;border-radius:4px;background:linear-gradient(90deg,rgba(184,56,59,.42) calc(var(--share,0)*100%),var(--tf-brown) 0);box-shadow:inset 0 -2px 0 rgba(0,0,0,.3)}
+[data-rt-theme=tf2] :is(.vote-marker,.vote-count){font-family:var(--rt-font-display);font-size:16px;color:var(--tf-tan-light);text-transform:uppercase}
+[data-rt-theme=tf2] .vote[data-leader=true] .vote-title{color:var(--tf-unique)}
+[data-rt-theme=tf2] .checklist li{margin-top:4px;padding:7px 10px;border:0;border-radius:4px;background:var(--tf-brown)}
+[data-rt-theme=tf2] .checklist li b{font-family:var(--rt-font-display);font-size:15px;letter-spacing:.02em;text-transform:uppercase}
+[data-rt-theme=tf2] .checklist li[data-result=ok] b{color:var(--tf-genuine)}
+[data-rt-theme=tf2] .checklist li[data-result=fail] b{color:var(--tf-strange)}
+
+/* ── v2.18 motion: Team Fortress 2 ──
+   Equipping a clip drops its slot in with the loadout's little bounce; a vote that arrives slides
+   in from the right like a kill-feed line; checks drop in one after another. */
+[data-rt-theme=tf2] .pad.playing{animation:tf-drop .32s cubic-bezier(.2,.9,.3,1.2)}
+[data-rt-theme=tf2] .vote[data-arrived]{animation:tf-feed .34s cubic-bezier(.2,.9,.3,1)}
+[data-rt-theme=tf2] .checklist li{animation:tf-drop .3s ease-out backwards}

@@ -194,4 +194,13 @@ html[data-rt-theme=dod]{scrollbar-color:#6b7343 #23261a}
 @keyframes dd-feed{0%{opacity:0;transform:translateY(-12px)}100%{opacity:1;transform:none}}
 [data-rt-theme=dod] :is(.view:not([hidden]),.sheet,section[data-view]:not([hidden])){animation:dd-warm .34s ease-out backwards}
 [data-rt-theme=dod] .rt-toast:not(.rt-leaving){animation:dd-feed .28s steps(5,end) backwards}
-[data-rt-theme=dod] .checklist li:last-child{animation:dd-feed .3s steps(4,end) backwards}
+
+/* ── v2.18 visual pass: Day of Defeat: Source log marks ── a red stamp for anything that needs attention. */
+[data-rt-theme=dod] .checklist li[data-result=fail] b{color:#8f2012}
+[data-rt-theme=dod] .checklist li[data-result=fail] b::after{content:"CHECK";margin-left:8px;padding:0 4px;font:700 9px/14px var(--rt-font-display);letter-spacing:.12em;color:#8f2012;border:1.5px solid #8f2012;border-radius:2px;display:inline-block;transform:rotate(-4deg)}
+
+/* ── v2.18 motion: Day of Defeat: Source ── a playing pad's lamp warms up; an arriving vote is typed onto the board. */
+[data-rt-theme=dod] .pad.playing{animation:dd-lamp 1.2s ease-in-out infinite}
+@keyframes dd-lamp{50%{box-shadow:inset 3px 0 0 var(--dd-amber),0 0 12px rgba(255,184,77,.4)}}
+[data-rt-theme=dod] .vote[data-arrived]{animation:dd-feed .3s steps(4,end)}
+[data-rt-theme=dod] .checklist li{animation:dd-feed .3s steps(4,end) backwards}

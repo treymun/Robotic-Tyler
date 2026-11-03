@@ -240,3 +240,34 @@
 .panel[data-rt-theme=doom]:has(.rt-toast[data-kind=success]:not(.rt-leaving))::after{background:rgba(255,210,60,.28);animation:doom-bonus .3s steps(2,end)}
 @keyframes doom-hurt{0%{opacity:1}100%{opacity:0}}
 @keyframes doom-bonus{0%{opacity:1}100%{opacity:0}}
+
+/* ── v2.18 visual pass: DOOM ──
+   The soundboard is the status bar's ARMS panel: stone-grey cells three across, each with a big
+   slot digit that lights yellow while its clip plays. Votes read like the intermission tally,
+   and checks are the red pick-up messages from the top of the screen. */
+[data-rt-theme=doom] .pads{grid-template-columns:repeat(3,minmax(0,1fr));gap:3px;padding:4px;background:#5a5a5a;border:3px solid;border-color:#8a8a8a #2a2a2a #2a2a2a #8a8a8a}
+[data-rt-theme=doom] .pad{min-height:60px;padding:30px 5px 5px;align-items:center;justify-content:flex-end;text-align:center;background:#3b3b3b;border:3px solid;border-color:#2a2a2a #777 #777 #2a2a2a;box-shadow:none}
+[data-rt-theme=doom] .pad::before{content:attr(data-slot);position:absolute;left:0;right:0;top:3px;font:26px/1 var(--rt-font-display);color:#8c8c8c;text-shadow:2px 2px 0 #000}
+[data-rt-theme=doom] .pad span{display:none}
+[data-rt-theme=doom] .pad b{font-size:11px;color:#e8e8e8;text-shadow:1px 1px 0 #000}
+[data-rt-theme=doom] .pad::after{display:none}
+[data-rt-theme=doom] .pad:hover{background:#474747}
+[data-rt-theme=doom] .pad.playing{background:#3b3b3b;box-shadow:none}
+[data-rt-theme=doom] .pad.playing::before{color:var(--d-yellow)}
+[data-rt-theme=doom] .vote{padding:5px 8px;border-radius:0;background:none}
+[data-rt-theme=doom] .vote-title{color:var(--d-red-text,#ff4a3a);font-size:14px;text-shadow:2px 2px 0 #000}
+[data-rt-theme=doom] .vote-marker{color:var(--d-yellow)}
+[data-rt-theme=doom] .vote-count{font-size:15px;color:var(--d-red-text,#ff4a3a);text-shadow:2px 2px 0 #000}
+[data-rt-theme=doom] .vote[data-leader=true] .vote-title{color:var(--d-yellow)}
+[data-rt-theme=doom] .checklist li{padding:3px 0;border:0;color:var(--d-red-text,#ff4a3a);text-shadow:2px 2px 0 #000}
+[data-rt-theme=doom] .checklist li b{font-weight:400;text-transform:uppercase}
+[data-rt-theme=doom] .checklist li span{color:#d7c3b5;text-shadow:none}
+[data-rt-theme=doom] .checklist li[data-result=ok] b{color:var(--d-yellow)}
+
+/* ── v2.18 motion: DOOM ──
+   Picking a clip flashes its ARMS digit the way a pick-up brightens the screen; an arriving vote
+   flashes too; check messages appear and the newest blinks once. */
+[data-rt-theme=doom] .pad.playing::before{animation:doom-pickup .35s ease-out}
+[data-rt-theme=doom] .vote[data-arrived]{animation:doom-pickup .4s ease-out}
+[data-rt-theme=doom] .checklist li:last-child{animation:doom-msg .5s steps(1) 2}
+@keyframes doom-msg{50%{opacity:.3}}

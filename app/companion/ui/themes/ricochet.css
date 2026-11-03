@@ -169,3 +169,15 @@ html[data-rt-theme=ricochet]{scrollbar-color:#22304d #04060e}
 [data-rt-theme=ricochet] :is(.view:not([hidden]),.sheet,section[data-view]:not([hidden])){animation:rc-rise .3s cubic-bezier(.2,.8,.3,1) backwards}
 [data-rt-theme=ricochet] .rt-toast:not(.rt-leaving){animation:rc-throw .26s cubic-bezier(.2,.8,.3,1) backwards}
 [data-rt-theme=ricochet] .panel:has(.tally[data-state=speaking]) .mark[data-logo],.panel[data-rt-theme=ricochet]:has(.tally[data-state=speaking]) .mark[data-logo]{animation:rc-glow 1s ease-in-out infinite}
+
+/* ── v2.18 visual pass: Ricochet checks ── each line rides on a small glowing disc: cyan when it passed, orange when it needs attention. */
+[data-rt-theme=ricochet] .checklist li{position:relative;padding:8px 0 8px 28px}
+[data-rt-theme=ricochet] .checklist li::before{content:"";position:absolute;left:2px;top:12px;width:16px;height:7px;border-radius:50%;background:radial-gradient(closest-side,#0a1730 50%,transparent 52%),#59d7ff;box-shadow:0 0 8px #59d7ff}
+[data-rt-theme=ricochet] .checklist li[data-result=fail]::before{background:radial-gradient(closest-side,#0a1730 50%,transparent 52%),#ff8a3a;box-shadow:0 0 8px #ff8a3a}
+[data-rt-theme=ricochet] .checklist li[data-result=unknown]::before{background:radial-gradient(closest-side,#0a1730 50%,transparent 52%),#6b7a99;box-shadow:none}
+
+/* ── v2.18 motion: Ricochet ── a playing pad's edge glows like a charged disc; check discs skim in from the left. */
+[data-rt-theme=ricochet] .pad.playing{animation:rc-charge 1s ease-in-out infinite}
+@keyframes rc-charge{50%{box-shadow:0 0 0 1px #59d7ff,0 0 16px rgba(89,215,255,.6)}}
+[data-rt-theme=ricochet] .checklist li::before{animation:rc-skim .35s cubic-bezier(.2,.9,.3,1) backwards}
+@keyframes rc-skim{from{transform:translateX(-30px);opacity:0}}

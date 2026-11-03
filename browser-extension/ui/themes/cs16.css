@@ -179,3 +179,41 @@
 [data-rt-theme=cs16] .tally:is([data-state=standby],[data-state=paused])::after{opacity:.4}
 @keyframes cs16-spray{0%{width:22px;height:22px}18%{width:36px;height:36px}100%{width:22px;height:22px}}
 @keyframes cs16-sway{0%,100%{width:24px;height:24px}50%{width:28px;height:28px}}
+
+/* ── v2.18 visual pass: Counter-Strike 1.6 ──
+   The soundboard is the buy menu: a translucent box with a title and numbered lines ("1. Airhorn"),
+   no buttons drawn at all; the clip that is playing turns radar green. Votes are the vote menu in
+   the same form, and checks print like the console. */
+[data-rt-theme=cs16] .pads{grid-template-columns:1fr;gap:0;padding:8px 10px 9px;background:rgba(0,0,0,.62);border:1px solid rgba(255,176,0,.35)}
+[data-rt-theme=cs16] .pads::before{content:"Play a sound";margin-bottom:4px;font-weight:700;font-size:13px;color:var(--c-orange)}
+[data-rt-theme=cs16] .pad{flex-direction:row;align-items:baseline;justify-content:flex-start;gap:6px;min-height:22px;padding:1px 4px;background:transparent;border:0;border-radius:0;box-shadow:none}
+[data-rt-theme=cs16] .pad::before{content:attr(data-slot) ".";min-width:1.9em;font-weight:700;color:var(--c-orange)}
+[data-rt-theme=cs16] .pad b{font-weight:400;font-size:13px;color:#fff}
+[data-rt-theme=cs16] .pad span{display:none}
+[data-rt-theme=cs16] .pad[data-fav=true] b::after{content:" ★";color:var(--c-orange)}
+[data-rt-theme=cs16] .pad::after{display:none}
+[data-rt-theme=cs16] .pad:hover{background:rgba(255,176,0,.16)}
+[data-rt-theme=cs16] .pad.playing{background:transparent;box-shadow:none}
+[data-rt-theme=cs16] .pad.playing b,[data-rt-theme=cs16] .pad.playing b::after{color:var(--c-radar)}
+[data-rt-theme=cs16] .pad.playing::after{display:block;position:static;margin:0 0 0 auto;width:7px;height:7px;background:var(--c-radar)}
+[data-rt-theme=cs16] .vote-board .votes{gap:0;padding:8px 10px;background:rgba(0,0,0,.62);border:1px solid rgba(255,176,0,.35)}
+[data-rt-theme=cs16] .vote{padding:1px 0;border-radius:0;background:none}
+[data-rt-theme=cs16] .vote-marker{min-width:1.9em;text-align:left;font-size:13px;color:var(--c-orange)}
+[data-rt-theme=cs16] .vote-marker::after{content:"."}
+[data-rt-theme=cs16] .vote-title{font-weight:400;color:#fff}
+[data-rt-theme=cs16] .vote-count{color:var(--c-orange)}
+[data-rt-theme=cs16] .vote[data-leader=true] .vote-title{color:var(--c-radar)}
+[data-rt-theme=cs16] .checklist{padding:8px 10px;background:rgba(0,0,0,.72);border:1px solid #3a352c;font-family:"Lucida Console","Courier New",monospace}
+[data-rt-theme=cs16] .checklist li{padding:2px 0;border:0;font-family:inherit;font-size:11.5px;color:#d8d8d8}
+[data-rt-theme=cs16] .checklist li b{font-weight:400}
+[data-rt-theme=cs16] .checklist li b::before{content:"] ";color:var(--c-orange)}
+[data-rt-theme=cs16] .checklist li span{font-size:11px;color:#9a9a9a}
+[data-rt-theme=cs16] .checklist li[data-result=fail] b{color:var(--c-orange)}
+
+/* ── v2.18 motion: Counter-Strike 1.6 ──
+   The playing line's marker blinks like a radio key; an arriving vote snaps on; console lines
+   appear in one step each. */
+[data-rt-theme=cs16] .pad.playing::after{animation:cs16-key .5s steps(1) infinite}
+@keyframes cs16-key{50%{opacity:.2}}
+[data-rt-theme=cs16] .vote[data-arrived]{animation:cs16-snap .2s steps(2)}
+[data-rt-theme=cs16] .checklist li{animation:cs16-snap .12s steps(1) backwards}

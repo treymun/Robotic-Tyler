@@ -142,6 +142,8 @@
 :host(.mini) .foot{order:2}
 :host(.mini) .rt-toasts{position:static;margin:0 10px 10px;gap:4px}
 :host(.mini) .rt-toasts:empty{display:none}
+/* Collapsed, the owner line stays to one or two short lines whatever the theme's type (v2.18). */
+:host(.mini) .foot small{font-size:10px;line-height:1.2;letter-spacing:0}
 /* Collapsing and expanding ease the panel in from its corner (themes may swap the motion). */
 @keyframes rt-mini{from{opacity:.4;transform:scale(.98,1.3);transform-origin:100% 100%}to{opacity:1;transform:none}}
 @keyframes rt-unmini{from{opacity:.5;transform:scale(.98,.82);transform-origin:100% 100%}to{opacity:1;transform:none}}
@@ -389,6 +391,17 @@ button:focus-visible,summary:focus-visible,a:focus-visible,input[type=checkbox]:
 .vote-count{font-size:var(--rt-text-xs);color:var(--rt-ink-2);font-variant-numeric:tabular-nums;white-space:nowrap}
 .vote[data-leader=true] .vote-title{font-weight:700}
 .vote-discs{display:none}
+
+/* ── v2.18 motion: Steam ──
+   A playing pad runs a thin download bar along its foot; an arriving vote's count flashes Steam
+   blue; check lines slide in as they are written. */
+[data-rt-theme=steam] .pad.playing{background:linear-gradient(90deg,#417a9b,#67c1f5) 0 100%/0 2px no-repeat,linear-gradient(90deg,rgba(144,186,60,.28),var(--rt-surface) 80%);animation:st-pad 2.4s linear infinite}
+@keyframes st-pad{to{background-size:100% 2px,auto}}
+[data-rt-theme=steam] .vote[data-arrived] .vote-count{animation:st-count .6s ease-out}
+@keyframes st-count{0%{color:#fff;text-shadow:0 0 8px #66c0f4}}
+[data-rt-theme=steam] .checklist li{animation:st-row .25s ease-out backwards}
+@keyframes st-row{from{opacity:0;transform:translateY(-4px)}}
+
 /* Sound banks as a rail (themes that lay the soundboard out as a spawn menu show it). */
 .bank-rail{display:none}
 /* Narrow windows (panel under ~385px): the footer note gets its own line, stat captions step aside
