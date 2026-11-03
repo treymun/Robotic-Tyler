@@ -1,4 +1,4 @@
-# ROBOTIC TYLER v2.16.0: a name tag you control, and a polish pass
+# ROBOTIC TYLER v2.16.0: a name tag you control, and a polish pass for every theme
 
 ## Name tag in chat messages
 - New in **Settings → AI & personality → Name tag in chat**: *Show name tag in chat messages* and *Chat display name*. Tyler's messages read `(ROBOTIC TYLER) Anyone up for another round?` by default, `(SQUAD BOT) …` with a custom name, or just the message with the tag off.
@@ -12,7 +12,24 @@
 - Fixed: the panel footer cut its status off ("This tab runs th…") next to the wider theme buttons in CS 1.6, HEV, Left 4 Dead and DOOM, in the panel and compact mode. It now wraps to two lines.
 - Fixed: *Open setup* looked like a section heading in most themes (it was styled as an icon button). It's now a real themed button.
 - Fixed: settings notifications covered the save bar's buttons. They now sit above it.
-- Left as they were: theme colours, borders, logos (sizes and DOOM's pixel rendering were already consistent), the Appearance gallery, dialogs and the Voice window. They already matched each theme and nothing else stood out at normal, high-DPI and narrow sizes. Left 4 Dead keeps its text-only secondary buttons, which match its menus.
+- Fixed: keyboard focus was a thin 1px line. It's now a 2px ring in each theme's own focus colour (Classic keeps VGUI's dotted rectangle, now 2px; Windows XP uses its dotted rectangle inside the control with the blue inner glow; Steam adds a Big Picture-style glow; Left 4 Dead switched from red to bone white so it shows on its red buttons).
+- Fixed: in the collapsed panel a notification covered the header and the status it was about. It now gets its own compact row (message, action, close) and the panel grows to fit it.
+- Fixed: in narrow windows (panel under about 385 px) text spend and wordmarks were cut off in DOOM, CS 1.6, CS2, HEV and Portal, and the footer note was squeezed to a few letters. The note now takes its own line, the stat captions step aside and the widest theme faces shrink a little.
+- Fixed: the *Soundboard only* cards squeezed their text into a narrow column next to wide theme buttons (DOOM especially). The button now drops below the text when needed.
+- Checked and left as they were: theme colours, logos (sizes and DOOM's pixel rendering were already consistent), the Appearance gallery, dialogs, disabled states and the Voice window.
+
+## Each theme gets a signature
+One new on-theme detail per theme, on top of the motion below. All plain CSS; no new images or downloads.
+- **Steam:** text spend reads like a store price, in Steam's green discount block.
+- **Classic Steam (2004):** the VGUI scrollbar: an olive well, a raised bevelled thumb and boxed arrow buttons.
+- **Team Fortress 2:** the three stats sit in backpack slots edged in item-quality colours: Unique gold, Strange orange (the running spend counter), Genuine green.
+- **Counter-Strike 2:** soundboard pads are inventory cards, each with a rarity colour (Consumer to Covert) glowing up from the bottom edge.
+- **Portal:** the header's chamber number follows the section you're in (01 to 05), with a chamber-progress strip under it like the test chamber sign.
+- **Counter-Strike 1.6:** the status strip carries the classic dynamic crosshair: tight while Tyler listens, kicking open while he talks, amber while he thinks, red on errors.
+- **Half-Life HEV suit:** a lambda in a circle stencilled into the orange suit plate behind the header.
+- **Left 4 Dead:** section headings get the red spray-paint arrow that marks the way to the safe room.
+- **Windows XP:** Luna scrollbars: the blue rounded thumb with grip lines and blue arrow buttons.
+- **DOOM:** the menu cursor is a blinking pixel skull (an original sprite, eyes flickering) on hovered buttons and the current settings section.
 
 ## Each theme moves its own way
 Every theme now has its own motion for three moments: a screen appearing (switching tabs in the panel, sections in Settings, pages in the Voice window), a notification arriving, and Tyler's logo while he talks. All of it uses only transforms, opacity and clipping, finishes in under half a second (the logo loops only while Tyler is talking), and switches off with the system's *reduce motion* setting.
@@ -28,7 +45,7 @@ Every theme now has its own motion for three moments: a screen appearing (switch
 - **DOOM:** screens arrive with DOOM's screen melt, pixel columns sliding down at their own speeds; notifications flash like a pickup message; buttons press in by whole pixels; the logo jolts like the status-bar face.
 
 ## Tested
-- 231 unit and integration tests (including the name tag on, off, custom, Unicode, legacy prefixes, the real background, and Tyler ignoring his own untagged messages) and 11 end-to-end tests in Chromium. Screenshots of all ten themes were compared before and after. Not tested in a real Steam chat.
+- 231 unit and integration tests (including the name tag on, off, custom, Unicode, legacy prefixes, the real background, and Tyler ignoring his own untagged messages) and 11 end-to-end tests in Chromium. Screenshots of all ten themes were compared before and after, including keyboard focus (real keyboard, not simulated states), hover, the collapsed panel, a 320 px window and scrollbars. Not tested in a real Steam chat or on Windows, so Windows-only fonts (Tahoma, Verdana, Trebuchet MS) and Windows scrollbar rendering were not seen.
 
 ---
 # ROBOTIC TYLER v2.15.0: one desktop app, and Gemini Live voice
