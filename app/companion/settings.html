@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; connect-src https://openrouter.ai https://generativelanguage.googleapis.com; style-src 'self'; img-src 'self' data:; font-src 'self'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; connect-src https://openrouter.ai https://generativelanguage.googleapis.com wss://generativelanguage.googleapis.com; media-src 'self' blob: data:; style-src 'self'; img-src 'self' data:; font-src 'self'; base-uri 'none'; form-action 'none'">
 <title>ROBOTIC TYLER Settings</title>
 <link rel="icon" href="icons/icon-32.png">
 <link rel="stylesheet" href="ui/tokens.css">
@@ -196,24 +196,104 @@
   <pre id="previewOutput" class="output">Previews appear here before you save.</pre>
 </section>
 
-<!-- ── Voice (Chrome only) ─────────────────────────────────── -->
-<section class="sheet only-chrome" id="voice" data-ui-zone="voice">
+<!-- ── Voice: one page for both engines (voice-settings.js) ─────── -->
+<section class="sheet" id="voice" data-ui-zone="voice">
   <div class="sheet-head">
-    <h2>How Tyler sounds and listens</h2>
-    <p>Speech uses Grok Voice through OpenRouter with a Voxtral fallback. Short replies keep voice banter snappy.</p>
+    <h2>Voice engine</h2>
+    <p>Pick how Tyler talks in Steam voice chat. Each engine keeps its own settings, so switching back and forth loses nothing.</p>
+  </div>
+  <input id="voiceEngine" type="hidden" value="standard">
+  <div class="engine-pick" role="radiogroup" aria-label="Voice engine">
+    <label class="engine-card"><input type="radio" name="voiceEnginePick" value="standard" checked><span><b>Standard</b><small>Waits for a pause, writes a reply with your AI provider, then speaks it. Works with an OpenRouter or Google key and uses your text personality and reply length.</small></span></label>
+    <label class="engine-card"><input type="radio" name="voiceEnginePick" value="live"><span><b>Gemini Live</b><small>A real-time voice conversation with Google: Tyler hears speech as it happens, answers quickly and stops when someone talks over him. Needs a Google AI key. Google bills for the audio while a session runs, so you start and stop each one yourself.</small></span></label>
+  </div>
+  <p class="hint" id="voiceKeyState" role="status">Checking keys…</p>
+</section>
+
+<section class="sheet" id="voiceStandard" data-ui-zone="voice" data-engine="standard">
+  <div class="sheet-head">
+    <h2>Standard voice</h2>
+    <p id="standardVoiceNote">Speech uses Grok Voice through OpenRouter, with Voxtral as the fallback.</p>
   </div>
   <div class="grid two">
-    <label>Voice
+    <label data-provider="openrouter">Grok voice
       <select id="speechVoice"><option value="rex">rex</option><option value="eve">eve</option><option value="ara">ara</option><option value="sal">sal</option><option value="leo">leo</option></select>
+    </label>
+    <label data-provider="gemini">Gemini speech model
+      <select id="geminiTtsModel"></select>
+    </label>
+    <label data-provider="gemini">Gemini voice
+      <select id="geminiVoice"></select>
     </label>
     <label>Noise filter
       <select id="noiseLevel"><option value="balanced">Balanced: 0.55 s of speech (default)</option><option value="strong">Strong: louder input, 0.8 s of speech</option><option value="sensitive">Sensitive: quiet voices, 0.2 s of speech</option></select>
     </label>
   </div>
-  <div class="toggle-grid">
-    <label class="toggle"><input id="fastSpeech" type="checkbox" checked><span><b>Start speaking sooner</b><small>Tyler starts saying the first sentence while the rest of the reply is still being written. Needs Stream AI text (OpenRouter). Turn off if replies ever sound cut or repeated.</small></span></label>
+  <div class="toggle-grid" data-provider="openrouter">
+    <label class="toggle"><input id="fastSpeech" type="checkbox" checked><span><b>Start speaking sooner</b><small>Tyler starts saying the first sentence while the rest of the reply is still being written. Needs Stream AI text. Turn off if replies ever sound cut or repeated.</small></span></label>
   </div>
-  <p class="hint">Fine-tune sensitivity, interruptions and turn-taking live from the Conversation section of Tyler's panel in Steam. The Checks tab shows how long each part of a voice reply takes.</p>
+  <p class="hint"><span class="only-chrome">Sensitivity, interruptions and turn-taking are tuned live in the Conversation section of Tyler's panel in Steam.</span><span class="only-desktop">Long replies are spoken in full, a sentence group at a time. Use the Voice window to start listening.</span></p>
+</section>
+
+<section class="sheet" id="voiceLive" data-ui-zone="voice" data-engine="live">
+  <div class="sheet-head">
+    <h2>Gemini Live</h2>
+    <p>Uses your Google AI key even when text replies use OpenRouter. Live sessions use the personality, reply length and talkativeness from AI &amp; personality.</p>
+  </div>
+  <div class="grid two">
+    <label>Live model
+      <select id="liveModel"></select>
+      <small id="liveModelNote" class="hint"></small>
+    </label>
+    <label>Live voice
+      <select id="liveVoice"></select>
+    </label>
+    <label>When someone talks over Tyler
+      <select id="liveInterrupt"><option value="true">Tyler stops and listens (natural)</option><option value="false">Tyler finishes his sentence</option></select>
+    </label>
+    <label>Pause before Tyler answers <small id="liveSilenceLabel">0.70 s</small>
+      <input id="liveSilenceMs" type="range" min="300" max="2000" step="50" value="700">
+    </label>
+    <label>Detecting the start of speech
+      <select id="liveStartSensitivity"><option value="low">Less sensitive: ignores coughs and game noise</option><option value="high">More sensitive: catches quiet voices</option></select>
+    </label>
+    <label>Detecting the end of speech
+      <select id="liveEndSensitivity"><option value="high">Quick: answers as soon as people pause</option><option value="low">Patient: lets people finish long thoughts</option></select>
+    </label>
+  </div>
+  <p class="hint">Changes here apply the next time you start a live session. A running session keeps the settings it started with; stop and start it again to switch.</p>
+  <p class="hint"><span class="only-chrome">Start and stop live sessions from the Gemini Live card in Tyler's panel in Steam. Tyler hears only the Steam voice call in that tab, never your microphone.</span><span class="only-desktop">Start and stop live sessions in the Voice window or from the tray icon. Tyler hears only the device you choose below.</span></p>
+</section>
+
+<section class="sheet only-desktop" id="voiceDevices" data-ui-zone="voice">
+  <div class="sheet-head">
+    <h2>Audio devices</h2>
+    <p>Tyler talks into a virtual audio cable that Steam uses as its microphone, and listens to the device Steam plays your friends through.</p>
+  </div>
+  <div class="grid two">
+    <label>Tyler speaks into
+      <select id="voiceOutputDevice"><option value="">Choose a device…</option></select>
+      <small class="hint">Usually CABLE Input (VB-CABLE). In Steam, set the microphone to CABLE Output.</small>
+    </label>
+    <label>Tyler listens to
+      <select id="voiceListenDevice"><option value="">Choose a device…</option></select>
+      <small class="hint">The speakers or headset Steam plays voice chat through. Everything playing on it is heard.</small>
+    </label>
+  </div>
+  <div class="toggle-grid">
+    <label class="toggle"><input id="voiceListenConsent" type="checkbox"><span><b>Everyone in the voice chat knows Tyler is listening</b><small>Required before Tyler listens. Their speech goes to your AI provider (or to Google in Gemini Live).</small></span></label>
+  </div>
+  <div class="actions"><button id="voiceDevicesRefresh" type="button" class="secondary">Refresh devices</button><button id="voiceToneTest" type="button" class="secondary">Play test tone into Steam</button></div>
+  <p class="hint" id="voiceDeviceState" role="status">Devices load when this page opens.</p>
+</section>
+
+<section class="sheet" id="voiceTestSheet" data-ui-zone="voice">
+  <div class="sheet-head">
+    <h2>Test the voice</h2>
+    <p>Plays a short line on this computer only, with the engine, model and voice selected above (saved or not).</p>
+  </div>
+  <div class="actions"><button id="voiceTest" type="button">Test voice</button></div>
+  <p class="hint" id="voiceTestState" role="status">Nothing is sent until you press Test voice.</p>
 </section>
 
 <!-- ── Squad & friends ─────────────────────────────────────── -->
@@ -321,5 +401,6 @@
 <script src="settings-navigation.js"></script>
 <script src="v23-settings.js"></script>
 <script src="theme-gallery.js"></script>
+<script src="voice-settings.js" type="module"></script>
 </body>
 </html>

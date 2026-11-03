@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
-  "name": "ROBOTIC TYLER \u2014 Chrome Command Center v2.10",
-  "version": "2.14.1",
+  "name": "ROBOTIC TYLER",
+  "version": "2.15.0",
   "description": "Browser-first Steam AI companion with opt-in screen-aware gaming commentary.",
   "permissions": [
     "storage",
@@ -44,6 +44,7 @@
         "trivia-bank.js",
         "trivia-party.js",
         "soundboard-audio.js",
+        "live-pcm.js",
         "audio-bridge.js",
         "wav-codec.js",
         "noise-filter.js",
@@ -84,6 +85,7 @@
         "content.js",
         "soundboard.js",
         "automatic.js",
+        "live-voice.js",
         "quick-start.js",
         "squad-suite.js",
         "screen-awareness.js",

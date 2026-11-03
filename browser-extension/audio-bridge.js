@@ -10,7 +10,14 @@
  function boardPlayer(){if(!board)board=new TylerBoardAudio(ctx,gain,text=>window.postMessage({source:'tyler-soundboard-status',text},location.origin));return board;}
  async function resumePlayer(){let timer;try{await Promise.race([ctx.resume(),new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('Audio player is suspended. Click Enable again or check this tab is allowed to play sound.')),2500);})]);}finally{clearTimeout(timer);}}
  function playing(value){window.postMessage({source:'tyler-playback',playing:value},location.origin);}
- function stop(all=true){if(all)board?.stop();try{previewNode?.stop();previewNode?.disconnect();}catch{}previewNode=null;for(const node of active){try{node.stop();node.disconnect();}catch{}}active=[];queued=[];playing(false);}
+ // Gemini Live chunks (v2.15): 24 kHz PCM scheduled back to back as they arrive, at most 20 s ahead.
+ // A flush stops the response that was interrupted and drops its queued chunks at once.
+ let liveNodes=[],liveNext=0,liveFlushed=0;
+ function livePlay(b64,gen){if(gen<=liveFlushed)return;const pcm=TylerLivePcm.fromBase64(b64);if(!pcm.length)return;const buf=ctx.createBuffer(1,pcm.length,24000),data=buf.getChannelData(0);for(let i=0;i<pcm.length;i++)data[i]=pcm[i]/32768;
+  const now=ctx.currentTime;if(liveNext<now+.03)liveNext=now+.06;if(liveNext-now>20)return;const src=ctx.createBufferSource();src.buffer=buf;src.connect(gain);src.start(liveNext);liveNext+=buf.duration;const node={src,gen};liveNodes.push(node);playing(true);
+  src.onended=()=>{src.disconnect();liveNodes=liveNodes.filter(n=>n!==node);if(!liveNodes.length&&!active.length)playing(false);};}
+ function liveFlush(gen){liveFlushed=Math.max(liveFlushed,gen);for(const n of liveNodes)if(n.gen<=gen){try{n.src.onended=null;n.src.stop();n.src.disconnect();}catch{}}liveNodes=liveNodes.filter(n=>n.gen>gen);liveNext=0;if(!liveNodes.length&&!active.length)playing(false);}
+ function stop(all=true){if(all)board?.stop();liveFlush(Number.MAX_SAFE_INTEGER-1);liveFlushed=0;try{previewNode?.stop();previewNode?.disconnect();}catch{}previewNode=null;for(const node of active){try{node.stop();node.disconnect();}catch{}}active=[];queued=[];playing(false);}
  // Plays one decoded clip; a clip queued with {queue:true} starts the moment this one ends, with no
  // playing(false) gap in between, so the panel keeps treating the reply as one continuous turn.
  function playBuffer(buffer){const source=ctx.createBufferSource();source.buffer=buffer;source.connect(gain);active.push(source);playing(true);source.onended=()=>{source.disconnect();if(!active.includes(source))return;active=active.filter(n=>n!==source);if(active.length)return;const next=queued.shift();if(next)playBuffer(next);else playing(false);};source.start();}
@@ -55,6 +62,9 @@
    if(m.type==='stop'){stop();return;}
    if(!enabled)throw Error('Click Enable voice bridge first.');
    if(m.type==='board-stop'){board?.stop();return;}
+   if(m.type==='pcm'){if(typeof m.audio!=='string'||m.audio.length>400000)throw Error('Live audio chunk too large.');if(ctx.state!=='running')await ctx.resume();livePlay(m.audio,Number(m.gen)||0);return;}
+   if(m.type==='pcm-flush'){liveFlush(Number(m.gen)||0);return;}
+   if(m.type==='pcm-reset'){liveFlush(Number.MAX_SAFE_INTEGER-1);liveFlushed=0;return;}
    if(m.type==='board-play'){if(!attached)for(const peer of peers)await attach(peer);await boardPlayer().play(m);return;}
    if(m.type==='volume'){gain.gain.value=Math.max(0,Math.min(.7,Number(m.volume)||0));monitor.gain.value=m.monitor?1:0;return;}
    if(m.type==='sound'){await ctx.resume();for(const peer of peers)await attach(peer);stop();const t=ctx.currentTime;if(m.sound==='beep')tone(660,t,.8);else if(m.sound==='airhorn'){tone(220,t,.6,'sawtooth');tone(277,t,.6,'sawtooth');}else if(m.sound==='drumroll'){for(let i=0;i<12;i++)tone(100+i*8,t+i*.065,.06,'triangle');}announce(attached?'Sound playing; synthetic sender attached. Check Steam meter.':'Sound playing locally; no outgoing Steam sender attached.');return;}

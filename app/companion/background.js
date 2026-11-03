@@ -4,7 +4,8 @@ import {scenePrompt,parseScene,MAX_IMAGE_CHARS} from './scene-vision.mjs';
 import {partyCommand,parsePartyCommand,inferScene,sceneStyle} from './party-core.mjs';
 import {cleanTitle,safeSteamId,capHistory,levelFor,chooseVote,cleanProfile,diagnosticSummary,squadTriviaQuestion,squadTriviaCard} from './suite-core.mjs';
 import {geminiModel,geminiSpeech,geminiReply,geminiHear,geminiSpeak,geminiTtsModel} from './gemini.mjs';
-import {GEMINI_VOICES,geminiVoiceFor} from './live-core.mjs';
+import {GEMINI_VOICES,geminiVoiceFor,Pcm} from './live-core.mjs';
+import {LiveHost} from './live-host.mjs';
 import {TabLease} from './lease.mjs';
 import './soundboard-core.js';
 import './trivia-bank.js';
@@ -23,6 +24,8 @@ const memory=new Memory(chrome.storage.local);
 const jobs=new Map();
 const lease=new TabLease(chrome.storage.session||chrome.storage.local,async id=>{if(!chrome.tabs?.get)return true;try{await chrome.tabs.get(id);return true;}catch{return false;}});
 const musicRouter=createMusicRouter(chrome);
+// Gemini Live (v2.15). One session at a time; the desktop app reaches it through globalThis.tylerLive.
+const live=new LiveHost({storage:chrome.storage.local,memory});globalThis.tylerLive=live;
 const MODEL='mistralai/mistral-small-3.2-24b-instruct';
 chrome.storage.local.setAccessLevel({accessLevel:'TRUSTED_CONTEXTS'});
 function apiError(stage,r,d,key){const error=Error((stage+' '+r.status+': '+String(d.error?.message||'Request failed')).split(key).join('[redacted]'));const raw=r.headers?.get?.('retry-after');const delay=Number(raw)*1000||Math.max(0,(Date.parse(raw)||0)-Date.now());error.retryAfter=Math.max(15000,delay||15000);return error;}
@@ -37,7 +40,7 @@ chrome.storage.local.get('uiTheme').then(v=>themeIcon(v.uiTheme)).catch(()=>{});
 // v2.14: the Game Request Hub was removed. Drop its saved keys, feeds and queues.
 const REMOVED_KEYS=['torboxKey','premiumizeKey','hydraAutoEnabled','hydraJobs','hydraRate','hydraRefreshRate','steamggFeedUrl','ankerFeedUrl','libraryEnabled','libraryCatalog','libraryQueue','trustedAutoEnabled','trustedRecent'];
 chrome.runtime.onInstalled?.addListener(()=>{chrome.storage.local.remove(REMOVED_KEYS).catch(()=>{});});
-chrome.storage.onChanged.addListener((changes,area)=>{if(area==='local'&&changes.uiTheme)themeIcon(changes.uiTheme.newValue);});
+chrome.storage.onChanged.addListener((changes,area)=>{if(area==='local'&&changes.uiTheme)themeIcon(changes.uiTheme.newValue);if(area==='local')live.settingsChanged(changes);});
 // Admin log writes are serialized so two events can't overwrite each other.
 async function handle(message,sender){
  if(['music:pending','music:event'].includes(message?.type))return musicRouter.route(message,sender);
@@ -187,7 +190,7 @@ async function handleGameUnlocked(message,sender){
   }
   return {enabled:true,profiles,checkedAt:Date.now(),message:'Only public Steam profile information is shown; unavailable results are not proof someone is offline.'};
  }
- if(message.type==='lease:claim'){const r=await lease.claim(tab,message.takeOver===true);if(r.owner&&r.previous!==undefined&&r.previous!==tab){const old=jobs.get(r.previous);old?.controller.abort();chrome.tabs?.sendMessage?.(r.previous,{source:'tyler-lease-lost'})?.catch?.(()=>{});}return r;}
+ if(message.type==='lease:claim'){const r=await lease.claim(tab,message.takeOver===true);if(r.owner&&r.previous!==undefined&&r.previous!==tab){const old=jobs.get(r.previous);old?.controller.abort();void live.stop('Another Steam tab took over Tyler','tab:'+r.previous);chrome.tabs?.sendMessage?.(r.previous,{source:'tyler-lease-lost'})?.catch?.(()=>{});}return r;}
  if(message.type==='lease:check')return {owner:await lease.check(tab)};
  if(message.type==='abort'){const job=jobs.get(tab);if(job&&job.id===message.requestId)job.controller.abort();return {};}
  if((['command','voice'].includes(message.type)||message.type==='soundboard:play')&&!await lease.check(tab))throw Error('Another Steam tab owns this bot. Use Take over in Setup.');
@@ -341,7 +344,7 @@ async function handleGameUnlocked(message,sender){
  }catch(error){if(heard&&message.modality==='voice'&&message.type==='command')error.retryMessage=message;throw error;}finally{busy.delete(tab);jobs.delete(tab);}
 }
 chrome.runtime.onMessage.addListener((m,s,reply)=>{handle(m,s).then(result=>reply({ok:true,...result})).catch(error=>reply({ok:false,error:redact(error.message),retryable:temporary(error),retryAfter:temporary(error)?(error.retryAfter||15000):0,retryMessage:temporary(error)?error.retryMessage:undefined}));return true;});
-chrome.tabs?.onRemoved?.addListener(id=>{lease.release(id).catch(()=>{});jobs.get(id)?.controller.abort();memory.clear(id).catch(()=>{});hosts.delete(id);histories.delete(id);last.delete(id);busy.delete(id);});
+chrome.tabs?.onRemoved?.addListener(id=>{void live.stop('The Steam tab closed','tab:'+id);lease.release(id).catch(()=>{});jobs.get(id)?.controller.abort();memory.clear(id).catch(()=>{});hosts.delete(id);histories.delete(id);last.delete(id);busy.delete(id);});
 
 
 
@@ -353,4 +356,31 @@ chrome.storage.onChanged.addListener((changes,area)=>{
  chrome.tabs.query({url:'https://steamcommunity.com/chat/*'}).then(tabs=>{
   for(const tab of tabs)chrome.tabs.sendMessage(tab.id,{type:'storage:changed',changes:safe}).catch(()=>{});
  }).catch(()=>{});
+});
+
+// Gemini Live from a Steam chat tab (Chrome). The tab's content script holds a port: it sends the
+// voice call's audio up as 16 kHz frames and plays Tyler's chunks into the call. The Google key
+// stays here. A closed port ends the session; nothing restarts on its own.
+chrome.runtime.onConnect?.addListener(port=>{
+ if(port.name!=='tyler-live')return;
+ const sender=port.sender;
+ if(!sender?.tab||!/^https:\/\/steamcommunity\.com\/chat\//.test(sender.url||'')){port.disconnect();return;}
+ const tab=sender.tab.id,owner='tab:'+tab;let open=true;
+ const post=m=>{if(!open)return;try{port.postMessage(m);}catch{open=false;}};
+ const sink={state:(state,detail)=>post({type:'state',state,detail}),audio:(data,gen)=>post({type:'audio',data,gen}),flush:(gen,reason)=>post({type:'flush',gen,reason}),
+  transcript:(who,text)=>post({type:'transcript',who,text}),latency:ms=>post({type:'latency',ms}),note:text=>post({type:'note',text}),restart:()=>post({type:'restart'})};
+ port.onMessage.addListener(async m=>{
+  try{
+   if(m?.type==='audio'){if(live.ownedBy(owner)&&typeof m.pcm==='string'&&m.pcm.length<=40000)live.audio(Pcm.fromBase64(m.pcm));return;}
+   if(m?.type==='ping')return;
+   if(m?.type==='start'){
+    if(!await lease.check(tab))throw Error('Another Steam tab owns Tyler. Use Take over first.');
+    const scope=acceptableScope(m.chatScope);
+    post({type:'started',...await live.start({sink,owner,historyId:scope?'room:'+scope:tab+':voice'})});return;
+   }
+   if(m?.type==='text'){if(live.ownedBy(owner))live.text(String(m.text||'').slice(0,500));return;}
+   if(m?.type==='stop'){await live.stop(String(m.reason||'Stopped').slice(0,80),owner);return;}
+  }catch(error){post({type:'error',text:redact(error.message)});}
+ });
+ port.onDisconnect.addListener(()=>{open=false;void live.stop('Live voice closed in Steam',owner);});
 });

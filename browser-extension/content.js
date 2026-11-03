@@ -150,7 +150,7 @@
    e.preventDefault();showTab(tabs[index].dataset.tab);tabs[index].focus();
   };
  }
- $('quickStop').onclick=()=>{globalThis.TylerCompanion.cancelSetup?.();globalThis.TylerCompanion.stopAutomatic?.('Paused by you');};
+ $('quickStop').onclick=()=>{globalThis.TylerCompanion.cancelSetup?.();globalThis.TylerCompanion.stopAutomatic?.('Paused by you');globalThis.TylerCompanion.stopLive?.('Live voice stopped by you.');};
 
  // ── Tab lease: one Steam tab runs the bot ───────────────────────────────
  function setOwner(value){
@@ -263,7 +263,7 @@
  $('testText').onclick=()=>run('ask Reply with a short hello.',false,true);checkAI();window.addEventListener('focus',checkAI);
  $('settings').onclick=()=>chrome.runtime.sendMessage({type:'settings'});
  $('voiceCheck').onclick=()=>bridge('status');
- $('beep').onclick=()=>bridge('sound',{sound:'beep'});$('stop').onclick=()=>bridge('stop');
+ $('beep').onclick=()=>bridge('sound',{sound:'beep'});$('stop').onclick=()=>{globalThis.TylerCompanion.stopLive?.('Live voice stopped by you.');bridge('stop');};
  function volume(){bridge('volume',{volume:Number($('volume').value),monitor:$('monitor').checked});}$('volume').oninput=volume;$('monitor').onchange=volume;
  $('clip').onchange=async()=>{const file=$('clip').files[0];if(!file)return;if(file.size>4000000){status('Choose a clip smaller than 4 MB.');return;}const reader=new FileReader();reader.onload=()=>bridge('audio',{audio:String(reader.result).split(',')[1]});reader.readAsDataURL(file);};
 

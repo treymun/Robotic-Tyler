@@ -9,13 +9,13 @@ const icon=name=>globalThis.TylerIcons?.svg(name)||'';
 const definitions=[
  ['overview','Overview','Setup steps and usage for this profile',icon('overview')],
  ['ai','AI & personality','Provider, model, personality and reply previews',icon('ai')],
- ['voice','Voice','How Tyler sounds and listens in Chrome',icon('voice')],
+ ['voice','Voice','Voice engine, voices, devices and a voice test',icon('voice')],
  ['squad','Squad & friends','Group features, party host and verified friends',icon('squad')],
  ['games','Games','Public Steam game activity',icon('games')],
  ['appearance','Appearance','Theme gallery for every Tyler window',icon('appearance')],
  ['advanced','Advanced','Memory, usage, safety tools and experimental options',icon('advanced')],
-].filter(x=>!isDesktop||x[0]!=='voice');
-const mapping={appearance:'appearance',quickStart:'overview',usagePulse:'overview',top:'overview',studio:'ai',personalitySheet:'ai',playground:'ai',voice:'voice',steamActivity:'games',suiteSettings:'squad',approvedFriends:'squad',friendProfiles:'squad',social:'advanced',usageSection:'advanced',v22Tools:'advanced',v23Tools:'advanced'};
+];
+const mapping={appearance:'appearance',quickStart:'overview',usagePulse:'overview',top:'overview',studio:'ai',personalitySheet:'ai',playground:'ai',voice:'voice',voiceStandard:'voice',voiceLive:'voice',voiceDevices:'voice',voiceTestSheet:'voice',steamActivity:'games',suiteSettings:'squad',approvedFriends:'squad',friendProfiles:'squad',social:'advanced',usageSection:'advanced',v22Tools:'advanced',v23Tools:'advanced'};
 document.getElementById('uiPlatform').textContent=isDesktop?'Desktop settings':'Chrome settings';
 globalThis.TylerIcons?.fill(document);
 
@@ -45,7 +45,9 @@ const markDirty=()=>{navStatus.textContent='Unsaved changes';navStatus.className
 document.addEventListener('input',e=>{if(e.target.closest?.('#sections')&&e.target.matches('input,select,textarea')&&!e.target.closest('#v22Tools,#v23Tools'))markDirty();});
 const status=document.getElementById('status');
 const kit=()=>globalThis.TylerKit?.page();
-if(status)new MutationObserver(()=>{const t=status.textContent;if(/saved|unchanged/i.test(t)&&!/unfinished/i.test(t)){navStatus.textContent='Settings saved';navStatus.className='ui-clean';void updateStatus();if(/saved/i.test(t))kit()?.toast({kind:'success',title:'Settings saved',text:'Tyler uses the new settings from the next reply.'});}else if(/stayed open|failed|rejected|could not/i.test(t)){const why=t.replace(/^Settings stayed open\.\s*/,'');navStatus.textContent=why;navStatus.className='ui-error';kit()?.toast({kind:'error',title:'Settings weren’t saved',text:why,action:{label:'Try again',run:()=>document.getElementById('save')?.click()}});}}).observe(status,{childList:true,characterData:true,subtree:true});
+// Only a press of Save settings ends in the "Settings saved" toast (the page also says "key saved" when it loads).
+let saveAt=0;document.getElementById('save')?.addEventListener('click',()=>{saveAt=Date.now();});
+if(status)new MutationObserver(()=>{const t=status.textContent;if(/saved|unchanged/i.test(t)&&!/unfinished/i.test(t)){navStatus.textContent='Settings saved';navStatus.className='ui-clean';void updateStatus();if(/saved/i.test(t)&&Date.now()-saveAt<60000)kit()?.toast({kind:'success',title:'Settings saved',text:'Tyler uses the new settings from the next reply.'});}else if(/stayed open|failed|rejected|could not/i.test(t)){const why=t.replace(/^Settings stayed open\.\s*/,'');navStatus.textContent=why;navStatus.className='ui-error';kit()?.toast({kind:'error',title:'Settings weren’t saved',text:why,action:{label:'Try again',run:()=>document.getElementById('save')?.click()}});}}).observe(status,{childList:true,characterData:true,subtree:true});
 
 // Key status in the overview step and the sidebar footer.
 const keyState=document.getElementById('uiKeyState'),keyStep=document.getElementById('uiKeyStep'),keySide=document.getElementById('uiKeySide'),keyDot=document.getElementById('uiKeyDot');

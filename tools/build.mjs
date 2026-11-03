@@ -39,13 +39,13 @@ export const FONT_FILES=fs.readdirSync(path.join(EXT,'ui','fonts')).filter(f=>/\
 export const PLATFORM=Object.freeze({
  // Need Chrome-only APIs: tab-audio capture, getDisplayMedia, the neural VAD
  // iframe (web_accessible_resources) or a second browser tab.
- chromeOnly:new Set(['neural-bridge.js','screen-awareness.js','music-core.js','music.js','youtube-music.js']),
+ chromeOnly:new Set(['neural-bridge.js','live-voice.js','screen-awareness.js','music-core.js','music.js','youtube-music.js']),
  // Deliberately not part of the desktop build (see CHANGES.md).
  notPorted:new Set([]),
  // Settings-page scripts with real desktop differences (IPC settings bridge).
  // Their desktop variants live in app/desktop-overrides/.
  overrides:['settings.js','v22-settings.js','package.json'],
- settingsPage:['settings.html','settings.css','settings-navigation.js','v23-settings.js','theme.js','ui/tokens.css',...THEMES.map(t=>'ui/themes/'+t),...FONT_FILES.map(f=>'ui/fonts/'+f),...LOGO_FILES.map(f=>'ui/logos/'+f),'ui/logo-mark.svg','icons/icon-32.png','ui/icons.css','ui/kit.css','ui-icons.js','ui-kit.js','ui-template.js','theme-gallery.js'],
+ settingsPage:['settings.html','settings.css','settings-navigation.js','v23-settings.js','theme.js','ui/tokens.css',...THEMES.map(t=>'ui/themes/'+t),...FONT_FILES.map(f=>'ui/fonts/'+f),...LOGO_FILES.map(f=>'ui/logos/'+f),'ui/logo-mark.svg','icons/icon-32.png','ui/icons.css','ui/kit.css','ui-icons.js','ui-kit.js','ui-template.js','theme-gallery.js','voice-settings.js'],
 });
 
 const read=p=>fs.readFileSync(p,'utf8').replace(/\r\n/g,'\n');

@@ -232,3 +232,16 @@ button:focus-visible,a:focus-visible,summary:focus-visible,input[type=checkbox]:
 }
 /* Steam theme (v2.13): the logo sits in Steam's online-blue avatar frame, as in the chat panel. */
 :root[data-rt-theme=steam] img.mark{--logo-pad:2px;background:#1b2838;border:2px solid #53a4c4;border-radius:2px}
+
+/* ── Voice page (v2.15): engine cards; sections follow the chosen engine and provider ── */
+.engine-pick{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:12px;margin:14px 0 6px}
+.engine-card{display:flex;gap:12px;align-items:flex-start;margin:0;padding:14px 16px;border:1px solid var(--rt-line-soft);border-radius:var(--rt-r-md);background:var(--rt-surface);cursor:pointer;font-weight:400;text-transform:none;letter-spacing:0;transition:border-color var(--rt-fast),background-color var(--rt-fast)}
+.engine-card:hover{background:var(--rt-surface-2)}
+.engine-card:has(input:checked){border-color:var(--rt-active);background:var(--rt-surface-2);box-shadow:inset 3px 0 0 var(--rt-active)}
+.engine-card:has(input:focus-visible){outline:2px solid var(--rt-focus);outline-offset:2px}
+.engine-card>input{margin:3px 0 0;flex-shrink:0;accent-color:var(--rt-active)}
+.engine-card>span{display:flex;flex-direction:column;gap:4px;min-width:0}
+.engine-card b{color:var(--rt-ink-strong);font-size:15px;font-weight:600}
+.engine-card small{display:block}
+body[data-voice-engine=standard] [data-engine=live],body[data-voice-engine=live] [data-engine=standard]{display:none!important}
+body[data-voice-provider=gemini] #voiceStandard [data-provider=openrouter],body:not([data-voice-provider=gemini]) #voiceStandard [data-provider=gemini]{display:none!important}

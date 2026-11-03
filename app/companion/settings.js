@@ -2,7 +2,7 @@
 'use strict';
 const $=id=>document.getElementById(id);
 let noiseChanged=false;
-const fields=['aiProvider','personality','length','brain','roastMode','talkativeness','insideJokes','callbackGap','nicknameAliases','textSpeed','spendingCapUSD','streamAI','friendMemory','smartRouting','libraryAllowedIds','activityEnabled','activitySteamIds'];
+const fields=['aiProvider','personality','length','brain','roastMode','talkativeness','insideJokes','callbackGap','nicknameAliases','textSpeed','spendingCapUSD','streamAI','friendMemory','smartRouting','libraryAllowedIds','activityEnabled','activitySteamIds','voiceEngine','geminiVoice','geminiTtsModel','liveModel','liveVoice','liveInterrupt','liveSilenceMs','liveStartSensitivity','liveEndSensitivity','speechVoice','noiseLevel','fastSpeech','voiceOutputDevice','voiceListenDevice','voiceListenConsent'];
 const sliderIds=['humorLevel','edgeLevel','helpLevel','chaosLevel'];
 const sliderLabels={humorLevel:['Dry','Light','High','Unhinged'],edgeLevel:['Soft','Spicy','Rowdy','Savage'],helpLevel:['Low','Balanced','Helpful','Coach mode'],chaosLevel:['Controlled','Loose','Chaotic','Gremlin']};
 const presetMap={
@@ -16,8 +16,8 @@ function readSuite(){return Object.fromEntries(Object.entries(suiteIds).map(([k,
 function storage(){return window.tylerSettings.storage.local;}
 function openSteam(){window.tylerSettings.tabs.create();}
 async function verifyOpenRouterKey(key){return window.tylerSettings.verifyKey(key);}
-function getFieldValue(key){return (key==='streamAI'||key==='friendMemory'||key==='smartRouting'||key==='activityEnabled')?$(key).checked:$(key).value;}
-function setFieldValue(key,value){if(key==='streamAI'||key==='friendMemory'||key==='smartRouting'||key==='activityEnabled')$(key).checked=!!value; else $(key).value=value;}
+function getFieldValue(key){const el=$(key);if(el.type==='checkbox')return el.checked;if(key==='liveInterrupt')return el.value!=='false';if(key==='liveSilenceMs')return Number(el.value)||700;return el.value;}
+function setFieldValue(key,value){const el=$(key);if(el.type==='checkbox')el.checked=!!value;else el.value=String(value);}
 function usageSummary(usage={}){
   const requests=Number(usage.requests||0);
   const tokens=(Number(usage.promptTokens||0)+Number(usage.completionTokens||0)).toLocaleString();
@@ -92,6 +92,7 @@ $('friendErase').onclick=()=>{
 $('nicknameAliases').addEventListener('input',showFriendCards);
 
 
+$('noiseLevel').onchange=()=>{noiseChanged=true;saveDraft('noiseLevel');};
 for(const id of sliderIds){$(id).addEventListener('input',()=>{sliderLabel(id);});}
 for(const key of fields)$(key).addEventListener('input',()=>saveDraft(key));
 for(const button of document.querySelectorAll('.preset'))button.onclick=()=>{
@@ -177,6 +178,8 @@ $('save').onclick=async()=>{
   }finally{$('save').disabled=false;}
 };
 load();
+// The Voice page fills its model and voice lists after this script runs, then loads the values again.
+window.tylerSettingsReload=load;
 
 // Advanced options stay visible by default; can be collapsed without affecting saved settings.
 const advancedToggle=document.getElementById('advancedToggle');advancedToggle?.addEventListener('click',()=>{const hidden=document.body.classList.toggle('advanced-hidden');advancedToggle.textContent=hidden?'Show advanced controls':'Hide advanced controls';});

@@ -2,7 +2,7 @@
 'use strict';
 const $=id=>document.getElementById(id);
 let noiseChanged=false;
-const fields=['aiProvider','personality','length','brain','noiseLevel','roastMode','speechVoice','talkativeness','insideJokes','callbackGap','nicknameAliases','textSpeed','spendingCapUSD','streamAI','friendMemory','smartRouting','libraryAllowedIds','activityEnabled','activitySteamIds','fastSpeech'];
+const fields=['aiProvider','personality','length','brain','noiseLevel','roastMode','speechVoice','talkativeness','insideJokes','callbackGap','nicknameAliases','textSpeed','spendingCapUSD','streamAI','friendMemory','smartRouting','libraryAllowedIds','activityEnabled','activitySteamIds','fastSpeech','voiceEngine','geminiVoice','geminiTtsModel','liveModel','liveVoice','liveInterrupt','liveSilenceMs','liveStartSensitivity','liveEndSensitivity'];
 const sliderIds=['humorLevel','edgeLevel','helpLevel','chaosLevel'];
 const sliderLabels={humorLevel:['Dry','Light','High','Unhinged'],edgeLevel:['Soft','Spicy','Rowdy','Savage'],helpLevel:['Low','Balanced','Helpful','Coach mode'],chaosLevel:['Controlled','Loose','Chaotic','Gremlin']};
 const presetMap={
@@ -16,8 +16,8 @@ function readSuite(){return Object.fromEntries(Object.entries(suiteIds).map(([k,
 function storage(){return chrome.storage.local;}
 function openSteam(){chrome.tabs.create({url:'https://steamcommunity.com/chat/'});}
 async function verifyOpenRouterKey(key){let response; try{response=await fetch('https://openrouter.ai/api/v1/key',{headers:{Authorization:'Bearer '+key},redirect:'error',cache:'no-store',signal:AbortSignal.timeout(12000)});}catch{throw Error('Could not reach OpenRouter. Check the connection and try Save again.');} if(response.status===401||response.status===403)throw Error('OpenRouter rejected this key. Paste the full secret from your OpenRouter Keys page.'); if(!response.ok)throw Error('OpenRouter key check returned HTTP '+response.status+'. Try again shortly.');}
-function getFieldValue(key){return (key==='streamAI'||key==='friendMemory'||key==='smartRouting'||key==='activityEnabled'||key==='fastSpeech')?$(key).checked:$(key).value;}
-function setFieldValue(key,value){if(key==='streamAI'||key==='friendMemory'||key==='smartRouting'||key==='activityEnabled'||key==='fastSpeech')$(key).checked=!!value; else $(key).value=value;}
+function getFieldValue(key){const el=$(key);if(el.type==='checkbox')return el.checked;if(key==='liveInterrupt')return el.value!=='false';if(key==='liveSilenceMs')return Number(el.value)||700;return el.value;}
+function setFieldValue(key,value){const el=$(key);if(el.type==='checkbox')el.checked=!!value;else el.value=String(value);}
 function usageSummary(usage={}){
   const requests=Number(usage.requests||0);
   const tokens=(Number(usage.promptTokens||0)+Number(usage.completionTokens||0)).toLocaleString();
@@ -177,6 +177,8 @@ $('save').onclick=async()=>{
   }finally{$('save').disabled=false;}
 };
 load();
+// The Voice page fills its model and voice lists after this script runs, then loads the values again.
+window.tylerSettingsReload=load;
 
 // Advanced options stay visible by default; can be collapsed without affecting saved settings.
 const advancedToggle=document.getElementById('advancedToggle');advancedToggle?.addEventListener('click',()=>{const hidden=document.body.classList.toggle('advanced-hidden');advancedToggle.textContent=hidden?'Show advanced controls':'Hide advanced controls';});
