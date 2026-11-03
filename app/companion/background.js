@@ -193,7 +193,7 @@ async function handleGameUnlocked(message,sender){
  if(message.type==='lease:claim'){const r=await lease.claim(tab,message.takeOver===true);if(r.owner&&r.previous!==undefined&&r.previous!==tab){const old=jobs.get(r.previous);old?.controller.abort();void live.stop('Another Steam tab took over Tyler','tab:'+r.previous);chrome.tabs?.sendMessage?.(r.previous,{source:'tyler-lease-lost'})?.catch?.(()=>{});}return r;}
  if(message.type==='lease:check')return {owner:await lease.check(tab)};
  if(message.type==='abort'){const job=jobs.get(tab);if(job&&job.id===message.requestId)job.controller.abort();return {};}
- if((['command','voice'].includes(message.type)||message.type==='soundboard:play')&&!await lease.check(tab))throw Error('Another Steam tab owns this bot. Use Take over in Setup.');
+ if((['command','voice'].includes(message.type)||message.type==='soundboard:play')&&!sender.native&&!await lease.check(tab))throw Error('Another Steam tab owns this bot. Use Take over in Setup.');
 
  if(message.type?.startsWith('soundboard:')){const store=chrome.storage.local;
  const {boardBank='Arcade'}=await store.get('boardBank');
@@ -384,3 +384,10 @@ chrome.runtime.onConnect?.addListener(port=>{
  });
  port.onDisconnect.addListener(()=>{open=false;void live.stop('Live voice closed in Steam',owner);});
 });
+
+// The desktop app's own voice (v2.15): its main process sends Standard-voice turns here directly,
+// as tab -1, so desktop and Chrome share one conversation engine. Only main-process code can
+// reach this function; Steam pages and the settings window can't.
+const NATIVE_TAB=-1;
+globalThis.tylerNativeTab=NATIVE_TAB;
+globalThis.tylerNativeRequest=message=>handle(message,{native:true,tab:{id:NATIVE_TAB},url:'https://steamcommunity.com/chat/'}).then(result=>({ok:true,...result}),error=>({ok:false,error:redact(error.message),retryable:temporary(error)}));

@@ -92,3 +92,14 @@ button:focus-visible{outline:1px solid var(--rt-focus);outline-offset:2px}
 }
 /* Steam theme (v2.13): the logo sits in Steam's online-blue avatar frame, as in the chat panel. */
 :root[data-rt-theme=steam] #brand-logo{--logo-pad:2px;background:#1b2838;border:2px solid #53a4c4;border-radius:2px}
+
+/* v2.15: readiness checklist and live transcript in the Voice window */
+.checklist{list-style:none;margin:12px 0 4px;padding:0;display:grid;gap:6px}
+.checklist li{display:flex;gap:8px;align-items:baseline;color:var(--rt-ink);font-size:14px}
+.checklist li::before{content:"○";color:var(--rt-ink-4);flex-shrink:0}
+.checklist li[data-ok=true]::before{content:"✓";color:var(--rt-active)}
+.checklist li button{margin-left:auto}
+.transcript{display:grid;gap:8px;margin:12px 0 0}
+.transcript div{display:grid;grid-template-columns:64px minmax(0,1fr);gap:10px;align-items:baseline}
+.transcript dt{font-size:12px;text-transform:uppercase;letter-spacing:var(--rt-track);color:var(--rt-ink-4)}
+.transcript dd{margin:0;overflow-wrap:anywhere;color:var(--rt-ink-strong,var(--rt-ink))}
