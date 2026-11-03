@@ -1703,7 +1703,7 @@ globalThis.TylerUI=Object.freeze({version:"2.14.1",css:":root,:host{color-scheme
  function pause(){if(autoActive)globalThis.TylerCompanion.stopAutomatic?.('Paused while setup changes');armed=false;globalThis.TylerCommands?.set('tyler',{enabled:false});epoch++;observer?.disconnect();observer=null;status('Commands paused. In-flight results will be ignored.');}
 
  // ── Chat targets ────────────────────────────────────────────────────────
- async function checkAI(){try{const r=await ask({type:'connection'});$('aiConnection').textContent=r.keyConfigured?(r.provider||'OpenRouter')+' key saved. Brain: '+r.model+'. Speech: '+r.speechVoice+'.':'No key saved for the selected provider. Open personality & API settings.';$('previewVoice').value=r.speechVoice||'rex';}catch(e){$('aiConnection').textContent=e.message;}}
+ async function checkAI(){try{const r=await ask({type:'connection'});$('aiConnection').textContent=r.keyConfigured?(r.provider||'OpenRouter')+' key saved. Brain: '+r.model+'. Speech: '+r.speechVoice+'.':'No key saved for the selected provider. Open personality & API settings.';const pick=$('previewVoice');if(Array.isArray(r.voices)&&r.voices.length){pick.replaceChildren(...r.voices.map(v=>{const o=document.createElement('option');o.value=v.value;o.textContent=v.label;return o;}));}pick.value=r.speechVoice||pick.options[0]?.value||'';}catch(e){$('aiConnection').textContent=e.message;}}
  function locateChat(){
   if(TylerSetup.visible(composer)&&TylerSetup.visible(region)&&sampleElement?.isConnected)return true;
   const found=TylerSelection.discover(document,lastChatFocus,chatHint);discovery={ambiguous:!!found.ambiguous,empty:!!found.empty};
@@ -1741,10 +1741,10 @@ globalThis.TylerUI=Object.freeze({version:"2.14.1",css:":root,:host{color-scheme
 
  // ── Setup & voice controls ──────────────────────────────────────────────
  $('connect').onclick=()=>globalThis.TylerCompanion.connectAndStart?.();
- $('previewVoice').onchange=async()=>{try{await ask({type:'preferences',values:{speechVoice:$('previewVoice').value}});status('Voice saved for the next spoken reply.');}catch(e){status(e.message);}};
+ $('previewVoice').onchange=async()=>{try{await ask({type:'preferences',values:{voice:$('previewVoice').value}});status('Voice saved for the next spoken reply.');}catch(e){status(e.message);}};
  $('preview').onclick=async()=>{
   if(pending){status('Wait for the current command to finish.');return;}pending=true;
-  try{await ask({type:'preferences',values:{speechVoice:$('previewVoice').value}});status('Generating local voice preview…');const r=await ask({type:'command',text:'say Hey, this is ROBOTIC TYLER. Ready when you are.'});if(!r.audio)throw Error(r.warning||'Preview unavailable');bridge('preview',{audio:r.audio});status('Voice preview playing locally.');}
+  try{await ask({type:'preferences',values:{voice:$('previewVoice').value}});status('Generating local voice preview…');const r=await ask({type:'command',text:'say Hey, this is ROBOTIC TYLER. Ready when you are.'});if(!r.audio)throw Error(r.warning||'Preview unavailable');bridge('preview',{audio:r.audio});status('Voice preview playing locally.');}
   catch(e){status(e.message);}finally{pending=false;}
  };
  $('testText').onclick=()=>run('ask Reply with a short hello.',false,true);checkAI();window.addEventListener('focus',checkAI);
