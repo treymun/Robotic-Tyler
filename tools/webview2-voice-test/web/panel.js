@@ -307,7 +307,8 @@
   const outcome = l => {
    const p = S.pcs.get(l.doc + '#' + l.pc);
    if (!l.ok) return 'rejected';
-   if (p && p.closedAt && p.closedAt - l.at < 10000) return 'dropped';
+   // Leaving voice yourself (Steam's own Leave button) within 10 s isn't a drop.
+   if (p && p.closedAt && p.closedAt - l.at < 10000) return /OnUserEndVoiceChat/.test(p.closedBy || '') ? 'stayed' : 'dropped';
    return now() - l.at < 10000 && !(p && p.closedAt) ? 'waiting' : 'stayed';
   };
   const results = lefts.map(outcome), kept = results.filter(r => r === 'stayed').length, last = results[results.length - 1];

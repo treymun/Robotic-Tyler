@@ -1,4 +1,4 @@
-# ROBOTIC TYLER · Electron voice test (prototype 0.1.2)
+# ROBOTIC TYLER · Electron voice test (prototype 0.1.3)
 
 A small, separate Windows app (not the ROBOTIC TYLER desktop app) that checks one thing: **can
 Steam web voice hold a group call in Electron, the engine the desktop app uses, when the Steam
@@ -14,7 +14,16 @@ Everything stays in `%LOCALAPPDATA%\RoboticTylerElectronVoiceTest`. The desktop 
 keys and Steam sign-in are not touched. The panel only measures (states, levels, packet counts,
 Steam's own voice messages); it never reads chat text or records audio.
 
-## New in 0.1.2: the leave fix, second try
+## New in 0.1.3: no physical microphone in Stage 2B
+
+Your 0.1.2 Stage 2B report showed Steam still opening your headset microphone: Steam's voice code
+asks through an old browser API that Tyler's audio bridge didn't cover. Tyler's synthetic audio was
+what went out, but the microphone was open. Now, with synthetic voice enabled, the bridge answers
+that request too, so Stage 2B should show no microphone prompt at all. (This is Tyler's real audio
+bridge, so the Chrome extension gets the same fix.) The panel also no longer counts you leaving
+voice yourself as the bot being dropped.
+
+## 0.1.2: the leave fix, second try
 
 In 0.1.0 the bot was dropped whenever someone left the call, and 0.1.1's fix didn't help: its
 report showed Steam's real descriptions, and the cause was different from my first guess.
@@ -37,7 +46,7 @@ is a mock: only your live test shows whether Steam's server is happy with it.
 
 ## Start
 
-1. Unzip `RoboticTyler-Electron-VoiceTest-0.1.2-win-x64.zip` anywhere (you can delete 0.1.0 and 0.1.1;
+1. Unzip `RoboticTyler-Electron-VoiceTest-0.1.3-win-x64.zip` anywhere (you can delete older versions;
    your Steam sign-in is kept).
 2. Run `RoboticTyler-Electron-VoiceTest.exe` (it has Electron's icon). It isn't signed: if Windows
    says *"Windows protected your PC"*, choose **More info → Run anyway**.

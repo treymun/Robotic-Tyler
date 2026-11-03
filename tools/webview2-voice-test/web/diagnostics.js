@@ -40,8 +40,9 @@
  } catch (e) {}
 
  // ── 2. Microphone requests that reach a real device ──
- // Wrapped at the prototype: Tyler's bridge answers Steam's audio request itself (with the synthetic
- // microphone) and never calls this for audio, so in Stage 2 this should stay silent.
+ // Wrapped at the prototype (and the old callback forms below, which Steam's voice code uses): with
+ // synthetic voice enabled, Tyler's bridge answers Steam's audio request itself, so in Stage 2 this
+ // should stay silent.
  const media = window.MediaDevices && MediaDevices.prototype;
  const realGum = media && media.getUserMedia;
  let gumSeq = 0;

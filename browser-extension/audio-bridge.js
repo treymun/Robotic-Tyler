@@ -29,6 +29,16 @@
   if(constraints.video){const video=await original({video:constraints.video,audio:false});for(const track of video.getVideoTracks())stream.addTrack(track);}
   announce('Steam requested the synthetic microphone. Test beep with a friend.');return stream;
  };
+ // Steam's voice code asks through the old callback form (navigator.getUserMedia, or its webkit
+ // name), which doesn't go through mediaDevices.getUserMedia and opened the physical microphone.
+ // With synthetic voice enabled, answer it with the synthetic microphone too; otherwise unchanged.
+ for(const name of ['getUserMedia','webkitGetUserMedia']){
+  const legacy=navigator[name];if(typeof legacy!=='function')continue;
+  navigator[name]=function(constraints,ok,fail){
+   if(!enabled||!constraints?.audio||!original)return legacy.call(navigator,constraints,ok,fail);
+   navigator.mediaDevices.getUserMedia(constraints).then(stream=>{if(typeof ok==='function')ok(stream);},err=>{if(typeof fail==='function')fail(err);});
+  };
+ }
  // Steam may hold a previously captured/cached microphone. Also attach at the outgoing WebRTC sender.
  function synthetic(){setup();return destination.stream.getAudioTracks()[0].clone();}
  async function attach(peer){if(!enabled)return;for(const sender of peer.getSenders()){if(sender.track?.kind!=='audio'||replaced.has(sender))continue;const track=synthetic();try{await sender.replaceTrack(track);replaced.add(sender);attached++;announce('Synthetic audio attached to an outgoing Steam audio sender. Confirm with Test beep and Steam meter.');}catch(e){track.stop();announce('Steam audio attachment failed: '+e.message,false);}}}

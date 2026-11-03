@@ -37,7 +37,8 @@ await steam.goto('https://steamcommunity.com/chat/');
 await steam.exposeFunction('__toFriend',j=>friend.evaluate(async j=>{const m=JSON.parse(j);window.pc?.close();const pc=window.pc=new RTCPeerConnection();pc.addTrack(window.voice.getAudioTracks()[0],window.voice);
   pc.ontrack=e=>{window.inTrack=e.track;const a=new Audio();a.srcObject=new MediaStream([e.track]);a.muted=false;a.play().catch(()=>{});window.inAudio=a;};await pc.setRemoteDescription(m);const a=await pc.createAnswer();await pc.setLocalDescription(a);
   await new Promise(r=>{if(pc.iceGatheringState==='complete')r();else pc.onicegatheringstatechange=()=>pc.iceGatheringState==='complete'&&r();});return JSON.stringify(pc.localDescription);},j));
-const join=()=>steam.evaluate(async()=>{const mic=await navigator.mediaDevices.getUserMedia({audio:true});const pc=window.pc=new RTCPeerConnection();for(const t of mic.getAudioTracks())pc.addTrack(t,mic);
+// Steam asks for the microphone through the old callback API, exactly like this.
+const join=()=>steam.evaluate(async()=>{const t=navigator;t.getUserMedia=t.getUserMedia||t.webkitGetUserMedia;const mic=await new Promise((ok,fail)=>t.getUserMedia({audio:{optional:[{googHighpassFilter:true}]},video:false},ok,fail));const pc=window.pc=new RTCPeerConnection();for(const t of mic.getAudioTracks())pc.addTrack(t,mic);
   pc.ontrack=e=>{const a=new Audio();a.srcObject=e.streams[0]||new MediaStream([e.track]);a.play().catch(()=>{});window.remoteAudio=a;};
   const o=await pc.createOffer();await pc.setLocalDescription(o);await new Promise(r=>{if(pc.iceGatheringState==='complete')r();else pc.onicegatheringstatechange=()=>pc.iceGatheringState==='complete'&&r();});
   const ans=JSON.parse(await window.__toFriend(JSON.stringify(pc.localDescription)));await pc.setRemoteDescription(ans);

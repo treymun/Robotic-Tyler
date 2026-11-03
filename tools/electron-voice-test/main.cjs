@@ -19,7 +19,7 @@
 const {app,BaseWindow,WebContentsView,session,ipcMain,dialog,clipboard,shell,protocol,net}=require('electron');
 const path=require('node:path'),fs=require('node:fs'),os=require('node:os'),{pathToFileURL}=require('node:url');
 
-const VERSION='0.1.2';
+const VERSION='0.1.3';
 const STEAM_CHAT='https://steamcommunity.com/chat/';
 const DATA=process.env.TYLER_TEST_DATA||path.join(process.env.LOCALAPPDATA||app.getPath('appData'),'RoboticTylerElectronVoiceTest');
 app.setPath('userData',path.join(DATA,'Profile'));
