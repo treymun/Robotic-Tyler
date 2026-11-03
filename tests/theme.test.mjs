@@ -123,6 +123,15 @@ test('every theme draws its own animated status strip',()=>{
  assert.match(panel,/prefers-reduced-motion:reduce\)\{\*,\*::before,\*::after\{animation:none!important/);
 });
 
+// v2.18: a theme's heading rule (:is(h1,h2,…,.sheet-head h2)) outranks a bare .rt-dialog-title rule,
+// which left dialog titles in the heading colour; title rules are scoped to their dialog or toast.
+test('dialog and notification titles keep their own colour in every theme',()=>{
+ for(const t of THEMES.filter(t=>t!=='steam')){
+  const css=read('browser-extension/ui/themes/'+t+'.css');
+  assert.doesNotMatch(css,/\[data-rt-theme=\w+\] (?::is\(\.rt-toast-title,\.rt-dialog-title\)|\.rt-dialog-title|\.rt-toast-title)\{/,t+': title rules are scoped as :is(.rt-toast,.rt-dialog) :is(…)');
+ }
+});
+
 // v2.18: Steam pages may forbid data: images, so the panel's textures are drawn with gradients only.
 test('panel styles never depend on data: images',()=>{
  for(const f of ['panel.css','kit.css','icons.css',...THEMES.filter(t=>t!=='steam').map(t=>'themes/'+t+'.css')]){

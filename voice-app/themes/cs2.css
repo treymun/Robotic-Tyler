@@ -178,7 +178,7 @@ html[data-rt-theme=cs2]{scrollbar-color:#3a4a5a transparent}
 [data-rt-theme=cs2] :is(.rt-toast,.rt-dialog){background:linear-gradient(180deg,rgba(30,45,61,.96),rgba(20,32,43,.96));border:1px solid rgba(255,255,255,.1);border-radius:2px;box-shadow:0 14px 40px rgba(0,0,0,.6);backdrop-filter:blur(6px)}
 [data-rt-theme=cs2] .rt-toast{border-left:3px solid var(--tone)}
 [data-rt-theme=cs2] .rt-dialog{border-top:2px solid var(--tone)}
-[data-rt-theme=cs2] :is(.rt-toast-title,.rt-dialog-title){font-family:var(--rt-font-display);font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#fff}
+[data-rt-theme=cs2] :is(.rt-toast,.rt-dialog) :is(.rt-toast-title,.rt-dialog-title){font-family:var(--rt-font-display);font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:#fff}
 [data-rt-theme=cs2] .rt-toast-text,.rt-dialog-text{color:var(--cs-text)}
 [data-rt-theme=cs2] .rt-tip{background:#0d151d;color:#e6eef5;border:1px solid rgba(130,216,255,.35);border-radius:2px}
 

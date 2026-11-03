@@ -172,7 +172,7 @@ html[data-rt-theme=gmod]{scrollbar-color:#9aa1a8 #d3d7db}
 [data-rt-theme=gmod] .rt-toast{--rt-focus:#ffffff}
 [data-rt-theme=gmod] .rt-dialog{background:var(--gm-panel);border:1px solid #1b1e21;border-radius:6px;padding-top:0;box-shadow:0 14px 34px rgba(0,0,0,.5)}
 [data-rt-theme=gmod] .rt-dialog-head{margin:0 -16px 4px;padding:8px 14px;background:linear-gradient(180deg,#41464d,#2b2f34);border-radius:5px 5px 0 0}
-[data-rt-theme=gmod] .rt-dialog-title{font-size:14px;font-weight:700;color:#fff}
+[data-rt-theme=gmod] .rt-dialog .rt-dialog-title{font-size:14px;font-weight:700;color:#fff}
 [data-rt-theme=gmod] .rt-tip{background:#ffffe0;color:#111;border:1px solid #6b7279;border-radius:2px;font-family:Tahoma,var(--rt-font);font-size:11px}
 
 /* ── Motion: Garry's Mod ──

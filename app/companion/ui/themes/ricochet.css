@@ -153,7 +153,7 @@ html[data-rt-theme=ricochet]{scrollbar-color:#22304d #04060e}
 [data-rt-theme=ricochet] .ic{--ic-w:1.7px;filter:drop-shadow(0 0 3px rgba(56,225,255,.45))}
 [data-rt-theme=ricochet] :is(.rt-toast,.rt-dialog){background:var(--rc-platform);border:0;border-radius:var(--rt-r-md);box-shadow:var(--rc-float),0 20px 40px rgba(0,0,0,.6)}
 [data-rt-theme=ricochet] .rt-toast{border-left:3px solid var(--tone)}
-[data-rt-theme=ricochet] :is(.rt-toast-title,.rt-dialog-title){font-family:var(--rt-font-display);font-weight:400;text-transform:uppercase;letter-spacing:.04em;color:#fff;text-shadow:0 0 8px rgba(56,225,255,.5)}
+[data-rt-theme=ricochet] :is(.rt-toast,.rt-dialog) :is(.rt-toast-title,.rt-dialog-title){font-family:var(--rt-font-display);font-weight:400;text-transform:uppercase;letter-spacing:.04em;color:#fff;text-shadow:0 0 8px rgba(56,225,255,.5)}
 [data-rt-theme=ricochet] :is(.rt-toast-text,.rt-dialog-text,.rt-steps){color:var(--rt-ink-2)}
 [data-rt-theme=ricochet] .rt-tip{background:#0e1526;color:#fff;border:1px solid var(--rc-cyan-lo);border-radius:6px}
 

@@ -160,7 +160,7 @@ html[data-rt-theme=quake]{scrollbar-color:#6b4420 #0b0907}
   border:3px solid;border-color:var(--q-bevel);border-radius:0;box-shadow:0 0 0 1px #000,0 14px 36px rgba(0,0,0,.7)}
 [data-rt-theme=quake] .rt-toast{border-left:5px solid var(--tone);padding-left:14px}
 [data-rt-theme=quake] :is(.rt-toast,.rt-dialog)[data-kind=error]{border-color:#e05a40 #3a0806 #3a0806 #e05a40}
-[data-rt-theme=quake] :is(.rt-toast-title,.rt-dialog-title){font-family:var(--rt-font-display);font-weight:700;font-size:17px;letter-spacing:.03em;background:var(--q-letter);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 1px 0 #000)}
+[data-rt-theme=quake] :is(.rt-toast,.rt-dialog) :is(.rt-toast-title,.rt-dialog-title){font-family:var(--rt-font-display);font-weight:700;font-size:17px;letter-spacing:.03em;background:var(--q-letter);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 1px 0 #000)}
 [data-rt-theme=quake] :is(.rt-toast-text,.rt-dialog-text,.rt-steps){color:var(--rt-ink)}
 [data-rt-theme=quake] .rt-tip{background:#120e0b;color:var(--q-bronze-hi);border:2px solid;border-color:#4a4038 #000 #000 #4a4038;border-radius:0;font-family:var(--rt-font);font-weight:600}
 

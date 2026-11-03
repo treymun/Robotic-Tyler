@@ -182,9 +182,9 @@ html[data-rt-theme=tf2]{scrollbar-color:var(--tf-tan) var(--tf-dark-brown)}
 [data-rt-theme=tf2] .ic-v .d{stroke:#2b2420;stroke-width:1.9px}
 [data-rt-theme=tf2] .ic-v .s{stroke-width:2.3px}
 [data-rt-theme=tf2] .rt-toast{background:linear-gradient(180deg,#3b3630,#2e2b2a);border:2px solid #4a433c;border-left:7px solid var(--tone);border-radius:10px;box-shadow:0 4px 0 rgba(0,0,0,.45)}
-[data-rt-theme=tf2] :is(.rt-toast-title,.rt-dialog-title){font-family:var(--rt-font-display);font-weight:400;font-size:19px;letter-spacing:.02em;color:var(--tf-tan-light);text-shadow:0 2px 0 rgba(0,0,0,.55)}
+[data-rt-theme=tf2] :is(.rt-toast,.rt-dialog) :is(.rt-toast-title,.rt-dialog-title){font-family:var(--rt-font-display);font-weight:400;font-size:19px;letter-spacing:.02em;color:var(--tf-tan-light);text-shadow:0 2px 0 rgba(0,0,0,.55)}
 [data-rt-theme=tf2] .rt-dialog{background:linear-gradient(180deg,#3b3630,#2a2624);border:3px solid #4a433c;border-top:6px solid var(--tone);border-radius:14px;box-shadow:0 6px 0 rgba(0,0,0,.5)}
-[data-rt-theme=tf2] .rt-dialog-title{font-size:24px}
+[data-rt-theme=tf2] .rt-dialog .rt-dialog-title{font-size:24px}
 [data-rt-theme=tf2] .rt-tip{background:#2b2522;color:var(--tf-tan-light);border:2px solid #6c6256;border-radius:6px;font-weight:700}
 
 /* ── v2.17 motion: Team Fortress 2 ──

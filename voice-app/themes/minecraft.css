@@ -173,7 +173,7 @@ html[data-rt-theme=minecraft]{scrollbar-color:#6f6f6f #8b8b8b}
 [data-rt-theme=minecraft] .ic{--px-a:currentColor;--px-b:rgba(0,0,0,.35);image-rendering:pixelated;shape-rendering:crispEdges}
 [data-rt-theme=minecraft] :is(.rt-toast,.rt-dialog){color:#ffffff;background:#212121;border:2px solid #000;border-radius:4px;box-shadow:inset 2px 2px 0 #555,inset -2px -2px 0 #111,4px 5px 0 rgba(0,0,0,.4)}
 [data-rt-theme=minecraft] .rt-toast{border-left:2px solid #000}
-[data-rt-theme=minecraft] :is(.rt-toast-title,.rt-dialog-title){font-family:var(--rt-font-display);font-weight:400;color:#ffff55;text-shadow:2px 2px 0 #3f3f15}
+[data-rt-theme=minecraft] :is(.rt-toast,.rt-dialog) :is(.rt-toast-title,.rt-dialog-title){font-family:var(--rt-font-display);font-weight:400;color:#ffff55;text-shadow:2px 2px 0 #3f3f15}
 [data-rt-theme=minecraft] :is(.rt-toast,.rt-dialog)[data-kind=error] :is(.rt-toast-title,.rt-dialog-title){color:#ff5555;text-shadow:2px 2px 0 #3f1515}
 [data-rt-theme=minecraft] :is(.rt-toast,.rt-dialog)[data-kind=success] :is(.rt-toast-title,.rt-dialog-title){color:#55ff55;text-shadow:2px 2px 0 #153f15}
 [data-rt-theme=minecraft] :is(.rt-toast-text,.rt-dialog-text,.rt-steps){color:#ffffff;text-shadow:var(--mc-shadow)}

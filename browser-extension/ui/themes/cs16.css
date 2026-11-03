@@ -143,8 +143,8 @@
 [data-rt-theme=cs16] .ic{--ic-w:1.4px;--ic-cap:square;--ic-join:miter;filter:drop-shadow(0 0 2px rgba(255,176,0,.55))}
 [data-rt-theme=cs16] :is(.rt-toast,.rt-dialog,.rt-tip){background:rgba(0,0,0,.94);border:1px solid var(--c-orange);border-radius:0;box-shadow:none}
 [data-rt-theme=cs16] .rt-toast{border-left-width:1px}
-[data-rt-theme=cs16] :is(.rt-toast-title,.rt-dialog-title){font:700 13px/1.3 var(--rt-font);color:var(--c-orange)}
-[data-rt-theme=cs16] .rt-dialog-title{font-size:15px}
+[data-rt-theme=cs16] :is(.rt-toast,.rt-dialog) :is(.rt-toast-title,.rt-dialog-title){font:700 13px/1.3 var(--rt-font);color:var(--c-orange)}
+[data-rt-theme=cs16] .rt-dialog .rt-dialog-title{font-size:15px}
 [data-rt-theme=cs16] .rt-scrim{background:rgba(0,0,0,.35)}
 [data-rt-theme=cs16] .rt-tip{color:#ececec}
 [data-rt-theme=cs16] .tabs button{display:grid;grid-template-columns:auto auto;justify-content:center;align-items:center;column-gap:4px;row-gap:2px}

@@ -157,8 +157,8 @@
 [data-rt-theme=l4d] .tabs button[aria-selected=true] .ic{color:var(--l-red-hi)}
 [data-rt-theme=l4d] :is(.rt-toast,.rt-dialog){background:var(--l-grime),rgba(10,11,10,.94);border:0;border-radius:0;clip-path:var(--l-torn);box-shadow:none}
 [data-rt-theme=l4d] .rt-toast{border-left:5px solid var(--tone)}
-[data-rt-theme=l4d] :is(.rt-toast-title,.rt-dialog-title){font-family:var(--rt-font-display);font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#f2f2f2}
-[data-rt-theme=l4d] .rt-dialog-title{font-size:22px}
+[data-rt-theme=l4d] :is(.rt-toast,.rt-dialog) :is(.rt-toast-title,.rt-dialog-title){font-family:var(--rt-font-display);font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#f2f2f2}
+[data-rt-theme=l4d] .rt-dialog .rt-dialog-title{font-size:22px}
 [data-rt-theme=l4d] :is(.rt-toast,.rt-dialog)[data-kind=error] :is(.rt-toast-title,.rt-dialog-title){background:var(--l-brush);padding:0 8px;margin-left:-4px}
 [data-rt-theme=l4d] :is(.rt-toast-text,.rt-dialog-text,.rt-steps){color:#c4c9c2}
 [data-rt-theme=l4d] .rt-dialog{padding:22px 18px 16px}

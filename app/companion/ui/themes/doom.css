@@ -194,8 +194,8 @@
 [data-rt-theme=doom] .tabs button .ic{grid-column:2;grid-row:1}
 [data-rt-theme=doom] .tabs button .tab-label{grid-column:1/-1;grid-row:2}
 [data-rt-theme=doom] :is(.rt-toast,.rt-dialog){background:var(--d-stone-tex);border:4px solid;border-color:var(--d-bevel);border-radius:0;box-shadow:0 0 0 2px #000,0 10px 30px rgba(0,0,0,.6)}
-[data-rt-theme=doom] :is(.rt-toast-title,.rt-dialog-title){font-family:var(--rt-font-display);font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--d-red);text-shadow:2px 2px 0 #000}
-[data-rt-theme=doom] .rt-dialog-title{font-size:22px}
+[data-rt-theme=doom] :is(.rt-toast,.rt-dialog) :is(.rt-toast-title,.rt-dialog-title){font-family:var(--rt-font-display);font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--d-red);text-shadow:2px 2px 0 #000}
+[data-rt-theme=doom] .rt-dialog .rt-dialog-title{font-size:22px}
 [data-rt-theme=doom] :is(.rt-toast-text,.rt-dialog-text,.rt-steps){color:#ececec;text-shadow:1px 1px 0 #000}
 [data-rt-theme=doom] :is(.rt-toast,.rt-dialog)[data-kind=warning] :is(.rt-toast-title,.rt-dialog-title){color:var(--d-yellow)}
 [data-rt-theme=doom] .rt-scrim{background:rgba(48,0,0,.55)}

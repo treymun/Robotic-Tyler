@@ -155,7 +155,7 @@ html[data-rt-theme=deadlock]{scrollbar-color:#7a5f2e #0c0a0a}
 [data-rt-theme=deadlock] :is(.rt-toast,.rt-dialog)[data-kind=warning]{--tone:#8a5a0a}
 [data-rt-theme=deadlock] :is(.rt-toast,.rt-dialog):not([data-kind]),[data-rt-theme=deadlock] :is(.rt-toast,.rt-dialog)[data-kind=info]{--tone:#2f6f66}
 [data-rt-theme=deadlock] :is(.rt-toast,.rt-dialog)[data-kind=error]{--tone:#9b2c22}
-[data-rt-theme=deadlock] :is(.rt-toast-title,.rt-dialog-title){font-family:var(--rt-font-display);font-weight:400;font-size:16px;letter-spacing:.03em;color:#2a2118;text-shadow:none}
+[data-rt-theme=deadlock] :is(.rt-toast,.rt-dialog) :is(.rt-toast-title,.rt-dialog-title){font-family:var(--rt-font-display);font-weight:400;font-size:16px;letter-spacing:.03em;color:#2a2118;text-shadow:none}
 [data-rt-theme=deadlock] :is(.rt-toast-text,.rt-dialog-text,.rt-steps){color:#3a2e22}
 [data-rt-theme=deadlock] :is(.rt-toast,.rt-dialog) .ic{color:var(--tone)}
 [data-rt-theme=deadlock] :is(.rt-toast,.rt-dialog) .rt-x{color:#5a4420}

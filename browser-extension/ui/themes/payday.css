@@ -172,7 +172,7 @@ html[data-rt-theme=payday]{scrollbar-color:#2c3b4b #06090d}
 [data-rt-theme=payday] :is(.rt-toast,.rt-dialog){background:rgba(4,8,12,.96);border:1px solid #24313f;border-radius:0;box-shadow:0 0 0 1px #000,0 14px 34px rgba(0,0,0,.65)}
 [data-rt-theme=payday] .rt-toast{border-left:3px solid var(--tone)}
 [data-rt-theme=payday] :is(.rt-toast,.rt-dialog)[data-kind=error]{border-top:5px solid transparent;border-image:repeating-linear-gradient(-45deg,#ff9a2e 0 7px,#000 7px 14px) 5;border-image-width:5px 0 0 0}
-[data-rt-theme=payday] :is(.rt-toast-title,.rt-dialog-title){font-family:var(--rt-font-display);font-weight:600;font-size:18px;text-transform:uppercase;letter-spacing:.04em;line-height:1;color:#fff}
+[data-rt-theme=payday] :is(.rt-toast,.rt-dialog) :is(.rt-toast-title,.rt-dialog-title){font-family:var(--rt-font-display);font-weight:600;font-size:18px;text-transform:uppercase;letter-spacing:.04em;line-height:1;color:#fff}
 [data-rt-theme=payday] :is(.rt-toast-text,.rt-dialog-text,.rt-steps){color:var(--rt-ink-2)}
 [data-rt-theme=payday] .rt-tip{background:#06090d;color:#fff;border:1px solid var(--pd-blue);border-radius:0;font-family:var(--rt-font);text-transform:uppercase;letter-spacing:.06em;font-size:10px}
 

@@ -391,6 +391,8 @@ button:focus-visible,summary:focus-visible,a:focus-visible,input[type=checkbox]:
 .vote-count{font-size:var(--rt-text-xs);color:var(--rt-ink-2);font-variant-numeric:tabular-nums;white-space:nowrap}
 .vote[data-leader=true] .vote-title{font-weight:700}
 .vote-discs{display:none}
+/* Before anyone votes, the board is an empty-state note in the theme's own line and ink colours. */
+#sqVotes:not(.vote-board):not(:empty){margin:6px 0 8px;padding:10px;border:1px dashed var(--rt-line-strong);border-radius:var(--rt-r-sm);color:var(--rt-ink-3);font-size:var(--rt-text-sm);text-align:center}
 
 /* ── v2.18 motion: Steam ──
    A playing pad runs a thin download bar along its foot; an arriving vote's count flashes Steam

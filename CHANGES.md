@@ -1,3 +1,37 @@
+# ROBOTIC TYLER v2.18.0: twenty themes
+
+## Five new themes
+Settings → Appearance now offers twenty themes, each with its own colours, type, controls, status strip, notifications, motion and Tyler mascot.
+- **PAYDAY 2 (Crime.net):** a dark street map with blue contract markers, compact type, crew-card stats and important notes on pinned briefing sheets. Game votes are contracts: each has a marker and its count, and the leading contract gets circled in red when a vote arrives. Collapsed, the panel is a crew radio whose transmit lamp lights while Tyler talks.
+- **Sega Dreamcast (VMU):** the console menu's warm whites, orange accents, pale grey geometry and generous spacing. A spiral resolves into the tab or section you pick. Collapsed, the panel takes a VMU's proportions: a narrow cream shell, the monochrome LCD with Tyler's pixel portrait (it changes pose when he listens, thinks or talks) and the status in pixel letters beside it, and the D-pad and round A/B buttons underneath (B pauses the AI, A stops audio).
+- **Garry's Mod (Sandbox):** Derma panels, property-sheet tabs and blue selection. The soundboard is the Q spawn menu: a category rail, a grid of spawn-icon tiles and the G-Man-inspired Tyler portrait. A playing clip is lifted by a physics-gun beam with a slight tilt, and drops back into its slot when playback stops. Errors show the floating red ERROR.
+- **Ricochet (Disc Arena):** floating platforms in dark space, luminous disc edges and chunky arcade lettering. A disc banks into the selected tab, and during a vote discs land on each game's platform as votes arrive, beside the numeric tally.
+- **Day of Defeat: Source (Field Radio):** olive-painted steel with worn edges, canvas pouches, cream stencils, manila map tabs and amber instruments. The status strip is the radio's face: a speaker grille, a receive needle driven by the real incoming voice level, and a separate red TX lamp that lights only while Tyler speaks. Connection checks are typed into the operator's log.
+
+Fonts, all bundled under the SIL Open Font License: Teko and IBM Plex Sans Condensed (PAYDAY 2), M PLUS Rounded 1c and Silkscreen (Dreamcast), Roboto (Garry's Mod), Audiowide and Exo 2 (Ricochet), Stardos Stencil and Courier Prime (Day of Defeat: Source). No game logos, textures or fonts are included: their reuse terms for an app aren't clear, so every theme is an original treatment of the game's style, credited as a fan project.
+
+## Logos
+- The five supplied logos are cut cleanly from the preview, aligned like the other fifteen, and used in the chat panel, compact mode, settings, the theme gallery, the Voice window, the toolbar icon and the desktop window and tray icons.
+- Every logo was compared at 32 and 64 px on its theme's real panel background. Small logos are now resampled to their exact on-screen pixel size (Lanczos with a light unsharp mask) instead of being shrunk by the browser, so glasses, the valve eye and outlines stay crisp. The toolbar and tray icons are dedicated small exports.
+- Dedicated small versions for three logos: Dreamcast and Day of Defeat: Source are centred and enlarged at small sizes (the VMU and the radio handset sat off-centre), and Quake's midtones are lifted (dark brown on a dark frame). The masters are unchanged and kept in `assets/theme-logos/`.
+
+## A design pass across all twenty themes
+Reviewed with motion off in the chat panel, soundboard, room tools, checks, settings, dialogs and compact view:
+- **Soundboard:** each theme now has its own structure instead of the same two-column list: Classic Steam VGUI push-buttons, TF2 loadout slots (favourites in Unique gold), CS2 inventory tiles, Portal test-chamber signs, the CS 1.6 buy menu, HEV weapon slots, Left 4 Dead painted numbers, a Windows XP Explorer tiles view, DOOM's ARMS panel, Quake rune plates, a Pip-Boy item list, Combine terminal cells, a Deadlock shop and a Minecraft inventory with stack counts.
+- **Game votes** are a ranked board in every theme: a VGUI list view, a TF2 vote panel, a CS2 map vote, the CS 1.6 vote menu, HEV segment meters, Left 4 Dead tally marks on the wall, XP progress blocks, Quake frag boxes, a Pip-Boy list and so on.
+- **Connection checks** are marked passed, needs attention or unknown, and each theme shows them its own way (console lines, Security Center icons, portal rings, Pip-Boy OK/CHECK, the field-radio log with a red CHECK stamp…).
+- Dialog and notification titles in several themes had been taking the page heading colour (low contrast on DOOM, Deadlock, Minecraft, Garry's Mod and Day of Defeat: Source dialogs); they now keep their own.
+- The "No votes yet" empty state, compact footers and narrow windows were tidied in every theme.
+
+## Motion across all twenty themes
+Every theme keeps a short entrance and its status-strip signature, and now also reacts to the real playback, vote and check events: Classic Steam's pushed button fills a download bar, HEV vote segments light in sequence, Left 4 Dead paints tally strokes, Portal rings pulse round a playing sign, DOOM flashes the ARMS digit like a pickup, Minecraft's selection frame snaps on, Pip-Boy lines draw in, and so on. Effects stop the moment playback stops or a view closes, nothing blocks clicks during a theme change, and with reduce motion on no animation runs; every state also has a clear static look.
+
+## Tested
+- 244 unit and integration tests and 11 end-to-end tests in Chromium (mocked Chrome APIs), including all twenty themes' text contrast (4.5:1), fonts, logos at 2× density with a page that blocks images, the gallery with the keyboard, and live theme switching.
+- In a browser with mocked Steam and Chrome APIs: the real soundboard status message, vote refresh, Systems check and incoming-level message were sent for every theme, and the matching effects ran and stopped (with reduce motion, none ran). Switching through all twenty themes rapidly leaves only the chosen theme's animations, starts no timers, and keeps the logo in step. No sideways scrolling at 360 px. The Chrome extension restores the saved theme, logo and font after a browser restart.
+- Not tested in a real Steam chat, on Windows, or with live audio, so the receive needle, transmit lamp and playback effects were driven by simulated events, not real voice.
+
+---
 # ROBOTIC TYLER v2.17.0: fifteen themes
 
 ## Five new themes

@@ -1,0 +1,19 @@
+ROBOTIC TYLER v2.18.0 — patch notes
+
+New themes (20 in total)
+- PAYDAY 2 (Crime.net): votes as contracts, the leader circled; compact mode is a crew radio with a transmit lamp.
+- Sega Dreamcast (VMU): a spiral resolves into the selected item; compact mode is a VMU whose pixel portrait changes pose.
+- Garry's Mod (Sandbox): the soundboard is the Q spawn menu; a playing clip is held by a physics-gun beam and drops back when it stops.
+- Ricochet (Disc Arena): a disc banks into the selected tab; votes land as discs on each game's platform beside the tally.
+- Day of Defeat: Source (Field Radio): a receive needle follows incoming voice, a TX lamp lights while Tyler speaks, checks go in the operator's log.
+
+Logos
+- Five new mascots. All twenty are resampled to their exact on-screen size, so they stay crisp at 24-64 px.
+- Dedicated small versions for Dreamcast, Day of Defeat: Source and Quake. Sharpened toolbar and tray icons.
+
+All twenty themes
+- Each theme has its own soundboard layout, vote board and connection-check list.
+- New motion tied to playback, votes and checks; reduce motion turns it all off.
+- Dialog titles keep their own colour in every theme.
+
+Tested in Chromium with mocked Steam/Chrome APIs (244 unit + 11 end-to-end tests). Not tested in a real Steam chat, on Windows or with live audio.
