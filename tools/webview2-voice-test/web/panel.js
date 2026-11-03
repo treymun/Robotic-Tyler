@@ -20,7 +20,7 @@
   pcs: new Map(), voiceUi: false, voiceUiOn: 0, voiceUiOff: 0,
   presence: {}, attached: 0, audioStatus: '', events: [], outSpeech: [], inSpeech: [], playing: false, playStart: 0,
   firsts: {}, peaks: { out: 0, in: 0 }, log: [],
-  sdps: [], repairs: [], repairReady: false, people: new Map()
+  sdps: [], repairs: [], repairReady: false, people: new Map(), midOff: new Set()
  };
  const STAGES = [
   ['support', 'Browser support'],
@@ -146,13 +146,14 @@
    case 'tyler-presence': S.presence = m; log('Tyler in the page: bridge ' + yes(m.bridge) + ', panel ' + yes(m.panel) + ', 2B test bar ' + yes(m.testBar)); break;
    case 'tyler': tyler(m); break;
    case 'pc-sdp': sdpEvent(m); break;
-   case 'sdp-repair': case 'sdp-repair-ready': repairEvent(m); break;
+   case 'sdp-repair': case 'sdp-repair-ready': case 'sdp-mid': repairEvent(m); break;
   }
  }
  const yes = v => v ? 'yes' : 'no';
 
  // How many other people Steam's server is sending us, from a remote description: the distinct
- // stream ids (msid) in sections that send to us, or their SSRCs when it lists no msid.
+ // stream ids (msid) in sections that send to us, or their SSRCs when it lists no msid. Steam's
+ // section 0 lists the bot itself ("Self-…"), which isn't another person.
  function people(text) {
   const streams = new Set(), ssrcs = new Set();
   for (const sec of String(text).split(/\n(?=m=)/).slice(1)) {
@@ -160,6 +161,7 @@
    const dir = (lines.find(l => /^a=(sendrecv|sendonly|recvonly|inactive)$/.test(l)) || 'a=sendrecv').slice(2);
    if (port === '0' || dir === 'recvonly' || dir === 'inactive') continue;
    for (const l of lines) {
+    if (lines.some(x => /^a=(msid:|ssrc:\d+ (msid|cname):)Self-/.test(x))) break;
     let m = /^a=msid:(\S+)/.exec(l) || /^a=ssrc:\d+ msid:(\S+)/.exec(l);
     if (m && m[1] !== '-') streams.add(m[1]);
     m = /^a=ssrc:(\d+)/.exec(l); if (m) ssrcs.add(m[1]);
@@ -179,6 +181,11 @@
  }
  function repairEvent(m) {
   if (m.type === 'sdp-repair-ready') { S.repairReady = true; return; }
+  if (m.type === 'sdp-mid') {
+   S.midOff.add(m.id);
+   log('Leave fix: connection #' + m.id + ' routes Steam\'s audio by stream id only (removed the MID tag from Steam\'s ' + m.kind + ', and from every description after it)');
+   return;
+  }
   S.repairs.push({ ...m, local: now() }); if (S.repairs.length > 20) S.repairs.shift();
   if (m.error) { log('Leave fix: couldn\'t check Steam\'s ' + m.kind + ' (' + m.error + '); used it unchanged'); return; }
   for (const c of m.changes || []) log('Leave fix: connection #' + m.id + ', Steam\'s ' + m.kind + ' listed stream ' + c.clash.map(x => x.ssrc).join(', ') + ' in section ' + c.mid + ' while section ' + [...new Set(c.clash.map(x => x.owner))].join(', ') + ' still had it; removed it from section ' + c.mid + ' so the browser accepts the ' + m.kind);
@@ -293,15 +300,22 @@
   const list = ev('session'), left = ev('left').length + ev('voice-off').length;
   return { count: list.length, rejoined: list.length >= 2 && left > 0, latest: list[list.length - 1] };
  }
- // After Steam says someone left: did this connection stay up for 10 s?
+ // After each time Steam said someone left: did the connection stay up for 10 s?
  function stayed() {
   const lefts = ev('someone-left');
   if (!lefts.length) return ['pending', 'With the bot, your main and your friend in the channel, your friend leaves (the bot and your main stay).'];
-  const last = lefts[lefts.length - 1], p = S.pcs.get(last.doc + '#' + last.pc);
-  if (!last.ok) return ['fail', 'The browser rejected Steam\'s offer after someone left, so Steam ended the bot\'s call.'];
-  if (p && p.closedAt && p.closedAt - last.at < 10000) return ['fail', 'The connection closed ' + Math.round((p.closedAt - last.at) / 1000) + ' s after someone left' + (p.closedBy ? ' (closed by ' + p.closedBy.split(' < ')[0] + ')' : '') + '.'];
-  if (now() - last.at < 10000) return ['active', 'Someone left ' + Math.round((now() - last.at) / 1000) + ' s ago; still connected…'];
-  return ['ok', 'Still connected ' + Math.round((((p && p.closedAt) || now()) - last.at) / 1000) + ' s after someone left' + (S.repairs.some(r => r.changes && r.local >= last.at - 2000 && r.local <= last.at + 2000) ? ' (the leave fix adjusted that offer)' : '') + '.'];
+  const outcome = l => {
+   const p = S.pcs.get(l.doc + '#' + l.pc);
+   if (!l.ok) return 'rejected';
+   if (p && p.closedAt && p.closedAt - l.at < 10000) return 'dropped';
+   return now() - l.at < 10000 && !(p && p.closedAt) ? 'waiting' : 'stayed';
+  };
+  const results = lefts.map(outcome), kept = results.filter(r => r === 'stayed').length, last = results[results.length - 1];
+  const bad = results.filter(r => r === 'rejected' || r === 'dropped').length;
+  const summary = 'Stayed through ' + kept + ' of ' + lefts.length + ' leave(s)';
+  if (bad) return ['fail', summary + '. ' + (results.includes('rejected') ? 'The browser rejected Steam\'s offer after someone left, so Steam ended the bot\'s call.' : 'The connection closed within 10 s after someone left.')];
+  if (last === 'waiting') return ['active', summary + '; someone left ' + Math.round((now() - lefts[lefts.length - 1].at) / 1000) + ' s ago, still connected…'];
+  return ['ok', summary + '.'];
  }
  function checks() {
   const mode = S.mode, ss = sessions();
@@ -355,7 +369,7 @@
    const on = h.repair !== 'off';
    for (const b of document.querySelectorAll('[data-repair]')) b.setAttribute('aria-checked', String((b.dataset.repair === 'on') === on));
    const fixed = S.repairs.filter(r => r.changes && r.changes.length).length;
-   $('repairNote').textContent = on ? (S.repairReady ? 'On and loaded in Steam. ' : 'On (loads with Steam chat). ') + (fixed ? 'Adjusted ' + fixed + ' of Steam\'s descriptions so far.' : 'Nothing needed adjusting yet.') + ' It only removes stream ids that would make the browser reject Steam\'s offer when someone leaves.'
+   $('repairNote').textContent = on ? (S.repairReady ? 'On and loaded in Steam. ' : 'On (loads with Steam chat). ') + 'The browser routes Steam\'s audio by each person\'s stream id, so a leave can\'t collide' + (S.midOff.size ? ' (active on this call)' : '') + '.' + (fixed ? ' Also fixed ' + fixed + ' listed stream collision(s).' : '')
     : 'Off: Steam\'s descriptions reach the browser unchanged (to compare with 0.1.0).';
   }
   steps();
@@ -421,7 +435,7 @@
   if (S.mode !== 'manual') lines.push(' Tyler: attached senders ' + S.attached + ', beeps ' + ev('beep').length + ', speech turns heard ' + ev('heard').length + ', playbacks ' + ev('play-end').length + ' · last bridge status: ' + (S.audioStatus || '—'));
   if (electron()) {
    const fixed = S.repairs.filter(r => r.changes && r.changes.length);
-   lines.push(' Leave fix: ' + (h.repair === 'off' ? 'off' : 'on, ' + (S.repairReady ? 'loaded' : 'NOT seen in the page')) + ' · descriptions adjusted ' + fixed.length + (S.repairs.some(r => r.error) ? ' · errors ' + S.repairs.filter(r => r.error).length : ''));
+   lines.push(' Leave fix: ' + (h.repair === 'off' ? 'off' : 'on, ' + (S.repairReady ? 'loaded' : 'NOT seen in the page')) + ' · MID tag removed on connection(s) ' + ([...S.midOff].map(x => '#' + x).join(', ') || 'none') + ' · stream collisions fixed ' + fixed.length + (S.repairs.some(r => r.error) ? ' · errors ' + S.repairs.filter(r => r.error).length : ''));
    for (const r of fixed) for (const c of r.changes) lines.push('  ' + time(r.local) + ' connection #' + r.id + ' ' + r.kind + ': removed SSRC ' + c.clash.map(x => x.ssrc + ' (held by section ' + x.owner + ')').join(', ') + ' from section ' + c.mid);
   }
   const lj = ev('someone-left').length, jj = ev('someone-joined').length;

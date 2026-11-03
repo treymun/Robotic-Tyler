@@ -1,16 +1,27 @@
 // ROBOTIC TYLER voice test: the "leave fix" (runs in the Steam page at document start, before
 // Steam's scripts, after diagnostics.js).
 //
-// What it fixes: when someone leaves a group voice call, Steam's voice server sends a new offer. That
-// offer can list an incoming audio stream (an SSRC) in one section while the browser still routes
-// that stream to another section. Chromium then rejects the whole offer ("Failed to set up audio
-// demuxing for mid='m1'"), refuses every later offer on that connection, and Steam ends the call.
+// What it fixes: Steam's voice server gives every other person in the call their own section (m1, m2…)
+// with their own SSRC, and marks it inactive when they leave. Chromium then re-registers that section
+// with the SSRC, and refuses ("Failed to set up audio demuxing for mid='m1'") when the SSRC is routed
+// to another section at that moment. After one refusal Chromium rejects every later offer on that
+// connection, and Steam ends the call.
 //
-// What it does: before each description from Steam's server reaches the browser, it replays how
-// Chromium will update its routing (section by section, in order, starting from the description in
-// force) and removes only the SSRC lines that would collide. Each removed stream keeps its msid, so Steam still sees the same
-// person's audio stream. Nothing else in the description changes, a description with no collision
-// passes through untouched, and any problem in this code falls back to Steam's original.
+// Why the SSRC is routed elsewhere (Steam's real descriptions in the 0.1.1 report, Chromium 156's
+// RtpDemuxer, and a local reproduction): when the bot joins, Steam's answer has only section 0, so
+// the audio of someone already talking first arrives tagged with MID "0". Chromium remembers that
+// tag for the SSRC and keeps routing the SSRC to section 0 even after Steam lists it in that person's
+// own section. The leave (or any other re-registration of that section) then collides.
+//
+// What it does, before each description from Steam's server reaches the browser:
+//  1. Removes the MID header extension (a=extmap … sdes:mid), so the browser routes Steam's audio by
+//     the SSRCs Steam lists, never by a remembered section tag. This is the fix for the leave drop.
+//     (Chrome only puts MID on a stream's first packets anyway, so Steam's server already routes the
+//     bot's own audio by SSRC.)
+//  2. Replays how Chromium will update its routing (section by section, in order, from the
+//     description in force) and removes SSRC lines that would collide with another section's listed
+//     SSRC, keeping each stream's msid so Steam still sees the same person.
+// Nothing else changes, and any problem in this code falls back to Steam's original description.
 (() => {
  'use strict';
  if (window !== window.top || location.hostname !== 'steamcommunity.com') return;
@@ -71,13 +82,16 @@
   }
  }
 
+ const MID_EXT = /^a=extmap:\d+(?:\/\w+)? urn:ietf:params:rtp-hdrext:sdes:mid\s*$/;
  // Replays Chromium's routing update for a new description, starting from the description in force
  // (`before`). Chromium updates the sections one by one, in order: a section whose SSRC list changed
  // drops its old SSRCs and claims its new ones, and a claim fails if another section still holds
- // that SSRC. Streams the browser only learned from received packets don't block a claim (checked
- // in Chromium 153 and 156), so only listed SSRCs count.
+ // that SSRC as a listed one.
  function plan(sdp, before) {
   const next = parse(sdp), old = before ? parse(before) : null;
+  let midExt = 0;
+  next.head = next.head.filter(l => !(MID_EXT.test(l) && ++midExt));
+  for (const s of next.secs) s.lines = s.lines.filter(l => !(MID_EXT.test(l) && ++midExt));
   const groupOf = new Map(next.secs.map(s => [s.mid, s.group]));
   const route = new Map();                                   // group|ssrc → mid
   const key = (g, x) => g + '|' + x;
@@ -95,10 +109,11 @@
    }
    if (clash.length) { strip(s, clash.map(c => c.ssrc)); changes.push({ mid: s.mid, clash }); }
   }
-  return { changes, sdp: changes.length ? text(next) : sdp };
+  return { changes, midExt, sdp: changes.length || midExt ? text(next) : sdp };
  }
 
  let enabled = true, seq = 0;
+ const midNoted = new WeakSet();
  const native = proto.setRemoteDescription;
  proto.setRemoteDescription = function (desc, ...rest) {
   let use = desc;
@@ -107,10 +122,9 @@
    try {
     const before = this.remoteDescription && this.remoteDescription.sdp;
     const r = plan(desc.sdp, before);
-    if (r.changes.length) {
-     use = new RTCSessionDescription({ type: desc.type, sdp: r.sdp });
-     post('sdp-repair', { id: diagId(this), n, kind: desc.type, changes: r.changes, original: redact(desc.sdp) });
-    }
+    if (r.changes.length || r.midExt) use = new RTCSessionDescription({ type: desc.type, sdp: r.sdp });
+    if (r.midExt && !midNoted.has(this)) { midNoted.add(this); post('sdp-mid', { id: diagId(this), n, kind: desc.type, lines: r.midExt }); }
+    if (r.changes.length) post('sdp-repair', { id: diagId(this), n, kind: desc.type, changes: r.changes, original: redact(desc.sdp) });
    } catch (e) { use = desc; post('sdp-repair', { id: diagId(this), n, kind: desc.type, error: String(e && e.message || e).slice(0, 160) }); }
   }
   return native.call(this, use, ...rest);

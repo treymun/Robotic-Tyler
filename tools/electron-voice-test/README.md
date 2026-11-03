@@ -1,4 +1,4 @@
-# ROBOTIC TYLER · Electron voice test (prototype 0.1.1)
+# ROBOTIC TYLER · Electron voice test (prototype 0.1.2)
 
 A small, separate Windows app (not the ROBOTIC TYLER desktop app) that checks one thing: **can
 Steam web voice hold a group call in Electron, the engine the desktop app uses, when the Steam
@@ -14,26 +14,31 @@ Everything stays in `%LOCALAPPDATA%\RoboticTylerElectronVoiceTest`. The desktop 
 keys and Steam sign-in are not touched. The panel only measures (states, levels, packet counts,
 Steam's own voice messages); it never reads chat text or records audio.
 
-## New in 0.1.1: the leave fix
+## New in 0.1.2: the leave fix, second try
 
-In 0.1.0 the bot was dropped whenever someone left the call. The log showed why: after a leave,
-Steam's voice server sends a new offer that lists one person's audio stream in a section the
-browser still routes to another section. The browser rejects that offer ("Failed to set up audio
-demuxing for mid='m1'"), and after one rejection it refuses every later offer on that connection,
-so Steam ends the call.
+In 0.1.0 the bot was dropped whenever someone left the call, and 0.1.1's fix didn't help: its
+report showed Steam's real descriptions, and the cause was different from my first guess.
 
-The **leave fix** (on by default, in the panel under *Leave fix*) checks each description from
-Steam's server before the browser sees it and removes only the lines that would collide. Each
-person's audio stream keeps its identity, so Steam still plays everyone. A description with no
-collision goes through unchanged. **Off (as in 0.1.0)** turns it off, to compare.
+What happens: when the bot joins, Steam first gives it a single audio section, so the audio of
+anyone already talking arrives tagged for that section (the "MID" tag). The browser remembers the
+tag for that person's stream and keeps routing it there, even after Steam gives the person their
+own section. When the person leaves, Steam marks their section inactive, the browser re-checks the
+routing, finds the stream "taken" by the first section, rejects Steam's offer, and Steam ends the
+call. It only bites when the last other person leaves (or leaves and rejoins), which is why it
+looked random.
 
-The report now also includes Steam's session descriptions (with addresses, ICE passwords and
-certificate fingerprints removed), so if anything still fails, the exact lines are in the report.
+The **leave fix** (on by default, under *Leave fix*) now removes that tag from Steam's descriptions,
+so the browser routes each person's audio by the stream id Steam lists for them. It also keeps
+0.1.1's check for listed collisions. **Off (as in 0.1.0)** turns it off, to compare.
+
+I reproduced the drop on my side with descriptions shaped like Steam's (fix off: dropped with the
+same error as your report; fix on: stayed through two leaves and a rejoin, audio both ways). That
+is a mock: only your live test shows whether Steam's server is happy with it.
 
 ## Start
 
-1. Unzip `RoboticTyler-Electron-VoiceTest-0.1.1-win-x64.zip` anywhere (you can delete 0.1.0; your
-   Steam sign-in is kept).
+1. Unzip `RoboticTyler-Electron-VoiceTest-0.1.2-win-x64.zip` anywhere (you can delete 0.1.0 and 0.1.1;
+   your Steam sign-in is kept).
 2. Run `RoboticTyler-Electron-VoiceTest.exe` (it has Electron's icon). It isn't signed: if Windows
    says *"Windows protected your PC"*, choose **More info → Run anyway**.
 3. Sign in to the **bot account** in the Steam window if asked.
@@ -79,11 +84,11 @@ button opens it). Turn VB-CABLE and the microphone back on if you use them.
 - `python3 tools/electron-voice-test/package.py` builds the zip (uses the desktop app's Electron
   version).
 - `ELECTRON=<electron binary> node tools/electron-voice-test/check.mjs` runs the test app against a
-  **mock** Steam page (no Steam servers, no Windows audio): bot joins, friend joins, friend leaves
-  with the colliding offer. With the fix on the bot must stay; with it off the mock must reproduce
-  the drop.
-- `node tools/electron-voice-test/sdp-scenarios.mjs` runs the leave fix against nine kinds of
-  re-offer in Playwright's Chromium (also a **mock**).
+  **mock** Steam page shaped like Steam's real descriptions (no Steam servers, no Windows audio):
+  the friend talks before the bot joins, then is listed in their own section, leaves, rejoins and
+  leaves again. With the fix on the bot must stay; with it off the mock must reproduce the drop.
+- `node tools/electron-voice-test/sdp-scenarios.mjs` runs the listed-collision part of the fix
+  against nine kinds of re-offer in Playwright's Chromium (also a **mock**).
 
 These checks show the fix works against the failure as reproduced locally. Only the live test with
 Steam shows whether Steam's real offers are the same kind.

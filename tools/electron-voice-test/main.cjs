@@ -11,13 +11,15 @@
 // Modes: manual (Stage 1: nothing of Tyler's) and bridge (Stage 2B: Tyler's in-page audio files
 // and a beep / listen / echo test bar). Data: %LOCALAPPDATA%\RoboticTylerElectronVoiceTest.
 //
-// 0.1.1 adds the leave fix (web/sdp-repair.js, on by default, switchable in the panel): when someone
-// leaves, Steam's next offer can list a stream in a section the browser still routes elsewhere, the
-// browser rejects it, and Steam ends the bot's call. The fix removes only those colliding lines.
+// The leave fix (web/sdp-repair.js, on by default, switchable in the panel): when someone leaves,
+// the browser rejected Steam's next offer because it still routed that person's stream by a
+// remembered section tag (MID), and Steam ended the bot's call. 0.1.2 removes the MID tag from
+// Steam's descriptions so streams are routed by the SSRCs Steam lists (0.1.1 only fixed listed
+// collisions, which Steam's real offers don't have).
 const {app,BaseWindow,WebContentsView,session,ipcMain,dialog,clipboard,shell,protocol,net}=require('electron');
 const path=require('node:path'),fs=require('node:fs'),os=require('node:os'),{pathToFileURL}=require('node:url');
 
-const VERSION='0.1.1';
+const VERSION='0.1.2';
 const STEAM_CHAT='https://steamcommunity.com/chat/';
 const DATA=process.env.TYLER_TEST_DATA||path.join(process.env.LOCALAPPDATA||app.getPath('appData'),'RoboticTylerElectronVoiceTest');
 app.setPath('userData',path.join(DATA,'Profile'));
