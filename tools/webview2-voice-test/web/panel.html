@@ -19,6 +19,15 @@
   <button type="button" role="radio" data-mode="bridge" aria-checked="false"><b>Stage 2B</b><span>Bridge only</span></button>
 </nav>
 
+<section class="card identity">
+  <h2>Browser identity</h2>
+  <div class="seg" role="radiogroup" aria-label="Browser identity">
+    <button type="button" role="radio" data-identity="default" aria-checked="true">WebView2 default (Edge)</button>
+    <button type="button" role="radio" data-identity="chrome" aria-checked="false">Same as Chrome</button>
+  </div>
+  <p class="muted small" id="identityNote">Steam only starts voice for a browser that calls itself Chrome or Edge, and its voice server sets up the call from that name. "Same as Chrome" uses Google Chrome's exact user agent for this engine version.</p>
+</section>
+
 <section class="card steps" id="steps"></section>
 
 <section class="card">

@@ -53,3 +53,6 @@ textarea{width:100%;padding:7px 8px;border:1px solid var(--line);border-radius:5
 .log ol{list-style:none;margin:8px 0 0;padding:0;max-height:260px;overflow:auto;font:11.5px/1.45 Consolas,"Cascadia Mono",monospace;color:#c6d0d9}
 .log li{padding:1px 0;border-top:1px solid #222b34;word-break:break-word}
 .log time{color:var(--muted);margin-right:6px}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+.seg button{padding:6px 8px;border:1px solid var(--line);border-radius:5px;background:#0f1419;color:var(--ink);font:inherit;cursor:pointer}
+.seg button[aria-checked=true]{border-color:var(--accent);background:#173048;box-shadow:inset 0 0 0 1px var(--accent)}

@@ -38,6 +38,11 @@ public sealed class MainForm : Form
     readonly string appDir = AppContext.BaseDirectory;
     CoreWebView2Environment? env;
     string mode = "manual";
+    // Browser identity (0.1.3). Steam's web chat sends navigator.userAgent to its voice server, which
+    // then builds the call's connection descriptions. "chrome" drops the " Edg/…" token so the user
+    // agent matches Google Chrome of the same version; everything else stays WebView2's default.
+    string identity = "default";
+    string defaultUserAgent = "";
     string? bridgeScriptId;
     CoreWebView2BrowserExtension? tyler;
     string extensionError = "";
@@ -103,6 +108,8 @@ public sealed class MainForm : Form
         core.NavigationCompleted += (_, e) => ToPanel(new JsonObject { ["type"] = "nav", ["phase"] = "done", ["ok"] = e.IsSuccess, ["status"] = e.WebErrorStatus.ToString(), ["url"] = Short(core.Source) });
         core.ProcessFailed += (_, e) => ToPanel(new JsonObject { ["type"] = "process-failed", ["kind"] = e.ProcessFailedKind.ToString(), ["reason"] = e.Reason.ToString() });
         core.DocumentTitleChanged += (_, _) => { };
+        defaultUserAgent = core.Settings.UserAgent;
+        ApplyIdentity();
         await core.AddScriptToExecuteOnDocumentCreatedAsync(ReadWeb("diagnostics.js"));
         await ApplyModeAsync(mode, reload: false);
         core.Navigate(SteamChat);
@@ -143,7 +150,7 @@ public sealed class MainForm : Form
     static string RuntimeReport(Exception? ex)
     {
         var sb = new StringBuilder();
-        sb.AppendLine("ROBOTIC TYLER · WebView2 voice test 0.1.2 · startup problem");
+        sb.AppendLine("ROBOTIC TYLER · WebView2 voice test 0.1.3 · startup problem");
         sb.AppendLine("Time: " + DateTime.Now.ToString("u"));
         sb.AppendLine("Windows: " + RuntimeInformation.OSDescription + " · " + RuntimeInformation.OSArchitecture + " · process " + RuntimeInformation.ProcessArchitecture);
         try { sb.AppendLine("Runtime WebView2 chose: " + CoreWebView2Environment.GetAvailableBrowserVersionString()); }
@@ -317,6 +324,13 @@ public sealed class MainForm : Form
             case "reload":
                 steam.CoreWebView2?.Navigate(SteamChat);
                 break;
+            case "identity":
+                identity = m?["identity"]?.GetValue<string>() == "chrome" ? "chrome" : "default";
+                ApplyIdentity();
+                SaveMode();
+                SendState();
+                steam.CoreWebView2?.Navigate(SteamChat);
+                break;
             case "devtools":
                 steam.CoreWebView2?.OpenDevToolsWindow();
                 break;
@@ -367,7 +381,7 @@ public sealed class MainForm : Form
         ToPanel(new JsonObject
         {
             ["type"] = "host",
-            ["app"] = "0.1.2",
+            ["app"] = "0.1.3",
             ["runtime"] = env.BrowserVersionString,
             ["sdk"] = sdk,
             ["os"] = RuntimeInformation.OSDescription,
@@ -375,6 +389,8 @@ public sealed class MainForm : Form
             ["userAgent"] = ua,
             ["profile"] = dataDir,
             ["mode"] = mode,
+            ["identity"] = identity,
+            ["defaultUserAgent"] = defaultUserAgent,
             ["extension"] = new JsonObject
             {
                 ["bundled"] = File.Exists(Path.Combine(ExtensionDir, "manifest.json")),
@@ -404,12 +420,24 @@ public sealed class MainForm : Form
     }
     string LoadMode()
     {
-        try { return JsonNode.Parse(File.ReadAllText(StateFile))?["mode"]?.GetValue<string>() ?? "manual"; }
+        try
+        {
+            var state = JsonNode.Parse(File.ReadAllText(StateFile));
+            identity = state?["identity"]?.GetValue<string>() == "chrome" ? "chrome" : "default";
+            return state?["mode"]?.GetValue<string>() ?? "manual";
+        }
         catch { return "manual"; }
     }
     void SaveMode()
     {
-        try { File.WriteAllText(StateFile, new JsonObject { ["mode"] = mode }.ToJsonString()); } catch { }
+        try { File.WriteAllText(StateFile, new JsonObject { ["mode"] = mode, ["identity"] = identity }.ToJsonString()); } catch { }
+    }
+    void ApplyIdentity()
+    {
+        if (steam.CoreWebView2 == null || defaultUserAgent == "") return;
+        steam.CoreWebView2.Settings.UserAgent = identity == "chrome"
+            ? System.Text.RegularExpressions.Regex.Replace(defaultUserAgent, @"\s+Edg/[\d.]+", "")
+            : defaultUserAgent;
     }
     static bool IsSteam(string uri) =>
         Uri.TryCreate(uri, UriKind.Absolute, out var u) && u.Scheme == "https" &&

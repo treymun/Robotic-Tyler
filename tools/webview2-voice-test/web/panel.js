@@ -3,7 +3,9 @@
 // the report is saved to your desktop or copied for you to send.
 (() => {
  'use strict';
- const wv = window.chrome && window.chrome.webview;
+ // WebView2 gives the page window.chrome.webview; the Electron test gives it window.tylerHost.
+ const wv = (window.chrome && window.chrome.webview) || window.tylerHost;
+ const electron = () => !!(S.host && S.host.platform === 'electron');
  const $ = id => document.getElementById(id);
  const send = m => { try { wv && wv.postMessage(m); } catch (e) {} };
  const now = () => Date.now();
@@ -62,6 +64,7 @@
    if (m.mode === 'tyler') log('Stage 2: Tyler ' + (x.installed ? 'installed (' + (x.enabled ? 'enabled' : 'disabled') + ', id ' + x.id + ', v' + x.version + ')' : 'not installed') + (x.error ? ' · error: ' + x.error : ''));
    else if (m.mode === 'bridge') log('Stage 2B: Tyler\'s in-page audio scripts ' + (m.bridgeInjected ? 'injected' : 'NOT injected') + (x.error ? ' · ' + x.error : ''));
    else log('Stage 1: manual call (no Tyler code loaded)');
+   log('Browser identity: ' + (m.identity === 'chrome' ? 'same as Chrome' : m.platform === 'electron' ? 'Electron default' : 'WebView2 default') + ' · ' + m.userAgent);
   } else if (m.type === 'permission') {
    S.permissions.push({ ...m, at: now() });
    log('Permission request: ' + m.kind + ' from ' + m.origin + ' → ' + m.state + (m.userInitiated ? ' (after a click)' : ''));
@@ -126,7 +129,11 @@
     break;
    }
    case 'page-error': S.events.push({ kind: 'page-error', at: now() }); log('Page error' + (m.kind ? ' (' + m.kind + ')' : '') + ': ' + m.message + (m.file ? ' [' + m.file + ':' + m.line + ']' : '')); break;
-   case 'console': log('Steam console ' + m.level + ': ' + m.text); break;
+   case 'console': {
+    const refused = /Voice chat not supported in browser: (.*)/.exec(m.text);
+    if (refused) S.steamRefused = refused[1] || '?';
+    log('Steam console ' + m.level + ': ' + m.text); break;
+   }
    case 'pc-closed': { const p = pc(m); p.closedAt = now(); S.events.push({ kind: 'left', at: now(), pc: p.id }); log('Connection #' + m.id + ' closed'); break; }
    case 'pc-stats': stats(m); break;
    case 'voice-ui':
@@ -191,7 +198,8 @@
  function verdicts() {
   const v = {}, s = S.support, all = pcs(), live = all.filter(p => !p.closedAt);
   // 1
-  if (!s) v.support = ['pending', 'Waiting for Steam chat to load (sign in first if asked).'];
+  if (S.steamRefused) v.support = ['fail', 'Steam refused voice: it read this browser as "' + S.steamRefused + '".'];
+  else if (!s) v.support = ['pending', 'Waiting for Steam chat to load (sign in first if asked).'];
   else if (s.error || !s.rtcPeerConnection || !s.getUserMedia || !s.audioContext || !s.opus || !s.secureContext) v.support = ['fail', supportSummary(s) + (s.error ? ' · ' + s.error : '')];
   else v.support = ['ok', supportSummary(s)];
   // 2
@@ -283,8 +291,15 @@
  const saveTicks = () => { try { localStorage.setItem('ticks', JSON.stringify(ticks)); } catch (e) {} };
  function render() {
   const h = S.host;
-  if (h) $('hostLine').textContent = 'WebView2 runtime ' + h.runtime + ' · SDK ' + h.sdk + ' · ' + h.os + ' · test profile ' + h.profile;
+  if (h) {
+   $('hostLine').textContent = (electron() ? h.runtime : 'WebView2 runtime ' + h.runtime + ' · SDK ' + h.sdk) + ' · ' + h.os + ' · test profile ' + h.profile;
+   document.querySelector('.title strong').textContent = electron() ? 'Electron voice test' : 'WebView2 voice test';
+   for (const b of document.querySelectorAll('.modes button')) b.hidden = !!h.modes && !h.modes.includes(b.dataset.mode);
+   const labels = electron() ? { default: 'Electron default', chrome: 'Same as Chrome' } : { default: 'WebView2 default (Edge)', chrome: 'Same as Chrome' };
+   for (const b of document.querySelectorAll('[data-identity]')) b.textContent = labels[b.dataset.identity];
+  }
   for (const b of document.querySelectorAll('.modes button')) b.setAttribute('aria-checked', String(b.dataset.mode === S.mode));
+  for (const b of document.querySelectorAll('[data-identity]')) b.setAttribute('aria-checked', String(b.dataset.identity === ((h && h.identity) || 'default')));
   $('settings').hidden = S.mode !== 'tyler';
   steps();
   const v = verdicts(), list = $('stages');
@@ -316,12 +331,13 @@
  }
  function steps() {
   const box = $('steps'), mode = S.mode;
-  if (box.dataset.mode === mode) return;
-  box.dataset.mode = mode;
+  const key = mode + (electron() ? '-e' : '');
+  if (box.dataset.mode === key) return;
+  box.dataset.mode = key;
   const items = {
    manual: ['Sign in to the bot account in the Steam window (normal Steam sign-in).', 'Open your group chat and join a voice channel.', 'Allow the microphone when this test asks.', 'Talk with your friend both ways, then tick the two boxes below.', 'Save report and send me the file.'],
    tyler: ['Windows sound settings: disable the VB-CABLE devices and mute the physical microphone.', 'Press Tyler settings: add your AI key, then Settings → Voice: tick the listening consent. Save.', 'In Steam chat open the group, then Tyler\'s panel → Connect & start.', 'Join the voice channel. If Windows asks for the microphone, choose No.', 'Tyler panel → Checks → Run connection checks (the beep). Then your friend talks to Tyler, and types a message for a text reply.', 'Leave voice, rejoin, beep and talk once more. Tick what your friend confirms, then Save report.'],
-   bridge: ['Use this only if Stage 2 can\'t load Tyler. It tests the audio path without AI or text.', 'Disable VB-CABLE and mute the physical microphone, as for Stage 2.', 'In the Steam window use the test bar (bottom left): 1 · Enable synthetic mic, then join voice.', '2 · Test beep, then 3 · Listen + echo: your friend speaks, pauses, and hears their own words come back.', 'Leave voice, rejoin, beep and echo once more. Tick what your friend confirms, then Save report.']
+   bridge: [electron() ? 'Tests Tyler\'s audio path (his own voice files) without AI or text.' : 'Use this only if Stage 2 can\'t load Tyler. It tests the audio path without AI or text.', 'Disable the VB-CABLE devices and mute the physical microphone.', 'In the Steam window use the test bar (bottom left): 1 · Enable synthetic mic, then join voice.', '2 · Test beep, then 3 · Listen + echo: your friend speaks, pauses, and hears their own words come back.', 'Leave voice, rejoin, beep and echo once more. Tick what your friend confirms, then Save report.']
   }[mode];
   box.innerHTML = '<h2></h2><ol></ol>';
   box.querySelector('h2').textContent = { manual: 'Stage 1 · manual call', tyler: 'Stage 2 · Tyler\'s bridge', bridge: 'Stage 2B · bridge only (fallback)' }[mode];
@@ -331,8 +347,9 @@
  // ── Report ──
  function report() {
   const h = S.host || {}, v = verdicts(), lines = [];
-  lines.push('ROBOTIC TYLER · WebView2 voice test report', 'Generated ' + new Date().toISOString());
-  lines.push('Test app ' + (h.app || '?') + ' · WebView2 runtime ' + (h.runtime || '?') + ' · SDK ' + (h.sdk || '?') + ' · ' + (h.os || '?') + ' ' + (h.arch || ''));
+  lines.push('ROBOTIC TYLER · ' + (electron() ? 'Electron' : 'WebView2') + ' voice test report', 'Generated ' + new Date().toISOString());
+  lines.push('Test app ' + (h.app || '?') + ' · ' + (electron() ? h.runtime : 'WebView2 runtime ' + (h.runtime || '?') + ' · SDK ' + (h.sdk || '?')) + ' · ' + (h.os || '?') + ' ' + (h.arch || ''));
+  lines.push('Identity: ' + (h.identity === 'chrome' ? 'same as Chrome' : electron() ? 'Electron default' : 'WebView2 default'));
   lines.push('User agent: ' + ((S.support && S.support.userAgent) || h.userAgent || '?'));
   if (S.support && S.support.brands) lines.push('Brands: ' + S.support.brands.join(', '));
   lines.push('Stage: ' + { manual: '1 (manual call)', tyler: '2 (Tyler extension)', bridge: '2B (bridge only)' }[S.mode] + ' · started ' + time(S.modeAt));
@@ -358,6 +375,13 @@
   if (b.dataset.mode === S.mode) return;
   log('Switching to ' + b.querySelector('b').textContent + '…');
   send({ action: 'mode', mode: b.dataset.mode });
+ });
+ for (const b of document.querySelectorAll('[data-identity]')) b.addEventListener('click', () => {
+  if (S.host && S.host.identity === b.dataset.identity) return;
+  log('Switching browser identity to ' + b.textContent + '…');
+  S.pcs.forEach(p => { if (!p.closedAt) p.closedAt = now(); });
+  resetForMode(S.mode);
+  send({ action: 'identity', identity: b.dataset.identity });
  });
  $('save').addEventListener('click', () => send({ action: 'save-report', text: report() }));
  $('copy').addEventListener('click', () => send({ action: 'copy', text: report() }));
