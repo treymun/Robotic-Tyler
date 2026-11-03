@@ -272,13 +272,13 @@ html[data-rt-theme=classic],[data-rt-theme=classic] :is(.scroll,.content,main){s
 [data-rt-theme=classic] ::-webkit-scrollbar-thumb:hover,html[data-rt-theme=classic]::-webkit-scrollbar-thumb:hover{background:#627058}
 [data-rt-theme=classic] ::-webkit-scrollbar-button:single-button,html[data-rt-theme=classic]::-webkit-scrollbar-button:single-button{display:block;width:15px;height:15px;background-color:var(--c-face);background-repeat:no-repeat;background-position:center;background-size:8px;border:1px solid;border-color:var(--c-hi) var(--c-lo) var(--c-lo) var(--c-hi)}
 [data-rt-theme=classic] ::-webkit-scrollbar-button:single-button:active,html[data-rt-theme=classic]::-webkit-scrollbar-button:single-button:active{border-color:var(--c-lo) var(--c-hi) var(--c-hi) var(--c-lo)}
-[data-rt-theme=classic] ::-webkit-scrollbar-button:single-button:vertical:decrement,html[data-rt-theme=classic]::-webkit-scrollbar-button:single-button:vertical:decrement{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath d='M1 6h6L4 2z' fill='%23b8bfa8'/%3E%3C/svg%3E")}
-[data-rt-theme=classic] ::-webkit-scrollbar-button:single-button:vertical:increment,html[data-rt-theme=classic]::-webkit-scrollbar-button:single-button:vertical:increment{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath d='M1 2h6L4 6z' fill='%23b8bfa8'/%3E%3C/svg%3E")}
+[data-rt-theme=classic] ::-webkit-scrollbar-button:single-button:vertical:decrement,html[data-rt-theme=classic]::-webkit-scrollbar-button:single-button:vertical:decrement{background-image:conic-gradient(from 148deg at 50% 12%,#b8bfa8 64deg,transparent 0)}
+[data-rt-theme=classic] ::-webkit-scrollbar-button:single-button:vertical:increment,html[data-rt-theme=classic]::-webkit-scrollbar-button:single-button:vertical:increment{background-image:conic-gradient(from -32deg at 50% 88%,#b8bfa8 64deg,transparent 0)}
 [data-rt-theme=classic] ::-webkit-scrollbar-corner{background:var(--c-face)}
 
 /* ── v2.17 authenticity: Classic ──
    Drop-downs are VGUI combo boxes: a flat well with a raised, bevelled arrow button on the
    right instead of a modern chevron. */
-[data-rt-theme=classic] select{padding-right:26px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath d='M1 2.5h6L4 6z' fill='%23b8bfa8'/%3E%3C/svg%3E"),linear-gradient(90deg,var(--c-hi) 0 1px,var(--c-face) 1px calc(100% - 1px),var(--c-lo) calc(100% - 1px));
+[data-rt-theme=classic] select{padding-right:26px;background-image:conic-gradient(from -32deg at 50% 88%,#b8bfa8 64deg,transparent 0),linear-gradient(90deg,var(--c-hi) 0 1px,var(--c-face) 1px calc(100% - 1px),var(--c-lo) calc(100% - 1px));
   background-position:right 5px center,right 1px top 1px;background-size:8px 8px,17px calc(100% - 2px);background-repeat:no-repeat}
-[data-rt-theme=classic] select:hover{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3E%3Cpath d='M1 2.5h6L4 6z' fill='%23dccd78'/%3E%3C/svg%3E"),linear-gradient(90deg,var(--c-hi) 0 1px,var(--c-raised) 1px calc(100% - 1px),var(--c-lo) calc(100% - 1px))}
+[data-rt-theme=classic] select:hover{background-image:conic-gradient(from -32deg at 50% 88%,#dccd78 64deg,transparent 0),linear-gradient(90deg,var(--c-hi) 0 1px,var(--c-raised) 1px calc(100% - 1px),var(--c-lo) calc(100% - 1px))}

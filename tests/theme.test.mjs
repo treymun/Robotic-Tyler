@@ -37,7 +37,7 @@ test('the theme setting is readable by the chat panel but only the settings page
 const THEMES=['steam',...fs.readdirSync(path.join(ROOT,'browser-extension/ui/themes')).filter(f=>f.endsWith('.css')).map(f=>f.slice(0,-4)).sort()];
 
 test('every theme ships to all three surfaces and every theme list agrees',()=>{
- assert.deepEqual([...THEMES].sort(),['classic','combine','cs16','cs2','deadlock','doom','hev','l4d','minecraft','pipboy','portal','quake','steam','tf2','winxp']);
+ assert.deepEqual([...THEMES].sort(),['classic','combine','cs16','cs2','deadlock','dod','doom','dreamcast','gmod','hev','l4d','minecraft','payday','pipboy','portal','quake','ricochet','steam','tf2','winxp']);
  const ui=read('browser-extension/ui-template.js'),settings=read('browser-extension/settings.html'),voice=read('voice-app/native.html');
  for(const t of THEMES.filter(t=>t!=='steam')){
   assert.ok(ui.includes('[data-rt-theme='+t+']{color-scheme:'),t+' compiled into the chat panel');
@@ -121,6 +121,14 @@ test('every theme draws its own animated status strip',()=>{
  assert.match(ui,/class=\\"tally-text\\" role=\\"status\\"/);assert.match(ui,/class=\\"tally-trace\\" aria-hidden=\\"true\\"/);
  // Reduced motion stops every strip animation.
  assert.match(panel,/prefers-reduced-motion:reduce\)\{\*,\*::before,\*::after\{animation:none!important/);
+});
+
+// v2.18: Steam pages may forbid data: images, so the panel's textures are drawn with gradients only.
+test('panel styles never depend on data: images',()=>{
+ for(const f of ['panel.css','kit.css','icons.css',...THEMES.filter(t=>t!=='steam').map(t=>'themes/'+t+'.css')]){
+  const p=path.join(ROOT,'browser-extension/ui',f);if(!fs.existsSync(p))continue;
+  assert.doesNotMatch(fs.readFileSync(p,'utf8'),/url\(\s*["']?data:/,f+' uses no data: URL');
+ }
 });
 
 // v2.13: every theme has its own Tyler logo, and every surface switches it with the theme.

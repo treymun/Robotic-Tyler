@@ -133,12 +133,12 @@ html[data-rt-theme=pipboy]{scrollbar-color:var(--pb-dim) #020a05}
   background:linear-gradient(var(--pb-faint),var(--pb-faint)) 0 50%/100% 1px no-repeat,repeating-linear-gradient(90deg,rgba(61,255,140,.14) 0 1px,transparent 1px 20px);border:1px solid var(--pb-faint)}
 [data-rt-theme=pipboy] .tally::after{content:"";position:absolute;left:11px;right:11px;bottom:8px;height:18px;pointer-events:none;filter:drop-shadow(0 0 3px rgba(61,255,140,.8));
   background:linear-gradient(var(--tone),var(--tone)) 0 50%/100% 2px no-repeat}
-[data-rt-theme=pipboy] .tally[data-state=listening]::after{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='18'%3E%3Cpath d='M0 9 Q5 5 10 9 T20 9 T30 9 T40 9' fill='none' stroke='%233dff8c' stroke-width='1.6'/%3E%3C/svg%3E") 0 0/40px 18px repeat-x;animation:pb-scope 2.4s linear infinite}
-[data-rt-theme=pipboy] .tally[data-state=speaking]::after{background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='18'%3E%3Cpath d='M0 9 Q3 0 6 9 T12 9 T18 9 T24 9' fill='none' stroke='%238affb8' stroke-width='1.8'/%3E%3C/svg%3E") 0 0/24px 18px repeat-x;animation:pb-scope-fast .45s linear infinite}
+[data-rt-theme=pipboy] .tally[data-state=listening]::after{background:radial-gradient(circle at 50% 100%,transparent 17.8px,#3dff8c 17.8px 19.6px,transparent 20.0px) 0 0/40px 9.0px repeat-x,radial-gradient(circle at 50% 0,transparent 17.8px,#3dff8c 17.8px 19.6px,transparent 20.0px) 20.0px 9.0px/40px 9.0px repeat-x;animation:pb-scope 2.4s linear infinite}
+[data-rt-theme=pipboy] .tally[data-state=speaking]::after{background:radial-gradient(circle at 50% 100%,transparent 4.8px,#8affb8 4.8px 6.6px,transparent 7.0px) 0 0/14px 9.0px repeat-x,radial-gradient(circle at 50% 0,transparent 4.8px,#8affb8 4.8px 6.6px,transparent 7.0px) 7.0px 9.0px/14px 9.0px repeat-x;animation:pb-scope-fast .45s linear infinite}
 [data-rt-theme=pipboy] .tally[data-state=thinking]::after{background:linear-gradient(90deg,transparent 0 45%,var(--pb-hi) 45% 55%,transparent 55%) 0 50%/40% 2px no-repeat,linear-gradient(var(--pb-faint),var(--pb-faint)) 0 50%/100% 2px no-repeat;animation:pb-seek 1.2s ease-in-out infinite alternate}
 [data-rt-theme=pipboy] .tally[data-state=error]::after{background:linear-gradient(#ff8a5c,#ff8a5c) 0 50%/100% 2px no-repeat;filter:drop-shadow(0 0 3px rgba(255,138,92,.9));animation:pb-blink .8s steps(1) infinite}
-@keyframes pb-scope{from{background-position:0 0}to{background-position:-40px 0}}
-@keyframes pb-scope-fast{from{background-position:0 0}to{background-position:-24px 0}}
+@keyframes pb-scope{from{background-position:0 0,20px 9px}to{background-position:-40px 0,-20px 9px}}
+@keyframes pb-scope-fast{from{background-position:0 0,7px 9px}to{background-position:-14px 0,-7px 9px}}
 @keyframes pb-seek{from{background-position:0 50%,0 50%}to{background-position:100% 50%,0 50%}}
 @keyframes pb-blink{0%{opacity:1}50%{opacity:.2}}
 

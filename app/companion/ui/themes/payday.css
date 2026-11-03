@@ -1,0 +1,188 @@
+/*
+ * ROBOTIC TYLER "PAYDAY 2 / Crime.net style" theme (v2.18).
+ * The contract map: a dark city street grid, blue contract markers with pulsing rings,
+ * compact condensed white type and translucent black info panels. Anything you must read
+ * first (setup steps, warnings, the soundboard entry) is a briefing sheet pinned to the map:
+ * off-white paper, dark ink, a red push-pin. Planning marks are dashed blue outlines.
+ * Signature: game votes are contracts on the board, each with a blue marker and its vote
+ * count; the leading contract is circled in red marker, drawn on when a vote arrives. When
+ * the panel is collapsed it becomes the crew radio, with a transmit lamp lit while Tyler talks.
+ * Type: "Tyler PAYDAY" = Teko (OFL) for condensed headings; "Tyler PAYDAY Text" =
+ * IBM Plex Sans Condensed (OFL) for briefing text.
+ * Style only: original map and marks; no PAYDAY logos, masks or game fonts.
+ */
+[data-rt-theme=payday]{
+  color-scheme:dark;
+  --pd-blue:#3fa0ff;--pd-blue-hi:#8fd0ff;--pd-blue-lo:#1d5fa8;--pd-map:#0c1117;--pd-street:#1b2530;--pd-paper:#ece6d6;--pd-ink:#1d1c1a;--pd-pin:#d4302a;--pd-heat:#ff9a2e;
+  --rt-bar:#06090d;--rt-bg:#0c1117;--rt-bg-deep:#06090d;--rt-surface:#121a23;--rt-surface-2:#17212c;--rt-surface-3:#1d2935;
+  --rt-block:#0f161e;--rt-block-hover:#16212c;--rt-input:#06090d;--rt-select:#1d4f86;
+  --rt-line:#24313f;--rt-line-soft:#1b2530;--rt-line-strong:#3fa0ff;
+  --rt-ink:#dfe7ef;--rt-ink-strong:#ffffff;--rt-ink-2:#cdd7e1;--rt-ink-3:#a9b7c5;--rt-ink-4:#94a3b2;--rt-ink-disabled:#4d5a66;
+  --rt-link:#8fd0ff;--rt-link-hover:#ffffff;--rt-blue:#8fd0ff;--rt-blue-deep:#3fa0ff;--rt-active:#3fa0ff;
+  --rt-blue-fade:#121a23;--rt-blue-fade-hover:#1a2a3a;
+  --rt-green:#1f6fc8;--rt-green-hover:#2a7dd8;--rt-green-ink:#ffffff;--rt-green-line:#1d5fa8;
+  --rt-state-standby:#94a3b2;--rt-state-ready:#7fe0a0;--rt-state-listening:#8fd0ff;--rt-state-thinking:#ffd37a;--rt-state-speaking:#ffb15c;--rt-state-waiting:#c9a6ff;--rt-state-error:#ff6b5e;
+  --rt-danger:#ff6b5e;--rt-danger-bg:#a8261f;--rt-danger-hover:#c22e25;--rt-danger-ink:#ffffff;--rt-success:#7fe0a0;--rt-focus:#8fd0ff;
+  --rt-accent:#3fa0ff;--rt-accent-soft:rgba(63,160,255,.14);--rt-accent-line:rgba(63,160,255,.5);
+  --rt-on-accent:#ffffff;--rt-accent-fill:#1d5fa8;--rt-meter:linear-gradient(90deg,#1d5fa8,#3fa0ff);--rt-marker:#ffffff;--rt-edge:rgba(143,208,255,.2);--rt-page-glow:#0d2338;
+  --rt-font:"Tyler PAYDAY Text","Arial Narrow",Arial,sans-serif;--rt-font-display:"Tyler PAYDAY","Tyler PAYDAY Text","Arial Narrow",sans-serif;
+  --rt-text-xs:11px;--rt-text-sm:12px;--rt-text-md:13px;--rt-text-lg:15px;--rt-track:.06em;
+  --rt-r-xs:0;--rt-r-sm:1px;--rt-r-md:2px;--rt-r-lg:2px;--rt-shadow-float:0 0 0 1px #000,0 22px 60px rgba(0,0,0,.85);
+  /* A night street map: two street grids at an angle, faint blocks and a river bend. */
+  --pd-mapart:linear-gradient(32deg,transparent 0 47%,rgba(63,160,255,.05) 47% 53%,transparent 53%) 0 0/220px 160px,
+    repeating-linear-gradient(0deg,transparent 0 37px,#18222c 37px 40px),repeating-linear-gradient(90deg,transparent 0 53px,#18222c 53px 56px),
+    repeating-linear-gradient(-28deg,transparent 0 91px,#1a2530 91px 95px),
+    radial-gradient(140% 80% at 85% 110%,rgba(30,70,110,.25),transparent 60%);
+  --pd-paper-tex:linear-gradient(180deg,rgba(255,255,255,.35),transparent 30%),repeating-linear-gradient(0deg,transparent 0 17px,rgba(60,90,140,.12) 17px 18px),#ece6d6;
+}
+.panel[data-rt-theme=payday]{background:var(--pd-mapart),var(--pd-map);border:1px solid #000;box-shadow:var(--rt-shadow-float),inset 0 0 0 1px #1b2530}
+[data-rt-theme=payday] body{background:var(--pd-mapart),var(--pd-map)}
+[data-rt-theme=payday] main{background:transparent}
+/* Condensed white capitals, like Crime.net's labels */
+[data-rt-theme=payday] :is(h1,h2,h3,.wordmark,.brand-text strong,.sheet-head h2,.card>h2,.marquee){font-family:var(--rt-font-display);font-weight:600;text-transform:uppercase;letter-spacing:.04em;line-height:.95;color:#fff}
+[data-rt-theme=payday] h2{font-size:24px}
+[data-rt-theme=payday] h1{font-size:38px}
+[data-rt-theme=payday] .wordmark{font-size:23px;letter-spacing:.05em}
+[data-rt-theme=payday] :is(label,.tally-label,.stat dt,.pulse dt,.facts b,.matrix dt,details.feature>summary,.ident-sub,.tabs button,.section-nav button,nav:not(.tabs) button,button,.pad span){font-family:var(--rt-font);font-weight:600;text-transform:uppercase;letter-spacing:.08em}
+[data-rt-theme=payday] label:not(:has(>input[type=checkbox])):not(.toggle){color:var(--pd-blue-hi);font-size:11px}
+[data-rt-theme=payday] label:has(>input[type=checkbox]),[data-rt-theme=payday] .toggle{text-transform:none;letter-spacing:0;font-weight:400}
+[data-rt-theme=payday] .ident-sub{color:var(--pd-blue-hi);font-size:10px}
+/* Info panels: translucent black with a thin blue rule; planning outlines are dashed */
+[data-rt-theme=payday] .bar{background:linear-gradient(180deg,rgba(0,0,0,.85),rgba(0,0,0,.6));border-bottom:1px solid rgba(63,160,255,.45);box-shadow:0 1px 0 #000}
+[data-rt-theme=payday] .bar .icon-btn{color:#fff;background:transparent;border:1px solid rgba(255,255,255,.35);border-radius:0}
+[data-rt-theme=payday] :where(details,.callout,.board-tools,.sheet,.card,.route-card,.panel,.mini-callout>div,.usage-banner,.facts>div,.matrix>div,.arcade-tickets>div){background:rgba(4,8,12,.82);border:1px solid #24313f;border-radius:0;box-shadow:none}
+[data-rt-theme=payday] details.feature>summary{font-size:12px;color:#fff}
+[data-rt-theme=payday] details.feature[open]{background:rgba(4,8,12,.9);box-shadow:inset 0 0 0 1px rgba(63,160,255,.25)}
+[data-rt-theme=payday] details.feature[open]>summary{color:var(--pd-blue-hi);box-shadow:inset 0 -1px 0 rgba(63,160,255,.3)}
+[data-rt-theme=payday] h3{font-size:18px;color:var(--pd-blue-hi);margin-top:14px}
+/* Briefing sheets pinned to the map: what you need to read first */
+[data-rt-theme=payday] :is(.quick-help,.confirm,#setup,.deck-entry){position:relative;color:var(--pd-ink);background:var(--pd-paper-tex);border:0;border-radius:0;box-shadow:2px 3px 0 rgba(0,0,0,.55),0 8px 18px rgba(0,0,0,.4);transform:rotate(-.4deg)}
+[data-rt-theme=payday] :is(.quick-help,.confirm,#setup,.deck-entry)::before{content:"";position:absolute;left:50%;top:-5px;width:11px;height:11px;margin-left:-5px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ff8a80,#d4302a 55%,#7a1410);box-shadow:1px 2px 2px rgba(0,0,0,.6)}
+[data-rt-theme=payday] :is(.quick-help,.confirm,#setup,.deck-entry) :is(b,strong,h3,label,small,span,p){color:var(--pd-ink);text-shadow:none}
+[data-rt-theme=payday] :is(.quick-help,.confirm,#setup,.deck-entry) button:not(.primary):not(#start){color:var(--pd-ink);background:transparent;border:1px solid #1d1c1a}
+[data-rt-theme=payday] :is(.quick-help,.confirm,#setup,.deck-entry) button:not(.primary):not(#start):hover{color:#fff;background:#1d1c1a}
+/* Crew cards: each stat is a crew slot with a portrait ring and a blue status line */
+[data-rt-theme=payday] .stats{gap:4px;padding:0;background:transparent;border:0}
+[data-rt-theme=payday] .stat{position:relative;padding:6px 8px 6px 30px;background:rgba(4,8,12,.85);border:1px solid #24313f;border-bottom:2px solid var(--pd-blue)}
+[data-rt-theme=payday] .stat:first-child{border-left:1px solid #24313f}
+[data-rt-theme=payday] .stat::before{content:"";position:absolute;left:6px;top:9px;width:18px;height:18px;border-radius:50%;
+  background:radial-gradient(circle at 50% 38%,#8fa3b5 0 3.5px,transparent 4px),radial-gradient(ellipse at 50% 100%,#8fa3b5 0 7px,transparent 7.5px),#1b2530;box-shadow:0 0 0 1px var(--pd-blue)}
+[data-rt-theme=payday] .stat dt{font-size:10px;color:var(--rt-ink-3)}
+[data-rt-theme=payday] .stat dd{font-family:var(--rt-font-display);font-weight:600;font-size:22px;line-height:.95;letter-spacing:.02em;color:#fff}
+[data-rt-theme=payday] .stat small{color:var(--rt-ink-4)}
+/* Tabs: the Crime.net filter strip; the open one is a solid blue bar */
+[data-rt-theme=payday] .tabs{gap:2px;padding:5px;background:rgba(0,0,0,.75);box-shadow:inset 0 -1px 0 #24313f}
+[data-rt-theme=payday] .tabs button{padding:7px 2px 6px;font-size:11px;color:var(--rt-ink-3);background:transparent;border:0;border-radius:0}
+[data-rt-theme=payday] .tabs button:hover{color:#fff;background:rgba(63,160,255,.12)}
+[data-rt-theme=payday] .tabs button[aria-selected=true]{color:#fff;background:var(--pd-blue-lo);box-shadow:inset 0 -2px 0 var(--pd-blue-hi)}
+[data-rt-theme=payday] .tabs button[aria-selected=true] .ic{color:#fff}
+[data-rt-theme=payday] .side{background:var(--pd-mapart),#080c11;box-shadow:inset -1px 0 0 #24313f}
+[data-rt-theme=payday] :is(.section-nav button,nav:not(.tabs) button){font-size:12px;color:var(--rt-ink-3);background:transparent;border:0;border-radius:0;box-shadow:none}
+[data-rt-theme=payday] :is(.section-nav button,nav:not(.tabs) button):hover{color:#fff;background:rgba(63,160,255,.12)}
+[data-rt-theme=payday] :is(.section-nav button[aria-current=page],nav:not(.tabs) button.active){color:#fff;background:var(--pd-blue-lo);box-shadow:inset 3px 0 0 var(--pd-blue-hi)}
+[data-rt-theme=payday] :is(.section-nav button[aria-current=page],nav:not(.tabs) button.active) .ic{color:#fff}
+/* Buttons: hairline boxes; the main action is solid contract blue */
+[data-rt-theme=payday] button{font-size:12px;color:#fff;background:rgba(4,8,12,.6);border:1px solid rgba(255,255,255,.35);border-radius:0;box-shadow:none}
+[data-rt-theme=payday] button:hover{color:#fff;background:rgba(63,160,255,.18);border-color:var(--pd-blue)}
+[data-rt-theme=payday] button:active:not(:disabled){transform:translateY(1px);background:rgba(63,160,255,.3)}
+[data-rt-theme=payday] :is(.primary,#start,#save){color:#fff;background:#2f86df;border-color:#8fd0ff;box-shadow:0 0 0 1px #000}
+[data-rt-theme=payday] :is(.primary,#start,#save):hover{background:#4199f0;box-shadow:0 0 0 1px #000,0 0 12px rgba(63,160,255,.5)}
+[data-rt-theme=payday] .danger{color:#fff;background:#a8261f;border-color:#ff8a7c}
+[data-rt-theme=payday] .danger:hover{background:#c22e25}
+[data-rt-theme=payday] :is(.ghost,.icon,.icon-btn){background:transparent;border-color:transparent}
+[data-rt-theme=payday] :is(.pad,.friend-card,.preset,.link-btn){text-transform:none;letter-spacing:0;font-weight:400}
+[data-rt-theme=payday] .link-btn{border:0;background:none;color:var(--rt-link)}
+[data-rt-theme=payday] button:disabled{color:var(--rt-ink-disabled);background:rgba(4,8,12,.6);border-color:#1b2530}
+/* Fields */
+[data-rt-theme=payday] input:where(:not([type=checkbox],[type=radio],[type=range],[type=file])),[data-rt-theme=payday] :is(textarea,select){color:#fff;background-color:#06090d;border:1px solid #2c3b4b;border-radius:0;box-shadow:none}
+[data-rt-theme=payday] select{background-image:linear-gradient(45deg,transparent 50%,var(--pd-blue-hi) 50%),linear-gradient(135deg,var(--pd-blue-hi) 50%,transparent 50%)}
+[data-rt-theme=payday] :is(input,textarea,select):focus{border-color:var(--pd-blue);box-shadow:0 0 0 1px rgba(63,160,255,.4)}
+[data-rt-theme=payday] input[type=checkbox]{width:15px;height:15px;background:#06090d;border:1px solid var(--pd-blue);border-radius:0;box-shadow:none}
+[data-rt-theme=payday] input[type=checkbox]:checked{background:var(--pd-blue-lo);border-color:var(--pd-blue-hi)}
+[data-rt-theme=payday] .toggle>input[type=checkbox]{width:34px;height:16px;background:#06090d;border:1px solid #2c3b4b;border-radius:0}
+[data-rt-theme=payday] .toggle>input[type=checkbox]::after{top:2px;left:2px;width:10px;height:10px;border-radius:0;background:#94a3b2}
+[data-rt-theme=payday] .toggle>input[type=checkbox]:checked{background:var(--pd-blue-lo);border-color:var(--pd-blue)}
+[data-rt-theme=payday] .toggle>input[type=checkbox]:checked::after{top:2px;left:2px;width:10px;height:10px;border-radius:0;transform:translateX(18px);background:#fff}
+[data-rt-theme=payday] input[type=range]{accent-color:var(--pd-blue)}
+[data-rt-theme=payday] :is(pre,.output,.v22-log,.response){background:#06090d;border:1px solid #24313f;box-shadow:none}
+[data-rt-theme=payday] :is(.meter,.arcade-progress,.lat-track){background:#06090d;border-radius:0;box-shadow:inset 0 0 0 1px #24313f}
+[data-rt-theme=payday] .pill{color:var(--pd-blue-hi);background:transparent;border-radius:0;box-shadow:inset 0 0 0 1px var(--pd-blue-lo)}
+[data-rt-theme=payday] .pad{background:rgba(4,8,12,.85);border:1px solid #24313f;border-left:3px solid var(--pd-blue-lo);border-radius:0}
+[data-rt-theme=payday] .pad b{color:#fff}
+[data-rt-theme=payday] .pad::after{border-left-color:var(--pd-blue)}
+[data-rt-theme=payday] .pad:hover{background:rgba(63,160,255,.14);border-left-color:var(--pd-blue)}
+[data-rt-theme=payday] .pad.playing{background:linear-gradient(90deg,rgba(255,154,46,.22),transparent 75%),rgba(4,8,12,.85);border-left-color:var(--pd-heat)}
+[data-rt-theme=payday] :is(.step-n,.setup-n,.friend-card .avatar){font-family:var(--rt-font-display);font-weight:600;color:#fff;background:var(--pd-blue-lo);border-radius:50%;box-shadow:0 0 0 2px #000,0 0 0 3px var(--pd-blue)}
+[data-rt-theme=payday] code{color:var(--pd-blue-hi);background:#06090d;border-radius:0}
+[data-rt-theme=payday] .savebar,[data-rt-theme=payday] .foot{background:rgba(0,0,0,.82);box-shadow:inset 0 1px 0 rgba(63,160,255,.35)}
+[data-rt-theme=payday] .foot small{color:var(--rt-ink-3)}
+[data-rt-theme=payday] .route li{background:rgba(4,8,12,.82);box-shadow:inset 0 0 0 1px #24313f}
+[data-rt-theme=payday] .route li:last-child{background:rgba(63,160,255,.14);box-shadow:inset 3px 0 0 var(--pd-blue)}
+[data-rt-theme=payday] :is(.scroll,.content,main){scrollbar-color:#2c3b4b #06090d}
+html[data-rt-theme=payday]{scrollbar-color:#2c3b4b #06090d}
+
+/* ── Contracts: game votes on the Crime.net board ──
+   Each vote is a contract card with a blue marker (its rank) and the count beside it. The
+   leader is circled in red marker; the circle is drawn on, and the count bumps, only when a
+   vote has just arrived. */
+[data-rt-theme=payday] .vote-board .votes{gap:7px;padding:6px 2px}
+[data-rt-theme=payday] .vote{grid-template-columns:auto minmax(0,1fr) auto;padding:7px 10px 7px 8px;background:rgba(4,8,12,.9);border:1px solid #24313f;border-radius:0;box-shadow:inset 3px 0 0 var(--pd-blue-lo)}
+[data-rt-theme=payday] .vote-marker{display:grid;place-items:center;width:22px;height:22px;border-radius:50%;font:600 14px/1 var(--rt-font-display);color:#fff;background:var(--pd-blue-lo);box-shadow:0 0 0 2px #000,0 0 0 3px var(--pd-blue),0 0 10px rgba(63,160,255,.5)}
+[data-rt-theme=payday] .vote-title{font-family:var(--rt-font-display);font-size:17px;font-weight:600;text-transform:uppercase;letter-spacing:.03em;line-height:1}
+[data-rt-theme=payday] .vote-count{font-family:var(--rt-font-display);font-size:16px;font-weight:600;letter-spacing:.04em;color:var(--pd-blue-hi);text-transform:uppercase}
+[data-rt-theme=payday] .vote[data-leader=true]::after{content:"";position:absolute;inset:-6px -8px;pointer-events:none;border:2.5px solid var(--pd-pin);border-radius:50% 45% 55% 48%/60% 52% 48% 55%;transform:rotate(-2deg);opacity:.9;box-shadow:0 0 0 1px rgba(0,0,0,.35)}
+[data-rt-theme=payday] .vote[data-leader=true][data-arrived]::after{animation:pd-circle .6s cubic-bezier(.4,0,.2,1) backwards}
+[data-rt-theme=payday] .vote[data-arrived] .vote-count{animation:pd-bump .45s ease-out}
+@keyframes pd-circle{0%{clip-path:polygon(50% 50%,0 0,0 0);opacity:0}10%{opacity:.9}100%{clip-path:polygon(50% 50%,-100% -300%,300% -300%,300% 300%,-100% 300%,-100% -300%)}}
+@keyframes pd-bump{0%{transform:scale(1.35);color:#fff}100%{transform:none}}
+
+/* ── Status strip: a contract marker on the map ──
+   A blue marker with a ring that pulses while Tyler listens, rings faster while he talks and
+   turns while he thinks. On an error the strip gets the orange-and-black assault banner. */
+[data-rt-theme=payday] .tally{background:rgba(4,8,12,.88);border:1px solid #24313f;border-radius:0;padding-left:44px}
+[data-rt-theme=payday] .tally-light{position:absolute;left:12px;top:12px;width:20px;height:20px;border-radius:50%;background:radial-gradient(circle,#fff 0 3px,var(--tone) 3.5px 6px,transparent 6.5px);box-shadow:0 0 0 2px var(--tone),0 0 12px var(--tone)!important}
+[data-rt-theme=payday] .tally-light::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:2px solid var(--tone);opacity:0}
+[data-rt-theme=payday] .tally[data-state=listening] .tally-light::after{animation:pd-ping 2s ease-out infinite}
+[data-rt-theme=payday] .tally[data-state=speaking] .tally-light::after{animation:pd-ping .8s ease-out infinite}
+[data-rt-theme=payday] .tally[data-state=thinking] .tally-light::after{opacity:1;border-style:dashed;animation:pd-turn 1.6s linear infinite}
+[data-rt-theme=payday] .tally-label{font-family:var(--rt-font-display);font-size:18px;font-weight:600;letter-spacing:.05em;line-height:1;color:var(--tone)}
+[data-rt-theme=payday] .tally-wave{display:none}
+[data-rt-theme=payday] .tally[data-state=error]{border-top:6px solid transparent;border-image:repeating-linear-gradient(-45deg,#ff9a2e 0 8px,#000 8px 16px) 6}
+@keyframes pd-ping{0%{opacity:.9;transform:scale(.6)}100%{opacity:0;transform:scale(1.7)}}
+@keyframes pd-turn{to{transform:rotate(1turn)}}
+
+/* The logo is the crew portrait in a ringed frame */
+[data-rt-theme=payday] :is(.mark[data-logo],img.mark,#brand-logo){--logo-pad:2px;background:radial-gradient(circle at 50% 40%,#1b2a3a,#06090d 72%);border:1px solid var(--pd-blue);border-radius:0;box-shadow:0 0 0 1px #000,0 0 10px rgba(63,160,255,.35)}
+[data-rt-theme=payday] .mark[data-logo]{width:42px;height:42px;margin:-6px 0}
+
+/* ── Collapsed: the crew radio ──
+   A black handset with a speaker grille behind the status and a transmit lamp that lights
+   while Tyler talks (TX), dim otherwise. */
+:host(.mini) .panel[data-rt-theme=payday]{background:linear-gradient(180deg,#22262b,#101214);border:2px solid #000;border-radius:10px;box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 16px 40px rgba(0,0,0,.8)}
+:host(.mini) .panel[data-rt-theme=payday] .bar{background:transparent;border:0}
+:host(.mini) .panel[data-rt-theme=payday] .tally{padding-left:56px;background:radial-gradient(circle,#05070a 0 1.4px,transparent 1.8px) 0 0/6px 6px,#1a1d21;border:1px solid #000;border-radius:6px;box-shadow:inset 0 2px 6px #000}
+:host(.mini) .panel[data-rt-theme=payday] .tally-light{left:12px;top:50%;margin-top:-14px;width:28px;height:28px;background:radial-gradient(circle at 40% 35%,#5a2622,#2a0f0d 70%);box-shadow:0 0 0 2px #000,inset 0 1px 2px rgba(255,255,255,.2)!important}
+:host(.mini) .panel[data-rt-theme=payday] .tally-light::before{content:"TX";position:absolute;left:0;right:0;top:100%;margin-top:2px;text-align:center;font:600 9px/1 var(--rt-font);letter-spacing:.1em;color:#94a3b2}
+:host(.mini) .panel[data-rt-theme=payday] .tally[data-state=speaking] .tally-light{background:radial-gradient(circle at 40% 35%,#fff2d0,#ff5a3a 45%,#a8160c 80%);box-shadow:0 0 0 2px #000,0 0 14px #ff5a3a,0 0 26px rgba(255,90,58,.6)!important}
+:host(.mini) .panel[data-rt-theme=payday] .tally[data-state=speaking] .tally-light::after{display:none}
+:host(.mini) .panel[data-rt-theme=payday] .foot{background:transparent;box-shadow:none}
+
+/* ── Icons, dialogs, notifications and tooltips ── */
+[data-rt-theme=payday] .ic{--ic-w:1.5px;--ic-cap:square;--ic-join:miter}
+[data-rt-theme=payday] :is(.rt-toast,.rt-dialog){background:rgba(4,8,12,.96);border:1px solid #24313f;border-radius:0;box-shadow:0 0 0 1px #000,0 14px 34px rgba(0,0,0,.65)}
+[data-rt-theme=payday] .rt-toast{border-left:3px solid var(--tone)}
+[data-rt-theme=payday] :is(.rt-toast,.rt-dialog)[data-kind=error]{border-top:5px solid transparent;border-image:repeating-linear-gradient(-45deg,#ff9a2e 0 7px,#000 7px 14px) 5;border-image-width:5px 0 0 0}
+[data-rt-theme=payday] :is(.rt-toast-title,.rt-dialog-title){font-family:var(--rt-font-display);font-weight:600;font-size:18px;text-transform:uppercase;letter-spacing:.04em;line-height:1;color:#fff}
+[data-rt-theme=payday] :is(.rt-toast-text,.rt-dialog-text,.rt-steps){color:var(--rt-ink-2)}
+[data-rt-theme=payday] .rt-tip{background:#06090d;color:#fff;border:1px solid var(--pd-blue);border-radius:0;font-family:var(--rt-font);text-transform:uppercase;letter-spacing:.06em;font-size:10px}
+
+/* ── Motion: PAYDAY 2 ──
+   Screens arrive like a Crime.net contract popping onto the map (a quick scale from the marker),
+   briefing sheets drop and settle on their pins, and the logo's frame pulses blue while Tyler talks. */
+@keyframes pd-pop{0%{opacity:0;transform:scale(.97);filter:brightness(1.6)}100%{opacity:1;transform:none;filter:none}}
+@keyframes pd-pin{0%{opacity:0;transform:translateY(-8px) rotate(-2deg)}100%{opacity:1;transform:rotate(-.4deg)}}
+@keyframes pd-crew{0%,100%{box-shadow:0 0 0 1px #000,0 0 6px rgba(63,160,255,.3)}50%{box-shadow:0 0 0 1px #000,0 0 16px rgba(63,160,255,.85)}}
+[data-rt-theme=payday] :is(.view:not([hidden]),.sheet,section[data-view]:not([hidden])){animation:pd-pop .22s ease-out backwards;transform-origin:20% 0}
+[data-rt-theme=payday] .view:not([hidden]) :is(.quick-help,.deck-entry,#setup){animation:pd-pin .3s .08s cubic-bezier(.2,.8,.3,1.2) backwards}
+[data-rt-theme=payday] .rt-toast:not(.rt-leaving){animation:pd-pop .2s ease-out backwards}
+[data-rt-theme=payday] .panel:has(.tally[data-state=speaking]) .mark[data-logo],.panel[data-rt-theme=payday]:has(.tally[data-state=speaking]) .mark[data-logo]{animation:pd-crew 1s ease-in-out infinite}

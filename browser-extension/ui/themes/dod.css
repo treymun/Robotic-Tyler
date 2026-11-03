@@ -1,0 +1,197 @@
+/*
+ * ROBOTIC TYLER "Day of Defeat: Source / Field Radio style" theme (v2.18).
+ * A field radio set up on the operator's desk: olive-drab painted steel with worn edges and
+ * slotted screws, cream stencilled labels, canvas pouches for the sections, manila map tabs,
+ * bakelite knobs for buttons and amber-lit instruments. The checks print in the operator's log.
+ * Signature: the status panel is the radio's face: a speaker grille, an amber receive meter whose
+ * needle follows the incoming voice level while Tyler listens, and a separate red transmit lamp
+ * (TX) that lights only while Tyler's own speech goes out.
+ * Type: "Tyler DoD" = Stardos Stencil (OFL) for stencilled labels; "Tyler DoD Log" =
+ * Courier Prime (OFL) for the typewritten log; Verdana for text, as the game's menus use.
+ * Style only: original paint, labels and shapes; no Day of Defeat logos, insignia or game fonts.
+ */
+[data-rt-theme=dod]{
+  color-scheme:dark;
+  --dd-olive:#4f5630;--dd-olive-hi:#6b7343;--dd-olive-lo:#2f3419;--dd-steel:#3b4026;--dd-cream:#e9dfbf;--dd-amber:#ffb84d;--dd-amber-lo:#8a5a12;--dd-manila:#d6c38e;--dd-canvas:#7a7050;--dd-lamp:#ff4a2e;--dd-bake:#1d1b17;
+  --rt-bar:#2a2e17;--rt-bg:#353a1f;--rt-bg-deep:#23261a;--rt-surface:#3e4426;--rt-surface-2:#474e2c;--rt-surface-3:#505832;
+  --rt-block:#30351c;--rt-block-hover:#3a4022;--rt-input:#ede4c8;--rt-select:#6b5a2c;
+  --rt-line:#1d2010;--rt-line-soft:#2a2e17;--rt-line-strong:#e9dfbf;
+  --rt-ink:#ede6cc;--rt-ink-strong:#fffbea;--rt-ink-2:#e2d9bb;--rt-ink-3:#d7cba5;--rt-ink-4:#cdc09a;--rt-ink-disabled:#7f7a5e;
+  --rt-link:#ffd28a;--rt-link-hover:#fffbea;--rt-blue:#ffd28a;--rt-blue-deep:#ffb84d;--rt-active:#ffb84d;
+  --rt-blue-fade:#30351c;--rt-blue-fade-hover:#3e4426;
+  --rt-green:linear-gradient(180deg,#ffd085,#ffb84d 50%,#d98b1f);--rt-green-hover:linear-gradient(180deg,#ffdc9e,#ffc566 50%,#e39a2c);--rt-green-ink:#1d1b17;--rt-green-line:#6a420a;
+  --rt-state-standby:#cdc09a;--rt-state-ready:#b9e07a;--rt-state-listening:#9fd6ff;--rt-state-thinking:#ffd28a;--rt-state-speaking:#ff9a7a;--rt-state-waiting:#e0c2ff;--rt-state-error:#ff8c7a;
+  --rt-danger:#ff8c7a;--rt-danger-bg:#8f2012;--rt-danger-hover:#a8281a;--rt-danger-ink:#ffffff;--rt-success:#b9e07a;--rt-focus:#ffd28a;
+  --rt-accent:#ffd28a;--rt-accent-soft:rgba(255,184,77,.14);--rt-accent-line:rgba(255,184,77,.5);
+  --rt-on-accent:#fffbea;--rt-accent-fill:#6b5a2c;--rt-meter:linear-gradient(90deg,#8a5a12,#ffb84d);--rt-marker:#fffbea;--rt-edge:rgba(233,223,191,.22);--rt-page-glow:#3a3a1c;
+  --rt-font:Verdana,Tahoma,"DejaVu Sans",sans-serif;--rt-font-display:"Tyler DoD","Stencil",Impact,sans-serif;
+  --dd-log:"Tyler DoD Log","Courier New",monospace;
+  --rt-text-xs:11px;--rt-text-sm:12px;--rt-text-md:13px;--rt-text-lg:15px;--rt-track:.08em;
+  --rt-r-xs:2px;--rt-r-sm:3px;--rt-r-md:5px;--rt-r-lg:8px;--rt-shadow-float:0 0 0 1px #10120a,0 20px 50px rgba(0,0,0,.75);
+  /* Worn olive paint: patches, edge wear and fine scratches over steel */
+  --dd-paint:repeating-linear-gradient(118deg,transparent 0 23px,rgba(233,223,191,.035) 23px 24px),radial-gradient(60% 40% at 20% 10%,rgba(255,255,255,.05),transparent 70%),
+    radial-gradient(30% 20% at 85% 70%,rgba(0,0,0,.18),transparent 70%),radial-gradient(18% 12% at 30% 85%,rgba(0,0,0,.14),transparent 70%),linear-gradient(180deg,#535a33,#464c2a);
+  --dd-screw:radial-gradient(circle,transparent 0 0,#2b2d22 0 1px,transparent 1.2px),radial-gradient(circle,#b9b39a 0 2.4px,#4a4a3a 3.2px,transparent 3.8px);
+  --dd-weave:repeating-linear-gradient(0deg,rgba(0,0,0,.1) 0 1px,transparent 1px 3px),repeating-linear-gradient(90deg,rgba(255,255,255,.05) 0 1px,transparent 1px 3px),linear-gradient(180deg,#7d7452,#6c6345);
+  --dd-paper:repeating-linear-gradient(0deg,transparent 0 19px,rgba(60,90,140,.18) 19px 20px),linear-gradient(90deg,transparent 0 26px,rgba(170,40,40,.3) 26px 27px,transparent 27px),#efe6c9;
+}
+.panel[data-rt-theme=dod]{background:var(--dd-paint);border:6px solid #3f4424;border-radius:10px;box-shadow:inset 0 0 0 1px #6b7343,inset 0 0 0 2px #23261a,var(--rt-shadow-float)}
+[data-rt-theme=dod] body{background:linear-gradient(180deg,rgba(0,0,0,.15),transparent),repeating-linear-gradient(90deg,#4a3826 0 120px,#45331f 120px 240px),#47362a}
+[data-rt-theme=dod] main{background:transparent}
+/* Stencilled cream lettering */
+[data-rt-theme=dod] :is(h1,h2,h3,.wordmark,.brand-text strong,.sheet-head h2,.card>h2,.marquee){font-family:var(--rt-font-display);font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--dd-cream);text-shadow:0 1px 0 rgba(0,0,0,.5)}
+[data-rt-theme=dod] h2{font-size:20px}
+[data-rt-theme=dod] h1{font-size:30px}
+[data-rt-theme=dod] .wordmark{font-size:18px;letter-spacing:.12em}
+[data-rt-theme=dod] :is(label,.tally-label,.stat dt,.pulse dt,.facts b,.matrix dt,details.feature>summary,.tabs button,.section-nav button,nav:not(.tabs) button,button,.pad span){font-family:var(--rt-font-display);font-weight:700;text-transform:uppercase;letter-spacing:.1em}
+[data-rt-theme=dod] label:not(:has(>input[type=checkbox])):not(.toggle){color:var(--dd-cream);font-size:11px}
+[data-rt-theme=dod] label:has(>input[type=checkbox]),[data-rt-theme=dod] .toggle{font-family:var(--rt-font);text-transform:none;letter-spacing:0;font-weight:400}
+[data-rt-theme=dod] .ident-sub{color:var(--rt-ink-3);font-family:var(--rt-font-display);letter-spacing:.14em;font-size:9.5px}
+/* The radio's top plate, screwed down at the corners */
+[data-rt-theme=dod] .bar{background:var(--dd-screw) 8px 8px/8px 8px no-repeat,var(--dd-screw) calc(100% - 8px) 8px/8px 8px no-repeat,linear-gradient(180deg,rgba(255,255,255,.06),transparent),var(--dd-paint);
+  border-bottom:2px solid #23261a;box-shadow:0 1px 0 #6b7343;padding:12px 12px 12px 20px}
+[data-rt-theme=dod] .bar .icon-btn{color:var(--dd-cream);background:radial-gradient(circle at 40% 35%,#3a3832,#141310 75%);border:1px solid #000;border-radius:50%;box-shadow:0 2px 2px rgba(0,0,0,.5)}
+/* Sections are canvas pouches with stitched edges */
+[data-rt-theme=dod] :where(details,.callout,.board-tools,.sheet,.card,.route-card,.panel,.mini-callout>div,.usage-banner,.facts>div,.matrix>div,.arcade-tickets>div){background:var(--dd-weave);border:1px solid #3a3424;border-radius:var(--rt-r-md);box-shadow:inset 0 0 0 3px rgba(0,0,0,.08),inset 0 0 0 4px rgba(233,223,191,.18)}
+[data-rt-theme=dod] details.feature[open]{background:var(--dd-weave)}
+[data-rt-theme=dod] details.feature>summary{font-size:12px;color:var(--dd-cream)}
+[data-rt-theme=dod] :where(details,.callout,.board-tools,.sheet,.card) :is(p,small,span,li){color:#f4ecd2}
+/* Message pads: the important notes are written on paper */
+[data-rt-theme=dod] :is(.quick-help,.confirm,#setup,.deck-entry){color:#2a261a;background:var(--dd-paper);border:0;border-radius:2px;box-shadow:0 2px 0 rgba(0,0,0,.35),0 6px 12px rgba(0,0,0,.3)}
+[data-rt-theme=dod] :is(.quick-help,.confirm,#setup,.deck-entry) :is(b,strong,h3,label,small,span,p){color:#2a261a;text-shadow:none}
+[data-rt-theme=dod] :is(.quick-help,.confirm,#setup,.deck-entry) button:not(.primary):not(#start){color:#2a261a;background:transparent;border:1px solid #2a261a;box-shadow:none}
+/* Stats are instrument plates */
+[data-rt-theme=dod] .stats{gap:5px;padding:5px;background:#23261a;border:1px solid #10120a;border-radius:var(--rt-r-md);box-shadow:inset 0 2px 4px rgba(0,0,0,.5)}
+[data-rt-theme=dod] .stat{padding:5px 8px;background:linear-gradient(180deg,#3b3a2c,#2a2920);border:1px solid #10120a;border-radius:3px;box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+[data-rt-theme=dod] .stat:first-child{border-left:1px solid #10120a}
+[data-rt-theme=dod] .stat dt{font-size:10px;color:var(--dd-cream)}
+[data-rt-theme=dod] .stat dd{font-family:var(--dd-log);font-size:18px;font-weight:400;color:var(--dd-amber);text-shadow:0 0 6px rgba(255,184,77,.55)}
+[data-rt-theme=dod] .stat small{color:var(--rt-ink-4)}
+/* Tabs: manila map-folder tabs along the desk edge */
+[data-rt-theme=dod] .tabs{gap:3px;padding:8px 8px 0;background:transparent;box-shadow:inset 0 -2px 0 #2a261a}
+[data-rt-theme=dod] .tabs button{padding:6px 2px 6px;font-size:10px;color:#3a3324;background:linear-gradient(180deg,#cdb985,#b9a46f);border:1px solid #6a5a32;border-bottom:0;border-radius:6px 6px 0 0;box-shadow:inset 0 1px 0 rgba(255,255,255,.35)}
+[data-rt-theme=dod] .tabs button .ic{color:#4a3f26}
+[data-rt-theme=dod] .tabs button:hover{color:#1d1b17;background:linear-gradient(180deg,#dbc897,#c8b37c)}
+[data-rt-theme=dod] .tabs button[aria-selected=true]{position:relative;margin-bottom:-2px;padding-bottom:8px;color:#1d1b17;background:linear-gradient(180deg,#efe2b4,#e2d19c);border-color:#7a6838}
+[data-rt-theme=dod] .tabs button[aria-selected=true] .ic{color:#5a2a12}
+[data-rt-theme=dod] .side{background:var(--dd-paint);box-shadow:inset -2px 0 0 #23261a}
+[data-rt-theme=dod] :is(.section-nav button,nav:not(.tabs) button){font-size:11px;color:var(--dd-cream);background:transparent;border:0;border-radius:3px;box-shadow:none}
+[data-rt-theme=dod] :is(.section-nav button,nav:not(.tabs) button):hover{color:#fffbea;background:rgba(0,0,0,.18)}
+[data-rt-theme=dod] :is(.section-nav button[aria-current=page],nav:not(.tabs) button.active){color:#1d1b17;background:linear-gradient(180deg,#efe2b4,#e2d19c);box-shadow:inset 4px 0 0 #8f2012}
+[data-rt-theme=dod] :is(.section-nav button[aria-current=page],nav:not(.tabs) button.active) .ic{color:#5a2a12}
+/* Buttons: bakelite push-buttons with stencilled cream labels; the main action is amber-lit */
+[data-rt-theme=dod] button{font-size:11px;color:var(--dd-cream);background:radial-gradient(120% 140% at 30% 20%,#3a3832,#191814 70%);border:1px solid #000;border-radius:4px;box-shadow:0 2px 0 #10120a,inset 0 1px 0 rgba(255,255,255,.12)}
+[data-rt-theme=dod] button:hover{color:#fffbea;background:radial-gradient(120% 140% at 30% 20%,#4a4840,#22211c 70%)}
+[data-rt-theme=dod] button:active:not(:disabled){transform:translateY(2px);box-shadow:0 0 0 #10120a,inset 0 2px 3px rgba(0,0,0,.6)}
+[data-rt-theme=dod] :is(.primary,#start,#save){color:#1d1b17;background:linear-gradient(180deg,#ffd085,#ffb84d 50%,#d98b1f);border-color:#6a420a;box-shadow:0 2px 0 #3a2406,0 0 12px rgba(255,184,77,.35),inset 0 1px 0 rgba(255,240,200,.6)}
+[data-rt-theme=dod] :is(.primary,#start,#save):hover{color:#1d1b17;background:linear-gradient(180deg,#ffdc9e,#ffc566 50%,#e39a2c)}
+[data-rt-theme=dod] :is(.primary,#start,#save) .ic{color:#1d1b17}
+[data-rt-theme=dod] .danger{color:#fff;background:radial-gradient(120% 140% at 30% 20%,#b8321f,#6a140a 70%);border-color:#2a0604}
+[data-rt-theme=dod] :is(.ghost,.icon,.icon-btn){background:transparent;border-color:transparent;box-shadow:none}
+[data-rt-theme=dod] .link-btn{border:0;background:none;box-shadow:none;color:var(--rt-link)}
+[data-rt-theme=dod] button:disabled{color:var(--rt-ink-disabled);background:#2a2920;box-shadow:none}
+/* Fields are message slips: cream paper, typewriter ink */
+[data-rt-theme=dod] input:where(:not([type=checkbox],[type=radio],[type=range],[type=file])),[data-rt-theme=dod] :is(textarea,select){color:#1d1b17;background-color:#ede4c8;border:1px solid #6a5a32;border-radius:2px;box-shadow:inset 0 1px 2px rgba(0,0,0,.2);font-family:var(--dd-log);font-size:13px}
+[data-rt-theme=dod] select{background-image:linear-gradient(45deg,transparent 50%,#3a3324 50%),linear-gradient(135deg,#3a3324 50%,transparent 50%)}
+[data-rt-theme=dod] select option{color:#1d1b17;background:#ede4c8}
+[data-rt-theme=dod] :is(input,textarea,select):focus{border-color:#8a5a12;box-shadow:0 0 0 2px rgba(255,184,77,.45)}
+[data-rt-theme=dod] input::placeholder,[data-rt-theme=dod] textarea::placeholder{color:#7a6f52}
+[data-rt-theme=dod] input[type=checkbox]{width:15px;height:15px;background:#191814;border:1px solid #000;border-radius:3px;box-shadow:inset 0 1px 2px rgba(0,0,0,.6)}
+[data-rt-theme=dod] input[type=checkbox]:checked{background:#191814;border-color:var(--dd-amber);box-shadow:0 0 6px rgba(255,184,77,.5)}
+[data-rt-theme=dod] input[type=checkbox]:checked::after{border-color:var(--dd-amber)}
+/* Switches are toggle levers: a bakelite slot with a steel bat */
+[data-rt-theme=dod] .toggle>input[type=checkbox]{width:38px;height:18px;border-radius:9px;background:#141310;border:1px solid #000;box-shadow:inset 0 2px 3px #000}
+[data-rt-theme=dod] .toggle>input[type=checkbox]::after{top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#e9e4d0,#8a8670 70%);box-shadow:0 1px 2px #000}
+[data-rt-theme=dod] .toggle>input[type=checkbox]:checked{background:#2a1c06;box-shadow:inset 0 2px 3px #000,0 0 8px rgba(255,184,77,.35)}
+[data-rt-theme=dod] .toggle>input[type=checkbox]:checked::after{top:2px;left:2px;width:12px;height:12px;border-radius:50%;transform:translateX(20px);background:radial-gradient(circle at 35% 30%,#fff1c8,#ffb84d 60%,#8a5a12)}
+[data-rt-theme=dod] input[type=range]{accent-color:var(--dd-amber)}
+[data-rt-theme=dod] :is(pre,.output,.v22-log,.response){color:#1d1b17;background:var(--dd-paper);border:0;box-shadow:0 2px 6px rgba(0,0,0,.3);font-family:var(--dd-log)}
+[data-rt-theme=dod] :is(.meter,.arcade-progress,.lat-track){background:#141310;border-radius:2px;box-shadow:inset 0 1px 3px #000}
+[data-rt-theme=dod] .pill{color:#1d1b17;background:var(--dd-manila);border-radius:2px;box-shadow:none}
+[data-rt-theme=dod] .pad{background:linear-gradient(180deg,#3b3a2c,#2a2920);border:1px solid #000;border-radius:4px;box-shadow:0 2px 0 #10120a,inset 0 1px 0 rgba(255,255,255,.1)}
+[data-rt-theme=dod] .pad b{color:var(--dd-cream)}
+[data-rt-theme=dod] .pad span{color:var(--dd-amber)}
+[data-rt-theme=dod] .pad::after{border-left-color:var(--dd-amber)}
+[data-rt-theme=dod] .pad:hover{background:linear-gradient(180deg,#4a4838,#322f24)}
+[data-rt-theme=dod] .pad.playing{background:linear-gradient(90deg,rgba(255,184,77,.25),transparent 70%),linear-gradient(180deg,#3b3a2c,#2a2920);box-shadow:inset 3px 0 0 var(--dd-amber),0 2px 0 #10120a}
+[data-rt-theme=dod] :is(.step-n,.setup-n,.friend-card .avatar){font-family:var(--rt-font-display);color:#1d1b17;background:var(--dd-cream);border-radius:50%}
+[data-rt-theme=dod] code{font-family:var(--dd-log);color:#1d1b17;background:var(--dd-manila);border-radius:2px}
+[data-rt-theme=dod] .savebar,[data-rt-theme=dod] .foot{background:linear-gradient(180deg,#2f3419,#23261a);box-shadow:inset 0 2px 0 #10120a}
+[data-rt-theme=dod] .foot small{color:var(--rt-ink-3);font-size:10px;-webkit-line-clamp:1}
+[data-rt-theme=dod] .route li{background:#30351c;box-shadow:inset 0 0 0 1px #10120a}
+[data-rt-theme=dod] .route li:last-child{background:rgba(255,184,77,.16);box-shadow:inset 3px 0 0 var(--dd-amber)}
+[data-rt-theme=dod] .vote{background:linear-gradient(90deg,rgba(255,184,77,.22) calc(var(--share,0)*100%),rgba(0,0,0,.2) 0);border:1px solid #10120a;border-radius:3px}
+[data-rt-theme=dod] .vote-marker{font-family:var(--rt-font-display);color:var(--dd-amber)}
+[data-rt-theme=dod] :is(.scroll,.content,main){scrollbar-color:#6b7343 #23261a}
+html[data-rt-theme=dod]{scrollbar-color:#6b7343 #23261a}
+
+/* ── The operator's log: connection checks typed on paper ── */
+[data-rt-theme=dod] .checklist{counter-reset:log;padding:10px 12px 10px 34px;list-style:none;background:var(--dd-paper);border-radius:2px;box-shadow:0 2px 0 rgba(0,0,0,.35),0 6px 12px rgba(0,0,0,.3)}
+[data-rt-theme=dod] .checklist li{counter-increment:log;position:relative;margin:0;padding:1px 0;line-height:20px;font-family:var(--dd-log);font-size:12.5px;color:#22201a;background:none;border:0;box-shadow:none}
+[data-rt-theme=dod] .checklist li :is(b,strong,small,span,p,em){font-family:var(--dd-log);color:#22201a;text-shadow:none;text-transform:none;letter-spacing:0}
+[data-rt-theme=dod] .checklist li small{display:block;color:#4a4436}
+[data-rt-theme=dod] .checklist li::before{content:counter(log,decimal-leading-zero);position:absolute;left:-26px;top:1px;font-family:var(--dd-log);font-size:11px;color:#8f2012}
+
+/* ── Status strip: the radio's face ──
+   Left, the speaker grille. Right, the amber receive meter (RX): its needle follows the incoming
+   voice level while Tyler listens and rests on the pin otherwise. Between them, the transmit
+   lamp (TX), lit only while Tyler's own speech goes out. Thinking dims the dial; an error lights
+   the lamp in a slow fault blink. */
+[data-rt-theme=dod] .tally{min-height:74px;padding:10px 92px 10px 64px;background:linear-gradient(180deg,#2a2920,#1d1c16);border:2px solid #10120a;border-radius:6px;box-shadow:inset 0 2px 6px rgba(0,0,0,.6),0 1px 0 #6b7343}
+[data-rt-theme=dod] .tally::before{content:"";position:absolute;left:10px;top:50%;width:44px;height:44px;margin-top:-22px;border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle,#0a0a08 0 1.3px,transparent 1.7px) 0 0/5px 5px,radial-gradient(circle at 40% 35%,#4a4840,#232220 70%);box-shadow:0 0 0 2px #10120a,0 0 0 3px #5a5f3a,inset 0 2px 4px rgba(0,0,0,.6)}
+[data-rt-theme=dod] .tally-body{position:static}
+[data-rt-theme=dod] .tally-label{font-size:12px;color:var(--dd-cream)}
+[data-rt-theme=dod] .tally-text{color:#f4ecd2}
+[data-rt-theme=dod] .tally-wave{display:block;position:absolute;right:10px;top:50%;width:66px;height:44px;margin-top:-24px;border-radius:6px 6px 3px 3px;
+  background:radial-gradient(130% 120% at 50% 110%,#ffe6b0,#ffc062 55%,#c88420);
+  box-shadow:0 0 0 2px #10120a,0 0 0 3px #5a5f3a,0 0 14px rgba(255,184,77,.35),inset 0 -6px 8px rgba(120,70,10,.35)}
+/* The scale: ticks on an arc, the last fifth in red; the needle and its pivot are the wave's first two bars. */
+[data-rt-theme=dod] .tally-wave::before{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:conic-gradient(from 32deg at 50% 100%,#a8160c 0 24deg,transparent 24deg),repeating-conic-gradient(from -56deg at 50% 100%,#3a2606 0 1.6deg,transparent 1.6deg 11deg);
+  -webkit-mask:radial-gradient(circle at 50% 100%,transparent 0 29px,#000 29.5px 37px,transparent 37.5px);mask:radial-gradient(circle at 50% 100%,transparent 0 29px,#000 29.5px 37px,transparent 37.5px)}
+[data-rt-theme=dod] .tally-wave::after{content:"RX";position:absolute;left:5px;bottom:3px;font:700 8px/1 var(--rt-font-display);letter-spacing:.1em;color:#3a2606}
+[data-rt-theme=dod] .tally-wave i{display:none;animation:none!important}
+[data-rt-theme=dod] .tally-wave i:nth-child(2){display:block;position:absolute;left:50%;bottom:-3px;width:10px;height:10px;margin-left:-5px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#6a665a,#1d1b17 70%);opacity:1}
+[data-rt-theme=dod] .tally-wave i:first-child{display:block;position:absolute;left:50%;bottom:2px;width:2px;height:37px;margin-left:-1px;border-radius:1px 1px 0 0;background:linear-gradient(#a8160c 0 6px,#1d1b17 6px);transform-origin:50% 100%;
+  transform:rotate(-55deg);transition:transform .12s ease-out;opacity:1}
+[data-rt-theme=dod] .tally[data-state=listening] .tally-wave i:first-child{transform:rotate(calc(-55deg + var(--rt-in-level,0) * 110deg))}
+[data-rt-theme=dod] .tally[data-state=thinking] .tally-wave{filter:brightness(.7)}
+[data-rt-theme=dod] .tally-light{position:absolute;right:84px;top:12px;width:13px;height:13px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#5a2620,#2a0d0a 70%);box-shadow:0 0 0 2px #10120a,inset 0 1px 1px rgba(255,255,255,.15)!important}
+[data-rt-theme=dod] .tally-light::after{content:"TX";position:absolute;left:50%;top:100%;margin:3px 0 0 -8px;width:16px;text-align:center;font:700 8px/1 var(--rt-font-display);letter-spacing:.1em;color:var(--dd-cream)}
+[data-rt-theme=dod] .tally[data-state=speaking] .tally-light{background:radial-gradient(circle at 40% 35%,#fff0d0,#ff4a2e 45%,#a8160c 80%);box-shadow:0 0 0 2px #10120a,0 0 10px #ff4a2e,0 0 20px rgba(255,74,46,.6)!important}
+[data-rt-theme=dod] .tally[data-state=error] .tally-light{background:radial-gradient(circle at 40% 35%,#ffe0a0,#ffb84d 45%,#8a5a12 80%);animation:dd-fault 1.2s steps(1) infinite}
+/* While the key is down the lamp flickers very slightly with the carrier. */
+[data-rt-theme=dod] .tally[data-state=speaking] .tally-light{animation:dd-tx .5s ease-in-out infinite alternate}
+@keyframes dd-tx{to{filter:brightness(1.25) saturate(1.1)}}
+@keyframes dd-fault{0%{opacity:1}50%{opacity:.25}}
+
+[data-rt-theme=dod] :is(.mark[data-logo],img.mark,#brand-logo){--logo-pad:2px;background:radial-gradient(circle at 50% 40%,#5a6038,#23261a 75%);border:1px solid #10120a;border-radius:4px;box-shadow:0 0 0 2px #5a5f3a}
+[data-rt-theme=dod] .mark[data-logo]{width:42px;height:42px;margin:-6px 0}
+
+/* ── Icons, dialogs, notifications and tooltips ──
+   Messages are signal slips: cream paper with typewritten text and a red-stamped title. */
+[data-rt-theme=dod] .ic{--ic-w:1.6px;--ic-cap:square;--ic-join:miter}
+[data-rt-theme=dod] :is(.rt-toast,.rt-dialog){color:#22201a;background:var(--dd-paper);border:0;border-radius:2px;box-shadow:0 2px 0 rgba(0,0,0,.35),0 14px 30px rgba(0,0,0,.55)}
+[data-rt-theme=dod] .rt-toast{border-left:4px solid var(--tone)}
+[data-rt-theme=dod] :is(.rt-toast,.rt-dialog)[data-kind=success]{--tone:#3f6a1e}
+[data-rt-theme=dod] :is(.rt-toast,.rt-dialog)[data-kind=warning]{--tone:#8a5a12}
+[data-rt-theme=dod] :is(.rt-toast,.rt-dialog)[data-kind=error]{--tone:#8f2012}
+[data-rt-theme=dod] :is(.rt-toast,.rt-dialog):not([data-kind]),[data-rt-theme=dod] :is(.rt-toast,.rt-dialog)[data-kind=info]{--tone:#2a4a6a}
+[data-rt-theme=dod] :is(.rt-toast-title,.rt-dialog-title){font-family:var(--rt-font-display);font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#8f2012}
+[data-rt-theme=dod] :is(.rt-toast-text,.rt-dialog-text,.rt-steps){font-family:var(--dd-log);color:#22201a}
+[data-rt-theme=dod] :is(.rt-toast,.rt-dialog) .ic{color:var(--tone)}
+[data-rt-theme=dod] :is(.rt-toast,.rt-dialog) .rt-x{color:#3a3324;background:transparent;border-color:transparent;box-shadow:none}
+[data-rt-theme=dod] :is(.rt-toast,.rt-dialog) .rt-x:hover{color:#8f2012;background:rgba(0,0,0,.06)}
+[data-rt-theme=dod] :is(.rt-toast,.rt-dialog) button:not(.rt-x):not(.primary){color:#22201a;background:transparent;border:1px solid #3a3324;box-shadow:none}
+[data-rt-theme=dod] .rt-tip{background:#efe6c9;color:#22201a;border:1px solid #6a5a32;border-radius:2px;font-family:var(--dd-log)}
+
+/* ── Motion: Day of Defeat: Source ──
+   Signature: the receive needle and transmit lamp above, driven by the real audio events. The
+   dial lamps warm up when a screen opens (a short amber flicker), signal slips are fed in from
+   the top like a teleprinter, and buttons click down a couple of millimetres. */
+@keyframes dd-warm{0%{opacity:0;filter:brightness(.4)}40%{opacity:1;filter:brightness(1.2)}60%{filter:brightness(.85)}100%{filter:none}}
+@keyframes dd-feed{0%{opacity:0;transform:translateY(-12px)}100%{opacity:1;transform:none}}
+[data-rt-theme=dod] :is(.view:not([hidden]),.sheet,section[data-view]:not([hidden])){animation:dd-warm .34s ease-out backwards}
+[data-rt-theme=dod] .rt-toast:not(.rt-leaving){animation:dd-feed .28s steps(5,end) backwards}
+[data-rt-theme=dod] .checklist li:last-child{animation:dd-feed .3s steps(4,end) backwards}

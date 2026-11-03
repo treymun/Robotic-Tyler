@@ -10,7 +10,10 @@ L={'steam':(372,1065,724),'classic-steam-2004':(331,945,699),'team-fortress-2':(
    'windows-xp':(441,1033,598),'doom-classic':(362,1002,630),
    # v2.17, the five-theme pack (assets/theme-logos/masters). Combine is a three-quarter pose, so its
    # left landmark is the near edge of the mask rather than the (foreshortened) glasses.
-   'quake':(274,944,499),'pipboy':(401,974,618),'combine':(423,971,607),'deadlock':(419,981,637),'minecraft':(423,1021,679)}
+   'quake':(274,944,499),'pipboy':(401,974,618),'combine':(423,971,607),'deadlock':(419,981,637),'minecraft':(423,1021,679),
+   # v2.18, themes 16-20 (assets/theme-logos/themes-16-20/masters, cut from the supplied preview).
+   # The Dreamcast logo is a VMU with Tyler on its screen, so its landmarks are the screen edges.
+   'payday':(430,985,620),'dreamcast':(330,866,590),'gmod':(490,980,500),'ricochet':(476,846,496),'dod':(550,1115,642)}
 PIXEL={'doom-classic','minecraft'}
 TSPAN,TX,TY=600,668,585     # target glasses width, glasses centre x, eye line y
 TOP,SIDE,BOTTOM=0.03*N,0.02*N,0.012*N   # keep tops inside; allow up to 6% of the bust to be trimmed

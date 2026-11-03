@@ -47,3 +47,27 @@
 @font-face{font-family:"Tyler Deadlock Caps";src:url("deadlock-caps-600.woff2") format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
 @font-face{font-family:"Tyler Minecraft";src:url("minecraft-400.woff2") format("woff2");font-weight:100 500;font-style:normal;font-display:swap}
 @font-face{font-family:"Tyler Minecraft";src:url("minecraft-700.woff2") format("woff2");font-weight:600 900;font-style:normal;font-display:swap}
+/* v2.18, themes 16-20:
+ *   Tyler PAYDAY         Teko (Latin)                     squared, condensed Crime.net headings
+ *   Tyler PAYDAY Text    IBM Plex Sans Condensed (Latin)  compact briefing text
+ *   Tyler Dreamcast      M PLUS Rounded 1c (Latin)        the console menu's soft rounded sans
+ *   Tyler VMU            Silkscreen (Latin)               the memory card's tiny pixel letters
+ *   Tyler GMod           Roboto (Latin)                   Derma's plain menu sans
+ *   Tyler Ricochet       Audiowide (Latin)                chunky arcade lettering
+ *   Tyler Ricochet Text  Exo 2 (Latin)                    rounded sci-fi text
+ *   Tyler DoD            Stardos Stencil (Latin)          army stencil capitals
+ *   Tyler DoD Log        Courier Prime (Latin)            the operator's typewritten log
+ */
+@font-face{font-family:"Tyler PAYDAY";src:url("payday-display-600.woff2") format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
+@font-face{font-family:"Tyler PAYDAY Text";src:url("payday-400.woff2") format("woff2");font-weight:100 500;font-style:normal;font-display:swap}
+@font-face{font-family:"Tyler PAYDAY Text";src:url("payday-600.woff2") format("woff2");font-weight:600 900;font-style:normal;font-display:swap}
+@font-face{font-family:"Tyler Dreamcast";src:url("dreamcast-400.woff2") format("woff2");font-weight:100 500;font-style:normal;font-display:swap}
+@font-face{font-family:"Tyler Dreamcast";src:url("dreamcast-700.woff2") format("woff2");font-weight:600 900;font-style:normal;font-display:swap}
+@font-face{font-family:"Tyler VMU";src:url("vmu-400.woff2") format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
+@font-face{font-family:"Tyler GMod";src:url("gmod-400.woff2") format("woff2");font-weight:100 500;font-style:normal;font-display:swap}
+@font-face{font-family:"Tyler GMod";src:url("gmod-700.woff2") format("woff2");font-weight:600 900;font-style:normal;font-display:swap}
+@font-face{font-family:"Tyler Ricochet";src:url("ricochet-display-400.woff2") format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
+@font-face{font-family:"Tyler Ricochet Text";src:url("ricochet-400.woff2") format("woff2");font-weight:100 500;font-style:normal;font-display:swap}
+@font-face{font-family:"Tyler Ricochet Text";src:url("ricochet-600.woff2") format("woff2");font-weight:600 900;font-style:normal;font-display:swap}
+@font-face{font-family:"Tyler DoD";src:url("dod-display-700.woff2") format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
+@font-face{font-family:"Tyler DoD Log";src:url("dod-log-400.woff2") format("woff2");font-weight:100 900;font-style:normal;font-display:swap}

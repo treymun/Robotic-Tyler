@@ -19,10 +19,36 @@
  <small>Only posts when you press a button. Game request links still follow Game Hub rules; this feature cannot bypass provider restrictions.</small>`;
  mount.append(panel);const $=id=>panel.querySelector('#'+id),say=x=>{$('sqStatus').textContent=String(x).slice(0,340);},send=async m=>{const r=await chrome.runtime.sendMessage(m);if(!r?.ok)throw Error(r?.error||'Extension unavailable');return r;};
  const clean=s=>String(s||'').replace(/[\u0000-\u001f]/g,' ').trim().slice(0,110);
+ // Game votes as a ranked board (v2.18): each entry has a marker, the title, a readable count and one
+ // disc per vote. Votes that arrived since the last refresh are marked .new so a theme can animate
+ // just those (Ricochet lands discs, PAYDAY circles the leading contract); the first render animates nothing.
+ const lastVotes=new Map();let votesPrimed=false;
+ function renderVotes(list){
+  const box=$('sqVotes');box.replaceChildren();
+  const votes=(list||[]).filter(v=>v&&v.title).slice().sort((a,b)=>(b.count||0)-(a.count||0)).slice(0,8);
+  if(!votes.length){box.classList.remove('vote-board');box.textContent='No votes yet.';lastVotes.clear();votesPrimed=true;return;}
+  box.classList.add('vote-board');
+  const top=votes[0].count||0,total=votes.reduce((n,v)=>n+(v.count||0),0),tied=votes.filter(v=>v.count===top).length>1;
+  const ol=document.createElement('ol');ol.className='votes';
+  votes.forEach((v,i)=>{
+   const count=Math.max(0,Number(v.count)||0),before=votesPrimed?(lastVotes.get(v.title)||0):count;
+   const li=document.createElement('li');li.className='vote';li.dataset.count=String(count);
+   li.style.setProperty('--share',String(total?count/total:0));li.style.setProperty('--rank',String(i+1));
+   if(i===0&&!tied&&count>0)li.dataset.leader='true';
+   if(count>before)li.dataset.arrived=String(count-before);
+   const marker=document.createElement('span');marker.className='vote-marker';marker.setAttribute('aria-hidden','true');marker.textContent=String(i+1);
+   const title=document.createElement('span');title.className='vote-title';title.textContent=v.title;
+   const tally=document.createElement('span');tally.className='vote-count';tally.textContent=count+(count===1?' vote':' votes');
+   const discs=document.createElement('span');discs.className='vote-discs';discs.setAttribute('aria-hidden','true');
+   for(let k=0;k<Math.min(count,12);k++){const d=document.createElement('i');if(k>=before)d.className='new';d.style.setProperty('--k',String(k-before));discs.append(d);}
+   li.append(marker,title,tally,discs);ol.append(li);lastVotes.set(v.title,count);
+  });
+  box.append(ol);votesPrimed=true;
+ }
  async function refresh(){try{if(!api.isOwner?.())return;const r=await send({type:'suite:status'}),d=r.diagnostics||{},u=r.usage||{};
  $('sqStats').textContent=`AI key ${d.model?'✓':'missing'} · AI requests ${u.requests||0} · text cost $${Number(u.reportedCostUSD||0).toFixed(4)} (voice separate)`;
  $('sqParty').textContent=r.party?.active?'Game night active: '+(r.party.members?.length||0)+' players':'No active game night.';
- $('sqVotes').replaceChildren();for(const v of r.votes||[]){const p=document.createElement('p');p.textContent=`${v.title}: ${v.count} vote(s)`;$('sqVotes').append(p);}if(!(r.votes||[]).length)$('sqVotes').textContent='No votes yet.';
+ renderVotes(r.votes);
  $('sqLeaderboard').replaceChildren();for(const x of r.xp||[]){const p=document.createElement('p');p.textContent=`${x.id}: level ${x.level} (${x.xp} XP)`;$('sqLeaderboard').append(p);}if(!(r.xp||[]).length)$('sqLeaderboard').textContent='No votes or XP yet.';
  say('Chrome extension active. Voice works only if the existing Steam voice bridge is connected.');
  }catch(e){say(e.message);}}

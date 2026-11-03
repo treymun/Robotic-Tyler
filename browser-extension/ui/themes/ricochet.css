@@ -1,0 +1,171 @@
+/*
+ * ROBOTIC TYLER "Ricochet / Disc Arena style" theme (v2.18).
+ * The disc arena: deep space with faint stars, floating metal platforms with luminous cyan rims
+ * and a soft glow underneath (they hang in the void), glowing orange discs and chunky arcade
+ * lettering. Every card is a platform; the tabs are pads you jump between.
+ * Signature: when you pick a tab, a disc banks in on a curve and lands on its pad. In game
+ * votes each entry is a platform; one disc lands on it for every vote that arrives, beside a
+ * readable tally.
+ * Type: "Tyler Ricochet" = Audiowide (OFL) for arcade lettering; "Tyler Ricochet Text" =
+ * Exo 2 (OFL) for text.
+ * Style only: original shapes; no Ricochet or Valve logos, textures or game fonts.
+ */
+[data-rt-theme=ricochet]{
+  color-scheme:dark;
+  --rc-cyan:#38e1ff;--rc-cyan-lo:#147a99;--rc-orange:#ff7a2a;--rc-orange-hi:#ffb36b;--rc-void:#04060e;--rc-slab:#121a2e;--rc-slab-2:#18223a;--rc-purple:#7a4bd6;
+  --rt-bar:#060912;--rt-bg:#070a14;--rt-bg-deep:#04060e;--rt-surface:#111829;--rt-surface-2:#162035;--rt-surface-3:#1c2842;
+  --rt-block:#0d1322;--rt-block-hover:#15203a;--rt-input:#04060e;--rt-select:#1b4d63;
+  --rt-line:#22304d;--rt-line-soft:#18233a;--rt-line-strong:#38e1ff;
+  --rt-ink:#dbe8f7;--rt-ink-strong:#ffffff;--rt-ink-2:#c7d6e8;--rt-ink-3:#a4b7cf;--rt-ink-4:#90a4bf;--rt-ink-disabled:#45536b;
+  --rt-link:#7cecff;--rt-link-hover:#ffffff;--rt-blue:#7cecff;--rt-blue-deep:#38e1ff;--rt-active:#38e1ff;
+  --rt-blue-fade:#111829;--rt-blue-fade-hover:#16283f;
+  --rt-green:linear-gradient(180deg,#ffa25a,#ff7a2a 55%,#d8541a);--rt-green-hover:linear-gradient(180deg,#ffb36b,#ff8a3d 55%,#e2601f);--rt-green-ink:#1a0a02;--rt-green-line:#8a3410;
+  --rt-state-standby:#90a4bf;--rt-state-ready:#7ff0a8;--rt-state-listening:#38e1ff;--rt-state-thinking:#ffd36b;--rt-state-speaking:#ffa25a;--rt-state-waiting:#c4a3ff;--rt-state-error:#ff6b6b;
+  --rt-danger:#ff6b6b;--rt-danger-bg:#a8232a;--rt-danger-hover:#c42b33;--rt-danger-ink:#ffffff;--rt-success:#7ff0a8;--rt-focus:#38e1ff;
+  --rt-accent:#38e1ff;--rt-accent-soft:rgba(56,225,255,.12);--rt-accent-line:rgba(56,225,255,.5);
+  --rt-on-accent:#ffffff;--rt-accent-fill:#147a99;--rt-meter:linear-gradient(90deg,#147a99,#38e1ff);--rt-marker:#ffffff;--rt-edge:rgba(56,225,255,.35);--rt-page-glow:#0b1d38;
+  --rt-font:"Tyler Ricochet Text","Segoe UI",Arial,sans-serif;--rt-font-display:"Tyler Ricochet","Tyler Ricochet Text",Arial,sans-serif;
+  --rt-text-xs:11px;--rt-text-sm:12px;--rt-text-md:13px;--rt-text-lg:15px;--rt-track:.04em;
+  --rt-r-xs:3px;--rt-r-sm:6px;--rt-r-md:10px;--rt-r-lg:14px;--rt-shadow-float:0 0 0 1px #000,0 0 30px rgba(56,225,255,.12),0 24px 60px rgba(0,0,0,.85);
+  --rc-stars:radial-gradient(circle at 12% 18%,#fff 0 .8px,transparent 1.3px) 0 0/97px 89px,radial-gradient(circle at 60% 72%,rgba(190,220,255,.8) 0 .7px,transparent 1.2px) 0 0/131px 113px,
+    radial-gradient(circle at 80% 30%,rgba(255,255,255,.6) 0 .6px,transparent 1px) 0 0/59px 71px,radial-gradient(110% 60% at 70% 0,rgba(122,75,214,.18),transparent 60%),radial-gradient(90% 50% at 0 100%,rgba(20,122,153,.18),transparent 60%);
+  /* A floating platform: metal slab, bright rim on top, glow cast underneath into the void */
+  --rc-platform:linear-gradient(180deg,rgba(56,225,255,.16),transparent 26%),linear-gradient(180deg,#18223a,#0e1526);
+  --rc-float:0 1px 0 rgba(124,236,255,.6) inset,0 0 0 1px #22304d,0 14px 16px -10px rgba(56,225,255,.45),0 18px 24px rgba(0,0,0,.5);
+}
+.panel[data-rt-theme=ricochet]{background:var(--rc-stars),#04060e;border:1px solid #17223a;box-shadow:var(--rt-shadow-float)}
+[data-rt-theme=ricochet] body{background:var(--rc-stars),#04060e}
+[data-rt-theme=ricochet] main{background:transparent}
+[data-rt-theme=ricochet] :is(h1,h2,h3,.wordmark,.brand-text strong,.sheet-head h2,.card>h2,.marquee){font-family:var(--rt-font-display);font-weight:400;text-transform:uppercase;letter-spacing:.04em;color:#fff;text-shadow:0 0 10px rgba(56,225,255,.45),0 2px 0 #0a3a4c}
+[data-rt-theme=ricochet] h2{font-size:19px}
+[data-rt-theme=ricochet] h1{font-size:30px}
+[data-rt-theme=ricochet] .wordmark{font-size:17px;font-style:italic;letter-spacing:.06em;background:linear-gradient(180deg,#fff,#9ff1ff 55%,#38e1ff);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none;filter:drop-shadow(0 0 6px rgba(56,225,255,.5)) drop-shadow(0 2px 0 #0a3a4c)}
+[data-rt-theme=ricochet] :is(label,.tally-label,.stat dt,.pulse dt,.facts b,.matrix dt,details.feature>summary,.ident-sub,.tabs button,.section-nav button,nav:not(.tabs) button,button,.pad span){font-family:var(--rt-font);font-weight:600;text-transform:uppercase;letter-spacing:.08em}
+[data-rt-theme=ricochet] label:not(:has(>input[type=checkbox])):not(.toggle){color:var(--rc-cyan);font-size:11px}
+[data-rt-theme=ricochet] label:has(>input[type=checkbox]),[data-rt-theme=ricochet] .toggle{text-transform:none;letter-spacing:0;font-weight:400}
+[data-rt-theme=ricochet] .ident-sub{color:var(--rt-ink-3);font-size:10px}
+/* Everything is a platform hanging in the void */
+[data-rt-theme=ricochet] .bar{background:linear-gradient(180deg,rgba(24,34,58,.9),rgba(6,9,18,.9));box-shadow:inset 0 -1px 0 rgba(56,225,255,.4)}
+[data-rt-theme=ricochet] .bar .icon-btn{color:var(--rc-cyan);background:transparent;border:1px solid rgba(56,225,255,.45);border-radius:50%}
+[data-rt-theme=ricochet] :where(details,.callout,.quick-help,.confirm,.deck-entry,.board-tools,.sheet,.card,.route-card,.panel,.mini-callout>div,.usage-banner,.facts>div,.matrix>div,#setup,.arcade-tickets>div){background:var(--rc-platform);border:0;border-radius:var(--rt-r-md);box-shadow:var(--rc-float);margin-bottom:16px}
+[data-rt-theme=ricochet] details.feature[open]{background:var(--rc-platform)}
+[data-rt-theme=ricochet] details.feature>summary{font-size:12px;color:#fff}
+[data-rt-theme=ricochet] :is(.quick-help,.confirm,#setup,.deck-entry){box-shadow:var(--rc-float),inset 3px 0 0 var(--rc-orange)}
+[data-rt-theme=ricochet] .stats{gap:8px;padding:0;background:transparent;border:0}
+[data-rt-theme=ricochet] .stat{padding:7px 9px 9px;background:var(--rc-platform);border:0;border-radius:var(--rt-r-md);box-shadow:var(--rc-float)}
+[data-rt-theme=ricochet] .stat:first-child{border:0}
+[data-rt-theme=ricochet] .stat dt{font-size:10px;color:var(--rc-cyan)}
+[data-rt-theme=ricochet] .stat dd{font-family:var(--rt-font-display);font-size:18px;font-weight:400;color:#fff;text-shadow:0 0 8px rgba(56,225,255,.5)}
+[data-rt-theme=ricochet] .stat small{color:var(--rt-ink-4)}
+/* Tabs: jump pads. Each one floats over the void; the chosen one carries a glowing disc */
+[data-rt-theme=ricochet] .tabs{gap:6px;padding:10px 8px 14px;background:transparent;box-shadow:none}
+[data-rt-theme=ricochet] .tabs button{position:relative;padding:7px 2px 11px;font-size:10px;color:var(--rt-ink-3);background:transparent;border:0;border-radius:0;box-shadow:none}
+[data-rt-theme=ricochet] .tabs button::before{content:"";position:absolute;left:8%;right:8%;bottom:0;height:10px;border-radius:50%;pointer-events:none;
+  background:radial-gradient(ellipse at 50% 30%,#2a3a5c,#0e1526 70%);box-shadow:inset 0 1px 0 rgba(124,236,255,.55),0 0 0 1px #22304d,0 8px 10px -4px rgba(56,225,255,.35)}
+[data-rt-theme=ricochet] .tabs button:hover{color:#fff;background:transparent}
+[data-rt-theme=ricochet] .tabs button:hover::before{box-shadow:inset 0 1px 0 #7cecff,0 0 0 1px var(--rc-cyan),0 8px 12px -4px rgba(56,225,255,.6)}
+[data-rt-theme=ricochet] .tabs button[aria-selected=true]{color:#fff;text-shadow:0 0 8px rgba(56,225,255,.6)}
+[data-rt-theme=ricochet] .tabs button[aria-selected=true] .ic{color:var(--rc-cyan)}
+[data-rt-theme=ricochet] .tabs button[aria-selected=true]::before{box-shadow:inset 0 1px 0 #b7f6ff,0 0 0 1px var(--rc-cyan),0 0 14px rgba(56,225,255,.55),0 8px 12px -4px rgba(56,225,255,.7)}
+[data-rt-theme=ricochet] .tabs button[aria-selected=true]::after{content:"";position:absolute;left:50%;bottom:4px;width:24px;height:7px;margin-left:-12px;border-radius:50%;pointer-events:none;
+  background:radial-gradient(ellipse,#fff 0 18%,#ffb36b 30%,#ff7a2a 62%,#a83a0c 100%);box-shadow:0 0 10px #ff7a2a,0 0 20px rgba(255,122,42,.5)}
+[data-rt-theme=ricochet] .side{background:var(--rc-stars),#05080f;box-shadow:inset -1px 0 0 rgba(56,225,255,.3)}
+[data-rt-theme=ricochet] :is(.section-nav button,nav:not(.tabs) button){position:relative;font-size:12px;color:var(--rt-ink-3);background:transparent;border:0;border-radius:var(--rt-r-sm);box-shadow:none}
+[data-rt-theme=ricochet] :is(.section-nav button,nav:not(.tabs) button):hover{color:#fff;background:rgba(56,225,255,.08)}
+[data-rt-theme=ricochet] :is(.section-nav button[aria-current=page],nav:not(.tabs) button.active){color:#fff;background:var(--rc-platform);box-shadow:var(--rc-float)}
+[data-rt-theme=ricochet] :is(.section-nav button[aria-current=page],nav:not(.tabs) button.active) .ic{color:var(--rc-cyan)}
+/* Buttons: chunky rounded slabs with a glowing rim; the main action is a disc-orange slab */
+[data-rt-theme=ricochet] button{font-size:11px;color:#fff;background:linear-gradient(180deg,#1c2842,#111829);border:0;border-radius:var(--rt-r-sm);box-shadow:inset 0 1px 0 rgba(124,236,255,.55),0 0 0 1px #22304d,0 3px 0 #04060e}
+[data-rt-theme=ricochet] button:hover{color:#fff;background:linear-gradient(180deg,#22345a,#15203a);box-shadow:inset 0 1px 0 #b7f6ff,0 0 0 1px var(--rc-cyan),0 3px 0 #04060e,0 0 12px rgba(56,225,255,.35)}
+[data-rt-theme=ricochet] button:active:not(:disabled){transform:translateY(2px);box-shadow:inset 0 1px 0 rgba(124,236,255,.55),0 0 0 1px #22304d,0 1px 0 #04060e}
+[data-rt-theme=ricochet] :is(.primary,#start,#save){color:#1a0a02;background:linear-gradient(180deg,#ffb36b,#ff7a2a 55%,#d8541a);box-shadow:inset 0 1px 0 rgba(255,230,200,.7),0 0 0 1px #8a3410,0 3px 0 #4a1a06,0 0 14px rgba(255,122,42,.35)}
+[data-rt-theme=ricochet] :is(.primary,#start,#save):hover{color:#1a0a02;background:linear-gradient(180deg,#ffc184,#ff8a3d 55%,#e2601f);box-shadow:inset 0 1px 0 rgba(255,230,200,.8),0 0 0 1px #8a3410,0 3px 0 #4a1a06,0 0 18px rgba(255,122,42,.55)}
+[data-rt-theme=ricochet] :is(.primary,#start,#save) .ic{color:#1a0a02}
+[data-rt-theme=ricochet] .danger{color:#fff;background:linear-gradient(180deg,#d8414a,#a8232a);box-shadow:inset 0 1px 0 rgba(255,200,200,.5),0 0 0 1px #5a0c10,0 3px 0 #2a0406}
+[data-rt-theme=ricochet] :is(.ghost,.icon,.icon-btn){background:transparent;box-shadow:none}
+[data-rt-theme=ricochet] .link-btn{background:none;box-shadow:none;color:var(--rt-link)}
+[data-rt-theme=ricochet] button:disabled{color:var(--rt-ink-disabled);background:#0d1322;box-shadow:0 0 0 1px #18233a}
+/* Fields */
+[data-rt-theme=ricochet] input:where(:not([type=checkbox],[type=radio],[type=range],[type=file])),[data-rt-theme=ricochet] :is(textarea,select){color:#fff;background-color:#04060e;border:1px solid #22304d;border-radius:var(--rt-r-sm);box-shadow:inset 0 2px 4px rgba(0,0,0,.6)}
+[data-rt-theme=ricochet] select{background-image:linear-gradient(45deg,transparent 50%,var(--rc-cyan) 50%),linear-gradient(135deg,var(--rc-cyan) 50%,transparent 50%)}
+[data-rt-theme=ricochet] :is(input,textarea,select):focus{border-color:var(--rc-cyan);box-shadow:inset 0 2px 4px rgba(0,0,0,.6),0 0 0 1px rgba(56,225,255,.4),0 0 12px rgba(56,225,255,.25)}
+[data-rt-theme=ricochet] input[type=checkbox]{width:16px;height:16px;background:#04060e;border:1px solid var(--rc-cyan);border-radius:50%;box-shadow:0 0 6px rgba(56,225,255,.3)}
+[data-rt-theme=ricochet] input[type=checkbox]:checked{background:radial-gradient(circle,#fff 0 2px,#ff7a2a 3px 5px,#04060e 5.5px);border-color:var(--rc-orange);box-shadow:0 0 8px rgba(255,122,42,.6)}
+[data-rt-theme=ricochet] input[type=checkbox]:checked::after{display:none}
+[data-rt-theme=ricochet] .toggle>input[type=checkbox]{width:38px;height:18px;border-radius:9px;background:#04060e;border:1px solid #22304d;box-shadow:inset 0 2px 4px #000}
+[data-rt-theme=ricochet] .toggle>input[type=checkbox]::after{display:block;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:#45536b}
+[data-rt-theme=ricochet] .toggle>input[type=checkbox]:checked{background:#0b2f3d;border-color:var(--rc-cyan);box-shadow:inset 0 2px 4px #000,0 0 10px rgba(56,225,255,.35)}
+[data-rt-theme=ricochet] .toggle>input[type=checkbox]:checked::after{display:block;top:2px;left:2px;width:12px;height:12px;border-radius:50%;transform:translateX(20px);background:radial-gradient(circle,#fff 0 20%,#ff7a2a 55%,#a83a0c);box-shadow:0 0 8px #ff7a2a}
+[data-rt-theme=ricochet] input[type=range]{accent-color:var(--rc-cyan)}
+[data-rt-theme=ricochet] :is(pre,.output,.v22-log,.response){background:#04060e;border:1px solid #18233a;box-shadow:none}
+[data-rt-theme=ricochet] :is(.meter,.arcade-progress,.lat-track){background:#04060e;border-radius:999px;box-shadow:inset 0 0 0 1px #22304d}
+[data-rt-theme=ricochet] .pill{color:var(--rc-cyan);background:transparent;border-radius:999px;box-shadow:inset 0 0 0 1px var(--rc-cyan-lo)}
+[data-rt-theme=ricochet] .pad{background:var(--rc-platform);border:0;border-radius:var(--rt-r-md);box-shadow:var(--rc-float)}
+[data-rt-theme=ricochet] .pad b{color:#fff}
+[data-rt-theme=ricochet] .pad span{color:var(--rc-cyan)}
+[data-rt-theme=ricochet] .pad::after{border-left-color:var(--rc-orange)}
+[data-rt-theme=ricochet] .pad:hover{background:linear-gradient(180deg,rgba(56,225,255,.26),transparent 30%),linear-gradient(180deg,#1d2a46,#111a2e)}
+[data-rt-theme=ricochet] .pad.playing{background:linear-gradient(180deg,rgba(255,122,42,.35),transparent 34%),linear-gradient(180deg,#1d2a46,#111a2e);box-shadow:inset 0 1px 0 #ffb36b,0 0 0 1px var(--rc-orange),0 14px 16px -10px rgba(255,122,42,.6),0 18px 24px rgba(0,0,0,.5)}
+[data-rt-theme=ricochet] :is(.step-n,.setup-n,.friend-card .avatar){font-family:var(--rt-font-display);color:#1a0a02;background:radial-gradient(circle,#fff 0 18%,#ffb36b 35%,#ff7a2a 65%);border-radius:50%;box-shadow:0 0 8px rgba(255,122,42,.6)}
+[data-rt-theme=ricochet] code{color:var(--rc-cyan);background:#04060e;border-radius:3px}
+[data-rt-theme=ricochet] .savebar,[data-rt-theme=ricochet] .foot{background:linear-gradient(180deg,rgba(6,9,18,.9),rgba(14,21,38,.95));box-shadow:inset 0 1px 0 rgba(56,225,255,.35)}
+[data-rt-theme=ricochet] .foot small{color:var(--rt-ink-3)}
+[data-rt-theme=ricochet] .route li{background:var(--rc-platform);box-shadow:var(--rc-float)}
+[data-rt-theme=ricochet] .route li:last-child{box-shadow:var(--rc-float),inset 3px 0 0 var(--rc-orange)}
+[data-rt-theme=ricochet] :is(.scroll,.content,main){scrollbar-color:#22304d #04060e}
+html[data-rt-theme=ricochet]{scrollbar-color:#22304d #04060e}
+
+/* ── Votes: platforms that collect discs ──
+   Each game is a floating platform with its tally; one disc sits on it per vote (up to twelve).
+   Discs for votes that just arrived drop in from above and bounce as they land. */
+[data-rt-theme=ricochet] .vote-board .votes{gap:14px;padding:6px 2px 10px}
+[data-rt-theme=ricochet] .vote{grid-template-columns:auto minmax(0,1fr) auto;padding:20px 10px 8px;background:var(--rc-platform);border-radius:var(--rt-r-md);box-shadow:var(--rc-float)}
+[data-rt-theme=ricochet] .vote-marker{font-family:var(--rt-font-display);font-size:14px;color:var(--rc-cyan)}
+[data-rt-theme=ricochet] .vote-title{font-weight:600}
+[data-rt-theme=ricochet] .vote-count{font-family:var(--rt-font-display);font-size:14px;color:#fff;text-shadow:0 0 8px rgba(56,225,255,.5)}
+[data-rt-theme=ricochet] .vote[data-leader=true]{box-shadow:var(--rc-float),0 0 0 1px var(--rc-orange),0 0 16px rgba(255,122,42,.25)}
+[data-rt-theme=ricochet] .vote-discs{display:flex;position:absolute;left:10px;right:10px;top:5px;height:9px;gap:4px;pointer-events:none}
+[data-rt-theme=ricochet] .vote-discs i{width:20px;height:7px;border-radius:50%;background:radial-gradient(ellipse,#fff 0 18%,#ffb36b 32%,#ff7a2a 62%,#a83a0c);box-shadow:0 0 6px rgba(255,122,42,.8)}
+[data-rt-theme=ricochet] .vote-discs i.new{animation:rc-land .55s cubic-bezier(.3,.6,.4,1) backwards;animation-delay:calc(var(--k,0) * 90ms)}
+@keyframes rc-land{0%{opacity:0;transform:translate(14px,-28px) rotate(-25deg) scaleX(.7)}55%{opacity:1;transform:translateY(1px) rotate(0) scaleX(1.1)}75%{transform:translateY(-4px)}100%{transform:none}}
+
+/* ── Status strip: a disc between the walls ──
+   The disc hovers while Tyler listens, ricochets wall to wall while he talks, spins in place
+   while he thinks and glows red on an error. */
+[data-rt-theme=ricochet] .tally{background:var(--rc-platform);border:0;border-radius:var(--rt-r-md);box-shadow:var(--rc-float),inset 2px 0 0 rgba(56,225,255,.5),inset -2px 0 0 rgba(56,225,255,.5);padding-bottom:22px;overflow:hidden}
+[data-rt-theme=ricochet] .tally-light{width:3px;border-radius:2px}
+[data-rt-theme=ricochet] .tally-label{font-family:var(--rt-font-display);font-weight:400;font-size:13px;color:var(--tone);text-shadow:0 0 8px color-mix(in srgb,var(--tone) 60%,transparent)}
+[data-rt-theme=ricochet] .tally-wave{display:none}
+[data-rt-theme=ricochet] .tally::after{content:"";position:absolute;left:12px;bottom:7px;width:22px;height:7px;border-radius:50%;pointer-events:none;
+  background:radial-gradient(ellipse,#fff 0 18%,#ffb36b 32%,#ff7a2a 62%,#a83a0c);box-shadow:0 0 8px #ff7a2a}
+[data-rt-theme=ricochet] .tally[data-state=listening]::after{animation:rc-hover 1.6s ease-in-out infinite}
+[data-rt-theme=ricochet] .tally[data-state=speaking]::after{animation:rc-bounce 1.1s linear infinite}
+[data-rt-theme=ricochet] .tally[data-state=thinking]::after{left:50%;margin-left:-11px;animation:rc-spin .6s linear infinite}
+[data-rt-theme=ricochet] .tally[data-state=error]::after{background:radial-gradient(ellipse,#fff 0 18%,#ff9a9a 32%,#ff3b3b 62%,#7a0c0c);box-shadow:0 0 8px #ff3b3b}
+@keyframes rc-hover{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes rc-bounce{0%{left:12px;transform:rotate(-12deg)}50%{left:calc(100% - 34px);transform:rotate(12deg)}100%{left:12px;transform:rotate(-12deg)}}
+@keyframes rc-spin{0%{transform:scaleX(1)}50%{transform:scaleX(.25)}100%{transform:scaleX(1)}}
+
+[data-rt-theme=ricochet] :is(.mark[data-logo],img.mark,#brand-logo){--logo-pad:2px;background:radial-gradient(circle at 50% 40%,#1c2842,#04060e 75%);border:1px solid rgba(56,225,255,.5);border-radius:50%;box-shadow:0 0 10px rgba(56,225,255,.3)}
+[data-rt-theme=ricochet] .mark[data-logo]{width:42px;height:42px;margin:-6px 0}
+
+/* ── Icons, dialogs, notifications and tooltips ── */
+[data-rt-theme=ricochet] .ic{--ic-w:1.7px;filter:drop-shadow(0 0 3px rgba(56,225,255,.45))}
+[data-rt-theme=ricochet] :is(.rt-toast,.rt-dialog){background:var(--rc-platform);border:0;border-radius:var(--rt-r-md);box-shadow:var(--rc-float),0 20px 40px rgba(0,0,0,.6)}
+[data-rt-theme=ricochet] .rt-toast{border-left:3px solid var(--tone)}
+[data-rt-theme=ricochet] :is(.rt-toast-title,.rt-dialog-title){font-family:var(--rt-font-display);font-weight:400;text-transform:uppercase;letter-spacing:.04em;color:#fff;text-shadow:0 0 8px rgba(56,225,255,.5)}
+[data-rt-theme=ricochet] :is(.rt-toast-text,.rt-dialog-text,.rt-steps){color:var(--rt-ink-2)}
+[data-rt-theme=ricochet] .rt-tip{background:#0e1526;color:#fff;border:1px solid var(--rc-cyan-lo);border-radius:6px}
+
+/* ── Motion: Ricochet ──
+   Signature: picking a tab sends a disc banking in from the right on a curve; it skims, tilts
+   and settles on the pad. Screens rise into place like a platform floating up, notifications
+   slide in tilted like a thrown disc, and the logo's ring glows cyan while Tyler talks. */
+@keyframes rc-bank{0%{opacity:0;transform:translate(70px,-34px) rotate(38deg) scale(.6)}45%{opacity:1;transform:translate(24px,-18px) rotate(18deg) scale(.85)}80%{transform:translate(-3px,0) rotate(-6deg) scale(1.05)}100%{transform:none}}
+@keyframes rc-rise{0%{opacity:0;transform:translateY(12px)}100%{opacity:1;transform:none}}
+@keyframes rc-throw{0%{opacity:0;transform:translateX(40px) skewX(-12deg)}100%{opacity:1;transform:none}}
+@keyframes rc-glow{0%,100%{box-shadow:0 0 6px rgba(56,225,255,.3)}50%{box-shadow:0 0 18px rgba(56,225,255,.9)}}
+[data-rt-theme=ricochet] .tabs button[aria-selected=true]::after{animation:rc-bank .5s cubic-bezier(.25,.7,.35,1) backwards}
+[data-rt-theme=ricochet] :is(.view:not([hidden]),.sheet,section[data-view]:not([hidden])){animation:rc-rise .3s cubic-bezier(.2,.8,.3,1) backwards}
+[data-rt-theme=ricochet] .rt-toast:not(.rt-leaving){animation:rc-throw .26s cubic-bezier(.2,.8,.3,1) backwards}
+[data-rt-theme=ricochet] .panel:has(.tally[data-state=speaking]) .mark[data-logo],.panel[data-rt-theme=ricochet]:has(.tally[data-state=speaking]) .mark[data-logo]{animation:rc-glow 1s ease-in-out infinite}

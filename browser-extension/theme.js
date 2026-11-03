@@ -9,7 +9,7 @@
 (() => {
  'use strict';
  const store=globalThis.tylerSettings?.storage?.local||globalThis.chrome?.storage?.local;
- const THEMES=['steam','classic','tf2','cs2','portal','cs16','hev','l4d','winxp','doom','quake','pipboy','combine','deadlock','minecraft'];
+ const THEMES=['steam','classic','tf2','cs2','portal','cs16','hev','l4d','winxp','doom','quake','pipboy','combine','deadlock','minecraft','payday','dreamcast','gmod','ricochet','dod'];
  // [name, one-line description, light?]
  const INFO={
   steam:['Steam','Today’s Steam: navy panels, blue highlights and a friends-list header.',false],
@@ -27,6 +27,11 @@
   combine:['Half-Life 2 Combine','Pale Civil Protection armour, charcoal panels and a cyan scanner line.',false],
   deadlock:['Deadlock','Occult noir: brass, parchment, vintage city signs and a spectral teal glow.',false],
   minecraft:['Minecraft','Inventory slots, square buttons, pixel letters and a hotbar highlight.',true],
+  payday:['PAYDAY 2','Crime.net: a dark city map, blue contract markers and a pinned heist briefing.',false],
+  dreamcast:['Sega Dreamcast','The console menu in warm white and orange, and a VMU when collapsed.',true],
+  gmod:['Garry’s Mod','The sandbox spawn menu: Derma panels, blue highlights and spawn-icon sounds.',true],
+  ricochet:['Ricochet','Floating platforms in dark space, glowing disc edges and arcade lettering.',false],
+  dod:['Day of Defeat: Source','A field radio on the operator’s desk: olive paint, canvas, stencils, amber dials.',false],
  };
  const clean=v=>THEMES.includes(v)?v:'steam';
  const root=document.documentElement;

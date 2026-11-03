@@ -1,0 +1,187 @@
+/*
+ * ROBOTIC TYLER "Garry's Mod / Sandbox style" theme (v2.18).
+ * Derma, the sandbox's own UI kit: light grey panels with dark title bars, gradient buttons with
+ * a thin grey border, property-sheet tabs, blue collapsible category headers and blue selection.
+ * The soundboard is the Q spawn menu: a category rail of sound banks on the left and a grid of
+ * square spawn icons on the right.
+ * Signature: playing a clip grabs its tile with the physics gun: a blue glowing outline, lifted
+ * and tilted in mid-air. When the clip stops it drops back into its slot with a little bounce.
+ * Errors show the famous red ERROR.
+ * Type: "Tyler GMod" = Roboto (OFL), the plain sans the newer Derma skin uses; Tahoma where
+ * Windows has it for small text, as the classic skin does.
+ * Style only: original drawings; the mascot's lapel pin is part of the supplied logo artwork.
+ */
+[data-rt-theme=gmod]{
+  color-scheme:light;
+  --gm-blue:#3e8ce0;--gm-blue-hi:#6fb0f4;--gm-blue-lo:#215fa6;--gm-title:#353a40;--gm-title-2:#22262b;--gm-panel:#e9ebed;--gm-well:#4a4e54;--gm-beam:#36b2ff;
+  --rt-bar:#353a40;--rt-bg:#e2e5e8;--rt-bg-deep:#d3d7db;--rt-surface:#f4f5f6;--rt-surface-2:#ffffff;--rt-surface-3:#ffffff;
+  --rt-block:#f4f5f6;--rt-block-hover:#ffffff;--rt-input:#ffffff;--rt-select:#b9d7f7;
+  --rt-line:#9aa1a8;--rt-line-soft:#c5cacf;--rt-line-strong:#3e8ce0;
+  --rt-ink:#26292d;--rt-ink-strong:#111315;--rt-ink-2:#2e3236;--rt-ink-3:#3c4146;--rt-ink-4:#454a50;--rt-ink-disabled:#9aa0a6;
+  --rt-link:#1d5aa0;--rt-link-hover:#123d70;--rt-blue:#1d5aa0;--rt-blue-deep:#123d70;--rt-active:#3e8ce0;
+  --rt-blue-fade:#f4f5f6;--rt-blue-fade-hover:#dcebfb;
+  --rt-green:#2870c0;--rt-green-hover:#2f7bd0;--rt-green-ink:#ffffff;--rt-green-line:#1b4f8c;
+  --rt-state-standby:#454a50;--rt-state-ready:#24692a;--rt-state-listening:#1d5aa0;--rt-state-thinking:#7a5200;--rt-state-speaking:#9a4200;--rt-state-waiting:#663a9c;--rt-state-error:#b01e1e;
+  --rt-danger:#b01e1e;--rt-danger-bg:#b01e1e;--rt-danger-hover:#c62828;--rt-danger-ink:#ffffff;--rt-success:#24692a;--rt-focus:#1d5aa0;
+  --rt-accent:#1d5aa0;--rt-accent-soft:rgba(62,140,224,.14);--rt-accent-line:rgba(62,140,224,.5);
+  --rt-on-accent:#ffffff;--rt-accent-fill:#2870c0;--rt-meter:linear-gradient(90deg,#6fb0f4,#3e8ce0);--rt-marker:#111315;--rt-edge:#ffffff;--rt-page-glow:#cfdcea;
+  --rt-font:"Tyler GMod",Tahoma,Roboto,Arial,sans-serif;--rt-font-display:"Tyler GMod",Roboto,Arial,sans-serif;
+  --rt-text-xs:11px;--rt-text-sm:12px;--rt-text-md:13px;--rt-text-lg:15px;--rt-track:0;
+  --rt-r-xs:2px;--rt-r-sm:4px;--rt-r-md:5px;--rt-r-lg:6px;--rt-shadow-float:0 0 0 1px #1b1e21,0 16px 40px rgba(0,0,0,.45);
+  --gm-button:linear-gradient(180deg,#fdfdfd,#e8eaec 60%,#dcdfe2);
+  --gm-cat:linear-gradient(180deg,#5aa0ea,#3e8ce0 55%,#2f7bd0);
+}
+.panel[data-rt-theme=gmod]{background:var(--gm-panel);border:1px solid #1b1e21;border-radius:6px;box-shadow:var(--rt-shadow-float)}
+[data-rt-theme=gmod] body{background:linear-gradient(180deg,#5d6268,#3f4348) fixed}
+[data-rt-theme=gmod] main{background:transparent}
+[data-rt-theme=gmod] :is(h1,h2,h3,.sheet-head h2,.card>h2,.marquee){font-family:var(--rt-font-display);font-weight:700;letter-spacing:0;text-transform:none;color:#26292d}
+[data-rt-theme=gmod] h2{font-size:17px}
+[data-rt-theme=gmod] h1{font-size:26px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.4)}
+[data-rt-theme=gmod] .page-head p{color:#e9ebed}
+[data-rt-theme=gmod] :is(label,.tally-label,.stat dt,.pulse dt,.facts b,.matrix dt,details.feature>summary,.tabs button,.section-nav button,nav:not(.tabs) button,button){text-transform:none;letter-spacing:0}
+[data-rt-theme=gmod] label:not(:has(>input[type=checkbox])):not(.toggle){color:#3c4146;font-weight:700;font-size:12px}
+/* The window title bar: dark, with the frame's white title */
+[data-rt-theme=gmod] .bar{background:linear-gradient(180deg,#41464d,#2b2f34);border-radius:5px 5px 0 0;box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 1px 0 #1b1e21;padding:9px 10px 9px 12px}
+[data-rt-theme=gmod] :is(.wordmark,.brand-text strong){font-family:var(--rt-font-display);font-weight:700;font-size:15px;letter-spacing:0;color:#fff;text-shadow:0 1px 1px #000}
+[data-rt-theme=gmod] .ident-sub{color:#c7ccd2;text-transform:none;letter-spacing:0}
+[data-rt-theme=gmod] .bar .icon-btn{color:#fff;background:linear-gradient(180deg,#6b737c,#4a5158);border:1px solid #1b1e21;border-radius:4px;box-shadow:inset 0 1px 0 rgba(255,255,255,.18)}
+[data-rt-theme=gmod] .bar .icon-btn:hover{background:linear-gradient(180deg,#7d868f,#575f67)}
+/* Panels and the blue collapsible categories */
+[data-rt-theme=gmod] :where(details,.callout,.quick-help,.confirm,.deck-entry,.board-tools,.sheet,.card,.route-card,.panel,.mini-callout>div,.usage-banner,.facts>div,.matrix>div,#setup,.arcade-tickets>div){background:#f7f8f9;border:1px solid #a9afb5;border-radius:var(--rt-r-md);box-shadow:inset 0 1px 0 #fff}
+[data-rt-theme=gmod] details.feature{padding:0;overflow:hidden}
+[data-rt-theme=gmod] details.feature>summary{margin:0;padding:6px 10px;font-weight:700;font-size:13px;color:#fff;background:var(--gm-cat);border-radius:0;text-shadow:0 1px 1px rgba(0,0,0,.35);box-shadow:inset 0 -1px 0 #1b4f8c}
+[data-rt-theme=gmod] details.feature>summary :is(.feature-meta,.ic){color:#e4f0fd}
+[data-rt-theme=gmod] details.feature>summary::after{border-color:#fff}
+[data-rt-theme=gmod] details.feature[open]{background:#fbfbfc}
+[data-rt-theme=gmod] details.feature[open]>summary{color:#fff;margin-bottom:6px}
+[data-rt-theme=gmod] details.feature>:not(summary){margin-left:10px;margin-right:10px}
+[data-rt-theme=gmod] :is(.quick-help,.confirm,#setup,.deck-entry){border-left:4px solid var(--gm-blue)}
+[data-rt-theme=gmod] .stats{gap:4px;padding:4px;background:#d3d7db;border:1px solid #a9afb5;border-radius:var(--rt-r-md)}
+[data-rt-theme=gmod] .stat{background:#fff;border:1px solid #c5cacf;border-radius:3px;padding:5px 8px}
+[data-rt-theme=gmod] .stat:first-child{border-left:1px solid #c5cacf}
+[data-rt-theme=gmod] .stat dt{font-size:11px;font-weight:700;color:#454a50}
+[data-rt-theme=gmod] .stat dd{font-size:17px;font-weight:700;color:#111315}
+/* Property-sheet tabs: grey tabs, the open one white and joined to the page */
+[data-rt-theme=gmod] .tabs{gap:2px;padding:6px 6px 0;background:#c9cdd1;box-shadow:inset 0 -1px 0 #9aa1a8}
+[data-rt-theme=gmod] .tabs button{padding:6px 2px 6px;font-size:12px;font-weight:700;color:#3c4146;background:linear-gradient(180deg,#dde0e3,#cdd1d5);border:1px solid #9aa1a8;border-bottom:0;border-radius:5px 5px 0 0}
+[data-rt-theme=gmod] .tabs button .ic{color:#454a50}
+[data-rt-theme=gmod] .tabs button:hover{color:#111315;background:linear-gradient(180deg,#eef0f2,#dfe2e5)}
+[data-rt-theme=gmod] .tabs button[aria-selected=true]{position:relative;margin-bottom:-1px;padding-bottom:7px;color:#111315;background:var(--gm-panel);box-shadow:inset 0 2px 0 var(--gm-blue)}
+[data-rt-theme=gmod] .tabs button[aria-selected=true] .ic{color:var(--gm-blue-lo)}
+[data-rt-theme=gmod] .side{background:linear-gradient(180deg,#41464d,#2b2f34);box-shadow:inset -1px 0 0 #1b1e21}
+[data-rt-theme=gmod] .side :is(.brand-text small,.side-foot,.side-foot span,.side-foot label,small,p){color:#c7ccd2}
+[data-rt-theme=gmod] .side .link-btn{color:var(--gm-blue-hi)}
+[data-rt-theme=gmod] :is(.section-nav button,nav:not(.tabs) button){font-weight:700;color:#d9dde1;background:transparent;border:0;border-radius:4px;box-shadow:none}
+[data-rt-theme=gmod] :is(.section-nav button,nav:not(.tabs) button) .ic{color:#c7ccd2}
+[data-rt-theme=gmod] :is(.section-nav button,nav:not(.tabs) button):hover{color:#fff;background:rgba(255,255,255,.08)}
+[data-rt-theme=gmod] :is(.section-nav button[aria-current=page],nav:not(.tabs) button.active){color:#fff;background:var(--gm-cat);box-shadow:inset 0 -1px 0 #1b4f8c}
+[data-rt-theme=gmod] :is(.section-nav button[aria-current=page],nav:not(.tabs) button.active) .ic{color:#fff}
+[data-rt-theme=gmod] .side{--rt-focus:#ffffff}
+/* Derma buttons */
+[data-rt-theme=gmod] button{font-weight:700;color:#26292d;background:var(--gm-button);border:1px solid #8a9198;border-radius:4px;box-shadow:inset 0 1px 0 #fff}
+[data-rt-theme=gmod] button:hover{color:#111315;background:linear-gradient(180deg,#f2f8ff,#d9ebfd);border-color:var(--gm-blue)}
+[data-rt-theme=gmod] button:active:not(:disabled){transform:none;background:linear-gradient(180deg,#d4d8dc,#e6e8ea);box-shadow:inset 0 1px 3px rgba(0,0,0,.25)}
+[data-rt-theme=gmod] :is(.primary,#start,#save){color:#fff;background:linear-gradient(180deg,#5aa0ea,#2f7bd0);border-color:#1b4f8c;text-shadow:0 1px 1px rgba(0,0,0,.3);box-shadow:inset 0 1px 0 rgba(255,255,255,.35)}
+[data-rt-theme=gmod] :is(.primary,#start,#save):hover{color:#fff;background:linear-gradient(180deg,#6fb0f4,#3e8ce0);border-color:#1b4f8c}
+[data-rt-theme=gmod] :is(.primary,#start,#save) .ic{color:#fff}
+[data-rt-theme=gmod] .danger{color:#fff;background:linear-gradient(180deg,#d9534f,#b01e1e);border-color:#6e1512;text-shadow:0 1px 1px rgba(0,0,0,.3)}
+[data-rt-theme=gmod] .danger:hover{color:#fff;background:linear-gradient(180deg,#e7625d,#c62828)}
+[data-rt-theme=gmod] :is(.ghost,.icon,.icon-btn){background:transparent;border-color:transparent;box-shadow:none}
+[data-rt-theme=gmod] .foot :is(.ghost,.icon){color:#26292d}
+[data-rt-theme=gmod] .link-btn{border:0;background:none;box-shadow:none;color:var(--rt-link)}
+[data-rt-theme=gmod] button:disabled{color:var(--rt-ink-disabled);background:#eceef0;border-color:#c5cacf;box-shadow:none;text-shadow:none}
+/* Fields: DTextEntry and DComboBox */
+[data-rt-theme=gmod] input:where(:not([type=checkbox],[type=radio],[type=range],[type=file])),[data-rt-theme=gmod] :is(textarea,select){color:#111315;background-color:#fff;border:1px solid #8a9198;border-radius:3px;box-shadow:inset 0 1px 2px rgba(0,0,0,.08)}
+[data-rt-theme=gmod] select{background-image:linear-gradient(45deg,transparent 50%,#454a50 50%),linear-gradient(135deg,#454a50 50%,transparent 50%)}
+[data-rt-theme=gmod] :is(input,textarea,select):focus{border-color:var(--gm-blue);box-shadow:0 0 0 2px rgba(62,140,224,.25)}
+[data-rt-theme=gmod] input[type=checkbox],[data-rt-theme=gmod] .toggle>input[type=checkbox]{width:15px;height:15px;background:#fff;border:1px solid #6b7279;border-radius:2px;box-shadow:inset 0 1px 2px rgba(0,0,0,.12)}
+[data-rt-theme=gmod] .toggle>input[type=checkbox]::after{display:none}
+[data-rt-theme=gmod] input[type=checkbox]:checked,[data-rt-theme=gmod] .toggle>input[type=checkbox]:checked{background:#fff;border-color:var(--gm-blue-lo)}
+[data-rt-theme=gmod] input[type=checkbox]:checked::after,[data-rt-theme=gmod] .toggle>input[type=checkbox]:checked::after{display:block;content:"";position:absolute;left:4px;top:0;width:4px;height:8px;background:none;border:solid var(--gm-blue-lo);border-width:0 2.5px 2.5px 0;border-radius:0;box-shadow:none;transform:rotate(45deg)}
+[data-rt-theme=gmod] input[type=range]{accent-color:var(--gm-blue)}
+[data-rt-theme=gmod] :is(pre,.output,.v22-log,.response){background:#fff;border:1px solid #a9afb5;box-shadow:none}
+[data-rt-theme=gmod] :is(.meter,.arcade-progress,.lat-track){background:#c5cacf;border-radius:3px;box-shadow:inset 0 1px 2px rgba(0,0,0,.2)}
+[data-rt-theme=gmod] .pill{color:var(--gm-blue-lo);background:#dcebfb;border-radius:3px;box-shadow:inset 0 0 0 1px #9cc4ee}
+[data-rt-theme=gmod] :is(.step-n,.setup-n,.friend-card .avatar){font-weight:700;color:#fff;background:var(--gm-blue);border-radius:4px}
+[data-rt-theme=gmod] code{color:#123d70;background:#e4eefa;border-radius:2px}
+[data-rt-theme=gmod] .savebar{background:linear-gradient(180deg,#41464d,#2b2f34)}
+[data-rt-theme=gmod] .savebar p{color:#e9ebed}
+[data-rt-theme=gmod] .savebar{--rt-focus:#ffffff}
+[data-rt-theme=gmod] .foot{background:#d3d7db;box-shadow:inset 0 1px 0 #a9afb5;border-radius:0 0 5px 5px}
+[data-rt-theme=gmod] .route li{background:#fff;box-shadow:inset 0 0 0 1px #c5cacf}
+[data-rt-theme=gmod] .route li:last-child{background:#dcebfb;box-shadow:inset 3px 0 0 var(--gm-blue)}
+[data-rt-theme=gmod] .vote{background:linear-gradient(90deg,#cfe4fb calc(var(--share,0)*100%),#fff 0);border:1px solid #c5cacf;border-radius:3px}
+[data-rt-theme=gmod] .vote-marker{color:#fff;background:var(--gm-blue);border-radius:3px;padding:1px 5px}
+[data-rt-theme=gmod] :is(.scroll,.content,main){scrollbar-color:#9aa1a8 #d3d7db}
+html[data-rt-theme=gmod]{scrollbar-color:#9aa1a8 #d3d7db}
+
+/* ── The soundboard is the Q spawn menu ──
+   A dark spawn-list panel: the sound banks as a category rail on the left (a tree of folders),
+   the clips as square spawn icons on the right, each with a waveform "thumbnail" and its name
+   on a label strip. */
+[data-rt-theme=gmod] .pad-deck{display:grid;grid-template-columns:96px minmax(0,1fr);gap:6px;margin:10px 0;padding:6px;background:var(--gm-well);border:1px solid #23262a;border-radius:5px;box-shadow:inset 0 1px 3px rgba(0,0,0,.4)}
+[data-rt-theme=gmod] .bank-rail{display:flex;flex-direction:column;gap:1px;padding:3px;background:#fff;border:1px solid #23262a;border-radius:3px;align-self:start}
+[data-rt-theme=gmod] .bank-tab{justify-content:flex-start;gap:5px;min-height:0;margin:0;padding:4px 5px;font-size:11px;font-weight:400;text-align:left;color:#26292d;background:transparent;border:0;border-radius:2px;box-shadow:none}
+[data-rt-theme=gmod] .bank-tab::before{content:"";flex-shrink:0;width:12px;height:9px;border-radius:1px 2px 1px 1px;background:linear-gradient(180deg,#f7d774 0 3px,#e9bc3e 3px);box-shadow:inset 0 0 0 1px #b8901f}
+[data-rt-theme=gmod] .bank-tab:hover{background:#e4eefa}
+[data-rt-theme=gmod] .bank-tab[aria-pressed=true]{color:#fff;background:var(--gm-blue)}
+[data-rt-theme=gmod] .pads{grid-template-columns:repeat(auto-fill,minmax(66px,1fr));gap:5px;margin:0}
+[data-rt-theme=gmod] .pad{aspect-ratio:1;min-height:0;padding:0;justify-content:flex-end;align-items:stretch;gap:0;overflow:visible;
+  background:repeating-linear-gradient(90deg,transparent 0 3px,rgba(111,176,244,.85) 3px 5px) center 38%/60% 26% no-repeat,radial-gradient(circle at 50% 38%,#5a6068,#3a3e43 70%);
+  border:1px solid #23262a;border-radius:4px;box-shadow:inset 0 1px 0 rgba(255,255,255,.12);
+  transition:transform .42s cubic-bezier(.34,1.9,.6,1),box-shadow .2s ease-out}
+[data-rt-theme=gmod] .pad span{position:absolute;left:4px;top:3px;font-size:9px;font-weight:700;color:#c7ccd2;text-shadow:0 1px 1px #000}
+[data-rt-theme=gmod] .pad b{display:block;padding:2px 4px;font-size:10.5px;font-weight:700;text-align:center;color:#fff;background:rgba(0,0,0,.6);border-radius:0 0 3px 3px;text-shadow:0 1px 1px #000}
+[data-rt-theme=gmod] .pad::after{right:5px;top:6px;margin-top:0;border-left:6px solid #fff;border-top-width:4px;border-bottom-width:4px;opacity:.7}
+[data-rt-theme=gmod] .pad:hover{background:repeating-linear-gradient(90deg,transparent 0 3px,rgba(143,200,255,.95) 3px 5px) center 38%/60% 26% no-repeat,radial-gradient(circle at 50% 38%,#6a7179,#41464c 70%);box-shadow:0 0 0 2px #fff}
+/* The physics gun: grabbed while it plays, dropped back when it stops */
+[data-rt-theme=gmod] .pad.playing{z-index:2;transform:translateY(-6px) rotate(-5deg) scale(1.05);box-shadow:0 0 0 2px #36b2ff,0 0 14px 3px rgba(54,178,255,.85),0 12px 14px rgba(0,0,0,.45)}
+[data-rt-theme=gmod] .pad.playing::before{content:"";position:absolute;left:50%;top:-60px;width:3px;height:60px;margin-left:-1px;pointer-events:none;transform:rotate(18deg);transform-origin:bottom;
+  background:linear-gradient(180deg,transparent,rgba(54,178,255,.15) 20%,#9edcff 60%,#36b2ff);box-shadow:0 0 8px #36b2ff;animation:gm-beam .18s steps(2) infinite}
+[data-rt-theme=gmod] .pad.playing::after{background:none;border-left-color:#36b2ff;opacity:1}
+@keyframes gm-beam{0%{opacity:.6}50%{opacity:1}}
+
+/* ── Status strip: a Derma progress panel ──
+   Thin blue level bars while Tyler listens or talks, a sliding block while he thinks, and on an
+   error the strip shows the red floating ERROR that marks a missing model. */
+[data-rt-theme=gmod] .tally{background:#fff;border:1px solid #a9afb5;border-radius:var(--rt-r-md);box-shadow:inset 0 1px 0 #fff}
+[data-rt-theme=gmod] .tally-light{width:4px;border-radius:2px}
+[data-rt-theme=gmod] .tally-label{font-weight:700;color:var(--tone)}
+[data-rt-theme=gmod] .tally-wave i{background:var(--gm-blue);border-radius:1px}
+[data-rt-theme=gmod] .tally[data-state=error]{padding-right:84px}
+[data-rt-theme=gmod] .tally[data-state=error]::after{content:"ERROR";position:absolute;right:12px;top:50%;margin-top:-12px;font:900 21px/24px Impact,"Arial Black",Arial,sans-serif;letter-spacing:.02em;color:#e01b1b;
+  text-shadow:1px 1px 0 #8a0f0f,2px 2px 0 #8a0f0f,3px 3px 0 #5a0808,0 0 8px rgba(224,27,27,.35);transform:rotate(-6deg);animation:gm-error 2.2s ease-in-out infinite}
+[data-rt-theme=gmod] .tally[data-state=thinking] .tally-wave{position:relative;width:64px;height:10px;background:#e9ecef;border:1px solid #a9afb5;border-radius:2px;overflow:hidden}
+[data-rt-theme=gmod] .tally[data-state=thinking] .tally-wave i{display:none}
+[data-rt-theme=gmod] .tally[data-state=thinking] .tally-wave::before{content:"";position:absolute;top:1px;bottom:1px;left:1px;width:18px;border-radius:1px;background:linear-gradient(180deg,#6fb0f4,#2870c0);animation:gm-slide .9s ease-in-out infinite alternate}
+@keyframes gm-slide{to{transform:translateX(42px)}}
+@keyframes gm-error{0%,100%{transform:rotate(-6deg) translateY(0)}50%{transform:rotate(-3deg) translateY(-3px)}}
+
+[data-rt-theme=gmod] :is(.mark[data-logo],img.mark,#brand-logo){--logo-pad:2px;background:radial-gradient(circle at 50% 40%,#5a6068,#2b2f34 75%);border:1px solid #1b1e21;border-radius:4px}
+[data-rt-theme=gmod] .mark[data-logo]{width:40px;height:40px;margin:-5px 0}
+
+/* ── Icons, dialogs, notifications and tooltips ──
+   Notifications are the sandbox's hint pop-ups: a dark rounded box with a coloured icon square,
+   sliding in from the right. Dialogs are Derma frames with the dark title. */
+[data-rt-theme=gmod] .ic{--ic-w:1.6px}
+[data-rt-theme=gmod] .rt-toast{color:#fff;background:#2d3035;border:1px solid #111;border-radius:6px;box-shadow:0 6px 18px rgba(0,0,0,.45);padding-left:48px}
+[data-rt-theme=gmod] .rt-toast>.ic{position:absolute;left:0;top:0;bottom:0;width:38px;height:auto;padding:0 10px;box-sizing:border-box;color:#fff;background:var(--tone);border-radius:5px 0 0 5px}
+[data-rt-theme=gmod] .rt-toast :is(.rt-toast-title,.rt-toast-text){color:#fff}
+[data-rt-theme=gmod] .rt-toast .rt-x{color:#c7ccd2;background:transparent;border-color:transparent;box-shadow:none}
+[data-rt-theme=gmod] .rt-toast .rt-x:hover{color:#fff;background:rgba(255,255,255,.12)}
+[data-rt-theme=gmod] .rt-toast{--rt-focus:#ffffff}
+[data-rt-theme=gmod] .rt-dialog{background:var(--gm-panel);border:1px solid #1b1e21;border-radius:6px;padding-top:0;box-shadow:0 14px 34px rgba(0,0,0,.5)}
+[data-rt-theme=gmod] .rt-dialog-head{margin:0 -16px 4px;padding:8px 14px;background:linear-gradient(180deg,#41464d,#2b2f34);border-radius:5px 5px 0 0}
+[data-rt-theme=gmod] .rt-dialog-title{font-size:14px;font-weight:700;color:#fff}
+[data-rt-theme=gmod] .rt-tip{background:#ffffe0;color:#111;border:1px solid #6b7279;border-radius:2px;font-family:Tahoma,var(--rt-font);font-size:11px}
+
+/* ── Motion: Garry's Mod ──
+   Signature: the physics-gun grab above. Screens appear like a Derma frame opening (a quick
+   fade and scale from the centre), hint pop-ups slide in from the right, and the logo's frame
+   glows blue while Tyler talks. */
+@keyframes gm-open{0%{opacity:0;transform:scale(.98)}100%{opacity:1;transform:none}}
+@keyframes gm-hint{0%{opacity:0;transform:translateX(30px)}100%{opacity:1;transform:none}}
+@keyframes gm-glow{0%,100%{box-shadow:0 0 0 1px #1b1e21}50%{box-shadow:0 0 0 1px #1b1e21,0 0 12px rgba(54,178,255,.85)}}
+[data-rt-theme=gmod] :is(.view:not([hidden]),.sheet,section[data-view]:not([hidden])){animation:gm-open .16s ease-out backwards}
+[data-rt-theme=gmod] .rt-toast:not(.rt-leaving){animation:gm-hint .25s cubic-bezier(.2,.8,.3,1) backwards}
+[data-rt-theme=gmod] .panel:has(.tally[data-state=speaking]) .mark[data-logo],.panel[data-rt-theme=gmod]:has(.tally[data-state=speaking]) .mark[data-logo]{animation:gm-glow 1s ease-in-out infinite}

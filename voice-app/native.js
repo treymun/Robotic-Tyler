@@ -2,7 +2,7 @@
 // heard and said, and try a typed message or a short recording. Devices, consent, engine and
 // voices are chosen in Settings → Voice.
 const $=id=>document.getElementById(id);const api=window.tylerNative;
-const THEMES=['steam','classic','tf2','cs2','portal','cs16','hev','l4d','winxp','doom','quake','pipboy','combine','deadlock','minecraft'];
+const THEMES=['steam','classic','tf2','cs2','portal','cs16','hev','l4d','winxp','doom','quake','pipboy','combine','deadlock','minecraft','payday','dreamcast','gmod','ricochet','dod'];
 const applyTheme=()=>Promise.resolve(api?.theme?.()).then(t=>{const theme=THEMES.includes(t)?t:'steam';document.documentElement.dataset.rtTheme=theme;const logo=$('brand-logo');if(logo&&logo.dataset.theme!==theme){logo.onerror=()=>{logo.onerror=null;logo.src='logos/steam.png';};logo.src='logos/'+theme+'.png';logo.dataset.theme=theme;}}).catch(()=>{});
 applyTheme();window.addEventListener('focus',()=>{applyTheme();void refresh();});api.onTheme?.(applyTheme);
 globalThis.TylerIcons?.fill(document);
