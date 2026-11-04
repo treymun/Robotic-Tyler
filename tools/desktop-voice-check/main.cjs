@@ -43,6 +43,7 @@ app.whenReady().then(async()=>{
  win.webContents.setAudioMuted(true);
  shares.muted={...await win.webContents.executeJavaScript('window.__hearMuted()',true),windowMuted:win.webContents.isAudioMuted()};
  win.webContents.setAudioMuted(false);
+ shares.keepQuiet=await win.webContents.executeJavaScript('window.__keepQuiet()',true);
  // One click (v2.20.1): Start Music DJ opens the Music window in the background and asks for the
  // share in the same click, before the window exists; the app waits for it and shares its sound.
  const old=media.youtubeId();if(old!==null)BrowserWindow.fromWebContents(webContents.fromId(old))?.destroy();

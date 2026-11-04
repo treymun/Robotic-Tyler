@@ -1,3 +1,25 @@
+# ROBOTIC TYLER v2.24.0: Tyler stays in quiet calls and keeps his chat connected
+
+## New: Stay connected (Chat tab)
+- **Keep Tyler in quiet calls (on by default).** Steam drops a call member who hasn't made a sound for about an hour. While Tyler is in a call, any sound he sends counts as activity: speech, clips, music or a beep. After 45 quiet minutes (or 15, 30 or 55, your choice), he hums once, softly: a short "mm", about 6 dB under his speaking voice at the same volume setting. **Play the hum now** lets you hear it with a friend first. Nothing plays outside a call.
+- **Keep the chat connected (on by default).** When Steam redraws its chat (after its own reconnect, for example), the message list Tyler was watching disappears and new messages stopped reaching him without any warning. Every 15 seconds Tyler now checks that it's still there. If it's gone, he finds the same Steam channel again and carries on. He recognises the channel by Steam's own record of it, not by its name, so he never switches to a different or unclear chat on his own. If he can't find the same channel within a minute, he stops and tells you, with a Connect & start button. If Steam keeps redrawing the chat, he stops after three tries in ten minutes.
+- **Chrome only:** while Tyler runs in a Steam tab, Memory Saver won't unload it. A connection inside the page also marks the tab as using WebRTC, so Chrome doesn't freeze it in the background (Energy Saver) or slow its timers to once a minute. That connection stays on this computer: no servers, and it never counts as a Steam call. The desktop app doesn't need either, because its window is never slowed down.
+- The panel shows how long the call has been quiet, when the last hum played and when the chat was last reconnected.
+
+## Tested
+- **Real Chromium, stand-in call on this machine (new end-to-end test):**
+  - In a quiet call, one hum arrives after the chosen time on Tyler's outgoing microphone, about 0.9 s long and soft (peak under −22 dBFS at the default volume).
+  - Received on the other side, its audio level reads about −32 dB; at Tyler's normal levels, his speech reads about −27 dB.
+  - His own beeps every 2 s keep it from playing, nothing plays outside a call or when it's off, and the page's keep-awake data channel opens without counting as a call.
+- **Desktop check in Electron with a mock Steam page:** a friend's side of a stand-in call hears the hum.
+- **Mocked unit tests:**
+  - After a redraw, the chat is re-attached only when Steam's channel object is the same.
+  - A different channel is never picked, and Tyler stops with a message after a minute, or after three tries in ten minutes.
+  - Chrome's keep-awake goes only to the tab that runs Tyler.
+- **Not tested:** a real Steam call over an hour. Steam doesn't document what it counts as activity, so whether a soft hum resets its timer has to be checked live. If Tyler is still dropped, try 15 or 30 minutes and tell me what you see. Also not tested: Steam's real chat redraws and Windows. The VB-CABLE voice route (desktop text-only mode) isn't covered; the hum only goes through Tyler's own call connection. 278 unit and integration tests and 22 end-to-end tests.
+
+---
+
 # ROBOTIC TYLER v2.23.0: a panel you can resize, docked beside the chat in the desktop app
 
 ## New

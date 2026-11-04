@@ -41,6 +41,21 @@ window.__hearMuted=async()=>{
  await wait(1200);let peak=0;const buf=new Float32Array(2048);for(let i=0;i<20;i++){await wait(50);an.getFloatTimeDomainData(buf);for(const x of buf)peak=Math.max(peak,Math.abs(x));}
  a.close();b.close();await ctx.close();await tone.close();return {heardPeak:Math.round(peak*1000)/1000};
 };
+// Stay connected (v2.24): in a quiet call Tyler hums once after the chosen time; the friend hears it.
+window.__keepQuiet=async()=>{
+ const wait=ms=>new Promise(r=>setTimeout(r,ms)),cmd=(type,extra={})=>window.postMessage({source:'tyler-audio-command',type,...extra},location.origin);
+ const hums=[];const on=e=>{if(e.data?.source==='tyler-keepalive'&&e.data.reason==='quiet')hums.push(e.data);};addEventListener('message',on);
+ cmd('enable');await wait(300);cmd('keepalive',{on:true,minutes:.05});
+ const mic=await navigator.mediaDevices.getUserMedia({audio:true});
+ const bot=new RTCPeerConnection(),srv=new (document.getElementById('srv').contentWindow.RTCPeerConnection)();bot.onicecandidate=e=>e.candidate&&srv.addIceCandidate(e.candidate);srv.onicecandidate=e=>e.candidate&&bot.addIceCandidate(e.candidate);
+ bot.addTrack(mic.getAudioTracks()[0],mic);const got=new Promise(r=>srv.ontrack=e=>r(e.track));
+ await bot.setLocalDescription(await bot.createOffer());await srv.setRemoteDescription(bot.localDescription);await srv.setLocalDescription(await srv.createAnswer());await bot.setRemoteDescription(srv.localDescription);
+ const track=await got,el=new Audio();el.srcObject=new MediaStream([track]);el.volume=0;el.play().catch(()=>{}); // a remote track only flows once something plays it
+ const ctx=new AudioContext(),an=ctx.createAnalyser(),z=ctx.createGain();z.gain.value=0;ctx.createMediaStreamSource(new MediaStream([track])).connect(an);an.connect(z);z.connect(ctx.destination);
+ let peak=0;const buf=new Float32Array(2048);for(let i=0;i<90;i++){await wait(50);an.getFloatTimeDomainData(buf);for(const x of buf)peak=Math.max(peak,Math.abs(x));}
+ cmd('keepalive',{on:true,minutes:45});removeEventListener('message',on);bot.close();srv.close();await ctx.close();
+ return {hums:hums.length,heardPeak:Math.round(peak*1000)/1000};
+};
 // Start Music DJ in one click: the share is asked for while the YouTube window is still opening.
 window.__oneClick=async()=>{
  const wait=ms=>new Promise(r=>setTimeout(r,ms));

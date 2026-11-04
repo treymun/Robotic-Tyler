@@ -1,7 +1,7 @@
 // Experimental adapter to the current Steam chat UI. Uses only scoped chat,
 // member, permission and voice fields verified in Steam's installed interface.
 (()=>{
- const armed=new Set(),muteArmed=new Set(),adminArmed=new Set(),executions=new Map(),adminExecutions=new Map(),names=new Map(),mutes=new Map();let kickInFlight=null,adminInFlight=null,autoPending=0,autoChain=Promise.resolve();
+ const chatMarks=new Map(),armed=new Set(),muteArmed=new Set(),adminArmed=new Set(),executions=new Map(),adminExecutions=new Map(),names=new Map(),mutes=new Map();let kickInFlight=null,adminInFlight=null,autoPending=0,autoChain=Promise.resolve();
  const activeMute=key=>{const m=mutes.get(key);if(m?.until&&Date.now()>=m.until){mutes.delete(key);return null;}return m;};
  const clearVotedMutes=()=>{for(const [key,m]of mutes)if(m.source==='vote')mutes.delete(key);};
  const own=(v,k)=>{if(!v||typeof v!=='object')return undefined;const d=Object.getOwnPropertyDescriptor(v,k);return d&&'value'in d?d.value:undefined;};
@@ -105,6 +105,10 @@
   const ctx=context(node);
   if(request.op==='group')return groupInfo(ctx);
   if(request.op==='voice')return voiceInfo(ctx);
+  // v2.24: which Steam channel a message reader belongs to. Steam keeps one chat object per channel
+  // while it redraws the view, so "the same object" means "the same channel", without reading names.
+  if(request.op==='chat-mark'){const key=String(request.key||'');if(!/^[\w-]{1,32}$/.test(key))throw Error('Invalid chat mark.');chatMarks.set(key,new WeakRef(ctx.chat));return {groupId:ctx.id};}
+  if(request.op==='chat-same'){const ref=chatMarks.get(String(request.key||''))?.deref();return {same:!!ref&&ref===ctx.chat,known:!!ref,groupId:ctx.id};}
   if(request.op==='bans')return {groupId:ctx.id,bans:await bans(ctx)};
   if(request.op==='inspect-message')return inspect(ctx,node.closest?.('.msgText')||node);
   if(request.op==='arm-mute'){if(request.enabled===true){if(!groupInfo(ctx).members.some(m=>!m.protected&&m.canDelete))throw Error('Give the bot Steam message deletion permission first.');muteArmed.add(ctx.id);}else{muteArmed.delete(ctx.id);clearVotedMutes();}return {armed:muteArmed.has(ctx.id),groupId:ctx.id};}

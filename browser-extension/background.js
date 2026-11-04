@@ -72,6 +72,8 @@ async function handleGameUnlocked(message,sender){
  }
  if(message.type==='music:command'){if(!await lease.check(tab))throw Error('Another Steam tab owns Tyler.');const flags=await chrome.storage.local.get('v22EmergencyStop');if(flags.v22EmergencyStop===true&&!['stop','pause'].includes(message.action))throw Error('Emergency stop enabled.');return musicRouter.command(message,sender);}
  if(message.type==='storage:content')return contentStorage(chrome.storage.local,message);
+ // v2.24: the Steam tab Tyler runs in is never discarded by Memory Saver while he runs there.
+ if(message.type==='keepalive:tab'){if(!Number.isInteger(tab))throw Error('No Steam tab.');if(message.on===true&&!await lease.check(tab))throw Error('Another Steam tab owns Tyler.');await chrome.tabs.update(tab,{autoDiscardable:message.on!==true});return {autoDiscardable:message.on!==true};}
  if(message.type==='v23:screen-config'){const p=await chrome.storage.local.get(['v23ScreenConsent','v23AutoRoast','v22EmergencyStop']);return {screenConsent:p.v23ScreenConsent===true,autoRoast:p.v23AutoRoast===true,stopped:p.v22EmergencyStop===true};}
  if(message.type==='v23:screen-analyze'){
   const pref=await chrome.storage.local.get(['v23ScreenConsent','v23ScreenRoast','v23VisionModel','openrouterKey','v22EmergencyStop']);

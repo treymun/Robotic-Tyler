@@ -182,7 +182,7 @@
  chrome.runtime.onMessage.addListener(m=>{if(m?.source==='tyler-lease-lost')setOwner(false);});
 
  // ── MAIN-world audio bridge ─────────────────────────────────────────────
- function bridge(type,extra={}){if(!owner&&!['stop','board-stop','status','music-disconnect'].includes(type)){status('This tab is on standby. Use this tab instead to take over.');return;}window.postMessage({source:'tyler-audio-command',type,...extra},location.origin);}
+ function bridge(type,extra={}){if(!owner&&!['stop','board-stop','status','music-disconnect','tab-awake'].includes(type)){status('This tab is on standby. Use this tab instead to take over.');return;}window.postMessage({source:'tyler-audio-command',type,...extra},location.origin);}
  window.addEventListener('message',e=>{
   if(e.source!==window||e.origin!==location.origin||e.data?.source!=='tyler-audio-status')return;
   status(e.data.text);const v=e.data.voice;if(!v)return;voiceReport=v;
@@ -378,7 +378,7 @@
   notify,confirm:confirmBox,emit,
   // Theme features (theme-features.js): the panel, live state and a subscription. Isolated world only.
   ui:{root,panel,host,onUI:fn=>{uiListeners.add(fn);return ()=>uiListeners.delete(fn);},state:()=>({state:$('activityCard').dataset.state,label:$('activityLabel').textContent,text:$('activity').textContent,tab:currentTab,hud:{...hudState},mini:host.classList.contains('mini'),theme:uiTheme,owner})},
-  isOwner:()=>owner,setAutomaticActive:value=>autoActive=value,reportTurn,getIncoming:()=>incomingReport,getComposer:()=>composer,getRegion:()=>region,getSample:()=>sampleElement,getEpoch:()=>epoch,
+  isOwner:()=>owner,setAutomaticActive:value=>autoActive=value,isAutomaticActive:()=>autoActive,reportTurn,getIncoming:()=>incomingReport,getComposer:()=>composer,getRegion:()=>region,getSample:()=>sampleElement,getEpoch:()=>epoch,
   platform};
 })();
 

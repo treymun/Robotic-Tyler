@@ -42,15 +42,15 @@
  // What Steam's call actually uses (for the full check): codec, its settings, Tyler's send rate.
  let lastCodec=null;
  async function codecReport(){for(const peer of peers){if(closed(peer)||peer.connectionState!=='connected')continue;try{const st=await peer.getStats();let out=null;st.forEach(x=>{if(x.type==='outbound-rtp'&&x.kind==='audio'&&(!out||x.bytesSent>out.bytesSent))out=x;});if(!out)continue;const c=out.codecId?st.get(out.codecId):null;return {codec:String(c?.mimeType||'').split('/')[1]||'',fmtp:String(c?.sdpFmtpLine||'').slice(0,200),kbps:Math.round((Number(out.targetBitrate)||0)/1000)};}catch{}}return null;}
- let board;let previewNode;let enabled=false,ctx,destination,gain,monitor,active=[],queued=[],audioJobs=Promise.resolve(),requests=0,attached=0;const peers=new Set(),replaced=new WeakSet();
+ let board;let previewNode;let enabled=false,ctx,destination,gain,monitor,meter=null,active=[],queued=[],audioJobs=Promise.resolve(),requests=0,attached=0;const peers=new Set(),replaced=new WeakSet();
  const announce=(text,ok=true)=>window.postMessage({source:'tyler-audio-status',text,ok,voice:{enabled,requests,attached,player:ctx?.state||'not started',peers:peers.size,observing:!!OriginalPeer,connectedPeers:[...peers].filter(p=>p.connectionState==='connected').length,codec:lastCodec}},location.origin);
- function setup(){if(ctx)return;ctx=new AudioContext();destination=ctx.createMediaStreamDestination();gain=ctx.createGain();gain.gain.value=.35;gain.connect(destination);monitor=ctx.createGain();monitor.gain.value=0;gain.connect(monitor);monitor.connect(ctx.destination);}
+ function setup(){if(ctx)return;ctx=new AudioContext();destination=ctx.createMediaStreamDestination();gain=ctx.createGain();gain.gain.value=.35;gain.connect(destination);monitor=ctx.createGain();monitor.gain.value=0;gain.connect(monitor);monitor.connect(ctx.destination);meter=ctx.createAnalyser?.()||null;if(meter){meter.fftSize=2048;gain.connect(meter);}}
  function boardPlayer(){if(!board)board=new TylerBoardAudio(ctx,gain,text=>window.postMessage({source:'tyler-soundboard-status',text},location.origin));return board;}
  async function resumePlayer(){let timer;try{await Promise.race([ctx.resume(),new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('Audio player is suspended. Click Enable again or check this tab is allowed to play sound.')),2500);})]);}finally{clearTimeout(timer);}}
  // v2.21: while Tyler talks, the Music DJ dips about 10 dB and comes back half a second after he stops.
  let musicDuck=null,duckOn=true;
  function duck(talking){if(!musicDuck||!ctx)return;const t=ctx.currentTime;musicDuck.gain.cancelScheduledValues(t);musicDuck.gain.setValueAtTime(musicDuck.gain.value,t);if(talking&&duckOn)musicDuck.gain.setTargetAtTime(.32,t,.04);else musicDuck.gain.setTargetAtTime(1,t+(talking?0:.45),.18);}
- function playing(value){duck(value);window.postMessage({source:'tyler-playback',playing:value},location.origin);}
+ function playing(value){lastOut=Date.now();duck(value);window.postMessage({source:'tyler-playback',playing:value},location.origin);}
  // Gemini Live chunks (v2.15): 24 kHz PCM scheduled back to back as they arrive, at most 20 s ahead.
  // A flush stops the response that was interrupted and drops its queued chunks at once.
  // v2.21: the 24 kHz chunks go through one band-limited converter per run (live-pcm.js) and are
@@ -119,9 +119,58 @@
   window.RTCPeerConnection=new Proxy(OriginalPeer,{construct(Target,args){const peer=Reflect.construct(Target,args);peers.add(peer);peer.addEventListener('connectionstatechange',()=>{if(peer.connectionState==='closed')peers.delete(peer);announce('Steam connection state: '+peer.connectionState);});return peer;}});
  }
  function tone(frequency,start,duration,type='sine'){const osc=ctx.createOscillator(),envelope=ctx.createGain();osc.frequency.value=frequency;osc.type=type;envelope.gain.setValueAtTime(0,start);envelope.gain.linearRampToValueAtTime(.20,start+.015);envelope.gain.linearRampToValueAtTime(0,start+duration);osc.connect(envelope);envelope.connect(gain);osc.start(start);osc.stop(start+duration+.01);active.push(osc);playing(true);osc.onended=()=>{osc.disconnect();envelope.disconnect();active=active.filter(n=>n!==osc);if(!active.length)playing(false);};}
+ // v2.24: keep Tyler in quiet calls. Steam removes a call member who has sent no sound for about an
+ // hour (seen by users; Steam doesn't document it). While Tyler is in a call, any sound he sends
+ // (speech, clips, music, beeps) resets the clock, checked on the outgoing signal itself. After
+ // `keepMinutes` of silence, a short soft hum goes out, about 6 dB under his speech at the same
+ // volume setting, so Steam sees activity. The clock starts when he joins a call.
+ let keepOn=true,keepMinutes=45,keepTimer=0,lastOut=Date.now(),keepCount=0,lastKeep=0;
+ const inCall=()=>[...peers].some(p=>!closed(p)&&p.connectionState==='connected');
+ const levelNow=()=>{if(!meter)return 0;const d=new Float32Array(meter.fftSize);meter.getFloatTimeDomainData(d);let e=0;for(const x of d)e+=x*x;return Math.sqrt(e/d.length);};
+ function humBuffer(){
+  const sr=ctx.sampleRate,len=.9,n=Math.round(sr*len),b=ctx.createBuffer(1,n,sr),d=b.getChannelData(0);let ph=0,peak=0;
+  // A voiced "mm": a gliding 132 → 118 Hz fundamental with harmonics shaped by two soft formants,
+  // a gentle syllable-like wobble, faded in and out.
+  for(let i=0;i<n;i++){const t=i/sr,f0=132-14*t/len;ph+=2*Math.PI*f0/sr;let x=0;
+   for(let k=1;k<=16;k++){const f=k*f0;if(f>4000)break;x+=Math.sin(k*ph)*(Math.exp(-(((f-480)/240)**2))+.5*Math.exp(-(((f-1350)/380)**2))+.12)/k;}
+   d[i]=x*Math.min(1,t/.08)*Math.min(1,(len-t)/.28)*(.85+.15*Math.sin(2*Math.PI*4.5*t));peak=Math.max(peak,Math.abs(d[i]));}
+  const g=peak?.18/peak:0;for(let i=0;i<n;i++)d[i]*=g;return b;
+ }
+ function keepAlive(reason){
+  if(!ctx||!gain)return false;lastOut=Date.now();lastKeep=lastOut;keepCount++;
+  const src=ctx.createBufferSource();src.buffer=humBuffer();src.connect(gain);src.onended=()=>src.disconnect();src.start();
+  window.postMessage({source:'tyler-keepalive',reason,at:lastKeep,count:keepCount,minutes:keepMinutes},location.origin);return true;
+ }
+ function keepTick(){
+  if(!ctx||!enabled)return;const now=Date.now();
+  if(!inCall()){lastOut=now;return;}
+  if(active.length||liveNodes.length||levelNow()>.003){lastOut=now;return;}
+  if(keepOn&&now-lastOut>=keepMinutes*60000)keepAlive('quiet');
+ }
+ function keepSchedule(){clearInterval(keepTimer);keepTimer=setInterval(keepTick,Math.max(1000,Math.min(30000,keepMinutes*60000/6)));}
+ keepSchedule();
+ // v2.24 (Chrome): while Tyler runs here, a data channel between two connections inside this page
+ // tells Chrome that WebRTC is in use, so it doesn't freeze the background tab (Energy Saver) or
+ // slow its timers to once a minute. Nothing leaves this computer: no servers, local candidates only.
+ // Built on the unwrapped RTCPeerConnection, so it never counts as a Steam call.
+ let awake=null;
+ async function tabAwake(on){
+  if(!on||!OriginalPeer){if(awake){for(const p of awake.peers)try{p.close();}catch{}awake=null;}return;}
+  if(awake&&awake.peers.every(p=>!closed(p)))return;
+  if(awake)for(const p of awake.peers)try{p.close();}catch{}
+  const a=new OriginalPeer({iceServers:[]}),b=new OriginalPeer({iceServers:[]});awake={peers:[a,b],channel:null};
+  a.onicecandidate=e=>{if(e.candidate)b.addIceCandidate(e.candidate).catch(()=>{});};b.onicecandidate=e=>{if(e.candidate)a.addIceCandidate(e.candidate).catch(()=>{});};
+  awake.channel=a.createDataChannel('tyler-awake');b.ondatachannel=e=>{e.channel.onmessage=()=>{};};
+  try{await a.setLocalDescription(await a.createOffer());await b.setRemoteDescription(a.localDescription);await b.setLocalDescription(await b.createAnswer());await a.setRemoteDescription(b.localDescription);}
+  catch{for(const p of [a,b])try{p.close();}catch{}awake=null;}
+ }
  window.addEventListener('message',async event=>{
   if(event.source!==window||event.origin!==location.origin||event.data?.source!=='tyler-audio-command')return;
   try{const m=event.data;
+   if(['board-play','sound','audio','preview','pcm'].includes(m.type))lastOut=Date.now();
+   if(m.type==='keepalive'){keepOn=m.on!==false;const mins=Number(m.minutes);if(Number.isFinite(mins))keepMinutes=Math.max(.02,Math.min(59,mins));keepSchedule();window.postMessage({source:'tyler-keepalive',reason:'status',on:keepOn,minutes:keepMinutes,inCall:inCall(),idleMs:inCall()?Date.now()-lastOut:0,at:lastKeep,count:keepCount},location.origin);return;}
+   if(m.type==='tab-awake'){await tabAwake(m.on===true);window.postMessage({source:'tyler-keepalive',reason:'tab',awake:awake?.channel?.readyState||'off'},location.origin);return;}
+   if(m.type==='keepalive-test'){setup();await resumePlayer();if(!keepAlive('test'))throw Error('The voice bridge is not ready yet.');return;}
    if(m.type==='music-disconnect'){disconnectMusic();return;}
    if(m.type==='music-quality'){const before=musicLevel;musicLevel=levelOf(m.level??m.bitrate);if(musicLevel==='auto'&&before!=='auto')autoRate=AUTO.at(-1);await retune();autoWatch();if(musicStream)musicStatus('Music quality: '+qualityName()+'.');return;}
    if(m.type==='music-duck'){duckOn=m.on!==false;duck(!!(active.length||liveNodes.length));return;}
@@ -137,6 +186,7 @@
     if(processed())await audio[0].applyConstraints?.(MUSIC_AUDIO).catch(()=>{});
     musicQuality={processed:processed(),channels:Number(audio[0].getSettings?.().channelCount)||1};
     musicStream=stream;musicSource=ctx.createMediaStreamSource(new MediaStream(audio));musicGain=ctx.createGain();musicGain.gain.value=Math.max(0,Math.min(2,(Number.isFinite(Number(m.volume))?Number(m.volume):.35)));musicSource.connect(musicGain);musicLimiter=ctx.createDynamicsCompressor();musicLimiter.threshold.value=-3;musicLimiter.knee.value=6;musicLimiter.ratio.value=20;musicLimiter.attack.value=.003;musicLimiter.release.value=.15;musicGain.connect(musicLimiter);musicDuck=ctx.createGain();musicDuck.gain.value=active.length||liveNodes.length?.32:1;musicLimiter.connect(musicDuck);musicDuck.connect(destination);
+    try{if(meter)musicDuck?.connect(meter);}catch{}
     for(const track of stream.getTracks())track.addEventListener('ended',()=>{if(musicStream===stream)disconnectMusic();});
     enabled=true;await resumePlayer();for(const peer of peers)await attach(peer);await retune();autoWatch();
     musicStatus('YouTube audio is shared. Join Steam voice with the bot, keep AI in Text mode, then request !play artist song.');return;

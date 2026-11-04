@@ -127,3 +127,13 @@ test('a queued automatic deletion rechecks the timed mute after a delayed Steam 
  const f=fixture();await f.handle({op:'admin-arm',enabled:true});await f.handle({op:'arm-mute',enabled:true});await f.handle(f.kick({op:'vote-mute',ballotId:'mute-queue-native-123',targetId:id(7)}));f.advance(1000);f.msg.unAccountID=7;
  let release;f.chat.DeleteChatMessages=async messages=>{f.calls.push({deleted:messages});await new Promise(r=>{release=r;});return 1;};const m=await f.handle({op:'inspect-message'}),first=f.handle({...m,op:'delete-message',actionId:'mute-manual-pending-123'}),queued=f.handle({...m,op:'auto-delete',actionId:'mute-queued-expired-123'});f.advance(300000);f.stamp(Number(m.messageKey.split('_')[0])*1000);release();await first;await assert.rejects(queued,/outside the active/);assert.equal(f.calls.length,1);
 });
+
+test('v2.24: the chat mark recognises the same Steam channel after a redraw, and only that one',async()=>{
+ const f=fixture();assert.equal((await f.handle({op:'chat-same',key:'auto'})).known,false,'nothing marked yet');
+ assert.equal((await f.handle({op:'chat-mark',key:'auto'})).groupId,'12345');
+ const r=await f.handle({op:'chat-same',key:'auto'});assert.deepEqual([r.same,r.known,r.groupId],[true,true,'12345']);
+ // Another channel of the same group: a different chat object in Steam's store.
+ const other={...f.chat};f.g.body.__reactFiber$steam.return.memoizedProps.chatView={chat:other};
+ assert.equal((await f.handle({op:'chat-same',key:'auto'})).same,false);
+ await assert.rejects(f.handle({op:'chat-mark',key:'bad key!'}),/Invalid chat mark/);
+});

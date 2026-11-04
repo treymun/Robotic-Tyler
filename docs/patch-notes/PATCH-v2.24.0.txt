@@ -1,0 +1,12 @@
+ROBOTIC TYLER v2.24.0 — patch notes
+
+New (Chat tab → Stay connected)
+- Keep Tyler in quiet calls (on): after 45 quiet minutes (15/30/45/55) he hums once, softly, so Steam doesn't drop him after an hour of silence. Any sound he makes resets the clock. "Play the hum now" to test.
+- Keep the chat connected (on): when Steam redraws its chat, Tyler finds the same channel again (by Steam's own channel record) and carries on; a different or unclear chat is never picked; he stops and tells you after a minute, or after 3 tries in 10 minutes.
+- Chrome: Tyler's Steam tab isn't unloaded by Memory Saver, and isn't frozen or slowed in the background (a local data channel; never counted as a call).
+
+Tested
+- Real Chromium, stand-in call: one soft hum after the quiet time (~0.9 s, received at about -32 dB); his own sounds reset it; none outside a call; keep-awake channel opens and isn't a call.
+- Electron desktop check: a friend in a stand-in call hears the hum.
+- Mocked: re-attach only to the same channel; stop and tell after a minute or 3 tries.
+- Not tested: a real hour-long Steam call (what Steam counts is undocumented; try 15 or 30 minutes if he's still dropped), real Steam chat redraws, Windows, the VB-CABLE route. 278 unit and 22 end-to-end tests.
