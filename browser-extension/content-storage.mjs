@@ -1,6 +1,6 @@
 // Content scripts may access only these non-secret settings through the worker.
-export const readable = new Set(['usage','spendingCapUSD','tylerLifetime','themeStats','activityEnabled','tylerArcadeStats','v22TurnMode','v22VoiceRecovery','v22SpeakerConsent','v22EmergencyStop','v22Latency','uiTheme','chatTagEnabled','chatTagName']);
-const writable = new Set(['tylerArcadeStats','v22Latency','tylerLifetime']);
+export const readable = new Set(['usage','spendingCapUSD','tylerLifetime','themeStats','musicQuality','activityEnabled','tylerArcadeStats','v22TurnMode','v22VoiceRecovery','v22SpeakerConsent','v22EmergencyStop','v22Latency','uiTheme','chatTagEnabled','chatTagName']);
+const writable = new Set(['tylerArcadeStats','v22Latency','tylerLifetime','musicQuality']);
 export async function contentStorage(store, message) {
  const {action,keys,values}=message;
  if(action==='get') {

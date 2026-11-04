@@ -86,3 +86,12 @@ test('one-click Start Music DJ opens YouTube behind Steam and asks for the share
  const bridge=source('audio-bridge.js');
  assert.match(bridge,/systemAudio:'exclude'/);assert.match(bridge,/selfBrowserSurface:'exclude'/);
 });
+test('Music DJ sound quality: untouched tab sound, a chosen call bitrate, kept between sessions (v2.20.2)',()=>{
+ const bridge=source('audio-bridge.js'),music=source('music.js');
+ assert.match(bridge,/MUSIC_AUDIO=Object\.freeze\(\{echoCancellation:false,noiseSuppression:false,autoGainControl:false/);
+ assert.match(bridge,/getDisplayMedia\(\{video:\{displaySurface:'browser'\},audio:MUSIC_AUDIO,/);
+ assert.match(bridge,/if\(replaced\.has\(sender\)\)await tuneSender\(sender\)/,'only Tyler\'s own senders are tuned');
+ assert.match(bridge,/bitrateBefore\.delete\(sender\);if\(before==null\)delete e\.maxBitrate/,'the earlier setting comes back');
+ assert.match(music,/<select id="musicQuality"><option value="128000">High · 128 kbps \(recommended\)<\/option><option value="64000">/);
+ assert.match(music,/TylerStorage\?\.set\?\.\(\{musicQuality:/);
+});

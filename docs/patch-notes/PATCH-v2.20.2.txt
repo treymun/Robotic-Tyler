@@ -1,0 +1,13 @@
+ROBOTIC TYLER v2.20.2 — patch notes
+
+Fixed
+- Music DJ: YouTube's sound is shared untouched and in stereo. Chrome (and the desktop app's Electron) applied echo cancellation, noise suppression and automatic gain in mono to shared tab audio by default, which made music warble and pump.
+- While music is shared, Tyler's outgoing audio is encoded at 128 kbps (Chrome's default is about 32 kbps); the default comes back when the music stops.
+
+New
+- Room → Music DJ → Sound quality: High 128 kbps (default), Medium 64 kbps, or Steam's default. Kept between sessions.
+- Full check: the call's codec, Tyler's send rate and Steam's codec settings; the Music DJ row shows whether the music is untouched and its rate.
+
+Tested
+- Measured in Chromium 153 (no Steam): default share processing on and mono vs. off and stereo with Tyler's request; tonal balance off by up to ~8 dB and nothing above 16 kHz with the defaults, within 0.5 dB untouched. Sent rate ~32 kbps before, 128 kbps now. Desktop app checked in Electron with mock Steam and YouTube pages.
+- Not tested: a real Steam call (Steam may set its own limits; the full check reports them). 269 unit and 17 end-to-end tests.

@@ -24,6 +24,7 @@ if(res.mainLog.some(l=>/blocked-mic|physical microphone/i.test(l)))bad.push('a p
 if(res.neural!=='ready')bad.push('speech detector: '+res.neural);
 if(!/^stayed/.test(res.call))bad.push('call: '+res.call);
 if(res.music?.error||res.music?.audioTracks!==1||res.music?.surface!=='browser'||!(res.music?.peak>0.05))bad.push('music share: '+JSON.stringify(res.music));
+if(res.musicQuality?.processed!==false||res.musicQuality?.bitrate!==128000)bad.push('music sound quality: '+JSON.stringify(res.musicQuality));
 if(!res.musicBridge?.some(t=>/YouTube audio is shared/.test(t)))bad.push('the audio bridge did not take the YouTube window\'s sound: '+JSON.stringify(res.musicBridge));
 if(res.oneClick?.error||res.oneClick?.audioTracks!==1||!(res.oneClick?.peak>0.05)||!res.oneClick?.windowOpen||!res.oneClick?.reopened)bad.push('one-click Music DJ: '+JSON.stringify(res.oneClick));
 if(res.screen?.error||res.screen?.audioTracks!==0)bad.push('screen share: '+JSON.stringify(res.screen));

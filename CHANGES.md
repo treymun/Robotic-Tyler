@@ -1,3 +1,20 @@
+# ROBOTIC TYLER v2.20.2: Music DJ that sounds like music
+
+## Fixed
+- **Music DJ sounded bad to everyone in the call.** The YouTube sound was being treated as a microphone: when a tab (or the desktop app's YouTube window) is shared, Chrome turns on echo cancellation, noise suppression and automatic gain unless asked not to, and mixes it to mono. Those are made for voices; on music they warble, pump and cut the highs. Tyler now asks for YouTube's sound untouched and in stereo, in Chrome and in the desktop app.
+- **More data for the music.** While the Music DJ is shared, Tyler's own outgoing audio is encoded at 128 kbps instead of Chrome's default of about 32 kbps, so the call's codec stops squeezing the music. It goes back to the default as soon as the music stops. Nothing changes for your own microphone or anyone else's.
+
+## New
+- **Sound quality** in Room → Music DJ: High · 128 kbps (default), Medium · 64 kbps for a slow upload, or Steam's default. It's kept between sessions and changes straight away while music plays. Under it, the panel says what is being sent ("YouTube's sound untouched, stereo, up to 128 kbps"), and warns if Chrome is still processing the sound.
+- **Full check** now shows the call's audio codec, Tyler's send rate and the settings Steam asked for, and the Music DJ row says whether the music is untouched and at what rate. If music still sounds off for your friends, Copy report from a call with music playing shows whether Steam itself limits the sound.
+
+## Tested
+- **Measured in Chromium 153 (headed, under Xvfb), no Steam:** a shared tab's sound with Chrome's defaults had echo cancellation, noise suppression and auto gain on, in mono; with Tyler's request all three were off, in stereo. On a test track, the default processing shifted the balance between bands by up to about 8 dB and removed everything above 16 kHz; untouched, every band stayed within 0.5 dB. The desktop app's Electron had the same defaults, and now gets the untouched stereo sound too (desktop check with a mock Steam page and a mock YouTube window).
+- **The codec, measured in Chromium:** Tyler's audio was sent at about 32 kbps before (on music, some frames switched to Opus's hybrid speech mode) and at 128 kbps with the new setting (every frame full-band music mode), measured from the bytes actually sent; 64 kbps and the default work as chosen. Offline with libopus on the same test track, going from 32 to 128 kbps lowered the codec's noise in the 2–6 kHz range from about 7 dB to about 21 dB below the music.
+- **Not tested:** a real Steam call. Steam's servers may set their own limits; the full check now reports them. 269 unit and integration tests and 17 end-to-end tests.
+
+---
+
 # ROBOTIC TYLER v2.20.1: repeat protection, a full check you can send, and theme stats that last
 
 ## New

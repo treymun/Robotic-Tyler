@@ -17,7 +17,7 @@ window.__shareChecks=async()=>{
   for(const t of s.getTracks())t.stop();
  }catch(e){out.music={error:e.name+': '+e.message};}
  // The bridge itself: its music-capture command and the status it reports.
- const statuses=[];const onMsg=e=>{if(e.data?.source==='tyler-music-status')statuses.push(e.data.text);};window.addEventListener('message',onMsg);
+ const statuses=[];const onMsg=e=>{if(e.data?.source==='tyler-music-status'){statuses.push(e.data.text);if(e.data.quality)out.musicQuality=e.data.quality;}};window.addEventListener('message',onMsg);
  window.postMessage({source:'tyler-audio-command',type:'music-capture',volume:.35},location.origin);await wait(2500);window.postMessage({source:'tyler-audio-command',type:'music-disconnect'},location.origin);await wait(300);
  window.removeEventListener('message',onMsg);out.musicBridge=statuses;
  // Screen awareness: a picture only.
@@ -34,7 +34,7 @@ window.__oneClick=async()=>{
   const s=await navigator.mediaDevices.getDisplayMedia({video:true,audio:true,selfBrowserSurface:'exclude',systemAudio:'exclude'});
   const a=s.getAudioTracks(),ac=new AudioContext(),an=ac.createAnalyser();an.fftSize=2048;if(a.length)ac.createMediaStreamSource(new MediaStream(a)).connect(an);
   let peak=0;const buf=new Float32Array(2048);for(let i=0;i<40;i++){await wait(50);an.getFloatTimeDomainData(buf);for(const x of buf)peak=Math.max(peak,Math.abs(x));}
-  const out={audioTracks:a.length,label:s.getVideoTracks()[0]?.label||'',peak:Math.round(peak*1000)/1000};for(const t of s.getTracks())t.stop();return out;
+  const st=a[0]?.getSettings?.()||{};const out={audioTracks:a.length,label:s.getVideoTracks()[0]?.label||'',peak:Math.round(peak*1000)/1000,defaultProcessing:!!(st.echoCancellation||st.noiseSuppression||st.autoGainControl)};for(const t of s.getTracks())t.stop();return out;
  }catch(e){return {error:e.name+': '+e.message};}
 };
 window.__checkDone=(async()=>{

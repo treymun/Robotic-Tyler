@@ -2,10 +2,31 @@
  'use strict';
  if(window.__roboticTylerAudioInstalled)return;window.__roboticTylerAudioInstalled=true;
  let musicStream,musicSource,musicGain,musicLimiter;
- function musicStatus(text,shared=!!musicStream){window.postMessage({source:'tyler-music-status',text,shared},location.origin);}
- function disconnectMusic(){const stream=musicStream;musicStream=null;try{musicSource?.disconnect();musicGain?.disconnect();musicLimiter?.disconnect();}catch{}musicSource=null;for(const track of stream?.getTracks()||[])track.stop();musicStatus('Music sharing stopped.',false);}
+ // Music quality (v2.20.2). Chrome treats shared tab sound like a microphone unless told otherwise:
+ // echo cancellation, noise suppression and automatic gain, in mono. On music that makes it warble
+ // and pump, so the share asks for the YouTube sound untouched, in stereo. And while music is
+ // shared, the call's Opus encoder gets more bits on Tyler's own senders (128 kbps by default,
+ // Chrome's default is about 32); the earlier setting comes back when the music stops.
+ const MUSIC_AUDIO=Object.freeze({echoCancellation:false,noiseSuppression:false,autoGainControl:false,channelCount:{ideal:2},sampleRate:{ideal:48000}});
+ let musicBitrate=128000,musicQuality=null,tuning=Promise.resolve();
+ const bitrateBefore=new WeakMap();
+ const bitrateOf=v=>{const n=Number(v);return n===0?0:Number.isFinite(n)?Math.round(Math.min(256000,Math.max(32000,n))):128000;};
+ function musicStatus(text,shared=!!musicStream){window.postMessage({source:'tyler-music-status',text,shared,quality:shared&&musicQuality?{...musicQuality,bitrate:musicBitrate}:null},location.origin);}
+ function disconnectMusic(){const stream=musicStream;musicStream=null;musicQuality=null;try{musicSource?.disconnect();musicGain?.disconnect();musicLimiter?.disconnect();}catch{}musicSource=null;for(const track of stream?.getTracks()||[])track.stop();void retune();musicStatus('Music sharing stopped.',false);}
+ async function tuneSender(sender){
+  const want=musicStream&&musicBitrate>0?musicBitrate:0;
+  try{const p=sender.getParameters(),e=p.encodings?.[0];if(!e)return;
+   if(want){if(!bitrateBefore.has(sender))bitrateBefore.set(sender,e.maxBitrate??null);if(e.maxBitrate===want)return;e.maxBitrate=want;}
+   else{if(!bitrateBefore.has(sender))return;const before=bitrateBefore.get(sender);bitrateBefore.delete(sender);if(before==null)delete e.maxBitrate;else e.maxBitrate=before;}
+   await sender.setParameters(p);}catch{}
+ }
+ // Only Tyler's own outgoing audio senders, one change at a time.
+ function retune(){tuning=tuning.then(async()=>{for(const peer of peers){if(closed(peer))continue;for(const sender of peer.getSenders())if(replaced.has(sender))await tuneSender(sender);}}).catch(()=>{});return tuning;}
+ // What Steam's call actually uses (for the full check): codec, its settings, Tyler's send rate.
+ let lastCodec=null;
+ async function codecReport(){for(const peer of peers){if(closed(peer)||peer.connectionState!=='connected')continue;try{const st=await peer.getStats();let out=null;st.forEach(x=>{if(x.type==='outbound-rtp'&&x.kind==='audio'&&(!out||x.bytesSent>out.bytesSent))out=x;});if(!out)continue;const c=out.codecId?st.get(out.codecId):null;return {codec:String(c?.mimeType||'').split('/')[1]||'',fmtp:String(c?.sdpFmtpLine||'').slice(0,200),kbps:Math.round((Number(out.targetBitrate)||0)/1000)};}catch{}}return null;}
  let board;let previewNode;let enabled=false,ctx,destination,gain,monitor,active=[],queued=[],audioJobs=Promise.resolve(),requests=0,attached=0;const peers=new Set(),replaced=new WeakSet();
- const announce=(text,ok=true)=>window.postMessage({source:'tyler-audio-status',text,ok,voice:{enabled,requests,attached,player:ctx?.state||'not started',peers:peers.size,observing:!!OriginalPeer,connectedPeers:[...peers].filter(p=>p.connectionState==='connected').length}},location.origin);
+ const announce=(text,ok=true)=>window.postMessage({source:'tyler-audio-status',text,ok,voice:{enabled,requests,attached,player:ctx?.state||'not started',peers:peers.size,observing:!!OriginalPeer,connectedPeers:[...peers].filter(p=>p.connectionState==='connected').length,codec:lastCodec}},location.origin);
  function setup(){if(ctx)return;ctx=new AudioContext();destination=ctx.createMediaStreamDestination();gain=ctx.createGain();gain.gain.value=.35;gain.connect(destination);monitor=ctx.createGain();monitor.gain.value=0;gain.connect(monitor);monitor.connect(ctx.destination);}
  function boardPlayer(){if(!board)board=new TylerBoardAudio(ctx,gain,text=>window.postMessage({source:'tyler-soundboard-status',text},location.origin));return board;}
  async function resumePlayer(){let timer;try{await Promise.race([ctx.resume(),new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('Audio player is suspended. Click Enable again or check this tab is allowed to play sound.')),2500);})]);}finally{clearTimeout(timer);}}
@@ -44,11 +65,11 @@
  // A connection Steam already closed (after a leave or a rejoin) is skipped and forgotten: only live
  // calls get the synthetic microphone, and the old one can't raise a false "attachment failed".
  const closed=peer=>peer.signalingState==='closed'||peer.connectionState==='closed';
- async function attach(peer){if(!enabled)return;if(closed(peer)){peers.delete(peer);return;}for(const sender of peer.getSenders()){if(sender.track?.kind!=='audio'||replaced.has(sender))continue;const track=synthetic();try{await sender.replaceTrack(track);replaced.add(sender);attached++;announce('Synthetic audio attached to an outgoing Steam audio sender. Confirm with Test beep and Steam meter.');}catch(e){track.stop();if(closed(peer)){peers.delete(peer);continue;}announce('Steam audio attachment failed: '+e.message,false);}}}
+ async function attach(peer){if(!enabled)return;if(closed(peer)){peers.delete(peer);return;}for(const sender of peer.getSenders()){if(sender.track?.kind!=='audio'||replaced.has(sender))continue;const track=synthetic();try{await sender.replaceTrack(track);replaced.add(sender);attached++;void retune();announce('Synthetic audio attached to an outgoing Steam audio sender. Confirm with Test beep and Steam meter.');}catch(e){track.stop();if(closed(peer)){peers.delete(peer);continue;}announce('Steam audio attachment failed: '+e.message,false);}}}
  const OriginalPeer=window.RTCPeerConnection;
  if(OriginalPeer){
   const proto=OriginalPeer.prototype,addTrack=proto.addTrack,addTransceiver=proto.addTransceiver,setLocal=proto.setLocalDescription;
-  if(addTrack)proto.addTrack=function(track,...streams){if(enabled&&track?.kind==='audio'){track=synthetic();const sender=addTrack.call(this,track,...streams);replaced.add(sender);attached++;announce('Synthetic audio added to an outgoing Steam connection. Confirm with Test beep.');return sender;}return addTrack.call(this,track,...streams);};
+  if(addTrack)proto.addTrack=function(track,...streams){if(enabled&&track?.kind==='audio'){track=synthetic();const sender=addTrack.call(this,track,...streams);replaced.add(sender);attached++;void retune();announce('Synthetic audio added to an outgoing Steam connection. Confirm with Test beep.');return sender;}return addTrack.call(this,track,...streams);};
   if(addTransceiver)proto.addTransceiver=function(...args){const result=addTransceiver.apply(this,args);void attach(this);return result;};
   if(setLocal)proto.setLocalDescription=async function(...args){await attach(this);return setLocal.apply(this,args);};
   window.RTCPeerConnection=new Proxy(OriginalPeer,{construct(Target,args){const peer=Reflect.construct(Target,args);peers.add(peer);peer.addEventListener('connectionstatechange',()=>{if(peer.connectionState==='closed')peers.delete(peer);announce('Steam connection state: '+peer.connectionState);});return peer;}});
@@ -58,20 +79,26 @@
   if(event.source!==window||event.origin!==location.origin||event.data?.source!=='tyler-audio-command')return;
   try{const m=event.data;
    if(m.type==='music-disconnect'){disconnectMusic();return;}
+   if(m.type==='music-quality'){musicBitrate=bitrateOf(m.bitrate);await retune();if(musicStream)musicStatus('Music quality: '+(musicBitrate?Math.round(musicBitrate/1000)+' kbps':'Steam\'s default')+'.');return;}
    if(m.type==='music-volume'){if(musicGain){const level=Math.max(0,Math.min(2,Number(m.volume)||0));musicGain.gain.setTargetAtTime(level,ctx.currentTime,.08);}return;}
    if(m.type==='music-capture'){
     disconnectMusic();setup();
-    const stream=await navigator.mediaDevices.getDisplayMedia({video:{displaySurface:'browser'},audio:true,preferCurrentTab:false,selfBrowserSurface:'exclude',systemAudio:'exclude',monitorTypeSurfaces:'exclude',surfaceSwitching:'include'});
+    if(m.bitrate!==undefined)musicBitrate=bitrateOf(m.bitrate);
+    const stream=await navigator.mediaDevices.getDisplayMedia({video:{displaySurface:'browser'},audio:MUSIC_AUDIO,preferCurrentTab:false,selfBrowserSurface:'exclude',systemAudio:'exclude',monitorTypeSurfaces:'exclude',surfaceSwitching:'include'});
     const video=stream.getVideoTracks()[0],audio=stream.getAudioTracks();
     if(!audio.length||video?.getSettings?.().displaySurface!=='browser'||/steam/i.test(video?.label||'')){for(const t of stream.getTracks())t.stop();throw Error('Select the YouTube browser tab and enable Share tab audio. Do not select Steam, a window or your screen.');}
+    // Older Chrome may ignore the request in getDisplayMedia; ask the track itself once more.
+    const processed=()=>{const x=audio[0].getSettings?.()||{};return !!(x.echoCancellation||x.noiseSuppression||x.autoGainControl);};
+    if(processed())await audio[0].applyConstraints?.(MUSIC_AUDIO).catch(()=>{});
+    musicQuality={processed:processed(),channels:Number(audio[0].getSettings?.().channelCount)||1};
     musicStream=stream;musicSource=ctx.createMediaStreamSource(new MediaStream(audio));musicGain=ctx.createGain();musicGain.gain.value=Math.max(0,Math.min(2,(Number.isFinite(Number(m.volume))?Number(m.volume):.35)));musicSource.connect(musicGain);musicLimiter=ctx.createDynamicsCompressor();musicLimiter.threshold.value=-3;musicLimiter.knee.value=6;musicLimiter.ratio.value=20;musicLimiter.attack.value=.003;musicLimiter.release.value=.15;musicGain.connect(musicLimiter);musicLimiter.connect(destination);
     for(const track of stream.getTracks())track.addEventListener('ended',()=>{if(musicStream===stream)disconnectMusic();});
-    enabled=true;await resumePlayer();for(const peer of peers)await attach(peer);
+    enabled=true;await resumePlayer();for(const peer of peers)await attach(peer);await retune();
     musicStatus('YouTube audio is shared. Join Steam voice with the bot, keep AI in Text mode, then request !play artist song.');return;
    }
    if(m.type==='preview'){if(typeof m.audio!=='string'||m.audio.length>6000000)throw Error('Preview too large');setup();await resumePlayer();const bytes=Uint8Array.from(atob(m.audio),c=>c.charCodeAt(0));const buffer=await ctx.decodeAudioData(bytes.buffer);if(buffer.duration>30)throw Error('Preview exceeds 30 seconds');try{previewNode?.stop();}catch{}const preview=ctx.createBufferSource();previewNode=preview;preview.buffer=buffer;preview.connect(ctx.destination);preview.onended=()=>preview.disconnect();preview.start();announce('Voice preview playing locally only.');return;}
    if(m.type==='enable'){setup();enabled=true;await resumePlayer();for(const peer of peers)await attach(peer);announce(attached?'Synthetic sender attached. Test beep and check Steam meter.':'Sound player ready; no outgoing Steam audio sender attached yet. Leave and rejoin voice.');return;}
-   if(m.type==='status'){announce('Voice connection checked.');return;}
+   if(m.type==='status'){lastCodec=await codecReport();announce('Voice connection checked.');return;}
    if(m.type==='stop'){stop();return;}
    if(!enabled)throw Error('Click Enable voice bridge first.');
    if(m.type==='board-stop'){board?.stop();return;}
