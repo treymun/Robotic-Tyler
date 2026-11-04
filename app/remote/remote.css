@@ -29,3 +29,9 @@
 .panel .board-tools label{display:block}
 .panel .board-tools svg{width:14px;height:14px;vertical-align:-2px;margin-right:4px}
 .check small.hint{display:block;margin-top:2px}
+
+/* v2.30: Connect & start's one-time chat check, answered from the phone. */
+.rm-notice{box-shadow:inset 3px 0 0 var(--rt-active)}
+.rm-notice p{margin:6px 0 0}
+.rm-notice .btn-row{margin-bottom:0}
+.rm-notice .btn{min-height:44px}

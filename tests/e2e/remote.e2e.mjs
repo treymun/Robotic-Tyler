@@ -124,6 +124,33 @@ test('phone remote: every theme chosen from the phone, the PC follows and both r
  }finally{await b.close();await browser.close();}
 });
 
+// v2.30: Connect & start's one-time chat check, answered from the phone. The PC's chat is mocked
+// (the panel preview with a stand-in chat), the server is real; no real Steam chat or provider.
+test('v2.30: the phone sees Connect & start waiting for the chat check and answers it (mocked chat on the PC)',{timeout:120000},async()=>{
+ const browser=await chromium.launch();const b=await bridge(browser,{theme:'steam'});
+ try{
+  const {pc,phone}=b;
+  await pc.evaluate(()=>{window.__saved=[];handlers['setup:save']=m=>{window.__saved.push(m.values);return {};};
+   const api=TylerCompanion,box=document.body;Object.assign(api,{locateChat:()=>true,getRegion:()=>box,getComposer:()=>box,getChatScope:()=>'group:42'});});
+  await phone.goto(b.base+'/?code='+b.code);await phone.waitForFunction(()=>globalThis.__tylerRemote?.state().link==='live',null,{timeout:30000});
+  await inPhone(phone,r=>{const m=r.getElementById('rmMode');m.value='text';m.dispatchEvent(new Event('change'));});
+  await pc.waitForFunction(()=>document.getElementById('tyler-companion-root').shadowRoot.getElementById('setupMode').value==='text');
+  assert.equal(await inPhone(phone,r=>r.getElementById('rmNotice').hidden),true,'nothing to answer yet');
+  await tap(phone,'connect');
+  await pc.waitForFunction(()=>TylerCompanion.noticePending===true,null,{timeout:10000});
+  await phone.waitForFunction(()=>document.getElementById('tyler').shadowRoot.getElementById('rmNotice').hidden===false,null,{timeout:5000});
+  assert.match(await inPhone(phone,r=>r.getElementById('rmNotice').textContent),/AI provider/);
+  if(SHOTS)await phone.screenshot({path:path.join(SHOTS,'remote-chat-check.png')});
+  await tap(phone,'rmNoticeAlways');
+  await pc.waitForFunction(()=>window.__saved.some(v=>v.noticeAlways===true),null,{timeout:5000});
+  assert.ok(await pc.evaluate(()=>window.__saved.some(v=>v.noticeScope==='chat:group:42')),'this chat is remembered too');
+  assert.equal(await pc.evaluate(()=>TylerCompanion.noticePending),false);
+  await phone.waitForFunction(()=>document.getElementById('tyler').shadowRoot.getElementById('rmNotice').hidden===true,null,{timeout:5000});
+  await pc.evaluate(()=>TylerCompanion.cancelSetup?.());
+  assert.deepEqual(b.errors,[]);
+ }finally{await b.close();await browser.close();}
+});
+
 test('Steam window side: status, actions through the panel\'s controls, events only while a phone watches (panel preview as the desktop app)',{timeout:120000},async()=>{
  const browser=await chromium.launch();const b=await bridge(browser,{theme:'steam'});
  try{
@@ -146,6 +173,7 @@ test('Steam window side: status, actions through the panel\'s controls, events o
   assert.match((await ask('music-quality',{level:'ultra'})).error,/isn.t available/);
   assert.match((await ask('mode',{mode:'party'})).error,/auto, text or voice/);
   assert.equal((await ask('pause')).ok,true);
+  assert.match((await ask('notice',{always:true})).error,/Nothing is waiting/,'v2.30: no chat check waiting');assert.equal(st.data.notice,false);
   assert.match((await ask('nope')).error,/Unknown action/);assert.match((await ask('__proto__')).error,/Unknown action/);
   // Events go to the main process only while a phone watches.
   const events=[];await pc.exposeFunction('__seen',m=>events.push(...m.events));await pc.evaluate(()=>{handlers['remote:event']=m=>{window.__seen(m);return {};};});

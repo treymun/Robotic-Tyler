@@ -2490,7 +2490,7 @@ window.addEventListener('keydown',e=>{
 })();
 ;/* quick-start.js */
 (() => {
- 'use strict';const api=globalThis.TylerCompanion,mount=api?.getQuickMount?.();if(!mount)return;const root=document.createElement('div');mount.append(root);root.innerHTML=`<div class="deck-entry" data-capability="voice"><div><b>Just here for the sounds?</b><span>Play clips for friends in voice. No API key needed.</span></div><button id="soundOnly">Soundboard only</button></div><p id="quickStatus" class="quick-status">${globalThis.TylerPlatform?.voice===false?'Press Connect &amp; start below to begin.':'For AI conversation and sounds, use Connect &amp; start below.'}</p><div id="quickHelp" class="quick-help" hidden><p id="helpText"></p><label id="noticeLabel" hidden><input id="quickNotice" type="checkbox">I’ve told this chat that Tyler sends chat/speech to the selected AI provider.</label><button id="continue" class="primary" hidden>Continue</button><button id="cancel" class="icon">Cancel</button></div>`;
+ 'use strict';const api=globalThis.TylerCompanion,mount=api?.getQuickMount?.();if(!mount)return;const root=document.createElement('div');mount.append(root);root.innerHTML=`<div class="deck-entry" data-capability="voice"><div><b>Just here for the sounds?</b><span>Play clips for friends in voice. No API key needed.</span></div><button id="soundOnly">Soundboard only</button></div><p id="quickStatus" class="quick-status">${globalThis.TylerPlatform?.voice===false?'Press Connect &amp; start below to begin.':'For AI conversation and sounds, use Connect &amp; start below.'}</p><div id="quickHelp" class="quick-help" hidden><p id="helpText"></p><label id="noticeLabel" hidden><input id="quickNotice" type="checkbox">I’ve told this chat that Tyler sends chat/speech to the selected AI provider.</label><label id="noticeAlwaysLabel" class="notice-always" hidden><input id="noticeAlways" type="checkbox">Don’t ask again: I always let my chats know (Settings → AI turns this check back on)</label><button id="continue" class="primary" hidden>Continue</button><button id="cancel" class="icon">Cancel</button></div>`;
  const $=id=>root.querySelector('#'+id),options=api.getQuickOptions?.(),mode=options?.querySelector('#setupMode');let config={},controller=null;const sessionNotices=new WeakSet();
  function message(text){$('quickStatus').textContent=text;api.setActivity(text);}
  async function send(type,extra={}){const r=await chrome.runtime.sendMessage({type,...extra});if(!r?.ok)throw Error(r?.error||'Setup unavailable');return r;}
@@ -2518,8 +2518,8 @@ window.addEventListener('keydown',e=>{
    message('Soundboard connected. Join Steam voice and type sound 1 in this group chat.');api.notify?.({kind:'success',title:'Soundboard connected',text:'Join Steam voice and type sound 1 in this group chat.'});
    return;
  }
- const scope=api.getChatScope(),noticeKey=scope?'chat:'+(r.provider==='Gemini'?'gemini:':'')+scope:null,region=api.getRegion();const known=noticeKey?(config.notices||[]).includes(noticeKey):sessionNotices.has(region);if(!known){help('One-time check for this chat: let participants know their chat/speech goes to OpenRouter.',true);$('quickNotice').checked=false;await consent(signal);check(signal);if(noticeKey){await send('setup:save',{values:{noticeScope:noticeKey}});config.notices=[...(config.notices||[]),noticeKey];}else sessionNotices.add(region);}api.confirmNotice(true);
- $('noticeLabel').hidden=true;$('continue').hidden=true;
+ const scope=api.getChatScope(),noticeKey=scope?'chat:'+(r.provider==='Gemini'?'gemini:':'')+scope:null,region=api.getRegion();const known=config.noticeAlways===true||(noticeKey?(config.notices||[]).includes(noticeKey):sessionNotices.has(region));if(!known){help('One-time check for this chat: let participants know their chat/speech goes to '+(r.provider==='Gemini'?'Google':'OpenRouter')+'.',true);$('quickNotice').checked=false;$('noticeAlways').checked=false;$('noticeAlwaysLabel').hidden=false;api.noticePending=true;api.emit?.('chat-check',{on:true});await consent(signal).finally(()=>{api.noticePending=false;api.emit?.('chat-check',{on:false});});check(signal);if($('noticeAlways').checked){config.noticeAlways=true;await send('setup:save',{values:{noticeAlways:true}});}if(noticeKey){await send('setup:save',{values:{noticeScope:noticeKey}});config.notices=[...(config.notices||[]),noticeKey];}else sessionNotices.add(region);}api.confirmNotice(true);
+ $('noticeLabel').hidden=true;$('noticeAlwaysLabel').hidden=true;$('continue').hidden=true;
  if(routing==='voice'&&!(voice?.peers>0))await waitForVoice(signal);
  const current=api.getVoiceState()||voice,noVoice=current?.enabled&&current.observing&&current.peers===0;
  if(routing!=='text'&&!(routing==='auto'&&noVoice)){if(!api.detectVoice(config.botName)){help('Click your BOT’s name beside its avatar in the Steam voice participant list. This layout needs one hint.');let selected=false;while(!selected){const target=await api.chooseTarget('voice',signal);check(signal);selected=api.acceptVoiceElement(target);if(!selected)help('Click the bot name beside its avatar inside the voice channel, not the general member list.');}}}
@@ -2528,7 +2528,9 @@ window.addEventListener('keydown',e=>{
  $('cancel').onclick=()=>{controller?.abort();$('quickHelp').hidden=true;};if(mode)mode.onchange=async()=>{config.mode=mode.value;try{await send('setup:save',{values:{mode:mode.value}});}catch(e){message(e.message);}};
  $('soundOnly').onclick=()=>start(true);
  api.startSoundboard=()=>start(true);
- api.connectAndStart=()=>start(false);api.cancelSetup=()=>controller?.abort();api.voiceHelpNeeded=()=>{if(!controller){$('quickStatus').textContent='Voice room needs one hint. Use Connect & start to identify your bot in that voice list.';}};api.setConnectBusy?.(true);void load().catch(e=>message(e.message)).finally(()=>{if(!controller)api.setConnectBusy?.(false);});
+ api.connectAndStart=()=>start(false);
+ // The phone remote (v2.30) can answer the chat check: it ticks the same boxes and presses Continue.
+ api.answerNotice=(always=false)=>{if(!api.noticePending)return false;$('quickNotice').checked=true;$('noticeAlways').checked=!!always;$('continue').click();return true;};api.cancelSetup=()=>controller?.abort();api.voiceHelpNeeded=()=>{if(!controller){$('quickStatus').textContent='Voice room needs one hint. Use Connect & start to identify your bot in that voice list.';}};api.setConnectBusy?.(true);void load().catch(e=>message(e.message)).finally(()=>{if(!controller)api.setConnectBusy?.(false);});
 })();
 ;/* squad-suite.js */
 (()=>{
@@ -3187,6 +3189,7 @@ window.addEventListener('pagehide',clean,{once:true});chrome.runtime.onMessage.a
    paused:['paused','standby'].includes(st.state)||!(api.isAutomaticActive?.()||api.liveActive?.()),automatic:!!api.isAutomaticActive?.(),live:!!api.liveActive?.(),
    voice:{armed,inCall,peers:armed&&inCall?Math.max(0,Number(heard.tracks)||0):0,attached:Number(v.attached)||0},
    chat:!!(api.getComposer?.()?.isConnected&&api.getRegion?.()?.isConnected),
+   notice:!!api.noticePending, // v2.30: Connect & start is waiting for the one-time chat check
    replies:(Number(S.replies)||0)+(Number(S.spoken)||0),spend:clean(st.hud?.spend,16),
    hud:Object.fromEntries(['voice','voiceMeta','spend','spendMeta','latency','latencyMeta'].map(k=>[k,clean(st.hud?.[k],60)])),
    footer:text('footerState'),platform:clean($('platformChip')?.textContent,40),
@@ -3199,7 +3202,7 @@ window.addEventListener('pagehide',clean,{once:true});chrome.runtime.onMessage.a
  // ── Live events while a phone watches ─────────────────────────────────────
  // Only these events, with only these fields (all of them are already on the panel).
  const FIELDS={state:['state','label','text','before'],hud:['voice','voiceMeta','spend','spendMeta','latency','latencyMeta'],reply:['chars'],chat:['recent','flood'],
-  sound:['slot','name'],music:['title','by'],report:['ms','spoken','live'],check:['problems','unsure'],keepalive:['reason'],theme:['theme']};
+  sound:['slot','name'],music:['title','by'],report:['ms','spoken','live'],check:['problems','unsure'],keepalive:['reason'],theme:['theme'],'chat-check':['on']};
  let watchUntil=0,queue=[],flushTimer=0;
  function pick(type,data){const out={};for(const k of FIELDS[type]){const v=data?.[k];if(v===undefined)continue;out[k]=typeof v==='string'?clean(v,k==='text'?200:120):typeof v==='number'||typeof v==='boolean'?v:clean(v,60);}return out;}
  function flush(){flushTimer=0;if(!queue.length)return;const events=queue.splice(0,60);queue=[];send({type:'remote:event',events});}
@@ -3223,6 +3226,8 @@ window.addEventListener('pagehide',clean,{once:true});chrome.runtime.onMessage.a
   watch:({on})=>{watchUntil=on===false?0:Date.now()+30000;if(on===false)queue=[];return {};},
   pause:()=>{click('quickStop');return {};},
   start:()=>{api.connectAndStart?.();return {};},
+  // v2.30: answers Connect & start's chat check from the phone (the same boxes as on the PC).
+  notice:({always})=>{if(!api.answerNotice?.(always===true))throw Error('Nothing is waiting for the chat check.');return {};},
   'stop-audio':()=>{click('stop');return {};},
   sound:({slot})=>{const n=Number(slot),list=api.listSounds?.()?.slots||[];if(!list.some(s=>s.slot===n))throw Error('That clip isn’t on the soundboard.');api.playSound?.(n);return {};},
   'clips-stop':()=>{click('boardStop');return {};},

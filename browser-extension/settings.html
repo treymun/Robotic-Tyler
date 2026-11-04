@@ -115,7 +115,7 @@
     <p class="only-chrome">The phone remote is part of the desktop app: it runs a small page on your home network, which a Chrome extension can't do.</p>
   </div>
   <div class="only-desktop">
-    <div class="toggle-grid"><label class="toggle"><input id="remoteOn" type="checkbox"><span><b>Let my phone control Tyler</b><small>Only devices on your home network can reach it, and only after pairing with a code from this page. Use it on your own Wi-Fi, not on public networks.</small></span></label></div>
+    <div class="toggle-grid"><label class="toggle"><input id="remoteOn" type="checkbox"><span><b>Let my phone control Tyler</b><small>Only devices on your home network (or, if you turn it on below, your own Tailscale network) can reach it, and only after pairing with a code from this page. Use it on your own Wi-Fi, not on public networks.</small></span></label></div>
     <div id="remotePanel" class="remote-panel" hidden>
       <div class="remote-pair">
         <canvas id="remoteQr" class="remote-qr" width="232" height="232" aria-label="QR code with the remote's address and pairing code"></canvas>
@@ -127,6 +127,9 @@
           <p class="hint">If Windows asks whether ROBOTIC TYLER may use the network, allow it on <b>private networks</b>. Tip: on the phone, add the page to your home screen.</p>
         </div>
       </div>
+      <h3>Away from home</h3>
+      <div class="toggle-grid"><label class="toggle"><input id="remoteAway" type="checkbox"><span><b>Use the remote away from home, through Tailscale</b><small>Install the free Tailscale app on this PC and on your phone and sign in to the same account. Your phone then reaches Tyler from anywhere (mobile data, another Wi-Fi) over Tailscale's encrypted private network. Nothing else on the internet can reach it, and the phone still needs pairing.</small></span></label></div>
+      <p class="hint" id="remoteAwayHint" hidden></p>
       <h3>Paired phones</h3>
       <ul id="remoteDevices" class="remote-devices"><li class="hint">No phones yet.</li></ul>
       <div class="actions"><button type="button" id="remoteForgetAll" class="secondary" hidden>Remove all phones</button></div>
@@ -242,6 +245,16 @@
   </div>
 </section>
 
+<section class="sheet" id="noticeSheet" data-ui-zone="ai">
+  <div class="sheet-head">
+    <h2>Telling each chat</h2>
+    <p>Tyler sends the chat's messages (and, in voice, what people say) to your AI provider. Connect &amp; start asks once in each new chat whether you've told everyone.</p>
+  </div>
+  <div class="toggle-grid">
+    <label class="toggle"><input id="noticeAsk" type="checkbox" checked><span><b>Ask in each new chat</b><small>Off: Connect &amp; start goes straight through, in every chat. You still need to let people know.</small></span></label>
+  </div>
+  <p class="hint" id="noticeStatus" role="status"></p>
+</section>
 <section class="sheet" id="chatTagSheet" data-ui-zone="ai">
   <div class="sheet-head">
     <h2>Name tag in chat</h2>
@@ -493,6 +506,7 @@
 <script src="ui-kit.js"></script>
 <script src="ui-template.js"></script>
 <script src="chat-tag.js"></script>
+<script src="notice-settings.js"></script>
 <script src="settings.js"></script>
 <script src="v22-settings.js"></script>
 <script src="settings-navigation.js"></script>

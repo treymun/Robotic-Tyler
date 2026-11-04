@@ -54,6 +54,7 @@
    paused:['paused','standby'].includes(st.state)||!(api.isAutomaticActive?.()||api.liveActive?.()),automatic:!!api.isAutomaticActive?.(),live:!!api.liveActive?.(),
    voice:{armed,inCall,peers:armed&&inCall?Math.max(0,Number(heard.tracks)||0):0,attached:Number(v.attached)||0},
    chat:!!(api.getComposer?.()?.isConnected&&api.getRegion?.()?.isConnected),
+   notice:!!api.noticePending, // v2.30: Connect & start is waiting for the one-time chat check
    replies:(Number(S.replies)||0)+(Number(S.spoken)||0),spend:clean(st.hud?.spend,16),
    hud:Object.fromEntries(['voice','voiceMeta','spend','spendMeta','latency','latencyMeta'].map(k=>[k,clean(st.hud?.[k],60)])),
    footer:text('footerState'),platform:clean($('platformChip')?.textContent,40),
@@ -66,7 +67,7 @@
  // ── Live events while a phone watches ─────────────────────────────────────
  // Only these events, with only these fields (all of them are already on the panel).
  const FIELDS={state:['state','label','text','before'],hud:['voice','voiceMeta','spend','spendMeta','latency','latencyMeta'],reply:['chars'],chat:['recent','flood'],
-  sound:['slot','name'],music:['title','by'],report:['ms','spoken','live'],check:['problems','unsure'],keepalive:['reason'],theme:['theme']};
+  sound:['slot','name'],music:['title','by'],report:['ms','spoken','live'],check:['problems','unsure'],keepalive:['reason'],theme:['theme'],'chat-check':['on']};
  let watchUntil=0,queue=[],flushTimer=0;
  function pick(type,data){const out={};for(const k of FIELDS[type]){const v=data?.[k];if(v===undefined)continue;out[k]=typeof v==='string'?clean(v,k==='text'?200:120):typeof v==='number'||typeof v==='boolean'?v:clean(v,60);}return out;}
  function flush(){flushTimer=0;if(!queue.length)return;const events=queue.splice(0,60);queue=[];send({type:'remote:event',events});}
@@ -90,6 +91,8 @@
   watch:({on})=>{watchUntil=on===false?0:Date.now()+30000;if(on===false)queue=[];return {};},
   pause:()=>{click('quickStop');return {};},
   start:()=>{api.connectAndStart?.();return {};},
+  // v2.30: answers Connect & start's chat check from the phone (the same boxes as on the PC).
+  notice:({always})=>{if(!api.answerNotice?.(always===true))throw Error('Nothing is waiting for the chat check.');return {};},
   'stop-audio':()=>{click('stop');return {};},
   sound:({slot})=>{const n=Number(slot),list=api.listSounds?.()?.slots||[];if(!list.some(s=>s.slot===n))throw Error('That clip isn’t on the soundboard.');api.playSound?.(n);return {};},
   'clips-stop':()=>{click('boardStop');return {};},

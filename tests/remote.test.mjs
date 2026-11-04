@@ -6,7 +6,7 @@ import http from 'node:http';
 import path from 'node:path';
 import {createRequire} from 'node:module';
 const require=createRequire(import.meta.url);
-const {setupRemote,privateAddress,hostAllowed}=require('../app/remote.cjs');
+const {setupRemote,privateAddress,tailnetAddress,hostAllowed}=require('../app/remote.cjs');
 const {memoryStorage}=require('../app/vault.cjs');
 const ROOT=path.resolve(import.meta.dirname,'..');
 
@@ -57,6 +57,30 @@ test('phone remote: pair with the code, then status and actions; nothing without
   assert.equal((await request(port,{method:'POST',path:'/pair',headers:H,body:{code:s.code}})).status,403,'after 8 wrong codes the right one no longer works');
   // Off: the port closes.
   await remote.handle('disable');await assert.rejects(request(port),/ECONNREFUSED/);
+ }finally{await remote.stop();}
+});
+
+// v2.30: "Away from home" lets the owner's Tailscale network in (off by default), and the phone can
+// answer Connect & start's chat check. Mocked Steam window; real HTTP on 127.0.0.1. Not tested here:
+// a real Tailscale network or a phone on mobile data.
+test('v2.30: Tailscale addresses only when Away from home is on; the chat check from the phone',async()=>{
+ for(const a of ['100.64.0.1','100.101.102.103','100.127.255.254','::ffff:100.88.1.2','fd7a:115c:a1e0::1','FD7A:115C:A1E0:ab12::9'])assert.equal(tailnetAddress(a),true,a);
+ for(const a of ['100.63.255.255','100.128.0.1','8.8.8.8','192.168.1.2','fd7a:115c:a1e1::1','fd12::1','',null])assert.equal(tailnetAddress(a),false,String(a));
+ assert.equal(privateAddress('100.101.102.103'),false,'a Tailscale address is not the home network');
+ const vault=memoryStorage(),asked=[];
+ const remote=setupRemote({vault,ask:async(action,args)=>{asked.push([action,args]);if(action==='state')return {ready:true,state:'paused',notice:true};return {};},
+  pageDir:path.join(ROOT,'app','remote'),uiDir:path.join(ROOT,'app','companion','ui'),version:'9.9.9'});
+ try{
+  let s=await remote.handle('status');assert.equal(s.away.on,false,'off until you turn it on');assert.ok(Array.isArray(s.away.addresses));
+  s=await remote.handle('away',{on:true});assert.equal(s.away.on,true);assert.equal((await vault.get(['remoteControl'])).remoteControl.away,true,'remembered');
+  s=await remote.handle('enable');const port=s.port;assert.equal(s.away.on,true,'turning the remote on keeps it');assert.equal(typeof s.qrs,'object');
+  const ok=await request(port,{method:'POST',path:'/pair',headers:H,body:{code:s.code}});const cookie=String(ok.headers['set-cookie']).split(';')[0];
+  assert.equal((await request(port,{path:'/state',headers:{cookie}})).json.notice,true,'the phone sees the check waiting');
+  assert.equal((await request(port,{method:'POST',path:'/action',headers:{...H,cookie},body:{action:'notice',always:true,extra:'x'}})).status,200);
+  assert.deepEqual(asked.at(-1),['notice',{always:true}]);
+  await request(port,{method:'POST',path:'/action',headers:{...H,cookie},body:{action:'notice',always:'yes'}});assert.deepEqual(asked.at(-1),['notice',{always:false}],'only a real true means "don\'t ask again"');
+  s=await remote.handle('away',{on:false});assert.equal(s.away.on,false);assert.equal(s.on,true,'turning it off leaves the home remote on');
+  s=await remote.handle('disable');assert.equal((await vault.get(['remoteControl'])).remoteControl.away,false);
  }finally{await remote.stop();}
 });
 

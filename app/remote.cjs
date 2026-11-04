@@ -20,7 +20,7 @@ const DEFAULT_PORT=47820,CODE_MS=600000,MAX_TRIES=8,MAX_DEVICES=8,COOKIE='rt_rem
 const THEMES=new Set(['steam','classic','tf2','cs2','portal','cs16','hev','l4d','winxp','doom','quake','pipboy','combine','deadlock','minecraft','payday','dreamcast','gmod','ricochet','dod','rust','x360','ipod','msn','xmb']);
 // Each action and the only fields it passes on (anything else a request carries is dropped).
 const num=(v,min,max)=>{const n=Number(v);return Number.isFinite(n)?Math.min(max,Math.max(min,n)):min;};
-const ACTIONS={pause:()=>({}),start:()=>({}),'stop-audio':()=>({}),sound:b=>({slot:Number(b.slot)}),'clips-stop':()=>({}),'clip-volume':b=>({value:num(b.value,0,1)}),
+const ACTIONS={pause:()=>({}),start:()=>({}),notice:b=>({always:b.always===true}),'stop-audio':()=>({}),sound:b=>({slot:Number(b.slot)}),'clips-stop':()=>({}),'clip-volume':b=>({value:num(b.value,0,1)}),
  'music-start':()=>({}),'music-play':b=>({query:String(b.query||'').slice(0,120)}),'music-skip':()=>({}),'music-stop':()=>({}),'music-volume':b=>({value:num(b.value,0,200)}),
  'music-quality':b=>({level:String(b.level||'')}),'music-duck':b=>({on:b.on===true}),'voice-volume':b=>({value:num(b.value,0,.7)}),mode:b=>({mode:String(b.mode||'')}),
  keepalive:b=>{const o={};if(typeof b.call==='boolean')o.call=b.call;if(typeof b.chat==='boolean')o.chat=b.chat;if(b.minutes!==undefined)o.minutes=String(Math.round(num(b.minutes,1,120)));return o;},
@@ -39,6 +39,11 @@ function privateAddress(address){
  if(m){const [p,q]=[Number(m[1]),Number(m[2])];return p===10||p===127||p===192&&q===168||p===172&&q>=16&&q<=31||p===169&&q===254;}
  return a==='::1'||/^fe[89ab]/.test(a)||/^f[cd]/.test(a);
 }
+/** v2.30: a Tailscale (or similar private VPN) address: 100.64.0.0/10. Used only when "Away from home"
+ *  is turned on, so the phone can reach the PC through the owner's own encrypted network. */
+function tailnetAddress(address){let a=String(address||'').toLowerCase();if(a.startsWith('::ffff:'))a=a.slice(7);const m=/^100\.(\d+)\.\d+\.\d+$/.exec(a);if(m){const q=Number(m[1]);return q>=64&&q<=127;}return /^fd7a:115c:a1e0:/.test(a);}
+/** This PC's addresses on the owner's Tailscale network. */
+function tailnetAddresses(){const out=[];for(const [name,list] of Object.entries(os.networkInterfaces()))for(const n of list||[]){if((n.family==='IPv4'||n.family===4)&&!n.internal&&tailnetAddress(n.address))out.push({name,address:n.address});}return out;}
 /** The Host header must be an IP address (or localhost) with our port: no domain names (DNS rebinding). */
 function hostAllowed(host,port){const h=String(host||'').toLowerCase();return new RegExp('^(?:\\d{1,3}(?:\\.\\d{1,3}){3}|localhost|\\[[0-9a-f:]+\\]):'+port+'$').test(h);}
 /** This PC's addresses on the home network, Wi-Fi/Ethernet first. */
@@ -58,7 +63,8 @@ const deviceName=ua=>{const s=String(ua||'');return /iPhone/.test(s)?'iPhone':/i
 function setupRemote({vault,log=()=>{},ask,pageDir,uiDir,libDir=path.dirname(uiDir||'.'),version='',theme=async()=>'steam',prefs=null,gesture=async()=>{}}){
  let server=null,port=0,code=null,codeUntil=0,tries=0,starting=null;const seen=new Map();let lastSeenWrite=0;
  const streams=new Set();let watchTimer=0;
- const readConfig=async()=>{const v=await vault.get(['remoteControl','remoteDevices']);return {on:v.remoteControl?.on===true,port:Number(v.remoteControl?.port)||DEFAULT_PORT,devices:Array.isArray(v.remoteDevices)?v.remoteDevices:[]};};
+ const readConfig=async()=>{const v=await vault.get(['remoteControl','remoteDevices']);const c={on:v.remoteControl?.on===true,away:v.remoteControl?.away===true,port:Number(v.remoteControl?.port)||DEFAULT_PORT,devices:Array.isArray(v.remoteDevices)?v.remoteDevices:[]};away=c.away;return c;};
+ let away=false; // "Away from home": also accept the owner's Tailscale network
  const writeDevices=devices=>vault.set({remoteDevices:devices.slice(-MAX_DEVICES)});
  function newCode(){code=String(crypto.randomInt(0,1000000)).padStart(6,'0');codeUntil=Date.now()+CODE_MS;tries=0;return code;}
  async function device(req){
@@ -127,7 +133,7 @@ function setupRemote({vault,log=()=>{},ask,pageDir,uiDir,libDir=path.dirname(uiD
  function dropStreams(id){for(const s of [...streams])if(!id||s.device===id){try{s.res.end();}catch{}streams.delete(s);clearInterval(s.ping);}if(!streams.size)renew();}
 
  async function route(req,res){
-  if(!privateAddress(req.socket.remoteAddress))return send(res,403,{error:'Only devices on your home network can use the remote.'});
+  if(!privateAddress(req.socket.remoteAddress)&&!(away&&tailnetAddress(req.socket.remoteAddress)))return send(res,403,{error:'Only devices on your home network'+(away?' or your Tailscale network':'')+' can use the remote.'});
   if(!hostAllowed(req.headers.host,port))return send(res,421,{error:'Open the remote by its address, like http://192.168.1.20:'+port});
   const url=new URL(req.url,'http://remote'),p=url.pathname;
   // The page and its files are public on the network; everything that touches Tyler needs a paired phone.
@@ -188,7 +194,7 @@ function setupRemote({vault,log=()=>{},ask,pageDir,uiDir,libDir=path.dirname(uiD
   starting=(async()=>{const cfg=await readConfig();let lastError;
    for(let p=cfg.port;p<cfg.port+10;p++){try{server=await listen(p);port=p;break;}catch(e){lastError=e;if(e.code!=='EADDRINUSE')break;}}
    if(!server)throw Error('The phone remote couldn\'t start: '+(lastError?.code||lastError?.message||'no free port'));
-   if(port!==cfg.port)await vault.set({remoteControl:{on:true,port}});log('Phone remote','on, port '+port);
+   if(port!==cfg.port)await vault.set({remoteControl:{on:true,away:cfg.away,port}});log('Phone remote','on, port '+port);
   })().finally(()=>{starting=null;});
   return starting;
  }
@@ -196,17 +202,20 @@ function setupRemote({vault,log=()=>{},ask,pageDir,uiDir,libDir=path.dirname(uiD
 // connection is closed straight away rather than after close() (which then never finished).
 async function stop(){if(!server)return;dropStreams();const s=server;server=null;code=null;const closed=new Promise(r=>s.close(()=>r()));s.closeAllConnections?.();await closed;log('Phone remote','off');}
  async function status(){
-  const cfg=await readConfig(),addresses=lanAddresses();if(cfg.on&&!server)await start().catch(()=>{});
-  const qr=code&&Date.now()<codeUntil&&addresses[0]?matrix('http://'+addresses[0].address+':'+port+'/?code='+code):null;
-  return {on:cfg.on&&!!server,port:port||cfg.port,addresses:addresses.map(a=>a.address),code:code&&Date.now()<codeUntil?code:null,codeUntil:code?codeUntil:0,qr,
+  const cfg=await readConfig(),addresses=lanAddresses(),tailnet=tailnetAddresses();if(cfg.on&&!server)await start().catch(()=>{});
+  const live=code&&Date.now()<codeUntil,qrFor=a=>live&&a?matrix('http://'+a+':'+port+'/?code='+code):null;
+  // One QR code for the home address, and one for the Tailscale address when "Away from home" is on.
+  const qrs={};if(addresses[0])qrs[addresses[0].address]=qrFor(addresses[0].address);if(cfg.away&&tailnet[0])qrs[tailnet[0].address]=qrFor(tailnet[0].address);
+  return {on:cfg.on&&!!server,port:port||cfg.port,addresses:addresses.map(a=>a.address),away:{on:cfg.away,addresses:tailnet.map(a=>a.address)},code:live?code:null,codeUntil:code?codeUntil:0,qr:addresses[0]?qrs[addresses[0].address]:null,qrs,
    devices:cfg.devices.map(d=>({id:d.id,name:d.name,created:d.created,seen:seen.get(d.id)||d.seen||d.created}))};
  }
  // The settings page draws the QR code from this grid (one string per row, "1" for a dark module).
  function matrix(text){try{const qrcode=require('./vendor/qrcode-generator.js'),q=qrcode(0,'M');q.addData(text);q.make();const n=q.getModuleCount(),rows=[];for(let r=0;r<n;r++){let row='';for(let c=0;c<n;c++)row+=q.isDark(r,c)?'1':'0';rows.push(row);}return rows;}catch{return null;}}
  async function handle(op,request={}){
   if(op==='status')return status();
-  if(op==='enable'){await vault.set({remoteControl:{on:true,port:(await readConfig()).port}});await start();newCode();return status();}
-  if(op==='disable'){await vault.set({remoteControl:{on:false,port:(await readConfig()).port}});await stop();return status();}
+  if(op==='enable'){const c=await readConfig();await vault.set({remoteControl:{on:true,away:c.away,port:c.port}});await start();newCode();return status();}
+  if(op==='disable'){const c=await readConfig();await vault.set({remoteControl:{on:false,away:c.away,port:c.port}});await stop();return status();}
+  if(op==='away'){const c=await readConfig(),on=request.on===true;await vault.set({remoteControl:{on:c.on,away:on,port:c.port}});away=on;if(!on)for(const s of [...streams])if(tailnetAddress(s.res.socket?.remoteAddress))dropStreams(s.device);return status();}
   if(op==='new-code'){if(!server)throw Error('Turn the phone remote on first.');newCode();return status();}
   if(op==='forget'){const id=String(request.id||''),{devices}=await readConfig();await writeDevices(devices.filter(d=>d.id!==id));dropStreams(id);return status();}
   if(op==='forget-all'){await writeDevices([]);dropStreams();return status();}
@@ -216,4 +225,4 @@ async function stop(){if(!server)return;dropStreams();const s=server;server=null
  void readConfig().then(cfg=>{if(cfg.on)return start();}).catch(e=>log('Phone remote',e.message));
  return {handle,stop,status,push,get port(){return port;},get watching(){return streams.size;}};
 }
-module.exports={setupRemote,privateAddress,hostAllowed,lanAddresses,deviceName};
+module.exports={setupRemote,privateAddress,tailnetAddress,hostAllowed,lanAddresses,tailnetAddresses,deviceName};

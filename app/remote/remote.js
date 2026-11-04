@@ -35,6 +35,7 @@
   <p id="pairMsg" class="hint" role="status"></p>
 </section>
 <section id="view-conversation" class="view" role="tabpanel" aria-labelledby="tab-conversation" data-view="conversation">
+  <div id="rmNotice" class="callout rm-notice" role="alert" hidden><b>One-time check for this chat</b><p>Have you told everyone that Tyler sends the chat (and what people say in voice) to your AI provider?</p><div class="btn-row"><button id="rmNoticeYes" class="btn primary" type="button">Yes, continue</button><button id="rmNoticeAlways" class="btn" type="button">Yes, don’t ask again</button></div></div>
   <button id="connect" class="btn primary block" type="button">${icon('play')}Connect &amp; start</button>
   <button id="rmPause" class="btn block" type="button" hidden>${icon('pause')}Pause AI</button>
   <p id="rmRunHint" class="hint">Tyler connects to the chat open on your PC.</p>
@@ -146,6 +147,8 @@
  function renderControls(s){
   const c=s.controls||{};
   live.paused=!!s.paused;$('connect').hidden=!live.paused;$('rmPause').hidden=live.paused;
+  // v2.30: Connect & start is waiting for the chat check: answer it here.
+  $('rmNotice').hidden=!s.notice;if(s.notice)$('connect').hidden=true; // it's already connecting
   $('rmRunHint').textContent=live.paused?'Tyler connects to the chat open on your PC.':'Tyler is running'+(s.automatic?' automatically':s.live?' in Live voice':'')+'. Pause AI stops his replies; Stop audio silences him.';
   // The panel's own footer note, about the Steam window on the PC ("this tab" means that window).
   $('footerState').textContent=String(s.footer||'Bot account · keep Tyler’s window open').replace(/^This tab\b/,'Tyler’s Steam window').replace(/keep this tab open/,'keep Tyler’s window open');
@@ -244,6 +247,8 @@
   $('quickStop').onclick=$('rmPause').onclick=()=>void act('pause',{},'Tyler paused');
   $('stop').onclick=()=>void act('stop-audio',{},'Audio stopped');
   $('connect').onclick=()=>void act('start',{},'Connecting…');
+  $('rmNoticeYes').onclick=()=>void act('notice',{always:false},'Continuing…');
+  $('rmNoticeAlways').onclick=()=>void act('notice',{always:true},'Continuing. Tyler won’t ask again.');
   $('settings').onclick=()=>showTab('setup');
   $('rmMode').onchange=()=>void act('mode',{mode:$('rmMode').value},'Mode saved for the next Connect & start');
   $('sayForm').addEventListener('submit',async e=>{e.preventDefault();const t=$('say').value.trim();if(!t)return;if(await act('say',{text:t},'Sent'))$('say').value='';});
@@ -336,6 +341,7 @@
    if(e.type==='state'){setActivity(d.state,d.label,d.text);continue;}
    if(e.type==='hud'){setHud(d);continue;}
    if(e.type==='theme'){setTheme(d.theme);continue;}
+   if(e.type==='chat-check'){const n=$('rmNotice');n.hidden=d.on!==true;$('connect').hidden=d.on===true||!live.paused;if(d.on===true){for(const x of n.getRootNode().querySelectorAll('.rt-toast .rt-x'))x.click();/* nothing covers its buttons */if($('tab-conversation')?.getAttribute('aria-selected')==='true')n.scrollIntoView({block:'center'});else toast('info','Tyler is waiting for you','Answer the one-time chat check on the Chat tab.');}continue;}
    if(e.type==='sound')flashPad(d.slot);
    if(e.type==='music'){live.music={...live.music,title:d.title||'',by:d.by||''};nowPlaying();}
    if(e.type==='check')pollSoon(300);

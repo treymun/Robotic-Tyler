@@ -13,22 +13,26 @@
   rows.forEach((row,y)=>{for(let x=0;x<n;x++)if(row[x]==='1')g.fillRect(off+x*cell,off+y*cell,cell,cell);});}
  function render(s){
   st=s;$('remoteOn').checked=!!s.on;$('remotePanel').hidden=!s.on;
-  const list=s.addresses||[];if(!address||!list.includes(address))address=list[0]||null;
-  const sel=$('remoteAddress');sel.hidden=list.length<2;sel.replaceChildren(...list.map(a=>{const o=document.createElement('option');o.value=a;o.textContent=a;o.selected=a===address;return o;}));
+  // v2.30: with Away from home on, the Tailscale address is offered too (with its own QR code).
+  const tail=s.away?.on?(s.away.addresses||[]):[],list=[...(s.addresses||[]),...tail];if(!address||!list.includes(address))address=list[0]||null;
+  const sel=$('remoteAddress');sel.hidden=list.length<2;sel.replaceChildren(...list.map(a=>{const o=document.createElement('option');o.value=a;o.textContent=a+(tail.includes(a)?' (Tailscale, away from home)':' (home Wi-Fi)');o.selected=a===address;return o;}));
+  $('remoteAway').checked=!!s.away?.on;const hint=$('remoteAwayHint');hint.hidden=!s.away?.on;
+  hint.textContent=!s.away?.on?'':tail.length?'Away from home: on your phone, open http://'+tail[0]+':'+s.port+' with Tailscale on, and pair once with a code (a phone paired at home pairs again for this address).':'Tailscale isn’t running on this PC yet: install it, sign in, and this address appears here.';
   const url=address?'http://'+address+':'+s.port:'';$('remoteUrl').textContent=url||'(no home network found)';
   $('remoteCode').textContent=s.code?s.code.slice(0,3)+' '+s.code.slice(3):'––– –––';
   $('remoteExpiry').textContent=s.code?'The code works for '+Math.max(1,Math.round((s.codeUntil-Date.now())/60000))+' more minutes, for one phone. Press New code for another.':'Press New code to pair a phone.';
-  draw(s.code&&address===list[0]?s.qr:null);
+  draw(s.code?(s.qrs?.[address]||null):null);
   const ul=$('remoteDevices');ul.replaceChildren();
   if(!(s.devices||[]).length){const li=document.createElement('li');li.className='hint';li.textContent='No phones yet.';ul.append(li);}
   for(const d of s.devices||[]){const li=document.createElement('li');const t=document.createElement('span');t.textContent=d.name+' · paired '+new Date(d.created).toLocaleDateString()+' · last used '+ago(d.seen);
    const b=document.createElement('button');b.type='button';b.className='secondary';b.textContent='Remove';b.onclick=()=>run('forget',{id:d.id},'Phone removed. It needs a new code to come back.');li.append(t,b);ul.append(li);}
   $('remoteForgetAll').hidden=!(s.devices||[]).length;
-  $('remoteStatus').textContent=s.on?'The remote is on at port '+s.port+'.':'The remote is off. No network port is open.';
+  $('remoteStatus').textContent=s.on?'The remote is on at port '+s.port+(s.away?.on?', at home and through Tailscale.':', on your home network.'):'The remote is off. No network port is open.';
  }
  async function run(op,extra={},done=''){try{render(await bridge(op,extra));if(done)kit()?.toast({kind:'success',title:'Phone remote',text:done});}catch(e){$('remoteStatus').textContent=String(e.message||e);kit()?.toast({kind:'error',title:'Phone remote',text:String(e.message||e)});if(op==='enable')$('remoteOn').checked=false;}}
  $('remoteOn').onchange=()=>run($('remoteOn').checked?'enable':'disable');
  $('remoteNewCode').onclick=()=>run('new-code');
+ $('remoteAway').onchange=()=>run('away',{on:$('remoteAway').checked},$('remoteAway').checked?'Away from home is on: use the Tailscale address.':'Away from home is off: home Wi-Fi only.');
  $('remoteForgetAll').onclick=async()=>{const ok=await (kit()?.dialog?.({title:'Remove all phones?',text:'Every paired phone stops working until it pairs again with a new code.',confirm:'Remove all',danger:true})??Promise.resolve(confirm('Remove all phones?')));if(ok)void run('forget-all',{},'All phones removed.');};
  $('remoteAddress').onchange=()=>{address=$('remoteAddress').value;render(st);};
  $('remoteCopy').onclick=async()=>{try{await navigator.clipboard.writeText($('remoteUrl').textContent);kit()?.toast({kind:'success',title:'Copied',text:'Paste the address into your phone’s browser.'});}catch{}};
