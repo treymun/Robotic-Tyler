@@ -235,6 +235,14 @@ body:not([data-ai-provider=gemini]) .for-gemini,body[data-ai-provider=gemini] .f
 .tg-logo-lg{width:52px;height:52px;flex-shrink:0;object-fit:contain}
 .tg-stage-preview{max-width:392px;width:100%;align-self:center;border-radius:var(--rt-r-md);overflow:hidden;background:#0b0d10}
 .tg-actions{display:flex;flex-direction:column;align-items:stretch;gap:6px}
+/* v2.22: preview the theme in each activity state; its extras react as they would in the panel. */
+.tg-states{display:flex;flex-wrap:wrap;gap:4px;align-self:center;max-width:392px;width:100%}
+.tg-states button{flex:1 1 auto;min-height:0;margin:0;padding:4px 8px;font-size:11px;font-weight:700;letter-spacing:.02em;border-radius:var(--rt-r-xs,3px);background:var(--rt-block);border:1px solid var(--rt-line);color:var(--rt-ink-2);box-shadow:none;cursor:pointer}
+.tg-states button:hover{border-color:var(--rt-line-strong);color:var(--rt-ink-strong)}
+.tg-states button[aria-pressed=true]{background:var(--rt-select);border-color:var(--rt-active);color:var(--rt-ink-strong);box-shadow:inset 0 -2px 0 var(--rt-active)}
+.tg-states button[data-state=error][aria-pressed=true]{border-color:var(--rt-danger,#e35e5e);box-shadow:inset 0 -2px 0 var(--rt-danger,#e35e5e)}
+.tg-states button[data-state=success][aria-pressed=true]{border-color:var(--rt-success,#8fb93b);box-shadow:inset 0 -2px 0 var(--rt-success,#8fb93b)}
+.tg-states button:focus-visible{outline:2px solid var(--rt-focus);outline-offset:2px}
 .tg-actions .hint{margin:0}
 @media (max-width:1180px){.tg-layout{grid-template-columns:minmax(0,1fr)}.tg-stage{position:static;order:-1}}
 @media (max-width:520px){.tg-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}.tg-shot{height:100px}.tg-shot .tg-host{transform:scale(.38)}}

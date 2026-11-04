@@ -7,8 +7,8 @@
 // (TylerUI from ui-template.js) inside shadow roots, so each one shows exactly
 // what the panel looks like in that theme, isolated from the page's own theme.
 // Previews use sample text only: nothing is sent, no AI request, no chat connection.
-// What each theme adds to Tyler's panel (theme-pack-1/2/3.js, v2.20), shown under its description.
-const EXTRAS={steam:'an activity graph like the downloads page, and achievements that unlock over time.',classic:'a server browser of Tyler\'s services, and a VGUI progress dialog while he writes.',tf2:'class-select hotkeys 1–5, an activity killfeed, and a taunt (double-click the logo).',cs2:'a round HUD, a sound buy wheel (B), and round-won banners.',portal:'a tests-passed sign with live status icons, and portal transitions between tabs.',cs16:'a scoreboard and a radio-command menu (V).',hev:'suit-voice status callouts, damage indicators, and a flashlight for extra contrast (F).',l4d:'the survivor team (health of each part of Tyler) and the Director\'s horde warning.',winxp:'a Start menu and system tray in the taskbar, and error dialogs.',doom:'a status face, the screen melt between tabs, and pickup messages.',quake:'a drop-down console with real commands (~) and arena medals.',pipboy:'DATA / MAP / INV / STAT / RADIO categories (Q / E), analog gauges, and a radio for the Music DJ.',combine:'an Overwatch dispatch ticker, a unit-record terminal (T or click DISPATCH), and biosignal scans.',deadlock:'a souls counter and a spirit thread that follows Tyler\'s state.',minecraft:'hearts, hunger and an XP level that grows over time, and block-breaking while Tyler thinks.',payday:'a heist plan, a heist timer with your heist count, and police-assault banners.',dreamcast:'a working VMU (click it for the memory card), and the boot swirl.',gmod:'Lua-error problem reports, spawn notices, and properties (right-click the stats).',ricochet:'an arcade score with a high-score table, discs and power-ups, and a flying disc between tabs.',dod:'a field-radio channel dial and an operation briefing.'};
+// What each theme adds to Tyler's panel (theme-pack-1/2/3.js, v2.20; v2.22 polish pass), shown under its description.
+const EXTRAS={steam:'your Steam persona with a status menu (click it), an activity graph like the downloads page, and achievements with progress.',classic:"a server browser of Tyler's services with Refresh and Connect, and a VGUI progress dialog while he writes.",tf2:'class-select hotkeys 1–5, a killfeed with crits and dominations, a taunt (double-click the logo), and MEDIC! (E) for the Checks tab.',cs2:'a round HUD with buys and MVPs, a sound buy wheel (B, arrows, favourites), and round-won banners.',portal:'a tests-passed sign with live status icons (click it for the chamber report), and portal transitions between tabs.',cs16:'a scoreboard and a radio-command menu (V) that can connect Tyler or run the full check.',hev:'suit-voice callouts, damage indicators, a suit charger (click the status strip to check voice), and a flashlight (F).',l4d:"the survivor team (health of each part of Tyler), the Director's horde warning, and safe-room banners after a full check.",winxp:'a two-column Start menu with Log Off and Turn Off, balloon tips from the system tray, and error dialogs.',doom:'a status face, key cards for the AI key, chat and voice, the screen melt between tabs, and pickup messages.',quake:'a drop-down console (~) with history, Tab completion and real commands, and arena medals.',pipboy:'DATA / MAP / INV / STAT / RADIO (Q / E), gauges, a condition screen (CND), and a radio with Skip and Off for the Music DJ.',combine:'the CP-17 unit plate with Overwatch directives, a coded dispatch ticker, a unit record (T) with sociostability, and biosignal scans.',deadlock:"a souls counter that opens the shop (B), a spirit thread that follows Tyler's state, and a respawn timer when he's down.",minecraft:'hearts, hunger and XP, an inventory of sound discs with a hotbar (E, 1–9), advancement toasts, and block-breaking while Tyler thinks.',payday:'a heist plan with a drill timer, a heist timer that opens the PAYDAY screen, and police assaults with a pager (hold F).',dreamcast:'a working VMU (click it for the memory card and main menu), LCD state icons, and the boot swirl.',gmod:'a spawn menu of sounds and tools (Q), Lua-error reports, spawn notices, and properties (right-click the stats).',ricochet:'an arcade score with discs and power-ups, Press start while paused, a high-score table, and a flying disc between tabs.',dod:'a field-radio channel dial with radio commands (Z), and an operation briefing with objectives.'};
 (()=>{
  'use strict';
  const gallery=document.getElementById('themeGallery'),stage=document.getElementById('themeStage');
@@ -18,6 +18,9 @@ const EXTRAS={steam:'an activity graph like the downloads page, and achievements
  // Each logo is redrawn at its exact displayed size once it is laid out (v2.18, see ui-logos.js).
  const sharp=(img,theme)=>requestAnimationFrame(()=>requestAnimationFrame(()=>globalThis.TylerLogos?.sharpen(img,theme)));
  if(!gallery||!stage||!T||!UI)return;
+ // v2.22: the activity states the large preview can show: [key, button, status label, status text].
+ const STATES=[['listening','Listening','Listening','Speak normally, then pause'],['thinking','Thinking','Thinking','Preparing a typed reply…'],['speaking','Speaking','On air','Speaking — say “stop” or “hold on” to interrupt'],['paused','Paused','Paused','Off — paused'],['waiting','Reconnecting','Recovering','Reconnecting to the voice bridge…'],['error','Error','Needs attention','Sample problem: the AI provider is busy'],['success','Success','Ready','Full check passed: every part works']];
+ let stageState='speaking';
  const icon=n=>globalThis.TylerIcons?.svg(n)||'';
  const kit=()=>globalThis.TylerKit?.page();
 
@@ -36,22 +39,27 @@ const EXTRAS={steam:'an activity graph like the downloads page, and achievements
   try{sheet=new CSSStyleSheet();sheet.replaceSync(UI.css+'\n'+PREVIEW_CSS);}catch{sheet=null;}
   return sheet;
  }
- // The real panel parts, without ids (each preview has its own copy).
- const parts=(()=>{const t=document.createElement('template');t.innerHTML=UI.html;const pick=s=>t.content.querySelector(s);
-  const out={};for(const [k,s] of [['bar','.bar'],['tally','.tally'],['stats','.stats'],['tabs','.tabs'],['foot','.foot']]){const n=pick(s)?.cloneNode(true);if(!n)continue;for(const e of [n,...n.querySelectorAll('[id]')])e.removeAttribute('id');out[k]=n;}
-  return out;})();
+ // The real panel parts: without ids for the cards; the large preview keeps them (it has its own
+ // shadow root) so the theme's extras find their places, and gets the extras' slots (v2.22).
+ const template=(()=>{const t=document.createElement('template');t.innerHTML=UI.html;return t;})();
+ function cut(ids){const pick=s=>template.content.querySelector(s),out={};
+  for(const [k,s] of [['bar','.bar'],['tally','.tally'],['stats','.stats'],['tabs','.tabs'],['foot','.foot'],['deck','#fxDeck'],['footSlot','#fxFoot'],['layer','#fxLayer']]){const n=pick(s)?.cloneNode(true);if(!n)continue;if(!ids)for(const e of [n,...n.querySelectorAll('[id]')])e.removeAttribute('id');out[k]=n;}
+  return out;}
+ const parts=cut(false),stageParts=cut(true);
 
- function panelFor(theme,{card=false}={}){
+ function panelFor(theme,{card=false,state='speaking'}={}){
+  const P=card?parts:stageParts;
   const panel=document.createElement('aside');panel.className='panel';panel.dataset.rtTheme=theme;panel.dataset.voice='true';panel.dataset.platform='chrome';
-  const bar=parts.bar.cloneNode(true),mark=bar.querySelector('.mark');
+  const bar=P.bar.cloneNode(true),mark=bar.querySelector('.mark');
   if(mark){mark.querySelector('canvas')?.remove();const img=document.createElement('img');img.className='mark-art';img.alt='';img.src='ui/logos/'+theme+'.png';if(PIXEL.has(theme))img.style.imageRendering='pixelated';mark.append(img);mark.dataset.logo=theme;sharp(img,theme);}
   const sub=bar.querySelector('.ident-sub');if(sub)sub.textContent='Chrome · voice and chat';
-  const tally=parts.tally.cloneNode(true);tally.dataset.state=card?'listening':'speaking';
+  const st=card?STATES[0]:STATES.find(x=>x[0]===state)||STATES[2];
+  const tally=P.tally.cloneNode(true);tally.dataset.state=st[0]==='success'?'ready':st[0];if(st[0]==='success')tally.dataset.flash='ok';
   const label=tally.querySelector('.tally-label'),text=tally.querySelector('.tally-text');
-  if(label)label.textContent=card?'Listening':'On air';if(text){text.textContent=card?'Speak normally, then pause':'Speaking — say “stop” or “hold on” to interrupt';text.removeAttribute('role');}
-  const stats=parts.stats.cloneNode(true),vals=['Idle','$0.0314','1.6 s'],metas=['Bridge ready','23.4K tokens','Text + speech'];
+  if(label)label.textContent=st[2];if(text){text.textContent=st[3];text.removeAttribute('role');}
+  const stats=P.stats.cloneNode(true),vals=['Idle','$0.0314','1.6 s'],metas=['Bridge ready','23.4K tokens','Text + speech'];
   stats.querySelectorAll('dd').forEach((d,i)=>d.textContent=vals[i]||'');stats.querySelectorAll('small').forEach((s,i)=>s.textContent=metas[i]||'');
-  panel.append(bar,tally,stats,parts.tabs.cloneNode(true));
+  panel.append(bar,tally,stats);if(!card&&P.deck)panel.append(P.deck.cloneNode(true));panel.append(P.tabs.cloneNode(true));
   if(!card){
    const scroll=document.createElement('div');scroll.className='scroll';
    scroll.innerHTML=`<h2>Conversation</h2><p class="hint preview-note">Sample preview. Nothing here is sent anywhere.</p>
@@ -59,14 +67,63 @@ const EXTRAS={steam:'an activity graph like the downloads page, and achievements
 <div class="btn-row"><button class="btn primary" type="button">${icon('play')}Connect &amp; start</button><button class="btn" type="button">${icon('pause')}Pause</button></div>
 <label>Participation<select><option>Active conversation</option></select></label>
 <div class="rt-toast rt-static" data-kind="success" data-n="01">${icon('success')}<p class="rt-toast-title">Connected</p><p class="rt-toast-text">Voice and text switch automatically with the room.</p><button class="rt-x" type="button" aria-label="Dismiss">${icon('close')}</button></div>`;
-   panel.append(scroll,parts.foot.cloneNode(true));
+   panel.append(scroll);if(P.footSlot)panel.append(P.footSlot.cloneNode(true));panel.append(P.foot.cloneNode(true));if(P.layer)panel.append(P.layer.cloneNode(true));
   }
   return panel;
  }
  function render(host,theme,opts){
   let root=host.shadowRoot;if(!root){root=host.attachShadow({mode:'open'});const s=styles();if(s)root.adoptedStyleSheets=[s];else{const st=document.createElement('style');st.textContent=UI.css+PREVIEW_CSS;root.append(st);}}
   for(const n of [...root.childNodes])if(n.nodeName!=='STYLE')n.remove();
-  root.append(panelFor(theme,opts));host.inert=true;
+  const panel=panelFor(theme,opts);root.append(panel);host.inert=true;return {root,panel};
+ }
+
+ // ── v2.22: the theme's own extras in the large preview ───────────────────
+ // The real feature code from the theme packs (theme-showcase.js lets them register here), mounted
+ // with sample numbers. Every action does nothing and keys aren't taken: the preview is inert, and
+ // nothing reaches Steam, the call or an AI provider.
+ const FX=globalThis.TylerThemeFeatures?.showcase?globalThis.TylerThemeFeatures:null;
+ const REDUCED=globalThis.matchMedia?.('(prefers-reduced-motion: reduce)');
+ const SOUNDS=['Airhorn','Drumroll','Sad trombone','Victory','Applause','Laser','Coin','Bruh','Rimshot'].map((name,i)=>({slot:i+1,name}));
+ let live=null,lastTheme='';
+ function mountExtras(root,panel,theme,stateKey){
+  live?.destroy();live=null;if(!FX)return;const first=theme!==lastTheme;lastTheme=theme;
+  const features=FX.features(theme);if(!features.length)return;
+  const $=id=>root.getElementById(id),slots={bar:$('fxBar'),deck:$('fxDeck'),foot:$('fxFoot'),layer:$('fxLayer')};if(!slots.deck||!slots.layer)return;
+  const t0=Date.now(),st=STATES.find(x=>x[0]===stateKey)||STATES[2],state=st[0]==='success'?'ready':st[0];
+  const S={started:t0-754000,since:t0-4000,state,label:st[2],text:st[3],tab:'conversation',mini:false,hud:{spend:'$0.0314',spendMeta:'23.4K tokens'},theme,
+   replies:12,spoken:7,heard:41,errors:1,sounds:5,lastSound:'Airhorn',music:'Sample song',musicBy:'',turns:[1650,1420,2100,980,1300],thinkingSince:state==='thinking'?t0-800:0,streak:4,best:9,
+   errorAt:[],log:[{at:t0-60000,kind:'reply',text:'Replied in chat (42 characters)'},{at:t0-42000,kind:'spoke',text:'Spoke in voice'},{at:t0-20000,kind:'sound',text:'Played Airhorn'},{at:t0-9000,kind:'state',text:st[2]}],
+   spend:0.0314,tokens:'23.4K tokens',chatBurst:0,flood:false,model:'Sample model',provider:'',keyOk:true};
+  const life={v:1,replies:340,spoken:128,heard:2100,sounds:64,songs:14,errors:9,turns:468,turnMs:468*1500,fastest:620,bestStreak:31,sessions:23,timeMs:5.4e7,ach:[],firstAt:t0-30*864e5,best:{ricochet:48200}};
+  const noop=()=>{},timers=new Set(),own=new Set(),offs=[],mounted=[];
+  const health=()=>state==='error'?25:state==='paused'||state==='standby'?60:state==='waiting'?70:100;
+  const voice=()=>({armed:true,inCall:true,peers:3,attached:1});
+  const systems=()=>[{id:'ai',name:'AI',tab:'setup',level:state==='error'?1:3,detail:'Sample model'},{id:'chat',name:'Chat',tab:'setup',level:3,detail:'Watching chat'},{id:'voice',name:'Voice',tab:'checks',level:3,detail:'3 in call'},{id:'music',name:'Music',tab:'room',level:3,detail:S.music}];
+  const actions={tab:noop,pause:noop,stopAudio:noop,beep:noop,checks:noop,collapse:noop,settings:noop,playSound:noop,sounds:()=>({slots:SOUNDS,favorites:[1,3]}),fullCheck:noop,connect:noop,refreshVoice:noop,paused:()=>state==='paused'||state==='standby'};
+  const h=(tag,cls,txt)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(txt!=null)e.textContent=txt;return e;};
+  const svg=(markup,cls)=>{const t=document.createElement('template');t.innerHTML=markup.trim();const e=t.content.firstElementChild;if(cls)e.classList.add(...cls.split(' '));return e;};
+  const ms=v=>!Number.isFinite(v)?'—':v<1000?Math.round(v)+' ms':(v/1000).toFixed(v<10000?1:0)+' s';
+  const clock=v=>{const x=Math.max(0,Math.floor(v/1000)),m=Math.floor(x/60),hh=Math.floor(m/60);return (hh?hh+':'+String(m%60).padStart(2,'0'):String(m))+':'+String(x%60).padStart(2,'0');};
+  const pad=(n,w=2)=>String(Math.max(0,Math.floor(n))).padStart(w,'0');
+  const TABS=['conversation','room','soundboard','setup','checks'],TAB_NAMES={conversation:'Chat',room:'Room',soundboard:'Sounds',setup:'Setup',checks:'Checks'};
+  const later=(fn,d)=>{const x=setTimeout(()=>{timers.delete(x);fn();},d);timers.add(x);return x;};
+  const ctx={S,api:{},actions,h,svg,ms,clock,pad,health,avgTurn:()=>1500,voice,systems,TABS,TAB_NAMES,root,panel,slots,life,unlock:()=>false,_session:new Set(),
+   best:(k,v)=>Math.max(v,Number(life.best[k])||0),get reduced(){return !!REDUCED?.matches;},
+   add(slot,el){(slots[slot]||slots.deck).append(el);own.add(el);return el;},later,cancel(x){clearTimeout(x);timers.delete(x);},every:noop,key:noop,
+   on(target,type,fn,o){target.addEventListener(type,fn,o);offs.push(()=>target.removeEventListener(type,fn,o));},
+   flash(el,l=1800){slots.layer.append(el);own.add(el);later(()=>el.remove(),l);return el;},
+   below(sel){const el=root.querySelector(sel),p=panel.getBoundingClientRect();return el?Math.round(el.getBoundingClientRect().bottom-p.top):0;},
+   menu:()=>({el:null,close:noop}),overlay:()=>({el:h('div'),close:noop}),
+   /** Set only here: the gallery's preview, and whether this theme was just picked (not a state change). */
+   preview:{first}};
+  for(const f of features){try{mounted.push({id:f.id,instance:f.mount(ctx)||{}});}catch{}}
+  panel.dataset.fx=mounted.map(m=>m.id).join(' ');for(const slot of Object.values(slots))slot?.toggleAttribute('data-filled',!!slot.childElementCount);
+  // The chosen state arrives as it would in the panel; Success is a passed full check after a problem.
+  const send=(type,data)=>{for(const m of mounted){try{m.instance.update?.(type,data);}catch{}}};
+  later(()=>{if(st[0]==='success'){send('state',{state:'ready',before:'error',label:'Ready',text:st[3]});send('check',{problems:0,unsure:0});}
+   else if(state!=='listening')send('state',{state,before:'listening',label:st[2],text:st[3]});
+   if(state==='speaking')send('turn',{ms:1420});},120);
+  live={destroy(){for(const m of mounted){try{m.instance.unmount?.();}catch{}}for(const x of timers)clearTimeout(x);timers.clear();for(const el of own)el.remove();own.clear();for(const off of offs)off();}};
  }
 
  // ── Cards ─────────────────────────────────────────────────────────────────
@@ -99,6 +156,12 @@ const EXTRAS={steam:'an activity graph like the downloads page, and achievements
  // ── Large preview and Apply ──────────────────────────────────────────────
  const $=id=>document.getElementById(id);
  const apply=$('tgApply'),state=$('tgState'),stageHost=stage.querySelector('.tg-host');
+ function show(){const {root,panel}=render(stageHost,selected,{card:false,state:stageState});mountExtras(root,panel,selected,stageState);}
+ // v2.22: buttons to see the theme in each activity state, with its extras reacting.
+ const picker=document.createElement('div');picker.className='tg-states';picker.setAttribute('role','group');picker.setAttribute('aria-label','Preview state');
+ for(const [key,name] of STATES){const b=document.createElement('button');b.type='button';b.className='tg-state';b.dataset.state=key;b.textContent=name;b.setAttribute('aria-pressed',String(key===stageState));
+  b.addEventListener('click',()=>{stageState=key;for(const x of picker.children)x.setAttribute('aria-pressed',String(x===b));show();});picker.append(b);}
+ stage.querySelector('.tg-stage-preview')?.before(picker);
  function refresh(){
   for(const [theme,card] of cards){
    const on=theme===selected,[name,,light]=T.info[theme];
@@ -114,7 +177,7 @@ const EXTRAS={steam:'an activity graph like the downloads page, and achievements
   state.textContent=same?'This is the theme every Tyler window uses now.':'Previewing '+name+'. Nothing changes until you press Apply.';
  }
  function select(theme,focus=false){
-  if(!T.themes.includes(theme))return;if(focus)touched=true;selected=theme;render(stageHost,theme,{card:false});refresh();
+  if(!T.themes.includes(theme))return;if(focus)touched=true;selected=theme;show();refresh();
   if(focus)cards.get(theme).focus();
  }
  apply.insertAdjacentHTML('afterbegin',icon('check'));

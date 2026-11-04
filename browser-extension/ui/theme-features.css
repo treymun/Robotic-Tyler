@@ -948,3 +948,9 @@
 .panel .dod-obj button:hover,.panel .dod-obj button:focus-visible{background:rgba(107,90,43,.18);outline:none}
 .dod-brief .dod-stamp{animation:dod-thunk .35s cubic-bezier(.3,1.5,.6,1) .15s both}
 @keyframes dod-thunk{from{opacity:0;transform:rotate(-12deg) scale(1.8)}}
+
+/* ── Shared (v2.22): Reconnecting shows a small spinner after the status label, in the theme's own
+   colour; Success is the status strip's flash (.tally[data-flash=ok]) above. */
+.tally[data-state=waiting] .tally-label::after{content:"";display:inline-block;width:.7em;height:.7em;margin-left:.45em;vertical-align:-.05em;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:fx-spin .9s linear infinite}
+[data-rt-theme=doom] .tally[data-state=waiting] .tally-label::after,[data-rt-theme=minecraft] .tally[data-state=waiting] .tally-label::after{border-radius:0}
+@keyframes fx-spin{to{transform:rotate(360deg)}}

@@ -173,7 +173,8 @@
   }},
   {id:'dc-swirl',mount(c){
    const play=()=>{if(c.reduced)return;const s=c.h('div','fx dc-swirl');s.append(c.svg('<svg viewBox="0 0 100 100"><path d="M50 50 m0 -6 a6 6 0 1 1 -6 6 a12 12 0 0 1 12 -12 a18 18 0 1 1 -18 18 a24 24 0 0 1 24 -24 a30 30 0 1 1 -30 30"/></svg>'));c.flash(s,1300);};
-   c.later(play,250);
+   // In the theme gallery the boot plays when the theme is picked, not on every preview state.
+   if(!c.preview||c.preview.first)c.later(play,250);
    return {update(type,d){if(type==='mini'&&!d.mini)play();if(type==='state'&&['paused','standby','error'].includes(d.before)&&['ready','listening'].includes(d.state))play();}};
   }},
  ]);

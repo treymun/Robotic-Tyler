@@ -46,7 +46,7 @@ export const PLATFORM=Object.freeze({
  // Settings-page scripts with real desktop differences (IPC settings bridge).
  // Their desktop variants live in app/desktop-overrides/.
  overrides:['settings.js','v22-settings.js','package.json'],
- settingsPage:['settings.html','settings.css','settings-navigation.js','v23-settings.js','theme.js','ui/tokens.css',...THEMES.map(t=>'ui/themes/'+t),...FONT_FILES.map(f=>'ui/fonts/'+f),...LOGO_FILES.map(f=>'ui/logos/'+f),'ui/logo-mark.svg','icons/icon-32.png','ui/icons.css','ui/kit.css','ui-icons.js','ui-logos.js','ui-kit.js','ui-template.js','theme-gallery.js','voice-settings.js','ai-settings.js','chat-tag.js'],
+ settingsPage:['settings.html','settings.css','settings-navigation.js','v23-settings.js','theme.js','ui/tokens.css',...THEMES.map(t=>'ui/themes/'+t),...FONT_FILES.map(f=>'ui/fonts/'+f),...LOGO_FILES.map(f=>'ui/logos/'+f),'ui/logo-mark.svg','icons/icon-32.png','ui/icons.css','ui/kit.css','ui-icons.js','ui-logos.js','ui-kit.js','ui-template.js','theme-showcase.js','theme-pack-1.js','theme-pack-2.js','theme-pack-3.js','theme-gallery.js','voice-settings.js','ai-settings.js','chat-tag.js'],
 });
 
 const read=p=>fs.readFileSync(p,'utf8').replace(/\r\n/g,'\n');
