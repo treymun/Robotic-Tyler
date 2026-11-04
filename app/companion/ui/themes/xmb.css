@@ -1,0 +1,198 @@
+/*
+ * ROBOTIC TYLER "PlayStation 3 XMB style" theme (v2.27).
+ * The XrossMediaBar: a deep gradient with the slow flowing wave across it, thin white type with a
+ * soft glow, the row of category icons (the tabs) with the open one bright and labelled, lists
+ * whose selected row glows, translucent rounded panels and the notices that drop in at the top
+ * right. The violet comes from the owner's PlayStation 3 artwork; the tint follows Tyler's state:
+ * violet while he's ready or listening, brighter while he writes or talks, grey when paused and red
+ * on a problem. Branding: the owner's logo art (the Tyler logo) and the PlayStation logo cut from the
+ * owner's artwork, on Information and the sign-in notice (theme-pack-4.js). The wave moves with transforms only, so it stays as light as the
+ * other themes.
+ * Type: "Tyler XMB" = Roboto Light and Regular, close to the menu's thin sans.
+ */
+[data-rt-theme=xmb]{
+  color-scheme:dark;
+  --xb-tint:#3a2c6e;
+  --rt-bar:transparent;--rt-bg:#0f2350;--rt-bg-deep:#081430;--rt-surface:rgba(255,255,255,.07);--rt-surface-2:rgba(255,255,255,.1);--rt-surface-3:rgba(255,255,255,.14);
+  --rt-block:rgba(255,255,255,.06);--rt-block-hover:rgba(255,255,255,.11);--rt-input:rgba(0,0,0,.3);--rt-select:rgba(255,255,255,.16);
+  --rt-line:rgba(255,255,255,.16);--rt-line-soft:rgba(255,255,255,.09);--rt-line-strong:rgba(255,255,255,.38);
+  --rt-ink:#eef3ff;--rt-ink-strong:#ffffff;--rt-ink-2:#dbe4f7;--rt-ink-3:#b9c6e2;--rt-ink-4:#a4b2d2;--rt-ink-disabled:#7383a6;
+  --rt-link:#cfe2ff;--rt-link-hover:#fff;--rt-blue:#eef3ff;--rt-blue-deep:#ffffff;--rt-active:#ffffff;
+  --rt-blue-fade:rgba(255,255,255,.09);--rt-blue-fade-hover:rgba(255,255,255,.17);
+  --rt-green:rgba(255,255,255,.2);--rt-green-hover:rgba(255,255,255,.28);--rt-green-ink:#ffffff;--rt-green-line:rgba(255,255,255,.5);
+  --rt-state-standby:#b9c6e2;--rt-state-ready:#ffffff;--rt-state-listening:#bfe0ff;--rt-state-thinking:#dcc6ff;--rt-state-speaking:#ffe08a;--rt-state-waiting:#c7d2ff;--rt-state-error:#ff9a8e;
+  --rt-danger:#ff9a8e;--rt-danger-bg:rgba(220,60,50,.55);--rt-danger-hover:rgba(235,75,62,.7);--rt-danger-ink:#ffffff;--rt-success:#bff0c0;--rt-focus:#ffffff;
+  --rt-accent:#ffffff;--rt-accent-soft:rgba(255,255,255,.12);--rt-accent-line:rgba(255,255,255,.45);
+  --rt-on-accent:#ffffff;--rt-accent-fill:rgba(255,255,255,.24);--rt-meter:linear-gradient(90deg,rgba(255,255,255,.4),#fff);--rt-marker:#fff;--rt-edge:rgba(255,255,255,.12);--rt-page-glow:#16306a;
+  --rt-font:"Tyler XMB",Roboto,"Segoe UI",Arial,sans-serif;--rt-font-display:"Tyler XMB",Roboto,"Segoe UI",Arial,sans-serif;
+  --rt-text-xs:11px;--rt-text-sm:12.5px;--rt-text-md:13.5px;--rt-text-lg:15px;--rt-track:0;
+  --rt-r-xs:3px;--rt-r-sm:5px;--rt-r-md:8px;--rt-r-lg:10px;--rt-shadow-float:0 0 0 1px rgba(0,0,0,.5),0 20px 50px rgba(0,0,0,.6);
+  --xb-glow:0 0 6px rgba(255,255,255,.45);
+}
+[data-rt-theme=xmb] :is(h1,h2,h3,label,.tabs button,.ident-sub,.stat dt,.tally-label,.pill,.pad span,details.feature>summary,.sheet-head h2,.card>h2,.pulse dt,.facts b,.matrix dt,.section-nav button,nav:not(.tabs) button,button){text-transform:none;letter-spacing:0}
+/* The background and its wave: soft ribbons, moved by transforms only. The tint follows the state. */
+.panel[data-rt-theme=xmb],[data-rt-theme=xmb] body{--xb-a:color-mix(in srgb,var(--xb-tint) 75%,#000);--xb-b:color-mix(in srgb,var(--xb-tint) 35%,#000)}
+.panel[data-rt-theme=xmb]{background:radial-gradient(120% 70% at 50% 45%,color-mix(in srgb,var(--xb-tint) 85%,#fff 6%),transparent 70%),linear-gradient(180deg,var(--xb-b),var(--xb-a) 45%,var(--xb-b));border:1px solid rgba(255,255,255,.12);border-radius:10px;box-shadow:var(--rt-shadow-float);isolation:isolate}
+.panel[data-rt-theme=xmb]:has(.tally[data-state=thinking]){--xb-tint:#4c3a8e}
+.panel[data-rt-theme=xmb]:has(.tally[data-state=speaking]){--xb-tint:#5a4396}
+.panel[data-rt-theme=xmb]:has(.tally:is([data-state=paused],[data-state=standby])){--xb-tint:#55606f}
+.panel[data-rt-theme=xmb]:has(.tally[data-state=waiting]){--xb-tint:#33357e}
+.panel[data-rt-theme=xmb]:has(.tally[data-state=error]){--xb-tint:#b23126}
+.panel[data-rt-theme=xmb]::before,.panel[data-rt-theme=xmb]::after,[data-rt-theme=xmb] body::before,[data-rt-theme=xmb] body::after{content:"";position:absolute;z-index:-1;left:-60%;width:220%;height:240px;border-radius:50%;pointer-events:none;
+  border-top:1.5px solid rgba(255,255,255,.32);background:radial-gradient(60% 50% at 50% 0,rgba(255,255,255,.16),transparent 70%);will-change:transform}
+.panel[data-rt-theme=xmb]::before,[data-rt-theme=xmb] body::before{top:46%;animation:xb-wave 18s ease-in-out infinite alternate}
+.panel[data-rt-theme=xmb]::after,[data-rt-theme=xmb] body::after{top:52%;height:300px;border-top-color:rgba(255,255,255,.2);background:radial-gradient(50% 40% at 50% 0,rgba(255,255,255,.1),transparent 70%);animation:xb-wave2 24s ease-in-out infinite alternate}
+[data-rt-theme=xmb] body{position:relative;min-height:100vh;overflow-x:hidden;--xb-tint:#3a2c6e;background:radial-gradient(120% 70% at 50% 45%,color-mix(in srgb,var(--xb-tint) 85%,#fff 6%),transparent 70%) fixed,linear-gradient(180deg,var(--xb-b),var(--xb-a) 45%,var(--xb-b)) fixed}
+[data-rt-theme=xmb] body::before,[data-rt-theme=xmb] body::after{position:fixed}
+@keyframes xb-wave{0%{transform:translateX(-6%) rotate(-3deg) scaleY(.9)}100%{transform:translateX(6%) rotate(2deg) scaleY(1.15)}}
+@keyframes xb-wave2{0%{transform:translateX(5%) rotate(2deg) scaleY(1.1)}100%{transform:translateX(-7%) rotate(-2.5deg) scaleY(.85)}}
+[data-rt-theme=xmb] main{background:transparent}
+/* Thin white type with a soft glow */
+[data-rt-theme=xmb] :is(h1,h2,h3,.sheet-head h2,.card>h2){font-weight:300;color:#fff;text-shadow:var(--xb-glow)}
+[data-rt-theme=xmb] h2{font-size:20px}
+[data-rt-theme=xmb] h1{font-size:32px}
+[data-rt-theme=xmb] h3{font-weight:400}
+[data-rt-theme=xmb] .wordmark{font:400 16px/1.15 var(--rt-font);color:#fff;text-shadow:var(--xb-glow)}
+[data-rt-theme=xmb] .ident-sub{font-size:11px;font-weight:300;color:var(--rt-ink-3)}
+[data-rt-theme=xmb] label:not(:has(>input[type=checkbox])):not(.toggle){font-size:12px;font-weight:400;color:var(--rt-ink-3)}
+[data-rt-theme=xmb] :is(p,small,.hint){color:var(--rt-ink-3)}
+[data-rt-theme=xmb] .bar{background:transparent;box-shadow:none}
+[data-rt-theme=xmb] .bar .icon-btn{color:#fff;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:50%}
+[data-rt-theme=xmb] .bar .icon-btn:hover{background:rgba(255,255,255,.2);box-shadow:0 0 10px rgba(255,255,255,.4)}
+[data-rt-theme=xmb] :is(.mark[data-logo],img.mark,#brand-logo){--logo-pad:0px;background:transparent;border:0;border-radius:0;box-shadow:none;filter:drop-shadow(0 0 6px rgba(255,255,255,.35))}
+[data-rt-theme=xmb] .mark[data-logo]{width:40px;height:40px;margin:-5px 0}
+/* Translucent panels */
+[data-rt-theme=xmb] :where(details,.callout,.board-tools,.sheet,.card,.route-card,.panel,.mini-callout>div,.usage-banner,.facts>div,.matrix>div,.arcade-tickets>div){background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.1);border-radius:8px;box-shadow:none}
+[data-rt-theme=xmb] details.feature{background:rgba(0,0,0,.18)}
+[data-rt-theme=xmb] details.feature[open]{background:rgba(0,0,0,.3)}
+[data-rt-theme=xmb] details.feature>summary{font-size:14px;font-weight:300;color:#fff;border-radius:8px}
+[data-rt-theme=xmb] details.feature>summary:hover{background:linear-gradient(90deg,rgba(255,255,255,.18),rgba(255,255,255,.04));text-shadow:var(--xb-glow)}
+[data-rt-theme=xmb] summary::after{border-color:rgba(255,255,255,.7)}
+[data-rt-theme=xmb] :is(.quick-help,.confirm,#setup,.deck-entry){background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);border-radius:8px}
+/* Stats */
+[data-rt-theme=xmb] .stats{gap:4px;padding:0;background:transparent;box-shadow:none}
+[data-rt-theme=xmb] .stat{padding:6px 10px;background:rgba(0,0,0,.22);border:1px solid rgba(255,255,255,.1);border-radius:8px}
+[data-rt-theme=xmb] .stat:first-child{border-left:1px solid rgba(255,255,255,.1)}
+[data-rt-theme=xmb] .stat dt{font-size:11px;font-weight:300;color:var(--rt-ink-3)}
+[data-rt-theme=xmb] .stat dd{font-size:18px;font-weight:300;color:#fff;text-shadow:var(--xb-glow)}
+[data-rt-theme=xmb] .stat small{color:var(--rt-ink-4)}
+/* Tabs: the cross-media bar. Category icons in a row; the open one is bright, larger and glows. */
+[data-rt-theme=xmb] .tabs{gap:0;padding:6px 6px 2px;margin-top:8px;background:transparent;box-shadow:inset 0 -1px 0 rgba(255,255,255,.12)}
+[data-rt-theme=xmb] .tabs button{padding:6px 2px 5px;font-size:11.5px;font-weight:300;color:rgba(255,255,255,.55);background:transparent;border:0;border-radius:0;box-shadow:none;transition:color .2s,transform .25s cubic-bezier(.25,.8,.3,1)}
+[data-rt-theme=xmb] .tabs button .ic{--ic-size:20px;color:rgba(255,255,255,.6)}
+[data-rt-theme=xmb] .tabs button:hover{color:#fff;background:transparent}
+[data-rt-theme=xmb] .tabs button[aria-selected=true]{color:#fff;transform:scale(1.12);text-shadow:var(--xb-glow);border-bottom:0}
+[data-rt-theme=xmb] .tabs button[aria-selected=true] .ic{color:#fff;filter:drop-shadow(0 0 5px rgba(255,255,255,.7))}
+[data-rt-theme=xmb] .side{background:rgba(0,0,0,.25);box-shadow:inset -1px 0 0 rgba(255,255,255,.1)}
+[data-rt-theme=xmb] :is(.section-nav button,nav:not(.tabs) button){font-size:13px;font-weight:300;color:var(--rt-ink-2);background:transparent;border:0;border-radius:6px;box-shadow:none}
+[data-rt-theme=xmb] :is(.section-nav button,nav:not(.tabs) button):hover{color:#fff;background:rgba(255,255,255,.08)}
+[data-rt-theme=xmb] :is(.section-nav button[aria-current=page],nav:not(.tabs) button.active){color:#fff;background:linear-gradient(90deg,rgba(255,255,255,.24),rgba(255,255,255,.04));text-shadow:var(--xb-glow)}
+/* Buttons: translucent rounded keys that glow when chosen */
+[data-rt-theme=xmb] button{font-size:12.5px;font-weight:400;color:#fff;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.22);border-radius:6px;box-shadow:none}
+[data-rt-theme=xmb] button:hover{color:#fff;background:rgba(255,255,255,.17);border-color:rgba(255,255,255,.5);box-shadow:0 0 12px rgba(255,255,255,.25)}
+[data-rt-theme=xmb] button:active:not(:disabled){transform:none;background:rgba(255,255,255,.26)}
+[data-rt-theme=xmb] :is(.primary,#start,#save){color:#fff;background:linear-gradient(180deg,rgba(255,255,255,.34),rgba(255,255,255,.14));border-color:rgba(255,255,255,.6);box-shadow:0 0 10px rgba(255,255,255,.2),inset 0 1px 0 rgba(255,255,255,.4);text-shadow:var(--xb-glow)}
+[data-rt-theme=xmb] :is(.primary,#start,#save):hover{background:linear-gradient(180deg,rgba(255,255,255,.44),rgba(255,255,255,.2));box-shadow:0 0 16px rgba(255,255,255,.35)}
+[data-rt-theme=xmb] :is(.primary,#start,#save) .ic{color:#fff}
+[data-rt-theme=xmb] .danger{color:#fff;background:rgba(220,60,50,.45);border-color:rgba(255,140,130,.6)}
+[data-rt-theme=xmb] .danger:hover{background:rgba(235,75,62,.62);box-shadow:0 0 12px rgba(255,120,110,.4)}
+[data-rt-theme=xmb] :is(.ghost,.icon){background:transparent;border-color:transparent}
+[data-rt-theme=xmb] .link-btn{border:0;background:none;box-shadow:none;color:var(--rt-link)}
+[data-rt-theme=xmb] button:disabled{color:var(--rt-ink-disabled);background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.1);box-shadow:none}
+/* Fields */
+[data-rt-theme=xmb] input:where(:not([type=checkbox],[type=radio],[type=range],[type=file])),[data-rt-theme=xmb] :is(textarea,select){color:#fff;background-color:rgba(0,0,0,.32);border:1px solid rgba(255,255,255,.24);border-radius:6px;box-shadow:none;font-family:var(--rt-font)}
+[data-rt-theme=xmb] select{background-image:linear-gradient(45deg,transparent 50%,#fff 50%),linear-gradient(135deg,#fff 50%,transparent 50%)}
+[data-rt-theme=xmb] select option{color:#fff;background:#0f2350}
+[data-rt-theme=xmb] :is(input,textarea,select):focus{border-color:#fff;box-shadow:0 0 10px rgba(255,255,255,.3)}
+[data-rt-theme=xmb] input::placeholder,[data-rt-theme=xmb] textarea::placeholder{color:#8d9cc0}
+[data-rt-theme=xmb] input[type=checkbox]{width:16px;height:16px;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.5);border-radius:3px}
+[data-rt-theme=xmb] input[type=checkbox]:checked{background:rgba(255,255,255,.3);border-color:#fff;box-shadow:0 0 6px rgba(255,255,255,.5)}
+[data-rt-theme=xmb] input[type=checkbox]:checked::after{border-color:#fff}
+[data-rt-theme=xmb] .toggle>input[type=checkbox]{width:38px;height:18px;border-radius:9px;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.35)}
+[data-rt-theme=xmb] .toggle>input[type=checkbox]::after{top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:rgba(255,255,255,.6)}
+[data-rt-theme=xmb] .toggle>input[type=checkbox]:checked{background:rgba(255,255,255,.3);border-color:#fff}
+[data-rt-theme=xmb] .toggle>input[type=checkbox]:checked::after{top:2px;left:2px;width:12px;height:12px;transform:translateX(20px);background:#fff;box-shadow:0 0 6px #fff}
+[data-rt-theme=xmb] input[type=range]{accent-color:#ffffff}
+[data-rt-theme=xmb] :is(pre,.output,.v22-log,.response){color:#eef3ff;background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.12);border-radius:6px}
+[data-rt-theme=xmb] :is(.meter,.arcade-progress,.lat-track){background:rgba(0,0,0,.35);border-radius:4px}
+[data-rt-theme=xmb] .pill{color:#fff;background:rgba(255,255,255,.18);border-radius:9px;box-shadow:none}
+/* Soundboard pads: list items; the playing one glows */
+[data-rt-theme=xmb] .pad{background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.1);border-radius:8px;box-shadow:none}
+[data-rt-theme=xmb] .pad b{font-weight:400;color:#fff}
+[data-rt-theme=xmb] .pad span{font-weight:300;color:var(--rt-ink-3)}
+[data-rt-theme=xmb] .pad::after{border-left-color:rgba(255,255,255,.75)}
+[data-rt-theme=xmb] .pad:hover{background:linear-gradient(90deg,rgba(255,255,255,.18),rgba(255,255,255,.05));border-color:rgba(255,255,255,.35)}
+[data-rt-theme=xmb] .pad.playing{background:linear-gradient(90deg,rgba(255,255,255,.3),rgba(255,255,255,.08));border-color:rgba(255,255,255,.7);box-shadow:0 0 14px rgba(255,255,255,.3)}
+[data-rt-theme=xmb] .pad.playing b{text-shadow:var(--xb-glow)}
+[data-rt-theme=xmb] :is(.step-n,.setup-n,.friend-card .avatar){font-weight:400;color:#fff;background:rgba(255,255,255,.2);border-radius:50%;box-shadow:0 0 0 1px rgba(255,255,255,.4)}
+[data-rt-theme=xmb] code{color:#fff;background:rgba(0,0,0,.35);border-radius:3px}
+[data-rt-theme=xmb] .savebar,[data-rt-theme=xmb] .foot{background:rgba(0,0,0,.25);box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+[data-rt-theme=xmb] .foot{border-radius:0 0 9px 9px}
+[data-rt-theme=xmb] .foot small{color:var(--rt-ink-3)}
+[data-rt-theme=xmb] .route li{background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.1);border-radius:6px}
+[data-rt-theme=xmb] .route li:last-child{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.5)}
+[data-rt-theme=xmb] .vote{background:linear-gradient(90deg,rgba(255,255,255,.22) calc(var(--share,0)*100%),rgba(0,0,0,.2) 0);border:1px solid rgba(255,255,255,.12);border-radius:6px}
+[data-rt-theme=xmb] .vote-marker{font-weight:400;color:#fff}
+[data-rt-theme=xmb] :is(.scroll,.content,main){scrollbar-color:rgba(255,255,255,.35) transparent}
+html[data-rt-theme=xmb]{scrollbar-color:rgba(255,255,255,.35) #0b1838}
+
+/* ── Checks: system messages with a round mark ── */
+[data-rt-theme=xmb] .checklist li{position:relative;padding:8px 8px 8px 34px;border-top:1px solid rgba(255,255,255,.1)}
+[data-rt-theme=xmb] .checklist li::before{content:"·";position:absolute;left:8px;top:9px;width:18px;height:18px;border-radius:50%;text-align:center;font:400 12px/18px var(--rt-font);color:#fff;box-shadow:0 0 0 1px rgba(255,255,255,.5)}
+[data-rt-theme=xmb] .checklist li[data-result=ok]::before{content:"✓";box-shadow:0 0 0 1px #fff,0 0 8px rgba(255,255,255,.4)}
+[data-rt-theme=xmb] .checklist li[data-result=fail]::before{content:"!";color:#ffb3aa;box-shadow:0 0 0 1px #ff9a8e,0 0 8px rgba(255,120,110,.5)}
+[data-rt-theme=xmb] .checklist li[data-result=unknown]::before{content:"?"}
+[data-rt-theme=xmb] .checklist b{font-weight:400;color:#fff}
+
+/* ── Status strip: the information bar ──
+   A ring on the left breathes while Tyler listens, turns like the loading ring while he writes,
+   glows gold while he talks and pulses red on a problem; the state and status sit beside it in
+   thin glowing type. */
+[data-rt-theme=xmb] .tally{min-height:56px;padding:9px 12px 9px 56px;background:linear-gradient(90deg,rgba(255,255,255,.14),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.14);border-radius:8px;box-shadow:none}
+[data-rt-theme=xmb] .tally-light{position:absolute;left:14px;top:50%;width:28px;height:28px;margin-top:-14px;border-radius:50%;background:transparent;box-shadow:0 0 0 2px var(--tone),0 0 10px color-mix(in srgb,var(--tone) 70%,transparent)!important}
+[data-rt-theme=xmb] .tally-light::after{content:"";position:absolute;inset:7px;border-radius:50%;background:var(--tone);opacity:.85}
+[data-rt-theme=xmb] .tally[data-state=listening] .tally-light{animation:xb-breathe 2.4s ease-in-out infinite}
+[data-rt-theme=xmb] .tally[data-state=thinking] .tally-light{box-shadow:none!important;background:conic-gradient(from 0deg,transparent 0 25%,var(--tone) 100%);-webkit-mask:radial-gradient(circle,transparent 0 10px,#000 10.5px);mask:radial-gradient(circle,transparent 0 10px,#000 10.5px);animation:xb-turn 1.1s linear infinite}
+[data-rt-theme=xmb] .tally[data-state=thinking] .tally-light::after{display:none}
+[data-rt-theme=xmb] .tally[data-state=speaking] .tally-light{animation:xb-breathe .9s ease-in-out infinite}
+[data-rt-theme=xmb] .tally[data-state=error] .tally-light{animation:xb-breathe .6s ease-in-out infinite}
+[data-rt-theme=xmb] :is(.tally-head,.tally-body){position:static}
+[data-rt-theme=xmb] .tally-label{font-size:15px;font-weight:300;color:#fff;text-shadow:var(--xb-glow)}
+[data-rt-theme=xmb] .tally-text{font-weight:300;color:var(--rt-ink-2)}
+[data-rt-theme=xmb] .tally-time{color:var(--rt-ink-3);font-weight:300}
+[data-rt-theme=xmb] .tally-wave i{background:#fff;opacity:.7}
+[data-rt-theme=xmb] .tally-trace{display:none}
+[data-rt-theme=xmb] .tally[data-flash=ok]{box-shadow:0 0 18px rgba(255,255,255,.45)}
+[data-rt-theme=xmb] .tally[data-flash=fail]{box-shadow:0 0 18px rgba(255,120,110,.5)}
+@keyframes xb-breathe{50%{transform:scale(.86);opacity:.75}}
+@keyframes xb-turn{to{transform:rotate(1turn)}}
+
+/* ── Icons, dialogs, notifications and tooltips ──
+   Notices drop in at the top right as translucent black boxes; dialogs float over a dimmed
+   screen with thin white type. */
+[data-rt-theme=xmb] .ic{--ic-w:1.5px;--ic-cap:round;--ic-join:round}
+[data-rt-theme=xmb] :is(.rt-toast,.rt-dialog){color:#fff;background:rgba(18,14,36,.96);border:1px solid rgba(255,255,255,.18);border-radius:8px;box-shadow:0 12px 30px rgba(0,0,0,.55)}
+[data-rt-theme=xmb] .rt-toast{border-left:1px solid rgba(255,255,255,.18)}
+[data-rt-theme=xmb] .rt-toast>.ic{color:var(--tone);filter:drop-shadow(0 0 4px currentColor)}
+[data-rt-theme=xmb] :is(.rt-toast,.rt-dialog)[data-kind=success]{--tone:#bff0c0}
+[data-rt-theme=xmb] :is(.rt-toast,.rt-dialog)[data-kind=warning]{--tone:#ffe08a}
+[data-rt-theme=xmb] :is(.rt-toast,.rt-dialog)[data-kind=error]{--tone:#ff9a8e}
+[data-rt-theme=xmb] :is(.rt-toast,.rt-dialog):not([data-kind]),[data-rt-theme=xmb] :is(.rt-toast,.rt-dialog)[data-kind=info]{--tone:#cfe2ff}
+[data-rt-theme=xmb] :is(.rt-toast,.rt-dialog) :is(.rt-toast-title,.rt-dialog-title){font-weight:400;color:#fff}
+[data-rt-theme=xmb] :is(.rt-toast-text,.rt-dialog-text,.rt-steps){font-weight:300;color:var(--rt-ink-2)}
+[data-rt-theme=xmb] :is(.rt-toast,.rt-dialog) .rt-x{color:var(--rt-ink-3);background:transparent;border:0;box-shadow:none;min-height:0}
+[data-rt-theme=xmb] :is(.rt-toast,.rt-dialog) .rt-x:hover{color:#fff;background:rgba(255,255,255,.12)}
+[data-rt-theme=xmb] .rt-dialog .ic{color:var(--tone)}
+[data-rt-theme=xmb] .rt-tip{background:rgba(6,10,22,.9);color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:6px}
+
+
+/* ── Motion: PlayStation 3 ──
+   Opening a category fades its items in as they slide down into place; notices drop in at the
+   top right; the wave above drifts; the open category icon grows. */
+@keyframes xb-in{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
+@keyframes xb-drop{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:none}}
+[data-rt-theme=xmb] :is(.view:not([hidden]),.sheet,section[data-view]:not([hidden])){animation:xb-in .3s cubic-bezier(.25,.8,.3,1) backwards}
+[data-rt-theme=xmb] .rt-toast:not(.rt-leaving){animation:xb-drop .3s ease-out backwards}
+[data-rt-theme=xmb] .checklist li{animation:xb-in .25s ease-out backwards}
+[data-rt-theme=xmb] .vote[data-arrived]{animation:xb-drop .25s ease-out}
+@media (prefers-reduced-motion:reduce){.panel[data-rt-theme=xmb]::before,.panel[data-rt-theme=xmb]::after,[data-rt-theme=xmb] body::before,[data-rt-theme=xmb] body::after{animation:none}}

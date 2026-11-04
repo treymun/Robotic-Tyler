@@ -39,7 +39,7 @@ const voiceChoices=google=>google?GEMINI_VOICES.map(v=>({value:v.name,label:v.na
 const redact=s=>String(s).replace(/sk-or-[\w-]+/gi,'[redacted]').slice(0,300);
 chrome.action.onClicked.addListener(()=>chrome.runtime.openOptionsPage());
 // The toolbar icon shows the chosen theme's Tyler (ui/logos/<theme>-16/-32.png).
-const LOGO_THEMES=['steam','classic','tf2','cs2','portal','cs16','hev','l4d','winxp','doom','quake','pipboy','combine','deadlock','minecraft','payday','dreamcast','gmod','ricochet','dod'];
+const LOGO_THEMES=['steam','classic','tf2','cs2','portal','cs16','hev','l4d','winxp','doom','quake','pipboy','combine','deadlock','minecraft','payday','dreamcast','gmod','ricochet','dod','rust','x360','ipod','msn','xmb'];
 function themeIcon(value){const t=LOGO_THEMES.includes(value)?value:'steam';globalThis.tylerThemeIcon?.(t);try{const r=chrome.action?.setIcon?.({path:{16:'ui/logos/'+t+'-16.png',32:'ui/logos/'+t+'-32.png'}});r?.catch?.(()=>{});}catch{}}
 chrome.storage.local.get('uiTheme').then(v=>themeIcon(v.uiTheme)).catch(()=>{});
 // v2.14: the Game Request Hub was removed. Drop its saved keys, feeds and queues.

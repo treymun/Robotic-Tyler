@@ -1,0 +1,157 @@
+{
+  "title": "Robotic Tyler \u2014 Five Theme Artwork Kits",
+  "created": "2026-11-04",
+  "formatVersion": 1,
+  "themes": [
+    {
+      "id": "xbox-360-blades",
+      "name": "Xbox 360 Blades",
+      "appearance": "light",
+      "suggestedPalette": [
+        "#107C10",
+        "#86C900",
+        "#E7ECEF",
+        "#202826"
+      ],
+      "assets": {
+        "logo": {
+          "path": "01-xbox-360-blades/tyler-logo.png",
+          "width": 1254,
+          "height": 1254,
+          "hasTransparency": true,
+          "mimeType": "image/png",
+          "sha256": "f6ad8368c9f8576917541b851fadd5bb4249514cb0aa6b40fa18a2582bd0c56d"
+        },
+        "background": {
+          "path": "01-xbox-360-blades/theme-background.png",
+          "width": 1672,
+          "height": 941,
+          "hasTransparency": false,
+          "mimeType": "image/png",
+          "sha256": "4d45d113b6211c4b87eab10a188d73a848054c3b20cc0cbed822a39d31a48d35"
+        }
+      },
+      "backgroundPlacement": "right center; preserve branding near right edge"
+    },
+    {
+      "id": "ipod-classic",
+      "name": "iPod Classic",
+      "appearance": "light",
+      "suggestedPalette": [
+        "#F5F6F7",
+        "#C8CDD0",
+        "#3C95DE",
+        "#202327"
+      ],
+      "assets": {
+        "logo": {
+          "path": "02-ipod-classic/tyler-logo.png",
+          "width": 1254,
+          "height": 1254,
+          "hasTransparency": true,
+          "mimeType": "image/png",
+          "sha256": "4b1f613b871d3540f6dda91e3a3ecadc94c7df3f91cefca2230088d92302c567"
+        },
+        "background": {
+          "path": "02-ipod-classic/theme-background.png",
+          "width": 1672,
+          "height": 941,
+          "hasTransparency": false,
+          "mimeType": "image/png",
+          "sha256": "34bf0f3c450779ac2bc588fdc310e17800639d512f00ff4b25438aa096c7c544"
+        }
+      },
+      "backgroundPlacement": "right center; preserve branding near right edge"
+    },
+    {
+      "id": "msn-messenger",
+      "name": "MSN Messenger",
+      "appearance": "light",
+      "suggestedPalette": [
+        "#2785D7",
+        "#B5E5FF",
+        "#77BE3E",
+        "#FFFFFF"
+      ],
+      "assets": {
+        "logo": {
+          "path": "03-msn-messenger/tyler-logo.png",
+          "width": 1254,
+          "height": 1254,
+          "hasTransparency": true,
+          "mimeType": "image/png",
+          "sha256": "5ec291f890beb6e4d8e310419b425269d6130efb4e58f72ee6c0b96736bf14ce"
+        },
+        "background": {
+          "path": "03-msn-messenger/theme-background.png",
+          "width": 1672,
+          "height": 941,
+          "hasTransparency": false,
+          "mimeType": "image/png",
+          "sha256": "0b3929fe3e7e69f1f2dd1cb9a608391c1f1381326f7bb164a930d21821b01bf1"
+        }
+      },
+      "backgroundPlacement": "right center; preserve branding near right edge"
+    },
+    {
+      "id": "ps3-xmb",
+      "name": "PS3 XMB",
+      "appearance": "dark",
+      "suggestedPalette": [
+        "#11121C",
+        "#2E294F",
+        "#ADA2CA",
+        "#EAEAF0"
+      ],
+      "assets": {
+        "logo": {
+          "path": "04-ps3-xmb/tyler-logo.png",
+          "width": 1254,
+          "height": 1254,
+          "hasTransparency": true,
+          "mimeType": "image/png",
+          "sha256": "9148aa74870cd9baac61ef2b716b2805cf5dce479b60143a749f1e142a8c0aaf"
+        },
+        "background": {
+          "path": "04-ps3-xmb/theme-background.png",
+          "width": 1672,
+          "height": 941,
+          "hasTransparency": false,
+          "mimeType": "image/png",
+          "sha256": "0879e76a100b4661eb651cc3e50a383bef31fa633afe26f3d1bbccc122ecef11"
+        }
+      },
+      "backgroundPlacement": "right center; preserve branding near right edge"
+    },
+    {
+      "id": "rust",
+      "name": "Rust",
+      "appearance": "dark",
+      "suggestedPalette": [
+        "#CE412B",
+        "#211D18",
+        "#A99068",
+        "#ECE0C7"
+      ],
+      "assets": {
+        "logo": {
+          "path": "05-rust/tyler-logo.png",
+          "width": 1254,
+          "height": 1254,
+          "hasTransparency": true,
+          "mimeType": "image/png",
+          "sha256": "45339a7a196e4650ae53fb6622b6c0096656d173a2b33674df786c5c8bb5f340"
+        },
+        "background": {
+          "path": "05-rust/theme-background.png",
+          "width": 1672,
+          "height": 941,
+          "hasTransparency": false,
+          "mimeType": "image/png",
+          "sha256": "7c396abf1a3eb6a728fd7ee89476e486383ada49d089e867d72af11a63765fa9"
+        }
+      },
+      "backgroundPlacement": "right center; preserve branding near right edge"
+    }
+  ]
+}

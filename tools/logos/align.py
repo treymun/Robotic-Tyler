@@ -13,7 +13,12 @@ L={'steam':(372,1065,724),'classic-steam-2004':(331,945,699),'team-fortress-2':(
    'quake':(274,944,499),'pipboy':(401,974,618),'combine':(423,971,607),'deadlock':(419,981,637),'minecraft':(423,1021,679),
    # v2.18, themes 16-20 (assets/theme-logos/themes-16-20/masters, cut from the supplied preview).
    # The Dreamcast logo is a VMU with Tyler on its screen, so its landmarks are the screen edges.
-   'payday':(430,985,620),'dreamcast':(330,866,590),'gmod':(490,980,500),'ricochet':(476,846,496),'dod':(550,1115,642)}
+   'payday':(430,985,620),'dreamcast':(330,866,590),'gmod':(490,980,500),'ricochet':(476,846,496),'dod':(550,1115,642),
+   # v2.27, themes 21-25: the owner's "Five Theme Artwork" pack faces left, so align.py runs on the
+   # mirrored copies (tools/logos/mirror.py → assets/theme-logos/themes-21-25/mirrored). There the eye
+   # piece (Rust's plate, the Ring of Light, the click wheel, the Messenger lens, the PlayStation lens)
+   # is the left landmark and the glasses' outer edge the right one.
+   'rust':(542,939,545),'x360':(569,1016,618),'ipod':(469,959,625),'msn':(484,959,652),'xmb':(434,924,625)}
 PIXEL={'doom-classic','minecraft'}
 TSPAN,TX,TY=600,668,585     # target glasses width, glasses centre x, eye line y
 TOP,SIDE,BOTTOM=0.03*N,0.02*N,0.012*N   # keep tops inside; allow up to 6% of the bust to be trimmed

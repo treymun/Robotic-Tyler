@@ -71,3 +71,15 @@
 @font-face{font-family:"Tyler Ricochet Text";src:url("ricochet-600.woff2") format("woff2");font-weight:600 900;font-style:normal;font-display:swap}
 @font-face{font-family:"Tyler DoD";src:url("dod-display-700.woff2") format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
 @font-face{font-family:"Tyler DoD Log";src:url("dod-log-400.woff2") format("woff2");font-weight:100 900;font-style:normal;font-display:swap}
+/* v2.27, themes 21-25:
+ *   Tyler Rust      Roboto Condensed (Latin)  Rust's own condensed menu sans (OFL-Roboto-Condensed.txt)
+ *   Tyler iPod      Source Sans 3 (Latin)     a humanist sans close to the iPod's menu type (OFL-Source-Sans-3.txt)
+ *   Tyler XMB       Roboto Light and Regular  the PS3 menu's thin, clean sans (Light: LICENSE-Roboto-Light-Apache-2.0.txt; Regular: OFL-Roboto.txt)
+ * Xbox 360 and MSN Messenger use Segoe UI and Tahoma, which Windows already has.
+ */
+@font-face{font-family:"Tyler Rust";src:url("rust-400.woff2") format("woff2");font-weight:100 500;font-style:normal;font-display:swap}
+@font-face{font-family:"Tyler Rust";src:url("rust-700.woff2") format("woff2");font-weight:600 900;font-style:normal;font-display:swap}
+@font-face{font-family:"Tyler iPod";src:url("ipod-400.woff2") format("woff2");font-weight:100 500;font-style:normal;font-display:swap}
+@font-face{font-family:"Tyler iPod";src:url("ipod-600.woff2") format("woff2");font-weight:600 900;font-style:normal;font-display:swap}
+@font-face{font-family:"Tyler XMB";src:url("xmb-300.woff2") format("woff2");font-weight:100 350;font-style:normal;font-display:swap}
+@font-face{font-family:"Tyler XMB";src:url("xmb-400.woff2") format("woff2");font-weight:351 900;font-style:normal;font-display:swap}

@@ -11,7 +11,7 @@ import {createRequire} from 'node:module';
 const require=createRequire(import.meta.url);
 const {chromium}=require('playwright');
 const ROOT=path.resolve(import.meta.dirname,'../..');
-const THEMES=['steam','classic','tf2','cs2','portal','cs16','hev','l4d','winxp','doom','quake','pipboy','combine','deadlock','minecraft','payday','dreamcast','gmod','ricochet','dod'];
+const THEMES=['steam','classic','tf2','cs2','portal','cs16','hev','l4d','winxp','doom','quake','pipboy','combine','deadlock','minecraft','payday','dreamcast','gmod','ricochet','dod','rust','x360','ipod','msn','xmb'];
 const types={'.html':'text/html','.js':'text/javascript','.mjs':'text/javascript','.css':'text/css','.json':'application/json','.svg':'image/svg+xml','.png':'image/png','.webp':'image/webp','.woff2':'font/woff2'};
 const serve=()=>http.createServer((req,res)=>{
  const file=path.join(ROOT,decodeURIComponent(new URL(req.url,'http://x').pathname));
@@ -29,7 +29,7 @@ test('Settings → Appearance: fifteen live previews, keyboard selection, Apply 
   const page=await browser.newPage({viewport:{width:1360,height:900}});const errors=[],outside=[];
   page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>{if(!r.url().startsWith(base)&&!r.url().startsWith('data:'))outside.push(r.url());});
   await page.addInitScript(mock,'cs2');await page.goto(base+'/browser-extension/settings.html#appearance');
-  await page.waitForFunction(()=>document.querySelectorAll('#themeGallery .tg-card').length===20);
+  await page.waitForFunction(()=>document.querySelectorAll('#themeGallery .tg-card').length===25);
   // One card per theme, each a radio with its logo and a real panel preview in its own shadow root.
   const cards=await page.evaluate(()=>[...document.querySelectorAll('#themeGallery .tg-card')].map(c=>({theme:c.dataset.theme,role:c.getAttribute('role'),checked:c.getAttribute('aria-checked'),tab:c.tabIndex,
    preview:c.querySelector('.tg-host').shadowRoot?.querySelector('.panel')?.dataset.rtTheme,inert:c.querySelector('.tg-host').inert,label:c.getAttribute('aria-label')})));
@@ -48,20 +48,20 @@ test('Settings → Appearance: fifteen live previews, keyboard selection, Apply 
    stage:document.querySelector('#themeStage .tg-host').shadowRoot.querySelector('.panel').dataset.rtTheme,page:document.documentElement.dataset.rtTheme,
    apply:document.getElementById('tgApply').textContent.trim(),disabled:document.getElementById('tgApply').disabled}));
   assert.deepEqual(await sel(),{selected:'portal',focus:'portal',stage:'portal',page:'cs2',apply:'Apply Portal',disabled:false});
-  await page.keyboard.press('End');assert.equal((await sel()).selected,'dod');
+  await page.keyboard.press('End');assert.equal((await sel()).selected,'xmb');
   await page.keyboard.press('Home');assert.equal((await sel()).selected,'steam');
-  await page.keyboard.press('ArrowLeft');assert.equal((await sel()).selected,'dod','arrows wrap around');
+  await page.keyboard.press('ArrowLeft');assert.equal((await sel()).selected,'xmb','arrows wrap around');
   // The large preview shows tabs, buttons, an input, the status strip and a notification.
   const stage=await page.evaluate(()=>{const r=document.querySelector('#themeStage .tg-host').shadowRoot;return {tabs:r.querySelectorAll('.tabs button').length,input:!!r.querySelector('input'),buttons:r.querySelectorAll('.btn').length>=2,strip:r.querySelector('.tally')?.dataset.state,toast:!!r.querySelector('.rt-toast'),pixelIcons:getComputedStyle(r.querySelector('.tabs .ic-p')).display!=='none'};});
   assert.deepEqual(stage,{tabs:5,input:true,buttons:true,strip:'speaking',toast:true,pixelIcons:false});
   assert.equal(await page.evaluate(()=>window.__writes.length),0,'previewing saves nothing');
   // Apply with the keyboard (Tab to the button), then Undo from the notification.
   await page.focus('#tgApply');await page.keyboard.press('Enter');
-  await page.waitForFunction(()=>document.documentElement.dataset.rtTheme==='dod');
-  assert.deepEqual(await page.evaluate(()=>window.__writes.at(-1)),{uiTheme:'dod'});
+  await page.waitForFunction(()=>document.documentElement.dataset.rtTheme==='xmb');
+  assert.deepEqual(await page.evaluate(()=>window.__writes.at(-1)),{uiTheme:'xmb'});
   const after=await page.evaluate(()=>({badge:document.querySelector('.tg-card[data-applied=true]').dataset.theme,chip:document.getElementById('uiThemeName').textContent,disabled:document.getElementById('tgApply').disabled,
    toast:document.querySelector('.rt-toast[data-kind=success] .rt-toast-title')?.textContent,role:document.querySelector('.rt-toast')?.getAttribute('role')}));
-  assert.deepEqual(after,{badge:'dod',chip:'Day of Defeat: Source',disabled:true,toast:'Theme applied',role:'status'});
+  assert.deepEqual(after,{badge:'xmb',chip:'PlayStation 3 (XMB)',disabled:true,toast:'Theme applied',role:'status'});
   await page.click('.rt-toast .rt-toast-actions button');
   await page.waitForFunction(()=>document.documentElement.dataset.rtTheme==='cs2');
   assert.deepEqual(await page.evaluate(()=>window.__writes.at(-1)),{uiTheme:'cs2'});

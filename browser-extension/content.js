@@ -20,7 +20,7 @@
  $('platformChip').textContent=platform.label;
  // Theme (v2.7+), chosen in Settings: steam (default), classic (2004), tf2, cs2, portal.
  // The attribute sits on each Tyler window; ui/classic.css keys off it.
- const THEMES=['steam','classic','tf2','cs2','portal','cs16','hev','l4d','winxp','doom','quake','pipboy','combine','deadlock','minecraft','payday','dreamcast','gmod','ricochet','dod'];
+ const THEMES=['steam','classic','tf2','cs2','portal','cs16','hev','l4d','winxp','doom','quake','pipboy','combine','deadlock','minecraft','payday','dreamcast','gmod','ricochet','dod','rust','x360','ipod','msn','xmb'];
  let uiTheme='steam';const themed=new Set([panel]);
  // Each theme has its own Tyler logo (ui-logos.js); the vector logo stays until it's drawn.
  const mark=root.querySelector('.mark'),markArt=root.querySelector('.mark-art');

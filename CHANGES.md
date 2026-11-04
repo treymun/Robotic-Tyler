@@ -1,3 +1,85 @@
+# ROBOTIC TYLER v2.27.0: five new themes
+
+Rust, Xbox 360 (2005), iPod classic, MSN Messenger and PlayStation 3 (XMB) join the theme list, for 25 in all. Each one reskins the chat panel, compact mode, Settings, the Voice Studio, the desktop window and the phone remote. Each has its own Tyler logo, status strip and extras, like the other 20.
+
+## Rust
+- **The look:** dark panels you can see through, Roboto Condensed capitals and a rust-red line along the top. The header has a hazard stripe, there are rivets in the corners, and the tabs look like inventory slots.
+- **The status strip:** a coloured square with white level bars, `!` on a problem, and a work bar while Tyler writes.
+- **Vitals:**
+  - Health is Tyler's connection.
+  - Calories is what's left of your spending cap.
+  - Hydration is how fast he replies.
+  - Status effects show only while they apply: Building privilege, Comfort (friends in the call), Crafting, Radio (music), Raid alarm (a busy chat) and Bleeding.
+- **The belt:** six soundboard clips along the bottom (keys 1–6). Pickup notices appear for replies (Scrap), clips, songs and the quiet-call hum.
+- **Crafting (Q):** the full check, test beep, voice status, Connect & start, Soundboard and Settings, as blueprints. Crafting one runs it and shows it in the queue until it's done.
+- **Tool Cupboard:** upkeep is the time until the quiet-call hum keeps Tyler in the call. You can play the hum or open Stay connected from here.
+- **Wounded:** a problem shows "You are wounded" with a bleed-out bar and Help up, which runs the full check. If it's still down a minute later, "You are dead" offers Respawn (Connect & start) and Checks.
+
+## Xbox 360 (2005)
+- **The look:** silver blades, each tab with its blade's colour, glossy green selections and dark pill notices.
+- **The Ring of Light:** one light for Tyler and one for each friend in the call, up to four. It spins while he writes, glows while he talks, and shows three red lights on a problem; click it then to run the full check.
+- **Gamer card:** gamerscore, reputation stars (Tyler's health), zone and motto. It opens 10 achievements earned from real use (first words, 100 replies, a clean full check, a sub-second reply…), with "Achievement unlocked" pop-ups.
+- **The Guide (G):** Pause or Connect & start, Stop audio, Music DJ, Soundboard, Full check and Settings, with A and B prompts.
+- **Movement:** a blade sweeps across when you change tab. Notices pop up when Tyler signs in and when friends join the call.
+
+## iPod classic
+- **The look:** a white screen in black glass, the title-bar gradient, blue selection strips and list rows with chevrons. The title bar shows a play sign and a battery (Tyler's health, which charges while he recovers).
+- **The status strip is Now Playing:** an "artwork" square, a pause sign, a spinner and a scrub bar.
+- **The click wheel:**
+  - drag round it (or use the mouse wheel) to scroll;
+  - MENU opens the iPod menu (M);
+  - ⏮ and ⏭ change tab;
+  - ▶❙❙ pauses Tyler or starts him;
+  - the centre button opens Now Playing.
+- **Screens:** the iPod menu, Now Playing (the Music DJ's song, time and Skip/Stop) and Cover Flow of your clips (← →, then Enter to play).
+- **Start-up:** starting Tyler shows the white start-up screen with the Apple logo for a moment.
+- **Compact mode** becomes the whole iPod: the screen on top, the click wheel below.
+
+## MSN Messenger
+- **The look:** sky-blue gradients and glossy buttons, and the display-picture frame, green, red or orange to match Tyler's presence.
+- **Presence:**
+  - Online while he listens, On the Phone while he talks, Busy on a problem, Away when paused.
+  - "Tyler is typing a message…" while he writes.
+  - What I'm listening to under his name while the Music DJ plays.
+- **The contact list:** Tyler's AI, Chat, Voice and Music, grouped Online and Not online.
+  - Nudge sends the test beep and shakes the window.
+  - Emoticons each play a clip.
+  - Clicking the display picture opens the status menu.
+- **Corner pop-ups,** with the Messenger butterfly in the title strip, for signing in, friends joining the call and new songs. A problem nudges the window.
+
+## PlayStation 3 (XMB)
+- **The look:** a deep violet wave that moves with transforms only and changes tint with Tyler's state, thin white type and the category row of tabs. ← and → move along it.
+- **The status strip:** a ring that breathes, and a spinner while Tyler writes.
+- **Corner details:** the clock as the XMB shows it, a note while music plays, and "Signed in to PlayStation Network." when Tyler starts.
+- **Options (O):** slides in from the right with Pause or Connect & start, Stop audio, Full check, Information, Trophies, Settings and Collapse.
+- **Trophies:** bronze, silver and gold, with "You have earned a trophy." notices and a trophy level.
+- **Information:** this session and your lifetime totals, with the PlayStation logo.
+
+## Logos and artwork
+- The five Tyler logos are your supplied artwork. They're mirrored so they face the same way as the other 20. The text and symbols on them are turned back so they still read correctly: RUST, XBOX 360, the controller buttons, MENU, the Apple logo, the PlayStation logo and its four symbols, and the butterfly. The two Messenger buddies stay mirrored.
+- Each logo has a closer crop for small sizes (the panel header, compact mode, toolbar and tray icons), so Tyler's face still reads.
+- The butterfly, PlayStation logo and Apple logo are cut from your theme backgrounds. They're built into the app, like the logos, so Steam's page can't block them. The backgrounds themselves aren't shown: the five themes keep their own surfaces, like the other 20.
+- The phone remote and Settings → Appearance list all 25 themes.
+
+## Fixed
+- **Turning the phone remote off no longer stalls while a phone is connected.** The phone's live stream reconnected at once, and the server waited for it to close. Now every connection is closed straight away.
+
+## Tested
+- **Chromium with the panel preview and a mocked Steam page (no real Steam, Windows audio or Gemini Live):**
+  - All 25 themes switch live, each with its own status strip, font and logo.
+  - Each theme mounts its own extras.
+  - The new themes' menus open, fit the panel and work with the keyboard and Escape.
+  - Their actions run the real panel controls: the Rust craft queue and belt keys, the Xbox Guide and achievements, the iPod menu, Cover Flow and click wheel, the Messenger status menu and emoticons, and the PS3 Options, Information and ← →.
+  - The butterfly, PlayStation logo and Apple logo are drawn.
+- **Settings → Appearance:** 25 previews, keyboard selection, Apply and Undo.
+- **Phone remote:** all 25 themes chosen from the phone, using the real server and an iPhone-sized Chromium.
+- **Unit:** every theme ships to all three surfaces, every theme list agrees, and text, states and buttons pass 4.5:1 contrast in all five new themes.
+- **Real Electron (Linux) with a mock Steam page:** the desktop check passes (voice, music and screen sharing, the phone remote's live events).
+- **Phone remote stop:** the remote tests pass eight runs in a row; the hang showed in two of eight before the fix.
+- **Not tested:** the new themes on the real Steam page, in the Windows desktop app, and on a real phone.
+
+---
+
 # ROBOTIC TYLER v2.26.0: the phone remote is Tyler's panel
 
 ## The phone shows Tyler's real panel, in your theme, live

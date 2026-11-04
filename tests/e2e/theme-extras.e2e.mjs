@@ -105,6 +105,52 @@ test('themed menus and screens: open, fit, keyboard, Escape, real actions',{time
   assert.equal(await count('.dod-menu'),1);await fits('.dod-menu',true);await page.keyboard.press('3');
   assert.equal(await count('.dod-menu'),0);assert.match(await text('.dod-line'),/Sound off!/);
   await click('.dod-chip');assert.equal(await count('.dod-obj li'),4);await page.keyboard.press('Escape');assert.equal(await count('.dod-brief'),0);
+
+  // How much of a canvas is drawn (the brand marks come from ui-art.js).
+  const ink=(sel)=>page.evaluate(R+'.querySelector('+JSON.stringify(sel)+')?.getContext("2d")?.getImageData(0,0,'+R+'.querySelector('+JSON.stringify(sel)+').width,'+R+'.querySelector('+JSON.stringify(sel)+').height).data.filter((v,i)=>i%4===3&&v>40).length||0');
+  // v2.27 Rust: Q opens crafting; Craft runs the full check and queues it; the Tool Cupboard opens; 1 plays the first belt slot.
+  await setTheme('rust');await page.evaluate(()=>{TylerCompanion.showTab('conversation');TylerCompanion.setActivity('LISTENING — speak normally, then pause');});await over();await page.keyboard.press('q');
+  assert.equal(await count('.rs-craft-menu'),1);await fits('.rs-craft-menu');assert.equal(await count('.rs-bp'),6);
+  await page.keyboard.press('Escape');assert.equal(await count('.rs-craft-menu'),0);
+  await click('.rs-chip');await page.evaluate(R+'.querySelector(".rs-bp button").click()');assert.match(await tab(),/checks/i,'Craft · Full check runs the full check');assert.equal(await count('.rs-job'),1);
+  await click('.rs-tc');assert.equal(await count('.rs-tc-menu'),1);await fits('.rs-tc-menu');await page.keyboard.press('Escape');
+  await over();const before=(await page.evaluate(()=>window.__played)).length;await page.keyboard.press('1');assert.equal((await page.evaluate(()=>window.__played)).length,before+1,'belt slot 1 plays a clip');
+  await page.evaluate(()=>TylerCompanion.setActivity('NEEDS ATTENTION — Gemini 429 failed · quota reached'));await page.waitForTimeout(100);assert.equal(await count('.rs-wound'),1);
+  await page.evaluate(()=>TylerCompanion.setActivity('LISTENING — speak normally, then pause'));await page.waitForTimeout(100);assert.equal(await count('.rs-wound'),0);
+
+  // Xbox 360: G opens the Guide, arrows move, an item runs; the gamer card opens the achievements; the ring counts Tyler.
+  await setTheme('x360');await page.evaluate(()=>TylerCompanion.showTab('conversation'));await over();await page.keyboard.press('g');
+  assert.equal(await count('.x-guide'),1);await fits('.x-guide');await page.keyboard.press('ArrowDown');assert.match(await focused(),/x-guide-item/);
+  await page.keyboard.press('Escape');assert.equal(await count('.x-guide'),0);
+  await click('.x-card');assert.equal(await count('.x-ach .x-ach-item'),10);await fits('.x-ach');await page.keyboard.press('Escape');
+  assert.equal(await page.evaluate(R+'.getElementById("activityCard").dataset.ring'),'1');
+
+  // iPod: M opens the iPod menu; Cover Flow lists the clips and Enter plays the one in front; the wheel's ⏭ steps the tab.
+  await setTheme('ipod');await page.evaluate(()=>TylerCompanion.showTab('conversation'));await over();await page.keyboard.press('m');
+  assert.equal(await count('.ip-screen .ip-row'),8);await fits('.ip-screen');
+  await page.evaluate(R+'.querySelectorAll(".ip-screen .ip-row")[3].click()');assert.ok(await count('.ip-flow .ip-cover')>=2,'Cover Flow');
+  const n=(await page.evaluate(()=>window.__played)).length;await page.keyboard.press('ArrowRight');await page.keyboard.press('Enter');assert.equal((await page.evaluate(()=>window.__played)).length,n+1,'Enter plays the clip in front');
+  await page.keyboard.press('Escape');assert.equal(await count('.ip-screen'),0);
+  // Starting Tyler turns the iPod on: the start-up screen with the Apple logo, then it goes.
+  await page.evaluate(async()=>{TylerCompanion.setActivity('OFF — Paused by you');await new Promise(r=>setTimeout(r,60));TylerCompanion.setActivity('LISTENING — speak normally, then pause');});await page.waitForTimeout(200);
+  assert.equal(await count('.ip-boot'),1);assert.ok(await ink('.ip-boot-apple')>50,'the Apple logo is drawn');await page.waitForTimeout(1600);assert.equal(await count('.ip-boot'),0);
+  await click('.ip-next');assert.match(await tab(),/room/i,'⏭ goes to the next tab');await click('.ip-centre');assert.equal(await count('.ip-now'),1);await page.keyboard.press('Escape');
+
+  // MSN Messenger: the display picture opens the status menu; Emoticons play clips; the contact list groups Tyler's parts.
+  await setTheme('msn');await page.evaluate(()=>TylerCompanion.showTab('conversation'));
+  await click('.msn-dp');assert.equal(await count('.fx-menu.msn-menu'),1);await fits('.msn-menu',true);await page.keyboard.press('Escape');assert.equal(await count('.fx-menu'),0);
+  await click('.msn-tool:nth-child(2)');assert.ok(await count('.msn-emo .fx-menu-item')>=2);const m=(await page.evaluate(()=>window.__played)).length;
+  await page.evaluate(R+'.querySelector(".msn-emo .fx-menu-item").click()');assert.equal((await page.evaluate(()=>window.__played)).length,m+1);
+  assert.equal(await count('.msn-contact'),4);assert.match(await text('.msn-presence'),/\(Online\)/);
+  await page.evaluate(()=>TylerCompanion.setActivity('THINKING — preparing a typed reply…'));await page.waitForTimeout(80);assert.equal(await page.evaluate(R+'.querySelector(".msn-typing").hidden'),false);
+  // The pop-ups carry the butterfly cut from the owner's Messenger artwork (ui-art.js draws it).
+  await page.evaluate(()=>TylerCompanion.emit('music',{title:'One More Time',by:'Sam'}));await page.waitForTimeout(250);assert.ok(await ink('.msn-pop-bf')>50,'the butterfly is drawn');
+
+  // PlayStation 3: O opens Options from the right; Information and Trophies open; → moves along the cross-media bar.
+  await setTheme('xmb');await page.evaluate(()=>{TylerCompanion.showTab('conversation');TylerCompanion.setActivity('LISTENING — speak normally, then pause');});await over();await page.keyboard.press('o');
+  assert.equal(await count('.xb-options .xb-opt-item'),7);await page.evaluate(R+'.querySelectorAll(".xb-opt-item")[3].click()');assert.equal(await count('.xb-info-list'),1);await fits('.xb-screen');await page.waitForTimeout(150);assert.ok(await ink('.xb-info-ps')>50,'Information shows the PlayStation logo');await page.keyboard.press('Escape');
+  await page.evaluate(()=>TylerCompanion.panel?.dispatchEvent?.(new CustomEvent('tyler-fx')));
+  await over();await page.keyboard.press('ArrowRight');assert.match(await tab(),/room/i,'→ moves to the next category');
   assert.deepEqual(errors,[]);
  }finally{await browser.close();server.close();}
 });

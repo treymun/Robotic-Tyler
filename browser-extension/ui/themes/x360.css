@@ -1,0 +1,211 @@
+/*
+ * ROBOTIC TYLER "Xbox 360 (2005) Blades style" theme (v2.27), light.
+ * The console's first dashboard: silver-white blades with rounded corners over a soft green-grey
+ * backdrop, a coloured edge for each blade (the tabs: green, orange, blue, silver and teal), the
+ * glossy green bar that marks what's selected, white list boxes and dark rounded notifications
+ * that rise from the bottom. Signature: the status strip's Ring of Light, four quarters around a
+ * power button: one lights for Tyler and one for each person in the call (theme-pack-4.js), they
+ * spin while he writes, pulse while he talks, and three turn red on a problem.
+ * Type: Segoe UI, which Windows already has (the dashboard's own type is close to it).
+ * Branding (v2.27): the owner's Xbox 360 logo art (the Tyler logo); everything else is drawn here.
+ */
+[data-rt-theme=x360]{
+  color-scheme:light;
+  --x-green:#6fbb2e;--x-green-hi:#8fd14b;--x-green-lo:#3f7d14;--x-green-ink:#ffffff;
+  --x-gloss:linear-gradient(180deg,#c3ea8b 0,#8fd14b 42%,#6fbb2e 52%,#5aa522 100%);
+  --x-gloss-hi:linear-gradient(180deg,#d2f2a2 0,#a0dc5e 42%,#7fc83a 52%,#66b12a 100%);
+  --x-blade:linear-gradient(180deg,#ffffff 0,#f2f3f0 60%,#e4e6e2 100%);--x-silver:#e8eae6;--x-ink:#2a2c2b;--x-ink-2:#555955;--x-line:#c5c9c3;
+  --x-live:#6fbb2e;--x-market:#f0921b;--x-media:#2a9be0;--x-system:#8f9496;--x-games:#22a884;
+  --rt-bar:#f4f5f2;--rt-bg:#eef0ec;--rt-bg-deep:#ffffff;--rt-surface:#ffffff;--rt-surface-2:#f4f5f2;--rt-surface-3:#e4e6e2;
+  --rt-block:#ffffff;--rt-block-hover:#f7f9f4;--rt-input:#ffffff;--rt-select:#dff0c9;
+  --rt-line:#c5c9c3;--rt-line-soft:#d9dcd6;--rt-line-strong:#9da29b;
+  --rt-ink:#2a2c2b;--rt-ink-strong:#111312;--rt-ink-2:#3c3f3d;--rt-ink-3:#555955;--rt-ink-4:#6a6e69;--rt-ink-disabled:#a3a7a1;
+  --rt-link:#356b10;--rt-link-hover:#111312;--rt-blue:#2a2c2b;--rt-blue-deep:#3f7d14;--rt-active:#6fbb2e;
+  --rt-blue-fade:#ffffff;--rt-blue-fade-hover:#f4fbec;
+  --rt-green:#3f7d14;--rt-green-hover:#4a8a1a;--rt-green-ink:#ffffff;--rt-green-line:#4e8d1e;
+  --rt-state-standby:#6a6e69;--rt-state-ready:#356b10;--rt-state-listening:#356b10;--rt-state-thinking:#8a5600;--rt-state-speaking:#1a6aa0;--rt-state-waiting:#6b55b0;--rt-state-error:#c4170f;
+  --rt-danger:#c4170f;--rt-danger-bg:#d9251b;--rt-danger-hover:#e63a2f;--rt-danger-ink:#ffffff;--rt-success:#3f7d14;--rt-focus:#6fbb2e;
+  --rt-accent:#6fbb2e;--rt-accent-soft:rgba(111,187,46,.16);--rt-accent-line:rgba(111,187,46,.55);
+  --rt-on-accent:#ffffff;--rt-accent-fill:#3f7d14;--rt-meter:linear-gradient(90deg,#5aa522,#a0dc5e);--rt-marker:#111312;--rt-edge:#c5c9c3;--rt-page-glow:#f4f5f2;
+  --rt-font:"Segoe UI","Segoe UI Variable",Tahoma,"Helvetica Neue",Arial,sans-serif;--rt-font-display:"Segoe UI","Segoe UI Variable",Tahoma,"Helvetica Neue",Arial,sans-serif;
+  --rt-text-xs:11px;--rt-text-sm:12.5px;--rt-text-md:13.5px;--rt-text-lg:15px;--rt-track:0;
+  --rt-r-xs:4px;--rt-r-sm:6px;--rt-r-md:8px;--rt-r-lg:12px;--rt-shadow-float:0 0 0 1px rgba(0,0,0,.18),0 18px 46px rgba(30,40,25,.45);
+}
+[data-rt-theme=x360] :is(h1,h2,h3,label,.tabs button,.ident-sub,.stat dt,.tally-label,.pill,.pad span,details.feature>summary,.sheet-head h2,.card>h2,.pulse dt,.facts b,.matrix dt,.section-nav button,nav:not(.tabs) button,button){text-transform:none;letter-spacing:0}
+.panel[data-rt-theme=x360]{background:var(--x-blade);border:1px solid #fff;border-radius:12px;box-shadow:var(--rt-shadow-float),inset 0 0 0 1px #d4d7d1}
+[data-rt-theme=x360] body{background:radial-gradient(60% 50% at 80% 10%,rgba(255,255,255,.85),transparent 70%),radial-gradient(50% 60% at 10% 90%,rgba(111,187,46,.22),transparent 70%),radial-gradient(40% 40% at 60% 70%,rgba(42,155,224,.12),transparent 70%),linear-gradient(160deg,#d9ded6,#b9c2b4)}
+[data-rt-theme=x360] main{background:transparent}
+[data-rt-theme=x360] :is(h1,h2,h3,.sheet-head h2,.card>h2){font-weight:300;color:#2a2c2b}
+[data-rt-theme=x360] h2{font-size:21px}
+[data-rt-theme=x360] h1{font-size:32px}
+[data-rt-theme=x360] h3{font-weight:600}
+[data-rt-theme=x360] .wordmark{font:600 16px/1.15 var(--rt-font);color:#2a2c2b}
+[data-rt-theme=x360] .ident-sub{font-size:11px;color:var(--x-green-lo)}
+[data-rt-theme=x360] label:not(:has(>input[type=checkbox])):not(.toggle){font-size:12px;font-weight:600;color:var(--x-ink-2)}
+[data-rt-theme=x360] :is(p,small,.hint){color:var(--x-ink-2)}
+/* The header: the top of a blade, with a green rim */
+[data-rt-theme=x360] .bar{background:linear-gradient(180deg,#ffffff,#eceee9);border-radius:11px 11px 0 0;box-shadow:inset 0 -3px 0 var(--x-green),0 1px 0 #fff}
+[data-rt-theme=x360] .bar .icon-btn{color:#555955;background:linear-gradient(180deg,#fff,#e6e8e4);border:1px solid #c5c9c3;border-radius:50%}
+[data-rt-theme=x360] .bar .icon-btn:hover{color:#fff;background:var(--x-gloss);border-color:#4e8d1e}
+[data-rt-theme=x360] :is(.mark[data-logo],img.mark,#brand-logo){--logo-pad:3px;background:linear-gradient(180deg,#fff,#e9ebe7);border:1px solid #c5c9c3;border-radius:8px;box-shadow:0 1px 2px rgba(0,0,0,.12)}
+[data-rt-theme=x360] .mark[data-logo]{width:40px;height:40px;margin:-5px 0}
+/* Boxes: white rounded list boxes */
+[data-rt-theme=x360] :where(details,.callout,.board-tools,.sheet,.card,.route-card,.panel,.mini-callout>div,.usage-banner,.facts>div,.matrix>div,.arcade-tickets>div){background:#fff;border:1px solid #d3d6d0;border-radius:8px;box-shadow:0 1px 2px rgba(0,0,0,.06)}
+[data-rt-theme=x360] details.feature{background:#fff}
+[data-rt-theme=x360] details.feature[open]{background:#fbfcfa;box-shadow:0 2px 6px rgba(0,0,0,.08)}
+[data-rt-theme=x360] details.feature>summary{font-size:13px;font-weight:600;color:#2a2c2b;border-radius:8px}
+[data-rt-theme=x360] details.feature[open]>summary{border-radius:8px 8px 0 0;box-shadow:inset 0 -1px 0 #e2e5df}
+[data-rt-theme=x360] summary::after{border-color:var(--x-green-lo)}
+[data-rt-theme=x360] summary:hover{background:#f4fbec}
+[data-rt-theme=x360] :is(.quick-help,.confirm,#setup,.deck-entry){background:linear-gradient(180deg,#fbfdf8,#f0f6e8);border:1px solid #c9e2ad;border-radius:8px;box-shadow:inset 4px 0 0 var(--x-green)}
+/* Stats: three white tiles */
+[data-rt-theme=x360] .stats{gap:5px;padding:0;background:transparent;box-shadow:none}
+[data-rt-theme=x360] .stat{padding:6px 10px;background:#fff;border:1px solid #d3d6d0;border-radius:8px;box-shadow:0 1px 2px rgba(0,0,0,.06)}
+[data-rt-theme=x360] .stat:first-child{border-left:1px solid #d3d6d0}
+[data-rt-theme=x360] .stat dt{font-size:11px;font-weight:600;color:var(--x-green-lo)}
+[data-rt-theme=x360] .stat dd{font-size:18px;font-weight:300;color:#2a2c2b}
+[data-rt-theme=x360] .stat small{color:var(--rt-ink-4)}
+/* Tabs: the blades' edges. Each blade has its colour; the open one is filled with it. */
+[data-rt-theme=x360] .tabs{gap:4px;padding:8px 8px 0;background:transparent;box-shadow:inset 0 -1px 0 #d3d6d0}
+[data-rt-theme=x360] .tabs button{--blade:var(--x-live);padding:7px 2px 6px;font-size:12px;font-weight:600;color:#555955;background:linear-gradient(180deg,#fff,#eceee9);border:1px solid #d3d6d0;border-bottom:0;border-radius:8px 8px 0 0;box-shadow:inset 0 3px 0 var(--blade)}
+[data-rt-theme=x360] .tabs button[data-tab=room]{--blade:var(--x-market)}
+[data-rt-theme=x360] .tabs button[data-tab=soundboard]{--blade:var(--x-media)}
+[data-rt-theme=x360] .tabs button[data-tab=setup]{--blade:var(--x-system)}
+[data-rt-theme=x360] .tabs button[data-tab=checks]{--blade:var(--x-games)}
+[data-rt-theme=x360] .tabs button .ic{color:var(--blade)}
+[data-rt-theme=x360] .tabs button:hover{color:#2a2c2b;background:#fff}
+[data-rt-theme=x360] .tabs button[aria-selected=true]{color:#fff;background:linear-gradient(180deg,color-mix(in srgb,var(--blade) 70%,#fff),var(--blade) 55%,color-mix(in srgb,var(--blade) 82%,#000));border-color:color-mix(in srgb,var(--blade) 80%,#000);box-shadow:inset 0 1px 0 rgba(255,255,255,.5);text-shadow:0 1px 1px rgba(0,0,0,.25)}
+[data-rt-theme=x360] .tabs button[aria-selected=true] .ic{color:#fff}
+[data-rt-theme=x360] .side{background:linear-gradient(180deg,#ffffff,#eef0ec);box-shadow:inset -1px 0 0 #d3d6d0}
+[data-rt-theme=x360] :is(.section-nav button,nav:not(.tabs) button){font-size:13px;font-weight:600;color:#3c3f3d;background:transparent;border:1px solid transparent;border-radius:6px;box-shadow:none}
+[data-rt-theme=x360] :is(.section-nav button,nav:not(.tabs) button):hover{color:#111312;background:#f4fbec;border-color:#c9e2ad}
+[data-rt-theme=x360] :is(.section-nav button[aria-current=page],nav:not(.tabs) button.active){color:#fff;background:var(--x-gloss);border-color:#4e8d1e;text-shadow:0 1px 1px rgba(0,0,0,.25)}
+[data-rt-theme=x360] :is(.section-nav button[aria-current=page],nav:not(.tabs) button.active) .ic{color:#fff}
+/* Buttons: white rounded keys; the selection glows green; the main action is the glossy green bar */
+[data-rt-theme=x360] button{font-size:12.5px;font-weight:600;color:#2a2c2b;background:linear-gradient(180deg,#fff,#e9ebe7);border:1px solid #bfc3bd;border-radius:6px;box-shadow:0 1px 1px rgba(0,0,0,.08)}
+[data-rt-theme=x360] button:hover{color:#2a2c2b;background:linear-gradient(180deg,#fff,#eef7e4);border-color:var(--x-green);box-shadow:0 0 0 2px rgba(111,187,46,.35)}
+[data-rt-theme=x360] button:active:not(:disabled){transform:translateY(1px)}
+[data-rt-theme=x360] :is(.primary,#start,#save){color:#fff;background:var(--x-gloss);border-color:#4e8d1e;text-shadow:0 1px 1px rgba(0,0,0,.28);box-shadow:inset 0 1px 0 rgba(255,255,255,.55),0 1px 2px rgba(0,0,0,.15)}
+[data-rt-theme=x360] :is(.primary,#start,#save):hover{color:#fff;background:var(--x-gloss-hi);border-color:#4e8d1e;box-shadow:inset 0 1px 0 rgba(255,255,255,.6),0 0 0 2px rgba(111,187,46,.35)}
+[data-rt-theme=x360] :is(.primary,#start,#save) .ic{color:#fff}
+[data-rt-theme=x360] .danger{color:#fff;background:linear-gradient(180deg,#f2766e 0,#e2382e 45%,#d1231a 55%,#b9170f);border-color:#8f1009;text-shadow:0 1px 1px rgba(0,0,0,.25)}
+[data-rt-theme=x360] .danger:hover{color:#fff;background:linear-gradient(180deg,#f78b84 0,#ea4a40 45%,#db2f25 55%,#c41d14);border-color:#8f1009;box-shadow:0 0 0 2px rgba(217,37,27,.3)}
+[data-rt-theme=x360] :is(.ghost,.icon){background:transparent;border-color:transparent;box-shadow:none}
+[data-rt-theme=x360] :is(.ghost,.icon):hover{background:#f4fbec;border-color:#c9e2ad}
+[data-rt-theme=x360] .link-btn{border:0;background:none;box-shadow:none;color:var(--rt-link)}
+[data-rt-theme=x360] button:disabled{color:var(--rt-ink-disabled);background:#eef0ec;border-color:#d3d6d0;box-shadow:none}
+/* Fields */
+[data-rt-theme=x360] input:where(:not([type=checkbox],[type=radio],[type=range],[type=file])),[data-rt-theme=x360] :is(textarea,select){color:#2a2c2b;background-color:#fff;border:1px solid #bfc3bd;border-radius:6px;box-shadow:inset 0 1px 2px rgba(0,0,0,.08);font-family:var(--rt-font)}
+[data-rt-theme=x360] select{background-image:linear-gradient(45deg,transparent 50%,#3f7d14 50%),linear-gradient(135deg,#3f7d14 50%,transparent 50%)}
+[data-rt-theme=x360] select option{color:#2a2c2b;background:#fff}
+[data-rt-theme=x360] :is(input,textarea,select):focus{border-color:var(--x-green);box-shadow:0 0 0 3px rgba(111,187,46,.3)}
+[data-rt-theme=x360] input::placeholder,[data-rt-theme=x360] textarea::placeholder{color:#8a8e88}
+[data-rt-theme=x360] input[type=checkbox]{width:17px;height:17px;background:#fff;border:1px solid #9da29b;border-radius:4px}
+[data-rt-theme=x360] input[type=checkbox]:checked{background:var(--x-gloss);border-color:#4e8d1e}
+[data-rt-theme=x360] input[type=checkbox]:checked::after{border-color:#fff}
+[data-rt-theme=x360] .toggle>input[type=checkbox]{width:38px;height:20px;border-radius:10px;background:linear-gradient(180deg,#d7dad4,#eef0ec);border:1px solid #9da29b;box-shadow:inset 0 1px 2px rgba(0,0,0,.15)}
+[data-rt-theme=x360] .toggle>input[type=checkbox]::after{top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:linear-gradient(180deg,#fff,#dfe2dc);box-shadow:0 1px 2px rgba(0,0,0,.3)}
+[data-rt-theme=x360] .toggle>input[type=checkbox]:checked{background:var(--x-gloss);border-color:#4e8d1e}
+[data-rt-theme=x360] .toggle>input[type=checkbox]:checked::after{top:2px;left:2px;width:14px;height:14px;transform:translateX(18px);background:#fff}
+[data-rt-theme=x360] input[type=range]{accent-color:var(--x-green)}
+[data-rt-theme=x360] :is(pre,.output,.v22-log,.response){color:#2a2c2b;background:#fbfcfa;border:1px solid #d3d6d0;border-radius:6px;box-shadow:inset 0 1px 2px rgba(0,0,0,.05)}
+[data-rt-theme=x360] :is(.meter,.arcade-progress,.lat-track){background:#e2e5df;border-radius:6px;box-shadow:inset 0 1px 2px rgba(0,0,0,.12)}
+[data-rt-theme=x360] .pill{color:#fff;background:var(--x-gloss);border-radius:10px;box-shadow:none;text-shadow:0 1px 1px rgba(0,0,0,.2)}
+/* Soundboard pads: Media blade tiles; the playing one gets the green selection bar */
+[data-rt-theme=x360] .pad{background:linear-gradient(180deg,#fff,#eef0ec);border:1px solid #d3d6d0;border-radius:8px;box-shadow:inset 3px 0 0 var(--x-media)}
+[data-rt-theme=x360] .pad b{color:#2a2c2b;font-weight:600}
+[data-rt-theme=x360] .pad span{color:#1f7fbf;font-weight:600}
+[data-rt-theme=x360] .pad::after{border-left-color:#1f7fbf}
+[data-rt-theme=x360] .pad:hover{background:#fff;border-color:var(--x-green);box-shadow:inset 3px 0 0 var(--x-media),0 0 0 2px rgba(111,187,46,.3)}
+[data-rt-theme=x360] .pad.playing{background:var(--x-gloss);border-color:#4e8d1e;box-shadow:inset 0 1px 0 rgba(255,255,255,.5)}
+[data-rt-theme=x360] .pad.playing :is(b,span){color:#fff;text-shadow:0 1px 1px rgba(0,0,0,.25)}
+[data-rt-theme=x360] .pad.playing::after{background:#fff}
+[data-rt-theme=x360] :is(.step-n,.setup-n,.friend-card .avatar){font-weight:700;color:#fff;background:var(--x-gloss);border-radius:50%;text-shadow:0 1px 1px rgba(0,0,0,.25)}
+[data-rt-theme=x360] code{color:#3f7d14;background:#eef5e5;border-radius:4px}
+[data-rt-theme=x360] .savebar,[data-rt-theme=x360] .foot{background:linear-gradient(180deg,#f4f5f2,#e4e6e2);box-shadow:inset 0 1px 0 #fff,0 -1px 0 #d3d6d0;border-radius:0 0 11px 11px}
+[data-rt-theme=x360] .savebar{border-radius:0}
+[data-rt-theme=x360] .foot small{color:var(--x-ink-2)}
+[data-rt-theme=x360] .route li{background:#fff;border:1px solid #d3d6d0;border-radius:6px}
+[data-rt-theme=x360] .route li:last-child{color:#fff;background:var(--x-gloss);border-color:#4e8d1e}
+[data-rt-theme=x360] .vote{background:linear-gradient(90deg,rgba(111,187,46,.35) calc(var(--share,0)*100%),#fff 0);border:1px solid #d3d6d0;border-radius:6px}
+[data-rt-theme=x360] .vote-marker{font-weight:700;color:var(--x-green-lo)}
+[data-rt-theme=x360] :is(.scroll,.content,main){scrollbar-color:#a8ada5 transparent}
+html[data-rt-theme=x360]{scrollbar-color:#a8ada5 #e4e6e2}
+
+/* ── Checks: list items with a round status button ── */
+[data-rt-theme=x360] .checklist{display:flex;flex-direction:column;gap:4px}
+[data-rt-theme=x360] .checklist li{position:relative;padding:7px 10px 7px 38px;background:#fff;border:1px solid #d3d6d0;border-radius:8px}
+[data-rt-theme=x360] .checklist li::before{content:"";position:absolute;left:9px;top:50%;width:20px;height:20px;margin-top:-10px;border-radius:50%;background:linear-gradient(180deg,#d7dad4,#a8ada5);box-shadow:inset 0 1px 0 rgba(255,255,255,.6)}
+[data-rt-theme=x360] .checklist li::after{content:"?";position:absolute;left:9px;top:50%;width:20px;margin-top:-9px;text-align:center;font:700 12px/18px var(--rt-font);color:#fff}
+[data-rt-theme=x360] .checklist li[data-result=ok]::before{background:var(--x-gloss)}
+[data-rt-theme=x360] .checklist li[data-result=ok]::after{content:"A";}
+[data-rt-theme=x360] .checklist li[data-result=fail]::before{background:linear-gradient(180deg,#f2766e,#d1231a)}
+[data-rt-theme=x360] .checklist li[data-result=fail]::after{content:"B"}
+[data-rt-theme=x360] .checklist li[data-result=unknown]::before{background:linear-gradient(180deg,#ffe27a,#e8b400)}
+[data-rt-theme=x360] .checklist li[data-result=unknown]::after{content:"Y"}
+[data-rt-theme=x360] .checklist li.check-summary{background:linear-gradient(180deg,#fbfdf8,#f0f6e8);border-color:#c9e2ad}
+
+/* ── Status strip: the Ring of Light ──
+   Four quarters around a power button. One lights for Tyler and one for each person in the call
+   (the extras set data-ring, 1–4). They spin while he writes (the console starting up), pulse
+   while he talks, and three turn red and blink on a problem. */
+[data-rt-theme=x360] .tally{min-height:62px;padding:10px 14px 10px 70px;background:linear-gradient(180deg,#ffffff,#f2f3f0);border:1px solid #d3d6d0;border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+[data-rt-theme=x360] .tally-light{--q:#d6dad3;--q1:var(--q);--q2:var(--q);--q3:var(--q);--q4:var(--q);position:absolute;left:12px;top:50%;width:46px;height:46px;margin-top:-23px;border-radius:50%;background:radial-gradient(circle,#f7f8f6 0 13px,#c8ccc5 13.5px 15px,transparent 15.5px);box-shadow:none!important}
+[data-rt-theme=x360] .tally-light::before{content:"";position:absolute;inset:0;border-radius:50%;
+  background:conic-gradient(from -45deg,var(--q1) 0 84deg,transparent 84deg 96deg,var(--q2) 96deg 174deg,transparent 174deg 186deg,var(--q3) 186deg 264deg,transparent 264deg 276deg,var(--q4) 276deg 354deg,transparent 354deg);
+  -webkit-mask:radial-gradient(circle,transparent 0 16px,#000 16.5px 22px,transparent 22.5px);mask:radial-gradient(circle,transparent 0 16px,#000 16.5px 22px,transparent 22.5px)}
+/* The power symbol in the middle */
+[data-rt-theme=x360] .tally-light::after{content:"";position:absolute;left:50%;top:50%;width:12px;height:12px;margin:-5px 0 0 -6px;border:2px solid #7b8079;border-top-color:transparent;border-radius:50%;box-shadow:0 -7px 0 -5px #7b8079}
+[data-rt-theme=x360] .tally:is([data-state=ready],[data-state=listening]) .tally-light{--q1:#7fd33a}
+[data-rt-theme=x360] .tally:is([data-state=ready],[data-state=listening])[data-ring="2"] .tally-light{--q1:#7fd33a;--q2:#7fd33a}
+[data-rt-theme=x360] .tally:is([data-state=ready],[data-state=listening])[data-ring="3"] .tally-light{--q1:#7fd33a;--q2:#7fd33a;--q3:#7fd33a}
+[data-rt-theme=x360] .tally:is([data-state=ready],[data-state=listening])[data-ring="4"] .tally-light{--q:#7fd33a}
+[data-rt-theme=x360] .tally[data-state=thinking] .tally-light{--q1:#7fd33a;--q2:#bfe796;--q3:#e3f2d2}
+[data-rt-theme=x360] .tally[data-state=thinking] .tally-light::before{animation:x-spin .9s linear infinite}
+[data-rt-theme=x360] .tally[data-state=speaking] .tally-light{--q:#7fd33a}
+[data-rt-theme=x360] .tally[data-state=speaking] .tally-light::before{animation:x-glow 1s ease-in-out infinite}
+[data-rt-theme=x360] .tally[data-state=waiting] .tally-light{--q1:#f0b400;--q3:#f0b400}
+[data-rt-theme=x360] .tally[data-state=waiting] .tally-light::before{animation:x-spin 2.4s linear infinite}
+[data-rt-theme=x360] .tally[data-state=error] .tally-light{--q1:#e2231a;--q2:#e2231a;--q3:#e2231a}
+[data-rt-theme=x360] .tally[data-state=error] .tally-light::before{animation:x-blink 1s steps(2,jump-none) infinite}
+[data-rt-theme=x360] .tally[data-state=error] .tally-light::after{border-color:#c4170f;border-top-color:transparent;box-shadow:0 -7px 0 -5px #c4170f}
+[data-rt-theme=x360] :is(.tally-head,.tally-body){position:static}
+[data-rt-theme=x360] .tally-label{font-size:15px;font-weight:300;color:var(--tone)}
+[data-rt-theme=x360] .tally-text{color:#3c3f3d}
+[data-rt-theme=x360] .tally-wave i{background:var(--x-green);width:3px;border-radius:2px}
+[data-rt-theme=x360] .tally-trace{display:none}
+[data-rt-theme=x360] .tally[data-flash=ok]{box-shadow:0 0 0 3px rgba(111,187,46,.45)}
+[data-rt-theme=x360] .tally[data-flash=fail]{box-shadow:0 0 0 3px rgba(226,35,26,.35)}
+@keyframes x-spin{to{transform:rotate(1turn)}}
+@keyframes x-glow{50%{opacity:.55}}
+@keyframes x-blink{50%{opacity:.3}}
+
+/* ── Icons, dialogs, notifications and tooltips ──
+   Notifications are the console's dark rounded pop-ups, with a round icon on the left. */
+[data-rt-theme=x360] .ic{--ic-w:1.7px;--ic-cap:round;--ic-join:round}
+[data-rt-theme=x360] .rt-toast{color:#fff;background:linear-gradient(180deg,#4a4d4b,#252726 55%,#1a1b1a);border:1px solid #111;border-radius:26px;padding:10px 12px 10px 14px;box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 10px 26px rgba(0,0,0,.45)}
+[data-rt-theme=x360] .rt-toast>.ic{--ic-size:16px;padding:6px;box-sizing:content-box;color:#fff;background:radial-gradient(circle at 50% 30%,color-mix(in srgb,var(--tone) 55%,#fff),var(--tone) 70%);border-radius:50%;box-shadow:0 0 0 2px rgba(255,255,255,.25)}
+[data-rt-theme=x360] :is(.rt-toast,.rt-dialog)[data-kind=success]{--tone:#6fbb2e}
+[data-rt-theme=x360] :is(.rt-toast,.rt-dialog)[data-kind=warning]{--tone:#e8a400}
+[data-rt-theme=x360] :is(.rt-toast,.rt-dialog)[data-kind=error]{--tone:#e2231a}
+[data-rt-theme=x360] :is(.rt-toast,.rt-dialog):not([data-kind]),[data-rt-theme=x360] :is(.rt-toast,.rt-dialog)[data-kind=info]{--tone:#2a9be0}
+[data-rt-theme=x360] .rt-toast .rt-toast-title{font-weight:600;color:#fff}
+[data-rt-theme=x360] .rt-toast-text{color:#d6dad3}
+[data-rt-theme=x360] .rt-toast .rt-x{color:#c5c9c3;background:transparent;border:0;border-radius:50%;box-shadow:none;min-height:0}
+[data-rt-theme=x360] .rt-toast .rt-x:hover{color:#fff;background:rgba(255,255,255,.12)}
+[data-rt-theme=x360] .rt-toast button:not(.rt-x){color:#fff;background:var(--x-gloss);border-color:#4e8d1e}
+[data-rt-theme=x360] .rt-dialog{color:#2a2c2b;background:var(--x-blade);border:1px solid #fff;border-radius:12px;box-shadow:0 0 0 1px #c5c9c3,0 18px 46px rgba(0,0,0,.4)}
+[data-rt-theme=x360] .rt-dialog .rt-dialog-title{font-weight:300;font-size:18px;color:#2a2c2b}
+[data-rt-theme=x360] .rt-dialog .ic{color:var(--tone)}
+[data-rt-theme=x360] .rt-tip{background:linear-gradient(180deg,#3a3d3b,#1d1f1e);color:#fff;border:1px solid #111;border-radius:12px}
+
+
+/* ── Motion: Xbox 360 ──
+   Opening a blade slides it in from the right; notifications rise from the bottom; the ring of
+   light above is the signature. */
+@keyframes x-blade{from{opacity:0;transform:translateX(26px)}to{opacity:1;transform:none}}
+@keyframes x-rise{from{opacity:0;transform:translateY(16px) scale(.96)}to{opacity:1;transform:none}}
+[data-rt-theme=x360] :is(.view:not([hidden]),.sheet,section[data-view]:not([hidden])){animation:x-blade .26s cubic-bezier(.2,.8,.25,1) backwards}
+[data-rt-theme=x360] .rt-toast:not(.rt-leaving){animation:x-rise .3s cubic-bezier(.2,.8,.25,1) backwards}
+[data-rt-theme=x360] .checklist li{animation:x-blade .22s ease-out backwards}
+[data-rt-theme=x360] .vote[data-arrived]{animation:x-rise .25s ease-out}

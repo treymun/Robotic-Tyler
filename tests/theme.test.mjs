@@ -37,7 +37,7 @@ test('the theme setting is readable by the chat panel but only the settings page
 const THEMES=['steam',...fs.readdirSync(path.join(ROOT,'browser-extension/ui/themes')).filter(f=>f.endsWith('.css')).map(f=>f.slice(0,-4)).sort()];
 
 test('every theme ships to all three surfaces and every theme list agrees',()=>{
- assert.deepEqual([...THEMES].sort(),['classic','combine','cs16','cs2','deadlock','dod','doom','dreamcast','gmod','hev','l4d','minecraft','payday','pipboy','portal','quake','ricochet','steam','tf2','winxp']);
+ assert.deepEqual([...THEMES].sort(),['classic','combine','cs16','cs2','deadlock','dod','doom','dreamcast','gmod','hev','ipod','l4d','minecraft','msn','payday','pipboy','portal','quake','ricochet','rust','steam','tf2','winxp','x360','xmb']);
  const ui=read('browser-extension/ui-template.js'),settings=read('browser-extension/settings.html'),voice=read('voice-app/native.html');
  for(const t of THEMES.filter(t=>t!=='steam')){
   assert.ok(ui.includes('[data-rt-theme='+t+']{color-scheme:'),t+' compiled into the chat panel');

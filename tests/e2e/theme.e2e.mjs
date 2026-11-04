@@ -28,14 +28,14 @@ test('the panel switches between all fifteen themes live, each with its own stat
   await page.evaluate(()=>{for(const fn of listeners)fn({type:'storage:changed',changes:{uiTheme:{oldValue:'classic',newValue:'steam'}}});});
   l=await look();assert.equal(l.theme,'steam');assert.equal(l.bg,'rgb(27, 40, 56)');assert.equal(l.radius,'4px');assert.equal(l.logo,true);
   // Every theme applies live; each brings its own canvas colour.
-  const canvas={steam:'#1b2838',classic:'#3e4637',tf2:'#2e2b2a',cs2:'#14202b',portal:'#eceff1',cs16:'#100f0c',hev:'#15120b',l4d:'#111111',winxp:'#ece9d8',doom:'#140a08',quake:'#17120e',pipboy:'#041208',combine:'#15191c',deadlock:'#141112',minecraft:'#c6c6c6',payday:'#0c1117',dreamcast:'#f3f1ec',gmod:'#e2e5e8',ricochet:'#070a14',dod:'#353a1f'};
+  const canvas={steam:'#1b2838',classic:'#3e4637',tf2:'#2e2b2a',cs2:'#14202b',portal:'#eceff1',cs16:'#100f0c',hev:'#15120b',l4d:'#111111',winxp:'#ece9d8',doom:'#140a08',quake:'#17120e',pipboy:'#041208',combine:'#15191c',deadlock:'#141112',minecraft:'#c6c6c6',payday:'#0c1117',dreamcast:'#f3f1ec',gmod:'#e2e5e8',ricochet:'#070a14',dod:'#353a1f',rust:'#1c1b19',x360:'#eef0ec',ipod:'#ffffff',msn:'#e8f1fb',xmb:'#0f2350'};
   for(const [theme,bg] of Object.entries(canvas)){
    await page.evaluate(t=>{for(const fn of listeners)fn({type:'storage:changed',changes:{uiTheme:{newValue:t}}});},theme);
    const got=await page.evaluate(()=>{const p=document.getElementById('tyler-companion-root').shadowRoot.querySelector('.panel');return {theme:p.dataset.rtTheme,bg:getComputedStyle(p).getPropertyValue('--rt-bg').trim()};});
    assert.deepEqual(got,{theme,bg},theme);
   }
   // Each game theme brings its own font, loaded into the page for the shadow root to use.
-  for(const [theme,family] of [['tf2','Tyler TF2 Display'],['cs2','Tyler CS2'],['portal','Tyler Portal'],['quake','Tyler Quake'],['pipboy','Tyler Pip-Boy'],['combine','Tyler Combine'],['deadlock','Tyler Deadlock'],['minecraft','Tyler Minecraft'],['payday','Tyler PAYDAY'],['dreamcast','Tyler Dreamcast'],['gmod','Tyler GMod'],['ricochet','Tyler Ricochet'],['dod','Tyler DoD']]){
+  for(const [theme,family] of [['tf2','Tyler TF2 Display'],['cs2','Tyler CS2'],['portal','Tyler Portal'],['quake','Tyler Quake'],['pipboy','Tyler Pip-Boy'],['combine','Tyler Combine'],['deadlock','Tyler Deadlock'],['minecraft','Tyler Minecraft'],['payday','Tyler PAYDAY'],['dreamcast','Tyler Dreamcast'],['gmod','Tyler GMod'],['ricochet','Tyler Ricochet'],['dod','Tyler DoD'],['rust','Tyler Rust'],['ipod','Tyler iPod'],['xmb','Tyler XMB']]){
    await page.evaluate(t=>{for(const fn of listeners)fn({type:'storage:changed',changes:{uiTheme:{newValue:t}}});},theme);
    await page.evaluate(()=>document.fonts.ready);
    const font=await page.evaluate(f=>({loaded:document.fonts.check('16px "'+f+'"'),used:getComputedStyle(document.getElementById('tyler-companion-root').shadowRoot.querySelector('.tabs button')).fontFamily}),family);

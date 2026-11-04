@@ -1,0 +1,210 @@
+/*
+ * ROBOTIC TYLER "Rust style" theme (v2.27).
+ * Rust's survival menus: dark see-through panels laid over the world, flat square boxes, off-white
+ * condensed capitals, inventory slots for the soundboard, olive-green Craft buttons, rust-red for
+ * anything dangerous and the blue of a selected belt slot. The status strip is a status-effect
+ * row: a coloured square with its icon, the state in capitals and a crafting bar along the bottom
+ * that fills while Tyler writes. The extras (theme-pack-4.js) add the vitals, the belt, the
+ * crafting menu, the Tool Cupboard and the wounded screen.
+ * Type: "Tyler Rust" = Roboto Condensed (OFL), the condensed sans of Rust's own menus.
+ * Branding (v2.27): the owner's Rust logo art (the Tyler logo) is the only game art; the rivets and
+ * the hazard stripe are drawn here, after the owner's artwork.
+ */
+[data-rt-theme=rust]{
+  color-scheme:dark;
+  --ru-ink:#e7e0d6;--ru-ink-2:#c9c1b5;--ru-dim:#968e82;--ru-panel:#1c1b19;--ru-panel-2:#232220;--ru-slot:rgba(255,255,255,.065);--ru-slot-hi:rgba(255,255,255,.11);--ru-line:rgba(255,255,255,.07);
+  --ru-rust:#cd412b;--ru-rust-hi:#e0573f;--ru-green:#6b7f35;--ru-green-hi:#7c933f;--ru-green-ink:#e3f1c2;--ru-red:#a5352a;--ru-red-hi:#ba4031;--ru-blue:#3a6c9c;--ru-blue-hi:#4a80b4;
+  --ru-health:#b63b2b;--ru-food:#c1802a;--ru-water:#3478b5;
+  --rt-bar:#141311;--rt-bg:#1c1b19;--rt-bg-deep:#121110;--rt-surface:#232220;--rt-surface-2:#2a2826;--rt-surface-3:#33302d;
+  --rt-block:rgba(255,255,255,.045);--rt-block-hover:rgba(255,255,255,.08);--rt-input:#121110;--rt-select:rgba(58,108,156,.55);
+  --rt-line:rgba(255,255,255,.08);--rt-line-soft:rgba(255,255,255,.055);--rt-line-strong:rgba(255,255,255,.22);
+  --rt-ink:#e7e0d6;--rt-ink-strong:#fbf6ee;--rt-ink-2:#d3cbbf;--rt-ink-3:#aaa296;--rt-ink-4:#9a9286;--rt-ink-disabled:#5e5952;
+  --rt-link:#e78a6f;--rt-link-hover:#fbf6ee;--rt-blue:#e7e0d6;--rt-blue-deep:#cd412b;--rt-active:#cd412b;
+  --rt-blue-fade:rgba(255,255,255,.1);--rt-blue-fade-hover:rgba(255,255,255,.17);
+  --rt-green:#4f6127;--rt-green-hover:#5a6e2c;--rt-green-ink:#eef7d9;--rt-green-line:#4c5c22;
+  --rt-state-standby:#7a746b;--rt-state-ready:#8fa84a;--rt-state-listening:#8fa84a;--rt-state-thinking:#c79a2e;--rt-state-speaking:#e5664d;--rt-state-waiting:#3a6c9c;--rt-state-error:#f07a66;
+  --rt-danger:#e0573f;--rt-danger-bg:#a5352a;--rt-danger-hover:#ba4031;--rt-danger-ink:#fbe3dc;--rt-success:#9cb85a;--rt-focus:#e7e0d6;
+  --rt-accent:#cd412b;--rt-accent-soft:rgba(205,65,43,.14);--rt-accent-line:rgba(205,65,43,.5);
+  --rt-on-accent:#fbf6ee;--rt-accent-fill:#3a6c9c;--rt-meter:linear-gradient(90deg,#6b7f35,#9cb85a);--rt-marker:#fbf6ee;--rt-edge:rgba(255,255,255,.07);--rt-page-glow:#262320;
+  --rt-font:"Tyler Rust","Roboto Condensed","Arial Narrow",Arial,sans-serif;--rt-font-display:"Tyler Rust","Roboto Condensed","Arial Narrow",Arial,sans-serif;
+  --rt-text-xs:11px;--rt-text-sm:12.5px;--rt-text-md:13.5px;--rt-text-lg:15px;--rt-track:.03em;
+  --rt-r-xs:0;--rt-r-sm:1px;--rt-r-md:2px;--rt-r-lg:2px;--rt-shadow-float:0 0 0 1px rgba(0,0,0,.6),0 18px 44px rgba(0,0,0,.65);
+  /* A faint grain over the dark glass, as Rust's panels have over the world behind them */
+  --ru-grain:repeating-linear-gradient(115deg,rgba(255,255,255,.012) 0 2px,transparent 2px 5px),radial-gradient(120% 70% at 20% 0,rgba(205,65,43,.07),transparent 60%);
+}
+.panel[data-rt-theme=rust]{background:var(--ru-grain),rgba(28,27,25,.97);border:1px solid rgba(255,255,255,.06);border-radius:2px;box-shadow:var(--rt-shadow-float)}
+[data-rt-theme=rust] body{background:radial-gradient(90% 60% at 70% 0,rgba(205,65,43,.12),transparent 60%),radial-gradient(70% 50% at 0 100%,rgba(107,127,53,.1),transparent 60%),linear-gradient(180deg,#191816,#0f0e0d)}
+[data-rt-theme=rust] main{background:transparent}
+/* Off-white condensed capitals */
+[data-rt-theme=rust] :is(h1,h2,h3,.wordmark,.brand-text strong,.sheet-head h2,.card>h2,.marquee,details.feature>summary,.tally-label,.stat dt,.pulse dt,.facts b,.matrix dt,.tabs button,.section-nav button,nav:not(.tabs) button,button,.pad span,.ident-sub){font-family:var(--rt-font-display);text-transform:uppercase;letter-spacing:.03em}
+[data-rt-theme=rust] :is(h1,h2,h3,.sheet-head h2,.card>h2){font-weight:700;color:var(--ru-ink)}
+[data-rt-theme=rust] h2{font-size:18px}
+[data-rt-theme=rust] h1{font-size:30px;letter-spacing:.02em}
+[data-rt-theme=rust] .wordmark{font-size:17px;font-weight:700;letter-spacing:.06em;color:var(--ru-ink)}
+[data-rt-theme=rust] .ident-sub{font-size:10.5px;letter-spacing:.08em;color:var(--ru-dim)}
+[data-rt-theme=rust] label:not(:has(>input[type=checkbox])):not(.toggle){font-size:11px;font-weight:700;letter-spacing:.06em;color:var(--ru-dim)}
+[data-rt-theme=rust] label:has(>input[type=checkbox]),[data-rt-theme=rust] .toggle{text-transform:none;letter-spacing:0}
+[data-rt-theme=rust] :is(p,small,.hint){color:var(--rt-ink-3)}
+/* The header: a darker strip, as over Rust's inventory panels */
+[data-rt-theme=rust] .bar{background:repeating-linear-gradient(-45deg,#d8c9ad 0 5px,transparent 5px 10px) 10px 0/84px 3px no-repeat,linear-gradient(180deg,rgba(255,255,255,.035),transparent),#151412;border-bottom:1px solid rgba(255,255,255,.06);box-shadow:inset 0 2px 0 var(--ru-rust)}
+/* Rivets in the panel's corners, as on the owner's artwork's metal plate. */
+.panel[data-rt-theme=rust]{--ru-rivet:radial-gradient(circle,#8c7660 0 1.6px,#3a312a 2.2px 3px,transparent 3.6px)}
+.panel[data-rt-theme=rust]>.foot{background-image:var(--ru-rivet),var(--ru-rivet);background-size:9px 9px;background-repeat:no-repeat;background-position:3px calc(100% - 3px),calc(100% - 3px) calc(100% - 3px)}
+[data-rt-theme=rust] .bar .icon-btn{color:var(--ru-ink-2);background:var(--ru-slot);border:0;border-radius:0}
+[data-rt-theme=rust] .bar .icon-btn:hover{color:#fff;background:var(--ru-slot-hi)}
+[data-rt-theme=rust] :is(.mark[data-logo],img.mark,#brand-logo){--logo-pad:2px;background:rgba(255,255,255,.05);border:0;border-radius:0;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+[data-rt-theme=rust] .mark[data-logo]{width:40px;height:40px;margin:-5px 0}
+/* Sections are flat see-through boxes */
+[data-rt-theme=rust] :where(details,.callout,.board-tools,.sheet,.card,.route-card,.panel,.mini-callout>div,.usage-banner,.facts>div,.matrix>div,.arcade-tickets>div){background:rgba(255,255,255,.035);border:0;border-radius:0;box-shadow:inset 0 0 0 1px rgba(255,255,255,.05)}
+[data-rt-theme=rust] details.feature{background:rgba(255,255,255,.035)}
+[data-rt-theme=rust] details.feature[open]{background:rgba(0,0,0,.25);box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
+[data-rt-theme=rust] details.feature>summary{font-size:12.5px;font-weight:700;color:var(--ru-ink);border-radius:0}
+[data-rt-theme=rust] details.feature[open]>summary{background:rgba(255,255,255,.05);box-shadow:inset 0 -1px 0 rgba(255,255,255,.06)}
+[data-rt-theme=rust] summary::after{border-color:var(--ru-dim)}
+[data-rt-theme=rust] :is(.quick-help,.confirm,#setup,.deck-entry){background:rgba(0,0,0,.3);border:0;border-left:3px solid var(--ru-rust);border-radius:0;box-shadow:inset 0 0 0 1px rgba(255,255,255,.05)}
+[data-rt-theme=rust] .confirm{border-left-color:var(--ru-blue)}
+/* Stats: the vitals panel's dark rows */
+[data-rt-theme=rust] .stats{gap:3px;padding:3px;background:rgba(0,0,0,.35);border-radius:0;box-shadow:inset 0 0 0 1px rgba(255,255,255,.05)}
+[data-rt-theme=rust] .stat{padding:6px 9px;background:var(--ru-slot);border:0}
+[data-rt-theme=rust] .stat:first-child{border-left:0}
+[data-rt-theme=rust] .stat dt{font-size:10px;font-weight:700;color:var(--ru-dim)}
+[data-rt-theme=rust] .stat dd{font-family:var(--rt-font-display);font-size:18px;font-weight:700;color:var(--ru-ink);letter-spacing:.01em}
+[data-rt-theme=rust] .stat small{color:var(--rt-ink-4)}
+/* Tabs: inventory category boxes; the open one is lit and underlined in rust red */
+[data-rt-theme=rust] .tabs{gap:3px;padding:8px 8px 0;background:transparent;box-shadow:none}
+[data-rt-theme=rust] .tabs button{padding:8px 2px 7px;font-size:11px;font-weight:700;color:var(--ru-dim);background:var(--ru-slot);border:0;border-bottom:2px solid transparent;border-radius:0}
+[data-rt-theme=rust] .tabs button .ic{color:var(--ru-dim)}
+[data-rt-theme=rust] .tabs button:hover{color:var(--ru-ink);background:var(--ru-slot-hi)}
+[data-rt-theme=rust] .tabs button[aria-selected=true]{color:#fff;background:rgba(255,255,255,.14);border-bottom-color:var(--ru-rust)}
+[data-rt-theme=rust] .tabs button[aria-selected=true] .ic{color:#fff}
+[data-rt-theme=rust] .side{background:rgba(20,19,17,.92);box-shadow:inset -1px 0 0 rgba(255,255,255,.06)}
+[data-rt-theme=rust] :is(.section-nav button,nav:not(.tabs) button){font-size:12px;font-weight:700;color:var(--ru-dim);background:transparent;border:0;border-radius:0;box-shadow:none}
+[data-rt-theme=rust] :is(.section-nav button,nav:not(.tabs) button):hover{color:var(--ru-ink);background:var(--ru-slot)}
+[data-rt-theme=rust] :is(.section-nav button[aria-current=page],nav:not(.tabs) button.active){color:#fff;background:rgba(255,255,255,.12);box-shadow:inset 3px 0 0 var(--ru-rust)}
+/* Buttons: flat boxes with capitals; Craft is olive green, anything that stops or removes is red */
+[data-rt-theme=rust] button{font-size:11.5px;font-weight:700;color:var(--ru-ink-2);background:var(--rt-blue-fade);border:0;border-radius:0;box-shadow:none;min-height:30px}
+[data-rt-theme=rust] button:hover{color:#fff;background:var(--rt-blue-fade-hover)}
+[data-rt-theme=rust] button:active:not(:disabled){transform:none;background:rgba(255,255,255,.22)}
+[data-rt-theme=rust] :is(.primary,#start,#save){color:var(--ru-green-ink);background:var(--ru-green);box-shadow:none}
+[data-rt-theme=rust] :is(.primary,#start,#save):hover{color:#f3fbe2;background:var(--ru-green-hi)}
+[data-rt-theme=rust] :is(.primary,#start,#save) .ic{color:var(--ru-green-ink)}
+[data-rt-theme=rust] .danger{color:var(--rt-danger-ink);background:var(--ru-red)}
+[data-rt-theme=rust] .danger:hover{color:#fff;background:var(--ru-red-hi)}
+[data-rt-theme=rust] :is(.ghost,.icon){color:var(--ru-dim);background:transparent}
+[data-rt-theme=rust] :is(.ghost,.icon):hover{color:var(--ru-ink);background:var(--ru-slot)}
+[data-rt-theme=rust] .link-btn{background:none;color:var(--rt-link);min-height:0}
+[data-rt-theme=rust] button:disabled{color:var(--rt-ink-disabled);background:rgba(255,255,255,.04)}
+/* Fields: dark wells */
+[data-rt-theme=rust] input:where(:not([type=checkbox],[type=radio],[type=range],[type=file])),[data-rt-theme=rust] :is(textarea,select){color:var(--ru-ink);background-color:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.08);border-radius:0;box-shadow:none;font-family:var(--rt-font)}
+[data-rt-theme=rust] select{background-image:linear-gradient(45deg,transparent 50%,var(--ru-dim) 50%),linear-gradient(135deg,var(--ru-dim) 50%,transparent 50%)}
+[data-rt-theme=rust] select option{color:var(--ru-ink);background:#1c1b19}
+[data-rt-theme=rust] :is(input,textarea,select):focus{border-color:rgba(255,255,255,.4);box-shadow:none}
+[data-rt-theme=rust] input::placeholder,[data-rt-theme=rust] textarea::placeholder{color:#6f685f}
+[data-rt-theme=rust] input[type=checkbox]{width:16px;height:16px;background:rgba(0,0,0,.45);border:1px solid rgba(255,255,255,.14);border-radius:0}
+[data-rt-theme=rust] input[type=checkbox]:checked{background:var(--ru-green);border-color:var(--ru-green-hi)}
+[data-rt-theme=rust] input[type=checkbox]:checked::after{border-color:#fff}
+[data-rt-theme=rust] .toggle>input[type=checkbox]{width:36px;height:18px;border-radius:0;background:rgba(0,0,0,.5);border:1px solid rgba(255,255,255,.12)}
+[data-rt-theme=rust] .toggle>input[type=checkbox]::after{top:2px;left:2px;width:12px;height:12px;border-radius:0;background:#8f877b}
+[data-rt-theme=rust] .toggle>input[type=checkbox]:checked{background:var(--ru-green);border-color:var(--ru-green-hi)}
+[data-rt-theme=rust] .toggle>input[type=checkbox]:checked::after{top:2px;left:2px;width:12px;height:12px;border-radius:0;transform:translateX(18px);background:#f3fbe2}
+[data-rt-theme=rust] input[type=range]{accent-color:var(--ru-green-hi)}
+[data-rt-theme=rust] :is(pre,.output,.v22-log,.response){color:var(--ru-ink-2);background:rgba(0,0,0,.45);border:0;border-radius:0;box-shadow:inset 0 0 0 1px rgba(255,255,255,.05);font-family:Consolas,"Courier New",monospace}
+[data-rt-theme=rust] :is(.meter,.arcade-progress,.lat-track){background:rgba(0,0,0,.5);border-radius:0}
+[data-rt-theme=rust] .pill{color:var(--ru-ink);background:rgba(255,255,255,.1);border-radius:0;box-shadow:none}
+/* Soundboard pads are inventory slots: the slot number in the corner, the clip's name along the
+   bottom; the one playing is the blue of a selected belt slot. */
+[data-rt-theme=rust] .pads{gap:3px}
+[data-rt-theme=rust] .pad{min-height:58px;justify-content:flex-end;padding:6px 26px 6px 9px;background:var(--ru-slot);border:0;border-radius:0;box-shadow:none}
+[data-rt-theme=rust] .pad b{font-weight:700;color:var(--ru-ink)}
+[data-rt-theme=rust] .pad span{font-size:10px;color:var(--ru-dim)}
+[data-rt-theme=rust] .pad::after{border-left-color:var(--ru-dim)}
+[data-rt-theme=rust] .pad:hover{background:var(--ru-slot-hi)}
+[data-rt-theme=rust] .pad[data-fav=true]{box-shadow:inset 0 -2px 0 var(--ru-food)}
+[data-rt-theme=rust] .pad.playing{background:linear-gradient(180deg,rgba(74,128,180,.55),rgba(58,108,156,.45));box-shadow:inset 0 0 0 1px var(--ru-blue-hi)}
+[data-rt-theme=rust] .pad.playing::after{background:#fff}
+[data-rt-theme=rust] :is(.step-n,.setup-n,.friend-card .avatar){font-family:var(--rt-font-display);font-weight:700;color:#fff;background:var(--ru-rust);border-radius:0}
+[data-rt-theme=rust] code{font-family:Consolas,"Courier New",monospace;color:#f0c2b4;background:rgba(0,0,0,.4);border-radius:0}
+[data-rt-theme=rust] .savebar,[data-rt-theme=rust] .foot{background:#151412;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+[data-rt-theme=rust] .foot small{color:var(--ru-dim)}
+[data-rt-theme=rust] .route li{background:var(--ru-slot);border-radius:0}
+[data-rt-theme=rust] .route li:last-child{background:rgba(107,127,53,.3);box-shadow:inset 3px 0 0 var(--ru-green-hi)}
+[data-rt-theme=rust] .vote{background:linear-gradient(90deg,rgba(107,127,53,.45) calc(var(--share,0)*100%),rgba(255,255,255,.05) 0);border:0;border-radius:0}
+[data-rt-theme=rust] .vote-marker{font-family:var(--rt-font-display);font-weight:700;color:var(--ru-green-ink)}
+[data-rt-theme=rust] :is(.scroll,.content,main){scrollbar-color:#4a4642 transparent}
+html[data-rt-theme=rust]{scrollbar-color:#4a4642 #141311}
+
+/* ── The checks: notification rows with a coloured square, like Rust's status list ── */
+[data-rt-theme=rust] .checklist{display:flex;flex-direction:column;gap:3px}
+[data-rt-theme=rust] .checklist li{position:relative;padding:7px 10px 7px 40px;min-height:30px;background:var(--ru-slot);border:0}
+[data-rt-theme=rust] .checklist li::before{content:"";position:absolute;left:0;top:0;bottom:0;width:30px;background:#4a4642}
+[data-rt-theme=rust] .checklist li::after{content:"·";position:absolute;left:0;top:50%;width:30px;margin-top:-9px;text-align:center;font:700 15px/18px var(--rt-font-display);color:#fff}
+[data-rt-theme=rust] .checklist li[data-result=ok]::before{background:var(--ru-green)}
+[data-rt-theme=rust] .checklist li[data-result=ok]::after{content:"✓"}
+[data-rt-theme=rust] .checklist li[data-result=fail]::before{background:var(--ru-red)}
+[data-rt-theme=rust] .checklist li[data-result=fail]::after{content:"!"}
+[data-rt-theme=rust] .checklist li[data-result=unknown]::before{background:#5a554e}
+[data-rt-theme=rust] .checklist li[data-result=unknown]::after{content:"?"}
+[data-rt-theme=rust] .checklist b{font-family:var(--rt-font-display);font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--ru-ink)}
+[data-rt-theme=rust] .checklist li.check-summary{background:rgba(255,255,255,.09)}
+
+/* ── Status strip: a status-effect row ──
+   A coloured square holds the state's icon (the panel's level bars, in white), the state is in
+   capitals beside it, and a bar along the bottom shows the work: it fills over Tyler's usual reply
+   time while he writes, stays lit in rust red while he talks and blinks red on a problem. */
+[data-rt-theme=rust] .tally{min-height:56px;padding:9px 12px 12px 56px;background:rgba(0,0,0,.35);border:0;border-radius:0;box-shadow:inset 0 0 0 1px rgba(255,255,255,.05)}
+[data-rt-theme=rust] .tally-light{position:absolute;left:9px;top:50%;width:36px;height:36px;margin-top:-20px;border-radius:0;background:var(--tone);box-shadow:none!important}
+[data-rt-theme=rust] :is(.tally-head,.tally-body){position:static}
+[data-rt-theme=rust] .tally-label{font-size:13px;font-weight:700;letter-spacing:.04em;color:var(--ru-ink)}
+[data-rt-theme=rust] .tally-text{color:var(--ru-ink-2)}
+[data-rt-theme=rust] .tally-time{color:var(--ru-dim);font-family:var(--rt-font-display);font-weight:700}
+/* The icon: the level bars sit in the square, white on its colour. */
+[data-rt-theme=rust] .tally-wave{position:absolute;left:9px;top:50%;width:36px;height:36px;margin-top:-20px;justify-content:center;gap:2px;z-index:2}
+[data-rt-theme=rust] .tally-wave i{width:3px;height:3px;background:#fff;opacity:.95;border-radius:0}
+[data-rt-theme=rust] .tally:is([data-state=ready],[data-state=paused],[data-state=standby]) .tally-wave i{height:3px}
+[data-rt-theme=rust] .tally[data-state=error] .tally-wave{display:none}
+[data-rt-theme=rust] .tally[data-state=error] .tally-light::after{content:"!";position:absolute;inset:0;text-align:center;font:700 26px/36px var(--rt-font-display);color:#fff}
+[data-rt-theme=rust] .tally[data-state=waiting] .tally-wave i{animation:ru-wait 1.2s ease-in-out infinite}
+[data-rt-theme=rust] .tally-trace{display:none}
+/* The work bar along the bottom */
+[data-rt-theme=rust] .tally::before{content:"";position:absolute;left:56px;right:12px;bottom:6px;height:3px;background:rgba(255,255,255,.08);pointer-events:none}
+[data-rt-theme=rust] .tally::after{content:"";position:absolute;left:56px;right:12px;bottom:6px;height:3px;background:var(--tone);transform-origin:0 50%;transform:scaleX(0);pointer-events:none}
+[data-rt-theme=rust] .tally[data-state=thinking]::after{animation:ru-craft 2.6s linear infinite}
+[data-rt-theme=rust] .tally[data-state=speaking]::after{transform:none;animation:ru-hot 1.4s ease-in-out infinite}
+[data-rt-theme=rust] .tally[data-state=listening]::after{transform:scaleX(1);opacity:.45}
+[data-rt-theme=rust] .tally[data-state=error]::after{transform:none;animation:ru-bleed 1s steps(2,jump-none) infinite}
+[data-rt-theme=rust] .tally[data-state=error]{box-shadow:inset 0 0 0 1px rgba(192,57,43,.55)}
+@keyframes ru-craft{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@keyframes ru-hot{50%{opacity:.6}}
+@keyframes ru-bleed{50%{opacity:.25}}
+@keyframes ru-wait{50%{transform:translateY(-3px)}}
+[data-rt-theme=rust] .tally[data-flash=ok]{box-shadow:inset 0 0 0 1px var(--ru-green-hi),0 0 0 1px rgba(124,147,63,.4)}
+[data-rt-theme=rust] .tally[data-flash=fail]{box-shadow:inset 0 0 0 1px var(--ru-red-hi),0 0 0 1px rgba(192,57,43,.4)}
+
+/* ── Icons, dialogs, notifications and tooltips ──
+   Notifications are Rust's pickup notices: a dark bar with a coloured square at the start. */
+[data-rt-theme=rust] .ic{--ic-w:1.7px;--ic-cap:square;--ic-join:miter}
+[data-rt-theme=rust] :is(.rt-toast,.rt-dialog){color:var(--ru-ink);background:rgba(24,23,21,.97);border:0;border-radius:0;box-shadow:inset 0 0 0 1px rgba(255,255,255,.07),0 10px 28px rgba(0,0,0,.6)}
+[data-rt-theme=rust] .rt-toast{border-left:34px solid var(--tone);padding-left:12px}
+[data-rt-theme=rust] .rt-toast>.ic{position:absolute;left:-26px;color:#fff}
+[data-rt-theme=rust] :is(.rt-toast,.rt-dialog)[data-kind=success]{--tone:var(--ru-green)}
+[data-rt-theme=rust] :is(.rt-toast,.rt-dialog)[data-kind=warning]{--tone:var(--ru-food)}
+[data-rt-theme=rust] :is(.rt-toast,.rt-dialog)[data-kind=error]{--tone:var(--ru-red)}
+[data-rt-theme=rust] :is(.rt-toast,.rt-dialog):not([data-kind]),[data-rt-theme=rust] :is(.rt-toast,.rt-dialog)[data-kind=info]{--tone:var(--ru-blue)}
+[data-rt-theme=rust] :is(.rt-toast,.rt-dialog) :is(.rt-toast-title,.rt-dialog-title){font-family:var(--rt-font-display);font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#fff}
+[data-rt-theme=rust] :is(.rt-toast-text,.rt-dialog-text,.rt-steps){color:var(--ru-ink-2)}
+[data-rt-theme=rust] .rt-dialog .ic{color:var(--tone)}
+[data-rt-theme=rust] :is(.rt-toast,.rt-dialog) .rt-x{color:var(--ru-dim);background:transparent;min-height:0}
+[data-rt-theme=rust] :is(.rt-toast,.rt-dialog) .rt-x:hover{color:#fff;background:var(--ru-slot)}
+[data-rt-theme=rust] .rt-dialog{border-top:3px solid var(--tone)}
+[data-rt-theme=rust] .rt-tip{background:#111;color:var(--ru-ink);border:0;border-radius:0;box-shadow:inset 0 0 0 1px rgba(255,255,255,.1);font-family:var(--rt-font)}
+
+
+/* ── Motion: Rust ──
+   Panels open at once with a short fade, as Rust's inventory does; notices slide in from the right
+   like item pickups; nothing bounces. The crafting bar and the bleed blink are above. */
+@keyframes ru-in{from{opacity:0}to{opacity:1}}
+@keyframes ru-pick{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:none}}
+[data-rt-theme=rust] :is(.view:not([hidden]),.sheet,section[data-view]:not([hidden])){animation:ru-in .14s ease-out backwards}
+[data-rt-theme=rust] .rt-toast:not(.rt-leaving){animation:ru-pick .22s cubic-bezier(.2,.8,.3,1) backwards}
+[data-rt-theme=rust] .checklist li{animation:ru-pick .2s ease-out backwards}
+[data-rt-theme=rust] .vote[data-arrived]{animation:ru-pick .22s ease-out}

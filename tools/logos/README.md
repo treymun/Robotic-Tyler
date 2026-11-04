@@ -6,7 +6,11 @@ Combine, Deadlock and Minecraft (v2.17), the "Five New Theme Logos" pack, whose 
 manifest and art briefs are kept in `assets/theme-logos/` (not shipped in the installers).
 PAYDAY 2, Sega Dreamcast, Garry's Mod, Ricochet and Day of Defeat: Source (v2.18) were cut
 from the supplied preview image; the cut-outs and the preview are kept in
-`assets/theme-logos/themes-16-20/`. All are used unchanged apart from alignment.
+`assets/theme-logos/themes-16-20/`. Rust, Xbox 360, iPod classic, MSN Messenger and PlayStation 3
+(v2.27) are the owner's "Five Theme Artwork" pack in `assets/theme-logos/themes-21-25/` (masters,
+backgrounds, manifest, prompts and handoff notes). They faced left, so `mirror.py` mirrors them to face
+like the others and turns their text and symbols back (see the script). All are used unchanged apart
+from alignment (and, for those five, the mirroring).
 
 - `aligned/<theme>.png` (512 px): the ten logos scaled and shifted so the glasses sit
   at the same height and width in every square. Switching themes then swaps the
@@ -34,7 +38,11 @@ Where the logo shows: the chat panel header (drawn on a canvas from bytes embedd
 Studio, the Chrome toolbar icon, and the desktop apps' window and tray icons. Unknown
 themes or a missing file fall back to the Steam logo. Theme keys: steam, classic,
 tf2, cs2, portal, cs16, hev, l4d, winxp, doom, quake, pipboy, combine, deadlock, minecraft,
-payday, dreamcast, gmod, ricochet, dod.
+payday, dreamcast, gmod, ricochet, dod, rust, x360, ipod, msn, xmb.
+
+Brand marks (v2.27): `tools/art/export.py` cuts the Messenger butterfly, the PlayStation logo and the
+Apple logo from the five-theme pack's backgrounds into `tools/art/marks/`; the build embeds them in
+`ui-art.js`, drawn on canvases like the logos. The backgrounds themselves aren't used in the apps.
 
 Note: the HEV, Windows XP and Portal logos include those games' and Windows' own
 symbols (the λ, the four-colour flag, the Aperture badge), and the Dreamcast logo shows an

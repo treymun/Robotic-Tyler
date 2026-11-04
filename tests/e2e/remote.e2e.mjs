@@ -5,7 +5,7 @@
 // Server-Sent Events, and the phone's page in a phone-sized Chromium (iPhone 14 emulation).
 //  1. Pairing, the copy of the panel in Tyler's theme with the theme's own extras, live status from
 //     the PC, and the remote's buttons reaching the panel.
-//  2. All 20 themes chosen from the phone: the PC follows, and the phone runs the same extras.
+//  2. All 25 themes chosen from the phone: the PC follows, and the phone runs the same extras.
 //  3. The Steam window's side (remote-control.js): status, actions, and events only while watched.
 // Not tested: a real phone on Wi-Fi, Windows' firewall, the real Steam page, the Electron IPC (the
 // desktop check, tools/desktop-voice-check, covers live events through real Electron IPC).
@@ -110,7 +110,7 @@ test('phone remote: every theme chosen from the phone, the PC follows and both r
  try{
   const {phone,pc}=b;await phone.goto(b.base+'/?code='+b.code);await phone.waitForFunction(()=>globalThis.__tylerRemote?.state().fx===true,null,{timeout:30000});
   await tap(phone,'tab-setup');
-  const themes=await inPhone(phone,r=>[...r.querySelectorAll('.rm-theme')].map(x=>x.dataset.theme));assert.equal(themes.length,20);
+  const themes=await inPhone(phone,r=>[...r.querySelectorAll('.rm-theme')].map(x=>x.dataset.theme));assert.equal(themes.length,25);
   for(const t of [...themes.slice(1),'steam']){
    await phone.waitForTimeout(220); // the remote takes at most 5 presses a second
    await inPhone(phone,(r,t)=>r.querySelector('.rm-theme[data-theme='+t+']').click(),t);

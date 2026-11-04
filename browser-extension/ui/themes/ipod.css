@@ -1,0 +1,239 @@
+/*
+ * ROBOTIC TYLER "iPod classic style" theme (v2.27), light.
+ * The iPod's menu screen behind its black glass: a glossy grey title bar, white lists with thin
+ * grey rules and chevrons, the bright blue highlight bar on whatever is selected, the battery,
+ * and the Now Playing screen with its scrub bar. Signature: the status strip is Now Playing
+ * (state "artwork", the state as the song title, a scrub bar that runs while Tyler writes and
+ * talks), and the click wheel below the screen (theme-pack-4.js) scrolls the lists, steps through
+ * the tabs, pauses Tyler and opens the iPod menu, Now Playing and Cover Flow of your clips.
+ * Collapsed, the panel is the whole iPod: the screen on top and the click wheel underneath.
+ * Type: "Tyler iPod" = Source Sans 3 (OFL), a humanist sans close to the iPod's menu type.
+ * Branding (v2.27): the owner's iPod logo art (the Tyler logo) and the Apple logo cut from the
+ * owner's iPod artwork, on the start-up screen when Tyler starts (theme-pack-4.js).
+ */
+[data-rt-theme=ipod]{
+  color-scheme:light;
+  --ip-blue:linear-gradient(180deg,#8ec5f7 0,#4f9ff0 46%,#2b7fe5 54%,#3a8cf0 100%);
+  --ip-blue-hi:linear-gradient(180deg,#a3d0f9 0,#64acf3 46%,#3a8cf0 54%,#4b98f3 100%);
+  --ip-title:linear-gradient(180deg,#fdfdfd 0,#ececec 48%,#d5d5d5 52%,#e1e1e1 100%);
+  --ip-ink:#111;--ip-ink-2:#4a4a4a;--ip-dim:#7a7a7a;--ip-rule:#dadada;--ip-glass:#121212;
+  --ip-metal:repeating-linear-gradient(90deg,rgba(255,255,255,.18) 0 1px,rgba(0,0,0,.025) 1px 3px),linear-gradient(180deg,#eeeeee,#cfd0d1);
+  --rt-bar:#e6e6e6;--rt-bg:#ffffff;--rt-bg-deep:#ffffff;--rt-surface:#ffffff;--rt-surface-2:#f5f5f5;--rt-surface-3:#e9e9e9;
+  --rt-block:#ffffff;--rt-block-hover:#f2f7fe;--rt-input:#ffffff;--rt-select:#d7e8fc;
+  --rt-line:#d3d3d3;--rt-line-soft:#e3e3e3;--rt-line-strong:#9a9a9a;
+  --rt-ink:#111111;--rt-ink-strong:#000000;--rt-ink-2:#2c2c2c;--rt-ink-3:#4a4a4a;--rt-ink-4:#646464;--rt-ink-disabled:#a6a6a6;
+  --rt-link:#1d6fd6;--rt-link-hover:#000;--rt-blue:#111111;--rt-blue-deep:#1d6fd6;--rt-active:#2b7fe5;
+  --rt-blue-fade:#ffffff;--rt-blue-fade-hover:#f2f7fe;
+  --rt-green:#1a68cc;--rt-green-hover:#2274d8;--rt-green-ink:#ffffff;--rt-green-line:#1d5fb4;
+  --rt-state-standby:#646464;--rt-state-ready:#1d6fd6;--rt-state-listening:#1d6fd6;--rt-state-thinking:#7a5a00;--rt-state-speaking:#1d6fd6;--rt-state-waiting:#6a4fb0;--rt-state-error:#c62b20;
+  --rt-danger:#c62b20;--rt-danger-bg:#d9382c;--rt-danger-hover:#e5493d;--rt-danger-ink:#ffffff;--rt-success:#2a7d2e;--rt-focus:#2b7fe5;
+  --rt-accent:#2b7fe5;--rt-accent-soft:rgba(43,127,229,.14);--rt-accent-line:rgba(43,127,229,.5);
+  --rt-on-accent:#ffffff;--rt-accent-fill:#1a68cc;--rt-meter:linear-gradient(90deg,#4f9ff0,#2b7fe5);--rt-marker:#000;--rt-edge:#d3d3d3;--rt-page-glow:#f5f5f5;
+  --rt-font:"Tyler iPod","Source Sans 3","Myriad Pro","Segoe UI","Helvetica Neue",Arial,sans-serif;--rt-font-display:"Tyler iPod","Source Sans 3","Myriad Pro","Segoe UI","Helvetica Neue",Arial,sans-serif;
+  --rt-text-xs:11.5px;--rt-text-sm:13px;--rt-text-md:14px;--rt-text-lg:16px;--rt-track:0;
+  --rt-r-xs:3px;--rt-r-sm:4px;--rt-r-md:6px;--rt-r-lg:14px;--rt-shadow-float:0 0 0 1px rgba(0,0,0,.35),0 20px 48px rgba(0,0,0,.4);
+}
+[data-rt-theme=ipod] :is(h1,h2,h3,label,.tabs button,.ident-sub,.stat dt,.tally-label,.pill,.pad span,details.feature>summary,.sheet-head h2,.card>h2,.pulse dt,.facts b,.matrix dt,.section-nav button,nav:not(.tabs) button,button){text-transform:none;letter-spacing:0}
+/* The screen behind black glass */
+.panel[data-rt-theme=ipod]{background:#fff;border:6px solid var(--ip-glass);border-radius:16px;box-shadow:var(--rt-shadow-float),inset 0 0 0 1px #000}
+[data-rt-theme=ipod] body{background:var(--ip-metal)}
+[data-rt-theme=ipod] main{background:transparent}
+[data-rt-theme=ipod] :is(h1,h2,h3,.sheet-head h2,.card>h2){font-weight:600;color:var(--ip-ink)}
+[data-rt-theme=ipod] h2{font-size:18px}
+[data-rt-theme=ipod] h1{font-size:30px;font-weight:600}
+[data-rt-theme=ipod] .wordmark{font:600 15px/1.15 var(--rt-font);color:#111}
+[data-rt-theme=ipod] .ident-sub{font-size:11.5px;color:var(--ip-dim)}
+[data-rt-theme=ipod] label:not(:has(>input[type=checkbox])):not(.toggle){font-size:12.5px;font-weight:600;color:var(--ip-ink-2)}
+[data-rt-theme=ipod] :is(p,small,.hint){color:var(--ip-ink-2)}
+/* The title bar */
+[data-rt-theme=ipod] .bar{background:var(--ip-title);border-radius:10px 10px 0 0;box-shadow:inset 0 -1px 0 #a9a9a9,inset 0 1px 0 #fff}
+[data-rt-theme=ipod] .bar .icon-btn{color:#4a4a4a;background:transparent;border:0;border-radius:4px}
+[data-rt-theme=ipod] .bar .icon-btn:hover{color:#fff;background:var(--ip-blue)}
+[data-rt-theme=ipod] :is(.mark[data-logo],img.mark,#brand-logo){--logo-pad:0px;background:transparent;border:0;border-radius:0;box-shadow:none}
+[data-rt-theme=ipod] .mark[data-logo]{width:38px;height:38px;margin:-4px 0}
+/* Lists: white rows with thin rules */
+[data-rt-theme=ipod] :where(details,.callout,.board-tools,.sheet,.card,.route-card,.panel,.mini-callout>div,.usage-banner,.facts>div,.matrix>div,.arcade-tickets>div){background:#fff;border:1px solid var(--ip-rule);border-radius:6px;box-shadow:none}
+[data-rt-theme=ipod] details.feature{border-radius:0;border-width:0 0 1px;background:#fff;margin:0}
+[data-rt-theme=ipod] details.feature[open]{background:#fafafa}
+[data-rt-theme=ipod] details.feature>summary{font-size:14px;font-weight:600;color:var(--ip-ink);border-radius:0}
+[data-rt-theme=ipod] details.feature>summary:hover{color:#fff;background:var(--ip-blue)}
+[data-rt-theme=ipod] details.feature>summary:hover :is(.feature-meta,.pill){color:#fff}
+[data-rt-theme=ipod] details.feature[open]>summary{background:var(--ip-title);box-shadow:inset 0 -1px 0 #c4c4c4}
+[data-rt-theme=ipod] details.feature[open]>summary:hover{color:#111;background:var(--ip-title)}
+/* Chevrons, as the iPod's lists end each row with one */
+[data-rt-theme=ipod] summary::after{width:7px;height:7px;border-color:#8a8a8a;transform:rotate(-45deg)}
+[data-rt-theme=ipod] details[open]>summary::after{transform:rotate(45deg)}
+[data-rt-theme=ipod] summary:hover::after{border-color:#fff}
+[data-rt-theme=ipod] :is(.quick-help,.confirm,#setup,.deck-entry){background:#f2f7fe;border:1px solid #c6dbf5;border-radius:6px}
+/* Stats: the About screen's rows */
+[data-rt-theme=ipod] .stats{gap:0;padding:0;background:#fff;border:1px solid var(--ip-rule);border-radius:6px;box-shadow:none}
+[data-rt-theme=ipod] .stat{padding:6px 10px;border-left:1px solid var(--ip-rule)}
+[data-rt-theme=ipod] .stat:first-child{border-left:0}
+[data-rt-theme=ipod] .stat dt{font-size:11.5px;font-weight:600;color:var(--ip-dim)}
+[data-rt-theme=ipod] .stat dd{font-size:17px;font-weight:600;color:#111}
+[data-rt-theme=ipod] .stat small{color:var(--rt-ink-4)}
+/* Tabs: a menu row; the open one wears the blue highlight */
+[data-rt-theme=ipod] .tabs{gap:0;padding:0;margin-top:8px;background:#fff;box-shadow:inset 0 1px 0 var(--ip-rule),inset 0 -1px 0 var(--ip-rule)}
+[data-rt-theme=ipod] .tabs button{padding:8px 2px 7px;font-size:13px;font-weight:600;color:#2c2c2c;background:transparent;border:0;border-right:1px solid #ececec;border-radius:0}
+[data-rt-theme=ipod] .tabs button:last-child{border-right:0}
+[data-rt-theme=ipod] .tabs button .ic{color:#7a7a7a}
+[data-rt-theme=ipod] .tabs button:hover{color:#111;background:#f2f7fe}
+[data-rt-theme=ipod] .tabs button[aria-selected=true]{color:#fff;background:var(--ip-blue);border-bottom:0;text-shadow:0 -1px 0 rgba(0,0,0,.2)}
+[data-rt-theme=ipod] .tabs button[aria-selected=true] .ic{color:#fff}
+[data-rt-theme=ipod] .side{background:var(--ip-metal);box-shadow:inset -1px 0 0 #b9b9b9}
+[data-rt-theme=ipod] :is(.section-nav button,nav:not(.tabs) button){font-size:14px;font-weight:600;color:#111;background:transparent;border:0;border-radius:0;box-shadow:none}
+[data-rt-theme=ipod] :is(.section-nav button,nav:not(.tabs) button):hover{color:#fff;background:var(--ip-blue)}
+[data-rt-theme=ipod] :is(.section-nav button[aria-current=page],nav:not(.tabs) button.active){color:#fff;background:var(--ip-blue);text-shadow:0 -1px 0 rgba(0,0,0,.2)}
+[data-rt-theme=ipod] :is(.section-nav button[aria-current=page],nav:not(.tabs) button.active) .ic{color:#fff}
+/* Buttons: pale keys that turn blue when touched; the main action is already blue */
+[data-rt-theme=ipod] button{font-size:13px;font-weight:600;color:#111;background:linear-gradient(180deg,#ffffff,#ececec);border:1px solid #b9b9b9;border-radius:5px;box-shadow:0 1px 0 rgba(0,0,0,.05)}
+[data-rt-theme=ipod] button:hover{color:#fff;background:var(--ip-blue);border-color:#1d5fb4}
+[data-rt-theme=ipod] button:hover .ic{color:#fff}
+[data-rt-theme=ipod] button:active:not(:disabled){transform:none;filter:brightness(.95)}
+[data-rt-theme=ipod] :is(.primary,#start,#save){color:#fff;background:var(--ip-blue);border-color:#1d5fb4;text-shadow:0 -1px 0 rgba(0,0,0,.2)}
+[data-rt-theme=ipod] :is(.primary,#start,#save):hover{background:var(--ip-blue-hi)}
+[data-rt-theme=ipod] :is(.primary,#start,#save) .ic{color:#fff}
+[data-rt-theme=ipod] .danger{color:#fff;background:linear-gradient(180deg,#f1857c 0,#e0483c 48%,#cd2f23 52%,#d9382c);border-color:#9c1c13}
+[data-rt-theme=ipod] .danger:hover{background:linear-gradient(180deg,#f59a92 0,#e85a4e 48%,#d93a2e 52%,#e2493d);border-color:#9c1c13}
+[data-rt-theme=ipod] :is(.ghost,.icon){background:transparent;border-color:transparent;box-shadow:none}
+[data-rt-theme=ipod] .link-btn{border:0;background:none;color:var(--rt-link)}
+[data-rt-theme=ipod] .link-btn:hover{background:none;color:#000}
+[data-rt-theme=ipod] button:disabled{color:var(--rt-ink-disabled);background:#f3f3f3;border-color:#d6d6d6}
+/* Fields */
+[data-rt-theme=ipod] input:where(:not([type=checkbox],[type=radio],[type=range],[type=file])),[data-rt-theme=ipod] :is(textarea,select){color:#111;background-color:#fff;border:1px solid #b9b9b9;border-radius:5px;box-shadow:inset 0 1px 2px rgba(0,0,0,.08);font-family:var(--rt-font)}
+[data-rt-theme=ipod] select{background-image:linear-gradient(45deg,transparent 50%,#4a4a4a 50%),linear-gradient(135deg,#4a4a4a 50%,transparent 50%)}
+[data-rt-theme=ipod] select option{color:#111;background:#fff}
+[data-rt-theme=ipod] :is(input,textarea,select):focus{border-color:#2b7fe5;box-shadow:0 0 0 3px rgba(43,127,229,.25)}
+[data-rt-theme=ipod] input::placeholder,[data-rt-theme=ipod] textarea::placeholder{color:#9a9a9a}
+[data-rt-theme=ipod] input[type=checkbox]{width:17px;height:17px;background:#fff;border:1px solid #9a9a9a;border-radius:4px}
+[data-rt-theme=ipod] input[type=checkbox]:checked{background:var(--ip-blue);border-color:#1d5fb4}
+[data-rt-theme=ipod] input[type=checkbox]:checked::after{border-color:#fff}
+[data-rt-theme=ipod] .toggle>input[type=checkbox]{width:40px;height:20px;border-radius:10px;background:#e3e3e3;border:1px solid #a9a9a9;box-shadow:inset 0 1px 2px rgba(0,0,0,.12)}
+[data-rt-theme=ipod] .toggle>input[type=checkbox]::after{top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:linear-gradient(180deg,#fff,#dedede);box-shadow:0 1px 2px rgba(0,0,0,.3)}
+[data-rt-theme=ipod] .toggle>input[type=checkbox]:checked{background:var(--ip-blue);border-color:#1d5fb4}
+[data-rt-theme=ipod] .toggle>input[type=checkbox]:checked::after{top:2px;left:2px;width:14px;height:14px;transform:translateX(20px);background:#fff}
+[data-rt-theme=ipod] input[type=range]{accent-color:#2b7fe5}
+[data-rt-theme=ipod] :is(pre,.output,.v22-log,.response){color:#111;background:#fafafa;border:1px solid var(--ip-rule);border-radius:5px}
+[data-rt-theme=ipod] :is(.meter,.arcade-progress,.lat-track){background:#e9e9e9;border-radius:4px;box-shadow:inset 0 1px 2px rgba(0,0,0,.12)}
+[data-rt-theme=ipod] .pill{color:#fff;background:var(--ip-blue);border-radius:9px;box-shadow:none}
+/* Soundboard pads: a song list; the clip that plays gets the blue bar and the speaker */
+[data-rt-theme=ipod] .pads{gap:0;border:1px solid var(--ip-rule);border-radius:6px;overflow:hidden}
+[data-rt-theme=ipod] .pad{min-height:44px;background:#fff;border:0;border-bottom:1px solid #ececec;border-right:1px solid #ececec;border-radius:0;box-shadow:none}
+[data-rt-theme=ipod] .pad b{font-weight:600;color:#111}
+[data-rt-theme=ipod] .pad span{font-size:11px;color:#7a7a7a}
+[data-rt-theme=ipod] .pad::after{width:6px;height:6px;margin-top:-3px;border:solid #8a8a8a;border-width:2px 2px 0 0;transform:rotate(45deg)}
+[data-rt-theme=ipod] .pad:hover{background:var(--ip-blue)}
+[data-rt-theme=ipod] .pad:hover :is(b,span){color:#fff}
+[data-rt-theme=ipod] .pad:hover::after{border-color:#fff}
+[data-rt-theme=ipod] .pad.playing{background:var(--ip-blue)}
+[data-rt-theme=ipod] .pad.playing :is(b,span){color:#fff}
+[data-rt-theme=ipod] .pad.playing::after{width:0;height:0;margin-top:-5px;border:0;border-left:8px solid #fff;border-top:5px solid transparent;border-bottom:5px solid transparent;transform:none;background:none}
+[data-rt-theme=ipod] :is(.step-n,.setup-n,.friend-card .avatar){font-weight:600;color:#fff;background:var(--ip-blue);border-radius:50%}
+[data-rt-theme=ipod] code{color:#1d5fb4;background:#eef4fd;border-radius:3px}
+[data-rt-theme=ipod] .savebar,[data-rt-theme=ipod] .foot{background:var(--ip-title);box-shadow:inset 0 1px 0 #a9a9a9}
+[data-rt-theme=ipod] .foot{border-radius:0 0 10px 10px}
+[data-rt-theme=ipod] .foot small{color:var(--ip-ink-2)}
+[data-rt-theme=ipod] .route li{background:#fff;border:1px solid var(--ip-rule);border-radius:4px}
+[data-rt-theme=ipod] .route li:last-child{color:#fff;background:var(--ip-blue);border-color:#1d5fb4}
+[data-rt-theme=ipod] .vote{background:linear-gradient(90deg,rgba(43,127,229,.25) calc(var(--share,0)*100%),#fff 0);border:1px solid var(--ip-rule);border-radius:4px}
+[data-rt-theme=ipod] .vote-marker{font-weight:600;color:#1d6fd6}
+[data-rt-theme=ipod] :is(.scroll,.content,main){scrollbar-color:#a9a9a9 transparent}
+html[data-rt-theme=ipod]{scrollbar-color:#a9a9a9 #e6e6e6}
+
+/* ── Checks: a list; a mark at the end of each row ── */
+[data-rt-theme=ipod] .checklist{border:1px solid var(--ip-rule);border-radius:6px;overflow:hidden}
+[data-rt-theme=ipod] .checklist li{position:relative;padding:8px 40px 8px 12px;border-top:1px solid #ececec;background:#fff}
+[data-rt-theme=ipod] .checklist li:first-child{border-top:0}
+[data-rt-theme=ipod] .checklist li::after{content:"";position:absolute;right:12px;top:50%;width:18px;margin-top:-9px;text-align:center;font:600 13px/18px var(--rt-font);color:#fff;border-radius:50%;height:18px}
+[data-rt-theme=ipod] .checklist li[data-result=ok]::after{content:"✓";background:var(--ip-blue)}
+[data-rt-theme=ipod] .checklist li[data-result=fail]::after{content:"!";background:linear-gradient(180deg,#f1857c,#cd2f23)}
+[data-rt-theme=ipod] .checklist li[data-result=unknown]::after{content:"?";background:#a6a6a6}
+[data-rt-theme=ipod] .checklist li.check-summary{background:var(--ip-title)}
+
+/* ── Status strip: Now Playing ──
+   The square is the "artwork": the state's colour with the level bars in white (a pause sign when
+   paused, the spinner while Tyler writes, ! on a problem). The state is the song title, the status
+   its artist line, and the scrub bar along the bottom runs while he writes and while he talks. */
+[data-rt-theme=ipod] .tally{min-height:66px;padding:9px 12px 20px 70px;background:linear-gradient(180deg,#ffffff,#f3f3f3);border:1px solid var(--ip-rule);border-radius:6px;box-shadow:none}
+[data-rt-theme=ipod] .tally-light{position:absolute;left:10px;top:9px;width:48px;height:48px;border-radius:3px;background:linear-gradient(135deg,color-mix(in srgb,var(--tone) 55%,#fff),var(--tone) 60%,color-mix(in srgb,var(--tone) 70%,#000));box-shadow:0 1px 3px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.4)!important}
+[data-rt-theme=ipod] :is(.tally-head,.tally-body){position:static}
+[data-rt-theme=ipod] .tally-label{font-size:15px;font-weight:600;color:#111}
+[data-rt-theme=ipod] .tally-text{color:#4a4a4a}
+[data-rt-theme=ipod] .tally-time{color:#7a7a7a;font-family:var(--rt-font);font-weight:600}
+[data-rt-theme=ipod] .tally-wave{position:absolute;left:10px;top:9px;width:48px;height:48px;justify-content:center;gap:2px;z-index:2}
+[data-rt-theme=ipod] .tally-wave i{width:3px;background:#fff;opacity:.95;border-radius:1px}
+[data-rt-theme=ipod] .tally:is([data-state=paused],[data-state=standby],[data-state=error],[data-state=thinking]) .tally-wave{display:none}
+[data-rt-theme=ipod] .tally:is([data-state=paused],[data-state=standby]) .tally-light::after{content:"";position:absolute;left:50%;top:50%;width:14px;height:16px;margin:-8px 0 0 -7px;background:linear-gradient(90deg,#fff 0 5px,transparent 5px 9px,#fff 9px 14px)}
+[data-rt-theme=ipod] .tally[data-state=error] .tally-light::after{content:"!";position:absolute;inset:0;text-align:center;font:700 28px/48px var(--rt-font);color:#fff}
+/* The spinner: twelve spokes, turning in steps */
+[data-rt-theme=ipod] .tally[data-state=thinking] .tally-light::after{content:"";position:absolute;left:50%;top:50%;width:26px;height:26px;margin:-13px 0 0 -13px;border-radius:50%;
+  background:repeating-conic-gradient(from 0deg,rgba(255,255,255,.95) 0 12deg,transparent 12deg 30deg);-webkit-mask:radial-gradient(circle,transparent 0 6px,#000 6.5px);mask:radial-gradient(circle,transparent 0 6px,#000 6.5px);animation:ip-spin .9s steps(12) infinite}
+/* The scrub bar */
+[data-rt-theme=ipod] .tally-trace{display:block;position:absolute;left:70px;right:12px;bottom:8px;height:6px;overflow:hidden;border-radius:3px;background:linear-gradient(180deg,#d4d4d4,#f0f0f0);box-shadow:inset 0 1px 1px rgba(0,0,0,.2);opacity:1}
+[data-rt-theme=ipod] .tally-trace svg{display:none}
+[data-rt-theme=ipod] .tally-trace::after{content:"";position:absolute;inset:0;border-radius:3px;background:linear-gradient(180deg,#8ec5f7,#2b7fe5);transform:translateX(-100%)}
+[data-rt-theme=ipod] .tally[data-state=thinking] .tally-trace::after{animation:ip-scrub 2.6s linear infinite}
+[data-rt-theme=ipod] .tally[data-state=speaking] .tally-trace::after{animation:ip-scrub 4s linear infinite}
+[data-rt-theme=ipod] .tally[data-state=listening] .tally-trace::after{transform:translateX(-96%)}
+[data-rt-theme=ipod] .tally[data-state=error] .tally-trace::after{transform:none;background:linear-gradient(180deg,#f1857c,#cd2f23)}
+[data-rt-theme=ipod] .tally[data-flash=ok]{box-shadow:0 0 0 3px rgba(43,127,229,.35)}
+[data-rt-theme=ipod] .tally[data-flash=fail]{box-shadow:0 0 0 3px rgba(198,43,32,.3)}
+@keyframes ip-spin{to{transform:rotate(1turn)}}
+@keyframes ip-scrub{from{transform:translateX(-100%)}to{transform:none}}
+
+/* ── Collapsed: the whole iPod ──
+   A white body with the screen at the top (the title bar and Now Playing) and the click wheel
+   underneath: Pause AI is the play/pause key at the bottom of the wheel, Stop audio the
+   fast-forward key on the right, and the centre button expands the panel again. */
+:host(.mini) .panel[data-rt-theme=ipod]{width:236px;padding:12px 12px 0;background:linear-gradient(180deg,#ffffff,#f1f1f1 60%,#e4e4e4);border:1px solid #c9c9c9;border-radius:24px;box-shadow:inset 0 1px 0 #fff,inset 0 -2px 0 #d3d3d3,0 16px 36px rgba(0,0,0,.35)}
+:host(.mini) .panel[data-rt-theme=ipod] .bar{border:5px solid var(--ip-glass);border-bottom:0;border-radius:8px 8px 0 0;padding:4px 6px}
+:host(.mini) .panel[data-rt-theme=ipod] .bar .ident-sub{display:none}
+:host(.mini) .panel[data-rt-theme=ipod] .mark[data-logo]{width:22px;height:22px;margin:0}
+:host(.mini) .panel[data-rt-theme=ipod] .wordmark{font-size:12px}
+:host(.mini) .panel[data-rt-theme=ipod] .bar #dock{display:none}
+:host(.mini) .panel[data-rt-theme=ipod] .bar #collapse{position:absolute;left:50%;top:auto;bottom:78px;z-index:3;width:52px;height:52px;margin-left:-26px;border-radius:50%;color:transparent;background:linear-gradient(180deg,#ffffff,#ececec);box-shadow:0 0 0 1px #c9c9c9,inset 0 -2px 3px rgba(0,0,0,.06)}
+:host(.mini) .panel[data-rt-theme=ipod] .bar #collapse:hover{background:linear-gradient(180deg,#f7f9fc,#e2e8f0)}
+:host(.mini) .panel[data-rt-theme=ipod] .tally{margin:0;border:5px solid var(--ip-glass);border-top:0;border-radius:0 0 8px 8px;padding:8px 10px 18px 64px;min-height:62px}
+:host(.mini) .panel[data-rt-theme=ipod] :is(.tally-light,.tally-wave){left:8px;top:8px;width:44px;height:44px}
+:host(.mini) .panel[data-rt-theme=ipod] .tally-trace{left:64px;right:10px;bottom:7px;height:5px}
+:host(.mini) .panel[data-rt-theme=ipod] .tally-label{font-size:13px}
+:host(.mini) .panel[data-rt-theme=ipod] .tally-text{font-size:11.5px}
+:host(.mini) .panel[data-rt-theme=ipod] .foot{position:relative;display:block;width:176px;height:176px;margin:14px auto 16px;padding:0;border-radius:50%;background:radial-gradient(circle,#fff 0 30px,#cfcfcf 30.5px 31.5px,transparent 32px),linear-gradient(180deg,#f7f7f7,#dedede);box-shadow:inset 0 0 0 1px #c9c9c9,inset 0 2px 4px rgba(0,0,0,.08)}
+:host(.mini) .panel[data-rt-theme=ipod] .foot::before{content:"MENU";position:absolute;left:0;right:0;top:14px;text-align:center;font:700 11px/1 var(--rt-font);letter-spacing:.04em;color:#9a9a9a}
+:host(.mini) .panel[data-rt-theme=ipod] .foot::after{content:"\25C0\25C0";position:absolute;left:13px;top:50%;margin-top:-6px;padding-left:2px;border-left:2px solid #9a9a9a;font:400 8px/12px Arial,sans-serif;letter-spacing:-2px;color:#9a9a9a}
+:host(.mini) .panel[data-rt-theme=ipod] .foot :is(small,.owner-dot){display:none}
+:host(.mini) .panel[data-rt-theme=ipod] .foot button{position:absolute;min-height:0;margin:0;padding:6px;font-size:0;color:#8a8a8a;background:none;border:0;box-shadow:none}
+:host(.mini) .panel[data-rt-theme=ipod] .foot button .ic{--ic-size:18px;color:#8a8a8a}
+:host(.mini) .panel[data-rt-theme=ipod] .foot button:hover .ic{color:#2b7fe5}
+:host(.mini) .panel[data-rt-theme=ipod] .foot #quickStop{left:50%;bottom:6px;transform:translateX(-50%)}
+:host(.mini) .panel[data-rt-theme=ipod] .foot #stop{right:6px;top:50%;transform:translateY(-50%)}
+:host(.mini) .panel[data-rt-theme=ipod] .rt-toasts{margin:0 0 8px}
+
+/* ── Icons, dialogs, notifications and tooltips ──
+   Notifications are the iPod's alert boxes: white, with the grey title bar. */
+[data-rt-theme=ipod] .ic{--ic-w:1.7px;--ic-cap:round;--ic-join:round}
+[data-rt-theme=ipod] :is(.rt-toast,.rt-dialog){color:#111;background:#fff;border:1px solid #b9b9b9;border-radius:8px;box-shadow:0 10px 26px rgba(0,0,0,.28)}
+[data-rt-theme=ipod] .rt-toast{border-left:4px solid var(--tone)}
+[data-rt-theme=ipod] :is(.rt-toast,.rt-dialog)[data-kind=success]{--tone:#2b7fe5}
+[data-rt-theme=ipod] :is(.rt-toast,.rt-dialog)[data-kind=warning]{--tone:#d08a00}
+[data-rt-theme=ipod] :is(.rt-toast,.rt-dialog)[data-kind=error]{--tone:#cd2f23}
+[data-rt-theme=ipod] :is(.rt-toast,.rt-dialog):not([data-kind]),[data-rt-theme=ipod] :is(.rt-toast,.rt-dialog)[data-kind=info]{--tone:#7a7a7a}
+[data-rt-theme=ipod] :is(.rt-toast,.rt-dialog) :is(.rt-toast-title,.rt-dialog-title){font-weight:600;color:#111}
+[data-rt-theme=ipod] :is(.rt-toast-text,.rt-dialog-text,.rt-steps){color:#4a4a4a}
+[data-rt-theme=ipod] :is(.rt-toast,.rt-dialog) .ic{color:var(--tone)}
+[data-rt-theme=ipod] :is(.rt-toast,.rt-dialog) .rt-x{color:#7a7a7a;background:transparent;border:0;box-shadow:none;min-height:0}
+[data-rt-theme=ipod] :is(.rt-toast,.rt-dialog) .rt-x:hover{color:#fff;background:var(--ip-blue)}
+[data-rt-theme=ipod] .rt-dialog{border-top:0;overflow:hidden}
+[data-rt-theme=ipod] .rt-dialog .rt-dialog-title{margin:-16px -16px 10px;padding:8px 16px;text-align:center;background:var(--ip-title);box-shadow:inset 0 -1px 0 #b9b9b9}
+[data-rt-theme=ipod] .rt-tip{background:#2c2c2c;color:#fff;border:0;border-radius:6px}
+
+
+/* ── Motion: iPod ──
+   A new menu slides in from the right, as the iPod's do; alerts fade in; the spinner and the
+   scrub bar above. */
+@keyframes ip-slide{from{opacity:.2;transform:translateX(40px)}to{opacity:1;transform:none}}
+@keyframes ip-fade{from{opacity:0}to{opacity:1}}
+[data-rt-theme=ipod] :is(.view:not([hidden]),.sheet,section[data-view]:not([hidden])){animation:ip-slide .22s cubic-bezier(.25,.8,.3,1) backwards}
+[data-rt-theme=ipod] .rt-toast:not(.rt-leaving){animation:ip-fade .2s ease-out backwards}
+[data-rt-theme=ipod] .checklist li{animation:ip-fade .2s ease-out backwards}
+[data-rt-theme=ipod] .vote[data-arrived]{animation:ip-slide .22s ease-out}

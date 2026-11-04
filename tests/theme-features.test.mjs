@@ -4,10 +4,10 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 const read=f=>fs.readFileSync(new URL('../'+f,import.meta.url),'utf8');
-const THEMES=['steam','classic','tf2','cs2','portal','cs16','hev','l4d','winxp','doom','quake','pipboy','combine','deadlock','minecraft','payday','dreamcast','gmod','ricochet','dod'];
+const THEMES=['steam','classic','tf2','cs2','portal','cs16','hev','l4d','winxp','doom','quake','pipboy','combine','deadlock','minecraft','payday','dreamcast','gmod','ricochet','dod','rust','x360','ipod','msn','xmb'];
 
-test('each of the 20 themes defines its features exactly once',()=>{
- const defined=['1','2','3'].flatMap(n=>[...read('browser-extension/theme-pack-'+n+'.js').matchAll(/F\.define\('([a-z0-9]+)'/g)].map(m=>m[1]));
+test('each of the 25 themes defines its features exactly once',()=>{
+ const defined=['1','2','3','4'].flatMap(n=>[...read('browser-extension/theme-pack-'+n+'.js').matchAll(/F\.define\('([a-z0-9]+)'/g)].map(m=>m[1]));
  assert.deepEqual([...defined].sort(),[...THEMES].sort());
 });
 

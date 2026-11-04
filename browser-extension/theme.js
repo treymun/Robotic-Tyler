@@ -9,7 +9,7 @@
 (() => {
  'use strict';
  const store=globalThis.tylerSettings?.storage?.local||globalThis.chrome?.storage?.local;
- const THEMES=['steam','classic','tf2','cs2','portal','cs16','hev','l4d','winxp','doom','quake','pipboy','combine','deadlock','minecraft','payday','dreamcast','gmod','ricochet','dod'];
+ const THEMES=['steam','classic','tf2','cs2','portal','cs16','hev','l4d','winxp','doom','quake','pipboy','combine','deadlock','minecraft','payday','dreamcast','gmod','ricochet','dod','rust','x360','ipod','msn','xmb'];
  // [name, one-line description, light?]
  const INFO={
   steam:['Steam','Today’s Steam: navy panels, blue highlights and a friends-list header.',false],
@@ -32,6 +32,11 @@
   gmod:['Garry’s Mod','The sandbox spawn menu: Derma panels, blue highlights and spawn-icon sounds.',true],
   ricochet:['Ricochet','Floating platforms in dark space, glowing disc edges and arcade lettering.',false],
   dod:['Day of Defeat: Source','A field radio on the operator’s desk: olive paint, canvas, stencils, amber dials.',false],
+  rust:['Rust','Survival crafting: dark see-through panels, off-white condensed capitals, rust-red warnings and the vitals bars.',false],
+  x360:['Xbox 360 (2005)','The original Blades dashboard: silver and white blades, lime-green highlights and the Ring of Light.',true],
+  ipod:['iPod classic','The iPod’s menu screen: a glossy title bar, white lists with the blue highlight, the battery and a click wheel.',true],
+  msn:['MSN Messenger','The mid-2000s messenger: soft blue gradients, a display-picture frame, status dots and pop-up toasts.',true],
+  xmb:['PlayStation 3 (XMB)','The XrossMediaBar: a flowing wave over a dark gradient, white glowing type and a cross-shaped menu.',false],
  };
  const clean=v=>THEMES.includes(v)?v:'steam';
  const root=document.documentElement;

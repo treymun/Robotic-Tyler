@@ -17,7 +17,7 @@
 const http=require('node:http'),crypto=require('node:crypto'),os=require('node:os'),fs=require('node:fs'),path=require('node:path'),zlib=require('node:zlib');
 
 const DEFAULT_PORT=47820,CODE_MS=600000,MAX_TRIES=8,MAX_DEVICES=8,COOKIE='rt_remote';
-const THEMES=new Set(['steam','classic','tf2','cs2','portal','cs16','hev','l4d','winxp','doom','quake','pipboy','combine','deadlock','minecraft','payday','dreamcast','gmod','ricochet','dod']);
+const THEMES=new Set(['steam','classic','tf2','cs2','portal','cs16','hev','l4d','winxp','doom','quake','pipboy','combine','deadlock','minecraft','payday','dreamcast','gmod','ricochet','dod','rust','x360','ipod','msn','xmb']);
 // Each action and the only fields it passes on (anything else a request carries is dropped).
 const num=(v,min,max)=>{const n=Number(v);return Number.isFinite(n)?Math.min(max,Math.max(min,n)):min;};
 const ACTIONS={pause:()=>({}),start:()=>({}),'stop-audio':()=>({}),sound:b=>({slot:Number(b.slot)}),'clips-stop':()=>({}),'clip-volume':b=>({value:num(b.value,0,1)}),
@@ -28,7 +28,7 @@ const ACTIONS={pause:()=>({}),start:()=>({}),'stop-audio':()=>({}),sound:b=>({sl
  // Settings on this PC, done here rather than in the Steam window.
  theme:b=>({theme:String(b.theme||'')}),'mute-call':b=>({on:b.on===true})};
 // The panel's own stylesheet, logos, icons, notifications and theme code (generated into app/companion).
-const LIB=new Set(['ui-template.js','ui-logos.js','ui-icons.js','ui-kit.js','theme-features.js','theme-pack-1.js','theme-pack-2.js','theme-pack-3.js']);
+const LIB=new Set(['ui-template.js','ui-logos.js','ui-art.js','ui-icons.js','ui-kit.js','theme-features.js','theme-pack-1.js','theme-pack-2.js','theme-pack-3.js','theme-pack-4.js']);
 const MAX_STREAMS=8;
 const TYPES={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.png':'image/png','.woff2':'font/woff2','.svg':'image/svg+xml'};
 
@@ -192,7 +192,9 @@ function setupRemote({vault,log=()=>{},ask,pageDir,uiDir,libDir=path.dirname(uiD
   })().finally(()=>{starting=null;});
   return starting;
  }
- async function stop(){if(!server)return;dropStreams();const s=server;server=null;code=null;await new Promise(r=>s.close(()=>r()));s.closeAllConnections?.();log('Phone remote','off');}
+ // Closing waits for open connections, and a phone's live stream reconnects at once, so every
+// connection is closed straight away rather than after close() (which then never finished).
+async function stop(){if(!server)return;dropStreams();const s=server;server=null;code=null;const closed=new Promise(r=>s.close(()=>r()));s.closeAllConnections?.();await closed;log('Phone remote','off');}
  async function status(){
   const cfg=await readConfig(),addresses=lanAddresses();if(cfg.on&&!server)await start().catch(()=>{});
   const qr=code&&Date.now()<codeUntil&&addresses[0]?matrix('http://'+addresses[0].address+':'+port+'/?code='+code):null;

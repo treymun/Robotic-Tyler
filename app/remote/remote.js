@@ -11,8 +11,8 @@
 // remote's own buttons. Nothing is stored on the phone except the pairing cookie.
 (() => {
  'use strict';
- const THEMES=['steam','classic','tf2','cs2','portal','cs16','hev','l4d','winxp','doom','quake','pipboy','combine','deadlock','minecraft','payday','dreamcast','gmod','ricochet','dod'];
- const NAMES={steam:'Steam',classic:'Classic Steam (2004)',tf2:'Team Fortress 2',cs2:'Counter-Strike 2',portal:'Portal',cs16:'Counter-Strike 1.6',hev:'Half-Life HEV suit',l4d:'Left 4 Dead',winxp:'Windows XP',doom:'DOOM (classic)',quake:'Quake (1996)',pipboy:'Fallout Pip-Boy',combine:'Half-Life 2 Combine',deadlock:'Deadlock',minecraft:'Minecraft',payday:'PAYDAY 2',dreamcast:'Sega Dreamcast',gmod:'Garry’s Mod',ricochet:'Ricochet',dod:'Day of Defeat: Source'};
+ const THEMES=['steam','classic','tf2','cs2','portal','cs16','hev','l4d','winxp','doom','quake','pipboy','combine','deadlock','minecraft','payday','dreamcast','gmod','ricochet','dod','rust','x360','ipod','msn','xmb'];
+ const NAMES={steam:'Steam',classic:'Classic Steam (2004)',tf2:'Team Fortress 2',cs2:'Counter-Strike 2',portal:'Portal',cs16:'Counter-Strike 1.6',hev:'Half-Life HEV suit',l4d:'Left 4 Dead',winxp:'Windows XP',doom:'DOOM (classic)',quake:'Quake (1996)',pipboy:'Fallout Pip-Boy',combine:'Half-Life 2 Combine',deadlock:'Deadlock',minecraft:'Minecraft',payday:'PAYDAY 2',dreamcast:'Sega Dreamcast',gmod:'Garry’s Mod',ricochet:'Ricochet',dod:'Day of Defeat: Source',rust:'Rust',x360:'Xbox 360 (2005)',ipod:'iPod classic',msn:'MSN Messenger',xmb:'PlayStation 3 (XMB)'};
  const TABS=['conversation','room','soundboard','setup','checks'];
  const H={'content-type':'application/json','x-tyler-remote':'1'};
  const host=document.getElementById('tyler');
@@ -305,7 +305,7 @@
   shim();const v='?v='+encodeURIComponent(version);
   await load('/lib/theme-features.js'+v);
   fxLoaded=!!globalThis.TylerThemeFeatures;seed(s.fx);
-  for(const n of [1,2,3])await load('/lib/theme-pack-'+n+'.js'+v).catch(e=>console.warn(e.message));
+  for(const n of [1,2,3,4])await load('/lib/theme-pack-'+n+'.js'+v).catch(e=>console.warn(e.message));
   emit('life',{});
  }
 
@@ -381,7 +381,7 @@
   let who={};try{who=await (await fetch('/whoami',{cache:'no-store'})).json();}catch{}
   version=String(who.version||'');theme=THEMES.includes(who.theme)?who.theme:'steam';
   const v='?v='+encodeURIComponent(version);
-  try{for(const f of ['ui-template.js','ui-icons.js','ui-kit.js','ui-logos.js'])await load('/lib/'+f+v);await build();}
+  try{for(const f of ['ui-template.js','ui-icons.js','ui-kit.js','ui-logos.js','ui-art.js'])await load('/lib/'+f+v);await build();}
   catch(e){document.getElementById('boot').textContent='Tyler’s remote couldn’t load: '+e.message+' Reload the page to try again.';return;}
   document.getElementById('boot')?.remove();
   setLink('connecting');setActivity('ready','Connecting','Looking for Tyler on your PC…');

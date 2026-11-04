@@ -45,7 +45,7 @@
   if(e.source!==window||e.origin!==location.origin||e.data?.source!=='tyler-keepalive')return;const d=e.data;
   if(d.reason==='quiet'||d.reason==='test'){lastHum=Number(d.at)||Date.now();api.emit?.('keepalive',{reason:d.reason});
    status((d.reason==='test'?'Hum played ':'Quiet call: hummed ')+'at '+clock(lastHum)+'.');}
-  if(d.reason==='status'){callInfo=d;describe();}
+  if(d.reason==='status'){callInfo={...d,seen:Date.now()};describe();}
  });
  function describe(){
   if(!cfg.call&&!cfg.chat){status('Off. Steam may drop Tyler from a call after about an hour of quiet.');return;}
@@ -93,5 +93,8 @@
  function tick(){const now=!!api.isOwner?.();if(now!==owner){owner=now;if(now)push();}awake();if(now&&cfg.call)api.bridge?.('keepalive',{on:cfg.call,minutes:cfg.minutes});else describe();}
  globalThis.TylerStorage?.get?.(['keepAlive']).then(r=>{const v=r?.keepAlive;if(v&&typeof v==='object')cfg={call:v.call!==false,chat:v.chat!==false,minutes:MINUTES.includes(Number(v.minutes))?Number(v.minutes):45};}).catch(()=>{}).finally(()=>{paint();tick();});
  paint();setInterval(tick,30000);
- globalThis.TylerKeepAlive=Object.freeze({config:()=>({...cfg}),watch,status:()=>$('kaStatus').textContent});
+ // v2.27: info() for theme extras (Rust's Tool Cupboard): the settings and the call's quiet time as the
+ // audio bridge last reported it, counted on since then; refresh() asks the bridge again.
+ const info=()=>({call:cfg.call,chat:cfg.chat,minutes:cfg.minutes,inCall:!!callInfo?.inCall,idleMs:callInfo?.inCall?(Number(callInfo.idleMs)||0)+(Date.now()-(callInfo.seen||Date.now())):0,lastHum});
+ globalThis.TylerKeepAlive=Object.freeze({config:()=>({...cfg}),watch,status:()=>$('kaStatus').textContent,info,refresh:push});
 })();

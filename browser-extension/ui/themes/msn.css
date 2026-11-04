@@ -1,0 +1,193 @@
+/*
+ * ROBOTIC TYLER "MSN Messenger (mid-2000s) style" theme (v2.27), light.
+ * The messenger's main window: soft sky-blue gradients, a white header with the display picture in
+ * its glossy frame (green Online, red Busy or On the Phone, orange Away, grey Appear Offline), the
+ * name in bold with the personal message under it, contact-list groups with blue headings, rounded
+ * glassy buttons, and the pop-up notices that rise in the corner. Signature: Tyler's presence
+ * follows his state, and while he writes the strip says he is typing a message
+ * (theme-pack-4.js adds the presence, What I'm listening to, the contact list of his parts, Nudge,
+ * emoticons for your clips and the sign-in notices).
+ * Type: Segoe UI and Tahoma, which Windows already has.
+ * Branding (v2.27): the owner's Messenger logo art (the Tyler logo) and the butterfly cut from the
+ * owner's Messenger artwork, in the pop-ups' title strip (theme-pack-4.js).
+ */
+[data-rt-theme=msn]{
+  color-scheme:light;
+  --m-sky:linear-gradient(180deg,#ffffff 0,#eaf2fc 35%,#d3e4f7 100%);--m-head:linear-gradient(180deg,#ffffff 0,#f1f6fd 55%,#dbe8f8 100%);
+  --m-glass:linear-gradient(180deg,#ffffff 0,#eef4fc 45%,#d6e5f7 55%,#e4eefa 100%);--m-glass-hi:linear-gradient(180deg,#ffffff 0,#f6fafe 45%,#e1edfa 55%,#edf4fc 100%);
+  --m-blue:linear-gradient(180deg,#8dbcf0 0,#5a98e0 45%,#3b7ccf 55%,#4a8ad8 100%);--m-edge:#86a9d6;--m-group:#16458c;--m-ink:#1b1b1b;--m-ink-2:#4b5563;--m-link:#0b52a8;
+  --m-online:#38b23c;--m-busy:#d6342a;--m-away:#f0a20f;--m-offline:#8c98a5;
+  --rt-bar:#f1f6fd;--rt-bg:#e8f1fb;--rt-bg-deep:#ffffff;--rt-surface:#ffffff;--rt-surface-2:#f4f8fd;--rt-surface-3:#e2ecf8;
+  --rt-block:#ffffff;--rt-block-hover:#f3f8fe;--rt-input:#ffffff;--rt-select:#d6e6fa;
+  --rt-line:#b9cfea;--rt-line-soft:#d5e2f3;--rt-line-strong:#86a9d6;
+  --rt-ink:#1b1b1b;--rt-ink-strong:#000000;--rt-ink-2:#2d3440;--rt-ink-3:#4b5563;--rt-ink-4:#5f6b7a;--rt-ink-disabled:#a3adba;
+  --rt-link:#0b52a8;--rt-link-hover:#e0670a;--rt-blue:#1b1b1b;--rt-blue-deep:#16458c;--rt-active:#3b7ccf;
+  --rt-blue-fade:#ffffff;--rt-blue-fade-hover:#f3f8fe;
+  --rt-green:#2d68b8;--rt-green-hover:#3474c4;--rt-green-ink:#ffffff;--rt-green-line:#2a5ea8;
+  --rt-state-standby:#5f6b7a;--rt-state-ready:#1d7023;--rt-state-listening:#1d7023;--rt-state-thinking:#1d7023;--rt-state-speaking:#b3261d;--rt-state-waiting:#a8650a;--rt-state-error:#b3261d;
+  --rt-danger:#b3261d;--rt-danger-bg:#d6342a;--rt-danger-hover:#e14a40;--rt-danger-ink:#ffffff;--rt-success:#23802a;--rt-focus:#3b7ccf;
+  --rt-accent:#3b7ccf;--rt-accent-soft:rgba(59,124,207,.14);--rt-accent-line:rgba(59,124,207,.5);
+  --rt-on-accent:#ffffff;--rt-accent-fill:#2d68b8;--rt-meter:linear-gradient(90deg,#5a98e0,#38b23c);--rt-marker:#000;--rt-edge:#b9cfea;--rt-page-glow:#f1f6fd;
+  --rt-font:"Segoe UI",Tahoma,Verdana,"DejaVu Sans",sans-serif;--rt-font-display:"Segoe UI",Tahoma,Verdana,"DejaVu Sans",sans-serif;
+  --rt-text-xs:11px;--rt-text-sm:12px;--rt-text-md:13px;--rt-text-lg:14px;--rt-track:0;
+  --rt-r-xs:3px;--rt-r-sm:4px;--rt-r-md:6px;--rt-r-lg:8px;--rt-shadow-float:0 0 0 1px #6f96c9,0 16px 40px rgba(20,50,100,.35);
+}
+[data-rt-theme=msn] :is(h1,h2,h3,label,.tabs button,.ident-sub,.stat dt,.tally-label,.pill,.pad span,details.feature>summary,.sheet-head h2,.card>h2,.pulse dt,.facts b,.matrix dt,.section-nav button,nav:not(.tabs) button,button){text-transform:none;letter-spacing:0}
+.panel[data-rt-theme=msn]{background:var(--m-sky);border:1px solid #fff;border-radius:8px;box-shadow:var(--rt-shadow-float)}
+[data-rt-theme=msn] body{background:radial-gradient(80% 60% at 85% 0,rgba(255,255,255,.9),transparent 60%),linear-gradient(180deg,#cfe0f5,#a9c6ea)}
+[data-rt-theme=msn] main{background:transparent}
+[data-rt-theme=msn] :is(h1,h2,h3,.sheet-head h2,.card>h2){font-weight:600;color:var(--m-group)}
+[data-rt-theme=msn] h2{font-size:16px}
+[data-rt-theme=msn] h1{font-size:26px}
+[data-rt-theme=msn] .wordmark{font:700 13.5px/1.2 var(--rt-font);color:#1b1b1b}
+/* The personal message under the name */
+[data-rt-theme=msn] .ident-sub{font-size:11.5px;font-style:italic;color:#5f6b7a}
+[data-rt-theme=msn] label:not(:has(>input[type=checkbox])):not(.toggle){font-size:12px;font-weight:600;color:#2d3440}
+[data-rt-theme=msn] :is(p,small,.hint){color:var(--m-ink-2)}
+/* The header with the display picture */
+[data-rt-theme=msn] .bar{background:var(--m-head);border-radius:7px 7px 0 0;box-shadow:inset 0 -1px 0 #b9cfea}
+[data-rt-theme=msn] .bar .icon-btn{color:#3d5f8f;background:var(--m-glass);border:1px solid var(--m-edge);border-radius:4px}
+[data-rt-theme=msn] .bar .icon-btn:hover{color:#16458c;background:var(--m-glass-hi);border-color:#3b7ccf}
+/* The display-picture frame takes Tyler's presence colour */
+[data-rt-theme=msn] :where(.mark,img.mark,#brand-logo){--dp:var(--m-online)}
+[data-rt-theme=msn] :is(.mark[data-logo],img.mark,#brand-logo){--logo-pad:4px;background:#fff;border:0;border-radius:7px;box-shadow:0 0 0 3px var(--dp),0 0 0 4px rgba(0,0,0,.18),inset 0 0 0 1px #c9d6e6,0 2px 5px rgba(0,0,0,.25)}
+[data-rt-theme=msn] .mark[data-logo]{width:44px;height:44px;margin:-4px 4px -4px 2px}
+.panel[data-rt-theme=msn]:has(.tally:is([data-state=speaking],[data-state=error])) .mark[data-logo]{--dp:var(--m-busy)}
+.panel[data-rt-theme=msn]:has(.tally:is([data-state=paused],[data-state=waiting])) .mark[data-logo]{--dp:var(--m-away)}
+.panel[data-rt-theme=msn]:has(.tally[data-state=standby]) .mark[data-logo]{--dp:var(--m-offline)}
+/* Groups and boxes: white on blue, rounded */
+[data-rt-theme=msn] :where(details,.callout,.board-tools,.sheet,.card,.route-card,.panel,.mini-callout>div,.usage-banner,.facts>div,.matrix>div,.arcade-tickets>div){background:#fff;border:1px solid #b9cfea;border-radius:6px;box-shadow:none}
+[data-rt-theme=msn] details.feature{background:#fff}
+[data-rt-theme=msn] details.feature[open]{background:#fbfdff}
+/* Group headings: blue, bold, with the count */
+[data-rt-theme=msn] details.feature>summary{font-size:12.5px;font-weight:700;color:var(--m-group);border-radius:6px}
+[data-rt-theme=msn] details.feature>summary:hover{background:#eef5fd}
+[data-rt-theme=msn] details.feature[open]>summary{border-radius:6px 6px 0 0;box-shadow:inset 0 -1px 0 #d5e2f3}
+[data-rt-theme=msn] summary::after{border-color:var(--m-group)}
+[data-rt-theme=msn] :is(.quick-help,.confirm,#setup,.deck-entry){background:linear-gradient(180deg,#fffef3,#fff7d6);border:1px solid #e6cf7a;border-radius:6px}
+/* Stats */
+[data-rt-theme=msn] .stats{gap:4px;padding:0;background:transparent;box-shadow:none}
+[data-rt-theme=msn] .stat{padding:6px 9px;background:#fff;border:1px solid #b9cfea;border-radius:6px}
+[data-rt-theme=msn] .stat:first-child{border-left:1px solid #b9cfea}
+[data-rt-theme=msn] .stat dt{font-size:11px;font-weight:600;color:var(--m-group)}
+[data-rt-theme=msn] .stat dd{font-size:16px;font-weight:600;color:#1b1b1b}
+[data-rt-theme=msn] .stat small{color:var(--rt-ink-4)}
+/* Tabs: the conversation window's toolbar buttons, icon over label */
+[data-rt-theme=msn] .tabs{gap:3px;padding:6px 8px 0;margin-top:8px;background:transparent;box-shadow:inset 0 -1px 0 #9fbbe0}
+[data-rt-theme=msn] .tabs button{padding:6px 2px 5px;font-size:12px;font-weight:600;color:#2d3440;background:var(--m-glass);border:1px solid #a9c3e6;border-bottom:0;border-radius:6px 6px 0 0;box-shadow:inset 0 1px 0 #fff}
+[data-rt-theme=msn] .tabs button .ic{color:#3b7ccf}
+[data-rt-theme=msn] .tabs button:hover{color:#000;background:var(--m-glass-hi);border-color:#7fa6da}
+[data-rt-theme=msn] .tabs button[aria-selected=true]{position:relative;margin-bottom:-1px;padding-bottom:6px;color:#16458c;background:#fff;border-color:#86a9d6;box-shadow:inset 0 3px 0 #f5a623}
+[data-rt-theme=msn] .scroll{background:rgba(255,255,255,.55)}
+[data-rt-theme=msn] .side{background:linear-gradient(180deg,#ffffff,#e4eefa);box-shadow:inset -1px 0 0 #b9cfea}
+[data-rt-theme=msn] :is(.section-nav button,nav:not(.tabs) button){font-size:12.5px;font-weight:600;color:#16458c;background:transparent;border:1px solid transparent;border-radius:4px;box-shadow:none}
+[data-rt-theme=msn] :is(.section-nav button,nav:not(.tabs) button):hover{background:#eef5fd;border-color:#b9cfea}
+[data-rt-theme=msn] :is(.section-nav button[aria-current=page],nav:not(.tabs) button.active){color:#fff;background:var(--m-blue);border-color:#2a5ea8;text-shadow:0 1px 0 rgba(0,0,0,.2)}
+[data-rt-theme=msn] :is(.section-nav button[aria-current=page],nav:not(.tabs) button.active) .ic{color:#fff}
+/* Buttons: rounded glassy keys; the main action is blue, like Send */
+[data-rt-theme=msn] button{font-size:12px;font-weight:600;color:#1b1b1b;background:var(--m-glass);border:1px solid var(--m-edge);border-radius:4px;box-shadow:inset 0 1px 0 #fff}
+[data-rt-theme=msn] button:hover{color:#000;background:var(--m-glass-hi);border-color:#f0a945;box-shadow:inset 0 1px 0 #fff,0 0 0 1px rgba(245,166,35,.45)}
+[data-rt-theme=msn] button:active:not(:disabled){transform:none;background:linear-gradient(180deg,#d6e5f7,#eef4fc)}
+[data-rt-theme=msn] :is(.primary,#start,#save){color:#fff;background:var(--m-blue);border-color:#2a5ea8;text-shadow:0 1px 0 rgba(0,0,0,.22);box-shadow:inset 0 1px 0 rgba(255,255,255,.5)}
+[data-rt-theme=msn] :is(.primary,#start,#save):hover{color:#fff;background:linear-gradient(180deg,#a3caf3 0,#6aa4e6 45%,#4a8ad8 55%,#5a98e0 100%);border-color:#2a5ea8}
+[data-rt-theme=msn] :is(.primary,#start,#save) .ic{color:#fff}
+[data-rt-theme=msn] .danger{color:#fff;background:linear-gradient(180deg,#f39a92 0,#e2574d 45%,#cf3a30 55%,#d9473d);border-color:#93241c}
+[data-rt-theme=msn] .danger:hover{color:#fff;background:linear-gradient(180deg,#f6aea7 0,#e86a61 45%,#d84a40 55%,#e1564c);border-color:#93241c}
+[data-rt-theme=msn] :is(.ghost,.icon){background:transparent;border-color:transparent;box-shadow:none}
+[data-rt-theme=msn] :is(.ghost,.icon):hover{background:#eef5fd;border-color:#b9cfea}
+[data-rt-theme=msn] .link-btn{border:0;background:none;box-shadow:none;color:var(--m-link);text-decoration:underline}
+[data-rt-theme=msn] button:disabled{color:var(--rt-ink-disabled);background:#f2f6fb;border-color:#d5e2f3;box-shadow:none}
+/* Fields */
+[data-rt-theme=msn] input:where(:not([type=checkbox],[type=radio],[type=range],[type=file])),[data-rt-theme=msn] :is(textarea,select){color:#1b1b1b;background-color:#fff;border:1px solid #7f9fcf;border-radius:3px;box-shadow:inset 0 1px 2px rgba(20,60,120,.1);font-family:var(--rt-font)}
+[data-rt-theme=msn] select{background-image:linear-gradient(45deg,transparent 50%,#3b7ccf 50%),linear-gradient(135deg,#3b7ccf 50%,transparent 50%)}
+[data-rt-theme=msn] select option{color:#1b1b1b;background:#fff}
+[data-rt-theme=msn] :is(input,textarea,select):focus{border-color:#3b7ccf;box-shadow:0 0 0 2px rgba(59,124,207,.25)}
+[data-rt-theme=msn] input::placeholder,[data-rt-theme=msn] textarea::placeholder{color:#8a97a8;font-style:italic}
+[data-rt-theme=msn] input[type=checkbox]{width:15px;height:15px;background:#fff;border:1px solid #6f96c9;border-radius:3px}
+[data-rt-theme=msn] input[type=checkbox]:checked{background:var(--m-blue);border-color:#2a5ea8}
+[data-rt-theme=msn] input[type=checkbox]:checked::after{border-color:#fff}
+[data-rt-theme=msn] .toggle>input[type=checkbox]{width:36px;height:18px;border-radius:9px;background:#dfe8f4;border:1px solid #7f9fcf}
+[data-rt-theme=msn] .toggle>input[type=checkbox]::after{top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:linear-gradient(180deg,#fff,#d6e5f7);box-shadow:0 1px 2px rgba(0,0,0,.3)}
+[data-rt-theme=msn] .toggle>input[type=checkbox]:checked{background:linear-gradient(180deg,#7fd481,#38b23c);border-color:#23802a}
+[data-rt-theme=msn] .toggle>input[type=checkbox]:checked::after{top:2px;left:2px;width:12px;height:12px;transform:translateX(18px);background:#fff}
+[data-rt-theme=msn] input[type=range]{accent-color:#3b7ccf}
+[data-rt-theme=msn] :is(pre,.output,.v22-log,.response){color:#1b1b1b;background:#fff;border:1px solid #b9cfea;border-radius:4px}
+[data-rt-theme=msn] :is(.meter,.arcade-progress,.lat-track){background:#e2ecf8;border-radius:4px;box-shadow:inset 0 1px 2px rgba(20,60,120,.15)}
+[data-rt-theme=msn] .pill{color:#16458c;background:#e2ecf8;border:1px solid #b9cfea;border-radius:9px;box-shadow:none}
+/* Soundboard pads: contacts in a list; the one playing is selected */
+[data-rt-theme=msn] .pad{background:#fff;border:1px solid #d5e2f3;border-radius:4px;box-shadow:none;padding-left:26px}
+[data-rt-theme=msn] .pad::before{content:"";position:absolute;left:9px;top:50%;width:9px;height:9px;margin-top:-5px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#b7efb8,#38b23c 60%,#1f7a23);box-shadow:0 0 0 1px rgba(0,0,0,.15)}
+[data-rt-theme=msn] .pad b{color:#1b1b1b;font-weight:600}
+[data-rt-theme=msn] .pad span{color:#5f6b7a;font-weight:400;font-style:italic}
+[data-rt-theme=msn] .pad::after{border-left-color:#3b7ccf}
+[data-rt-theme=msn] .pad:hover{background:#eef5fd;border-color:#86a9d6}
+[data-rt-theme=msn] .pad.playing{background:linear-gradient(180deg,#e9f3fe,#cfe2f9);border-color:#3b7ccf;box-shadow:inset 0 0 0 1px #fff}
+[data-rt-theme=msn] .pad.playing::before{background:radial-gradient(circle at 35% 30%,#ffc2bd,#d6342a 60%,#8f1d16)}
+[data-rt-theme=msn] :is(.step-n,.setup-n,.friend-card .avatar){font-weight:700;color:#fff;background:var(--m-blue);border-radius:50%}
+[data-rt-theme=msn] code{color:#16458c;background:#eef5fd;border-radius:3px}
+[data-rt-theme=msn] .savebar,[data-rt-theme=msn] .foot{background:linear-gradient(180deg,#e4eefa,#c9dcf3);box-shadow:inset 0 1px 0 #fff,0 -1px 0 #9fbbe0}
+[data-rt-theme=msn] .foot{border-radius:0 0 7px 7px}
+[data-rt-theme=msn] .foot small{color:#3d4b5e}
+[data-rt-theme=msn] .route li{background:#fff;border:1px solid #b9cfea;border-radius:4px}
+[data-rt-theme=msn] .route li:last-child{color:#fff;background:var(--m-blue);border-color:#2a5ea8}
+[data-rt-theme=msn] .vote{background:linear-gradient(90deg,rgba(59,124,207,.22) calc(var(--share,0)*100%),#fff 0);border:1px solid #b9cfea;border-radius:4px}
+[data-rt-theme=msn] .vote-marker{font-weight:700;color:var(--m-group)}
+[data-rt-theme=msn] :is(.scroll,.content,main){scrollbar-color:#9fbbe0 transparent}
+html[data-rt-theme=msn]{scrollbar-color:#9fbbe0 #e4eefa}
+
+/* ── Checks: contacts with presence dots ── */
+[data-rt-theme=msn] .checklist li{position:relative;padding:7px 8px 7px 26px;border-top:1px dotted #b9cfea}
+[data-rt-theme=msn] .checklist li::before{content:"";position:absolute;left:8px;top:11px;width:10px;height:10px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#e7edf3,#8c98a5 60%,#5f6b7a);box-shadow:0 0 0 1px rgba(0,0,0,.15)}
+[data-rt-theme=msn] .checklist li[data-result=ok]::before{background:radial-gradient(circle at 35% 30%,#b7efb8,#38b23c 60%,#1f7a23)}
+[data-rt-theme=msn] .checklist li[data-result=fail]::before{background:radial-gradient(circle at 35% 30%,#ffc2bd,#d6342a 60%,#8f1d16)}
+[data-rt-theme=msn] .checklist li[data-result=unknown]::before{background:radial-gradient(circle at 35% 30%,#ffe3a6,#f0a20f 60%,#9e6a06)}
+[data-rt-theme=msn] .checklist b{color:#16458c}
+
+/* ── Status strip: Tyler's presence ──
+   A glossy presence orb in the presence colour (green Online, red On the Phone or Busy, orange Away
+   or Be Right Back, grey Appear Offline), the state in bold and the status as his personal
+   message. While he writes, a pencil writes beside "is typing a message…" (theme-pack-4.js). */
+[data-rt-theme=msn] .tally{--pres:var(--m-online);min-height:52px;padding:8px 12px 8px 42px;background:linear-gradient(180deg,#ffffff,#f3f8fe);border:1px solid #b9cfea;border-radius:6px;box-shadow:none}
+[data-rt-theme=msn] .tally:is([data-state=speaking],[data-state=error]){--pres:var(--m-busy)}
+[data-rt-theme=msn] .tally:is([data-state=paused],[data-state=waiting]){--pres:var(--m-away)}
+[data-rt-theme=msn] .tally[data-state=standby]{--pres:var(--m-offline)}
+[data-rt-theme=msn] .tally-light{position:absolute;left:12px;top:50%;width:20px;height:20px;margin-top:-10px;border-radius:50%;background:radial-gradient(circle at 35% 28%,rgba(255,255,255,.95) 0 3px,transparent 6px),radial-gradient(circle at 50% 60%,var(--pres),color-mix(in srgb,var(--pres) 55%,#000) 100%);box-shadow:0 0 0 1px rgba(0,0,0,.2),0 1px 2px rgba(0,0,0,.25)!important}
+[data-rt-theme=msn] :is(.tally-head,.tally-body){position:static}
+[data-rt-theme=msn] .tally-label{font-size:13px;font-weight:700;color:#1b1b1b}
+[data-rt-theme=msn] .tally-text{font-style:italic;color:#4b5563}
+[data-rt-theme=msn] .tally-wave,[data-rt-theme=msn] .tally-trace{display:none}
+[data-rt-theme=msn] .tally[data-state=speaking] .tally-light{animation:m-ring 1.2s ease-in-out infinite}
+[data-rt-theme=msn] .tally[data-state=error] .tally-light{animation:m-ring .6s ease-in-out infinite}
+[data-rt-theme=msn] .tally[data-flash=ok]{box-shadow:0 0 0 2px rgba(56,178,60,.45)}
+[data-rt-theme=msn] .tally[data-flash=fail]{box-shadow:0 0 0 2px rgba(214,52,42,.4)}
+@keyframes m-ring{50%{transform:scale(1.12)}}
+
+/* ── Icons, dialogs, notifications and tooltips ──
+   Notifications are the messenger's corner pop-ups: a white card with a blue title strip. */
+[data-rt-theme=msn] .ic{--ic-w:1.6px;--ic-cap:round;--ic-join:round}
+[data-rt-theme=msn] .rt-toast{color:#1b1b1b;background:linear-gradient(180deg,#ffffff,#eef4fc);border:1px solid #6f96c9;border-top:22px solid #4a8ad8;border-radius:6px;box-shadow:0 8px 24px rgba(20,50,100,.35)}
+[data-rt-theme=msn] .rt-toast::before{content:"MSN Messenger";position:absolute;left:10px;top:-18px;font:700 11px/14px var(--rt-font);color:#fff;text-shadow:0 1px 0 rgba(0,0,0,.25)}
+[data-rt-theme=msn] .rt-toast[data-kind=success]{--tone:var(--m-online)}
+[data-rt-theme=msn] .rt-toast[data-kind=warning]{--tone:var(--m-away)}
+[data-rt-theme=msn] .rt-toast[data-kind=error]{--tone:var(--m-busy)}
+[data-rt-theme=msn] .rt-toast:not([data-kind]),[data-rt-theme=msn] .rt-toast[data-kind=info]{--tone:#3b7ccf}
+[data-rt-theme=msn] :is(.rt-toast,.rt-dialog) :is(.rt-toast-title,.rt-dialog-title){font-weight:700;color:#16458c}
+[data-rt-theme=msn] :is(.rt-toast-text,.rt-dialog-text,.rt-steps){color:#2d3440}
+[data-rt-theme=msn] .rt-toast .ic{color:var(--tone)}
+[data-rt-theme=msn] .rt-toast .rt-x{position:absolute;right:4px;top:-20px;width:18px;height:18px;min-height:0;padding:0;color:#fff;background:transparent;border:0;box-shadow:none}
+[data-rt-theme=msn] .rt-toast .rt-x:hover{color:#fff;background:rgba(255,255,255,.2)}
+[data-rt-theme=msn] .rt-dialog{color:#1b1b1b;background:var(--m-sky);border:1px solid #6f96c9;border-radius:8px;box-shadow:0 16px 40px rgba(20,50,100,.35)}
+[data-rt-theme=msn] .rt-dialog .ic{color:var(--tone)}
+[data-rt-theme=msn] .rt-tip{background:#ffffe1;color:#000;border:1px solid #767676;border-radius:0;font-family:Tahoma,"Segoe UI",sans-serif;font-size:11px}
+
+
+/* ── Motion: MSN Messenger ──
+   Notices rise from the bottom corner and settle, as the messenger's pop-ups did; groups fold
+   open; the presence orb pulses while Tyler is on the phone. A nudge shakes the window (the
+   extras). */
+@keyframes m-rise{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:none}}
+@keyframes m-open{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+[data-rt-theme=msn] :is(.view:not([hidden]),.sheet,section[data-view]:not([hidden])){animation:m-open .18s ease-out backwards}
+[data-rt-theme=msn] .rt-toast:not(.rt-leaving){animation:m-rise .32s cubic-bezier(.2,.8,.3,1) backwards}
+[data-rt-theme=msn] .checklist li{animation:m-open .18s ease-out backwards}
+[data-rt-theme=msn] .vote[data-arrived]{animation:m-rise .25s ease-out}

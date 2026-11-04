@@ -15,7 +15,7 @@
 
 <p align="center"><b>Tyler is an AI squadmate for Steam.</b> He sits in your group chat and voice channel, talks like one of the crew, and keeps the night going with trivia, votes, sounds and music.</p>
 
-<p align="center"><a href="CHANGES.md"><img src="assets/readme/whats-new.png" width="100%" alt="What's new since v2.20.1: Phone remote (v2.25, v2.26), Stay connected (v2.24), a docked and resizable panel (v2.23), themes with their own menus and screens (v2.22), smoother voice (v2.21), music that sounds right (v2.20.2, v2.20.3), the full check and repeat protection (v2.20.1)."></a></p>
+<p align="center"><a href="CHANGES.md"><img src="assets/readme/whats-new.png" width="100%" alt="What's new since v2.20.1: five new themes, Rust, Xbox 360, iPod classic, MSN Messenger and PlayStation 3 (v2.27), Phone remote (v2.25, v2.26), Stay connected (v2.24), a docked and resizable panel (v2.23), themes with their own menus and screens (v2.22), smoother voice (v2.21), music that sounds right (v2.20.2, v2.20.3), the full check and repeat protection (v2.20.1)."></a></p>
 
 ---
 
@@ -32,7 +32,7 @@
 </tr>
 <tr>
 <td valign="top"><img src="assets/readme/icon-games.png" width="52" align="left" alt="">&nbsp;<b>Trivia, votes and games</b><br>&nbsp;500-question trivia races, an arcade (<code>play vault</code>, <code>play hangman</code>, <code>play riddle</code> …), squad votes and optional mute or kick votes.</td>
-<td valign="top"><img src="assets/readme/icon-themes.png" width="52" align="left" alt="">&nbsp;<b>20 themes</b><br>&nbsp;Steam, TF2, CS2, Portal, DOOM, Deadlock, PAYDAY 2 and more, each with its own Tyler, status strip, menus and screens: a Quake console, a Pip-Boy radio, a CS2 buy wheel, a working Dreamcast VMU…</td>
+<td valign="top"><img src="assets/readme/icon-themes.png" width="52" align="left" alt="">&nbsp;<b>25 themes</b><br>&nbsp;Steam, TF2, CS2, Portal, DOOM, Rust, Xbox 360, iPod, MSN Messenger, PS3 and more, each with its own Tyler, status strip, menus and screens: a Quake console, a Pip-Boy radio, a click wheel, a Ring of Light, a working Dreamcast VMU…</td>
 </tr>
 <tr>
 <td valign="top"><img src="assets/readme/icon-remote.png" width="52" align="left" alt="">&nbsp;<b>Phone remote</b> <sup>new</sup><br>&nbsp;Tyler's panel on your phone, live and in your theme. Start or pause him, play clips, run the music, type in chat, switch the theme. Nothing to install.</td>
@@ -86,7 +86,7 @@ Both run the same engine, settings and themes. Prefer the older desktop route th
 
 Your personality, reply length and rules always apply, and people in the call can't change them.
 
-<p align="center"><img src="assets/readme/themes.png" width="100%" alt="The theme gallery: the real panel in each of the 20 themes, with its Tyler logo: Steam, Classic Steam, Team Fortress 2, Counter-Strike 2, Portal, Counter-Strike 1.6, HEV suit, Left 4 Dead, Windows XP, DOOM, Quake, Pip-Boy, Combine, Deadlock, Minecraft, PAYDAY 2, Dreamcast, Garry's Mod, Ricochet, Day of Defeat"></p>
+<p align="center"><img src="assets/readme/themes.png" width="100%" alt="The theme gallery: the real panel in each of the 25 themes, with its Tyler logo: Steam, Classic Steam, Team Fortress 2, Counter-Strike 2, Portal, Counter-Strike 1.6, HEV suit, Left 4 Dead, Windows XP, DOOM, Quake, Pip-Boy, Combine, Deadlock, Minecraft, PAYDAY 2, Dreamcast, Garry's Mod, Ricochet, Day of Defeat, Rust, Xbox 360, iPod classic, MSN Messenger, PlayStation 3"></p>
 
 **Settings → Appearance** shows every theme as a live preview card, with the theme's real extras reacting as Tyler listens, thinks, talks, pauses or hits a problem; **Apply** changes every Tyler window at once (so does the phone remote's Setup tab). Every theme adds its own controls on top: Steam's persona menu and achievements, the Windows XP Start menu, a PAYDAY heist plan with a drill timer, a Minecraft hotbar of sound discs, a Deadlock shop, a Day of Defeat field radio and more. Game themes follow each game's own menu colors and shapes, with free look-alike fonts (bundled, SIL Open Font License). No game fonts are included.
 
