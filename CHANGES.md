@@ -1,3 +1,22 @@
+# ROBOTIC TYLER v2.20.1: repeat protection, a full check you can send, and theme stats that last
+
+## New
+- **Repeat protection for text replies.** When the text model falls into a rut (the same sentence again with a word or two swapped), Tyler now notices. Before each request he names the openings and phrases his last few replies keep reusing, so the model steers away from them. After a reply, he compares it with his recent ones: a copied sentence inside an otherwise new reply is dropped, and a reply that is mostly a repeat is asked for once more with a note to say something different (same model, same provider, one extra request at most). If the second try repeats too, an automatic turn stays quiet instead of saying the same thing again; a reply you asked for by hand is still sent. A repeated first sentence is never spoken early in voice. Short reactions like "lol" or "gg" are left alone. Works with every text model (OpenRouter and Gemini).
+- **Full check** (Checks tab, **Run full check**): one pass over everything Tyler needs (this tab, the chat reader, his microphone, the voice call, outgoing audio, hearing the call, the Music DJ, your key and model, a real AI reply, speech and the test beep), with a summary first ("All good", "Working, 2 not verified" or "3 problems found") and what to do for each problem. **Copy report** puts the results on the clipboard as plain text to send to whoever set Tyler up; it contains no keys and no chat messages.
+- **Theme stats that last between sessions** (on by default, **Settings → Appearance → Remember theme stats between sessions**, with **Reset theme stats**): Steam achievements, the Minecraft XP level, Ricochet's high score, the PAYDAY heist count, the Dreamcast memory card and the Combine unit record now build up over time. Only counts are kept on this profile or PC (replies, messages heard, sounds, songs, reply times, best streak, sessions, time); no chat text and no names. Turn it off and nothing more is kept.
+- **Stronger extras for three themes:** Combine has a unit-record terminal (press T or click DISPATCH: totals and the last 10 dispatches with 10-codes); Ricochet shows its high score and opens a high-score table; the Dreamcast VMU opens a memory card of Tyler's saved stats, and the boot swirl plays when the panel opens and when Tyler recovers. Steam achievements are now a set of 12 that unlock over time (first reply, 100 and 1,000 replies, a reply under a second, 15 in a row, 10 sessions, 10 hours…).
+- **Music DJ in one click.** **Start Music DJ** opens YouTube and asks for its sound in the same click. In the desktop app the YouTube window opens behind Steam and its sound is shared automatically. In Chrome, YouTube opens in a background tab and Chrome's own share picker appears straight away: choose the YouTube tab and keep "Also share tab audio" on (Chrome always asks; that step can't be skipped). **Reopen YouTube** and **Share its audio again** are still there.
+
+## Improved
+- **Last reply** in the stats now updates for automatic replies and Gemini Live turns, not only for commands you run by hand.
+- The new overlays and the full check summary follow each theme's look: they open below the tabs, stay inside the panel and respect reduced motion.
+
+## Tested
+- **Mocks:** repeat protection on 18 example reply pairs (7 rewordings caught, 11 different replies and short reactions left alone) and through the real background script with a mocked streaming OpenRouter (retry note sent, one retry at most, automatic turn quiet after two repeats, no early clip of a repeated sentence); the full check, Copy report, Last reply, lifetime stats across a reload, the off switch and reset, and the Combine, Ricochet and Dreamcast overlays in the real panel in headless Chromium; one-click Music DJ in the desktop app's Steam window in Electron against a mock Steam page and a mock YouTube page, with the share asked for half a second before the window opened (its sound arrived). 268 unit and integration tests and 16 end-to-end tests.
+- **Not tested:** repeat protection with a real model (no key here), the Chrome one-click flow with Chrome's real share picker, the themes in a real Steam chat, and the desktop app on Windows.
+
+---
+
 # ROBOTIC TYLER v2.20.0: Venice Uncensored, three Gemini models, and 20 themes that each do their own thing
 
 ## New: AI models

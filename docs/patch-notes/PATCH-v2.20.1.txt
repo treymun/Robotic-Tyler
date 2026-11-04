@@ -1,0 +1,16 @@
+ROBOTIC TYLER v2.20.1 — patch notes
+
+New
+- Repeat protection for text replies: the rut hint names reused openings and phrases; a near-duplicate reply is asked for once more (same model and provider); a copied sentence is dropped; an automatic turn stays quiet if the second try repeats too. Every text model.
+- Full check in the Checks tab: every part in one pass, a summary first, what to do for each problem, and Copy report (no keys, no chat text).
+- Theme stats kept between sessions (Settings → Appearance, on by default, with Reset): achievements, Minecraft level, Ricochet high score, PAYDAY heists, Dreamcast memory card, Combine unit record. Counts only.
+- Combine unit-record terminal (T), Ricochet high-score table, Dreamcast memory card, 12 lifetime Steam achievements.
+- Music DJ in one click: desktop shares the YouTube window automatically; Chrome opens YouTube in the background and shows its share picker right away.
+
+Improved
+- Last reply updates for automatic replies and Gemini Live turns.
+- New overlays and the full check summary fit every theme.
+
+Tested
+- Mocks: repeat protection (18 reply pairs; background script with mocked OpenRouter), full check, lifetime stats and overlays in headless Chromium, one-click Music DJ in Electron with mock Steam and YouTube pages; 268 unit and 16 end-to-end tests.
+- Not tested: repeat protection with a real model, Chrome's real share picker, a real Steam chat, the desktop app on Windows.

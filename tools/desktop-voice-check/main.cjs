@@ -2,7 +2,7 @@
 // Electron side of tools/desktop-voice-check/check.mjs: the desktop app's Steam window setup
 // (app/steam-voice.cjs and the generated app/steam-preload.cjs, unchanged) around a MOCK Steam chat
 // page. Not Steam, not Windows audio. Writes what the page measured to $TYLER_CHECK_OUT.
-const {app,BrowserWindow,session,ipcMain,protocol,desktopCapturer}=require('electron');
+const {app,BrowserWindow,session,ipcMain,protocol,desktopCapturer,webContents}=require('electron');
 const fs=require('node:fs'),path=require('node:path');
 const ROOT=path.resolve(__dirname,'..','..');
 const steamVoice=require(path.join(ROOT,'app','steam-voice.cjs')),{setupDesktopMedia}=require(path.join(ROOT,'app','desktop-media.cjs'));
@@ -34,6 +34,16 @@ app.whenReady().then(async()=>{
  await media.openYouTube('https://www.youtube.com/');await new Promise(r=>setTimeout(r,1500));
  // A click in Tyler's panel starts these in the app; here a simulated user gesture does.
  const shares=await win.webContents.executeJavaScript('window.__shareChecks()',true);
+ // One click (v2.20.1): Start Music DJ opens the Music window in the background and asks for the
+ // share in the same click, before the window exists; the app waits for it and shares its sound.
+ const old=media.youtubeId();if(old!==null)BrowserWindow.fromWebContents(webContents.fromId(old))?.destroy();
+ await new Promise(r=>setTimeout(r,300));
+ // The share request reaches the app first; the window opens half a second later.
+ const asking=win.webContents.executeJavaScript('window.__oneClick()',true);
+ await new Promise(r=>setTimeout(r,500));const opening=media.openYouTube('https://www.youtube.com/',{background:true});
+ const oneClick=await asking;await opening;
+ const yt=media.youtubeId()!==null?BrowserWindow.fromWebContents(webContents.fromId(media.youtubeId())):null;
+ shares.oneClick={...oneClick,windowOpen:!!yt&&yt.isVisible(),reopened:old!==media.youtubeId()};
  fs.writeFileSync(process.env.TYLER_CHECK_OUT,JSON.stringify({...result,...shares,picked,mainLog:log},null,1));
  app.quit();
 });
