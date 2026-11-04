@@ -39,18 +39,35 @@
    function close(){menu?.remove();menu=null;start.setAttribute('aria-expanded','false');}
    function open(){if(menu)return close();menu=c.h('div','fx xp-menu fx-interactive');menu.setAttribute('role','menu');
     const head=c.h('div','xp-menu-head');head.append(c.h('span','xp-menu-pic'),c.h('b',null,'ROBOTIC TYLER'));menu.append(head);
-    const list=c.h('div','xp-menu-list');
-    for(const [label,run] of [...c.TABS.map(t=>[c.TAB_NAMES[t],()=>c.actions.tab(t)]),['Settings…',c.actions.settings],['Pause AI',c.actions.pause]]){const b=c.h('button','xp-mi',label);b.type='button';b.setAttribute('role','menuitem');b.onclick=()=>{close();run();};list.append(b);}
-    const off=c.h('div','xp-menu-foot'),hide=c.h('button','xp-off','Turn off panel');hide.type='button';hide.onclick=()=>{close();c.actions.collapse();};off.append(hide);
-    menu.append(list,off);menu.style.bottom=(c.panel.getBoundingClientRect().bottom-foot.getBoundingClientRect().top)+'px';c.slots.layer.append(menu);start.setAttribute('aria-expanded','true');list.querySelector('button').focus();}
+    // v2.22: the real Start menu's two columns: Tyler's tabs on the white side, his tools on the blue
+    // side, and Log Off (Pause AI) / Turn Off (collapse) along the bottom. Arrow keys move around.
+    const cols=c.h('div','xp-menu-cols'),list=c.h('div','xp-menu-list'),places=c.h('div','xp-menu-places');
+    const item=(parent,cls,label,sub,run)=>{const b=c.h('button',cls);b.type='button';b.setAttribute('role','menuitem');b.append(c.h('b',null,label));if(sub)b.append(c.h('small',null,sub));b.onclick=()=>{close();run();};parent.append(b);return b;};
+    const SUB={conversation:'Replies and participation',room:'Music, squad and extras',soundboard:'Play clips in voice',setup:'Connect Tyler to this chat',checks:'Find and fix problems'};
+    for(const t of c.TABS)item(list,'xp-mi',c.TAB_NAMES[t],SUB[t],()=>c.actions.tab(t));
+    list.append(c.h('i','xp-menu-sep'));item(list,'xp-mi xp-all','All Programs','',()=>c.actions.settings());
+    item(places,'xp-pl',"Tyler's Settings",'',c.actions.settings);item(places,'xp-pl','Run full check','',c.actions.fullCheck);item(places,'xp-pl','Stop audio','',c.actions.stopAudio);places.append(c.h('i','xp-menu-sep'));item(places,'xp-pl','Help and Support','',()=>c.actions.tab('checks'));
+    cols.append(list,places);
+    const off=c.h('div','xp-menu-foot'),logoff=c.h('button','xp-off xp-logoff','Log Off'),hide=c.h('button','xp-off','Turn Off');logoff.type=hide.type='button';logoff.title='Pause AI';hide.title='Collapse the panel';
+    logoff.onclick=()=>{close();c.actions.pause();};hide.onclick=()=>{close();c.actions.collapse();};off.append(logoff,hide);
+    menu.append(cols,off);menu.style.bottom=(c.panel.getBoundingClientRect().bottom-foot.getBoundingClientRect().top)+'px';c.slots.layer.append(menu);start.setAttribute('aria-expanded','true');list.querySelector('button').focus();
+    menu.addEventListener('keydown',e=>{const all=[...menu.querySelectorAll('button')],i=all.indexOf(c.root.activeElement);if(e.key==='ArrowDown'){e.preventDefault();all[(i+1)%all.length].focus();}else if(e.key==='ArrowUp'){e.preventDefault();all[(i-1+all.length)%all.length].focus();}else if(e.key==='ArrowRight'&&list.contains(c.root.activeElement)){e.preventDefault();places.querySelector('button').focus();}else if(e.key==='ArrowLeft'&&places.contains(c.root.activeElement)){e.preventDefault();list.querySelector('button').focus();}});}
    start.onclick=open;c.key(e=>{if(menu&&e.key==='Escape'){e.preventDefault();close();}});
+   // v2.22: balloon tips from the tray when something real happens: the call, the music, a problem fixed.
+   let balloon=null,was={peers:0,music:''};
+   function tip(icon,title,text){balloon?.remove();balloon=c.h('div','fx xp-balloon fx-interactive');balloon.setAttribute('role','status');const x=c.h('button','xp-bx','✕');x.type='button';x.setAttribute('aria-label','Close');x.onclick=()=>balloon?.remove();
+    const head=c.h('div','xp-bhead');head.append(c.h('span','xp-bicon '+icon),c.h('b',null,title),x);balloon.append(head,c.h('p',null,text));balloon.style.bottom=(c.panel.getBoundingClientRect().bottom-foot.getBoundingClientRect().top+6)+'px';c.flash(balloon,6000);}
+   const balloons=(type,d)=>{const v=c.voice();
+    if(v.peers>0&&!was.peers)tip('voice','Joined the voice call',v.peers+' '+(v.peers===1?'person':'people')+' in the call can hear Tyler now.');was.peers=v.peers;
+    if(type==='music'&&d?.title&&d.title!==was.music)tip('music','Now playing',d.title.slice(0,80));if(type==='music')was.music=d?.title||'';
+    if(type==='state'&&d?.before==='error'&&['ready','listening'].includes(d?.state))tip('ok','Problem solved','Tyler is working again.');};
    function render(){const v=c.voice(),sys=c.systems();
     icons.owner.dataset.on=String(c.panel.dataset.owner==='true');icons.owner.title=c.root.getElementById('footerState')?.textContent||'';icons.owner.setAttribute('aria-label',icons.owner.title);icons.owner.setAttribute('role','img');
     icons.voice.dataset.on=String(v.armed);icons.voice.title=v.armed?'Voice: '+(v.peers?v.peers+' people in the call':'armed, call empty'):'Voice: off';
     const net=sys[0].level===3&&sys[1].level===3;icons.net.dataset.on=String(net);icons.net.title='Connection: AI '+sys[0].detail+' · chat '+sys[1].detail;
     icons.music.dataset.on=String(!!c.S.music);icons.music.title=c.S.music?'Now playing: '+c.S.music:'Music DJ idle';
     clock.textContent=new Date().toLocaleTimeString([],{hour:'numeric',minute:'2-digit'});}
-   render();c.every(render);return {update:render,unmount(){close();start.remove();tray.remove();}};
+   render();c.every(render);return {update(type,d){render();balloons(type,d);},unmount(){close();start.remove();tray.remove();balloon?.remove();}};
   }},
   {id:'xp-error',mount(c){
    let box=null;
@@ -72,8 +89,11 @@
    const ammoN=c.h('b'),hpN=c.h('b');ammo.append(ammoN,c.h('small',null,'Replies'));hp.append(hpN,c.h('small',null,'Health'));
    const art=c.root.querySelector('.mark-art');const img=c.h('canvas');img.width=64;img.height=64;face.append(img);
    const draw=()=>{try{const g=img.getContext('2d');g.imageSmoothingEnabled=false;g.clearRect(0,0,64,64);g.drawImage(art,0,0,art.width,art.height,4,4,56,56);}catch{}};
-   box.append(ammo,face,hp);face.title='Tyler\'s status';
-   function render(){ammoN.textContent=String(c.S.replies+c.S.spoken);const h=c.health();hpN.textContent=h+'%';face.dataset.mood=c.S.state==='error'?'hurt':c.S.state==='speaking'?'grin':c.S.state==='thinking'?'squint':h<50?'hurt':'idle';box.dataset.low=String(h<40);}
+   // v2.22: the key cards, like the status bar's: blue = AI key saved, yellow = chat linked, red = voice armed.
+   const keys=c.h('div','doom-keys');const cards={blue:c.h('i','doom-key blue'),yellow:c.h('i','doom-key yellow'),red:c.h('i','doom-key red')};for(const k of Object.values(cards))keys.append(k);
+   box.append(ammo,face,hp,keys);face.title='Tyler\'s status';
+   function render(){ammoN.textContent=String(c.S.replies+c.S.spoken);const h=c.health();hpN.textContent=h+'%';face.dataset.mood=c.S.state==='error'?'hurt':c.S.state==='speaking'?'grin':c.S.state==='thinking'?'squint':h<50?'hurt':'idle';box.dataset.low=String(h<40);
+    const sys=c.systems(),v=c.voice(),have={blue:c.S.keyOk===true,yellow:sys[1].level===3,red:v.armed};for(const [k,el] of Object.entries(cards)){el.dataset.have=String(!!have[k]);el.title=({blue:'Blue key: AI key',yellow:'Yellow key: chat linked',red:'Red key: voice armed'})[k]+(have[k]?'':' (missing)');}}
    draw();c.later(draw,800);c.later(draw,2500);render();c.every(render);return {update(type){if(type==='theme')c.later(draw,500);render();}};
   }},
   {id:'doom-melt',mount(c){
@@ -97,7 +117,9 @@
    const chip=c.add('bar',c.h('button','fx fx-chip qk-chip','~'));chip.type='button';chip.title='Console (~)';chip.setAttribute('aria-label','Open the console');
    let con=null,out=null;
    const line=(t,cls)=>{if(!out)return;const p=c.h('div',cls||null,t);out.append(p);while(out.children.length>60)out.firstElementChild.remove();out.scrollTop=out.scrollHeight;};
-   const help='Commands: status · tab <chat|room|sounds|setup|checks> · pause · stopaudio · beep · log · clear · quit';
+   const help='Commands: status · tab <chat|room|sounds|setup|checks> · connect · check · pause · stopaudio · beep · play <sound> · sounds · music · log · history · clear · quit';
+   // v2.22: command history (Up / Down, kept for the session), Tab completes, and a hint line suggests.
+   const CMDS=['status','tab','connect','check','pause','stopaudio','beep','play','sounds','music','log','history','clear','quit','help'],history=[];let hi=0;
    const tabOf={chat:'conversation',room:'room',sounds:'soundboard',setup:'setup',checks:'checks'};
    function run(cmd){const [w,arg]=cmd.trim().toLowerCase().split(/\s+/);line(']'+cmd);
     if(!w)return;if(w==='help'||w==='?')return line(help);if(w==='clear'){out.replaceChildren();return;}if(w==='quit'||w==='exit')return close();
@@ -105,12 +127,26 @@
     if(w==='tab'&&tabOf[arg]){c.actions.tab(tabOf[arg]);return line('switched to '+arg);}
     if(w==='pause'){c.actions.pause();return line('AI paused');}if(w==='stopaudio'){c.actions.stopAudio();return line('audio stopped');}if(w==='beep'){c.actions.beep();return line('beep sent to voice');}
     if(w==='log'){for(const e of c.S.log.slice(-15))line(new Date(e.at).toLocaleTimeString()+'  '+e.text,e.kind==='error'?'qk-err':null);return;}
+    if(w==='connect'){c.actions.connect();return line('connecting: Connect & start');}
+    if(w==='check'){c.actions.fullCheck();return line('running the full check (Checks tab)');}
+    if(w==='history'){history.forEach((h,i)=>line('  '+(i+1)+'  '+h));return;}
+    if(w==='sounds'){const {slots}=c.actions.sounds();return line(slots.length?slots.map(s=>s.name.toLowerCase().replace(/\s+/g,'_')).join('  '):'no sounds loaded: open the Sounds tab once');}
+    if(w==='play'){const {slots}=c.actions.sounds(),want=cmd.trim().split(/\s+/).slice(1).join(' ').toLowerCase().replace(/_/g,' ');const s=slots.find(x=>x.name.toLowerCase()===want)||slots.find(x=>x.name.toLowerCase().startsWith(want));if(!want||!s)return line('play: no sound "'+want+'". Type sounds.','qk-err');c.actions.playSound(s.slot);return line('playing '+s.name);}
+    if(w==='music'){return line(c.S.music?'now playing: '+c.S.music:'music: idle (Room → Music DJ)');}
     line('Unknown command "'+w+'". Type help.','qk-err');}
    function close(){con?.remove();con=null;out=null;chip.setAttribute('aria-expanded','false');}
    function open(){if(con)return close();con=c.h('div','fx qk-console fx-interactive');con.setAttribute('role','dialog');con.setAttribute('aria-label','Console');
     out=c.h('div','qk-out');out.setAttribute('role','log');const form=c.h('form','qk-in'),input=c.h('input');input.setAttribute('aria-label','Console command');input.spellcheck=false;input.autocomplete='off';form.append(c.h('span',null,']'),input);
-    form.onsubmit=e=>{e.preventDefault();run(input.value);input.value='';};input.onkeydown=e=>{if(e.key==='Escape'||e.key==='`'){e.preventDefault();close();}};
-    con.append(out,form);c.slots.layer.append(con);chip.setAttribute('aria-expanded','true');
+    const hint=c.h('div','qk-hint');
+    const suggest=()=>{const v=input.value.trimStart().toLowerCase();if(!v){hint.textContent='';return;}const [w,...rest]=v.split(/\s+/);if(!rest.length){const m=CMDS.filter(k=>k.startsWith(w));hint.textContent=m.length?m.join('  '):'';return;}
+     if(w==='tab')hint.textContent=Object.keys(tabOf).filter(k=>k.startsWith(rest[0]||'')).join('  ');else if(w==='play'){const {slots}=c.actions.sounds();hint.textContent=slots.map(s=>s.name.toLowerCase().replace(/\s+/g,'_')).filter(n=>n.startsWith(rest.join('_'))).slice(0,8).join('  ');}else hint.textContent='';};
+    form.onsubmit=e=>{e.preventDefault();const v=input.value;if(v.trim()){history.push(v);if(history.length>30)history.shift();}hi=history.length;run(v);input.value='';suggest();};
+    input.oninput=suggest;
+    input.onkeydown=e=>{if(e.key==='Escape'||e.key==='`'){e.preventDefault();close();}
+     else if(e.key==='ArrowUp'&&history.length){e.preventDefault();hi=Math.max(0,hi-1);input.value=history[hi];suggest();}
+     else if(e.key==='ArrowDown'&&history.length){e.preventDefault();hi=Math.min(history.length,hi+1);input.value=history[hi]||'';suggest();}
+     else if(e.key==='Tab'){e.preventDefault();const first=hint.textContent.split(/\s+/)[0];if(!first)return;const parts=input.value.trimStart().split(/\s+/);parts[parts.length-1]=first;input.value=parts.join(' ')+' ';suggest();}};
+    con.append(out,form,hint);c.slots.layer.append(con);chip.setAttribute('aria-expanded','true');
     line('ROBOTIC TYLER console. '+help);for(const e of c.S.log.slice(-8))line(new Date(e.at).toLocaleTimeString()+'  '+e.text,e.kind==='error'?'qk-err':null);input.focus();}
    chip.onclick=open;c.key(e=>{if((e.key==='`'||e.key==='~')&&!e.repeat){e.preventDefault();open();}});
    return {update(type,d){if(!out)return;if(type==='state'&&d.state!==d.before)line(d.label+(d.text?': '+d.text:''),d.state==='error'?'qk-err':null);if(type==='reply')line('reply sent ('+d.chars+' chars)');if(type==='sound')line('sound: '+d.name);},unmount:close};
@@ -140,6 +176,12 @@
    const gauge=(label,title)=>{const g=c.h('div','pb-gauge');g.title=title;const dial=c.svg('<svg viewBox="0 0 100 60"><path class="pb-arc" d="M10 55 A40 40 0 0 1 90 55"/><path class="pb-ticks" d="M10 55 A40 40 0 0 1 90 55"/><line class="pb-needle" x1="50" y1="55" x2="50" y2="20"/><circle cx="50" cy="55" r="4"/></svg>');const v=c.h('b');g.append(dial,c.h('small',null,label),v);box.append(g);return {g,v,needle:dial.querySelector('.pb-needle')};};
    const resp=gauge('RESP','Last reply time (0 to 5 s)'),rad=gauge('RADS','Text spend this session (reported by provider)');
    const cnd=c.h('div','pb-cnd');cnd.title='Condition: Tyler\'s health';const fill=c.h('i'),track=c.h('span');track.append(fill);cnd.append(c.h('small',null,'CND'),track);box.append(cnd);
+   // v2.22: CND opens the condition screen: each part of Tyler with its own bar, like the limbs.
+   cnd.tabIndex=0;cnd.setAttribute('role','button');cnd.title='Condition: Tyler\'s health. Click for each part.';
+   const status=()=>{const o=c.overlay('pb-status','Condition');o.el.append(c.h('b','pb-st-head','STAT · CONDITION'));
+    for(const sys of c.systems()){const row=c.h('div','pb-st-row'),bar=c.h('span','pb-st-bar'),f=c.h('i');const hp=sys.level===3?100:sys.level===2?55:sys.level===1?22:0;f.style.width=hp+'%';bar.append(f);row.dataset.hp=String(hp);row.append(c.h('span',null,sys.name.toUpperCase()),bar,c.h('small',null,sys.detail));o.el.append(row);}
+    const x=c.h('button','pb-st-close','[ BACK ]');x.type='button';x.onclick=o.close;o.el.append(x);x.focus({preventScroll:true});};
+   cnd.onclick=status;cnd.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();status();}};
    const set=(g,frac,text)=>{g.needle.style.transform='rotate('+(-80+Math.max(0,Math.min(1,frac))*160)+'deg)';g.v.textContent=text;};
    function render(){const last=c.S.turns.at(-1);set(resp,last?last/5000:0,last?c.ms(last):'—');const spend=c.S.spend;set(rad,Math.min(1,spend/0.25),'$'+spend.toFixed(3));fill.style.width=c.health()+'%';}
    render();c.every(render);return {update:render};
@@ -148,6 +190,9 @@
    const box=c.add('deck',c.h('div','fx pb-radio'));box.hidden=true;
    const wave=c.svg('<svg viewBox="0 0 120 24" preserveAspectRatio="none"><path d="M0 12 Q7.5 0 15 12 T30 12 T45 12 T60 12 T75 12 T90 12 T105 12 T120 12"/></svg>','pb-wave');
    const title=c.h('span','pb-song');box.append(c.h('b',null,'Tyler FM'),wave,title);
+   // v2.22: the radio's own buttons: skip the song or switch the station off (the Music DJ's controls).
+   const ctl=c.h('span','pb-ctl'),skip=c.h('button',null,'SKIP'),off=c.h('button',null,'OFF');skip.type=off.type='button';skip.title='Skip this song (Music DJ: Skip now)';off.title='Stop the music and the sharing';
+   skip.onclick=()=>c.root.getElementById('musicSkip')?.click();off.onclick=()=>c.root.getElementById('musicEnd')?.click();ctl.append(skip,off);box.append(ctl);
    function render(){box.hidden=!c.S.music;title.textContent=c.S.music;box.parentElement?.toggleAttribute('data-filled',true);}
    render();return {update(type){if(type==='music')render();}};
   }},

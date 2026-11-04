@@ -625,3 +625,69 @@
 .l4d-safe span{display:block;margin-top:3px;font-size:12px;color:#b9b19a}
 .l4d-safe.down{border-top-color:#d41a1a}.l4d-safe.down b{color:#ff5a4a}
 [data-rt-theme=l4d] .tally[data-flash=ok]{box-shadow:inset 0 0 0 1px #63c94f}
+
+/* ── Windows XP ── the two-column Start menu and tray balloon tips. */
+.xp-menu:has(.xp-menu-cols){width:min(330px,calc(100% - 8px))}
+.xp-menu-cols{display:grid;grid-template-columns:1.15fr 1fr;border-top:2px solid #e89b42}
+.xp-menu-cols .xp-menu-list{border-top:0;background:#fff}
+.xp-menu-places{display:flex;flex-direction:column;padding:4px;background:#d3e5fa;border-left:1px solid #95bdee}
+.xp-menu .xp-mi{display:flex;flex-direction:column;align-items:flex-start;gap:1px}
+.xp-menu .xp-mi b{font-weight:700}.xp-mi small{font-size:10px;color:#7a7a7a}
+.xp-menu .xp-mi:hover small,.xp-menu .xp-mi:focus-visible small{color:#dfe9ff}
+.xp-menu .xp-mi.xp-all{flex-direction:row;justify-content:center;font-weight:700}.xp-menu .xp-mi.xp-all b::after{content:" ▶";color:#2f9e2f}
+.xp-menu .xp-pl{min-height:0;margin:0;padding:6px 8px;border:0;border-radius:0;background:transparent;color:#0a246a;text-align:left;font:700 11px Tahoma,sans-serif;box-shadow:none}
+.xp-menu .xp-pl:hover,.xp-menu .xp-pl:focus-visible{background:#316ac5;color:#fff;outline:0}
+.xp-menu-sep{display:block;height:1px;margin:4px 6px;background:linear-gradient(90deg,transparent,#c5c5c5,transparent)}
+.xp-menu-places .xp-menu-sep{background:linear-gradient(90deg,transparent,#95bdee,transparent)}
+.xp-menu-foot{gap:4px}
+.xp-menu .xp-off{display:inline-flex;align-items:center;gap:5px}
+.xp-menu .xp-off::before{content:"";width:14px;height:14px;border-radius:3px;background:linear-gradient(135deg,#ffc46b,#e3781c);box-shadow:inset 0 0 0 1px rgba(255,255,255,.5)}
+.xp-menu .xp-off.xp-logoff::before{background:linear-gradient(135deg,#ffd76b,#d9a414)}
+.xp-menu .xp-off:not(.xp-logoff)::before{background:linear-gradient(135deg,#ff8f75,#d42b0f)}
+.xp-menu .xp-off:hover{text-decoration:underline}
+.xp-balloon{position:absolute;right:8px;max-width:260px;padding:7px 9px 9px;background:#ffffe1;border:1px solid #000;border-radius:7px;box-shadow:2px 3px 8px rgba(0,0,0,.45);font:11px Tahoma,sans-serif;color:#000;animation:fx-in .15s}
+.xp-balloon::after{content:"";position:absolute;right:26px;bottom:-10px;border:10px solid transparent;border-bottom:0;border-top-color:#ffffe1;filter:drop-shadow(0 1px 0 #000)}
+.xp-bhead{display:flex;align-items:center;gap:6px}.xp-bhead b{flex:1}
+.xp-bicon{width:16px;height:16px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#9fd4ff,#2f7fd6 60%,#1a4f9c)}
+.xp-bicon.ok{background:radial-gradient(circle at 40% 35%,#c8ffc8,#2fbf2f 55%,#1b7a1b)}
+.xp-bicon.music{background:radial-gradient(circle at 40% 35%,#ffe6a8,#e3a21c 60%,#a06a00)}
+.xp-balloon p{margin:4px 0 0 22px}
+.xp-balloon .xp-bx{width:15px;height:15px;min-height:0;margin:0;padding:0;border:1px solid #a0a0a0;border-radius:2px;background:#fff;color:#555;font-size:9px!important;line-height:1;box-shadow:none}
+[data-rt-theme=winxp] .tally[data-flash=ok]{box-shadow:inset 0 0 0 2px #3c9a3c}
+
+.xp-menu .xp-mi,.xp-menu .xp-pl,.xp-menu .xp-off{min-height:0;margin:0;border:0;border-radius:0;background:transparent;box-shadow:none;text-shadow:none}
+.xp-menu .xp-mi{padding:5px 8px;color:#000;text-align:left;font:11px Tahoma,sans-serif}
+.xp-menu .xp-mi:hover,.xp-menu .xp-mi:focus-visible{background:#316ac5;color:#fff;outline:0}
+.xp-menu .xp-off{padding:3px 8px;color:#fff;font:11px Tahoma,sans-serif}
+/* ── DOOM ── key cards in the status bar. */
+.doom-bar:has(.doom-keys){grid-template-columns:1fr 66px 1fr 22px}
+.doom-keys{display:flex;flex-direction:column;justify-content:center;gap:3px;margin:3px 3px 3px 0;padding:2px;border:2px solid;border-color:#151515 #8a8a8a #8a8a8a #151515;background:#3a3a3a}
+.doom-key{display:block;width:12px;height:12px;margin:0 auto;border-radius:1px;opacity:.12;box-shadow:inset 0 0 0 1px rgba(0,0,0,.5)}
+.doom-key[data-have=true]{opacity:1;box-shadow:inset 0 0 0 1px rgba(0,0,0,.5),0 0 4px currentColor}
+.doom-key.blue{background:linear-gradient(135deg,#a8c0ff,#2a5cff 50%,#0a2aa0);color:#2a5cff}
+.doom-key.yellow{background:linear-gradient(135deg,#fff3a0,#ffd34d 50%,#a07400);color:#ffd34d}
+.doom-key.red{background:linear-gradient(135deg,#ffb09a,#ff2a10 50%,#900000);color:#ff2a10}
+[data-rt-theme=doom] .tally[data-flash=ok]{box-shadow:inset 0 0 0 2px #ffd34d}
+[data-rt-theme=doom] .tally[data-flash=fail]{box-shadow:inset 0 0 0 2px #ff2a10}
+
+/* ── Quake ── the suggestion line under the console input. */
+.qk-hint{min-height:16px;padding:0 10px 6px 24px;color:#a07040;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.qk-hint:empty::before{content:"↑↓ history · Tab completes · help";color:#6a4a2a}
+[data-rt-theme=quake] .tally[data-flash=ok]{box-shadow:inset 0 0 0 1px #ffcf7a}
+
+/* ── Pip-Boy ── radio buttons and the condition screen. */
+.pb-ctl{display:flex;gap:4px;margin-left:auto}
+.pb-ctl button{min-height:0;margin:0;padding:1px 6px;border:1px solid #1aff80;border-radius:0;background:transparent;color:#1aff80;font:inherit;font-size:10px!important;letter-spacing:.08em;box-shadow:none}
+.pb-ctl button:hover,.pb-ctl button:focus-visible{background:#1aff80;color:#041a0b;outline:0}
+.pb-cnd[role=button]{cursor:pointer}.pb-cnd[role=button]:hover,.pb-cnd[role=button]:focus-visible{outline:1px solid #1aff80;outline-offset:2px}
+.pb-status{display:flex;flex-direction:column;gap:6px;padding:12px;background:rgba(4,20,10,.97);border:1px solid #1aff80;box-shadow:0 0 0 3px rgba(26,255,128,.08),inset 0 0 30px rgba(26,255,128,.08);color:#1aff80;font-family:var(--rt-font-display);text-shadow:0 0 4px rgba(26,255,128,.5)}
+.pb-st-head{font-weight:400;letter-spacing:.14em;border-bottom:1px solid rgba(26,255,128,.5);padding-bottom:4px}
+.pb-st-row{display:grid;grid-template-columns:60px 1fr;gap:2px 10px;align-items:center}
+.pb-st-row small{grid-column:2;font-size:10px;opacity:.75;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pb-st-bar{display:block;height:9px;border:1px solid #1aff80;padding:1px}
+.pb-st-bar i{display:block;height:100%;background:repeating-linear-gradient(90deg,#1aff80 0 6px,transparent 6px 8px)}
+.pb-st-row[data-hp="22"] .pb-st-bar i,.pb-st-row[data-hp="0"] .pb-st-bar i{animation:hev-blink .8s steps(1) infinite}
+.pb-st-close{align-self:flex-start;min-height:0;margin:4px 0 0;padding:2px 6px;border:0;background:transparent;color:#1aff80;font:inherit;letter-spacing:.1em;box-shadow:none}
+.pb-st-close:hover,.pb-st-close:focus-visible{background:#1aff80;color:#041a0b;text-shadow:none;outline:0}
+[data-rt-theme=pipboy] .tally[data-flash=ok]{box-shadow:inset 0 0 0 1px #1aff80,0 0 14px rgba(26,255,128,.35)}
+.xp-menu .xp-pl,.xp-menu .xp-mi{display:flex;justify-content:flex-start;width:100%}.xp-menu .xp-mi{flex-direction:column;align-items:flex-start}.xp-menu .xp-mi.xp-all{flex-direction:row;justify-content:center}
