@@ -72,6 +72,11 @@
   tab:name=>api.showTab?.(name),pause:()=>$('quickStop')?.click(),stopAudio:()=>$('stop')?.click(),beep:()=>$('beep')?.click(),
   checks:()=>api.showTab?.('checks'),collapse:()=>$('collapse')?.click(),settings:()=>$('settings')?.click(),
   playSound:slot=>api.playSound?.(slot),sounds:()=>api.listSounds?.()||{slots:[],favorites:[]},
+  // v2.22: the full check (Checks tab → Run full check) and whether Tyler is paused right now.
+  fullCheck:()=>{api.showTab?.('checks');const b=$('diagnose');if(b&&!b.disabled)b.click();},
+  connect:()=>{api.showTab?.('conversation');$('connect')?.click();},
+  refreshVoice:()=>{const b=$('voiceCheck');if(b&&!b.disabled)b.click();},
+  paused:()=>S.state==='paused'||S.state==='standby',
  };
 
  // ── Mounting ──────────────────────────────────────────────────────────────
@@ -88,13 +93,14 @@
   if(typing(document.activeElement))return false;
   return hovering;
  }
+ const sessionUnlocks=new Set(); // achievements this session when lifetime stats are off (shared by a theme's features)
  function makeCtx(){
   const own=new Set(),timers=new Set(),offs=[];let tick=null;
   const ctx={S,api,actions,h,svg,ms,clock,pad,health,avgTurn,voice,systems,TABS,TAB_NAMES,root,panel,slots,
    /** Lifetime totals, or null when Settings turns them off. */
    get life(){return life;},
    /** Unlock a lifetime achievement once; true the first time (also when lifetime stats are off, per session). */
-   unlock(key){if(life){if(life.ach.includes(key))return false;life.ach.push(key);lifeSave();return true;}if(ctx._session.has(key))return false;ctx._session.add(key);return true;},_session:new Set(),
+   unlock(key){if(life){if(life.ach.includes(key))return false;life.ach.push(key);lifeSave();return true;}if(ctx._session.has(key))return false;ctx._session.add(key);return true;},_session:sessionUnlocks,
    /** A theme's best value (high score…), kept with the lifetime totals. */
    best(key,value){if(!life)return value;const old=Number(life.best[key])||0;if(value>old){life.best[key]=value;lifeSave();}return Math.max(old,value);},
    get reduced(){return !!reduced?.matches;},
@@ -110,6 +116,41 @@
    get tick(){return tick;},
    /** Pixels from the panel's top to the bottom of an element (to place overlays under the tabs, say). */
    below(selector){const el=root.querySelector(selector),p=panel.getBoundingClientRect();return el?Math.round(el.getBoundingClientRect().bottom-p.top):0;},
+   /**
+    * v2.22: a themed menu of real actions next to `anchor` (or at x/y in the panel). Items:
+    * {label, hint, mark, run, disabled, current} or 'sep'. Arrow keys, Home/End, Enter and Escape work;
+    * a click outside closes it and focus goes back to the anchor. Returns {el, close}.
+    */
+   menu(anchor,items,{cls='',label='Menu',x,y,align='left'}={}){
+    ctx._menu?.close();
+    const el=h('div','fx fx-menu fx-interactive '+cls);el.setAttribute('role','menu');el.setAttribute('aria-label',label);
+    const buttons=[];
+    for(const it of items){
+     if(it==='sep'){el.append(h('i','fx-menu-sep'));continue;}
+     if(it.heading){el.append(h('b','fx-menu-head',it.heading));continue;}
+     const b=h('button','fx-menu-item');b.type='button';b.setAttribute('role','menuitem');if(it.current)b.setAttribute('aria-current','true');if(it.disabled)b.disabled=true;
+     if(it.mark!==undefined)b.append(h('span','fx-menu-mark',it.mark));b.append(h('span','fx-menu-label',it.label));if(it.hint)b.append(h('small','fx-menu-hint',it.hint));
+     b.onclick=()=>{close();it.run?.();};el.append(b);buttons.push(b);
+    }
+    const p=panel.getBoundingClientRect();let left=x,top=y;
+    if(anchor&&left===undefined){const r=anchor.getBoundingClientRect();top=Math.round(r.bottom-p.top+4);left=Math.round((align==='right'?r.right:r.left)-p.left);}
+    el.style.top=(top??60)+'px';if(align==='right'){el.style.right=Math.max(6,Math.round(p.width-(left??p.width-8)))+'px';}else el.style.left=Math.max(6,Math.min(left??8,p.width-200))+'px';
+    const move=(i)=>{const list=buttons.filter(b=>!b.disabled);if(!list.length)return;const at=list.indexOf(root.activeElement);list[(i==='first'?0:i==='last'?list.length-1:(at+i+list.length)%list.length)]?.focus();};
+    el.addEventListener('keydown',e=>{if(e.key==='ArrowDown'){e.preventDefault();move(1);}else if(e.key==='ArrowUp'){e.preventDefault();move(-1);}else if(e.key==='Home'){e.preventDefault();move('first');}else if(e.key==='End'){e.preventDefault();move('last');}else if(e.key==='Escape'){e.preventDefault();e.stopPropagation();close();}else if(e.key==='Tab'){close(false);}});
+    const outside=e=>{if(!e.composedPath().includes(el)&&!e.composedPath().includes(anchor))close(false);};
+    function close(refocus=true){if(!el.isConnected)return;el.remove();own.delete(el);root.removeEventListener('pointerdown',outside,true);anchor?.setAttribute?.('aria-expanded','false');if(ctx._menu?.el===el)ctx._menu=null;if(refocus)anchor?.focus?.();}
+    slots.layer.append(el);own.add(el);root.addEventListener('pointerdown',outside,true);anchor?.setAttribute?.('aria-expanded','true');
+    (buttons.find(b=>b.getAttribute('aria-current')==='true'&&!b.disabled)||buttons.find(b=>!b.disabled))?.focus();
+    ctx._menu={el,close};return ctx._menu;
+   },
+   /** v2.22: a themed panel over the content, under the tabs (Escape or its close button shuts it). */
+   overlay(cls,label,{onClose}={}){
+    ctx._overlay?.close();
+    const el=h('div','fx fx-overlay fx-interactive '+cls);el.setAttribute('role','dialog');el.setAttribute('aria-label',label);el.style.setProperty('--fx-top',(ctx.below('.tabs')+6)+'px');
+    el.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();e.stopPropagation();close();}});
+    function close(){if(!el.isConnected)return;el.remove();own.delete(el);if(ctx._overlay?.el===el)ctx._overlay=null;onClose?.();}
+    slots.layer.append(el);own.add(el);ctx._overlay={el,close};return ctx._overlay;
+   },
   };
   return ctx;
  }
@@ -123,7 +164,11 @@
   for(const slot of Object.values(slots))slot?.toggleAttribute('data-filled',!!slot.childElementCount);
   stopTicker();if(mounted.some(m=>m.ctx.tick))start();
  }
- function deliver(type,data){for(const m of mounted){try{m.instance?.update?.(type,data);}catch(error){console.warn('[ROBOTIC TYLER] theme feature '+m.feature.id+':',error?.message||error);}}}
+ // v2.22: a short success or failure flash on the status strip: a full check's verdict, or Tyler
+ // coming back after a problem. Themes style .tally[data-flash=ok|fail]; reduced motion keeps it still.
+ let flashTimer=0;
+ function flashTally(kind){const t=root.querySelector('.tally');if(!t)return;clearTimeout(flashTimer);t.removeAttribute('data-flash');void t.offsetWidth;t.dataset.flash=kind;flashTimer=setTimeout(()=>t.removeAttribute('data-flash'),1400);}
+ function deliver(type,data){if(type==='check')flashTally(data?.problems?'fail':'ok');if(type==='state'&&data?.before==='error'&&['ready','listening'].includes(data?.state))flashTally('ok');for(const m of mounted){try{m.instance?.update?.(type,data);}catch(error){console.warn('[ROBOTIC TYLER] theme feature '+m.feature.id+':',error?.message||error);}}}
  function emitLocal(type,data={}){deliver(type,data);}
 
  // ── The status strip, in every theme (v2.20 polish) ───────────────────────

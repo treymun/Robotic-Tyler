@@ -74,8 +74,9 @@
 .cl-title{padding:3px 6px;background:#5a6a50;color:#fff;font-weight:700}
 .cl-body{padding:8px 10px 10px}.cl-body p{margin:0 0 6px;color:#dedfd6}.cl-body small{display:block;margin-top:5px;color:#a0aa95}
 .cl-bar{display:flex;gap:2px;padding:2px;background:#3e4637;border:1px solid;border-color:#292e23 #8c9284 #8c9284 #292e23}
-.cl-bar i{flex:1;height:10px;background:#c4b550;opacity:0;animation:cl-seg var(--fill,2s) steps(1) forwards}
-.cl-bar i:nth-child(n){animation-delay:calc(var(--fill,2s) / 20 * var(--n,0))}
+.cl-bar i{flex:1;height:10px;background:#c4b550;opacity:0;animation:cl-seg 1ms steps(1) forwards}
+/* v2.22: segment n lights at n/18 of the estimate (before, every segment waited a whole estimate first). */
+.cl-bar i:nth-child(n){animation-delay:calc(var(--fill,2s) / 18 * var(--n,0))}
 .cl-bar i:nth-child(1){--n:0}.cl-bar i:nth-child(2){--n:1}.cl-bar i:nth-child(3){--n:2}.cl-bar i:nth-child(4){--n:3}.cl-bar i:nth-child(5){--n:4}.cl-bar i:nth-child(6){--n:5}.cl-bar i:nth-child(7){--n:6}.cl-bar i:nth-child(8){--n:7}.cl-bar i:nth-child(9){--n:8}.cl-bar i:nth-child(10){--n:9}.cl-bar i:nth-child(11){--n:10}.cl-bar i:nth-child(12){--n:11}.cl-bar i:nth-child(13){--n:12}.cl-bar i:nth-child(14){--n:13}.cl-bar i:nth-child(15){--n:14}.cl-bar i:nth-child(16){--n:15}.cl-bar i:nth-child(17){--n:16}.cl-bar i:nth-child(18){--n:17}
 @keyframes cl-seg{to{opacity:1}}
 
@@ -112,7 +113,7 @@
 .cs-alive{position:absolute;left:50%;bottom:-7px;display:flex;gap:3px;transform:translateX(-50%)}
 .cs-alive i{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.18)}.cs-alive i.on{background:#96c8fa;box-shadow:0 0 5px #96c8fa}
 .cs-buy{font-family:"Tyler CS2",sans-serif}
-.cs-wheel{position:absolute;left:50%;top:46%;width:260px;height:260px;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,rgba(10,14,18,.94) 0 26%,rgba(20,28,38,.9) 26.5% 100%);box-shadow:0 0 0 1px rgba(130,216,255,.3),0 20px 60px rgba(0,0,0,.7);animation:cs-open .18s ease-out;font-family:"Tyler CS2",sans-serif}
+.cs-wheel{position:absolute;left:50%;top:46%;width:260px;height:260px;transform:translate(-50%,-50%);border-radius:50%;background:radial-gradient(circle,rgba(10,14,18,.97) 0 26%,rgba(20,28,38,.96) 26.5% 100%);box-shadow:0 0 0 1px rgba(130,216,255,.3),0 20px 60px rgba(0,0,0,.7);animation:cs-open .18s ease-out;font-family:"Tyler CS2",sans-serif}
 @keyframes cs-open{from{transform:translate(-50%,-50%) scale(.85);opacity:0}}
 .cs-wheel-center{position:absolute;left:50%;top:50%;width:110px;transform:translate(-50%,-50%);text-align:center;font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:#82d8ff}
 .cs-slice{position:absolute;width:84px;min-height:46px;margin:0;padding:4px;transform:translate(-50%,-50%);border:1px solid rgba(255,255,255,.12);border-radius:4px;background:rgba(255,255,255,.06);color:#ddd;font-size:11px!important;text-transform:uppercase;line-height:1.15;box-shadow:none}
@@ -480,3 +481,108 @@
 .pd-timer small:empty{display:none}
 
 @media (prefers-reduced-motion:reduce){.cb-term,.rc-table,.dc-memory{animation:none}}
+
+/* ═════ v2.22 polish pass ═════════════════════════════════════════════════════════════════════ */
+/* Shared: themed menus (ctx.menu), overlays (ctx.overlay) and the status strip's success/failure flash. */
+.fx-menu{position:absolute;z-index:3;min-width:190px;max-width:calc(100% - 12px);padding:4px;display:flex;flex-direction:column;background:var(--rt-surface);border:1px solid var(--rt-line-strong);border-radius:var(--rt-r-sm);box-shadow:var(--rt-shadow-float,0 10px 30px rgba(0,0,0,.55));animation:fx-menu-in .12s ease-out}
+@keyframes fx-menu-in{from{opacity:0;transform:translateY(-4px)}}
+.fx-menu-head{padding:6px 10px 4px;font-size:10px;letter-spacing:var(--rt-track);text-transform:uppercase;color:var(--rt-ink-3)}
+.fx-menu-sep{display:block;height:1px;margin:4px 6px;background:var(--rt-line-soft)}
+.fx-menu-item{display:flex;align-items:center;gap:8px;width:100%;min-height:30px;margin:0;padding:5px 10px;border:0;border-radius:var(--rt-r-xs,2px);background:transparent;box-shadow:none;color:var(--rt-ink);font:inherit;font-size:var(--rt-text-sm);text-align:left;cursor:pointer}
+.fx-menu-item:hover,.fx-menu-item:focus-visible{background:var(--rt-select);color:var(--rt-ink-strong);outline:none}
+.fx-menu-item:disabled{opacity:.45;cursor:default;background:transparent}
+.fx-menu-item[aria-current=true]{color:var(--rt-ink-strong)}
+.fx-menu-mark{flex:0 0 14px;display:inline-grid;place-items:center;font-size:11px}
+.fx-menu-label{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fx-menu-hint{flex-shrink:0;color:var(--rt-ink-3);font-size:10px}
+.fx-overlay{position:absolute;left:10px;right:10px;top:var(--fx-top,70px);max-height:calc(100% - var(--fx-top,70px) - 52px);overflow:auto;animation:fx-in .18s ease-out}
+.tally-pulse.ok,.tally[data-flash=ok] .tally-pulse{opacity:0}
+.tally[data-flash]{transition:box-shadow .3s}
+.tally[data-flash=ok]{box-shadow:inset 0 0 0 1px var(--rt-success,#8fb93b),0 0 14px color-mix(in srgb,var(--rt-success,#8fb93b) 45%,transparent)}
+.tally[data-flash=fail]{box-shadow:inset 0 0 0 1px var(--rt-danger,#e35e5e),0 0 14px color-mix(in srgb,var(--rt-danger,#e35e5e) 45%,transparent)}
+@media (prefers-reduced-motion:reduce){.fx-menu,.fx-overlay{animation:none}}
+
+/* ── Steam ── persona chip and status menu like the friends list; the achievements page. */
+.st-persona{display:inline-flex;align-items:center;gap:6px;height:24px;margin:0 2px 0 0;padding:0 8px 0 7px;border:0;border-radius:2px;background:rgba(0,0,0,.22);box-shadow:inset 0 0 0 1px rgba(255,255,255,.05);color:var(--p,#57cbde);font:700 10px/1 var(--rt-font);letter-spacing:.06em;text-transform:uppercase;cursor:pointer}
+.st-persona:hover,.st-persona[aria-expanded=true]{background:rgba(103,193,245,.12);box-shadow:inset 0 0 0 1px rgba(103,193,245,.35)}
+.st-persona[data-persona=ingame]{--p:#90ba3c}.st-persona[data-persona=away]{--p:#4f8fa3}.st-persona[data-persona=offline]{--p:#898989}
+.st-p-dot{width:7px;height:7px;border-radius:50%;background:var(--p,#57cbde);box-shadow:0 0 6px color-mix(in srgb,var(--p,#57cbde) 70%,transparent)}
+.st-persona[data-persona=away] .st-p-dot{background:transparent;box-shadow:inset 0 0 0 2px var(--p)}
+.st-persona[data-persona=offline] .st-p-dot{box-shadow:none}
+.st-menu{min-width:214px;padding:4px 0;background:#3d4450;border:0;border-radius:3px;box-shadow:0 12px 32px rgba(0,0,0,.7),0 0 0 1px rgba(0,0,0,.35)}
+.st-menu .fx-menu-head{padding:7px 14px 6px;color:#8f98a0;font-size:10px;letter-spacing:.05em;text-transform:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.st-menu .fx-menu-item{border-radius:0;padding:6px 14px;min-height:28px;color:#dcdedf;font-size:12px}
+.st-menu .fx-menu-item:hover,.st-menu .fx-menu-item:focus-visible{background:#dcdedf;color:#3d4450}
+.st-menu .fx-menu-item:nth-of-type(1) .fx-menu-mark{color:#57cbde}.st-menu .fx-menu-item:nth-of-type(2) .fx-menu-mark{color:#4f8fa3}
+.st-menu .fx-menu-item[aria-current=true] .fx-menu-label::after{content:" ✓";color:#90ba3c}
+.st-menu .fx-menu-item:hover .fx-menu-hint,.st-menu .fx-menu-item:focus-visible .fx-menu-hint{color:#3d4450}
+.st-menu .fx-menu-hint{color:#8f98a0}
+.st-menu .fx-menu-sep{margin:4px 0;background:rgba(0,0,0,.3);box-shadow:0 1px 0 rgba(255,255,255,.04)}
+.st-ach.fx-interactive{cursor:pointer}.st-ach.fx-interactive:hover{box-shadow:0 0 0 1px #66c0f4,0 8px 24px rgba(0,0,0,.6)}
+.st-ach-page{display:flex;flex-direction:column;gap:8px;padding:12px;background:linear-gradient(180deg,#1f3346,#171d25 60%);border-radius:3px;box-shadow:0 0 0 1px #2a475e,0 16px 40px rgba(0,0,0,.6)}
+.st-ap-head{display:flex;flex-direction:column;gap:3px}
+.st-ap-head b{font-size:15px;color:#fff;letter-spacing:.02em}.st-ap-head>span{font-size:11px;color:#8f98a0}
+.st-ap-bar,.st-ap-prog{display:block;height:6px;border-radius:3px;background:#0e141b;box-shadow:inset 0 1px 2px rgba(0,0,0,.6);overflow:hidden}
+.st-ap-bar i,.st-ap-prog i{display:block;height:100%;background:linear-gradient(90deg,#1a9fff,#66c0f4)}
+.st-ap-list{display:flex;flex-direction:column;gap:3px}
+.st-ap-row{display:grid;grid-template-columns:38px 1fr auto;align-items:center;gap:10px;padding:6px 8px;background:rgba(0,0,0,.25);border-radius:2px}
+.st-ap-row .st-ach-icon{width:38px;height:38px;font-size:15px;filter:grayscale(1) brightness(.55)}
+.st-ap-row.got{background:linear-gradient(90deg,rgba(102,192,244,.1),rgba(0,0,0,.25) 60%)}
+.st-ap-row.got .st-ach-icon{filter:none}
+.st-ap-text{display:flex;flex-direction:column;gap:2px;min-width:0}
+.st-ap-text b{font-size:12px;color:#dcdedf}.st-ap-text>span{font-size:11px;color:#8f98a0}.st-ap-text small{font-size:10px;color:#66c0f4;font-variant-numeric:tabular-nums}
+.st-ap-row:not(.got) .st-ap-text b{color:#9aa4ad}
+.st-ap-state{font-size:10px;color:#56707f;text-transform:uppercase;letter-spacing:.05em}.st-ap-row.got .st-ap-state{color:#90ba3c}
+.st-ap-close{align-self:flex-end;min-height:0;margin:2px 0 0;padding:5px 16px;border:0;border-radius:2px;background:linear-gradient(90deg,#47bfff,#1a44c2);color:#fff;font-size:12px!important;box-shadow:none}
+.st-ap-close:hover{background:linear-gradient(90deg,#68ccff,#2a5ce0)}
+.st-ap-note{margin:0;font-size:11px;color:#8f98a0}
+[data-rt-theme=steam] .tabs button:not([aria-selected=true]):hover{box-shadow:inset 0 -2px 0 rgba(102,192,244,.35)}
+[data-rt-theme=steam] .tally[data-flash=ok]{box-shadow:inset 0 0 0 1px #90ba3c,0 0 16px rgba(144,186,60,.45)}
+[data-rt-theme=steam] details.feature>summary:hover{background:linear-gradient(90deg,rgba(102,192,244,.14),rgba(102,192,244,.04))}
+
+/* ── Classic Steam ── the server browser's status bar (Refresh, Connect) and the dialog's finish. */
+.cl-foot{display:flex;align-items:center;gap:4px;padding:3px 3px 3px 6px;border-top:1px solid #292e23;background:#4c5844;box-shadow:inset 0 1px 0 #8c9284}
+.cl-info{flex:1;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:#d8ded3}
+.cl-btn{min-height:0;height:18px;margin:0;padding:0 9px;border:1px solid;border-color:#8c9284 #292e23 #292e23 #8c9284;border-radius:0;background:#4c5844;color:#dedfd6;font:11px Tahoma,Verdana,sans-serif!important;box-shadow:none}
+.cl-btn:hover{color:#c4b550}
+.cl-btn:active{border-color:#292e23 #8c9284 #8c9284 #292e23;padding:1px 8px 0 10px}
+.cl-scan .cl-row{animation:cl-relight .5s steps(2) both}
+.cl-scan .cl-row:nth-of-type(2){animation-delay:.08s}.cl-scan .cl-row:nth-of-type(3){animation-delay:.16s}.cl-scan .cl-row:nth-of-type(4){animation-delay:.24s}.cl-scan .cl-row:nth-of-type(5){animation-delay:.32s}
+@keyframes cl-relight{0%{opacity:.35}100%{opacity:1}}
+.cl-elapsed{display:block;margin-top:5px;color:#a0aa95;font-variant-numeric:tabular-nums}
+.cl-dialog.cl-done .cl-bar i{opacity:1;animation:none}
+.cl-dialog.cl-done .cl-title{background:#5d7046}
+.cl-dialog.cl-fail .cl-title{background:#7a3b2e}.cl-dialog.cl-fail .cl-bar i{background:#c4523f}
+[data-rt-theme=classic] .tally[data-flash=ok]{box-shadow:inset 0 0 0 1px #c4b550}
+[data-rt-theme=classic] .tally[data-flash=fail]{box-shadow:inset 0 0 0 1px #c4523f}
+
+/* ── TF2 ── killfeed criticals, dominations and revenge; the MEDIC! call. */
+.tf-kill .tf-icon{display:inline-grid;place-items:center}
+.tf-kill:has(.tf-icon:first-of-type){}
+.tf-kill.tf-special{background:rgba(46,43,42,.92);box-shadow:0 0 0 1px #cf6a32,0 1px 0 rgba(0,0,0,.5)}
+.tf-kill.tf-special.dom .tf-target{color:#ffd35a;font-style:italic;max-width:230px}
+.tf-kill.tf-special.rev .tf-target{color:#ff9a6b;font-style:italic;max-width:230px}
+.tf-kill:has(.tf-icon):nth-child(n){}
+.tf-medic{position:absolute;left:46px;top:46px;max-width:250px;padding:6px 12px 7px;border-radius:10px;background:#ebe2ca;color:#2c2826;box-shadow:0 3px 0 #756b5e,0 8px 22px rgba(0,0,0,.55);animation:tf-pop .2s cubic-bezier(.3,1.6,.5,1)}
+.tf-medic::before{content:"";position:absolute;left:16px;top:-8px;border:8px solid transparent;border-top:0;border-bottom-color:#ebe2ca}
+.tf-medic b{display:block;font:400 22px/1 "Tyler TF2 Display",Verdana,sans-serif;letter-spacing:.04em;color:#b8383b}
+.tf-medic small{display:block;margin-top:2px;font-size:11px;color:#5a514a}
+.tf-medic.tf-medic-hint b{font-size:16px;color:#91493b}
+.mark.tf-medic-call{animation:tf-medic-shout .8s cubic-bezier(.3,1.6,.5,1)}
+@keyframes tf-medic-shout{30%{transform:scale(1.18) rotate(-6deg)}60%{transform:scale(.96) rotate(3deg)}}
+[data-rt-theme=tf2] .tally[data-flash=ok]{box-shadow:inset 0 0 0 2px #cf6a32,0 0 16px rgba(207,106,50,.4)}
+
+/* ── CS2 ── buy feed in the round HUD, the MVP star, and the wheel's highlighted slice. */
+.cs-mvp{font-style:normal;color:#ffd35a;text-shadow:0 0 6px rgba(255,211,90,.7);font-size:12px}
+.cs-mvp[hidden]{display:none}
+.cs-round[data-bought] .cs-mid{border-bottom-color:#eabe54}
+.cs-round[data-bought] .cs-time{font-size:11px;letter-spacing:.14em;color:#eabe54}
+.cs-round[data-bought] .cs-mid small{max-width:96px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px;color:#fff}
+.cs-wheel-center b{display:block;font-size:13px;color:#fff;line-height:1.15;overflow:hidden;text-overflow:ellipsis}
+.cs-wheel-center small{display:block;margin-top:3px;font-size:9px;letter-spacing:.08em;color:#9aa7b3}
+.cs-wheel-ring{position:absolute;inset:6%;border-radius:50%;pointer-events:none;opacity:0;transition:opacity .12s;background:conic-gradient(from calc(var(--a,0deg) - 22.5deg),rgba(130,216,255,.28) 0 45deg,transparent 45deg);-webkit-mask:radial-gradient(circle,transparent 0 33%,#000 34%);mask:radial-gradient(circle,transparent 0 33%,#000 34%)}
+.cs-wheel-ring.on{opacity:1}
+.cs-slice.hot{background:#3281ac;color:#fff;border-color:#82d8ff;box-shadow:0 0 12px rgba(130,216,255,.45)}
+.cs-slice.fav span::before{content:"★ ";color:#eabe54}
+[data-rt-theme=cs2] .tally[data-flash=ok]{box-shadow:inset 0 -3px 0 #65e46a}
+[data-rt-theme=cs2] .tally[data-flash=fail]{box-shadow:inset 0 -3px 0 #e05a4e}

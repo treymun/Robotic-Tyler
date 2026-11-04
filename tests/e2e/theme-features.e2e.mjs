@@ -28,7 +28,7 @@ test('each theme has its own features, wired to the real panel',{timeout:180000}
   for(const theme of THEMES){
    await setTheme(theme);await page.waitForTimeout(80);
    const m=await page.evaluate(()=>TylerThemeFeatures.mounted());
-   assert.ok(m.length>=2&&m.length<=3,theme+' has 2-3 features: '+m);
+   assert.ok(m.length>=2&&m.length<=4,theme+' has 2-4 features: '+m);
    for(const id of m){assert.ok(!seen.has(id),id+' belongs to one theme');seen.add(id);}
    // Real state reaches the features: a thinking → reply → speaking turn never throws.
    await page.evaluate(async()=>{const C=TylerCompanion;C.setActivity('THINKING — preparing');await new Promise(r=>setTimeout(r,60));C.emit('reply',{chars:12});C.setActivity('SPEAKING — on air');C.emit('sound',{slot:1,name:'Beep'});C.emit('music',{title:'Song'});C.emit('chat',{recent:10,flood:true});C.setActivity('LISTENING — speak');C.showTab('room');C.showTab('conversation');});

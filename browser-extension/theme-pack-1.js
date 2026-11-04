@@ -24,6 +24,25 @@
    }
    render();return {update(type){if(type==='turn'||type==='reply'||type==='state'||type==='life'||type==='report')render();}};
   }},
+  // v2.22: Tyler's Steam persona in the header, like the friends list: Online, In voice, Away, Snooze or
+  // Offline, in Steam's own colours. Clicking it opens the status menu with real actions.
+  {id:'st-persona',mount(c){
+   const chip=c.add('bar',c.h('button','fx st-persona'));chip.type='button';chip.setAttribute('aria-haspopup','menu');chip.setAttribute('aria-expanded','false');
+   const dot=c.h('i','st-p-dot'),name=c.h('span','st-p-name');chip.append(dot,name);
+   const persona=()=>{const s=c.S.state;return s==='speaking'?['ingame','In voice']:s==='paused'?['away','Away']:s==='standby'?['away','Snooze']:s==='error'?['offline','Offline']:['online','Online'];};
+   function render(){const [kind,label]=persona();chip.dataset.persona=kind;name.textContent=label;chip.title='Tyler is '+label.toLowerCase()+(c.S.text?': '+c.S.text:'')+'. Click for the status menu.';}
+   chip.onclick=()=>{if(chip.getAttribute('aria-expanded')==='true'){c._menu?.close();return;}
+    const [kind,label]=persona(),paused=c.actions.paused(),L=c.life,got=(L?.ach||[...c._session]).filter(a=>String(a).startsWith('st:')).length;
+    c.menu(chip,[{heading:'Robotic Tyler · '+label+(c.S.label&&c.S.label!==label?' · '+c.S.label:'')},
+     paused?{mark:'●',label:'Online',hint:'Connect & start',run:c.actions.connect}:{mark:'●',label:'Online',current:kind!=='offline',hint:kind==='ingame'?'In voice':'',run:()=>{}},
+     {mark:'●',label:'Away',hint:'Pause AI',current:paused,disabled:paused,run:c.actions.pause},
+     'sep',
+     {mark:'★',label:'Achievements',hint:got+' of 12',run:()=>c.panel.dispatchEvent(new CustomEvent('tyler-fx',{detail:'st-achievements'}))},
+     {mark:'✓',label:'Run full check',run:c.actions.fullCheck},
+     {mark:'■',label:'Stop audio',run:c.actions.stopAudio},
+     'sep',{mark:'⚙',label:'Settings…',run:c.actions.settings}],{cls:'st-menu',label:'Tyler status',align:'right'});};
+   render();return {update(type){if(type==='state')render();}};
+  }},
   {id:'st-achievements',mount(c){
    // Lifetime achievements (kept between sessions unless Settings → Appearance turns stats off).
    let queue=Promise.resolve();
@@ -42,11 +61,28 @@
     ['marathon','Marathon','10 hours on duty.','⏱',()=>(c.life?.timeMs||0)>=36e6],
     ['back','Back Online','Recovered after a problem.','↺',()=>false],
    ];
+   // v2.22: progress toward the counted ones, for the achievements page.
+   const PROGRESS={ten:[()=>total('replies')+total('spoken'),10],hundred:[()=>total('replies')+total('spoken'),100],thousand:[()=>total('replies')+total('spoken'),1000],
+    streak:[()=>Math.max(c.life?.bestStreak||0,c.S.best),15],regular:[()=>c.life?.sessions||0,10],marathon:[()=>(c.life?.timeMs||0)/36e5,10]};
+   const has=key=>(c.life?.ach||[...c._session]).includes('st:'+key);
+   function page(){
+    const o=c.overlay('st-ach-page','Achievements');const got=LIST.filter(([k])=>has(k)).length;
+    const head=c.h('div','st-ap-head'),bar=c.h('span','st-ap-bar'),fill=c.h('i');fill.style.width=Math.round(got/LIST.length*100)+'%';bar.append(fill);
+    head.append(c.h('b',null,'Robotic Tyler'),c.h('span',null,'You have unlocked '+got+' of '+LIST.length+' achievements ('+Math.round(got/LIST.length*100)+'%)'),bar);o.el.append(head);
+    const list=c.h('div','st-ap-list');
+    for(const [key,name,desc,glyph] of [...LIST].sort((a,b)=>has(b[0])-has(a[0]))){
+     const row=c.h('div','st-ap-row'+(has(key)?' got':''));const t=c.h('span','st-ap-text');t.append(c.h('b',null,name),c.h('span',null,desc));
+     const pr=PROGRESS[key];if(pr&&!has(key)){const [now,max]=[pr[0](),pr[1]],pb=c.h('span','st-ap-prog'),pf=c.h('i');pf.style.width=Math.min(100,now/max*100)+'%';pb.append(pf);t.append(pb,c.h('small',null,(key==='marathon'?now.toFixed(1):Math.floor(now))+' / '+max));}
+     row.append(c.h('span','st-ach-icon',glyph),t,c.h('small','st-ap-state',has(key)?'Unlocked':'Locked'));list.append(row);}
+    const x=c.h('button','st-ap-close','Close');x.type='button';x.onclick=o.close;o.el.append(list,x);
+    if(!c.life)o.el.append(c.h('p','st-ap-note','Lifetime stats are off (Settings → Appearance): achievements last this session only.'));x.focus();
+   }
+   c.on(c.panel,'tyler-fx',e=>{if(e.detail==='st-achievements')page();});
    function toast(name,desc,glyph){
     queue=queue.then(()=>new Promise(done=>{
-     const el=c.h('div','fx st-ach'),icon=c.h('span','st-ach-icon',glyph),text=c.h('span','st-ach-text');
+     const el=c.h('div','fx st-ach fx-interactive'),icon=c.h('span','st-ach-icon',glyph),text=c.h('span','st-ach-text');
      text.append(c.h('small',null,'Achievement unlocked'),c.h('b',null,name),c.h('span',null,desc));el.append(icon,text);
-     el.setAttribute('role','status');c.flash(el,5200);c.later(done,1400);
+     el.setAttribute('role','status');el.title='Open achievements';el.onclick=()=>{el.remove();page();};c.flash(el,5200);c.later(done,1400);
     }));
    }
    function check(type,d){
@@ -69,14 +105,23 @@
    const rows=new Map();let selected='ai';
    for(const s of c.systems()){const row=c.h('div','cl-row');row.setAttribute('role','option');row.tabIndex=s.id==='ai'?0:-1;const lamp=c.h('i','cl-lamp');const name=c.h('span','cl-name',s.name),status=c.h('span','cl-status'),ping=c.h('span','cl-ping');name.prepend(lamp);row.append(name,status,ping);box.append(row);rows.set(s.id,{row,status,ping,tab:s.tab});
     row.onclick=()=>select(s.id);row.ondblclick=()=>c.actions.tab(s.tab);}
-   function select(id){selected=id;for(const [k,r] of rows){r.row.setAttribute('aria-selected',String(k===id));r.row.tabIndex=k===id?0:-1;}}
+   let select=function(id){selected=id;for(const [k,r] of rows){r.row.setAttribute('aria-selected',String(k===id));r.row.tabIndex=k===id?0:-1;}};
    box.addEventListener('keydown',e=>{const ids=[...rows.keys()];let i=ids.indexOf(selected);if(e.key==='ArrowDown')i=Math.min(ids.length-1,i+1);else if(e.key==='ArrowUp')i=Math.max(0,i-1);else if(e.key==='Enter'){c.actions.tab(rows.get(selected).tab);return;}else return;e.preventDefault();select(ids[i]);rows.get(ids[i]).row.focus();});
    function render(){
     const sys=c.systems(),v=c.voice();
     for(const s of sys){const r=rows.get(s.id);r.row.dataset.level=s.level;r.status.textContent=s.detail;
      r.ping.textContent=s.id==='ai'?(c.S.turns.length?Math.round(c.avgTurn()):'—'):s.id==='voice'?(v.armed?String(v.peers):'—'):s.id==='chat'?(s.level===3?String(c.S.heard):'—'):(c.S.music?'♪':'—');}
    }
-   select('ai');render();c.every(render);return {update:render};
+   // v2.22: a status bar like the server browser's: details of the selected service, Refresh
+   // (re-reads every service; the voice bridge too) and Connect (opens the service's tab).
+   const bar=c.h('div','cl-foot'),info=c.h('span','cl-info'),refresh=c.h('button','cl-btn','Refresh'),connect=c.h('button','cl-btn','Connect');
+   refresh.type=connect.type='button';refresh.title='Refresh every service';connect.title='Open the selected service';bar.append(info,refresh,connect);box.append(bar);
+   const detail=id=>{const v=c.voice(),S=c.S;return id==='ai'?(S.model||'AI')+' · '+(S.turns.length?'avg '+c.ms(c.avgTurn())+' · '+(S.replies+S.spoken)+' replies':'no replies yet'):id==='chat'?S.heard+' messages heard this session':id==='voice'?(v.armed?(v.inCall?v.peers+' in call · ':'not in a call · ')+(v.attached?'audio attached':'audio not attached'):'microphone off'):(S.music?'Now playing: '+S.music:'Music DJ idle');};
+   const showInfo=()=>{info.textContent=detail(selected);};
+   const select0=select;select=id=>{select0(id);showInfo();};
+   refresh.onclick=()=>{c.actions.refreshVoice();box.classList.remove('cl-scan');void box.offsetWidth;box.classList.add('cl-scan');info.textContent='Refreshing servers…';c.later(()=>{render();showInfo();},650);};
+   connect.onclick=()=>c.actions.tab(rows.get(selected).tab);
+   select('ai');render();c.every(()=>{render();showInfo();});return {update(){render();showInfo();}};
   }},
   {id:'cl-progress',mount(c){
    let dialog=null,wait=0;
@@ -86,10 +131,13 @@
     dialog=c.h('div','fx cl-dialog');dialog.setAttribute('role','status');
     const title=c.h('div','cl-title','Steam - Preparing reply'),body=c.h('div','cl-body');
     const bar=c.h('div','cl-bar');for(let i=0;i<18;i++)bar.append(c.h('i'));
-    body.append(c.h('p',null,'Tyler is writing a reply…'),bar,c.h('small',null,'Estimated: about '+c.ms(est)+' (average of recent replies)'));
+    // v2.22: elapsed time ticks while it works; when the reply is done the bar fills and it says so.
+    const elapsed=c.h('small','cl-elapsed'),started=c.S.since||Date.now();const tick=()=>{if(!dialog)return;elapsed.textContent='Elapsed: '+c.ms(Date.now()-started)+' · estimated about '+c.ms(est);c.later(tick,250);};
+    body.append(c.h('p',null,'Tyler is writing a reply…'),bar,elapsed);tick();
     dialog.style.setProperty('--fill',Math.round(est)+'ms');dialog.append(title,body);c.slots.layer.append(dialog);
    }
-   return {update(type,d){if(type!=='state')return;if(d.state==='thinking'){if(!wait&&!dialog)wait=c.later(()=>{wait=0;if(c.S.state==='thinking')open();},700);}else close();},unmount:close};
+   function done(ok){if(!dialog)return close();dialog.classList.add(ok?'cl-done':'cl-fail');dialog.querySelector('p').textContent=ok?'Reply complete.':'Tyler ran into a problem.';dialog.querySelector('.cl-title').textContent=ok?'Steam - Complete':'Steam - Error';const d=dialog;c.later(()=>{if(dialog===d)close();},ok?650:1400);}
+   return {update(type,d){if(type!=='state')return;if(d.state==='thinking'){if(!wait&&!dialog)wait=c.later(()=>{wait=0;if(c.S.state==='thinking')open();},700);}else if(d.before==='thinking'&&dialog)done(d.state!=='error');else close();},unmount:close};
   }},
  ]);
 
@@ -106,13 +154,28 @@
    const feed=c.add('layer',c.h('div','fx tf-feed'));feed.setAttribute('role','log');feed.setAttribute('aria-label','Activity');
    const place=()=>{feed.style.top=(c.below('.tabs')+6)+'px';};place();c.later(place,400);
    function push(icon,verb,target,bad=false){place();const row=c.h('div','tf-kill'+(bad?' bad':''));row.append(c.h('b','tf-name','TYLER'),c.h('span','tf-icon',icon),c.h('span','tf-target',target||verb));feed.prepend(row);while(feed.children.length>4)feed.lastElementChild.remove();c.later(()=>row.classList.add('gone'),5600);c.later(()=>row.remove(),6000);}
+   // v2.22: real streaks and speed: a reply under a second is a critical, every fifth in a row a
+   // domination, and coming back from a problem is revenge.
+   let streak=0;
+   function special(text,kind){place();const row=c.h('div','tf-kill tf-special '+kind);row.append(c.h('b','tf-name','TYLER'),c.h('span','tf-target',text));feed.prepend(row);while(feed.children.length>4)feed.lastElementChild.remove();c.later(()=>row.classList.add('gone'),5600);c.later(()=>row.remove(),6000);}
    return {update(type,d){
+    if(type==='turn'){streak++;if(d.ms<1000)push('✸','crit','critical reply · '+c.ms(d.ms));if(streak%5===0)special('is DOMINATING the chat · '+streak+' in a row','dom');}
+    if(type==='state'&&d.state==='error'){streak=0;}
+    if(type==='state'&&d.before==='error'&&['ready','listening'].includes(d.state))special('got REVENGE on the error','rev');
     if(type==='reply')push('✎','replied','chat · '+d.chars+' chars');
     if(type==='state'&&d.state==='speaking'&&d.before!=='speaking')push('🔊','spoke','voice call');
     if(type==='sound')push('📣','played',d.name);
     if(type==='music'&&d.title)push('♪','queued',d.title.slice(0,32));
     if(type==='state'&&d.state==='error'&&d.before!=='error')push('☠','error','Needs attention',true);
    }};
+  }},
+  // v2.22: press E to call for a MEDIC: Tyler shouts it and the Checks tab (the medic) opens.
+  {id:'tf-medic',mount(c){
+   let last=0;
+   function call(){if(Date.now()-last<1500)return;last=Date.now();const b=c.h('div','fx tf-medic');b.append(c.h('b',null,'MEDIC!'),c.h('small',null,'Checks tab: run the full check to patch Tyler up'));c.flash(b,1800);c.root.querySelector('.mark')?.classList.add('tf-medic-call');c.later(()=>c.root.querySelector('.mark')?.classList.remove('tf-medic-call'),900);c.actions.tab('checks');}
+   c.key(e=>{if((e.key==='e'||e.key==='E')&&!e.repeat){e.preventDefault();call();}});
+   const hint=c.root.querySelector('#tab-checks');hint?.setAttribute('title','Checks (5) · E calls for a medic');
+   return {update(type,d){if(type==='state'&&d.state==='error'&&d.before!=='error'){const b=c.h('div','fx tf-medic tf-medic-hint');b.append(c.h('b',null,'Tyler is hurt'),c.h('small',null,'Press E for a medic'));c.flash(b,2600);}},unmount(){hint?.removeAttribute('title');}};
   }},
   {id:'tf-taunt',mount(c){
    const mark=c.root.querySelector('.mark');let busy=false;
@@ -130,9 +193,14 @@
    const ctScore=c.h('b'),tScore=c.h('b'),time=c.h('span','cs-time'),round=c.h('small'),alive=c.h('span','cs-alive');
    ct.append(ctScore,c.h('span',null,'TYLER'));t.append(c.h('span',null,'SQUAD'),tScore);mid.append(time,round);box.append(ct,mid,t,alive);
    ct.title='Replies this session (chat and voice)';t.title='Chat messages Tyler heard this session';alive.title='People in the voice call';
-   function render(){ctScore.textContent=String(c.S.replies+c.S.spoken);tScore.textContent=String(c.S.heard);time.textContent=c.clock(Date.now()-c.S.started);round.textContent='ROUND '+(c.S.turns.length+1);
+   // v2.22: a sound that plays shows as a purchase in the middle, like the buy feed; a reply under a
+   // second earns the round MVP star beside Tyler's score.
+   let bought=null,boughtAt=0;const mvp=c.h('i','cs-mvp','★');mvp.title='MVP: a reply in under a second';ct.prepend(mvp);
+   function render(){ctScore.textContent=String(c.S.replies+c.S.spoken);tScore.textContent=String(c.S.heard);
+    if(bought&&Date.now()-boughtAt<1800){time.textContent='BOUGHT';round.textContent=bought;box.dataset.bought='true';}else{bought=null;box.removeAttribute('data-bought');time.textContent=c.clock(Date.now()-c.S.started);round.textContent='ROUND '+(c.S.turns.length+1);}
+    mvp.hidden=!(c.S.turns.length&&Math.min(...c.S.turns.slice(-5))<1000);
     const v=c.voice(),n=Math.min(5,v.peers);alive.replaceChildren(...Array.from({length:5},(_,i)=>{const d=c.h('i');if(i<n)d.className='on';return d;}));box.dataset.state=c.S.state;}
-   render();c.every(render);return {update:render};
+   render();c.every(render);return {update(type,d){if(type==='sound'&&d?.name){bought=String(d.name).slice(0,24);boughtAt=Date.now();c.later(render,1850);}render();}};
   }},
   {id:'cs-wheel',mount(c){
    const chip=c.add('bar',c.h('button','fx fx-chip cs-buy','B'));chip.type='button';chip.title='Sound wheel (B)';chip.setAttribute('aria-label','Open the sound wheel');
@@ -144,11 +212,17 @@
     wheel=c.h('div','fx cs-wheel fx-interactive');wheel.setAttribute('role','menu');wheel.setAttribute('aria-label','Sound wheel');
     const center=c.h('div','cs-wheel-center','Pick a sound');wheel.append(center);
     if(!pick.length)center.textContent='Open Sounds once to load the board';
-    pick.forEach((s,i)=>{const a=i/pick.length*Math.PI*2-Math.PI/2,b=c.h('button','cs-slice');b.type='button';b.setAttribute('role','menuitem');
+    // v2.22: point at a slice (or use the arrow keys) to highlight it, click or Enter to buy it.
+    const slices=[];let hot=-1;const ring=c.h('i','cs-wheel-ring');wheel.append(ring);
+    const light=i=>{hot=i;slices.forEach((b,k)=>b.classList.toggle('hot',k===i));const s=pick[i];center.replaceChildren(c.h('b',null,s?s.name:'Pick a sound'),c.h('small',null,s?(favorites.includes(s.slot)?'★ favourite · ':'')+'slot '+s.slot+' · click to buy':'1–8 · arrows · Esc'));if(s)ring.style.setProperty('--a',(i/pick.length*360)+'deg');ring.classList.toggle('on',!!s);};
+    pick.forEach((s,i)=>{const a=i/pick.length*Math.PI*2-Math.PI/2,b=c.h('button','cs-slice'+(favorites.includes(s.slot)?' fav':''));b.type='button';b.setAttribute('role','menuitem');
      b.style.left=(50+Math.cos(a)*38)+'%';b.style.top=(50+Math.sin(a)*38)+'%';b.append(c.h('small',null,String(i+1)),c.h('span',null,s.name));
-     b.onmouseenter=b.onfocus=()=>center.textContent=s.name;b.onclick=()=>{c.actions.playSound(s.slot);close();};wheel.append(b);});
+     b.onfocus=()=>light(i);b.onmouseenter=()=>b.focus({preventScroll:true});b.onclick=e=>{e.stopPropagation();c.actions.playSound(s.slot);close();};wheel.append(b);slices.push(b);});
+    wheel.addEventListener('pointermove',e=>{if(!pick.length)return;const r=wheel.getBoundingClientRect(),dx=e.clientX-r.left-r.width/2,dy=e.clientY-r.top-r.height/2;if(Math.hypot(dx,dy)<r.width*.16)return;let a=Math.atan2(dy,dx)+Math.PI/2;if(a<0)a+=Math.PI*2;const i=Math.round(a/(Math.PI*2)*pick.length)%pick.length;if(i!==hot)slices[i].focus({preventScroll:true});});
+    wheel.addEventListener('click',e=>{if(e.target===wheel&&hot>=0)slices[hot].click();});
+    wheel.addEventListener('keydown',e=>{if(!pick.length)return;if(e.key==='ArrowRight'||e.key==='ArrowDown'){e.preventDefault();slices[(hot+1)%pick.length].focus();}else if(e.key==='ArrowLeft'||e.key==='ArrowUp'){e.preventDefault();slices[(hot-1+pick.length)%pick.length].focus();}});
     const x=c.h('button','cs-wheel-close','✕');x.type='button';x.setAttribute('aria-label','Close');x.onclick=close;wheel.append(x);
-    c.slots.layer.append(wheel);chip.setAttribute('aria-expanded','true');wheel.querySelector('button')?.focus();
+    c.slots.layer.append(wheel);chip.setAttribute('aria-expanded','true');(slices[0]||x).focus();
    }
    chip.onclick=open;
    c.key(e=>{if(e.key==='b'||e.key==='B'){if(!e.repeat){e.preventDefault();open();}}else if(wheel&&e.key==='Escape'){e.preventDefault();close();}else if(wheel&&/^[1-8]$/.test(e.key)){e.preventDefault();wheel.querySelectorAll('.cs-slice')[Number(e.key)-1]?.click();}});
