@@ -1,0 +1,34 @@
+ROBOTIC TYLER v2.22.0 — patch notes
+
+New (one or more extras in every theme; each one reaches something the panel already does)
+- Steam: persona chip + status menu; achievements page with progress.
+- Classic: server browser Refresh/Connect bar; VGUI dialog shows time, Complete or Error.
+- TF2: crits, dominations, revenge in the killfeed; MEDIC! (E) opens Checks.
+- CS2: bought feed and MVP star; buy wheel with pointer, arrows and favourites.
+- Portal: chamber report from the sign; Enrichment Center lines (double-click logo).
+- CS 1.6: radio "Go go go!" (connect) and "Report in" (full check); live scoreboard.
+- HEV: suit charger on the status strip (voice check); critical warning below 30%.
+- L4D: safe room / incapacitated after a full check; "back up" after recovery.
+- Windows XP: two-column Start menu, Log Off / Turn Off, balloon tips.
+- DOOM: key cards for AI key, chat and voice.
+- Quake: console history, Tab completion, suggestions, new commands.
+- Pip-Boy: radio Skip/Off; CND condition screen.
+- Combine: CP-17 plate with scanner lens and directives; coded dispatch; sociostability.
+- Deadlock: shop (B) of actions; soul gains; Down timer with Rejuvenate.
+- Minecraft: inventory of sound discs + hotbar (E, 1-9); advancements; hurt blink.
+- PAYDAY 2: drill timer; assault banner on the plan with a pager (hold F = full check); PAYDAY screen.
+- Dreamcast: memory card as the File screen with the main menu; VMU refresh and clock blink.
+- Garry's Mod: spawn menu (Q) with sounds, search and tools; Lua error repeat count.
+- Ricochet: point pops, Press start while paused, new high score.
+- Day of Defeat: radio commands (Z, 1-5) as radio lines; static; briefing objectives.
+
+Improved
+- Theme gallery: preview each activity state with the theme's real extras (sample data; sends, plays and stores nothing).
+- Status strip: success/failure flash; Reconnecting spinner.
+- Shared menu/screen behaviour (arrows, Escape, focus return); screens move up in short windows; narrow-window fixes.
+- Fixed: Escape in the Windows XP Start menu threw an error.
+
+Tested
+- Mocked in headless Chromium: 2 new end-to-end tests (theme menus and screens; gallery isolation in Chrome and desktop settings).
+- Screenshots of all 20 themes in 13 states and surfaces, before and after; reduced motion; idle cost unchanged from v2.21.0.
+- Not tested: real Steam, real Gemini Live, Windows. 272 unit and 20 end-to-end tests; desktop check in Electron.

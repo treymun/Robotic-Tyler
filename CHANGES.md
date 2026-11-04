@@ -1,3 +1,43 @@
+# ROBOTIC TYLER v2.22.0: every theme gets its own menus, screens and reactions
+
+A polish pass over all 20 themes. Each new control is another way to reach something the panel already does (the full check, the soundboard, Pause, Settings and so on), and the numbers come from Tyler's real session. Theme shortcut keys only work while the pointer is over the panel or focus is in it, and never while you type.
+
+## New in each theme
+- **Steam:** a persona chip in the header (Online, In voice, Away, Offline) with a status menu, and an achievements page with progress bars (click an achievement toast to open it).
+- **Classic Steam:** the server browser has a status bar with Refresh and Connect; the VGUI progress dialog shows the time so far and ends with Complete or Error.
+- **TF2:** the killfeed shows crits for replies under a second, a domination every 5th turn and revenge after a recovery; MEDIC! (E) opens the Checks tab.
+- **CS2:** a bought feed and an MVP star in the round HUD. The buy wheel follows the pointer, takes arrow keys, stars favourites and shows the sound in its centre.
+- **Portal:** the tests-passed sign opens a chamber report; double-click the logo for an Enrichment Center line.
+- **CS 1.6:** radio items "Go go go!" (Connect & start) and "Report in" (full check); the scoreboard keeps updating while it's open.
+- **HEV suit:** the status strip is a suit charger (click it to check voice), with a critical warning below 30% health.
+- **Left 4 Dead:** "Safe room reached" or "Survivor incapacitated" after a full check, and "Tyler is back up" after a recovery.
+- **Windows XP:** a two-column Start menu with Log Off (Pause AI) and Turn Off (collapse) that works with arrow keys, plus balloon tips for joining the call, now playing and problems solved.
+- **DOOM:** blue, yellow and red key cards for the AI key, the chat and voice.
+- **Quake:** console history (Up/Down), Tab completion, a suggestion line, and new `connect`, `check`, `history`, `sounds`, `play` and `music` commands.
+- **Pip-Boy:** Skip and Off on the radio; CND opens a condition screen with a bar for each part of Tyler.
+- **Combine:** a CP-17 unit plate with a scanner lens that flashes when Tyler hears chat, and a menu of Overwatch directives. Dispatch lines carry radio codes, and long lines roll once to show their end. The unit record gets a sociostability gauge and Inspect sector.
+- **Deadlock:** the souls open a shop (B) that sorts Tyler's actions into Weapon, Vitality and Spirit, and gained souls float up. When there's a problem, a "Down" timer with Rejuvenate appears; when Tyler recovers, a Rejuvenated banner.
+- **Minecraft:** an inventory of soundboard music discs with a hotbar (E, and 1–9 to play), advancement toasts for milestones, and hearts that blink when Tyler takes damage.
+- **PAYDAY 2:** a drill timer while Tyler writes ("The drill's jammed!" past twice his usual time). The police assault banner now sits on the heist plan instead of over the page, ends with "Assault ending", and has a pager: hold it, or hold F, to run the full check. The heist timer opens a PAYDAY screen with this heist's take, the cleaner costs (AI spend) and your career.
+- **Dreamcast:** the memory card is the File screen, with Play, File, Music and Settings along the top, a pixel icon for each save file and the VMU screen describing it. The VMU screens refresh when Tyler's state changes, and the clock blinks.
+- **Garry's Mod:** a spawn menu (Q) with the sounds as spawn icons, a search box and a tool list. The Lua error counts repeats (x2, x3) and opens the Checks tab.
+- **Ricochet:** points pop out of the score, Press start (Connect & start) shows while Tyler is paused, and a new high score is announced.
+- **Day of Defeat:** the TYLER-1 callsign opens radio commands (Z, then 1–5) that go out as a radio line; changing channel crackles; the briefing has objectives, ticked off from your real setup.
+
+## Improved
+- **Theme gallery (Settings → Appearance):** preview a theme as Listening, Thinking, Speaking, Paused, Reconnecting, Error or Success, with the theme's real extras reacting. The preview uses sample numbers, takes no clicks, and sends, plays and stores nothing. The descriptions name the new extras.
+- **Status strip:** a short success or failure flash after a full check or when Tyler recovers; Reconnecting shows a small spinner in the theme's colour.
+- **Menus and screens** share one behaviour: arrow keys, Home/End, Escape, and focus goes back to where it was. A screen that doesn't fit under the tabs (a short window) opens under the header instead. In narrow windows Minecraft's inventory shrinks its slots and header chips drop their labels.
+- **Fixed:** Escape in the Windows XP Start menu threw an error.
+
+## Tested
+- **Mocked, in headless Chromium (preview pages, no Steam, AI provider or Windows audio):** two new end-to-end tests. In one, every new menu and screen opens from its control or key, fits the panel, works from the keyboard, closes with Escape and runs the panel's own action (full check, soundboard). In the other, the gallery mounts all 20 themes' extras in the Chrome and desktop settings pages, the states react, and previewing sends no message, makes no network request and stores nothing.
+- **Visual:** before and after screenshots of every theme in 13 states and surfaces (listening, thinking, speaking, error, paused, Room, Sounds, Setup, Checks, the theme's extra, mini, a 360 × 620 window and a 900 × 560 window), plus a reduced-motion pass that leaves no animation running.
+- **Idle cost:** the same as v2.21.0. Restyles per second in the listening state are within 2 of v2.21.0 for every theme, and the error and reconnecting states stay at 2–7.
+- **Not tested:** a real Steam call, a real Gemini Live session, and the desktop app on Windows. 272 unit and integration tests and 20 end-to-end tests, plus the desktop check in Electron with a mock Steam page.
+
+---
+
 # ROBOTIC TYLER v2.21.0: Tyler sounds smoother, hears better, and the themes run lighter
 
 ## Improved: how Tyler sounds

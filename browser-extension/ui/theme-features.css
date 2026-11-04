@@ -796,7 +796,7 @@
 .mc-inv-grid:not(.mc-hotbar){max-height:calc(36px * 4);overflow:auto}
 .mc-hotbar{margin-top:2px}
 .panel .mc-slot{position:relative;display:grid;place-items:center;width:36px;height:36px;min-height:0;margin:0;padding:0;border:0;border-radius:0;background:#8b8b8b;box-shadow:inset 2px 2px 0 #373737,inset -2px -2px 0 #fff;cursor:pointer}
-.panel .mc-slot:disabled{cursor:default;opacity:1}
+.panel .mc-slot:disabled{cursor:default;opacity:1;background:#8b8b8b;box-shadow:inset 2px 2px 0 #373737,inset -2px -2px 0 #fff;filter:none}
 .panel .mc-slot:hover:not(:disabled),.panel .mc-slot:focus-visible{background:#a8a8a8;outline:none}
 .panel .mc-slot:focus-visible{box-shadow:inset 2px 2px 0 #373737,inset -2px -2px 0 #fff,inset 0 0 0 4px #fff}
 .mc-disc{width:28px;height:28px;image-rendering:pixelated}
@@ -954,3 +954,9 @@
 .tally[data-state=waiting] .tally-label::after{content:"";display:inline-block;width:.7em;height:.7em;margin-left:.45em;vertical-align:-.05em;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:fx-spin .9s linear infinite}
 [data-rt-theme=doom] .tally[data-state=waiting] .tally-label::after,[data-rt-theme=minecraft] .tally[data-state=waiting] .tally-label::after{border-radius:0}
 @keyframes fx-spin{to{transform:rotate(360deg)}}
+@media (max-width:430px){.panel .st-persona .st-p-name{display:none}.panel .st-persona{padding:0 7px}}
+@media (prefers-reduced-motion:reduce){.pd-drill[data-on=run] .pd-drill-bar i{transform:none;opacity:.45}}
+/* Minecraft's inventory shrinks its slots in a narrow panel instead of cutting off the hotbar. */
+.mc-inv-grid{grid-template-columns:repeat(9,minmax(24px,36px))}
+.panel .mc-slot{width:100%;height:auto;aspect-ratio:1}
+.mc-disc{width:78%;height:78%}
