@@ -112,6 +112,8 @@
    on(target,type,fn,opts){target.addEventListener(type,fn,opts);offs.push(()=>target.removeEventListener(type,fn,opts));},
    /** A short-lived element in the overlay layer (notifications, transitions). */
    flash(el,life=1800){slots.layer.append(el);own.add(el);ctx.later(()=>{el.remove();own.delete(el);},life);return el;},
+   /** One of the current theme's branded icons (v2.28, ui-brand.js), or null if it has none. */
+   brand(id,cls='fx-bi'){const g=globalThis.TylerBrand;return g?.el?.(S.theme,id,cls)||null;},
    destroy(){for(const t of timers)clearTimeout(t);timers.clear();for(const el of own)el.remove();own.clear();for(const off of offs)off();tick=null;},
    get tick(){return tick;},
    /** Pixels from the panel's top to the bottom of an element (to place overlays under the tabs, say). */
@@ -129,7 +131,8 @@
      if(it==='sep'){el.append(h('i','fx-menu-sep'));continue;}
      if(it.heading){el.append(h('b','fx-menu-head',it.heading));continue;}
      const b=h('button','fx-menu-item');b.type='button';b.setAttribute('role','menuitem');if(it.current)b.setAttribute('aria-current','true');if(it.disabled)b.disabled=true;
-     if(it.mark!==undefined)b.append(h('span','fx-menu-mark',it.mark));b.append(h('span','fx-menu-label',it.label));if(it.hint)b.append(h('small','fx-menu-hint',it.hint));
+     // v2.28: a menu item can show one of the theme's branded icons (ui-brand.js) instead of a symbol.
+     const bi=it.icon?ctx.brand(it.icon,'fx-menu-bi'):null;if(bi){const m=h('span','fx-menu-mark fx-menu-mark-bi');m.append(bi);b.append(m);}else if(it.mark!==undefined)b.append(h('span','fx-menu-mark',it.mark));b.append(h('span','fx-menu-label',it.label));if(it.hint)b.append(h('small','fx-menu-hint',it.hint));
      b.onclick=()=>{close();it.run?.();};el.append(b);buttons.push(b);
     }
     const p=panel.getBoundingClientRect();let left=x,top=y;
@@ -161,8 +164,12 @@
  function start(){if(ticker)return;ticker=setInterval(()=>{if(document.hidden||S.mini&&S.theme!=='dreamcast')return;for(const m of mounted){try{m.ctx.tick?.();}catch(e){console.warn('[ROBOTIC TYLER] theme feature tick:',e?.message);}}},1000);}
  function stopTicker(){if(ticker&&!mounted.some(m=>m.ctx.tick)){clearInterval(ticker);ticker=0;}}
  function unmount(){for(const m of mounted){try{m.instance?.unmount?.();}catch{}m.ctx.destroy();}mounted=[];panel.removeAttribute('data-fx');stopTicker();}
+ // v2.28: the original themes' branded icons (ui-brand.js): the panel's own icons (tabs, buttons,
+ // notifications) take the theme's drawing where it has one, and the status strip shows a badge for
+ // Tyler's real state where the theme has one for it (CSS picks it from the strip's data-state).
+ function brand(theme){const B=globalThis.TylerBrand;if(!B)return;B.apply(root,theme);B.badge?.(root.querySelector('.tally'),theme);}
  function mount(theme){
-  unmount();S.theme=theme;const list=packs.get(theme)||[];
+  unmount();S.theme=theme;brand(theme);const list=packs.get(theme)||[];
   for(const feature of list){const ctx=makeCtx();try{const instance=feature.mount(ctx)||{};mounted.push({feature,ctx,instance});}catch(error){ctx.destroy();console.warn('[ROBOTIC TYLER] theme feature '+feature.id+':',error?.message||error);}}
   panel.dataset.fx=mounted.map(m=>m.feature.id).join(' ');
   for(const slot of Object.values(slots))slot?.toggleAttribute('data-filled',!!slot.childElementCount);

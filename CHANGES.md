@@ -1,3 +1,121 @@
+# ROBOTIC TYLER v2.28.0: branded icons for the original 20 themes
+
+The original 20 themes now use your "Branded Icon Packs" for their smaller icons, emblems and badges. The Tyler logos are unchanged.
+
+## Everywhere, in all 20
+- **Tabs:** Chat, Room, Sounds, Setup and Checks show the theme's own object where one fits, for example TF2's Engineer wrench for Setup, the Medic cross for Checks, a Minecraft chest for Sounds and XP's My Computer for Setup. Unselected tabs are a little quieter, and selected, hovered and focused tabs show full colour.
+- **Status strip:** a badge for Tyler's real state where the theme has one. Examples:
+  - the CS2 radar while he listens, and the C4 timer while he writes;
+  - Portal's blue portal (listening), orange portal (on air), Aperture iris (thinking) and exit sign (paused);
+  - DOOM's blue, yellow and red key cards.
+  - States without a matching object show no badge.
+- **Notifications, dialogs, Settings and the Voice Studio:** these use the theme's success, error, warning, info and voice icons where it has them (XP's error and information icons, HEV's radiation, L4D's safe room, Portal's cake…).
+- **Appearance:** each card shows the theme's emblem beside its name, and the previews show the branded tabs and badge. Settings' theme chip shows the emblem too.
+
+## Theme by theme
+- **Steam:**
+  - Tabs: chat, friends, headset and Workshop.
+  - Badges: the headset on air, a download while Tyler writes.
+  - The status menu's Achievements and Settings have Steam's medal and gear.
+- **Classic Steam:**
+  - Tabs: friends, music, VGUI window and server.
+  - Badges: download, connection and warning.
+  - Each service in the server list has its own icon.
+- **Team Fortress 2:**
+  - Tabs: teleporter, Engineer wrench and Medic cross.
+  - Badges: BLU while listening, RED on air, Übercharge while writing.
+  - The Medic cross appears on MEDIC!.
+- **Counter-Strike 2:**
+  - Tabs: radar, headset and defuse kit.
+  - Badges: radar, C4 timer and kevlar.
+  - The round banner shows round won or the C4.
+- **Portal:**
+  - Tabs: companion cube and floor button.
+  - Badges: portals, the Aperture iris and the exit sign.
+  - The turret is used for voice, the cake for success, and the Aperture iris on the chamber report.
+- **Counter-Strike 1.6:**
+  - Tabs: radio and defuse kit.
+  - Badges: crosshair, C4 and rescue.
+  - The scoreboard shows the Counter-Strike mark, and the radio menu and messages show the radio.
+- **HEV suit:**
+  - Tabs: Black Mesa and health.
+  - Badges: Geiger counter, suit battery, HEV armour and radiation.
+  - The flashlight chip shows the suit's flashlight.
+- **Left 4 Dead:**
+  - Tabs: safe room and first aid kit.
+  - Each survivor card carries an item: a first aid kit while healthy, pills when hurt, adrenaline when critical, and incapacitated when a part is down.
+- **Windows XP:**
+  - Tabs: folder, speaker, My Computer and network.
+  - The flag is on Start, and every Start menu entry has its XP icon.
+  - The tray has XP's volume and network icons.
+  - Balloons and the error dialog use XP's information icon and red X.
+- **DOOM:**
+  - The status bar has the pixel key cards, the ammo and the medikit.
+  - Tabs: health and armour. Problems show the barrel or the red key.
+- **Quake:**
+  - Tabs: teleporter, runestone and health.
+  - Badges: rune, lightning and armour.
+  - The medals show Quad Damage, the rune and armour.
+- **Pip-Boy:**
+  - Tabs: radio, Pip-Boy and health.
+  - The gauges show the atom and radiation symbols, the status screen shows Vault-Tec, and Tyler FM shows the radio.
+- **Combine:**
+  - Tabs: Citadel, Civil Protection mask and checkpoint.
+  - Badges: the scanner while listening, the alert on a problem.
+  - The directives menu, the unit record, the biosignal scan and the anomaly band all use the Combine icons.
+- **Deadlock:**
+  - Tabs: transit token and spectral radio.
+  - Badges: the occult sigil while writing, the spirit flame on air.
+  - Soul currency appears on the souls and the shop. Shop items use the flame, the radio and the patron totem.
+- **Minecraft:**
+  - Tabs, in pixels: grass block, chest, pickaxe and heart.
+  - Badges: a music disc on air, redstone while recovering.
+  - Success shows a diamond.
+- **PAYDAY 2:**
+  - The heist plan's steps have their gear: loot bag, ghost, drill and mask.
+  - The drill, the pager and the PAYDAY screen use PAYDAY's icons.
+  - Badges: the drill, the stealth ghost when paused, and assault on a problem.
+- **Dreamcast:**
+  - Tabs: GD-ROM, controller and modem.
+  - The memory card's menu has the console's icons, and the orange swirl plays at start-up.
+- **Garry's Mod:**
+  - Tabs: wireframe cube, spawn menu and tool gun.
+  - The HUD notices show the spawn menu, tool gun or undo, and the spawn menu headings have icons.
+- **Ricochet:**
+  - Tab: arena platform.
+  - Badges: target, ricochet path and jump pad.
+  - The flying disc between tabs is the Ricochet disc, the high scores have a medal, and an extra life shows for success.
+- **Day of Defeat:**
+  - Tabs: compass, field radio, orders and field medic.
+  - Badges: the helmet and the radio.
+  - The Orders chip, the field radio and the briefing's emblem use Day of Defeat's icons.
+
+## How it's built
+- The 160 drawings are embedded in `ui-brand.js`, so they load with no image request (Steam's page policy doesn't apply).
+- They're checked at build time: plain drawing elements only, no scripts, links or styles.
+- Two supplied drawings had a rectangle's attributes shifted by one (the HEV battery and the Pip-Boy device). They're fixed at build time; the pack itself is kept as supplied in `assets/theme-icons/`.
+- The pack's credits and licences ship with the app (`ui/brand/`). These include Papirus (GPL-3.0), Simple Icons (CC0) and Font Awesome (CC BY 4.0).
+- If the icons don't load, every surface falls back to the theme's own drawings.
+
+## Tested
+- **Unit (no browser):**
+  - every mapping points at a real icon;
+  - the embedded drawings contain no scripts, links or styles, and the checker rejects them;
+  - every surface loads the icons;
+  - the credits and licences ship.
+- **Chromium with the panel preview and a mocked Steam page (no real Steam, Windows audio or Gemini Live):**
+  - all 25 themes switch live: the original 20 show their branded tabs and badge, and the five newer themes keep their own;
+  - no icon is left behind from another theme;
+  - the Portal badge follows thinking, paused and error;
+  - the XP Start menu has its icons;
+  - with the icon file removed, the drawn icons come back and the menus still open.
+- **Every original theme, exercised in Chromium:** through error, listening, thinking, speaking and paused, with replies, clips, songs, a check, all five tabs and every header button. No errors.
+- **Screenshots:** every original theme in the normal, error and compact layouts. Also Settings, Appearance and the Voice Studio (TF2, XP, DOOM and Minecraft), and the menus and screens with new icons.
+- **Real Electron (Linux) with a mock Steam page:** the desktop check passes.
+- **Not tested:** the real Steam page, the Windows desktop app and a real phone.
+
+---
+
 # ROBOTIC TYLER v2.27.0: five new themes
 
 Rust, Xbox 360 (2005), iPod classic, MSN Messenger and PlayStation 3 (XMB) join the theme list, for 25 in all. Each one reskins the chat panel, compact mode, Settings, the Voice Studio, the desktop window and the phone remote. Each has its own Tyler logo, status strip and extras, like the other 20.

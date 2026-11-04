@@ -1,0 +1,3343 @@
+{
+  "title": "Robotic Tyler — Branded Supporting Icon Packs",
+  "formatVersion": 1,
+  "created": "2026-11-04",
+  "scope": "Supporting icons, emblems and decorative UI motifs. Preserve existing Tyler mascot logos.",
+  "themeCount": 25,
+  "iconCount": 200,
+  "themes": [
+    {
+      "id": "steam",
+      "name": "Steam",
+      "appearance": "dark",
+      "aliases": [],
+      "registeredInCurrentApp": true,
+      "assets": [
+        {
+          "id": "steam-mark",
+          "name": "Steam mark",
+          "svg": "svg/steam/steam-mark.svg",
+          "symbolId": "steam-steam-mark",
+          "png": {
+            "32": "png/32/steam/steam-mark.png",
+            "64": "png/64/steam/steam-mark.png",
+            "128": "png/128/steam/steam-mark.png",
+            "256": "png/256/steam/steam-mark.png"
+          },
+          "suggestedUse": "Brand accents and section headers",
+          "pixelArt": false,
+          "provenance": "sourced",
+          "source": {
+            "origin": "Simple Icons",
+            "url": "https://github.com/simple-icons/simple-icons/blob/develop/icons/steam.svg",
+            "license": "CC0-1.0"
+          }
+        },
+        {
+          "id": "friends",
+          "name": "Steam friends",
+          "svg": "svg/steam/friends.svg",
+          "symbolId": "steam-friends",
+          "png": {
+            "32": "png/32/steam/friends.png",
+            "64": "png/64/steam/friends.png",
+            "128": "png/128/steam/friends.png",
+            "256": "png/256/steam/friends.png"
+          },
+          "suggestedUse": "Room and participants",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "chat",
+          "name": "Steam chat",
+          "svg": "svg/steam/chat.svg",
+          "symbolId": "steam-chat",
+          "png": {
+            "32": "png/32/steam/chat.png",
+            "64": "png/64/steam/chat.png",
+            "128": "png/128/steam/chat.png",
+            "256": "png/256/steam/chat.png"
+          },
+          "suggestedUse": "Chat navigation",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "headset",
+          "name": "Voice headset",
+          "svg": "svg/steam/headset.svg",
+          "symbolId": "steam-headset",
+          "png": {
+            "32": "png/32/steam/headset.png",
+            "64": "png/64/steam/headset.png",
+            "128": "png/128/steam/headset.png",
+            "256": "png/256/steam/headset.png"
+          },
+          "suggestedUse": "Voice state",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "download",
+          "name": "Steam download",
+          "svg": "svg/steam/download.svg",
+          "symbolId": "steam-download",
+          "png": {
+            "32": "png/32/steam/download.png",
+            "64": "png/64/steam/download.png",
+            "128": "png/128/steam/download.png",
+            "256": "png/256/steam/download.png"
+          },
+          "suggestedUse": "Loading and downloads",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "achievement",
+          "name": "Achievement medallion",
+          "svg": "svg/steam/achievement.svg",
+          "symbolId": "steam-achievement",
+          "png": {
+            "32": "png/32/steam/achievement.png",
+            "64": "png/64/steam/achievement.png",
+            "128": "png/128/steam/achievement.png",
+            "256": "png/256/steam/achievement.png"
+          },
+          "suggestedUse": "Real milestones",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "workshop",
+          "name": "Workshop tools",
+          "svg": "svg/steam/workshop.svg",
+          "symbolId": "steam-workshop",
+          "png": {
+            "32": "png/32/steam/workshop.png",
+            "64": "png/64/steam/workshop.png",
+            "128": "png/128/steam/workshop.png",
+            "256": "png/256/steam/workshop.png"
+          },
+          "suggestedUse": "Setup and tools",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "connection",
+          "name": "Connection plug",
+          "svg": "svg/steam/connection.svg",
+          "symbolId": "steam-connection",
+          "png": {
+            "32": "png/32/steam/connection.png",
+            "64": "png/64/steam/connection.png",
+            "128": "png/128/steam/connection.png",
+            "256": "png/256/steam/connection.png"
+          },
+          "suggestedUse": "Connect and provider state",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        }
+      ]
+    },
+    {
+      "id": "classic",
+      "name": "Classic Steam (2004)",
+      "appearance": "dark",
+      "aliases": [],
+      "registeredInCurrentApp": true,
+      "assets": [
+        {
+          "id": "steam-mark",
+          "name": "Classic Steam mark",
+          "svg": "svg/classic/steam-mark.svg",
+          "symbolId": "classic-steam-mark",
+          "png": {
+            "32": "png/32/classic/steam-mark.png",
+            "64": "png/64/classic/steam-mark.png",
+            "128": "png/128/classic/steam-mark.png",
+            "256": "png/256/classic/steam-mark.png"
+          },
+          "suggestedUse": "Brand accents",
+          "pixelArt": false,
+          "provenance": "sourced",
+          "source": {
+            "origin": "Simple Icons",
+            "url": "https://github.com/simple-icons/simple-icons/blob/develop/icons/steam.svg",
+            "license": "CC0-1.0"
+          }
+        },
+        {
+          "id": "server",
+          "name": "Classic server",
+          "svg": "svg/classic/server.svg",
+          "symbolId": "classic-server",
+          "png": {
+            "32": "png/32/classic/server.png",
+            "64": "png/64/classic/server.png",
+            "128": "png/128/classic/server.png",
+            "256": "png/256/classic/server.png"
+          },
+          "suggestedUse": "Connections and room",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "friends",
+          "name": "Classic friends",
+          "svg": "svg/classic/friends.svg",
+          "symbolId": "classic-friends",
+          "png": {
+            "32": "png/32/classic/friends.png",
+            "64": "png/64/classic/friends.png",
+            "128": "png/128/classic/friends.png",
+            "256": "png/256/classic/friends.png"
+          },
+          "suggestedUse": "Participants",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "vgui-window",
+          "name": "VGUI window",
+          "svg": "svg/classic/vgui-window.svg",
+          "symbolId": "classic-vgui-window",
+          "png": {
+            "32": "png/32/classic/vgui-window.png",
+            "64": "png/64/classic/vgui-window.png",
+            "128": "png/128/classic/vgui-window.png",
+            "256": "png/256/classic/vgui-window.png"
+          },
+          "suggestedUse": "Settings and panel",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "download",
+          "name": "Classic download",
+          "svg": "svg/classic/download.svg",
+          "symbolId": "classic-download",
+          "png": {
+            "32": "png/32/classic/download.png",
+            "64": "png/64/classic/download.png",
+            "128": "png/128/classic/download.png",
+            "256": "png/256/classic/download.png"
+          },
+          "suggestedUse": "Loading",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "music",
+          "name": "Classic media",
+          "svg": "svg/classic/music.svg",
+          "symbolId": "classic-music",
+          "png": {
+            "32": "png/32/classic/music.png",
+            "64": "png/64/classic/music.png",
+            "128": "png/128/classic/music.png",
+            "256": "png/256/classic/music.png"
+          },
+          "suggestedUse": "Music and soundboard",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "connection",
+          "name": "Classic connection",
+          "svg": "svg/classic/connection.svg",
+          "symbolId": "classic-connection",
+          "png": {
+            "32": "png/32/classic/connection.png",
+            "64": "png/64/classic/connection.png",
+            "128": "png/128/classic/connection.png",
+            "256": "png/256/classic/connection.png"
+          },
+          "suggestedUse": "Connect",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "warning",
+          "name": "Amber warning",
+          "svg": "svg/classic/warning.svg",
+          "symbolId": "classic-warning",
+          "png": {
+            "32": "png/32/classic/warning.png",
+            "64": "png/64/classic/warning.png",
+            "128": "png/128/classic/warning.png",
+            "256": "png/256/classic/warning.png"
+          },
+          "suggestedUse": "Error details",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        }
+      ]
+    },
+    {
+      "id": "tf2",
+      "name": "Team Fortress 2",
+      "appearance": "dark",
+      "aliases": [],
+      "registeredInCurrentApp": true,
+      "assets": [
+        {
+          "id": "tf2-emblem",
+          "name": "TF2 emblem",
+          "svg": "svg/tf2/tf2-emblem.svg",
+          "symbolId": "tf2-tf2-emblem",
+          "png": {
+            "32": "png/32/tf2/tf2-emblem.png",
+            "64": "png/64/tf2/tf2-emblem.png",
+            "128": "png/128/tf2/tf2-emblem.png",
+            "256": "png/256/tf2/tf2-emblem.png"
+          },
+          "suggestedUse": "Brand accent",
+          "pixelArt": false,
+          "provenance": "sourced",
+          "source": {
+            "origin": "Papirus Icon Theme",
+            "url": "https://github.com/PapirusDevelopmentTeam/papirus-icon-theme/blob/master/Papirus/64x64/apps/steam_icon_440.svg",
+            "license": "GPL-3.0"
+          }
+        },
+        {
+          "id": "red-team",
+          "name": "RED badge",
+          "svg": "svg/tf2/red-team.svg",
+          "symbolId": "tf2-red-team",
+          "png": {
+            "32": "png/32/tf2/red-team.png",
+            "64": "png/64/tf2/red-team.png",
+            "128": "png/128/tf2/red-team.png",
+            "256": "png/256/tf2/red-team.png"
+          },
+          "suggestedUse": "Team and active state",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "blu-team",
+          "name": "BLU badge",
+          "svg": "svg/tf2/blu-team.svg",
+          "symbolId": "tf2-blu-team",
+          "png": {
+            "32": "png/32/tf2/blu-team.png",
+            "64": "png/64/tf2/blu-team.png",
+            "128": "png/128/tf2/blu-team.png",
+            "256": "png/256/tf2/blu-team.png"
+          },
+          "suggestedUse": "Alternate team and idle state",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "medic-cross",
+          "name": "Medic cross",
+          "svg": "svg/tf2/medic-cross.svg",
+          "symbolId": "tf2-medic-cross",
+          "png": {
+            "32": "png/32/tf2/medic-cross.png",
+            "64": "png/64/tf2/medic-cross.png",
+            "128": "png/128/tf2/medic-cross.png",
+            "256": "png/256/tf2/medic-cross.png"
+          },
+          "suggestedUse": "Checks and health",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "engineer-wrench",
+          "name": "Engineer wrench",
+          "svg": "svg/tf2/engineer-wrench.svg",
+          "symbolId": "tf2-engineer-wrench",
+          "png": {
+            "32": "png/32/tf2/engineer-wrench.png",
+            "64": "png/64/tf2/engineer-wrench.png",
+            "128": "png/128/tf2/engineer-wrench.png",
+            "256": "png/256/tf2/engineer-wrench.png"
+          },
+          "suggestedUse": "Setup and tools",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "ubercharge",
+          "name": "ÜberCharge battery",
+          "svg": "svg/tf2/ubercharge.svg",
+          "symbolId": "tf2-ubercharge",
+          "png": {
+            "32": "png/32/tf2/ubercharge.png",
+            "64": "png/64/tf2/ubercharge.png",
+            "128": "png/128/tf2/ubercharge.png",
+            "256": "png/256/tf2/ubercharge.png"
+          },
+          "suggestedUse": "Thinking and charge",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "ammo",
+          "name": "TF2 ammunition",
+          "svg": "svg/tf2/ammo.svg",
+          "symbolId": "tf2-ammo",
+          "png": {
+            "32": "png/32/tf2/ammo.png",
+            "64": "png/64/tf2/ammo.png",
+            "128": "png/128/tf2/ammo.png",
+            "256": "png/256/tf2/ammo.png"
+          },
+          "suggestedUse": "Resources and usage",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "teleporter",
+          "name": "Teleporter pad",
+          "svg": "svg/tf2/teleporter.svg",
+          "symbolId": "tf2-teleporter",
+          "png": {
+            "32": "png/32/tf2/teleporter.png",
+            "64": "png/64/tf2/teleporter.png",
+            "128": "png/128/tf2/teleporter.png",
+            "256": "png/256/tf2/teleporter.png"
+          },
+          "suggestedUse": "Connection and arrival",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        }
+      ]
+    },
+    {
+      "id": "cs2",
+      "name": "Counter-Strike 2",
+      "appearance": "dark",
+      "aliases": [],
+      "registeredInCurrentApp": true,
+      "assets": [
+        {
+          "id": "counter-strike-mark",
+          "name": "Counter-Strike mark",
+          "svg": "svg/cs2/counter-strike-mark.svg",
+          "symbolId": "cs2-counter-strike-mark",
+          "png": {
+            "32": "png/32/cs2/counter-strike-mark.png",
+            "64": "png/64/cs2/counter-strike-mark.png",
+            "128": "png/128/cs2/counter-strike-mark.png",
+            "256": "png/256/cs2/counter-strike-mark.png"
+          },
+          "suggestedUse": "Brand accent",
+          "pixelArt": false,
+          "provenance": "sourced",
+          "source": {
+            "origin": "Simple Icons",
+            "url": "https://github.com/simple-icons/simple-icons/blob/develop/icons/counterstrike.svg",
+            "license": "CC0-1.0"
+          }
+        },
+        {
+          "id": "defuse-kit",
+          "name": "Defuse kit",
+          "svg": "svg/cs2/defuse-kit.svg",
+          "symbolId": "cs2-defuse-kit",
+          "png": {
+            "32": "png/32/cs2/defuse-kit.png",
+            "64": "png/64/cs2/defuse-kit.png",
+            "128": "png/128/cs2/defuse-kit.png",
+            "256": "png/256/cs2/defuse-kit.png"
+          },
+          "suggestedUse": "Checks",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "c4-timer",
+          "name": "C4 timer",
+          "svg": "svg/cs2/c4-timer.svg",
+          "symbolId": "cs2-c4-timer",
+          "png": {
+            "32": "png/32/cs2/c4-timer.png",
+            "64": "png/64/cs2/c4-timer.png",
+            "128": "png/128/cs2/c4-timer.png",
+            "256": "png/256/cs2/c4-timer.png"
+          },
+          "suggestedUse": "Thinking and timers",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "kevlar",
+          "name": "Kevlar shield",
+          "svg": "svg/cs2/kevlar.svg",
+          "symbolId": "cs2-kevlar",
+          "png": {
+            "32": "png/32/cs2/kevlar.png",
+            "64": "png/64/cs2/kevlar.png",
+            "128": "png/128/cs2/kevlar.png",
+            "256": "png/256/cs2/kevlar.png"
+          },
+          "suggestedUse": "Connection health",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "headset",
+          "name": "Tactical headset",
+          "svg": "svg/cs2/headset.svg",
+          "symbolId": "cs2-headset",
+          "png": {
+            "32": "png/32/cs2/headset.png",
+            "64": "png/64/cs2/headset.png",
+            "128": "png/128/cs2/headset.png",
+            "256": "png/256/cs2/headset.png"
+          },
+          "suggestedUse": "Voice",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "premier-plate",
+          "name": "Premier-style plate",
+          "svg": "svg/cs2/premier-plate.svg",
+          "symbolId": "cs2-premier-plate",
+          "png": {
+            "32": "png/32/cs2/premier-plate.png",
+            "64": "png/64/cs2/premier-plate.png",
+            "128": "png/128/cs2/premier-plate.png",
+            "256": "png/256/cs2/premier-plate.png"
+          },
+          "suggestedUse": "Milestones and rankings",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "radar",
+          "name": "Tactical radar",
+          "svg": "svg/cs2/radar.svg",
+          "symbolId": "cs2-radar",
+          "png": {
+            "32": "png/32/cs2/radar.png",
+            "64": "png/64/cs2/radar.png",
+            "128": "png/128/cs2/radar.png",
+            "256": "png/256/cs2/radar.png"
+          },
+          "suggestedUse": "Connection activity",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "round-win",
+          "name": "Round-win badge",
+          "svg": "svg/cs2/round-win.svg",
+          "symbolId": "cs2-round-win",
+          "png": {
+            "32": "png/32/cs2/round-win.png",
+            "64": "png/64/cs2/round-win.png",
+            "128": "png/128/cs2/round-win.png",
+            "256": "png/256/cs2/round-win.png"
+          },
+          "suggestedUse": "Successful checks",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        }
+      ]
+    },
+    {
+      "id": "portal",
+      "name": "Portal",
+      "appearance": "light",
+      "aliases": [],
+      "registeredInCurrentApp": true,
+      "assets": [
+        {
+          "id": "aperture-iris",
+          "name": "Aperture iris",
+          "svg": "svg/portal/aperture-iris.svg",
+          "symbolId": "portal-aperture-iris",
+          "png": {
+            "32": "png/32/portal/aperture-iris.png",
+            "64": "png/64/portal/aperture-iris.png",
+            "128": "png/128/portal/aperture-iris.png",
+            "256": "png/256/portal/aperture-iris.png"
+          },
+          "suggestedUse": "Brand and thinking",
+          "pixelArt": false,
+          "provenance": "sourced",
+          "source": {
+            "origin": "Papirus Icon Theme",
+            "url": "https://github.com/PapirusDevelopmentTeam/papirus-icon-theme/blob/master/Papirus/64x64/apps/portal.svg",
+            "license": "GPL-3.0"
+          }
+        },
+        {
+          "id": "blue-portal",
+          "name": "Blue portal",
+          "svg": "svg/portal/blue-portal.svg",
+          "symbolId": "portal-blue-portal",
+          "png": {
+            "32": "png/32/portal/blue-portal.png",
+            "64": "png/64/portal/blue-portal.png",
+            "128": "png/128/portal/blue-portal.png",
+            "256": "png/256/portal/blue-portal.png"
+          },
+          "suggestedUse": "Connect and incoming",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "orange-portal",
+          "name": "Orange portal",
+          "svg": "svg/portal/orange-portal.svg",
+          "symbolId": "portal-orange-portal",
+          "png": {
+            "32": "png/32/portal/orange-portal.png",
+            "64": "png/64/portal/orange-portal.png",
+            "128": "png/128/portal/orange-portal.png",
+            "256": "png/256/portal/orange-portal.png"
+          },
+          "suggestedUse": "Outgoing and speaking",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "companion-cube",
+          "name": "Companion cube",
+          "svg": "svg/portal/companion-cube.svg",
+          "symbolId": "portal-companion-cube",
+          "png": {
+            "32": "png/32/portal/companion-cube.png",
+            "64": "png/64/portal/companion-cube.png",
+            "128": "png/128/portal/companion-cube.png",
+            "256": "png/256/portal/companion-cube.png"
+          },
+          "suggestedUse": "Room and favorites",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "turret",
+          "name": "Aperture turret",
+          "svg": "svg/portal/turret.svg",
+          "symbolId": "portal-turret",
+          "png": {
+            "32": "png/32/portal/turret.png",
+            "64": "png/64/portal/turret.png",
+            "128": "png/128/portal/turret.png",
+            "256": "png/256/portal/turret.png"
+          },
+          "suggestedUse": "Voice",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "exit-sign",
+          "name": "Test chamber exit",
+          "svg": "svg/portal/exit-sign.svg",
+          "symbolId": "portal-exit-sign",
+          "png": {
+            "32": "png/32/portal/exit-sign.png",
+            "64": "png/64/portal/exit-sign.png",
+            "128": "png/128/portal/exit-sign.png",
+            "256": "png/256/portal/exit-sign.png"
+          },
+          "suggestedUse": "Navigation and pause",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "floor-button",
+          "name": "Test chamber button",
+          "svg": "svg/portal/floor-button.svg",
+          "symbolId": "portal-floor-button",
+          "png": {
+            "32": "png/32/portal/floor-button.png",
+            "64": "png/64/portal/floor-button.png",
+            "128": "png/128/portal/floor-button.png",
+            "256": "png/256/portal/floor-button.png"
+          },
+          "suggestedUse": "Checks and actions",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "cake",
+          "name": "Portal cake",
+          "svg": "svg/portal/cake.svg",
+          "symbolId": "portal-cake",
+          "png": {
+            "32": "png/32/portal/cake.png",
+            "64": "png/64/portal/cake.png",
+            "128": "png/128/portal/cake.png",
+            "256": "png/256/portal/cake.png"
+          },
+          "suggestedUse": "Achievements",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        }
+      ]
+    },
+    {
+      "id": "cs16",
+      "name": "Counter-Strike 1.6",
+      "appearance": "dark",
+      "aliases": [],
+      "registeredInCurrentApp": true,
+      "assets": [
+        {
+          "id": "counter-strike-mark",
+          "name": "Classic Counter-Strike mark",
+          "svg": "svg/cs16/counter-strike-mark.svg",
+          "symbolId": "cs16-counter-strike-mark",
+          "png": {
+            "32": "png/32/cs16/counter-strike-mark.png",
+            "64": "png/64/cs16/counter-strike-mark.png",
+            "128": "png/128/cs16/counter-strike-mark.png",
+            "256": "png/256/cs16/counter-strike-mark.png"
+          },
+          "suggestedUse": "Brand accent",
+          "pixelArt": false,
+          "provenance": "sourced",
+          "source": {
+            "origin": "Simple Icons",
+            "url": "https://github.com/simple-icons/simple-icons/blob/develop/icons/counterstrike.svg",
+            "license": "CC0-1.0"
+          }
+        },
+        {
+          "id": "defuse-kit",
+          "name": "Classic defuse kit",
+          "svg": "svg/cs16/defuse-kit.svg",
+          "symbolId": "cs16-defuse-kit",
+          "png": {
+            "32": "png/32/cs16/defuse-kit.png",
+            "64": "png/64/cs16/defuse-kit.png",
+            "128": "png/128/cs16/defuse-kit.png",
+            "256": "png/256/cs16/defuse-kit.png"
+          },
+          "suggestedUse": "Checks",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "c4-timer",
+          "name": "Classic bomb timer",
+          "svg": "svg/cs16/c4-timer.svg",
+          "symbolId": "cs16-c4-timer",
+          "png": {
+            "32": "png/32/cs16/c4-timer.png",
+            "64": "png/64/cs16/c4-timer.png",
+            "128": "png/128/cs16/c4-timer.png",
+            "256": "png/256/cs16/c4-timer.png"
+          },
+          "suggestedUse": "Thinking",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "kevlar",
+          "name": "Classic kevlar",
+          "svg": "svg/cs16/kevlar.svg",
+          "symbolId": "cs16-kevlar",
+          "png": {
+            "32": "png/32/cs16/kevlar.png",
+            "64": "png/64/cs16/kevlar.png",
+            "128": "png/128/cs16/kevlar.png",
+            "256": "png/256/cs16/kevlar.png"
+          },
+          "suggestedUse": "Connection health",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "crosshair",
+          "name": "GoldSrc crosshair",
+          "svg": "svg/cs16/crosshair.svg",
+          "symbolId": "cs16-crosshair",
+          "png": {
+            "32": "png/32/cs16/crosshair.png",
+            "64": "png/64/cs16/crosshair.png",
+            "128": "png/128/cs16/crosshair.png",
+            "256": "png/256/cs16/crosshair.png"
+          },
+          "suggestedUse": "Listening",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "radio",
+          "name": "Classic team radio",
+          "svg": "svg/cs16/radio.svg",
+          "symbolId": "cs16-radio",
+          "png": {
+            "32": "png/32/cs16/radio.png",
+            "64": "png/64/cs16/radio.png",
+            "128": "png/128/cs16/radio.png",
+            "256": "png/256/cs16/radio.png"
+          },
+          "suggestedUse": "Voice",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "rescue",
+          "name": "Rescue symbol",
+          "svg": "svg/cs16/rescue.svg",
+          "symbolId": "cs16-rescue",
+          "png": {
+            "32": "png/32/cs16/rescue.png",
+            "64": "png/64/cs16/rescue.png",
+            "128": "png/128/cs16/rescue.png",
+            "256": "png/256/cs16/rescue.png"
+          },
+          "suggestedUse": "Recover and reconnect",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "round-timer",
+          "name": "Round timer",
+          "svg": "svg/cs16/round-timer.svg",
+          "symbolId": "cs16-round-timer",
+          "png": {
+            "32": "png/32/cs16/round-timer.png",
+            "64": "png/64/cs16/round-timer.png",
+            "128": "png/128/cs16/round-timer.png",
+            "256": "png/256/cs16/round-timer.png"
+          },
+          "suggestedUse": "Usage and latency",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        }
+      ]
+    },
+    {
+      "id": "hev",
+      "name": "Half-Life HEV suit",
+      "appearance": "dark",
+      "aliases": [],
+      "registeredInCurrentApp": true,
+      "assets": [
+        {
+          "id": "lambda",
+          "name": "Half-Life lambda",
+          "svg": "svg/hev/lambda.svg",
+          "symbolId": "hev-lambda",
+          "png": {
+            "32": "png/32/hev/lambda.png",
+            "64": "png/64/hev/lambda.png",
+            "128": "png/128/hev/lambda.png",
+            "256": "png/256/hev/lambda.png"
+          },
+          "suggestedUse": "Brand accent",
+          "pixelArt": false,
+          "provenance": "sourced",
+          "source": {
+            "origin": "Papirus Icon Theme",
+            "url": "https://github.com/PapirusDevelopmentTeam/papirus-icon-theme/blob/master/Papirus/64x64/apps/half-life.svg",
+            "license": "GPL-3.0"
+          }
+        },
+        {
+          "id": "black-mesa",
+          "name": "Black Mesa emblem",
+          "svg": "svg/hev/black-mesa.svg",
+          "symbolId": "hev-black-mesa",
+          "png": {
+            "32": "png/32/hev/black-mesa.png",
+            "64": "png/64/hev/black-mesa.png",
+            "128": "png/128/hev/black-mesa.png",
+            "256": "png/256/hev/black-mesa.png"
+          },
+          "suggestedUse": "Brand accent and settings",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "hev-armor",
+          "name": "HEV chest plate",
+          "svg": "svg/hev/hev-armor.svg",
+          "symbolId": "hev-hev-armor",
+          "png": {
+            "32": "png/32/hev/hev-armor.png",
+            "64": "png/64/hev/hev-armor.png",
+            "128": "png/128/hev/hev-armor.png",
+            "256": "png/256/hev/hev-armor.png"
+          },
+          "suggestedUse": "System health",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "health",
+          "name": "HEV medical cross",
+          "svg": "svg/hev/health.svg",
+          "symbolId": "hev-health",
+          "png": {
+            "32": "png/32/hev/health.png",
+            "64": "png/64/hev/health.png",
+            "128": "png/128/hev/health.png",
+            "256": "png/256/hev/health.png"
+          },
+          "suggestedUse": "Checks",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "battery",
+          "name": "Suit battery",
+          "svg": "svg/hev/battery.svg",
+          "symbolId": "hev-battery",
+          "png": {
+            "32": "png/32/hev/battery.png",
+            "64": "png/64/hev/battery.png",
+            "128": "png/128/hev/battery.png",
+            "256": "png/256/hev/battery.png"
+          },
+          "suggestedUse": "Usage",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "radiation",
+          "name": "Radiation emblem",
+          "svg": "svg/hev/radiation.svg",
+          "symbolId": "hev-radiation",
+          "png": {
+            "32": "png/32/hev/radiation.png",
+            "64": "png/64/hev/radiation.png",
+            "128": "png/128/hev/radiation.png",
+            "256": "png/256/hev/radiation.png"
+          },
+          "suggestedUse": "Errors",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "geiger",
+          "name": "Geiger signal",
+          "svg": "svg/hev/geiger.svg",
+          "symbolId": "hev-geiger",
+          "png": {
+            "32": "png/32/hev/geiger.png",
+            "64": "png/64/hev/geiger.png",
+            "128": "png/128/hev/geiger.png",
+            "256": "png/256/hev/geiger.png"
+          },
+          "suggestedUse": "Listening and activity",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "flashlight",
+          "name": "HEV flashlight",
+          "svg": "svg/hev/flashlight.svg",
+          "symbolId": "hev-flashlight",
+          "png": {
+            "32": "png/32/hev/flashlight.png",
+            "64": "png/64/hev/flashlight.png",
+            "128": "png/128/hev/flashlight.png",
+            "256": "png/256/hev/flashlight.png"
+          },
+          "suggestedUse": "Quick actions",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        }
+      ]
+    },
+    {
+      "id": "l4d",
+      "name": "Left 4 Dead",
+      "appearance": "dark",
+      "aliases": [],
+      "registeredInCurrentApp": true,
+      "assets": [
+        {
+          "id": "left-4-dead-mark",
+          "name": "Left 4 Dead mark",
+          "svg": "svg/l4d/left-4-dead-mark.svg",
+          "symbolId": "l4d-left-4-dead-mark",
+          "png": {
+            "32": "png/32/l4d/left-4-dead-mark.png",
+            "64": "png/64/l4d/left-4-dead-mark.png",
+            "128": "png/128/l4d/left-4-dead-mark.png",
+            "256": "png/256/l4d/left-4-dead-mark.png"
+          },
+          "suggestedUse": "Brand accent",
+          "pixelArt": false,
+          "provenance": "sourced",
+          "source": {
+            "origin": "Papirus Icon Theme",
+            "url": "https://github.com/PapirusDevelopmentTeam/papirus-icon-theme/blob/master/Papirus/64x64/apps/steam_icon_500.svg",
+            "license": "GPL-3.0"
+          }
+        },
+        {
+          "id": "medkit",
+          "name": "First aid kit",
+          "svg": "svg/l4d/medkit.svg",
+          "symbolId": "l4d-medkit",
+          "png": {
+            "32": "png/32/l4d/medkit.png",
+            "64": "png/64/l4d/medkit.png",
+            "128": "png/128/l4d/medkit.png",
+            "256": "png/256/l4d/medkit.png"
+          },
+          "suggestedUse": "Checks",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "pills",
+          "name": "Pain pills",
+          "svg": "svg/l4d/pills.svg",
+          "symbolId": "l4d-pills",
+          "png": {
+            "32": "png/32/l4d/pills.png",
+            "64": "png/64/l4d/pills.png",
+            "128": "png/128/l4d/pills.png",
+            "256": "png/256/l4d/pills.png"
+          },
+          "suggestedUse": "Recovery",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "adrenaline",
+          "name": "Adrenaline syringe",
+          "svg": "svg/l4d/adrenaline.svg",
+          "symbolId": "l4d-adrenaline",
+          "png": {
+            "32": "png/32/l4d/adrenaline.png",
+            "64": "png/64/l4d/adrenaline.png",
+            "128": "png/128/l4d/adrenaline.png",
+            "256": "png/256/l4d/adrenaline.png"
+          },
+          "suggestedUse": "Quick actions",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "safe-room",
+          "name": "Safe room door",
+          "svg": "svg/l4d/safe-room.svg",
+          "symbolId": "l4d-safe-room",
+          "png": {
+            "32": "png/32/l4d/safe-room.png",
+            "64": "png/64/l4d/safe-room.png",
+            "128": "png/128/l4d/safe-room.png",
+            "256": "png/256/l4d/safe-room.png"
+          },
+          "suggestedUse": "Ready and successful checks",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "four-finger-hand",
+          "name": "Four-finger infected hand",
+          "svg": "svg/l4d/four-finger-hand.svg",
+          "symbolId": "l4d-four-finger-hand",
+          "png": {
+            "32": "png/32/l4d/four-finger-hand.png",
+            "64": "png/64/l4d/four-finger-hand.png",
+            "128": "png/128/l4d/four-finger-hand.png",
+            "256": "png/256/l4d/four-finger-hand.png"
+          },
+          "suggestedUse": "Health and infection",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "incapacitated",
+          "name": "Incapacitated survivor",
+          "svg": "svg/l4d/incapacitated.svg",
+          "symbolId": "l4d-incapacitated",
+          "png": {
+            "32": "png/32/l4d/incapacitated.png",
+            "64": "png/64/l4d/incapacitated.png",
+            "128": "png/128/l4d/incapacitated.png",
+            "256": "png/256/l4d/incapacitated.png"
+          },
+          "suggestedUse": "Error",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "rescue",
+          "name": "Rescue teammate",
+          "svg": "svg/l4d/rescue.svg",
+          "symbolId": "l4d-rescue",
+          "png": {
+            "32": "png/32/l4d/rescue.png",
+            "64": "png/64/l4d/rescue.png",
+            "128": "png/128/l4d/rescue.png",
+            "256": "png/256/l4d/rescue.png"
+          },
+          "suggestedUse": "Reconnect",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        }
+      ]
+    },
+    {
+      "id": "winxp",
+      "name": "Windows XP",
+      "appearance": "light",
+      "aliases": [],
+      "registeredInCurrentApp": true,
+      "assets": [
+        {
+          "id": "windows-flag",
+          "name": "Windows XP flag",
+          "svg": "svg/winxp/windows-flag.svg",
+          "symbolId": "winxp-windows-flag",
+          "png": {
+            "32": "png/32/winxp/windows-flag.png",
+            "64": "png/64/winxp/windows-flag.png",
+            "128": "png/128/winxp/windows-flag.png",
+            "256": "png/256/winxp/windows-flag.png"
+          },
+          "suggestedUse": "Start and brand",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "my-computer",
+          "name": "My Computer",
+          "svg": "svg/winxp/my-computer.svg",
+          "symbolId": "winxp-my-computer",
+          "png": {
+            "32": "png/32/winxp/my-computer.png",
+            "64": "png/64/winxp/my-computer.png",
+            "128": "png/128/winxp/my-computer.png",
+            "256": "png/256/winxp/my-computer.png"
+          },
+          "suggestedUse": "Setup",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "recycle-bin",
+          "name": "Recycle Bin",
+          "svg": "svg/winxp/recycle-bin.svg",
+          "symbolId": "winxp-recycle-bin",
+          "png": {
+            "32": "png/32/winxp/recycle-bin.png",
+            "64": "png/64/winxp/recycle-bin.png",
+            "128": "png/128/winxp/recycle-bin.png",
+            "256": "png/256/winxp/recycle-bin.png"
+          },
+          "suggestedUse": "Clear and cleanup",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "folder",
+          "name": "XP folder",
+          "svg": "svg/winxp/folder.svg",
+          "symbolId": "winxp-folder",
+          "png": {
+            "32": "png/32/winxp/folder.png",
+            "64": "png/64/winxp/folder.png",
+            "128": "png/128/winxp/folder.png",
+            "256": "png/256/winxp/folder.png"
+          },
+          "suggestedUse": "Rooms and files",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "speaker",
+          "name": "XP speaker",
+          "svg": "svg/winxp/speaker.svg",
+          "symbolId": "winxp-speaker",
+          "png": {
+            "32": "png/32/winxp/speaker.png",
+            "64": "png/64/winxp/speaker.png",
+            "128": "png/128/winxp/speaker.png",
+            "256": "png/256/winxp/speaker.png"
+          },
+          "suggestedUse": "Sound",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "network",
+          "name": "XP network",
+          "svg": "svg/winxp/network.svg",
+          "symbolId": "winxp-network",
+          "png": {
+            "32": "png/32/winxp/network.png",
+            "64": "png/64/winxp/network.png",
+            "128": "png/128/winxp/network.png",
+            "256": "png/256/winxp/network.png"
+          },
+          "suggestedUse": "Connection",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "error",
+          "name": "XP error",
+          "svg": "svg/winxp/error.svg",
+          "symbolId": "winxp-error",
+          "png": {
+            "32": "png/32/winxp/error.png",
+            "64": "png/64/winxp/error.png",
+            "128": "png/128/winxp/error.png",
+            "256": "png/256/winxp/error.png"
+          },
+          "suggestedUse": "Error",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "information",
+          "name": "XP information",
+          "svg": "svg/winxp/information.svg",
+          "symbolId": "winxp-information",
+          "png": {
+            "32": "png/32/winxp/information.png",
+            "64": "png/64/winxp/information.png",
+            "128": "png/128/winxp/information.png",
+            "256": "png/256/winxp/information.png"
+          },
+          "suggestedUse": "Help and notices",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        }
+      ]
+    },
+    {
+      "id": "doom",
+      "name": "DOOM (classic)",
+      "appearance": "dark",
+      "aliases": [],
+      "registeredInCurrentApp": true,
+      "assets": [
+        {
+          "id": "doom-game-icon",
+          "name": "Classic DOOM game icon",
+          "svg": "svg/doom/doom-game-icon.svg",
+          "symbolId": "doom-doom-game-icon",
+          "png": {
+            "32": "png/32/doom/doom-game-icon.png",
+            "64": "png/64/doom/doom-game-icon.png",
+            "128": "png/128/doom/doom-game-icon.png",
+            "256": "png/256/doom/doom-game-icon.png"
+          },
+          "suggestedUse": "Brand accent",
+          "pixelArt": true,
+          "provenance": "sourced",
+          "source": {
+            "origin": "Papirus Icon Theme",
+            "url": "https://github.com/PapirusDevelopmentTeam/papirus-icon-theme/blob/master/Papirus/64x64/apps/doom.svg",
+            "license": "GPL-3.0"
+          }
+        },
+        {
+          "id": "red-keycard",
+          "name": "Red keycard",
+          "svg": "svg/doom/red-keycard.svg",
+          "symbolId": "doom-red-keycard",
+          "png": {
+            "32": "png/32/doom/red-keycard.png",
+            "64": "png/64/doom/red-keycard.png",
+            "128": "png/128/doom/red-keycard.png",
+            "256": "png/256/doom/red-keycard.png"
+          },
+          "suggestedUse": "Error and locked state",
+          "pixelArt": true,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "blue-keycard",
+          "name": "Blue keycard",
+          "svg": "svg/doom/blue-keycard.svg",
+          "symbolId": "doom-blue-keycard",
+          "png": {
+            "32": "png/32/doom/blue-keycard.png",
+            "64": "png/64/doom/blue-keycard.png",
+            "128": "png/128/doom/blue-keycard.png",
+            "256": "png/256/doom/blue-keycard.png"
+          },
+          "suggestedUse": "Listening and access",
+          "pixelArt": true,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "yellow-keycard",
+          "name": "Yellow keycard",
+          "svg": "svg/doom/yellow-keycard.svg",
+          "symbolId": "doom-yellow-keycard",
+          "png": {
+            "32": "png/32/doom/yellow-keycard.png",
+            "64": "png/64/doom/yellow-keycard.png",
+            "128": "png/128/doom/yellow-keycard.png",
+            "256": "png/256/doom/yellow-keycard.png"
+          },
+          "suggestedUse": "Thinking",
+          "pixelArt": true,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "health",
+          "name": "DOOM health cross",
+          "svg": "svg/doom/health.svg",
+          "symbolId": "doom-health",
+          "png": {
+            "32": "png/32/doom/health.png",
+            "64": "png/64/doom/health.png",
+            "128": "png/128/doom/health.png",
+            "256": "png/256/doom/health.png"
+          },
+          "suggestedUse": "Checks",
+          "pixelArt": true,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "armor",
+          "name": "DOOM armor",
+          "svg": "svg/doom/armor.svg",
+          "symbolId": "doom-armor",
+          "png": {
+            "32": "png/32/doom/armor.png",
+            "64": "png/64/doom/armor.png",
+            "128": "png/128/doom/armor.png",
+            "256": "png/256/doom/armor.png"
+          },
+          "suggestedUse": "System health",
+          "pixelArt": true,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "ammo",
+          "name": "DOOM ammunition",
+          "svg": "svg/doom/ammo.svg",
+          "symbolId": "doom-ammo",
+          "png": {
+            "32": "png/32/doom/ammo.png",
+            "64": "png/64/doom/ammo.png",
+            "128": "png/128/doom/ammo.png",
+            "256": "png/256/doom/ammo.png"
+          },
+          "suggestedUse": "Resources",
+          "pixelArt": true,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "barrel",
+          "name": "Toxic barrel",
+          "svg": "svg/doom/barrel.svg",
+          "symbolId": "doom-barrel",
+          "png": {
+            "32": "png/32/doom/barrel.png",
+            "64": "png/64/doom/barrel.png",
+            "128": "png/128/doom/barrel.png",
+            "256": "png/256/doom/barrel.png"
+          },
+          "suggestedUse": "Warnings",
+          "pixelArt": true,
+          "provenance": "custom theme-inspired vector"
+        }
+      ]
+    },
+    {
+      "id": "quake",
+      "name": "Quake (1996)",
+      "appearance": "dark",
+      "aliases": [],
+      "registeredInCurrentApp": true,
+      "assets": [
+        {
+          "id": "quake-rune",
+          "name": "Quake rune",
+          "svg": "svg/quake/quake-rune.svg",
+          "symbolId": "quake-quake-rune",
+          "png": {
+            "32": "png/32/quake/quake-rune.png",
+            "64": "png/64/quake/quake-rune.png",
+            "128": "png/128/quake/quake-rune.png",
+            "256": "png/256/quake/quake-rune.png"
+          },
+          "suggestedUse": "Brand accent",
+          "pixelArt": false,
+          "provenance": "sourced",
+          "source": {
+            "origin": "Papirus Icon Theme",
+            "url": "https://github.com/PapirusDevelopmentTeam/papirus-icon-theme/blob/master/Papirus/64x64/apps/quake.svg",
+            "license": "GPL-3.0"
+          }
+        },
+        {
+          "id": "quad-damage",
+          "name": "Quad Damage motif",
+          "svg": "svg/quake/quad-damage.svg",
+          "symbolId": "quake-quad-damage",
+          "png": {
+            "32": "png/32/quake/quad-damage.png",
+            "64": "png/64/quake/quad-damage.png",
+            "128": "png/128/quake/quad-damage.png",
+            "256": "png/256/quake/quad-damage.png"
+          },
+          "suggestedUse": "Milestones",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "health",
+          "name": "Quake health",
+          "svg": "svg/quake/health.svg",
+          "symbolId": "quake-health",
+          "png": {
+            "32": "png/32/quake/health.png",
+            "64": "png/64/quake/health.png",
+            "128": "png/128/quake/health.png",
+            "256": "png/256/quake/health.png"
+          },
+          "suggestedUse": "Checks",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "armor",
+          "name": "Quake armor",
+          "svg": "svg/quake/armor.svg",
+          "symbolId": "quake-armor",
+          "png": {
+            "32": "png/32/quake/armor.png",
+            "64": "png/64/quake/armor.png",
+            "128": "png/128/quake/armor.png",
+            "256": "png/256/quake/armor.png"
+          },
+          "suggestedUse": "System health",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "runestone",
+          "name": "Carved runestone",
+          "svg": "svg/quake/runestone.svg",
+          "symbolId": "quake-runestone",
+          "png": {
+            "32": "png/32/quake/runestone.png",
+            "64": "png/64/quake/runestone.png",
+            "128": "png/128/quake/runestone.png",
+            "256": "png/256/quake/runestone.png"
+          },
+          "suggestedUse": "Settings",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "nail-ammo",
+          "name": "Nail ammunition",
+          "svg": "svg/quake/nail-ammo.svg",
+          "symbolId": "quake-nail-ammo",
+          "png": {
+            "32": "png/32/quake/nail-ammo.png",
+            "64": "png/64/quake/nail-ammo.png",
+            "128": "png/128/quake/nail-ammo.png",
+            "256": "png/256/quake/nail-ammo.png"
+          },
+          "suggestedUse": "Usage",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "teleporter",
+          "name": "Quake teleporter",
+          "svg": "svg/quake/teleporter.svg",
+          "symbolId": "quake-teleporter",
+          "png": {
+            "32": "png/32/quake/teleporter.png",
+            "64": "png/64/quake/teleporter.png",
+            "128": "png/128/quake/teleporter.png",
+            "256": "png/256/quake/teleporter.png"
+          },
+          "suggestedUse": "Connect",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "lightning",
+          "name": "Lightning bolt",
+          "svg": "svg/quake/lightning.svg",
+          "symbolId": "quake-lightning",
+          "png": {
+            "32": "png/32/quake/lightning.png",
+            "64": "png/64/quake/lightning.png",
+            "128": "png/128/quake/lightning.png",
+            "256": "png/256/quake/lightning.png"
+          },
+          "suggestedUse": "Voice and quick actions",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        }
+      ]
+    },
+    {
+      "id": "pipboy",
+      "name": "Fallout Pip-Boy",
+      "appearance": "dark",
+      "aliases": [],
+      "registeredInCurrentApp": true,
+      "assets": [
+        {
+          "id": "vault-tec",
+          "name": "Vault-Tec gear motif",
+          "svg": "svg/pipboy/vault-tec.svg",
+          "symbolId": "pipboy-vault-tec",
+          "png": {
+            "32": "png/32/pipboy/vault-tec.png",
+            "64": "png/64/pipboy/vault-tec.png",
+            "128": "png/128/pipboy/vault-tec.png",
+            "256": "png/256/pipboy/vault-tec.png"
+          },
+          "suggestedUse": "Brand accent",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "pip-boy-device",
+          "name": "Pip-Boy device",
+          "svg": "svg/pipboy/pip-boy-device.svg",
+          "symbolId": "pipboy-pip-boy-device",
+          "png": {
+            "32": "png/32/pipboy/pip-boy-device.png",
+            "64": "png/64/pipboy/pip-boy-device.png",
+            "128": "png/128/pipboy/pip-boy-device.png",
+            "256": "png/256/pipboy/pip-boy-device.png"
+          },
+          "suggestedUse": "Setup",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "perk-star",
+          "name": "Perk star",
+          "svg": "svg/pipboy/perk-star.svg",
+          "symbolId": "pipboy-perk-star",
+          "png": {
+            "32": "png/32/pipboy/perk-star.png",
+            "64": "png/64/pipboy/perk-star.png",
+            "128": "png/128/pipboy/perk-star.png",
+            "256": "png/256/pipboy/perk-star.png"
+          },
+          "suggestedUse": "Achievements",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "radiation",
+          "name": "Pip-Boy radiation",
+          "svg": "svg/pipboy/radiation.svg",
+          "symbolId": "pipboy-radiation",
+          "png": {
+            "32": "png/32/pipboy/radiation.png",
+            "64": "png/64/pipboy/radiation.png",
+            "128": "png/128/pipboy/radiation.png",
+            "256": "png/256/pipboy/radiation.png"
+          },
+          "suggestedUse": "Warnings",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "carry-weight",
+          "name": "Carry weight",
+          "svg": "svg/pipboy/carry-weight.svg",
+          "symbolId": "pipboy-carry-weight",
+          "png": {
+            "32": "png/32/pipboy/carry-weight.png",
+            "64": "png/64/pipboy/carry-weight.png",
+            "128": "png/128/pipboy/carry-weight.png",
+            "256": "png/256/pipboy/carry-weight.png"
+          },
+          "suggestedUse": "Usage",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "atomic",
+          "name": "Atomic orbit",
+          "svg": "svg/pipboy/atomic.svg",
+          "symbolId": "pipboy-atomic",
+          "png": {
+            "32": "png/32/pipboy/atomic.png",
+            "64": "png/64/pipboy/atomic.png",
+            "128": "png/128/pipboy/atomic.png",
+            "256": "png/256/pipboy/atomic.png"
+          },
+          "suggestedUse": "Thinking",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "health",
+          "name": "Pip-Boy health",
+          "svg": "svg/pipboy/health.svg",
+          "symbolId": "pipboy-health",
+          "png": {
+            "32": "png/32/pipboy/health.png",
+            "64": "png/64/pipboy/health.png",
+            "128": "png/128/pipboy/health.png",
+            "256": "png/256/pipboy/health.png"
+          },
+          "suggestedUse": "Checks",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "radio",
+          "name": "Pip-Boy radio",
+          "svg": "svg/pipboy/radio.svg",
+          "symbolId": "pipboy-radio",
+          "png": {
+            "32": "png/32/pipboy/radio.png",
+            "64": "png/64/pipboy/radio.png",
+            "128": "png/128/pipboy/radio.png",
+            "256": "png/256/pipboy/radio.png"
+          },
+          "suggestedUse": "Voice and music",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        }
+      ]
+    },
+    {
+      "id": "combine",
+      "name": "Half-Life 2 Combine",
+      "appearance": "dark",
+      "aliases": [],
+      "registeredInCurrentApp": true,
+      "assets": [
+        {
+          "id": "combine-insignia",
+          "name": "Combine-style insignia",
+          "svg": "svg/combine/combine-insignia.svg",
+          "symbolId": "combine-combine-insignia",
+          "png": {
+            "32": "png/32/combine/combine-insignia.png",
+            "64": "png/64/combine/combine-insignia.png",
+            "128": "png/128/combine/combine-insignia.png",
+            "256": "png/256/combine/combine-insignia.png"
+          },
+          "suggestedUse": "Brand accent",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "scanner",
+          "name": "Overwatch scanner",
+          "svg": "svg/combine/scanner.svg",
+          "symbolId": "combine-scanner",
+          "png": {
+            "32": "png/32/combine/scanner.png",
+            "64": "png/64/combine/scanner.png",
+            "128": "png/128/combine/scanner.png",
+            "256": "png/256/combine/scanner.png"
+          },
+          "suggestedUse": "Listening",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "citadel",
+          "name": "Citadel",
+          "svg": "svg/combine/citadel.svg",
+          "symbolId": "combine-citadel",
+          "png": {
+            "32": "png/32/combine/citadel.png",
+            "64": "png/64/combine/citadel.png",
+            "128": "png/128/combine/citadel.png",
+            "256": "png/256/combine/citadel.png"
+          },
+          "suggestedUse": "Connection",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "stun-baton",
+          "name": "Stun baton",
+          "svg": "svg/combine/stun-baton.svg",
+          "symbolId": "combine-stun-baton",
+          "png": {
+            "32": "png/32/combine/stun-baton.png",
+            "64": "png/64/combine/stun-baton.png",
+            "128": "png/128/combine/stun-baton.png",
+            "256": "png/256/combine/stun-baton.png"
+          },
+          "suggestedUse": "Quick actions",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "radio",
+          "name": "Overwatch radio",
+          "svg": "svg/combine/radio.svg",
+          "symbolId": "combine-radio",
+          "png": {
+            "32": "png/32/combine/radio.png",
+            "64": "png/64/combine/radio.png",
+            "128": "png/128/combine/radio.png",
+            "256": "png/256/combine/radio.png"
+          },
+          "suggestedUse": "Voice",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "civil-protection-mask",
+          "name": "Civil Protection mask",
+          "svg": "svg/combine/civil-protection-mask.svg",
+          "symbolId": "combine-civil-protection-mask",
+          "png": {
+            "32": "png/32/combine/civil-protection-mask.png",
+            "64": "png/64/combine/civil-protection-mask.png",
+            "128": "png/128/combine/civil-protection-mask.png",
+            "256": "png/256/combine/civil-protection-mask.png"
+          },
+          "suggestedUse": "Setup",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "checkpoint",
+          "name": "Checkpoint barrier",
+          "svg": "svg/combine/checkpoint.svg",
+          "symbolId": "combine-checkpoint",
+          "png": {
+            "32": "png/32/combine/checkpoint.png",
+            "64": "png/64/combine/checkpoint.png",
+            "128": "png/128/combine/checkpoint.png",
+            "256": "png/256/combine/checkpoint.png"
+          },
+          "suggestedUse": "Checks",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "alert",
+          "name": "Overwatch alert",
+          "svg": "svg/combine/alert.svg",
+          "symbolId": "combine-alert",
+          "png": {
+            "32": "png/32/combine/alert.png",
+            "64": "png/64/combine/alert.png",
+            "128": "png/128/combine/alert.png",
+            "256": "png/256/combine/alert.png"
+          },
+          "suggestedUse": "Error",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        }
+      ]
+    },
+    {
+      "id": "deadlock",
+      "name": "Deadlock",
+      "appearance": "dark",
+      "aliases": [],
+      "registeredInCurrentApp": true,
+      "assets": [
+        {
+          "id": "spirit-flame",
+          "name": "Spirit flame",
+          "svg": "svg/deadlock/spirit-flame.svg",
+          "symbolId": "deadlock-spirit-flame",
+          "png": {
+            "32": "png/32/deadlock/spirit-flame.png",
+            "64": "png/64/deadlock/spirit-flame.png",
+            "128": "png/128/deadlock/spirit-flame.png",
+            "256": "png/256/deadlock/spirit-flame.png"
+          },
+          "suggestedUse": "Brand accent and speaking",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "occult-sigil",
+          "name": "Occult sigil",
+          "svg": "svg/deadlock/occult-sigil.svg",
+          "symbolId": "deadlock-occult-sigil",
+          "png": {
+            "32": "png/32/deadlock/occult-sigil.png",
+            "64": "png/64/deadlock/occult-sigil.png",
+            "128": "png/128/deadlock/occult-sigil.png",
+            "256": "png/256/deadlock/occult-sigil.png"
+          },
+          "suggestedUse": "Thinking",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "souls-vial",
+          "name": "Souls vial motif",
+          "svg": "svg/deadlock/souls-vial.svg",
+          "symbolId": "deadlock-souls-vial",
+          "png": {
+            "32": "png/32/deadlock/souls-vial.png",
+            "64": "png/64/deadlock/souls-vial.png",
+            "128": "png/128/deadlock/souls-vial.png",
+            "256": "png/256/deadlock/souls-vial.png"
+          },
+          "suggestedUse": "Usage",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "patron-totem",
+          "name": "Patron-style totem",
+          "svg": "svg/deadlock/patron-totem.svg",
+          "symbolId": "deadlock-patron-totem",
+          "png": {
+            "32": "png/32/deadlock/patron-totem.png",
+            "64": "png/64/deadlock/patron-totem.png",
+            "128": "png/128/deadlock/patron-totem.png",
+            "256": "png/256/deadlock/patron-totem.png"
+          },
+          "suggestedUse": "Connection",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "transit-token",
+          "name": "Transit token",
+          "svg": "svg/deadlock/transit-token.svg",
+          "symbolId": "deadlock-transit-token",
+          "png": {
+            "32": "png/32/deadlock/transit-token.png",
+            "64": "png/64/deadlock/transit-token.png",
+            "128": "png/128/deadlock/transit-token.png",
+            "256": "png/256/deadlock/transit-token.png"
+          },
+          "suggestedUse": "Room",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "soul-currency",
+          "name": "Spirit currency",
+          "svg": "svg/deadlock/soul-currency.svg",
+          "symbolId": "deadlock-soul-currency",
+          "png": {
+            "32": "png/32/deadlock/soul-currency.png",
+            "64": "png/64/deadlock/soul-currency.png",
+            "128": "png/128/deadlock/soul-currency.png",
+            "256": "png/256/deadlock/soul-currency.png"
+          },
+          "suggestedUse": "Milestones",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "art-deco-badge",
+          "name": "Art Deco badge",
+          "svg": "svg/deadlock/art-deco-badge.svg",
+          "symbolId": "deadlock-art-deco-badge",
+          "png": {
+            "32": "png/32/deadlock/art-deco-badge.png",
+            "64": "png/64/deadlock/art-deco-badge.png",
+            "128": "png/128/deadlock/art-deco-badge.png",
+            "256": "png/256/deadlock/art-deco-badge.png"
+          },
+          "suggestedUse": "Notices",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "spectral-radio",
+          "name": "Spectral radio",
+          "svg": "svg/deadlock/spectral-radio.svg",
+          "symbolId": "deadlock-spectral-radio",
+          "png": {
+            "32": "png/32/deadlock/spectral-radio.png",
+            "64": "png/64/deadlock/spectral-radio.png",
+            "128": "png/128/deadlock/spectral-radio.png",
+            "256": "png/256/deadlock/spectral-radio.png"
+          },
+          "suggestedUse": "Voice",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        }
+      ]
+    },
+    {
+      "id": "minecraft",
+      "name": "Minecraft",
+      "appearance": "light",
+      "aliases": [],
+      "registeredInCurrentApp": true,
+      "assets": [
+        {
+          "id": "creeper-face",
+          "name": "Creeper face",
+          "svg": "svg/minecraft/creeper-face.svg",
+          "symbolId": "minecraft-creeper-face",
+          "png": {
+            "32": "png/32/minecraft/creeper-face.png",
+            "64": "png/64/minecraft/creeper-face.png",
+            "128": "png/128/minecraft/creeper-face.png",
+            "256": "png/256/minecraft/creeper-face.png"
+          },
+          "suggestedUse": "Brand accent",
+          "pixelArt": true,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "grass-block",
+          "name": "Grass block",
+          "svg": "svg/minecraft/grass-block.svg",
+          "symbolId": "minecraft-grass-block",
+          "png": {
+            "32": "png/32/minecraft/grass-block.png",
+            "64": "png/64/minecraft/grass-block.png",
+            "128": "png/128/minecraft/grass-block.png",
+            "256": "png/256/minecraft/grass-block.png"
+          },
+          "suggestedUse": "Room",
+          "pixelArt": true,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "diamond",
+          "name": "Diamond",
+          "svg": "svg/minecraft/diamond.svg",
+          "symbolId": "minecraft-diamond",
+          "png": {
+            "32": "png/32/minecraft/diamond.png",
+            "64": "png/64/minecraft/diamond.png",
+            "128": "png/128/minecraft/diamond.png",
+            "256": "png/256/minecraft/diamond.png"
+          },
+          "suggestedUse": "Milestones",
+          "pixelArt": true,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "pickaxe",
+          "name": "Diamond pickaxe",
+          "svg": "svg/minecraft/pickaxe.svg",
+          "symbolId": "minecraft-pickaxe",
+          "png": {
+            "32": "png/32/minecraft/pickaxe.png",
+            "64": "png/64/minecraft/pickaxe.png",
+            "128": "png/128/minecraft/pickaxe.png",
+            "256": "png/256/minecraft/pickaxe.png"
+          },
+          "suggestedUse": "Setup",
+          "pixelArt": true,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "heart",
+          "name": "Inventory heart",
+          "svg": "svg/minecraft/heart.svg",
+          "symbolId": "minecraft-heart",
+          "png": {
+            "32": "png/32/minecraft/heart.png",
+            "64": "png/64/minecraft/heart.png",
+            "128": "png/128/minecraft/heart.png",
+            "256": "png/256/minecraft/heart.png"
+          },
+          "suggestedUse": "Checks and health",
+          "pixelArt": true,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "chest",
+          "name": "Inventory chest",
+          "svg": "svg/minecraft/chest.svg",
+          "symbolId": "minecraft-chest",
+          "png": {
+            "32": "png/32/minecraft/chest.png",
+            "64": "png/64/minecraft/chest.png",
+            "128": "png/128/minecraft/chest.png",
+            "256": "png/256/minecraft/chest.png"
+          },
+          "suggestedUse": "Soundboard",
+          "pixelArt": true,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "music-disc",
+          "name": "Music disc",
+          "svg": "svg/minecraft/music-disc.svg",
+          "symbolId": "minecraft-music-disc",
+          "png": {
+            "32": "png/32/minecraft/music-disc.png",
+            "64": "png/64/minecraft/music-disc.png",
+            "128": "png/128/minecraft/music-disc.png",
+            "256": "png/256/minecraft/music-disc.png"
+          },
+          "suggestedUse": "Music",
+          "pixelArt": true,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "redstone",
+          "name": "Redstone dust",
+          "svg": "svg/minecraft/redstone.svg",
+          "symbolId": "minecraft-redstone",
+          "png": {
+            "32": "png/32/minecraft/redstone.png",
+            "64": "png/64/minecraft/redstone.png",
+            "128": "png/128/minecraft/redstone.png",
+            "256": "png/256/minecraft/redstone.png"
+          },
+          "suggestedUse": "Connection and activity",
+          "pixelArt": true,
+          "provenance": "custom theme-inspired vector"
+        }
+      ]
+    },
+    {
+      "id": "payday",
+      "name": "PAYDAY 2",
+      "appearance": "dark",
+      "aliases": [],
+      "registeredInCurrentApp": true,
+      "assets": [
+        {
+          "id": "payday-2-mark",
+          "name": "PAYDAY 2 mark",
+          "svg": "svg/payday/payday-2-mark.svg",
+          "symbolId": "payday-payday-2-mark",
+          "png": {
+            "32": "png/32/payday/payday-2-mark.png",
+            "64": "png/64/payday/payday-2-mark.png",
+            "128": "png/128/payday/payday-2-mark.png",
+            "256": "png/256/payday/payday-2-mark.png"
+          },
+          "suggestedUse": "Brand accent",
+          "pixelArt": false,
+          "provenance": "sourced",
+          "source": {
+            "origin": "Papirus Icon Theme",
+            "url": "https://github.com/PapirusDevelopmentTeam/papirus-icon-theme/blob/master/Papirus/64x64/apps/payday2.svg",
+            "license": "GPL-3.0"
+          }
+        },
+        {
+          "id": "dallas-mask",
+          "name": "Dallas-style mask",
+          "svg": "svg/payday/dallas-mask.svg",
+          "symbolId": "payday-dallas-mask",
+          "png": {
+            "32": "png/32/payday/dallas-mask.png",
+            "64": "png/64/payday/dallas-mask.png",
+            "128": "png/128/payday/dallas-mask.png",
+            "256": "png/256/payday/dallas-mask.png"
+          },
+          "suggestedUse": "Theme emblem",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "loot-bag",
+          "name": "Loot bag",
+          "svg": "svg/payday/loot-bag.svg",
+          "symbolId": "payday-loot-bag",
+          "png": {
+            "32": "png/32/payday/loot-bag.png",
+            "64": "png/64/payday/loot-bag.png",
+            "128": "png/128/payday/loot-bag.png",
+            "256": "png/256/payday/loot-bag.png"
+          },
+          "suggestedUse": "Usage and milestones",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "stealth-ghost",
+          "name": "Stealth ghost",
+          "svg": "svg/payday/stealth-ghost.svg",
+          "symbolId": "payday-stealth-ghost",
+          "png": {
+            "32": "png/32/payday/stealth-ghost.png",
+            "64": "png/64/payday/stealth-ghost.png",
+            "128": "png/128/payday/stealth-ghost.png",
+            "256": "png/256/payday/stealth-ghost.png"
+          },
+          "suggestedUse": "Idle and paused",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "pager",
+          "name": "Heist pager",
+          "svg": "svg/payday/pager.svg",
+          "symbolId": "payday-pager",
+          "png": {
+            "32": "png/32/payday/pager.png",
+            "64": "png/64/payday/pager.png",
+            "128": "png/128/payday/pager.png",
+            "256": "png/256/payday/pager.png"
+          },
+          "suggestedUse": "Voice and notices",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "drill",
+          "name": "Heist drill",
+          "svg": "svg/payday/drill.svg",
+          "symbolId": "payday-drill",
+          "png": {
+            "32": "png/32/payday/drill.png",
+            "64": "png/64/payday/drill.png",
+            "128": "png/128/payday/drill.png",
+            "256": "png/256/payday/drill.png"
+          },
+          "suggestedUse": "Thinking",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "contract",
+          "name": "Crime.net contract",
+          "svg": "svg/payday/contract.svg",
+          "symbolId": "payday-contract",
+          "png": {
+            "32": "png/32/payday/contract.png",
+            "64": "png/64/payday/contract.png",
+            "128": "png/128/payday/contract.png",
+            "256": "png/256/payday/contract.png"
+          },
+          "suggestedUse": "Room and settings",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "assault-badge",
+          "name": "Assault badge",
+          "svg": "svg/payday/assault-badge.svg",
+          "symbolId": "payday-assault-badge",
+          "png": {
+            "32": "png/32/payday/assault-badge.png",
+            "64": "png/64/payday/assault-badge.png",
+            "128": "png/128/payday/assault-badge.png",
+            "256": "png/256/payday/assault-badge.png"
+          },
+          "suggestedUse": "Error and activity",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        }
+      ]
+    },
+    {
+      "id": "dreamcast",
+      "name": "Sega Dreamcast",
+      "appearance": "light",
+      "aliases": [],
+      "registeredInCurrentApp": true,
+      "assets": [
+        {
+          "id": "dreamcast-swirl",
+          "name": "Dreamcast swirl",
+          "svg": "svg/dreamcast/dreamcast-swirl.svg",
+          "symbolId": "dreamcast-dreamcast-swirl",
+          "png": {
+            "32": "png/32/dreamcast/dreamcast-swirl.png",
+            "64": "png/64/dreamcast/dreamcast-swirl.png",
+            "128": "png/128/dreamcast/dreamcast-swirl.png",
+            "256": "png/256/dreamcast/dreamcast-swirl.png"
+          },
+          "suggestedUse": "Brand accent",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "sega-mark",
+          "name": "SEGA mark",
+          "svg": "svg/dreamcast/sega-mark.svg",
+          "symbolId": "dreamcast-sega-mark",
+          "png": {
+            "32": "png/32/dreamcast/sega-mark.png",
+            "64": "png/64/dreamcast/sega-mark.png",
+            "128": "png/128/dreamcast/sega-mark.png",
+            "256": "png/256/dreamcast/sega-mark.png"
+          },
+          "suggestedUse": "Brand accent",
+          "pixelArt": false,
+          "provenance": "sourced",
+          "source": {
+            "origin": "Simple Icons",
+            "url": "https://github.com/simple-icons/simple-icons/blob/develop/icons/sega.svg",
+            "license": "CC0-1.0"
+          }
+        },
+        {
+          "id": "vmu",
+          "name": "Dreamcast VMU",
+          "svg": "svg/dreamcast/vmu.svg",
+          "symbolId": "dreamcast-vmu",
+          "png": {
+            "32": "png/32/dreamcast/vmu.png",
+            "64": "png/64/dreamcast/vmu.png",
+            "128": "png/128/dreamcast/vmu.png",
+            "256": "png/256/dreamcast/vmu.png"
+          },
+          "suggestedUse": "Collapsed mode",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "controller",
+          "name": "Dreamcast controller",
+          "svg": "svg/dreamcast/controller.svg",
+          "symbolId": "dreamcast-controller",
+          "png": {
+            "32": "png/32/dreamcast/controller.png",
+            "64": "png/64/dreamcast/controller.png",
+            "128": "png/128/dreamcast/controller.png",
+            "256": "png/256/dreamcast/controller.png"
+          },
+          "suggestedUse": "Navigation",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "gd-rom",
+          "name": "GD-ROM disc",
+          "svg": "svg/dreamcast/gd-rom.svg",
+          "symbolId": "dreamcast-gd-rom",
+          "png": {
+            "32": "png/32/dreamcast/gd-rom.png",
+            "64": "png/64/dreamcast/gd-rom.png",
+            "128": "png/128/dreamcast/gd-rom.png",
+            "256": "png/256/dreamcast/gd-rom.png"
+          },
+          "suggestedUse": "Soundboard and media",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "memory-card",
+          "name": "Memory unit",
+          "svg": "svg/dreamcast/memory-card.svg",
+          "symbolId": "dreamcast-memory-card",
+          "png": {
+            "32": "png/32/dreamcast/memory-card.png",
+            "64": "png/64/dreamcast/memory-card.png",
+            "128": "png/128/dreamcast/memory-card.png",
+            "256": "png/256/dreamcast/memory-card.png"
+          },
+          "suggestedUse": "Storage",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "modem",
+          "name": "Dreamcast modem",
+          "svg": "svg/dreamcast/modem.svg",
+          "symbolId": "dreamcast-modem",
+          "png": {
+            "32": "png/32/dreamcast/modem.png",
+            "64": "png/64/dreamcast/modem.png",
+            "128": "png/128/dreamcast/modem.png",
+            "256": "png/256/dreamcast/modem.png"
+          },
+          "suggestedUse": "Connection",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "clock",
+          "name": "Console clock",
+          "svg": "svg/dreamcast/clock.svg",
+          "symbolId": "dreamcast-clock",
+          "png": {
+            "32": "png/32/dreamcast/clock.png",
+            "64": "png/64/dreamcast/clock.png",
+            "128": "png/128/dreamcast/clock.png",
+            "256": "png/256/dreamcast/clock.png"
+          },
+          "suggestedUse": "Latency and time",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        }
+      ]
+    },
+    {
+      "id": "gmod",
+      "name": "Garry’s Mod",
+      "appearance": "light",
+      "aliases": [],
+      "registeredInCurrentApp": true,
+      "assets": [
+        {
+          "id": "garrys-mod-mark",
+          "name": "Garry’s Mod mark",
+          "svg": "svg/gmod/garrys-mod-mark.svg",
+          "symbolId": "gmod-garrys-mod-mark",
+          "png": {
+            "32": "png/32/gmod/garrys-mod-mark.png",
+            "64": "png/64/gmod/garrys-mod-mark.png",
+            "128": "png/128/gmod/garrys-mod-mark.png",
+            "256": "png/256/gmod/garrys-mod-mark.png"
+          },
+          "suggestedUse": "Brand accent",
+          "pixelArt": false,
+          "provenance": "sourced",
+          "source": {
+            "origin": "Papirus Icon Theme",
+            "url": "https://github.com/PapirusDevelopmentTeam/papirus-icon-theme/blob/master/Papirus/64x64/apps/garrysmod.svg",
+            "license": "GPL-3.0"
+          }
+        },
+        {
+          "id": "physics-gun",
+          "name": "Physics gun",
+          "svg": "svg/gmod/physics-gun.svg",
+          "symbolId": "gmod-physics-gun",
+          "png": {
+            "32": "png/32/gmod/physics-gun.png",
+            "64": "png/64/gmod/physics-gun.png",
+            "128": "png/128/gmod/physics-gun.png",
+            "256": "png/256/gmod/physics-gun.png"
+          },
+          "suggestedUse": "Quick actions",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "tool-gun",
+          "name": "Tool gun",
+          "svg": "svg/gmod/tool-gun.svg",
+          "symbolId": "gmod-tool-gun",
+          "png": {
+            "32": "png/32/gmod/tool-gun.png",
+            "64": "png/64/gmod/tool-gun.png",
+            "128": "png/128/gmod/tool-gun.png",
+            "256": "png/256/gmod/tool-gun.png"
+          },
+          "suggestedUse": "Setup",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "spawn-menu",
+          "name": "Spawn menu",
+          "svg": "svg/gmod/spawn-menu.svg",
+          "symbolId": "gmod-spawn-menu",
+          "png": {
+            "32": "png/32/gmod/spawn-menu.png",
+            "64": "png/64/gmod/spawn-menu.png",
+            "128": "png/128/gmod/spawn-menu.png",
+            "256": "png/256/gmod/spawn-menu.png"
+          },
+          "suggestedUse": "Soundboard",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "wireframe-cube",
+          "name": "Sandbox cube",
+          "svg": "svg/gmod/wireframe-cube.svg",
+          "symbolId": "gmod-wireframe-cube",
+          "png": {
+            "32": "png/32/gmod/wireframe-cube.png",
+            "64": "png/64/gmod/wireframe-cube.png",
+            "128": "png/128/gmod/wireframe-cube.png",
+            "256": "png/256/gmod/wireframe-cube.png"
+          },
+          "suggestedUse": "Room",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "undo",
+          "name": "Sandbox undo",
+          "svg": "svg/gmod/undo.svg",
+          "symbolId": "gmod-undo",
+          "png": {
+            "32": "png/32/gmod/undo.png",
+            "64": "png/64/gmod/undo.png",
+            "128": "png/128/gmod/undo.png",
+            "256": "png/256/gmod/undo.png"
+          },
+          "suggestedUse": "Reset and cleanup",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "prop-crate",
+          "name": "Prop crate",
+          "svg": "svg/gmod/prop-crate.svg",
+          "symbolId": "gmod-prop-crate",
+          "png": {
+            "32": "png/32/gmod/prop-crate.png",
+            "64": "png/64/gmod/prop-crate.png",
+            "128": "png/128/gmod/prop-crate.png",
+            "256": "png/256/gmod/prop-crate.png"
+          },
+          "suggestedUse": "Resources",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "duplicator",
+          "name": "Duplicator",
+          "svg": "svg/gmod/duplicator.svg",
+          "symbolId": "gmod-duplicator",
+          "png": {
+            "32": "png/32/gmod/duplicator.png",
+            "64": "png/64/gmod/duplicator.png",
+            "128": "png/128/gmod/duplicator.png",
+            "256": "png/256/gmod/duplicator.png"
+          },
+          "suggestedUse": "Copy and presets",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        }
+      ]
+    },
+    {
+      "id": "ricochet",
+      "name": "Ricochet",
+      "appearance": "dark",
+      "aliases": [],
+      "registeredInCurrentApp": true,
+      "assets": [
+        {
+          "id": "ricochet-emblem",
+          "name": "Ricochet emblem",
+          "svg": "svg/ricochet/ricochet-emblem.svg",
+          "symbolId": "ricochet-ricochet-emblem",
+          "png": {
+            "32": "png/32/ricochet/ricochet-emblem.png",
+            "64": "png/64/ricochet/ricochet-emblem.png",
+            "128": "png/128/ricochet/ricochet-emblem.png",
+            "256": "png/256/ricochet/ricochet-emblem.png"
+          },
+          "suggestedUse": "Brand accent",
+          "pixelArt": false,
+          "provenance": "sourced",
+          "source": {
+            "origin": "Papirus Icon Theme",
+            "url": "https://github.com/PapirusDevelopmentTeam/papirus-icon-theme/blob/master/Papirus/64x64/apps/steam_icon_60.svg",
+            "license": "GPL-3.0"
+          }
+        },
+        {
+          "id": "jump-pad",
+          "name": "Jump pad",
+          "svg": "svg/ricochet/jump-pad.svg",
+          "symbolId": "ricochet-jump-pad",
+          "png": {
+            "32": "png/32/ricochet/jump-pad.png",
+            "64": "png/64/ricochet/jump-pad.png",
+            "128": "png/128/ricochet/jump-pad.png",
+            "256": "png/256/ricochet/jump-pad.png"
+          },
+          "suggestedUse": "Connect",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "arena-platform",
+          "name": "Floating platform",
+          "svg": "svg/ricochet/arena-platform.svg",
+          "symbolId": "ricochet-arena-platform",
+          "png": {
+            "32": "png/32/ricochet/arena-platform.png",
+            "64": "png/64/ricochet/arena-platform.png",
+            "128": "png/128/ricochet/arena-platform.png",
+            "256": "png/256/ricochet/arena-platform.png"
+          },
+          "suggestedUse": "Room",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "ricochet-path",
+          "name": "Ricochet trajectory",
+          "svg": "svg/ricochet/ricochet-path.svg",
+          "symbolId": "ricochet-ricochet-path",
+          "png": {
+            "32": "png/32/ricochet/ricochet-path.png",
+            "64": "png/64/ricochet/ricochet-path.png",
+            "128": "png/128/ricochet/ricochet-path.png",
+            "256": "png/256/ricochet/ricochet-path.png"
+          },
+          "suggestedUse": "Thinking",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "target",
+          "name": "Arena target",
+          "svg": "svg/ricochet/target.svg",
+          "symbolId": "ricochet-target",
+          "png": {
+            "32": "png/32/ricochet/target.png",
+            "64": "png/64/ricochet/target.png",
+            "128": "png/128/ricochet/target.png",
+            "256": "png/256/ricochet/target.png"
+          },
+          "suggestedUse": "Listening",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "arena",
+          "name": "Arena platforms",
+          "svg": "svg/ricochet/arena.svg",
+          "symbolId": "ricochet-arena",
+          "png": {
+            "32": "png/32/ricochet/arena.png",
+            "64": "png/64/ricochet/arena.png",
+            "128": "png/128/ricochet/arena.png",
+            "256": "png/256/ricochet/arena.png"
+          },
+          "suggestedUse": "Navigation",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "medal",
+          "name": "Arcade medal",
+          "svg": "svg/ricochet/medal.svg",
+          "symbolId": "ricochet-medal",
+          "png": {
+            "32": "png/32/ricochet/medal.png",
+            "64": "png/64/ricochet/medal.png",
+            "128": "png/128/ricochet/medal.png",
+            "256": "png/256/ricochet/medal.png"
+          },
+          "suggestedUse": "Milestones",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "extra-life",
+          "name": "Extra life disc",
+          "svg": "svg/ricochet/extra-life.svg",
+          "symbolId": "ricochet-extra-life",
+          "png": {
+            "32": "png/32/ricochet/extra-life.png",
+            "64": "png/64/ricochet/extra-life.png",
+            "128": "png/128/ricochet/extra-life.png",
+            "256": "png/256/ricochet/extra-life.png"
+          },
+          "suggestedUse": "Successful checks",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        }
+      ]
+    },
+    {
+      "id": "dod",
+      "name": "Day of Defeat: Source",
+      "appearance": "dark",
+      "aliases": [],
+      "registeredInCurrentApp": true,
+      "assets": [
+        {
+          "id": "game-emblem",
+          "name": "Day of Defeat emblem",
+          "svg": "svg/dod/game-emblem.svg",
+          "symbolId": "dod-game-emblem",
+          "png": {
+            "32": "png/32/dod/game-emblem.png",
+            "64": "png/64/dod/game-emblem.png",
+            "128": "png/128/dod/game-emblem.png",
+            "256": "png/256/dod/game-emblem.png"
+          },
+          "suggestedUse": "Brand accent",
+          "pixelArt": false,
+          "provenance": "sourced",
+          "source": {
+            "origin": "Papirus Icon Theme",
+            "url": "https://github.com/PapirusDevelopmentTeam/papirus-icon-theme/blob/master/Papirus/64x64/apps/steam_icon_300.svg",
+            "license": "GPL-3.0"
+          }
+        },
+        {
+          "id": "field-radio",
+          "name": "Field radio",
+          "svg": "svg/dod/field-radio.svg",
+          "symbolId": "dod-field-radio",
+          "png": {
+            "32": "png/32/dod/field-radio.png",
+            "64": "png/64/dod/field-radio.png",
+            "128": "png/128/dod/field-radio.png",
+            "256": "png/256/dod/field-radio.png"
+          },
+          "suggestedUse": "Voice",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "helmet",
+          "name": "Allied helmet",
+          "svg": "svg/dod/helmet.svg",
+          "symbolId": "dod-helmet",
+          "png": {
+            "32": "png/32/dod/helmet.png",
+            "64": "png/64/dod/helmet.png",
+            "128": "png/128/dod/helmet.png",
+            "256": "png/256/dod/helmet.png"
+          },
+          "suggestedUse": "System health",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "capture-flag",
+          "name": "Capture flag",
+          "svg": "svg/dod/capture-flag.svg",
+          "symbolId": "dod-capture-flag",
+          "png": {
+            "32": "png/32/dod/capture-flag.png",
+            "64": "png/64/dod/capture-flag.png",
+            "128": "png/128/dod/capture-flag.png",
+            "256": "png/256/dod/capture-flag.png"
+          },
+          "suggestedUse": "Milestones",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "field-medic",
+          "name": "Field medic",
+          "svg": "svg/dod/field-medic.svg",
+          "symbolId": "dod-field-medic",
+          "png": {
+            "32": "png/32/dod/field-medic.png",
+            "64": "png/64/dod/field-medic.png",
+            "128": "png/128/dod/field-medic.png",
+            "256": "png/256/dod/field-medic.png"
+          },
+          "suggestedUse": "Checks",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "ammo",
+          "name": "Field ammunition",
+          "svg": "svg/dod/ammo.svg",
+          "symbolId": "dod-ammo",
+          "png": {
+            "32": "png/32/dod/ammo.png",
+            "64": "png/64/dod/ammo.png",
+            "128": "png/128/dod/ammo.png",
+            "256": "png/256/dod/ammo.png"
+          },
+          "suggestedUse": "Usage",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "compass",
+          "name": "Field compass",
+          "svg": "svg/dod/compass.svg",
+          "symbolId": "dod-compass",
+          "png": {
+            "32": "png/32/dod/compass.png",
+            "64": "png/64/dod/compass.png",
+            "128": "png/128/dod/compass.png",
+            "256": "png/256/dod/compass.png"
+          },
+          "suggestedUse": "Room and navigation",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "orders",
+          "name": "Field orders",
+          "svg": "svg/dod/orders.svg",
+          "symbolId": "dod-orders",
+          "png": {
+            "32": "png/32/dod/orders.png",
+            "64": "png/64/dod/orders.png",
+            "128": "png/128/dod/orders.png",
+            "256": "png/256/dod/orders.png"
+          },
+          "suggestedUse": "Setup",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        }
+      ]
+    },
+    {
+      "id": "xbox360",
+      "name": "Xbox 360 Blades",
+      "appearance": "light",
+      "aliases": [
+        "xbox-360-blades"
+      ],
+      "registeredInCurrentApp": false,
+      "assets": [
+        {
+          "id": "xbox-sphere",
+          "name": "Xbox emblem",
+          "svg": "svg/xbox360/xbox-sphere.svg",
+          "symbolId": "xbox360-xbox-sphere",
+          "png": {
+            "32": "png/32/xbox360/xbox-sphere.png",
+            "64": "png/64/xbox360/xbox-sphere.png",
+            "128": "png/128/xbox360/xbox-sphere.png",
+            "256": "png/256/xbox360/xbox-sphere.png"
+          },
+          "suggestedUse": "Brand accent",
+          "pixelArt": false,
+          "provenance": "sourced",
+          "source": {
+            "origin": "Font Awesome",
+            "url": "https://github.com/FortAwesome/Font-Awesome/blob/7.x/svgs/brands/xbox.svg",
+            "license": "CC-BY-4.0"
+          }
+        },
+        {
+          "id": "ring-of-light",
+          "name": "Ring of Light",
+          "svg": "svg/xbox360/ring-of-light.svg",
+          "symbolId": "xbox360-ring-of-light",
+          "png": {
+            "32": "png/32/xbox360/ring-of-light.png",
+            "64": "png/64/xbox360/ring-of-light.png",
+            "128": "png/128/xbox360/ring-of-light.png",
+            "256": "png/256/xbox360/ring-of-light.png"
+          },
+          "suggestedUse": "Live connection state",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "controller",
+          "name": "Xbox 360 controller",
+          "svg": "svg/xbox360/controller.svg",
+          "symbolId": "xbox360-controller",
+          "png": {
+            "32": "png/32/xbox360/controller.png",
+            "64": "png/64/xbox360/controller.png",
+            "128": "png/128/xbox360/controller.png",
+            "256": "png/256/xbox360/controller.png"
+          },
+          "suggestedUse": "Navigation",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "achievement",
+          "name": "Achievement medallion",
+          "svg": "svg/xbox360/achievement.svg",
+          "symbolId": "xbox360-achievement",
+          "png": {
+            "32": "png/32/xbox360/achievement.png",
+            "64": "png/64/xbox360/achievement.png",
+            "128": "png/128/xbox360/achievement.png",
+            "256": "png/256/xbox360/achievement.png"
+          },
+          "suggestedUse": "Real milestones",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "guide",
+          "name": "Guide button",
+          "svg": "svg/xbox360/guide.svg",
+          "symbolId": "xbox360-guide",
+          "png": {
+            "32": "png/32/xbox360/guide.png",
+            "64": "png/64/xbox360/guide.png",
+            "128": "png/128/xbox360/guide.png",
+            "256": "png/256/xbox360/guide.png"
+          },
+          "suggestedUse": "Quick actions",
+          "pixelArt": false,
+          "provenance": "sourced",
+          "source": {
+            "origin": "Font Awesome",
+            "url": "https://github.com/FortAwesome/Font-Awesome/blob/7.x/svgs/brands/xbox.svg",
+            "license": "CC-BY-4.0"
+          }
+        },
+        {
+          "id": "blade",
+          "name": "Dashboard blade",
+          "svg": "svg/xbox360/blade.svg",
+          "symbolId": "xbox360-blade",
+          "png": {
+            "32": "png/32/xbox360/blade.png",
+            "64": "png/64/xbox360/blade.png",
+            "128": "png/128/xbox360/blade.png",
+            "256": "png/256/xbox360/blade.png"
+          },
+          "suggestedUse": "Tabs",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "player",
+          "name": "Player badge",
+          "svg": "svg/xbox360/player.svg",
+          "symbolId": "xbox360-player",
+          "png": {
+            "32": "png/32/xbox360/player.png",
+            "64": "png/64/xbox360/player.png",
+            "128": "png/128/xbox360/player.png",
+            "256": "png/256/xbox360/player.png"
+          },
+          "suggestedUse": "Participants",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "messages",
+          "name": "Xbox messages",
+          "svg": "svg/xbox360/messages.svg",
+          "symbolId": "xbox360-messages",
+          "png": {
+            "32": "png/32/xbox360/messages.png",
+            "64": "png/64/xbox360/messages.png",
+            "128": "png/128/xbox360/messages.png",
+            "256": "png/256/xbox360/messages.png"
+          },
+          "suggestedUse": "Chat",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        }
+      ]
+    },
+    {
+      "id": "ipod",
+      "name": "iPod Classic",
+      "appearance": "light",
+      "aliases": [
+        "ipod-classic"
+      ],
+      "registeredInCurrentApp": false,
+      "assets": [
+        {
+          "id": "apple-mark",
+          "name": "Apple mark",
+          "svg": "svg/ipod/apple-mark.svg",
+          "symbolId": "ipod-apple-mark",
+          "png": {
+            "32": "png/32/ipod/apple-mark.png",
+            "64": "png/64/ipod/apple-mark.png",
+            "128": "png/128/ipod/apple-mark.png",
+            "256": "png/256/ipod/apple-mark.png"
+          },
+          "suggestedUse": "Brand accent",
+          "pixelArt": false,
+          "provenance": "sourced",
+          "source": {
+            "origin": "Simple Icons",
+            "url": "https://github.com/simple-icons/simple-icons/blob/develop/icons/apple.svg",
+            "license": "CC0-1.0"
+          }
+        },
+        {
+          "id": "classic-ipod",
+          "name": "iPod Classic",
+          "svg": "svg/ipod/classic-ipod.svg",
+          "symbolId": "ipod-classic-ipod",
+          "png": {
+            "32": "png/32/ipod/classic-ipod.png",
+            "64": "png/64/ipod/classic-ipod.png",
+            "128": "png/128/ipod/classic-ipod.png",
+            "256": "png/256/ipod/classic-ipod.png"
+          },
+          "suggestedUse": "Theme emblem",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "click-wheel",
+          "name": "Click wheel",
+          "svg": "svg/ipod/click-wheel.svg",
+          "symbolId": "ipod-click-wheel",
+          "png": {
+            "32": "png/32/ipod/click-wheel.png",
+            "64": "png/64/ipod/click-wheel.png",
+            "128": "png/128/ipod/click-wheel.png",
+            "256": "png/256/ipod/click-wheel.png"
+          },
+          "suggestedUse": "Navigation",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "earbuds",
+          "name": "Classic earbuds",
+          "svg": "svg/ipod/earbuds.svg",
+          "symbolId": "ipod-earbuds",
+          "png": {
+            "32": "png/32/ipod/earbuds.png",
+            "64": "png/64/ipod/earbuds.png",
+            "128": "png/128/ipod/earbuds.png",
+            "256": "png/256/ipod/earbuds.png"
+          },
+          "suggestedUse": "Voice",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "play-pause",
+          "name": "Play and pause",
+          "svg": "svg/ipod/play-pause.svg",
+          "symbolId": "ipod-play-pause",
+          "png": {
+            "32": "png/32/ipod/play-pause.png",
+            "64": "png/64/ipod/play-pause.png",
+            "128": "png/128/ipod/play-pause.png",
+            "256": "png/256/ipod/play-pause.png"
+          },
+          "suggestedUse": "Media",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "shuffle",
+          "name": "Shuffle",
+          "svg": "svg/ipod/shuffle.svg",
+          "symbolId": "ipod-shuffle",
+          "png": {
+            "32": "png/32/ipod/shuffle.png",
+            "64": "png/64/ipod/shuffle.png",
+            "128": "png/128/ipod/shuffle.png",
+            "256": "png/256/ipod/shuffle.png"
+          },
+          "suggestedUse": "Soundboard",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "repeat",
+          "name": "Repeat",
+          "svg": "svg/ipod/repeat.svg",
+          "symbolId": "ipod-repeat",
+          "png": {
+            "32": "png/32/ipod/repeat.png",
+            "64": "png/64/ipod/repeat.png",
+            "128": "png/128/ipod/repeat.png",
+            "256": "png/256/ipod/repeat.png"
+          },
+          "suggestedUse": "Repeat actions",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "battery",
+          "name": "iPod battery",
+          "svg": "svg/ipod/battery.svg",
+          "symbolId": "ipod-battery",
+          "png": {
+            "32": "png/32/ipod/battery.png",
+            "64": "png/64/ipod/battery.png",
+            "128": "png/128/ipod/battery.png",
+            "256": "png/256/ipod/battery.png"
+          },
+          "suggestedUse": "Usage",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        }
+      ]
+    },
+    {
+      "id": "msn",
+      "name": "MSN Messenger",
+      "appearance": "light",
+      "aliases": [
+        "msn-messenger"
+      ],
+      "registeredInCurrentApp": false,
+      "assets": [
+        {
+          "id": "msn-butterfly",
+          "name": "MSN butterfly motif",
+          "svg": "svg/msn/msn-butterfly.svg",
+          "symbolId": "msn-msn-butterfly",
+          "png": {
+            "32": "png/32/msn/msn-butterfly.png",
+            "64": "png/64/msn/msn-butterfly.png",
+            "128": "png/128/msn/msn-butterfly.png",
+            "256": "png/256/msn/msn-butterfly.png"
+          },
+          "suggestedUse": "Brand accent",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "messenger-buddies",
+          "name": "Messenger buddies",
+          "svg": "svg/msn/messenger-buddies.svg",
+          "symbolId": "msn-messenger-buddies",
+          "png": {
+            "32": "png/32/msn/messenger-buddies.png",
+            "64": "png/64/msn/messenger-buddies.png",
+            "128": "png/128/msn/messenger-buddies.png",
+            "256": "png/256/msn/messenger-buddies.png"
+          },
+          "suggestedUse": "Room",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "online",
+          "name": "Online buddy",
+          "svg": "svg/msn/online.svg",
+          "symbolId": "msn-online",
+          "png": {
+            "32": "png/32/msn/online.png",
+            "64": "png/64/msn/online.png",
+            "128": "png/128/msn/online.png",
+            "256": "png/256/msn/online.png"
+          },
+          "suggestedUse": "Ready and listening",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "busy",
+          "name": "Busy buddy",
+          "svg": "svg/msn/busy.svg",
+          "symbolId": "msn-busy",
+          "png": {
+            "32": "png/32/msn/busy.png",
+            "64": "png/64/msn/busy.png",
+            "128": "png/128/msn/busy.png",
+            "256": "png/256/msn/busy.png"
+          },
+          "suggestedUse": "Speaking",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "away",
+          "name": "Away buddy",
+          "svg": "svg/msn/away.svg",
+          "symbolId": "msn-away",
+          "png": {
+            "32": "png/32/msn/away.png",
+            "64": "png/64/msn/away.png",
+            "128": "png/128/msn/away.png",
+            "256": "png/256/msn/away.png"
+          },
+          "suggestedUse": "Paused",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "offline",
+          "name": "Offline buddy",
+          "svg": "svg/msn/offline.svg",
+          "symbolId": "msn-offline",
+          "png": {
+            "32": "png/32/msn/offline.png",
+            "64": "png/64/msn/offline.png",
+            "128": "png/128/msn/offline.png",
+            "256": "png/256/msn/offline.png"
+          },
+          "suggestedUse": "Disconnected",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "nudge",
+          "name": "Nudge",
+          "svg": "svg/msn/nudge.svg",
+          "symbolId": "msn-nudge",
+          "png": {
+            "32": "png/32/msn/nudge.png",
+            "64": "png/64/msn/nudge.png",
+            "128": "png/128/msn/nudge.png",
+            "256": "png/256/msn/nudge.png"
+          },
+          "suggestedUse": "Test beep",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "typing",
+          "name": "Typing bubble",
+          "svg": "svg/msn/typing.svg",
+          "symbolId": "msn-typing",
+          "png": {
+            "32": "png/32/msn/typing.png",
+            "64": "png/64/msn/typing.png",
+            "128": "png/128/msn/typing.png",
+            "256": "png/256/msn/typing.png"
+          },
+          "suggestedUse": "Thinking",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        }
+      ]
+    },
+    {
+      "id": "ps3",
+      "name": "PS3 XMB",
+      "appearance": "dark",
+      "aliases": [
+        "ps3-xmb"
+      ],
+      "registeredInCurrentApp": false,
+      "assets": [
+        {
+          "id": "playstation-mark",
+          "name": "PlayStation mark",
+          "svg": "svg/ps3/playstation-mark.svg",
+          "symbolId": "ps3-playstation-mark",
+          "png": {
+            "32": "png/32/ps3/playstation-mark.png",
+            "64": "png/64/ps3/playstation-mark.png",
+            "128": "png/128/ps3/playstation-mark.png",
+            "256": "png/256/ps3/playstation-mark.png"
+          },
+          "suggestedUse": "Brand accent",
+          "pixelArt": false,
+          "provenance": "sourced",
+          "source": {
+            "origin": "Simple Icons",
+            "url": "https://github.com/simple-icons/simple-icons/blob/develop/icons/playstation.svg",
+            "license": "CC0-1.0"
+          }
+        },
+        {
+          "id": "triangle",
+          "name": "PlayStation triangle",
+          "svg": "svg/ps3/triangle.svg",
+          "symbolId": "ps3-triangle",
+          "png": {
+            "32": "png/32/ps3/triangle.png",
+            "64": "png/64/ps3/triangle.png",
+            "128": "png/128/ps3/triangle.png",
+            "256": "png/256/ps3/triangle.png"
+          },
+          "suggestedUse": "Navigation",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "circle",
+          "name": "PlayStation circle",
+          "svg": "svg/ps3/circle.svg",
+          "symbolId": "ps3-circle",
+          "png": {
+            "32": "png/32/ps3/circle.png",
+            "64": "png/64/ps3/circle.png",
+            "128": "png/128/ps3/circle.png",
+            "256": "png/256/ps3/circle.png"
+          },
+          "suggestedUse": "Navigation",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "cross",
+          "name": "PlayStation cross",
+          "svg": "svg/ps3/cross.svg",
+          "symbolId": "ps3-cross",
+          "png": {
+            "32": "png/32/ps3/cross.png",
+            "64": "png/64/ps3/cross.png",
+            "128": "png/128/ps3/cross.png",
+            "256": "png/256/ps3/cross.png"
+          },
+          "suggestedUse": "Navigation",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "square",
+          "name": "PlayStation square",
+          "svg": "svg/ps3/square.svg",
+          "symbolId": "ps3-square",
+          "png": {
+            "32": "png/32/ps3/square.png",
+            "64": "png/64/ps3/square.png",
+            "128": "png/128/ps3/square.png",
+            "256": "png/256/ps3/square.png"
+          },
+          "suggestedUse": "Navigation",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "trophy",
+          "name": "PlayStation trophy",
+          "svg": "svg/ps3/trophy.svg",
+          "symbolId": "ps3-trophy",
+          "png": {
+            "32": "png/32/ps3/trophy.png",
+            "64": "png/64/ps3/trophy.png",
+            "128": "png/128/ps3/trophy.png",
+            "256": "png/256/ps3/trophy.png"
+          },
+          "suggestedUse": "Milestones",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "controller",
+          "name": "PlayStation controller",
+          "svg": "svg/ps3/controller.svg",
+          "symbolId": "ps3-controller",
+          "png": {
+            "32": "png/32/ps3/controller.png",
+            "64": "png/64/ps3/controller.png",
+            "128": "png/128/ps3/controller.png",
+            "256": "png/256/ps3/controller.png"
+          },
+          "suggestedUse": "Quick actions",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "xmb-wave",
+          "name": "XMB ribbon",
+          "svg": "svg/ps3/xmb-wave.svg",
+          "symbolId": "ps3-xmb-wave",
+          "png": {
+            "32": "png/32/ps3/xmb-wave.png",
+            "64": "png/64/ps3/xmb-wave.png",
+            "128": "png/128/ps3/xmb-wave.png",
+            "256": "png/256/ps3/xmb-wave.png"
+          },
+          "suggestedUse": "Decorative divider",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        }
+      ]
+    },
+    {
+      "id": "rust",
+      "name": "Rust",
+      "appearance": "dark",
+      "aliases": [],
+      "registeredInCurrentApp": false,
+      "assets": [
+        {
+          "id": "rust-game-mark",
+          "name": "Rust game emblem",
+          "svg": "svg/rust/rust-game-mark.svg",
+          "symbolId": "rust-rust-game-mark",
+          "png": {
+            "32": "png/32/rust/rust-game-mark.png",
+            "64": "png/64/rust/rust-game-mark.png",
+            "128": "png/128/rust/rust-game-mark.png",
+            "256": "png/256/rust/rust-game-mark.png"
+          },
+          "suggestedUse": "Brand accent",
+          "pixelArt": false,
+          "provenance": "sourced",
+          "source": {
+            "origin": "Papirus Icon Theme",
+            "url": "https://github.com/PapirusDevelopmentTeam/papirus-icon-theme/blob/master/Papirus/64x64/apps/steam_icon_252490.svg",
+            "license": "GPL-3.0"
+          }
+        },
+        {
+          "id": "scrap",
+          "name": "Scrap metal",
+          "svg": "svg/rust/scrap.svg",
+          "symbolId": "rust-scrap",
+          "png": {
+            "32": "png/32/rust/scrap.png",
+            "64": "png/64/rust/scrap.png",
+            "128": "png/128/rust/scrap.png",
+            "256": "png/256/rust/scrap.png"
+          },
+          "suggestedUse": "Usage",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "hammer",
+          "name": "Building hammer",
+          "svg": "svg/rust/hammer.svg",
+          "symbolId": "rust-hammer",
+          "png": {
+            "32": "png/32/rust/hammer.png",
+            "64": "png/64/rust/hammer.png",
+            "128": "png/128/rust/hammer.png",
+            "256": "png/256/rust/hammer.png"
+          },
+          "suggestedUse": "Setup",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "pickaxe",
+          "name": "Salvaged pickaxe",
+          "svg": "svg/rust/pickaxe.svg",
+          "symbolId": "rust-pickaxe",
+          "png": {
+            "32": "png/32/rust/pickaxe.png",
+            "64": "png/64/rust/pickaxe.png",
+            "128": "png/128/rust/pickaxe.png",
+            "256": "png/256/rust/pickaxe.png"
+          },
+          "suggestedUse": "Tools",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "radiation-barrel",
+          "name": "Radiation barrel",
+          "svg": "svg/rust/radiation-barrel.svg",
+          "symbolId": "rust-radiation-barrel",
+          "png": {
+            "32": "png/32/rust/radiation-barrel.png",
+            "64": "png/64/rust/radiation-barrel.png",
+            "128": "png/128/rust/radiation-barrel.png",
+            "256": "png/256/rust/radiation-barrel.png"
+          },
+          "suggestedUse": "Warnings",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "tool-cupboard",
+          "name": "Tool cupboard",
+          "svg": "svg/rust/tool-cupboard.svg",
+          "symbolId": "rust-tool-cupboard",
+          "png": {
+            "32": "png/32/rust/tool-cupboard.png",
+            "64": "png/64/rust/tool-cupboard.png",
+            "128": "png/128/rust/tool-cupboard.png",
+            "256": "png/256/rust/tool-cupboard.png"
+          },
+          "suggestedUse": "Connection and permissions",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "furnace",
+          "name": "Furnace",
+          "svg": "svg/rust/furnace.svg",
+          "symbolId": "rust-furnace",
+          "png": {
+            "32": "png/32/rust/furnace.png",
+            "64": "png/64/rust/furnace.png",
+            "128": "png/128/rust/furnace.png",
+            "256": "png/256/rust/furnace.png"
+          },
+          "suggestedUse": "Thinking and activity",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        },
+        {
+          "id": "sleeping-bag",
+          "name": "Sleeping bag",
+          "svg": "svg/rust/sleeping-bag.svg",
+          "symbolId": "rust-sleeping-bag",
+          "png": {
+            "32": "png/32/rust/sleeping-bag.png",
+            "64": "png/64/rust/sleeping-bag.png",
+            "128": "png/128/rust/sleeping-bag.png",
+            "256": "png/256/rust/sleeping-bag.png"
+          },
+          "suggestedUse": "Paused",
+          "pixelArt": false,
+          "provenance": "custom theme-inspired vector"
+        }
+      ]
+    }
+  ]
+}

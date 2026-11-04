@@ -10,6 +10,7 @@
 //   browser-extension/ui-icons.js GENERATED — the themed icon set
 //   browser-extension/ui-logos.js GENERATED — theme logos for the in-chat panel
 //   browser-extension/ui-art.js  GENERATED — brand marks for theme extras (tools/art/marks/)
+//   browser-extension/ui-brand.js GENERATED — the 20 original themes' branded icons (assets/theme-icons)
 //   browser-extension/trivia-bank.js GENERATED — from tools/trivia/questions.txt
 //
 // Usage:  node tools/build.mjs          write every generated file
@@ -23,6 +24,8 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {compileTrivia} from './trivia/compile.mjs';
 import {ICONS,iconSvg} from './icons/icons.mjs';
+import {BRAND} from './brand/map.mjs';
+import {cleanBrandSvg} from './brand/clean.mjs';
 
 const ROOT=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const EXT=path.join(ROOT,'browser-extension');
@@ -35,6 +38,8 @@ export const THEMES=fs.readdirSync(path.join(EXT,'ui','themes')).filter(f=>f.end
 // Theme fonts (ui/fonts/): font files, their licences and fonts.css.
 // Theme logos (ui/logos/): <theme>.png for pages, .webp for the panel, -16/-32.png for the toolbar.
 export const LOGO_FILES=fs.readdirSync(path.join(EXT,'ui','logos')).filter(f=>/\.(png|webp)$/.test(f)).sort();
+// Branded icons' credits and licences (ui/brand/), shipped with the icons.
+export const BRAND_FILES=fs.existsSync(path.join(EXT,'ui','brand'))?fs.readdirSync(path.join(EXT,'ui','brand')).filter(f=>/\.(md|txt)$/.test(f)).sort():[];
 export const FONT_FILES=fs.readdirSync(path.join(EXT,'ui','fonts')).filter(f=>/\.(woff2|css|txt)$/.test(f)).sort();
 
 export const PLATFORM=Object.freeze({
@@ -48,8 +53,8 @@ export const PLATFORM=Object.freeze({
  // Their desktop variants live in app/desktop-overrides/.
  overrides:['settings.js','v22-settings.js','package.json'],
  // The phone remote's copy of the panel (v2.26, app/remote.cjs serves these from app/companion).
- remotePage:['ui-template.js','ui-logos.js','ui-art.js','ui-icons.js','ui-kit.js','theme-features.js','theme-pack-1.js','theme-pack-2.js','theme-pack-3.js','theme-pack-4.js'],
- settingsPage:['settings.html','settings.css','settings-navigation.js','v23-settings.js','theme.js','ui/tokens.css',...THEMES.map(t=>'ui/themes/'+t),...FONT_FILES.map(f=>'ui/fonts/'+f),...LOGO_FILES.map(f=>'ui/logos/'+f),'ui/logo-mark.svg','icons/icon-32.png','ui/icons.css','ui/kit.css','ui-icons.js','ui-logos.js','ui-art.js','ui-kit.js','ui-template.js','theme-showcase.js','theme-pack-1.js','theme-pack-2.js','theme-pack-3.js','theme-pack-4.js','theme-gallery.js','remote-settings.js','voice-settings.js','ai-settings.js','chat-tag.js'],
+ remotePage:['ui-template.js','ui-logos.js','ui-art.js','ui-brand.js','ui-icons.js','ui-kit.js','theme-features.js','theme-pack-1.js','theme-pack-2.js','theme-pack-3.js','theme-pack-4.js'],
+ settingsPage:['settings.html','settings.css','settings-navigation.js','v23-settings.js','theme.js','ui/tokens.css',...THEMES.map(t=>'ui/themes/'+t),...FONT_FILES.map(f=>'ui/fonts/'+f),...LOGO_FILES.map(f=>'ui/logos/'+f),'ui/logo-mark.svg','icons/icon-32.png','ui/icons.css','ui/kit.css','ui-icons.js','ui-logos.js','ui-art.js','ui-brand.js','ui-kit.js','ui-template.js','theme-showcase.js',...BRAND_FILES.map(f=>'ui/brand/'+f),'theme-pack-1.js','theme-pack-2.js','theme-pack-3.js','theme-pack-4.js','theme-gallery.js','remote-settings.js','voice-settings.js','ai-settings.js','chat-tag.js'],
 });
 
 const read=p=>fs.readFileSync(p,'utf8').replace(/\r\n/g,'\n');
@@ -104,6 +109,57 @@ export function compileFonts(){
   return Promise.all(jobs);
  }
  globalThis.TylerFonts=Object.freeze({load,themes:THEMES});
+})();
+`;
+}
+
+// ── 1e. Branded icons for the original 20 themes (v2.28): assets/theme-icons → ui-brand.js ──
+// The owner's icon pack (SVG, 64 px artboard). Each file is checked against a short list of plain
+// drawing elements and attributes (no scripts, links, styles or images), its title and namespace
+// prefixes are dropped, and the markup is embedded: inline SVG is drawn by the page itself, so
+// Steam's page policy never sees an image request. tools/brand/map.mjs says where each one goes.
+export function compileBrand(){
+ const dir=path.join(ROOT,'assets','theme-icons'),manifest=JSON.parse(read(path.join(dir,'manifest.json'))),data={},map={};
+ for(const [theme,cfg] of Object.entries(BRAND)){
+  const t=manifest.themes.find(x=>x.id===theme);if(!t)throw Error('assets/theme-icons has no '+theme+' icons');
+  const used=new Set([cfg.mark,...Object.values(cfg.icons||{}),...Object.values(cfg.states||{})]);
+  data[theme]={};
+  for(const a of t.assets)data[theme][a.id]=cleanBrandSvg(read(path.join(dir,a.svg)),a.svg);
+  for(const id of used)if(!data[theme][id])throw Error('tools/brand/map.mjs: '+theme+' has no icon '+id);
+  for(const n of Object.keys(cfg.icons||{}))if(!ICONS[n])throw Error('tools/brand/map.mjs: '+theme+' maps an unknown icon name '+n);
+  map[theme]={mark:cfg.mark,icons:cfg.icons||{},states:cfg.states||{},pixel:!!cfg.pixel,names:Object.fromEntries(t.assets.map(a=>[a.id,a.name]))};
+ }
+ return `// GENERATED by tools/build.mjs from assets/theme-icons (the owner's branded icon pack) and tools/brand/map.mjs.
+// Icon credits and licences: ui/brand/CREDITS.md and ui/brand/*.txt.
+(()=>{
+ 'use strict';if(globalThis.TylerBrand)return;
+ const DATA=${JSON.stringify(data)};
+ const MAP=${JSON.stringify(map)};
+ // Static, trusted markup (checked at build time) for one of a theme's icons; '' if it has none.
+ const svg=(theme,id,cls='bi')=>{const m=DATA[theme]?.[id];if(!m)return '';return '<svg class="'+cls+'" data-bi="'+theme+'/'+id+'" viewBox="0 0 64 64" aria-hidden="true" focusable="false"'+(MAP[theme].pixel?' shape-rendering="crispEdges"':'')+'>'+m+'</svg>';};
+ const el=(theme,id,cls)=>{const t=document.createElement('template');t.innerHTML=svg(theme,id,cls);return t.content.firstElementChild;};
+ // The app's icons (<svg class="ic" data-i="name">) take the theme's branded drawing where the
+ // theme has one for that name; the theme's own drawing stays underneath for every other theme.
+ const themes=new WeakMap(),watched=new WeakSet();
+ function decorate(icon,theme){
+  const id=MAP[theme]?.icons?.[icon.dataset.i],want=id?theme+'/'+id:'',old=icon.querySelector(':scope>.ic-b');
+  if((icon.dataset.b||'')===want&&(!want||old))return;
+  old?.remove();
+  if(!want){icon.removeAttribute('data-b');return;}
+  icon.insertAdjacentHTML('beforeend','<svg class="ic-b" x="-1.5" y="-1.5" width="23" height="23" viewBox="0 0 64 64"'+(MAP[theme].pixel?' shape-rendering="crispEdges"':'')+'>'+DATA[theme][id]+'</svg>');icon.dataset.b=want;
+ }
+ function scan(node,theme){if(node.nodeType!==1)return;if(node.matches?.('svg.ic[data-i]'))decorate(node,theme);for(const i of node.querySelectorAll?.('svg.ic[data-i]')||[])decorate(i,theme);}
+ // Applies a theme to every icon under root, and to icons added later (notifications, menus…).
+ function apply(root,theme){if(!root)return;themes.set(root,theme);scan(root.host||root.documentElement||root,theme);if(root.nodeType===11)for(const c of root.children)scan(c,theme);
+  if(!watched.has(root)&&globalThis.MutationObserver){watched.add(root);new MutationObserver(list=>{const t=themes.get(root);for(const r of list)for(const n of r.addedNodes)if(n.nodeType===1&&!n.classList?.contains('ic-b'))scan(n,t);}).observe(root,{childList:true,subtree:true});}}
+ // The status strip's badge: one icon per state the theme has one for; CSS shows the one for the
+ // strip's real data-state (ui/theme-features.css).
+ function badge(tally,theme){const head=tally?.querySelector('.tally-head');if(!head)return null;let b=head.querySelector(':scope>.tally-brand');const st=MAP[theme]?.states||{},keys=Object.keys(st);
+  if(!keys.length){b?.remove();return null;}
+  if(!b){b=document.createElement('span');b.className='tally-brand';b.setAttribute('aria-hidden','true');const l=head.querySelector('.tally-label');if(l)l.after(b);else head.prepend(b);}
+  if(b.dataset.theme!==theme){b.dataset.theme=theme;b.replaceChildren(...keys.map(k=>{const e=el(theme,st[k],'tally-bi');e.dataset.for=k;return e;}));}
+  return b;}
+ globalThis.TylerBrand=Object.freeze({has:t=>Object.hasOwn(MAP,t),badge,mark:t=>MAP[t]?.mark||'',state:(t,s)=>MAP[t]?.states?.[s]||'',name:(t,id)=>MAP[t]?.names?.[id]||'',states:t=>({...(MAP[t]?.states||{})}),svg,el,apply,themes:Object.freeze(Object.keys(MAP))});
 })();
 `;
 }
@@ -369,6 +425,7 @@ emit(path.join(EXT,'ui-template.js'),compileUI());
 emit(path.join(EXT,'ui-fonts.js'),compileFonts());
 emit(path.join(EXT,'ui-logos.js'),compileLogos());
 emit(path.join(EXT,'ui-art.js'),compileArt());
+emit(path.join(EXT,'ui-brand.js'),compileBrand());
 emit(path.join(EXT,'ui-icons.js'),compileIcons());
 const companionFiles=buildCompanion();
 emit(path.join(ROOT,'app','steam-preload.cjs'),buildPreload());
@@ -380,6 +437,7 @@ emit(path.join(ROOT,'voice-app','logo-mark.svg'),fs.readFileSync(path.join(EXT,'
 for(const [from,to] of [['ui/icons.css','icons.css'],['ui/kit.css','kit.css'],['ui-kit.js','ui-kit.js']])emit(path.join(ROOT,'voice-app',to),fs.readFileSync(path.join(EXT,from)));
 emit(path.join(ROOT,'voice-app','ui-icons.js'),String(outputs.get(path.join(EXT,'ui-icons.js'))));
 emit(path.join(ROOT,'voice-app','ui-logos.js'),String(outputs.get(path.join(EXT,'ui-logos.js'))));
+emit(path.join(ROOT,'voice-app','ui-brand.js'),String(outputs.get(path.join(EXT,'ui-brand.js'))));
 for(const f of LOGO_FILES.filter(f=>/^[a-z0-9]+\.png$/.test(f)))emit(path.join(ROOT,'voice-app','logos',f),fs.readFileSync(path.join(EXT,'ui','logos',f)));
 
 const same=(file,content)=>{try{return Buffer.from(content).equals(fs.readFileSync(file));}catch{return false;}};

@@ -106,6 +106,17 @@ test('themed menus and screens: open, fit, keyboard, Escape, real actions',{time
   assert.equal(await count('.dod-menu'),0);assert.match(await text('.dod-line'),/Sound off!/);
   await click('.dod-chip');assert.equal(await count('.dod-obj li'),4);await page.keyboard.press('Escape');assert.equal(await count('.dod-brief'),0);
 
+  // v2.28: the branded icons appear in the original themes' extras and track Tyler's real state;
+  // without ui-brand.js everything falls back to the theme's own drawings.
+  await setTheme('portal');await page.evaluate(()=>TylerCompanion.setActivity('THINKING — preparing a typed reply…'));await page.waitForTimeout(80);
+  const shown=()=>page.evaluate(R+'.querySelector(".tally-brand") && [...'+R+'.querySelectorAll(".tally-bi")].filter(e=>getComputedStyle(e).display!=="none").map(e=>e.dataset.for)');
+  assert.deepEqual(await shown(),['thinking'],'the Aperture iris while Tyler thinks');
+  await page.evaluate(()=>TylerCompanion.setActivity('OFF — Paused by you'));await page.waitForTimeout(80);assert.deepEqual(await shown(),['paused'],'the exit sign when paused');
+  await page.evaluate(()=>TylerCompanion.setActivity('NEEDS ATTENTION — Gemini 429 failed · quota reached'));await page.waitForTimeout(80);assert.deepEqual(await shown(),[],'Portal has no error badge, so none shows');
+  await setTheme('winxp');await page.evaluate(()=>TylerCompanion.setActivity('LISTENING — speak normally, then pause'));await click('.xp-start');
+  assert.equal(await count('.xp-menu-list .xp-mi-bi'),5,'Start menu entries carry XP icons');assert.equal(await count('.xp-menu-places .xp-mi-bi'),4);assert.equal(await count('.xp-start .xp-flag'),1);await page.keyboard.press('Escape');
+  await page.evaluate(()=>{delete globalThis.TylerBrand;});await setTheme('doom');await setTheme('winxp');
+  assert.equal(await count('.xp-start .xp-flag'),0,'no pack: the drawn flag');assert.equal(await count('.xp-ti.voice'),1);await click('.xp-start');assert.equal(await count('.xp-menu .xp-mi'),6,'the Start menu still opens');await page.keyboard.press('Escape');
   // How much of a canvas is drawn (the brand marks come from ui-art.js).
   const ink=(sel)=>page.evaluate(R+'.querySelector('+JSON.stringify(sel)+')?.getContext("2d")?.getImageData(0,0,'+R+'.querySelector('+JSON.stringify(sel)+').width,'+R+'.querySelector('+JSON.stringify(sel)+').height).data.filter((v,i)=>i%4===3&&v>40).length||0');
   // v2.27 Rust: Q opens crafting; Craft runs the full check and queues it; the Tool Cupboard opens; 1 plays the first belt slot.

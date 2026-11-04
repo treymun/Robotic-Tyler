@@ -74,7 +74,10 @@ const EXTRAS={steam:'your Steam persona with a status menu (click it), an activi
  function render(host,theme,opts){
   let root=host.shadowRoot;if(!root){root=host.attachShadow({mode:'open'});const s=styles();if(s)root.adoptedStyleSheets=[s];else{const st=document.createElement('style');st.textContent=UI.css+PREVIEW_CSS;root.append(st);}}
   for(const n of [...root.childNodes])if(n.nodeName!=='STYLE')n.remove();
-  const panel=panelFor(theme,opts);root.append(panel);host.inert=true;return {root,panel};
+  const panel=panelFor(theme,opts);root.append(panel);host.inert=true;
+  // v2.28: the theme's branded icons (ui-brand.js) on the preview's tabs and buttons, and its status badge.
+  globalThis.TylerBrand?.apply(root,theme);globalThis.TylerBrand?.badge(panel.querySelector('.tally'),theme);
+  return {root,panel};
  }
 
  // ── v2.22: the theme's own extras in the large preview ───────────────────
@@ -112,6 +115,8 @@ const EXTRAS={steam:'your Steam persona with a status menu (click it), an activi
    add(slot,el){(slots[slot]||slots.deck).append(el);own.add(el);return el;},later,cancel(x){clearTimeout(x);timers.delete(x);},every:noop,key:noop,
    on(target,type,fn,o){target.addEventListener(type,fn,o);offs.push(()=>target.removeEventListener(type,fn,o));},
    flash(el,l=1800){slots.layer.append(el);own.add(el);later(()=>el.remove(),l);return el;},
+   // v2.28: the theme's branded icons (ui-brand.js), as in the real panel.
+   brand(id,cls='fx-bi'){return globalThis.TylerBrand?.el?.(panel.dataset.rtTheme,id,cls)||null;},
    below(sel){const el=root.querySelector(sel),p=panel.getBoundingClientRect();return el?Math.round(el.getBoundingClientRect().bottom-p.top):0;},
    menu:()=>({el:null,close:noop}),overlay:()=>({el:h('div'),close:noop}),
    /** Set only here: the gallery's preview, and whether this theme was just picked (not a state change). */
@@ -137,7 +142,10 @@ const EXTRAS={steam:'your Steam persona with a status menu (click it), an activi
   const logo=document.createElement('img');logo.className='tg-logo';logo.alt='';logo.src='ui/logos/'+theme+'.png';if(PIXEL.has(theme))logo.style.imageRendering='pixelated';sharp(logo,theme);
   const title=document.createElement('span');title.className='tg-name';title.textContent=name;
   const badge=document.createElement('span');badge.className='tg-badge';badge.textContent='In use';
-  meta.append(logo,title);if(light){const tag=document.createElement('span');tag.className='tg-tag';tag.textContent='Light';meta.append(tag);}meta.append(badge);
+  meta.append(logo,title);
+  // v2.28: the theme's emblem from its branded icon pack, beside its name.
+  const B=globalThis.TylerBrand,mk=B?.mark(theme);if(mk){const em=B.el(theme,mk,'tg-bi');em.setAttribute('aria-hidden','true');meta.append(em);}
+  if(light){const tag=document.createElement('span');tag.className='tg-tag';tag.textContent='Light';meta.append(tag);}meta.append(badge);
   card.append(shot,meta);gallery.append(card);cards.set(theme,card);
   render(host,theme,{card:true});
   card.addEventListener('click',()=>select(theme,true));

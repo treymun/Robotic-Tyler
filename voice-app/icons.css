@@ -24,3 +24,11 @@
 button .ic{--ic-size:14px;margin-right:6px;vertical-align:-2px}
 .icon-btn .ic{--ic-size:16px;margin:0}
 .board-tools label>.ic{--ic-size:14px;margin-right:6px;vertical-align:-2px}
+
+/* v2.28: the original themes' branded icons (ui-brand.js, the owner's icon pack). Where a theme has
+   one for an icon it replaces the theme's own drawing; it keeps its colours, so the surrounding
+   theme only sets its size and states. */
+.ic>.ic-b{display:none}
+.ic[data-b]>:is(.ic-v,.ic-p){display:none}
+.ic[data-b]>.ic-b{display:inline;overflow:visible;fill:initial;stroke:initial;stroke-width:initial;color:initial}
+.bi{display:inline-block;width:var(--bi-size,20px);height:var(--bi-size,20px);flex-shrink:0;vertical-align:middle;overflow:visible}

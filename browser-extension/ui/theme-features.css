@@ -1270,3 +1270,95 @@
 .ip-boot-apple{width:56px;height:66px;animation:ip-boot-logo 1.6s ease forwards}
 @keyframes ip-boot{0%,70%{opacity:1}100%{opacity:0}}
 @keyframes ip-boot-logo{0%{opacity:0}18%,70%{opacity:1}100%{opacity:0}}
+
+/* ── v2.28 branded icons in every original theme ──────────────────────────────────────────────
+   Tabs: the unselected ones a little quieter, full colour on hover, focus and when selected.
+   The status strip's badge: the theme's object for Tyler's real state (only that state's shows).
+   Menus: a branded icon in the mark column. */
+.tabs button .ic[data-b]{--ic-size:18px;transition:opacity .15s,transform .15s}
+.tabs button[aria-selected=false] .ic[data-b]{opacity:.78;filter:saturate(.72)}
+.tabs button:is(:hover,:focus-visible) .ic[data-b]{opacity:1;filter:none}
+.tabs button[aria-selected=true] .ic[data-b]{opacity:1;filter:drop-shadow(0 1px 1px rgba(0,0,0,.25))}
+@media (prefers-reduced-motion:no-preference){.tabs button[aria-selected=true] .ic[data-b]{transform:scale(1.06)}}
+.tally-brand{display:inline-flex;align-items:center;flex-shrink:0;width:18px;height:18px;margin:0 2px}
+.tally-brand:not(:has(.tally-bi[data-for])){display:none}
+.tally-bi{display:none;width:18px;height:18px;overflow:visible;filter:drop-shadow(0 1px 1px rgba(0,0,0,.3))}
+.tally[data-state=ready] .tally-bi[data-for=ready],.tally[data-state=listening] .tally-bi[data-for=listening],.tally[data-state=thinking] .tally-bi[data-for=thinking],
+.tally[data-state=speaking] .tally-bi[data-for=speaking],.tally[data-state=paused] .tally-bi[data-for=paused],.tally[data-state=standby] .tally-bi[data-for=paused],
+.tally[data-state=waiting] .tally-bi[data-for=waiting],.tally[data-state=error] .tally-bi[data-for=error]{display:block}
+.tally:not(:is([data-state=ready]:has(.tally-bi[data-for=ready]),[data-state=listening]:has(.tally-bi[data-for=listening]),[data-state=thinking]:has(.tally-bi[data-for=thinking]),[data-state=speaking]:has(.tally-bi[data-for=speaking]),[data-state=paused]:has(.tally-bi[data-for=paused]),[data-state=standby]:has(.tally-bi[data-for=paused]),[data-state=waiting]:has(.tally-bi[data-for=waiting]),[data-state=error]:has(.tally-bi[data-for=error]))) .tally-brand{display:none}
+@media (prefers-reduced-motion:no-preference){.tally-bi{animation:bi-in .25s ease-out}}
+@keyframes bi-in{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:none}}
+.fx-menu-mark-bi{display:inline-grid;place-items:center}
+.fx-menu-bi,.fx-bi{display:block;width:16px;height:16px;overflow:visible}
+
+/* Branded icons inside the theme extras keep their own colours, whatever the extra draws its own
+   icons with (fills, strokes, dashes). */
+.panel svg[data-bi][data-bi],svg[data-bi][data-bi][data-bi]{fill:initial;stroke:none;stroke-width:initial;stroke-dasharray:none;stroke-dashoffset:0;color:initial;flex-shrink:0;overflow:visible}
+/* Classic Steam: each service's icon in the server list */
+.cl-bi{width:15px;height:15px;margin-right:5px;vertical-align:-3px}
+/* TF2: the Medic cross on MEDIC! */
+.tf-medic-bi{width:30px;height:30px;margin-bottom:2px}
+/* CS2: the round banner's icon */
+.cs-banner-bi{width:30px;height:30px}
+/* Portal: the Aperture iris on the chamber report */
+.po-r-bi{width:34px;height:34px}
+/* CS 1.6: the scoreboard's mark, the radio menu and the radio message */
+.c16-title-bi{width:20px;height:20px;margin-right:6px;vertical-align:-5px}
+.c16-menu-bi,.c16-roger-bi{width:14px;height:14px;margin-right:5px;vertical-align:-2px}
+/* HEV: the flashlight */
+.hev-bi{width:18px;height:18px}
+/* L4D: the item each survivor carries */
+.l4d-item{display:inline-grid;place-items:center;width:20px;height:20px;flex-shrink:0}
+.l4d-bi{width:20px;height:20px}
+.l4d-mate[data-hp=down] .l4d-bi{animation:none}
+/* Windows XP: the flag on Start, Start menu icons, the tray's volume and network, balloon and error icons */
+.xp-flag{width:17px;height:17px;margin-right:5px;vertical-align:-3px;filter:drop-shadow(1px 1px 0 rgba(0,0,0,.35))}
+.panel .foot .xp-start:has(.xp-flag)::before{display:none}
+.xp-menu .xp-mi.xp-has-bi,.xp-menu .xp-pl.xp-has-bi{flex-direction:row;align-items:center;gap:7px}
+.xp-mi-bi{width:24px;height:24px}.xp-pl .xp-mi-bi{width:20px;height:20px}
+.xp-mi-text{display:flex;flex-direction:column;gap:1px;min-width:0}
+.xp-ti.xp-ti-b{display:inline-grid;place-items:center;background:none!important;border-radius:0}
+.xp-ti-bi{width:15px;height:15px}
+.xp-bicon-bi{width:16px;height:16px}
+.xp-stop-bi{width:32px;height:32px}
+/* DOOM: the key cards and the status bar's pickups, in pixels */
+.doom-key.doom-key-b{display:inline-grid;place-items:center;background:none;border:0;box-shadow:none;width:18px;height:12px}
+.doom-key-bi{width:18px;height:18px}
+.doom-key-b[data-have=false]{opacity:.22;filter:grayscale(1)}
+.doom-cell-bi{display:block;width:18px;height:18px;margin:0 auto 1px}
+/* Quake: the medal's icon */
+.qk-medal-bi{width:30px;height:30px}
+/* Pip-Boy: the gauges' icons, the status screen's Vault-Tec mark and the radio */
+.pb-gauge small svg.pb-gauge-bi{display:inline-block;width:12px;height:12px;margin-right:3px;vertical-align:-2px;filter:drop-shadow(0 0 2px rgba(120,255,120,.4))}
+.pb-st-bi{width:18px;height:18px;margin-right:6px;vertical-align:-4px}
+.pb-radio-bi{width:16px;height:16px;margin-right:5px;vertical-align:-3px}
+/* Combine: the insignia, scanner and alert */
+.cb-term-bi{width:26px;height:26px;margin-right:6px}
+.cb-scan-bi{width:22px;height:22px}
+.cb-alert-bi{width:18px;height:18px;margin-right:6px}
+/* Deadlock: souls and the shop's items */
+.dl-orb.dl-orb-b{display:inline-grid;place-items:center;background:none;box-shadow:none;border:0}
+.dl-orb-bi{width:20px;height:20px}
+.dl-item-bi{width:26px;height:26px;margin:2px auto 4px;display:block}
+/* PAYDAY: the plan's gear, the drill, the pager and the PAYDAY screen */
+.pd-step-bi{width:20px;height:20px;margin:2px 0}
+.pd-drill-bi{width:14px;height:14px;margin-right:4px;vertical-align:-2px}
+.pd-pager-bi{width:18px;height:18px}
+.pd-pay-bi{width:28px;height:28px;margin-right:6px}
+/* Dreamcast: the BIOS icons and the swirl */
+.dc-bios-bi{width:22px;height:22px}
+.dc-swirl svg.dc-swirl-bi{width:110px;height:110px;fill:initial;stroke:none;stroke-dasharray:none;animation:dc-spin 1.3s ease-in-out}
+/* Garry's Mod: the HUD notices' icons and the spawn menu headings */
+.gm-note-bi{width:16px;height:16px;flex-shrink:0}
+.gm-sp-bi{width:16px;height:16px;margin-right:5px;vertical-align:-3px}
+/* Ricochet: the flying disc and the high scores' medal */
+.rc-flying.rc-flying-b{background:none;border:0;box-shadow:none}
+.rc-flying-bi{width:18px;height:18px;display:block}
+.rc-table-bi{width:18px;height:18px;margin-right:6px;vertical-align:-4px}
+/* Day of Defeat: the orders, the radio and the briefing's emblem */
+.dod-chip-bi{width:14px;height:14px;margin-right:4px;vertical-align:-2px}
+.dod-radio-bi{width:22px;height:22px}
+.dod-sheet-bi{float:right;width:34px;height:34px;margin:0 0 4px 8px}
+/* Brand marks beside a heading or in a menu */
+.fx-menu-mark-bi .fx-menu-bi{width:16px;height:16px}

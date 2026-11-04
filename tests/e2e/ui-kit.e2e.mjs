@@ -129,10 +129,12 @@ test('the chat panel: themed icons in every theme, notifications, dialogs and to
    await page.evaluate(t=>{for(const fn of listeners)fn({type:'storage:changed',changes:{uiTheme:{newValue:t}}});},theme);
    const icons=await page.evaluate(()=>{const r=document.getElementById('tyler-companion-root').shadowRoot;
     return [...r.querySelectorAll('.tabs button')].map(b=>{const ic=b.querySelector('svg.ic'),v=ic.querySelector('.ic-v'),p=ic.querySelector('.ic-p'),box=ic.getBoundingClientRect();
-     return {name:ic.dataset.i,label:b.querySelector('.tab-label').textContent,size:box.width>=12&&box.height>=12,mode:getComputedStyle(p).display!=='none'?'pixel':getComputedStyle(v).display!=='none'?'vector':'none'};});});
+     const bi=ic.querySelector(':scope>.ic-b');return {name:ic.dataset.i,label:b.querySelector('.tab-label').textContent,size:box.width>=12&&box.height>=12,mode:bi&&getComputedStyle(bi).display!=='none'?'brand':getComputedStyle(p).display!=='none'?'pixel':getComputedStyle(v).display!=='none'?'vector':'none'};});});
    assert.deepEqual(icons.map(i=>i.name),['chat','room','sounds','setup','checks'],theme);
    assert.ok(icons.every(i=>i.size&&i.label),theme+': every tab keeps its label and a visible icon');
-   assert.deepEqual([...new Set(icons.map(i=>i.mode))],[theme==='doom'||theme==='minecraft'?'pixel':'vector'],theme+' icon style');
+   // v2.28: the original themes draw some tabs with their branded icons; the rest keep the theme's style.
+   const own=[...new Set(icons.map(i=>i.mode).filter(m=>m!=='brand'))];assert.ok(own.length<=1&&!own.includes('none'),theme+' icon style '+own);
+   if(own.length)assert.deepEqual(own,[theme==='doom'||theme==='minecraft'?'pixel':'vector'],theme+' icon style');
   }
   // Notifications and dialogs are built inside the panel, so the theme applies to them.
   await page.evaluate(()=>{for(const fn of listeners)fn({type:'storage:changed',changes:{uiTheme:{newValue:'doom'}}});});

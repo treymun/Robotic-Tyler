@@ -1,0 +1,30 @@
+ROBOTIC TYLER v2.28.0 — patch notes
+
+Branded icons for the original 20 themes, from the owner's "Branded Icon Packs" (the Tyler logos are unchanged).
+
+Everywhere, in all 20
+- Tabs show the theme's own objects where one fits (TF2 wrench and Medic cross, Minecraft chest, XP My Computer…). Selected, hover and focus are in full colour.
+- The status strip shows a badge for Tyler's real state where the theme has one (CS2 radar and C4, Portal's portals and Aperture, DOOM's key cards…).
+- Notifications, dialogs, Settings and the Voice Studio use the theme's success, error, warning, info and voice icons where it has them.
+- Appearance cards and Settings' theme chip show the theme's emblem, and the previews show the branded tabs.
+
+Theme extras
+- Steam: status menu medal and gear. Classic: a service icon on each server list row.
+- TF2: the Medic cross on MEDIC!. CS2: the round-banner icons. Portal: the chamber report's Aperture iris.
+- CS 1.6: the scoreboard mark and the radio. HEV: the flashlight. L4D: the item each survivor carries, by health.
+- XP: the Start flag, Start menu icons, the tray's volume and network, the information balloons and the error X.
+- DOOM: pixel key cards, ammo and medikit. Quake: medal icons. Pip-Boy: gauges, Vault-Tec and the radio.
+- Combine: directives, insignia, scanner and alert. Deadlock: soul currency and the shop items.
+- PAYDAY: heist gear, drill, pager and the PAYDAY mark. Dreamcast: the memory card's icons and the swirl.
+- Garry's Mod: notice and spawn menu icons. Ricochet: the disc and the medal. Day of Defeat: orders, radio and emblem.
+
+Build
+- Embedded inline SVG (no image requests, checked at build time). Two supplied drawings had shifted attributes and are fixed at build time.
+- The credits and licences ship with the app. Without the file, the themes' own icons show.
+
+Tested
+- Unit: mappings, the drawings' safety checks, files on every surface, licences.
+- Chromium with a mocked Steam page: branded tabs and badges in the original 20 (none in the five newer themes), state badges, the XP Start menu, and the fallback without the icons.
+- Every original theme exercised through all states, events, tabs and header buttons with no errors. Screenshots in the normal, error and compact layouts, plus Settings, Appearance and the Voice Studio.
+- Real Electron (Linux) with a mock Steam page: the desktop check passes.
+- Not tested: the real Steam page, the Windows app and a real phone.

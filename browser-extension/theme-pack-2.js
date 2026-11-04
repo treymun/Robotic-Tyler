@@ -8,9 +8,13 @@
   {id:'l4d-team',mount(c){
    const box=c.add('deck',c.h('div','fx l4d-team'));box.setAttribute('aria-label','Tyler\'s team: each part\'s health');
    const cards=new Map();
-   for(const s of c.systems()){const b=c.h('button','l4d-mate');b.type='button';const name=c.h('b',null,s.name),bar=c.h('span','l4d-bar'),fill=c.h('i'),note=c.h('small');bar.append(fill);b.append(name,bar,note);b.onclick=()=>c.actions.tab(s.tab);box.append(b);cards.set(s.id,{b,fill,note});}
+   for(const s of c.systems()){const b=c.h('button','l4d-mate');b.type='button';const name=c.h('b',null,s.name),bar=c.h('span','l4d-bar'),fill=c.h('i'),note=c.h('small'),item=c.h('span','l4d-item');bar.append(fill);b.append(item,name,bar,note);b.onclick=()=>c.actions.tab(s.tab);box.append(b);cards.set(s.id,{b,fill,note,item,kit:''});}
    function render(){for(const s of c.systems()){const k=cards.get(s.id);const hp=s.level===3?100:s.level===2?55:s.level===1?22:0;
-    k.b.dataset.hp=hp>=70?'good':hp>=40?'hurt':hp>0?'critical':'down';k.fill.style.width=hp+'%';k.note.textContent=s.level===0?'Down':s.detail;k.b.title=s.name+': '+s.detail+'. Opens '+c.TAB_NAMES[s.tab]+'.';}
+    k.b.dataset.hp=hp>=70?'good':hp>=40?'hurt':hp>0?'critical':'down';
+    // v2.28: the item each survivor carries, as on the team HUD: a first aid kit while healthy, pills
+    // when hurt, adrenaline when critical, and down (incapacitated) when the part isn't working.
+    const kit=({good:'medkit',hurt:'pills',critical:'adrenaline',down:'incapacitated'})[k.b.dataset.hp];
+    if(k.kit!==kit){k.kit=kit;k.item.replaceChildren(...[c.brand(kit,'l4d-bi')].filter(Boolean));k.item.title=({medkit:'First aid kit',pills:'Pain pills',adrenaline:'Adrenaline',incapacitated:'Incapacitated'})[kit];}k.fill.style.width=hp+'%';k.note.textContent=s.level===0?'Down':s.detail;k.b.title=s.name+': '+s.detail+'. Opens '+c.TAB_NAMES[s.tab]+'.';}
     box.dataset.incap=String(c.S.state==='error');}
    render();c.every(render);return {update:render};
   }},
@@ -31,9 +35,11 @@
  F.define('winxp',[
   {id:'xp-taskbar',mount(c){
    const foot=c.root.querySelector('.foot');
-   const start=c.h('button','fx xp-start','start');start.type='button';start.setAttribute('aria-haspopup','menu');start.setAttribute('aria-expanded','false');
+   const start=c.h('button','fx xp-start','start');{const f=c.brand('windows-flag','xp-flag');if(f)start.prepend(f);}start.type='button';start.setAttribute('aria-haspopup','menu');start.setAttribute('aria-expanded','false');
    const tray=c.h('span','fx xp-tray'),clock=c.h('time','xp-clock');
    const icons={owner:c.h('span','xp-ti owner'),voice:c.h('span','xp-ti voice'),net:c.h('span','xp-ti net'),music:c.h('span','xp-ti music')};
+   // v2.28: the tray's volume and network icons are XP's own (the branded pack); the others stay drawn.
+   for(const [k,id] of [['voice','speaker'],['net','network']]){const bi=c.brand(id,'xp-ti-bi');if(bi){icons[k].classList.add('xp-ti-b');icons[k].append(bi);}}
    for(const i of Object.values(icons))tray.append(i);tray.append(clock);foot.prepend(start);foot.append(tray);
    let menu=null;
    function close(){menu?.remove();menu=null;start.setAttribute('aria-expanded','false');}
@@ -42,11 +48,12 @@
     // v2.22: the real Start menu's two columns: Tyler's tabs on the white side, his tools on the blue
     // side, and Log Off (Pause AI) / Turn Off (collapse) along the bottom. Arrow keys move around.
     const cols=c.h('div','xp-menu-cols'),list=c.h('div','xp-menu-list'),places=c.h('div','xp-menu-places');
-    const item=(parent,cls,label,sub,run)=>{const b=c.h('button',cls);b.type='button';b.setAttribute('role','menuitem');b.append(c.h('b',null,label));if(sub)b.append(c.h('small',null,sub));b.onclick=()=>{close();run();};parent.append(b);return b;};
+    const item=(parent,cls,label,sub,run,icon)=>{const b=c.h('button',cls);b.type='button';b.setAttribute('role','menuitem');const bi=icon&&c.brand(icon,'xp-mi-bi');if(bi){b.classList.add('xp-has-bi');b.append(bi);const t=c.h('span','xp-mi-text');t.append(c.h('b',null,label));if(sub)t.append(c.h('small',null,sub));b.append(t);}else{b.append(c.h('b',null,label));if(sub)b.append(c.h('small',null,sub));}b.onclick=()=>{close();run();};parent.append(b);return b;};
     const SUB={conversation:'Replies and participation',room:'Music, squad and extras',soundboard:'Play clips in voice',setup:'Connect Tyler to this chat',checks:'Find and fix problems'};
-    for(const t of c.TABS)item(list,'xp-mi',c.TAB_NAMES[t],SUB[t],()=>c.actions.tab(t));
+    const XI={conversation:'information',room:'folder',soundboard:'speaker',setup:'my-computer',checks:'network'};
+    for(const t of c.TABS)item(list,'xp-mi',c.TAB_NAMES[t],SUB[t],()=>c.actions.tab(t),XI[t]);
     list.append(c.h('i','xp-menu-sep'));item(list,'xp-mi xp-all','All Programs','',()=>c.actions.settings());
-    item(places,'xp-pl',"Tyler's Settings",'',c.actions.settings);item(places,'xp-pl','Run full check','',c.actions.fullCheck);item(places,'xp-pl','Stop audio','',c.actions.stopAudio);places.append(c.h('i','xp-menu-sep'));item(places,'xp-pl','Help and Support','',()=>c.actions.tab('checks'));
+    item(places,'xp-pl',"Tyler's Settings",'',c.actions.settings,'my-computer');item(places,'xp-pl','Run full check','',c.actions.fullCheck,'network');item(places,'xp-pl','Stop audio','',c.actions.stopAudio,'speaker');places.append(c.h('i','xp-menu-sep'));item(places,'xp-pl','Help and Support','',()=>c.actions.tab('checks'),'information');
     cols.append(list,places);
     const off=c.h('div','xp-menu-foot'),logoff=c.h('button','xp-off xp-logoff','Log Off'),hide=c.h('button','xp-off','Turn Off');logoff.type=hide.type='button';logoff.title='Pause AI';hide.title='Collapse the panel';
     logoff.onclick=()=>{close();c.actions.pause();};hide.onclick=()=>{close();c.actions.collapse();};off.append(logoff,hide);
@@ -57,7 +64,7 @@
    // v2.22: balloon tips from the tray when something real happens: the call, the music, a problem fixed.
    let balloon=null,was={peers:0,music:''};
    function tip(icon,title,text){balloon?.remove();balloon=c.h('div','fx xp-balloon fx-interactive');balloon.setAttribute('role','status');const x=c.h('button','xp-bx','✕');x.type='button';x.setAttribute('aria-label','Close');x.onclick=()=>balloon?.remove();
-    const head=c.h('div','xp-bhead');head.append(c.h('span','xp-bicon '+icon),c.h('b',null,title),x);balloon.append(head,c.h('p',null,text));balloon.style.bottom=(c.panel.getBoundingClientRect().bottom-foot.getBoundingClientRect().top+6)+'px';c.flash(balloon,6000);}
+    const head=c.h('div','xp-bhead');head.append(c.brand(icon==='voice'?'speaker':'information','xp-bicon-bi')||c.h('span','xp-bicon '+icon),c.h('b',null,title),x);balloon.append(head,c.h('p',null,text));balloon.style.bottom=(c.panel.getBoundingClientRect().bottom-foot.getBoundingClientRect().top+6)+'px';c.flash(balloon,6000);}
    const balloons=(type,d)=>{const v=c.voice();
     if(v.peers>0&&!was.peers)tip('voice','Joined the voice call',v.peers+' '+(v.peers===1?'person':'people')+' in the call can hear Tyler now.');was.peers=v.peers;
     if(type==='music'&&d?.title&&d.title!==was.music)tip('music','Now playing',d.title.slice(0,80));if(type==='music')was.music=d?.title||'';
@@ -76,7 +83,7 @@
    return {update(type,d){if(type!=='state'||d.state!=='error'||d.before==='error')return;close();
     box=c.h('div','fx xp-dialog fx-interactive');box.setAttribute('role','alertdialog');box.setAttribute('aria-label','ROBOTIC TYLER problem');
     const title=c.h('div','xp-dtitle','ROBOTIC TYLER'),x=c.h('button','xp-x','✕');x.type='button';x.setAttribute('aria-label','Close');x.onclick=close;title.append(x);
-    const body=c.h('div','xp-dbody');body.append(c.h('span','xp-stop'),c.h('p',null,(d.text||'Tyler ran into a problem.').slice(0,180)));
+    const body=c.h('div','xp-dbody');body.append(c.brand('error','xp-stop-bi')||c.h('span','xp-stop'),c.h('p',null,(d.text||'Tyler ran into a problem.').slice(0,180)));
     const row=c.h('div','xp-dbtns'),checks=c.h('button',null,'Run checks'),ok=c.h('button',null,'OK');checks.type=ok.type='button';checks.onclick=()=>{close();c.actions.tab('checks');};ok.onclick=close;row.append(checks,ok);
     box.append(title,body,row);c.slots.layer.append(box);ok.focus();c.later(close,12000);},unmount:close};
   }},
@@ -91,7 +98,9 @@
    const art=c.root.querySelector('.mark-art');const img=c.h('canvas');img.width=64;img.height=64;face.append(img);
    const draw=()=>{try{const g=img.getContext('2d');g.imageSmoothingEnabled=false;g.clearRect(0,0,64,64);g.drawImage(art,0,0,art.width,art.height,4,4,56,56);}catch{}};
    // v2.22: the key cards, like the status bar's: blue = AI key saved, yellow = chat linked, red = voice armed.
-   const keys=c.h('div','doom-keys');const cards={blue:c.h('i','doom-key blue'),yellow:c.h('i','doom-key yellow'),red:c.h('i','doom-key red')};for(const k of Object.values(cards))keys.append(k);
+   const keys=c.h('div','doom-keys');const cards={blue:c.h('i','doom-key blue'),yellow:c.h('i','doom-key yellow'),red:c.h('i','doom-key red')};for(const [k,el] of Object.entries(cards)){const bi=c.brand(k+'-keycard','doom-key-bi');if(bi){el.classList.add('doom-key-b');el.append(bi);}keys.append(el);}
+   // v2.28: the status bar's own pickups beside the numbers: the ammo for replies, the medikit for health.
+   for(const [cell,id] of [[ammo,'ammo'],[hp,'health']]){const bi=c.brand(id,'doom-cell-bi');if(bi)cell.prepend(bi);}
    box.append(ammo,face,hp,keys);face.title='Tyler\'s status';
    function render(){ammoN.textContent=String(c.S.replies+c.S.spoken);const h=c.health();hpN.textContent=h+'%';face.dataset.mood=c.S.state==='error'?'hurt':c.S.state==='speaking'?'grin':c.S.state==='thinking'?'squint':h<50?'hurt':'idle';box.dataset.low=String(h<40);
     const sys=c.systems(),v=c.voice(),have={blue:c.S.keyOk===true,yellow:sys[1].level===3,red:v.armed};for(const [k,el] of Object.entries(cards)){el.dataset.have=String(!!have[k]);el.title=({blue:'Blue key: AI key',yellow:'Yellow key: chat linked',red:'Red key: voice armed'})[k]+(have[k]?'':' (missing)');}}
@@ -154,7 +163,7 @@
   }},
   {id:'qk-medals',mount(c){
    const counts={};let lastTurn=0;
-   function award(key,name){counts[key]=c.best('quake:'+key,(Number(c.life?.best?.['quake:'+key])||counts[key]||0)+1);const el=c.h('div','fx qk-medal '+key);el.append(c.h('span','qk-medal-icon'),c.h('b',null,name),c.h('small',null,'×'+counts[key]));el.setAttribute('role','status');c.flash(el,1700);}
+   function award(key,name){counts[key]=c.best('quake:'+key,(Number(c.life?.best?.['quake:'+key])||counts[key]||0)+1);const el=c.h('div','fx qk-medal '+key);el.append(c.brand(({impressive:'quad-damage',excellent:'quake-rune',perfect:'armor'})[key],'qk-medal-bi')||c.h('span','qk-medal-icon'),c.h('b',null,name),c.h('small',null,'×'+counts[key]));el.setAttribute('role','status');c.flash(el,1700);}
    return {update(type,d){if(type!=='turn')return;const t=Date.now();
     if(d.ms<1200)award('impressive','Impressive');else if(lastTurn&&t-lastTurn<10000)award('excellent','Excellent');
     if(c.S.streak&&c.S.streak%5===0)award('perfect','Perfect');lastTurn=t;}};
@@ -174,12 +183,12 @@
   }},
   {id:'pb-gauges',mount(c){
    const box=c.add('deck',c.h('div','fx pb-gauges'));
-   const gauge=(label,title)=>{const g=c.h('div','pb-gauge');g.title=title;const dial=c.svg('<svg viewBox="0 0 100 60"><path class="pb-arc" d="M10 55 A40 40 0 0 1 90 55"/><path class="pb-ticks" d="M10 55 A40 40 0 0 1 90 55"/><line class="pb-needle" x1="50" y1="55" x2="50" y2="20"/><circle cx="50" cy="55" r="4"/></svg>');const v=c.h('b');g.append(dial,c.h('small',null,label),v);box.append(g);return {g,v,needle:dial.querySelector('.pb-needle')};};
-   const resp=gauge('RESP','Last reply time (0 to 5 s)'),rad=gauge('RADS','Text spend this session (reported by provider)');
+   const gauge=(label,title,icon)=>{const g=c.h('div','pb-gauge');g.title=title;const dial=c.svg('<svg viewBox="0 0 100 60"><path class="pb-arc" d="M10 55 A40 40 0 0 1 90 55"/><path class="pb-ticks" d="M10 55 A40 40 0 0 1 90 55"/><line class="pb-needle" x1="50" y1="55" x2="50" y2="20"/><circle cx="50" cy="55" r="4"/></svg>');const v=c.h('b'),l=c.h('small',null,label);const bi=c.brand(icon,'pb-gauge-bi');if(bi)l.prepend(bi);g.append(dial,l,v);box.append(g);return {g,v,needle:dial.querySelector('.pb-needle')};};
+   const resp=gauge('RESP','Last reply time (0 to 5 s)','atomic'),rad=gauge('RADS','Text spend this session (reported by provider)','radiation');
    const cnd=c.h('div','pb-cnd');cnd.title='Condition: Tyler\'s health';const fill=c.h('i'),track=c.h('span');track.append(fill);cnd.append(c.h('small',null,'CND'),track);box.append(cnd);
    // v2.22: CND opens the condition screen: each part of Tyler with its own bar, like the limbs.
    cnd.tabIndex=0;cnd.setAttribute('role','button');cnd.title='Condition: Tyler\'s health. Click for each part.';
-   const status=()=>{const o=c.overlay('pb-status','Condition');o.el.append(c.h('b','pb-st-head','STAT · CONDITION'));
+   const status=()=>{const o=c.overlay('pb-status','Condition');const sh=c.h('b','pb-st-head','STAT · CONDITION');const vt=c.brand('vault-tec','pb-st-bi');if(vt)sh.prepend(vt);o.el.append(sh);
     for(const sys of c.systems()){const row=c.h('div','pb-st-row'),bar=c.h('span','pb-st-bar'),f=c.h('i');const hp=sys.level===3?100:sys.level===2?55:sys.level===1?22:0;f.style.width=hp+'%';bar.append(f);row.dataset.hp=String(hp);row.append(c.h('span',null,sys.name.toUpperCase()),bar,c.h('small',null,sys.detail));o.el.append(row);}
     const x=c.h('button','pb-st-close','[ BACK ]');x.type='button';x.onclick=o.close;o.el.append(x);x.focus({preventScroll:true});};
    cnd.onclick=status;cnd.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();status();}};
@@ -190,7 +199,7 @@
   {id:'pb-radio',mount(c){
    const box=c.add('deck',c.h('div','fx pb-radio'));box.hidden=true;
    const wave=c.svg('<svg viewBox="0 0 120 24" preserveAspectRatio="none"><path d="M0 12 Q7.5 0 15 12 T30 12 T45 12 T60 12 T75 12 T90 12 T105 12 T120 12"/></svg>','pb-wave');
-   const title=c.h('span','pb-song');box.append(c.h('b',null,'Tyler FM'),wave,title);
+   const title=c.h('span','pb-song');{const fm=c.h('b',null,'Tyler FM');const ri=c.brand('radio','pb-radio-bi');if(ri)fm.prepend(ri);box.append(fm,wave,title);}
    // v2.22: the radio's own buttons: skip the song or switch the station off (the Music DJ's controls).
    const ctl=c.h('span','pb-ctl'),skip=c.h('button',null,'SKIP'),off=c.h('button',null,'OFF');skip.type=off.type='button';skip.title='Skip this song (Music DJ: Skip now)';off.title='Stop the music and the sharing';
    skip.onclick=()=>c.root.getElementById('musicSkip')?.click();off.onclick=()=>c.root.getElementById('musicEnd')?.click();ctl.append(skip,off);box.append(ctl);
@@ -226,7 +235,7 @@
    let term=null;const close=()=>{term?.remove();term=null;};
    const code=k=>({reply:'10-4',spoke:'11-6',sound:'10-91',music:'10-22',error:'10-108',state:'10-8'})[k]||'10-9';
    function open(){if(term)return close();const S=c.S,L=c.life,v=c.voice(),hp=c.health();term=c.h('div','fx cb-term fx-interactive');term.setAttribute('role','dialog');term.setAttribute('aria-label','Unit record');
-    const head=c.h('div','cb-term-head');head.append(c.h('b',null,'UNIT ROBOTIC TYLER'),c.h('span',null,'SECTOR STATUS: '+(S.state==='error'?'NON-COMPLIANT':'COMPLIANT')));
+    const head=c.h('div','cb-term-head');{const ins=c.brand('combine-insignia','cb-term-bi');if(ins)head.append(ins);}head.append(c.h('b',null,'UNIT ROBOTIC TYLER'),c.h('span',null,'SECTOR STATUS: '+(S.state==='error'?'NON-COMPLIANT':'COMPLIANT')));
     const gauge=c.h('div','cb-socio');gauge.dataset.level=hp>=80?'stable':hp>=50?'marginal':'critical';const meter=c.h('span','cb-socio-bar');for(let i=0;i<20;i++){const seg=c.h('i');if(i<Math.round(hp/5))seg.className='on';meter.append(seg);}
     gauge.append(c.h('small',null,'SOCIOSTABILITY'),meter,c.h('b',null,(hp>=80?'STABLE':hp>=50?'MARGINAL':'CRITICAL')+' · '+hp+'%'));
     const facts=c.h('div','cb-term-facts');for(const [k,val] of [['RESPONSES',L?L.replies+L.spoken:S.replies+S.spoken],['CITIZENS HEARD',L?L.heard:S.heard],['VIOLATIONS',L?L.errors:S.errors],['SUBJECTS ON BAND',v.peers],['AVG RESPONSE',c.ms(c.avgTurn())],['DEPLOYMENTS',L?L.sessions:1]]){const f=c.h('div');f.append(c.h('small',null,k),c.h('b',null,String(val)));facts.append(f);}
@@ -249,18 +258,18 @@
    chip.onclick=()=>{if(chip.getAttribute('aria-expanded')==='true'){c._menu?.close();return;}const paused=c.actions.paused();
     c.menu(chip,[{heading:'Overwatch directives · CP-17'},
      paused?{mark:'▶',label:'Deploy unit',hint:'Connect & start',run:c.actions.connect}:{mark:'❚❚',label:'Suspend unit',hint:'Pause AI',run:c.actions.pause},
-     {mark:'◎',label:'Inspect sector',hint:'Full check',run:c.actions.fullCheck},
-     {mark:'≋',label:'Re-scan voice band',hint:'Voice check',run:c.actions.refreshVoice},
-     {mark:'■',label:'Silence audio',hint:'Stop audio',run:c.actions.stopAudio},
+     {mark:'◎',icon:'checkpoint',label:'Inspect sector',hint:'Full check',run:c.actions.fullCheck},
+     {mark:'≋',icon:'radio',label:'Re-scan voice band',hint:'Voice check',run:c.actions.refreshVoice},
+     {mark:'■',icon:'stun-baton',label:'Silence audio',hint:'Stop audio',run:c.actions.stopAudio},
      'sep',{mark:'▤',label:'Unit record',hint:'T',run:()=>c.panel.dispatchEvent(new CustomEvent('tyler-fx',{detail:'cb-terminal'}))},
-     {mark:'⚙',label:'Overwatch config',hint:'Settings',run:c.actions.settings}],{cls:'cb-menu',label:'Overwatch directives',align:'right'});};
+     {mark:'⚙',icon:'civil-protection-mask',label:'Overwatch config',hint:'Settings',run:c.actions.settings}],{cls:'cb-menu',label:'Overwatch directives',align:'right'});};
    render();return {update(type){if(type==='state')render();if(type==='chat')snap();}};
   }},
   {id:'cb-scan',mount(c){
    let last=0;
    return {update(type,d){if(type!=='state'||d.state===d.before)return;
-    if(d.state==='listening'&&Date.now()-last>15000&&!c.reduced){last=Date.now();const v=c.voice(),scan=c.h('div','fx cb-scan');scan.style.setProperty('--cb-top',(c.below('#activityCard')-12)+'px');scan.append(c.h('i'),c.h('b',null,'Biosignal scan: '+(v.peers||'no')+' subject'+(v.peers===1?'':'s')+' in call'));c.flash(scan,2000);}
-    if(d.state==='error'){const a=c.h('div','fx cb-alert'),band=c.h('div','cb-alert-band');band.style.top=(c.below('.tabs')+4)+'px';band.append(c.h('b',null,'Anomaly'),c.h('i',null,'10-108'),c.h('span',null,(d.text||'Unit requires inspection').slice(0,90)));a.append(band);c.flash(a,3200);}}};
+    if(d.state==='listening'&&Date.now()-last>15000&&!c.reduced){last=Date.now();const v=c.voice(),scan=c.h('div','fx cb-scan');scan.style.setProperty('--cb-top',(c.below('#activityCard')-12)+'px');scan.append(c.h('i'),...[c.brand('scanner','cb-scan-bi')].filter(Boolean),c.h('b',null,'Biosignal scan: '+(v.peers||'no')+' subject'+(v.peers===1?'':'s')+' in call'));c.flash(scan,2000);}
+    if(d.state==='error'){const a=c.h('div','fx cb-alert'),band=c.h('div','cb-alert-band');band.style.top=(c.below('.tabs')+4)+'px';band.append(...[c.brand('alert','cb-alert-bi')].filter(Boolean),c.h('b',null,'Anomaly'),c.h('i',null,'10-108'),c.h('span',null,(d.text||'Unit requires inspection').slice(0,90)));a.append(band);c.flash(a,3200);}}};
   }},
  ]);
 
@@ -269,7 +278,7 @@
   {id:'dl-souls',mount(c){
    const box=c.add('deck',c.h('div','fx dl-plate'));
    const orb=c.h('span','dl-orb'),souls=c.h('b','dl-souls'),flex=c.h('span','dl-flex');
-   const left=c.h('div','dl-left');left.append(orb,souls,c.h('small',null,'Souls'));box.append(left,c.h('span','dl-rule'),flex);
+   const left=c.h('div','dl-left');{const sc=c.brand('soul-currency','dl-orb-bi');if(sc){orb.classList.add('dl-orb-b');orb.append(sc);}}left.append(orb,souls,c.h('small',null,'Souls'));box.append(left,c.h('span','dl-rule'),flex);
    left.title='Souls: tokens Tyler has used (1 soul per 10 tokens)';flex.title='Flex slots: people in the voice call';
    let shown=0,target=0,anim=0;
    const tokens=()=>{const m=/([\d.,]+)\s*([KMB]?)/i.exec(c.S.tokens||'');if(!m)return 0;return Number(m[1].replace(/,/g,''))*({K:1e3,M:1e6,B:1e9}[m[2].toUpperCase()]||1);};
@@ -301,16 +310,16 @@
    left.tabIndex=0;left.setAttribute('role','button');left.setAttribute('aria-haspopup','dialog');left.title='Souls: tokens Tyler has used (1 soul per 10 tokens). Click for the shop (B).';
    const CATS=[['weapon','Weapon'],['vitality','Vitality'],['spirit','Spirit']];let cat='weapon',o=null;
    function items(k){const S=c.S,v=c.voice(),snd=c.actions.sounds(),paused=c.actions.paused(),fav=snd.favorites.map(n=>snd.slots.find(x=>x.slot===n)).find(Boolean);
-    if(k==='weapon')return [['Soundboard',snd.slots.length+' clips · '+S.sounds+' played','◆',()=>c.actions.tab('soundboard')],fav?['Quick cast',fav.name,'✦',()=>c.actions.playSound(fav.slot)]:['Quick cast','Star a clip in Sounds first','✦',null],['Silence','Stops clips, music and voice','■',c.actions.stopAudio]];
-    if(k==='vitality')return [['Full check','Health '+c.health()+'%','✚',c.actions.fullCheck],['Voice check',v.armed?(v.peers?v.peers+' in the call':'Armed, call empty'):'Microphone off','◖',c.actions.refreshVoice],['Checks','Problems and fixes','☰',()=>c.actions.tab('checks')]];
-    return [[paused?'Connect & start':'Pause AI',S.label||'Ready','❚',paused?c.actions.connect:c.actions.pause],['Setup',S.model||(S.keyOk===false?'No AI key saved':'Chat and AI'),'⚙',()=>c.actions.tab('setup')],['Settings','Voice, theme and keys','✧',c.actions.settings]];}
+    if(k==='weapon')return [['Soundboard',snd.slots.length+' clips · '+S.sounds+' played','◆',()=>c.actions.tab('soundboard')],fav?['Quick cast',fav.name,'bi:spirit-flame',()=>c.actions.playSound(fav.slot)]:['Quick cast','Star a clip in Sounds first','bi:spirit-flame',null],['Silence','Stops clips, music and voice','■',c.actions.stopAudio]];
+    if(k==='vitality')return [['Full check','Health '+c.health()+'%','✚',c.actions.fullCheck],['Voice check',v.armed?(v.peers?v.peers+' in the call':'Armed, call empty'):'Microphone off','bi:spectral-radio',c.actions.refreshVoice],['Checks','Problems and fixes','☰',()=>c.actions.tab('checks')]];
+    return [[paused?'Connect & start':'Pause AI',S.label||'Ready','❚',paused?c.actions.connect:c.actions.pause],['Setup',S.model||(S.keyOk===false?'No AI key saved':'Chat and AI'),'bi:patron-totem',()=>c.actions.tab('setup')],['Settings','Voice, theme and keys','✧',c.actions.settings]];}
    function render(focusTab){if(!o)return;const el=o.el;el.replaceChildren();el.dataset.cat=cat;
-    const head=c.h('div','dl-shop-head');const bank=c.h('span','dl-shop-bank');bank.append(c.h('i','dl-orb'),c.h('b',null,(c.root.querySelector('.dl-souls')?.textContent||'0')));head.append(c.h('b',null,'Shop'),bank);
+    const head=c.h('div','dl-shop-head');const bank=c.h('span','dl-shop-bank');bank.append(c.brand('soul-currency','dl-orb-bi')||c.h('i','dl-orb'),c.h('b',null,(c.root.querySelector('.dl-souls')?.textContent||'0')));head.append(c.h('b',null,'Shop'),bank);
     const tabs=c.h('div','dl-shop-tabs');tabs.setAttribute('role','tablist');
     for(const [k,name] of CATS){const t=c.h('button','dl-shop-tab',name);t.type='button';t.dataset.cat=k;t.setAttribute('role','tab');t.setAttribute('aria-selected',String(k===cat));t.tabIndex=k===cat?0:-1;t.onclick=()=>{cat=k;render(true);};
      t.onkeydown=e=>{const i=CATS.findIndex(x=>x[0]===cat);if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();cat=CATS[(i+(e.key==='ArrowRight'?1:2))%3][0];render(true);}};tabs.append(t);}
     const grid=c.h('div','dl-shop-grid');grid.setAttribute('role','tabpanel');
-    items(cat).forEach(([name,stat,glyph,run],i)=>{const b=c.h('button','dl-item');b.type='button';b.disabled=!run;b.append(c.h('span','dl-item-top'),c.h('span','dl-item-glyph',glyph),c.h('b',null,name),c.h('small',null,stat),c.h('span','dl-item-tier','I'.repeat(i+1)));b.onclick=()=>{o?.close();run?.();};grid.append(b);});
+    items(cat).forEach(([name,stat,glyph,run],i)=>{const b=c.h('button','dl-item');b.type='button';b.disabled=!run;b.append(c.h('span','dl-item-top'),String(glyph).startsWith('bi:')?(c.brand(glyph.slice(3),'dl-item-bi')||c.h('span','dl-item-glyph','✦')):c.h('span','dl-item-glyph',glyph),c.h('b',null,name),c.h('small',null,stat),c.h('span','dl-item-tier','I'.repeat(i+1)));b.onclick=()=>{o?.close();run?.();};grid.append(b);});
     const x=c.h('button','dl-shop-close','Close');x.type='button';x.onclick=()=>o?.close();
     el.append(head,tabs,grid,c.h('small','dl-shop-note','Arrows switch category · B or Esc closes'),x);
     (focusTab?tabs.querySelector('[aria-selected=true]'):grid.querySelector('button:not(:disabled)'))?.focus();}

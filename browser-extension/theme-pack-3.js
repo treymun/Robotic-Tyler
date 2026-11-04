@@ -83,9 +83,10 @@
    const title=c.h('div','pd-title');const status=c.h('b');title.append(c.h('small',null,'Heist plan'),status);box.append(title);
    // v2.22: the drill. While Tyler writes, a drill timer runs to his usual reply time; past twice that,
    // "The drill's jammed!"; then "Drill done".
-   const drill=c.h('div','pd-drill'),bar=c.h('span','pd-drill-bar'),fill=c.h('i'),dt=c.h('small');bar.append(fill);drill.append(c.h('b',null,'Drill'),bar,dt);box.append(drill);
+   const drill=c.h('div','pd-drill'),bar=c.h('span','pd-drill-bar'),fill=c.h('i'),dt=c.h('small');bar.append(fill);{const dl=c.h('b',null,'Drill'),di=c.brand('drill','pd-drill-bi');if(di)dl.prepend(di);drill.append(dl,bar,dt);}box.append(drill);
    const row=c.h('div','pd-steps');box.append(row);
-   defs.forEach(([name,detail,tab],i)=>{const b=c.h('button','pd-step');b.type='button';b.append(c.h('small',null,String(i+1)),c.h('b',null,name),c.h('span',null,detail));b.onclick=()=>c.actions.tab(tab);row.append(b);steps.push(b);});
+   const PD_GEAR=['loot-bag','stealth-ghost','drill','dallas-mask'];
+   defs.forEach(([name,detail,tab],i)=>{const b=c.h('button','pd-step');b.type='button';const n=c.h('small',null,String(i+1)),gear=c.brand(PD_GEAR[i],'pd-step-bi');b.append(n);if(gear)b.append(gear);b.append(c.h('b',null,name),c.h('span',null,detail));b.onclick=()=>c.actions.tab(tab);row.append(b);steps.push(b);});
    let jam=0,done=0;
    function render(){let first=-1;defs.forEach((d,i)=>{const ok=d[3]();steps[i].dataset.done=String(ok);if(!ok&&first<0)first=i;steps[i].dataset.next=String(i===first);});status.textContent=first<0?'Ready. Go loud.':'Next: '+defs[first][0];box.dataset.ready=String(first<0);}
    function drillState(st){c.cancel(jam);
@@ -99,7 +100,7 @@
    const render=()=>{const L=c.life;n.textContent=L?'#'+L.sessions:'';time.textContent=c.clock(Date.now()-c.S.started);t.title='Heist time: how long this panel has been running'+(L?'. Heist #'+L.sessions+', career '+(L.timeMs/36e5).toFixed(1)+' h, '+(L.replies+L.spoken).toLocaleString()+' jobs done':'')+'. Click for the PAYDAY screen.';};
    const plural=(n,w)=>n.toLocaleString()+' '+w+(n===1?'':'s');
    function payday(){const S=c.S,L=c.life,o=c.overlay('pd-payday','PAYDAY');
-    const head=c.h('div','pd-pay-head');head.append(c.h('b',null,'PAYDAY'),c.h('span',null,(L?'Heist #'+L.sessions+' · ':'')+c.clock(Date.now()-S.started)));
+    const head=c.h('div','pd-pay-head');{const pm=c.brand('payday-2-mark','pd-pay-bi');if(pm)head.append(pm);}head.append(c.h('b',null,'PAYDAY'),c.h('span',null,(L?'Heist #'+L.sessions+' · ':'')+c.clock(Date.now()-S.started)));
     const take=c.h('div','pd-pay-grid');for(const [k,v] of [['Jobs done',S.replies+S.spoken],['Crew heard',S.heard],['Bags secured',S.sounds],['Alarms raised',S.errors],['Average job',c.ms(c.avgTurn())],['Best streak',S.best]]){const f=c.h('div');f.append(c.h('small',null,k),c.h('b',null,String(v)));take.append(f);}
     const cost=c.h('div','pd-pay-cost');cost.append(c.h('small',null,'Cleaner costs (AI text spend)'),c.h('b',null,'$'+S.spend.toFixed(4)));
     o.el.append(head,c.h('small','pd-pay-sub','This heist'),take,cost);
@@ -118,7 +119,7 @@
    function show(phase){c.cancel(fade);
     if(!banner){banner=c.h('div','fx pd-assault');banner.setAttribute('role','status');
      if(plan)plan.prepend(banner);else{c.add('layer',banner);banner.style.top=(c.below('.tabs')+2)+'px';}
-     const inner=c.h('span','pd-assault-text'),pager=c.h('button','pd-pager fx-interactive');pager.type='button';pager.title='Hold to answer the pager: runs the full check (or hold F over the panel)';pager.append(c.h('i'),c.h('b',null,'Pager'),c.h('small',null,'hold F'));
+     const inner=c.h('span','pd-assault-text'),pager=c.h('button','pd-pager fx-interactive');pager.type='button';pager.title='Hold to answer the pager: runs the full check (or hold F over the panel)';pager.append(c.brand('pager','pd-pager-bi')||c.h('i'),c.h('b',null,'Pager'),c.h('small',null,'hold F'));
      pager.onpointerdown=e=>{e.preventDefault();startHold();};pager.onpointerup=pager.onpointerleave=pager.onpointercancel=cancelHold;pager.onclick=e=>{if(e.detail===0)c.actions.fullCheck();};
      banner.append(inner,pager);}
     banner.dataset.phase=phase;banner.querySelector('.pd-assault-text').textContent=phase==='fade'?'Assault ending':'Police assault in progress';
@@ -149,7 +150,7 @@
    vmu.onclick=()=>{if(mem)return close();const L=c.life,S=c.S;mem=c.h('div','fx dc-memory fx-interactive');mem.setAttribute('role','dialog');mem.setAttribute('aria-label','Memory card');
     const bios=c.h('div','dc-bios');bios.setAttribute('role','group');bios.setAttribute('aria-label','Main menu');
     for(const [k,name,run] of [['play','Play',()=>{close();c.actions.paused()?c.actions.connect():c.actions.tab('conversation');}],['file','File',null],['music','Music',()=>{close();c.actions.tab('room');}],['settings','Settings',()=>{close();c.actions.settings();}]]){
-     const b=c.h('button','dc-bios-item');b.type='button';b.dataset.k=k;b.append(c.svg('<svg viewBox="0 0 16 16" shape-rendering="crispEdges"><path d="'+DC_BIOS[k]+'"/></svg>','dc-bios-icon'),c.h('span',null,name));
+     const b=c.h('button','dc-bios-item');b.type='button';b.dataset.k=k;b.append(c.brand(({play:'controller',file:'memory-card',music:'gd-rom',settings:'clock'})[k],'dc-bios-bi')||c.svg('<svg viewBox="0 0 16 16" shape-rendering="crispEdges"><path d="'+DC_BIOS[k]+'"/></svg>','dc-bios-icon'),c.h('span',null,name));
      if(!run){b.setAttribute('aria-current','page');b.tabIndex=-1;}else b.onclick=run;b.title=k==='play'?(c.actions.paused()?'Connect & start':'Back to Chat'):k==='music'?'Room tab: the Music DJ':k==='settings'?'Settings':'This screen';bios.append(b);}
     mem.append(bios,c.h('b',null,'Visual Memory · Tyler'));const grid=c.h('div','dc-files');
     const info=c.h('div','dc-info');const show=(name,value,blocks)=>{info.replaceChildren(c.h('b',null,name.toUpperCase()),c.h('span',null,String(value)),c.h('small',null,blocks+' BLOCK'+(blocks===1?'':'S')));};
@@ -172,7 +173,7 @@
    render();c.every(render);return {update:render,unmount(){lcd.remove();close();}};
   }},
   {id:'dc-swirl',mount(c){
-   const play=()=>{if(c.reduced)return;const s=c.h('div','fx dc-swirl');s.append(c.svg('<svg viewBox="0 0 100 100"><path d="M50 50 m0 -6 a6 6 0 1 1 -6 6 a12 12 0 0 1 12 -12 a18 18 0 1 1 -18 18 a24 24 0 0 1 24 -24 a30 30 0 1 1 -30 30"/></svg>'));c.flash(s,1300);};
+   const play=()=>{if(c.reduced)return;const s=c.h('div','fx dc-swirl');s.append(c.brand('dreamcast-swirl','dc-swirl-bi')||c.svg('<svg viewBox="0 0 100 100"><path d="M50 50 m0 -6 a6 6 0 1 1 -6 6 a12 12 0 0 1 12 -12 a18 18 0 1 1 -18 18 a24 24 0 0 1 24 -24 a30 30 0 1 1 -30 30"/></svg>'));c.flash(s,1300);};
    // In the theme gallery the boot plays when the theme is picked, not on every preview state.
    if(!c.preview||c.preview.first)c.later(play,250);
    return {update(type,d){if(type==='mini'&&!d.mini)play();if(type==='state'&&['paused','standby','error'].includes(d.before)&&['ready','listening'].includes(d.state))play();}};
@@ -197,7 +198,7 @@
    let o=null;
    function open(){if(o){o.close();return;}const {slots,favorites}=c.actions.sounds(),paused=c.actions.paused();
     o=c.overlay('gm-spawn','Spawn menu',{onClose:()=>{o=null;}});const el=o.el;
-    const tabs=c.h('div','gm-sp-tabs');tabs.append(c.h('b',null,'Spawnlists'),c.h('span',null,'Sounds · '+slots.length));
+    const tabs=c.h('div','gm-sp-tabs');{const sp=c.h('b',null,'Spawnlists'),si=c.brand('spawn-menu','gm-sp-bi');if(si)sp.prepend(si);tabs.append(sp);}tabs.append(c.h('span',null,'Sounds · '+slots.length));
     const left=c.h('div','gm-sp-left'),search=c.h('input','gm-sp-search');search.type='search';search.placeholder='Search...';search.setAttribute('aria-label','Search sounds');
     const grid=c.h('div','gm-sp-grid');
     const list=[...favorites.map(n=>slots.find(x=>x.slot===n)).filter(Boolean),...slots.filter(x=>!favorites.includes(x.slot))];
@@ -206,7 +207,7 @@
     if(!list.length)grid.append(c.h('p','gm-sp-empty','No sounds yet. The Sounds tab sets up the soundboard.'));
     search.oninput=()=>{const q=search.value.trim().toLowerCase();for(const b of grid.querySelectorAll('.gm-icon'))b.hidden=!!q&&!b.dataset.name.includes(q);};
     left.append(search,grid);
-    const tools=c.h('div','gm-sp-tools');tools.append(c.h('b',null,'Tools'));
+    const tools=c.h('div','gm-sp-tools');{const tl=c.h('b',null,'Tools'),ti=c.brand('tool-gun','gm-sp-bi');if(ti)tl.prepend(ti);tools.append(tl);}
     for(const [name,hint,run] of [paused?['Unfreeze','Connect & start',c.actions.connect]:['Freeze','Pause AI',c.actions.pause],['Remover','Stop audio',c.actions.stopAudio],['Inspector','Full check',c.actions.fullCheck],['Voice check','People in the call',c.actions.refreshVoice],['Options','Settings',c.actions.settings]]){
      const t=c.h('button','gm-tool');t.type='button';t.append(c.h('span',null,name),c.h('small',null,hint));t.onclick=()=>{o?.close();run();};tools.append(t);}
     const body=c.h('div','gm-sp-body');body.append(left,tools);
@@ -218,7 +219,7 @@
   }},
   {id:'gm-notices',mount(c){
    const stack=c.add('layer',c.h('div','fx gm-stack'));
-   function note(kind,text){const n=c.h('div','gm-note '+kind);n.append(c.h('i'),c.h('span',null,text));stack.append(n);while(stack.children.length>4)stack.firstElementChild.remove();c.later(()=>n.classList.add('gone'),3400);c.later(()=>n.remove(),3800);}
+   function note(kind,text){const n=c.h('div','gm-note '+kind);n.append(c.brand(({spawn:'spawn-menu',tool:'tool-gun',undo:'undo'})[kind],'gm-note-bi')||c.h('i'),c.h('span',null,text));stack.append(n);while(stack.children.length>4)stack.firstElementChild.remove();c.later(()=>n.classList.add('gone'),3400);c.later(()=>n.remove(),3800);}
    return {update(type,d){if(type==='sound')note('spawn','Spawned sound: '+d.name);if(type==='reply')note('spawn','Spawned reply ('+d.chars+' chars)');if(type==='tab')note('tool','Tool: '+c.TAB_NAMES[d.tab]);if(type==='music'&&d.title)note('spawn','Spawned song: '+d.title.slice(0,34));if(type==='state'&&d.state==='paused'&&d.before!=='paused')note('undo','Undone: Automatic replies');}};
   }},
   {id:'gm-props',mount(c){
@@ -249,7 +250,7 @@
    const showHi=()=>{const best=c.best('ricochet',points);hi.textContent='HI '+String(best).padStart(6,'0');};
    box.tabIndex=0;box.setAttribute('role','button');box.title='Arcade score: replies score points, faster ones more. Click for the high-score table.';
    let table=null;const close=()=>{table?.remove();table=null;};
-   const open=()=>{if(table)return close();const L=c.life;table=c.h('div','fx rc-table fx-interactive');table.setAttribute('role','dialog');table.setAttribute('aria-label','High scores');table.append(c.h('b',null,'High scores'));
+   const open=()=>{if(table)return close();const L=c.life;table=c.h('div','fx rc-table fx-interactive');table.setAttribute('role','dialog');table.setAttribute('aria-label','High scores');{const hs=c.h('b',null,'High scores'),md=c.brand('medal','rc-table-bi');if(md)hs.prepend(md);table.append(hs);}
     const rows=[['This game',points],['Best ever',Number(L?.best?.ricochet)||points],['Fastest reply',L?.fastest?c.ms(L.fastest):'—'],['Longest streak',Math.max(L?.bestStreak||0,c.S.best)],['Games played',L?.sessions||1]];
     for(const [k,v] of rows){const r=c.h('div','rc-row');r.append(c.h('span',null,k),c.h('b',null,typeof v==='number'?String(v).padStart(k.includes('streak')||k.includes('played')?1:6,'0'):String(v)));table.append(r);}
     const x=c.h('button','rc-close','Continue');x.type='button';x.onclick=close;table.append(x);table.style.setProperty('--fx-top',(c.below('.tabs')+6)+'px');c.slots.layer.append(table);x.focus();};
@@ -266,7 +267,7 @@
    const tabs=c.root.querySelector('.tabs');let prev=c.S.tab;
    return {update(type,d){if(type!=='tab'||d.tab===prev||c.reduced)return;const from=c.TABS.indexOf(prev),to=c.TABS.indexOf(d.tab);prev=d.tab;
     const p=c.panel.getBoundingClientRect(),r=tabs.getBoundingClientRect(),w=r.width/c.TABS.length;
-    const disc=c.h('span','fx rc-flying');disc.style.top=(r.top-p.top+r.height/2-9)+'px';disc.style.setProperty('--from',(r.left-p.left+w*(from+.5)-9)+'px');disc.style.setProperty('--to',(r.left-p.left+w*(to+.5)-9)+'px');c.flash(disc,520);}};
+    const disc=c.h('span','fx rc-flying');{const em=c.brand('ricochet-emblem','rc-flying-bi');if(em){disc.classList.add('rc-flying-b');disc.append(em);}}disc.style.top=(r.top-p.top+r.height/2-9)+'px';disc.style.setProperty('--from',(r.left-p.left+w*(from+.5)-9)+'px');disc.style.setProperty('--to',(r.left-p.left+w*(to+.5)-9)+'px');c.flash(disc,520);}};
   }},
  ]);
 
@@ -281,7 +282,7 @@
    // v2.22: the callsign opens the radio commands (or Z over the panel); a command goes out as a radio
    // line under the dial, and changing channel crackles.
    const call=c.h('button','dod-call','TYLER-1');call.type='button';call.title='Radio commands (Z)';call.setAttribute('aria-haspopup','menu');call.setAttribute('aria-expanded','false');
-   const meta=c.h('div','dod-meta');meta.append(lamp,call,signal);const line=c.h('div','dod-line');line.setAttribute('aria-live','polite');box.append(knob,scale,meta,line);
+   const meta=c.h('div','dod-meta');{const fr=c.brand('field-radio','dod-radio-bi');if(fr)meta.append(fr);}meta.append(lamp,call,signal);const line=c.h('div','dod-line');line.setAttribute('aria-live','polite');box.append(knob,scale,meta,line);
    let lineT=0;const radio=t=>{c.cancel(lineT);line.replaceChildren(c.h('b',null,'(RADIO) TYLER-1:'),c.h('span',null,' '+t));box.dataset.line='on';lineT=c.later(()=>{box.dataset.line='';},3200);};
    function commands(){if(call.getAttribute('aria-expanded')==='true'){c._menu?.close();return;}const paused=c.actions.paused();
     const say=(t,run)=>()=>{radio(t);run();};
@@ -305,12 +306,12 @@
    render();c.every(render);return {update(type,d){if(type==='tab'&&d.tab!==lastTab){lastTab=d.tab;crackle();}render();}};
   }},
   {id:'dod-brief',mount(c){
-   const chip=c.add('bar',c.h('button','fx fx-chip dod-chip','Orders'));chip.type='button';chip.title='Operation briefing';
+   const chip=c.add('bar',c.h('button','fx fx-chip dod-chip','Orders'));{const oi=c.brand('orders','dod-chip-bi');if(oi)chip.prepend(oi);}chip.type='button';chip.title='Operation briefing';
    let sheet=null;
    function close(){sheet?.remove();sheet=null;}
    function open(){if(sheet)return close();const S=c.S,v=c.voice(),sys=c.systems();
     sheet=c.h('div','fx dod-brief fx-interactive');sheet.setAttribute('role','dialog');sheet.setAttribute('aria-label','Operation briefing');
-    sheet.append(c.h('small',null,'Field orders · '+new Date().toLocaleDateString()),c.h('b',null,'Operation Friday Squad'));
+    {const em=c.brand('game-emblem','dod-sheet-bi');if(em)sheet.append(em);}sheet.append(c.h('small',null,'Field orders · '+new Date().toLocaleDateString()),c.h('b',null,'Operation Friday Squad'));
     const list=c.h('dl');for(const [k,val] of [['Unit','ROBOTIC TYLER'],['Objective','Keep the squad company in chat and voice'],['Comms',sys[1].detail],['Radio',v.armed?(v.peers?v.peers+' on the net':'net open, no one on it'):'radio off'],['Brain',S.model||'unknown'],['Reports',(S.replies+S.spoken)+' sent · '+S.errors+' problems']]){list.append(c.h('dt',null,k),c.h('dd',null,String(val)));}
     // v2.22: the objectives, ticked off from what is really set up; each one opens where it's done.
     const obj=c.h('ol','dod-obj');for(const [done,label,tab] of [[S.keyOk===true,'Secure the AI key','setup'],[sys[1].level===3,'Establish comms with the chat','setup'],[v.armed,'Open the radio net','checks'],[v.peers>0,'Rally the squad on the net','checks']]){const li=c.h('li');li.dataset.done=String(done);const b=c.h('button',null,label);b.type='button';b.onclick=()=>{close();c.actions.tab(tab);};li.append(b);obj.append(li);}

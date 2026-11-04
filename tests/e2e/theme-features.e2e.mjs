@@ -30,6 +30,11 @@ test('each theme has its own features, wired to the real panel',{timeout:180000}
    const m=await page.evaluate(()=>TylerThemeFeatures.mounted());
    assert.ok(m.length>=2&&m.length<=4,theme+' has 2-4 features: '+m);
    for(const id of m){assert.ok(!seen.has(id),id+' belongs to one theme');seen.add(id);}
+   // v2.28: the original 20 themes draw some of the panel's icons with their branded pack (tabs, status
+   // badge); the five newer themes keep their own. Switching themes swaps or removes them.
+   const bi=await page.evaluate(R2=>{const r=document.getElementById('tyler-companion-root').shadowRoot;return {tabs:r.querySelectorAll('.tabs .ic[data-b]').length,stale:[...r.querySelectorAll('.ic[data-b]')].filter(i=>!i.dataset.b.startsWith(r.querySelector('.panel').dataset.rtTheme+'/')).length,badge:!!r.querySelector('.tally-brand')};});
+   if(['rust','x360','ipod','msn','xmb'].includes(theme))assert.deepEqual(bi,{tabs:0,stale:0,badge:false},theme+' keeps its own icons');
+   else{assert.ok(bi.tabs>=1,theme+' tabs use its branded icons ('+bi.tabs+')');assert.equal(bi.stale,0,theme+': no icon left from another theme');assert.equal(bi.badge,true,theme+' has a status badge');}
    // Real state reaches the features: a thinking → reply → speaking turn never throws.
    await page.evaluate(async()=>{const C=TylerCompanion;C.setActivity('THINKING — preparing');await new Promise(r=>setTimeout(r,60));C.emit('reply',{chars:12});C.setActivity('SPEAKING — on air');C.emit('sound',{slot:1,name:'Beep'});C.emit('music',{title:'Song'});C.emit('chat',{recent:10,flood:true});C.setActivity('LISTENING — speak');C.showTab('room');C.showTab('conversation');});
   }

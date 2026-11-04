@@ -31,6 +31,8 @@ body[data-desktop=true] .only-chrome,body:not([data-desktop=true]) .only-desktop
 .side-key{display:flex;align-items:center;gap:8px}
 .theme-chip{justify-content:flex-start;width:100%;min-height:30px;padding:5px 10px;font-size:12px;color:var(--rt-ink-2);background:var(--rt-block)}
 .theme-chip .ic{--ic-size:16px;margin:0}
+.theme-chip .theme-chip-bi{width:18px;height:18px;flex-shrink:0;overflow:visible}
+.theme-chip:has(.theme-chip-bi)>[data-icon]{display:none}
 .theme-chip b{color:var(--rt-ink-strong)}
 .key-dot{width:8px;height:8px;border-radius:50%;background:var(--rt-state-standby);flex-shrink:0}
 .key-dot[data-on=true]{background:var(--rt-state-ready);box-shadow:0 0 6px var(--rt-state-ready)}
@@ -225,6 +227,8 @@ body:not([data-ai-provider=gemini]) .for-gemini,body[data-ai-provider=gemini] .f
 .tg-name{flex:1;min-width:0;font:700 12px/1.25 var(--rt-font);color:var(--rt-ink-strong)}
 .tg-tag,.tg-badge{flex-shrink:0;padding:1px 6px;border-radius:var(--rt-r-xs);font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase}
 .tg-tag{color:var(--rt-ink-3);background:var(--rt-select)}
+/* v2.28: the theme's emblem from its branded icon pack, beside its name */
+.tg-bi{width:20px;height:20px;flex-shrink:0;overflow:visible;filter:drop-shadow(0 1px 1px rgba(0,0,0,.25))}
 .tg-badge{display:none;color:var(--rt-on-accent);background:var(--rt-accent-fill)}
 .tg-card[data-applied=true] .tg-badge{display:inline-block}
 .tg-stage{position:sticky;top:16px;display:flex;flex-direction:column;gap:12px;padding:14px;background:var(--rt-block);border:1px solid var(--rt-line);border-radius:var(--rt-r-md)}

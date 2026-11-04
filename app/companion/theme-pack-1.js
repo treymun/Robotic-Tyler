@@ -37,10 +37,10 @@
      paused?{mark:'●',label:'Online',hint:'Connect & start',run:c.actions.connect}:{mark:'●',label:'Online',current:kind!=='offline',hint:kind==='ingame'?'In voice':'',run:()=>{}},
      {mark:'●',label:'Away',hint:'Pause AI',current:paused,disabled:paused,run:c.actions.pause},
      'sep',
-     {mark:'★',label:'Achievements',hint:got+' of 12',run:()=>c.panel.dispatchEvent(new CustomEvent('tyler-fx',{detail:'st-achievements'}))},
+     {mark:'★',icon:'achievement',label:'Achievements',hint:got+' of 12',run:()=>c.panel.dispatchEvent(new CustomEvent('tyler-fx',{detail:'st-achievements'}))},
      {mark:'✓',label:'Run full check',run:c.actions.fullCheck},
      {mark:'■',label:'Stop audio',run:c.actions.stopAudio},
-     'sep',{mark:'⚙',label:'Settings…',run:c.actions.settings}],{cls:'st-menu',label:'Tyler status',align:'right'});};
+     'sep',{mark:'⚙',icon:'workshop',label:'Settings…',run:c.actions.settings}],{cls:'st-menu',label:'Tyler status',align:'right'});};
    render();return {update(type){if(type==='state')render();}};
   }},
   {id:'st-achievements',mount(c){
@@ -103,7 +103,7 @@
    const box=c.add('deck',c.h('div','fx cl-servers'));box.setAttribute('role','listbox');box.setAttribute('aria-label','Tyler services. Enter opens the matching tab.');
    const head=c.h('div','cl-head');head.append(c.h('span',null,'Service'),c.h('span',null,'Status'),c.h('span',null,'Ping'));box.append(head);
    const rows=new Map();let selected='ai';
-   for(const s of c.systems()){const row=c.h('div','cl-row');row.setAttribute('role','option');row.tabIndex=s.id==='ai'?0:-1;const lamp=c.h('i','cl-lamp');const name=c.h('span','cl-name',s.name),status=c.h('span','cl-status'),ping=c.h('span','cl-ping');name.prepend(lamp);row.append(name,status,ping);box.append(row);rows.set(s.id,{row,status,ping,tab:s.tab});
+   for(const s of c.systems()){const row=c.h('div','cl-row');row.setAttribute('role','option');row.tabIndex=s.id==='ai'?0:-1;const lamp=c.h('i','cl-lamp');const name=c.h('span','cl-name',s.name),status=c.h('span','cl-status'),ping=c.h('span','cl-ping');const bi=c.brand(({ai:'server',chat:'vgui-window',voice:'friends',music:'music'})[s.id],'cl-bi');if(bi)name.prepend(bi);name.prepend(lamp);row.append(name,status,ping);box.append(row);rows.set(s.id,{row,status,ping,tab:s.tab});
     row.onclick=()=>select(s.id);row.ondblclick=()=>c.actions.tab(s.tab);}
    let select=function(id){selected=id;for(const [k,r] of rows){r.row.setAttribute('aria-selected',String(k===id));r.row.tabIndex=k===id?0:-1;}};
    box.addEventListener('keydown',e=>{const ids=[...rows.keys()];let i=ids.indexOf(selected);if(e.key==='ArrowDown')i=Math.min(ids.length-1,i+1);else if(e.key==='ArrowUp')i=Math.max(0,i-1);else if(e.key==='Enter'){c.actions.tab(rows.get(selected).tab);return;}else return;e.preventDefault();select(ids[i]);rows.get(ids[i]).row.focus();});
@@ -172,7 +172,7 @@
   // v2.22: press E to call for a MEDIC: Tyler shouts it and the Checks tab (the medic) opens.
   {id:'tf-medic',mount(c){
    let last=0;
-   function call(){if(Date.now()-last<1500)return;last=Date.now();const b=c.h('div','fx tf-medic');b.append(c.h('b',null,'MEDIC!'),c.h('small',null,'Checks tab: run the full check to patch Tyler up'));c.flash(b,1800);c.root.querySelector('.mark')?.classList.add('tf-medic-call');c.later(()=>c.root.querySelector('.mark')?.classList.remove('tf-medic-call'),900);c.actions.tab('checks');}
+   function call(){if(Date.now()-last<1500)return;last=Date.now();const b=c.h('div','fx tf-medic');const mc=c.brand('medic-cross','tf-medic-bi');if(mc)b.append(mc);b.append(c.h('b',null,'MEDIC!'),c.h('small',null,'Checks tab: run the full check to patch Tyler up'));c.flash(b,1800);c.root.querySelector('.mark')?.classList.add('tf-medic-call');c.later(()=>c.root.querySelector('.mark')?.classList.remove('tf-medic-call'),900);c.actions.tab('checks');}
    c.key(e=>{if((e.key==='e'||e.key==='E')&&!e.repeat){e.preventDefault();call();}});
    const hint=c.root.querySelector('#tab-checks');hint?.setAttribute('title','Checks (5) · E calls for a medic');
    return {update(type,d){if(type==='state'&&d.state==='error'&&d.before!=='error'){const b=c.h('div','fx tf-medic tf-medic-hint');b.append(c.h('b',null,'Tyler is hurt'),c.h('small',null,'Press E for a medic'));c.flash(b,2600);}},unmount(){hint?.removeAttribute('title');}};
@@ -230,7 +230,7 @@
   }},
   {id:'cs-banner',mount(c){
    let last=0;
-   function show(kind,title,sub){if(Date.now()-last<2500)return;last=Date.now();const el=c.h('div','fx cs-banner '+kind);el.append(c.h('b',null,title),c.h('span',null,sub));c.flash(el,1900);}
+   function show(kind,title,sub){if(Date.now()-last<2500)return;last=Date.now();const el=c.h('div','fx cs-banner '+kind);const ic=c.brand(kind==='win'?'round-win':'c4-timer','cs-banner-bi');if(ic)el.append(ic);el.append(c.h('b',null,title),c.h('span',null,sub));c.flash(el,1900);}
    return {update(type,d){if(type==='turn')show('win','Round won',(d.ms<1500?'MVP · ':'')+'Tyler answered in '+c.ms(d.ms));if(type==='state'&&d.state==='error'&&d.before!=='error')show('loss','Round lost','Tyler needs attention');}};
   }},
  ]);
@@ -252,7 +252,7 @@
    // v2.22: the sign opens the chamber report (Enter or click): what each tile means and the numbers.
    box.tabIndex=0;box.setAttribute('role','button');box.title='Test chamber report';
    function report(){const S=c.S,v=c.voice(),L=c.life,o=c.overlay('po-report','Test chamber report');
-    const head=c.h('div','po-r-head');head.append(c.h('b',null,c.pad(S.replies+S.spoken)),c.h('span',null,'Test chamber report · subject: Robotic Tyler'));
+    const head=c.h('div','po-r-head');const ap=c.brand('aperture-iris','po-r-bi');if(ap)head.append(ap);head.append(c.h('b',null,c.pad(S.replies+S.spoken)),c.h('span',null,'Test chamber report · subject: Robotic Tyler'));
     const rows=[['Tests passed',S.replies+S.spoken],['Tests failed',S.errors],['Fastest test',S.turns.length?c.ms(Math.min(...S.turns)):'—'],['Average test',S.turns.length?c.ms(c.avgTurn()):'—'],['Subject health',c.health()+'%'],['Observers in the call',v.peers],['Lifetime tests',L?(L.replies+L.spoken).toLocaleString():'—']];
     const t=c.h('div','po-r-rows');for(const [k,val] of rows){const r=c.h('div');r.append(c.h('span',null,k),c.h('b',null,String(val)));t.append(r);}
     const legend=c.h('div','po-r-legend');for(const w of icons.children){const r=c.h('div');r.append(w.cloneNode(true),c.h('span',null,w.title+(w.classList.contains('on')?': yes':': not yet')));legend.append(r);}
@@ -290,7 +290,7 @@
    function open(){
     if(board)return close();
     board=c.h('div','fx c16-board fx-interactive');board.setAttribute('role','dialog');board.setAttribute('aria-label','Scoreboard');
-    title=c.h('div','c16-title');title.append(c.h('b',null,'ROBOTIC TYLER'),c.h('span',null,''));table=c.h('table');last='';fill();
+    title=c.h('div','c16-title');{const cm=c.brand('counter-strike-mark','c16-title-bi');if(cm)title.append(cm);}title.append(c.h('b',null,'ROBOTIC TYLER'),c.h('span',null,''));table=c.h('table');last='';fill();
     const x=c.h('button','c16-close','Close');x.type='button';x.onclick=close;board.append(title,table,x);c.slots.layer.append(board);chip.setAttribute('aria-pressed','true');x.focus();
    }
    c.every(()=>{if(board)fill();});
@@ -303,8 +303,8 @@
     ['Go go go! (Connect & start)',c.actions.connect,'Go go go!'],['Report in (full check)',c.actions.fullCheck,'Reporting in.']];
    let menu=null;
    function close(){menu?.remove();menu=null;}
-   function choose(i){const it=items[i];close();if(!it)return;it[1]();const msg=c.h('div','fx c16-roger');msg.append(c.h('b',null,'ROBOTIC TYLER (RADIO): '),it[2]);c.flash(msg,2200);}
-   function open(){if(menu)return close();menu=c.h('div','fx c16-menu fx-interactive');menu.setAttribute('role','menu');menu.append(c.h('b',null,'Radio commands'));
+   function choose(i){const it=items[i];close();if(!it)return;it[1]();const msg=c.h('div','fx c16-roger');{const ri=c.brand('radio','c16-roger-bi');if(ri)msg.append(ri);}msg.append(c.h('b',null,'ROBOTIC TYLER (RADIO): '),it[2]);c.flash(msg,2200);}
+   function open(){if(menu)return close();menu=c.h('div','fx c16-menu fx-interactive');menu.setAttribute('role','menu');{const rh=c.h('b',null,'Radio commands'),ri=c.brand('radio','c16-menu-bi');if(ri)rh.prepend(ri);menu.append(rh);}
     items.forEach((it,i)=>{const b=c.h('button','c16-item');b.type='button';b.setAttribute('role','menuitem');b.append(c.h('span',null,(i+1)+'.'),' '+it[0]);b.onclick=()=>choose(i);menu.append(b);});
     const x=c.h('button','c16-item');x.type='button';x.append(c.h('span',null,'0.'),' Exit');x.onclick=close;menu.append(x);c.slots.layer.append(menu);menu.querySelector('button').focus();}
    chip.onclick=open;
@@ -335,7 +335,7 @@
   }},
   {id:'hev-light',mount(c){
    const b=c.add('bar',c.h('button','fx fx-chip hev-lamp'));b.type='button';b.setAttribute('aria-pressed','false');b.title='Flashlight: brighter, higher-contrast panel (F)';b.setAttribute('aria-label','Flashlight');
-   b.append(c.svg('<svg viewBox="0 0 24 24"><path d="M3 9h7l3-3h4v12h-4l-3-3H3z"/><path d="M19 8l3-2M19 16l3 2M19 12h3"/></svg>'));
+   b.append(c.brand('flashlight','hev-bi')||c.svg('<svg viewBox="0 0 24 24"><path d="M3 9h7l3-3h4v12h-4l-3-3H3z"/><path d="M19 8l3-2M19 16l3 2M19 12h3"/></svg>'));
    const toggle=()=>{const on=!c.panel.hasAttribute('data-hev-light');c.panel.toggleAttribute('data-hev-light',on);b.setAttribute('aria-pressed',String(on));};
    b.onclick=toggle;c.key(e=>{if((e.key==='f'||e.key==='F')&&!e.repeat){e.preventDefault();toggle();}});
    return {unmount(){c.panel.removeAttribute('data-hev-light');}};

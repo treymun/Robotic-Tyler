@@ -381,7 +381,7 @@
   let who={};try{who=await (await fetch('/whoami',{cache:'no-store'})).json();}catch{}
   version=String(who.version||'');theme=THEMES.includes(who.theme)?who.theme:'steam';
   const v='?v='+encodeURIComponent(version);
-  try{for(const f of ['ui-template.js','ui-icons.js','ui-kit.js','ui-logos.js','ui-art.js'])await load('/lib/'+f+v);await build();}
+  try{for(const f of ['ui-template.js','ui-icons.js','ui-kit.js','ui-logos.js','ui-art.js','ui-brand.js'])await load('/lib/'+f+v);await build();}
   catch(e){document.getElementById('boot').textContent='Tyler’s remote couldn’t load: '+e.message+' Reload the page to try again.';return;}
   document.getElementById('boot')?.remove();
   setLink('connecting');setActivity('ready','Connecting','Looking for Tyler on your PC…');

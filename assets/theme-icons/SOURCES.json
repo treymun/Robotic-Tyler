@@ -1,0 +1,92 @@
+{
+  "simple-steam": {
+    "origin": "Simple Icons",
+    "url": "https://github.com/simple-icons/simple-icons/blob/develop/icons/steam.svg",
+    "license": "CC0-1.0"
+  },
+  "simple-counterstrike": {
+    "origin": "Simple Icons",
+    "url": "https://github.com/simple-icons/simple-icons/blob/develop/icons/counterstrike.svg",
+    "license": "CC0-1.0"
+  },
+  "simple-sega": {
+    "origin": "Simple Icons",
+    "url": "https://github.com/simple-icons/simple-icons/blob/develop/icons/sega.svg",
+    "license": "CC0-1.0"
+  },
+  "papirus-portal": {
+    "origin": "Papirus Icon Theme",
+    "url": "https://github.com/PapirusDevelopmentTeam/papirus-icon-theme/blob/master/Papirus/64x64/apps/portal.svg",
+    "license": "GPL-3.0"
+  },
+  "papirus-half-life": {
+    "origin": "Papirus Icon Theme",
+    "url": "https://github.com/PapirusDevelopmentTeam/papirus-icon-theme/blob/master/Papirus/64x64/apps/half-life.svg",
+    "license": "GPL-3.0"
+  },
+  "papirus-minecraft": {
+    "origin": "Papirus Icon Theme",
+    "url": "https://github.com/PapirusDevelopmentTeam/papirus-icon-theme/blob/master/Papirus/64x64/apps/minecraft.svg",
+    "license": "GPL-3.0"
+  },
+  "papirus-garrysmod": {
+    "origin": "Papirus Icon Theme",
+    "url": "https://github.com/PapirusDevelopmentTeam/papirus-icon-theme/blob/master/Papirus/64x64/apps/garrysmod.svg",
+    "license": "GPL-3.0"
+  },
+  "papirus-quake": {
+    "origin": "Papirus Icon Theme",
+    "url": "https://github.com/PapirusDevelopmentTeam/papirus-icon-theme/blob/master/Papirus/64x64/apps/quake.svg",
+    "license": "GPL-3.0"
+  },
+  "papirus-doom": {
+    "origin": "Papirus Icon Theme",
+    "url": "https://github.com/PapirusDevelopmentTeam/papirus-icon-theme/blob/master/Papirus/64x64/apps/doom.svg",
+    "license": "GPL-3.0"
+  },
+  "papirus-payday2": {
+    "origin": "Papirus Icon Theme",
+    "url": "https://github.com/PapirusDevelopmentTeam/papirus-icon-theme/blob/master/Papirus/64x64/apps/payday2.svg",
+    "license": "GPL-3.0"
+  },
+  "simple-apple": {
+    "origin": "Simple Icons",
+    "url": "https://github.com/simple-icons/simple-icons/blob/develop/icons/apple.svg",
+    "license": "CC0-1.0"
+  },
+  "simple-playstation": {
+    "origin": "Simple Icons",
+    "url": "https://github.com/simple-icons/simple-icons/blob/develop/icons/playstation.svg",
+    "license": "CC0-1.0"
+  },
+  "papirus-team-fortress": {
+    "origin": "Papirus Icon Theme",
+    "url": "https://github.com/PapirusDevelopmentTeam/papirus-icon-theme/blob/master/Papirus/64x64/apps/steam_icon_440.svg",
+    "license": "GPL-3.0"
+  },
+  "papirus-left4dead": {
+    "origin": "Papirus Icon Theme",
+    "url": "https://github.com/PapirusDevelopmentTeam/papirus-icon-theme/blob/master/Papirus/64x64/apps/steam_icon_500.svg",
+    "license": "GPL-3.0"
+  },
+  "papirus-rust-game": {
+    "origin": "Papirus Icon Theme",
+    "url": "https://github.com/PapirusDevelopmentTeam/papirus-icon-theme/blob/master/Papirus/64x64/apps/steam_icon_252490.svg",
+    "license": "GPL-3.0"
+  },
+  "papirus-ricochet": {
+    "origin": "Papirus Icon Theme",
+    "url": "https://github.com/PapirusDevelopmentTeam/papirus-icon-theme/blob/master/Papirus/64x64/apps/steam_icon_60.svg",
+    "license": "GPL-3.0"
+  },
+  "papirus-dod": {
+    "origin": "Papirus Icon Theme",
+    "url": "https://github.com/PapirusDevelopmentTeam/papirus-icon-theme/blob/master/Papirus/64x64/apps/steam_icon_300.svg",
+    "license": "GPL-3.0"
+  },
+  "fa-xbox": {
+    "origin": "Font Awesome",
+    "url": "https://github.com/FortAwesome/Font-Awesome/blob/7.x/svgs/brands/xbox.svg",
+    "license": "CC-BY-4.0"
+  }
+}
