@@ -13,6 +13,7 @@ function steam({rooms:names=[['901','General Voice']],button=true}={}){
   InitiateRoomChat(g,c){calls.push('start '+c);this.m_VoiceCallState={m_eState:1,m_chatRoom:{groupID:g,chatID:c}};},
   IsVoiceActiveForRoom(g,c){const s=this.m_VoiceCallState;return !!s.m_chatRoom&&s.m_chatRoom.groupID===g&&s.m_chatRoom.chatID===c&&s.m_eState!==0;},
   OnUserEndVoiceChat(){calls.push('end');this.m_VoiceCallState={m_eState:0,m_chatRoom:null};members=[];},
+  IsAccountFullyConnectedToActiveVoiceChat(id){return id===self.accountid&&this.m_VoiceCallState.m_eState===10;},
   GetVoiceLogs:()=>log.join('\r\n')};
  const room=(id,name)=>({GetRoomID:()=>id,name,GetVoiceAllowed:()=>true,ChatStore:{VoiceChat:VC},StartVoiceChat(){if(!this.BVoiceActive())VC.InitiateRoomChat('12345',id);},
   ToggleVoiceChat(){calls.push('toggle '+id);this.BVoiceActive()?VC.OnUserEndVoiceChat():this.StartVoiceChat();},BVoiceActive(){return VC.IsVoiceActiveForRoom('12345',id);},
@@ -24,7 +25,7 @@ function steam({rooms:names=[['901','General Voice']],button=true}={}){
  const document={querySelectorAll:s=>s==='.chatEndVoiceChat'&&button&&VC.m_VoiceCallState.m_eState?[leave]:[],addEventListener(){}};
  const box={document,window:{postMessage(){}},location:{origin:'https://steamcommunity.com'}};vm.runInNewContext(source,box);
  const handle=r=>box.TylerSteamChatAdapter.handle(node,r).then(x=>JSON.parse(JSON.stringify(x))); // (out of the vm's realm)
- return {handle,VC,calls,log,connect(){VC.m_VoiceCallState.m_eState=9;members=[self,friend];},other(){VC.m_VoiceCallState={m_eState:9,m_chatRoom:{groupID:'999',chatID:'5'}};}};
+ return {handle,VC,calls,log,step(n){VC.m_VoiceCallState.m_eState=n;},connect(){VC.m_VoiceCallState.m_eState=10;members=[self,friend];},other(){VC.m_VoiceCallState={m_eState:10,m_chatRoom:{groupID:'999',chatID:'5'}};}};
 }
 
 test('voice-state reads the group\'s channels and Steam\'s own call state',async()=>{
@@ -33,12 +34,18 @@ test('voice-state reads the group\'s channels and Steam\'s own call state',async
  assert.deepEqual(v.rooms,[{id:'901',name:'General Voice',self:false,count:1,active:false}]);
 });
 
-test('join presses Steam\'s own StartVoiceChat once; connected only at Steam\'s state 9 with the bot listed',async()=>{
+test('join presses Steam\'s own StartVoiceChat once; connected only when Steam says so (state 10, Connected)',async()=>{
  const s=steam(),r=await s.handle({op:'voice-join'});
  assert.equal(r.started,true);assert.equal(r.roomId,'901');assert.equal(r.activeRoom,'901');assert.deepEqual(s.calls,['start 901']);
  const again=await s.handle({op:'voice-join'});assert.equal(again.started,false,'already joining: nothing more');assert.deepEqual(s.calls,['start 901']);
  let v=await s.handle({op:'voice-state'});assert.equal(v.state,1);assert.equal(v.rooms[0].self,false);
- s.connect();v=await s.handle({op:'voice-state'});assert.equal(v.state,9);assert.equal(v.rooms[0].self,true);assert.equal(v.rooms[0].count,2);
+ assert.equal(v.connected,false);
+ // v2.32.4: 9 is NotifyingVoiceChatOfWebRTCSession, still setting up; 10 is Connected.
+ s.step(9);v=await s.handle({op:'voice-state'});assert.equal(v.connected,false,'step 9 is not connected yet');
+ s.connect();v=await s.handle({op:'voice-state'});assert.equal(v.state,10);assert.equal(v.connected,true);assert.equal(v.rooms[0].self,true);assert.equal(v.rooms[0].count,2);
+ // Steam's own test wins over the number: without it, state 10 alone.
+ const fully=s.VC.IsAccountFullyConnectedToActiveVoiceChat;delete s.VC.IsAccountFullyConnectedToActiveVoiceChat;assert.equal((await s.handle({op:'voice-state'})).connected,true);
+ s.VC.IsAccountFullyConnectedToActiveVoiceChat=()=>false;assert.equal((await s.handle({op:'voice-state'})).connected,false);s.VC.IsAccountFullyConnectedToActiveVoiceChat=fully;
 });
 
 test('leave uses Steam\'s Leave button, or the room\'s toggle when it isn\'t on screen; nothing when not in the call',async()=>{
@@ -65,6 +72,8 @@ test('Steam\'s voice log: its tagged lines only, with addresses, ports, ids and 
  assert.equal((await s.handle({op:'voice-state'})).log,undefined,'only when asked (the full check)');
  // v2.32.3: Steam's "Still trying…" every two seconds collapses to the latest, so the earlier steps stay.
  const t=steam();t.log.push('(VoiceChat) Call to room 901 now initating getUserMedia/WebRTC','(WebRTC) Set remote description','(WebRTC) ICE state checking');
+ t.log.push('(WebRTC) (Sender SSRC) Packets Sent Connection State Writable Track State Round Trip MS Transport Bytes Sent Transport Bytes Received','(WebRTC) audio 1234567890 3982 succeeded writable active 23 602131 117152',
+  '(WebRTC) (Receiving SSRC) Packets Received Packets Lost Est. Delay MS Samples Received','(WebRTC) Some Friend 987654321 894 9 66.17 7720800'); // stats tables: dropped (they name people)
  for(let n=1;n<=20;n++)t.log.push('(VoiceChat) Still trying to connect to voice chat/webrtc InitiatedWebRTCSession(5) '+n*2000+'ms elapsed...');
  const w=await t.handle({op:'voice-state',logs:true});
  assert.deepEqual(w.log,['(VoiceChat) Call to room 901 now initating getUserMedia/WebRTC','(WebRTC) Set remote description','(WebRTC) ICE state checking','(VoiceChat) Still trying to connect to voice chat/webrtc InitiatedWebRTCSession(5) 40000ms elapsed...']);

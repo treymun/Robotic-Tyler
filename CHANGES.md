@@ -1,3 +1,27 @@
+# ROBOTIC TYLER v2.32.4: "In the call" shows when the bot really is in the call
+
+## Fixed
+- **Join voice / Leave voice (panel and phone):** they now show **In the call** once Steam says the bot is fully connected.
+  - Since 2.32.0 they had waited for Steam's call step 9. In Steam's own code that step is *"NotifyingVoiceChatOfWebRTCSession"*, and **10 is "Connected"**. So a connected bot showed "Joining…", then "Couldn't finish" after 25 s.
+  - "Connected" now comes from Steam's own test, `IsAccountFullyConnectedToActiveVoiceChat` for the bot account, or step 10 when that test isn't there.
+- **Full check:**
+  - The step is named the way Steam names it, for example *"step 5 (InitiatedWebRTCSession)"*.
+  - A connection the browser gave up on with no answer shows as *"Steam's voice server isn't answering"*. Its counters are gone by then, so the check now reads the connection's own steps.
+  - The voice connection lines show even when Tyler isn't connected to the chat (before Connect & start).
+- **Steam's voice log:** Steam's periodic stats tables are left out. They list everyone in the call by name, say nothing about where a connection stopped, and pushed the useful lines out.
+
+## Correction to 2.32.3
+- Its notes said a `failed/disconnected` connection "normally means the route worked and the encryption failed". **That was wrong.** The next real check showed the bot's connection going straight from checking to disconnected and failed after 15 s, with no answer from Steam and the encryption never started.
+- On a good try the same app connected in 0.3 s (Steam answered at once, DTLS 1.2). Around then, a friend's normal Steam app couldn't join voice either. So the stuck calls on 4 November look like **Steam's voice servers not answering**, not something in ROBOTIC TYLER. Nothing about joining was changed for it.
+
+## Tested
+- **Unit tests (mocked Steam):** step 9 is not connected; step 10 is; Steam's own test wins over the step number; the stats tables are dropped.
+- **Phone remote end-to-end:** still "joining" at steps 8 and 9, connected at 10.
+- All unit and end-to-end tests, and the desktop check.
+- **Not tested:** a real Steam call with this version.
+
+---
+
 # ROBOTIC TYLER v2.32.3: the full check shows where a voice connection fails
 
 ## Changed

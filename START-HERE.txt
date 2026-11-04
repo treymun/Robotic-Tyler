@@ -1,7 +1,7 @@
-ROBOTIC TYLER — v2.32.3
+ROBOTIC TYLER — v2.32.4
 
 JUST WANT TO USE IT?
-  Download ROBOTIC-TYLER-Setup-2.32.3.exe from
+  Download ROBOTIC-TYLER-Setup-2.32.4.exe from
   github.com/treymun/Robotic-Tyler/releases/latest and run it. Two parts:
     Desktop app        → Steam chat and Steam voice on Windows, no Chrome needed
                          (voice: Standard or Gemini Live, right in its Steam window)

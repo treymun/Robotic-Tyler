@@ -1,0 +1,6 @@
+ROBOTIC TYLER v2.32.4 — patch notes
+
+- Fixed: Join voice / Leave voice (panel and phone) show "In the call" when the bot is in the call. Steam's step 10 is "Connected" (Steam's own IsAccountFullyConnectedToActiveVoiceChat is used); 2.32.0-2.32.3 waited for step 9 and showed "Joining…" then "Couldn't finish" on a connected bot.
+- Full check: Steam's step names; a connection the browser gave up on with no answer shows as "Steam's voice server isn't answering"; the voice connection lines also show before Connect & start; Steam's per-person stats tables are left out of the voice log.
+- Correction to 2.32.3: failed/disconnected did not mean the route worked. The real check showed no answer from Steam and the encryption never started; a friend's normal Steam app couldn't join either. Looks like Steam's voice servers, not ROBOTIC TYLER.
+- Tested: mocked Steam unit tests, phone remote e2e, all tests, desktop check. Not tested: a real Steam call with this version.

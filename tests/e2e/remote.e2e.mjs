@@ -163,6 +163,7 @@ const FAKE_STEAM=`(()=>{
   InitiateRoomChat(g,c){this.m_VoiceCallState={m_eState:1,m_chatRoom:{groupID:g,chatID:c}};log.push('(VoiceChat) Call to room '+c+' now initating getUserMedia/WebRTC');window.__steam.started.push(c);},
   IsVoiceActiveForRoom(g,c){const s=this.m_VoiceCallState;return !!s.m_chatRoom&&s.m_chatRoom.groupID===g&&s.m_chatRoom.chatID===c&&s.m_eState!==0;},
   OnUserEndVoiceChat(){this.m_VoiceCallState={m_eState:0,m_chatRoom:null};members=members.filter(m=>m!==self);log.push('(VoiceChat) Ended');window.__steam.ended++;},
+  IsAccountFullyConnectedToActiveVoiceChat(id){return id===self.accountid&&this.m_VoiceCallState.m_eState===10;},
   GetVoiceLogs(){return log.join('\\r\\n');}};
  const room=(id,name)=>({GetRoomID:()=>id,name,GetVoiceAllowed:()=>true,ChatStore:{VoiceChat:VC},
   StartVoiceChat(){if(!this.BVoiceActive())VC.InitiateRoomChat('12345',id);},ToggleVoiceChat(){this.BVoiceActive()?VC.OnUserEndVoiceChat():this.StartVoiceChat();},
@@ -176,7 +177,7 @@ const FAKE_STEAM=`(()=>{
  // Steam's Leave button, rendered while a call is active.
  const leave=document.createElement('div');leave.className='VoiceControlPanelButton chatEndVoiceChat';leave.title='Leave voice chat';leave.onclick=()=>VC.OnUserEndVoiceChat();
  window.__steam={started:[],ended:0,region,sample,rooms,room,
-  connect(){VC.m_VoiceCallState.m_eState=9;members=[self,friend];log.push('(WebRTC) WebRTC session connected');document.body.append(leave);},
+  connect(){VC.m_VoiceCallState.m_eState=10;members=[self,friend];log.push('(WebRTC) WebRTC session connected');document.body.append(leave);},
   step(n){VC.m_VoiceCallState.m_eState=n;},
   drop(){VC.m_VoiceCallState={m_eState:0,m_chatRoom:null};members=[];log.push('(VoiceChat) Voice chat failed: timed out');leave.remove();},
   manual(id){const r=rooms.find(x=>x.GetRoomID()===id);r.StartVoiceChat();this.connect();}};
@@ -198,6 +199,7 @@ test('v2.32: Join Voice / Leave Voice from the phone follow Steam\'s own state (
   await phone.waitForTimeout(1500);assert.deepEqual(await pc.evaluate(()=>__steam.started),['901']);
   assert.equal((await ui()).state,'joining','the request alone is not "Connected"');
   await pc.evaluate(()=>__steam.step(8));await phone.waitForTimeout(1300);assert.equal((await ui()).state,'joining','still not connected at Steam\'s step 8');
+  await pc.evaluate(()=>__steam.step(9));await phone.waitForTimeout(1300);assert.equal((await ui()).state,'joining','step 9 (NotifyingVoiceChatOfWebRTCSession) is still setting up');
   await pc.evaluate(()=>__steam.connect());u=await until('connected');assert.equal(u.label,'Connected');assert.match(u.text,/General Voice · 1 other/);assert.equal(u.join,true);assert.equal(u.leave,false);
   if(SHOTS){await inPhone(phone,r=>r.getElementById('rmCall').scrollIntoView({block:'center'}));await phone.screenshot({path:path.join(SHOTS,'remote-call.png')});await pc.screenshot({path:path.join(SHOTS,'pc-call.png')});}
   // Leave: Steam's own Leave button.

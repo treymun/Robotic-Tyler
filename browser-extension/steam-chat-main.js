@@ -99,8 +99,11 @@
  }
  // v2.32: the connected group's voice channels and Steam's own call state, to join and leave them the
  // way Steam's controls do: clicking a voice channel calls the room's StartVoiceChat (its onSelect), and
- // Steam's "Leave voice chat" button is .chatEndVoiceChat. Steam's call state reaches 9 only once its
- // WebRTC session and the voice chat are both connected.
+ // Steam's "Leave voice chat" button is .chatEndVoiceChat. Steam's call states (friendsui.js): 0 None,
+ // 1 ScheduledInitiate, 2 RequestedMicAccess, 3 LocalMicOnly, 4 CreatePeerConnection, 5 InitiatedWebRTCSession,
+ // 6 UpdatingWebRTCSession, 7 WaitingOnICEConnected, 8 RequestedPermission, 9 NotifyingVoiceChatOfWebRTCSession,
+ // 10 Connected. "connected" is Steam's own IsAccountFullyConnectedToActiveVoiceChat for the bot (state 10),
+ // or state 10 itself when that method isn't there. (v2.32.4: 2.32.0–2.32.3 wrongly took 9 for connected.)
  function voiceCall(ctx){
   const cs=get(get(get(ctx.chat,'ChatStore'),'VoiceChat'),'m_VoiceCallState'),e=Number(get(cs,'m_eState')),at=get(cs,'m_chatRoom');
   let rooms=[];try{rooms=[...(get(ctx.group,'voiceRoomList')||[])].slice(0,40);}catch{}
@@ -108,7 +111,9 @@
    try{id=String(call(room,'GetRoomID'));self=get(room,'voice_active_contains_self')===true;const m=get(get(room,'voice_active_member_list'),'member_list');count=Array.isArray(m)?Math.min(m.length,256):0;active=call(room,'BVoiceActive')===true;}catch{}
    return {id,name:clean(get(room,'name'),60)||'Voice',self,count,active,room};}).filter(r=>/^\d{1,20}$/.test(r.id));
   const state=Number.isFinite(e)?e:null,here=list.find(r=>r.active)||null;
-  return {groupId:ctx.id,state,activeRoom:here?.id||null,elsewhere:state!==null&&state>0&&!here&&!(at&&String(get(at,'groupID')??'')===ctx.id),rooms:list};
+  let connected=state===10;
+  try{const vc=get(get(ctx.chat,'ChatStore'),'VoiceChat');if(ctx.self&&typeof get(vc,'IsAccountFullyConnectedToActiveVoiceChat')==='function')connected=call(vc,'IsAccountFullyConnectedToActiveVoiceChat',ctx.self)===true;}catch{}
+  return {groupId:ctx.id,state,connected,activeRoom:here?.id||null,elsewhere:state!==null&&state>0&&!here&&!(at&&String(get(at,'groupID')??'')===ctx.id),rooms:list};
  }
  const voicePublic=v=>({...v,rooms:v.rooms.map(({room,...r})=>r)});
  // The last lines of Steam's own voice log (VoiceChat.GetVoiceLogs, what Steam's voice settings show),
@@ -116,7 +121,9 @@
  // with addresses, ports and long ids hidden.
  function voiceLog(ctx){
   try{const vc=get(get(ctx.chat,'ChatStore'),'VoiceChat');const text=String(call(vc,'GetVoiceLogs')||'');
-   const lines=text.split(/\r?\n/).filter(l=>/^\((?:VoiceChat|WebRTC)\)/.test(l)&&!/Description\)|SDP/i.test(l));
+   // v2.32.4: also without Steam's periodic stats tables (one row per person in the call, by name, then
+   // counters), which said nothing about a step and pushed the useful lines out.
+   const lines=text.split(/\r?\n/).filter(l=>/^\((?:VoiceChat|WebRTC)\)/.test(l)&&!/Description\)|SDP|SSRC\)/i.test(l)&&!/(?:\s[\d.]+){3,}\s*$/.test(l));
    // v2.32.3: "Still trying to connect…" repeats every two seconds; only the latest one is kept, so the
    // steps before it stay in view.
    let lastTry=-1;lines.forEach((l,i)=>{if(/Still trying/i.test(l))lastTry=i;});

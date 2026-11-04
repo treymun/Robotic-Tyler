@@ -2,8 +2,8 @@
 //
 // Steam's own controls do the work (steam-chat-main.js): joining calls the voice channel's
 // StartVoiceChat, which is what clicking the channel does; leaving presses Steam's "Leave voice chat"
-// button. The state shown here is only what Steam shows: "connected" once Steam's call state says its
-// WebRTC session and voice chat are both up (state 9) and Steam lists the bot in the channel. A command
+// button. The state shown here is only what Steam shows: "connected" once Steam itself says the bot is
+// fully connected (its call state 10, Connected) and lists the bot in the channel. A command
 // that Steam accepted is "joining" or "leaving" until then, and "failed" if Steam doesn't get there.
 //
 // States: unavailable (no connected group chat / not this tab), disconnected, joining, connected,
@@ -33,7 +33,7 @@
   let v;try{v=await globalThis.TylerSteamChat.request(node,'voice-state',{logs});}
   catch(e){if(!pending)set({state:'unavailable',reason:clean(e.message,160)||'Steam chat controls did not answer.'});return null;}
   last=v;const here=v.rooms.find(r=>r.id===v.activeRoom)||null;
-  const connected=!!here&&here.self&&(v.state===null||v.state===9),connecting=!!here&&!connected;
+  const connected=!!here&&here.self&&v.connected===true,connecting=!!here&&!connected;
   if(connected&&v.groupId&&remembered[v.groupId]!==here.id){remembered={...remembered,[v.groupId]:here.id};void globalThis.TylerStorage?.set?.({voiceRooms:remembered}).catch(()=>{});}
   const base={groupId:v.groupId,rooms:v.rooms,steam:v.state,room:here?.name||'',roomId:here?.id||'',people:here?Math.max(0,here.count-(here.self?1:0)):0,reason:''};
   if(pending?.kind==='join'){
