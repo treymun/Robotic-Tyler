@@ -864,3 +864,87 @@
 [data-rt-theme=payday] .tally[data-flash=fail]{box-shadow:inset 0 0 0 1px #e8463c,0 0 16px rgba(232,70,60,.45)}
 .dl-plate[data-down=true] .dl-left small{display:none}
 @media (max-width:430px){.panel .cb-unit span{display:none}.panel .cb-unit{padding:0 6px}}
+
+/* ── Dreamcast (v2.22): the memory card as the File screen (main menu row, pixel save icons, the VMU
+   screen describing a file, a blocks-free gauge) and an LCD refresh on the VMU screens. */
+.dc-bios{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px;margin:-2px -2px 10px;padding:6px;border-radius:8px;background:radial-gradient(120% 140% at 0% 0%,#2a4fa8,#132a66 60%,#0b1a44);box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
+.panel .dc-bios-item{display:flex;flex-direction:column;align-items:center;gap:3px;min-height:0;margin:0;padding:5px 2px 4px;border:0;border-radius:6px;background:transparent;box-shadow:none;color:#cfe0ff;font:600 10px var(--rt-font);letter-spacing:.04em;cursor:pointer;transition:background .15s,transform .15s}
+.dc-bios-icon{width:20px;height:20px;fill:currentColor}
+.panel .dc-bios-item:hover,.panel .dc-bios-item:focus-visible{background:rgba(255,255,255,.12);color:#fff;outline:none;transform:translateY(-1px)}
+.panel .dc-bios-item[aria-current=page]{background:linear-gradient(180deg,#ff8a2a,#ff6a00);color:#fff;box-shadow:0 2px 8px rgba(255,106,0,.45);cursor:default}
+.panel .dc-file{min-height:0;margin:0;padding:6px 4px;border:1px solid #ddd6c8;border-radius:6px;background:#fff;box-shadow:none;color:#2a2a2a;font:inherit;cursor:default;transition:border-color .15s,box-shadow .15s,transform .15s}
+.panel .dc-file:hover,.panel .dc-file:focus-visible{border-color:var(--file);box-shadow:0 0 0 2px color-mix(in srgb,var(--file) 30%,transparent);outline:none;transform:translateY(-1px)}
+.dc-file-icon{width:24px;height:24px;padding:3px;border-radius:5px;background:var(--file,#ff6a00);fill:#fff;box-shadow:inset 0 -3px 0 rgba(0,0,0,.18)}
+.dc-info{display:grid;grid-template-columns:1fr auto;align-items:center;gap:0 10px;margin-top:8px;padding:5px 8px;border-radius:4px;background:#a9c59a;box-shadow:inset 0 0 0 1px #6f8463,inset 0 2px 4px rgba(0,0,0,.15);font:12px "Tyler VMU",monospace;color:#24301e}
+.dc-info b{font-weight:400;letter-spacing:.08em}.dc-info span{grid-row:span 2;font-size:20px;text-align:right}.dc-info small{font-size:10px;opacity:.75}
+.dc-free{display:grid;grid-template-columns:1fr 90px;align-items:center;gap:8px}
+.dc-free-bar{height:6px;border-radius:2px;background:#6f8463;overflow:hidden}.dc-free-bar i{display:block;height:100%;background:#24301e}
+.dc-refresh{animation:dc-refresh .32s steps(3)}
+@keyframes dc-refresh{0%{opacity:.25}50%{opacity:.7}}
+
+/* ── Garry's Mod (v2.22): the spawn menu (Q): sound spawn icons with search, and the tool list. The Lua
+   error box opens the Checks tab and counts repeats. */
+.gm-lua.fx-interactive{cursor:pointer}.gm-lua.fx-interactive:hover{background:rgba(0,0,0,.85)}
+.gm-spawn{display:flex;flex-direction:column;padding:0;overflow:hidden;background:#e8e8e8;border:1px solid #6a6a6a;border-radius:5px;box-shadow:0 10px 28px rgba(0,0,0,.55);font:12px "Tyler GMod",Tahoma,sans-serif;color:#222}
+.gm-sp-tabs{display:flex;align-items:center;gap:8px;padding:0 4px 0 0;background:#3c3c3c;color:#ddd}
+.gm-sp-tabs b{padding:6px 12px;background:#e8e8e8;color:#222;border-radius:4px 4px 0 0;margin-top:4px;font-weight:700}
+.gm-sp-tabs span{flex:1;font-size:11px;color:#bbb}
+.panel .gm-sp-close{min-height:0;width:22px;height:22px;margin:0;padding:0;border:0;border-radius:3px;background:#c33;box-shadow:inset 0 -2px 0 rgba(0,0,0,.25);color:#fff;font:700 14px/1 Tahoma,sans-serif;cursor:pointer}
+.panel .gm-sp-close:hover,.panel .gm-sp-close:focus-visible{background:#e44;outline:2px solid #fff;outline-offset:-2px}
+.gm-sp-body{display:grid;grid-template-columns:1fr 118px;gap:6px;padding:6px;min-height:0}
+.gm-sp-left{display:flex;flex-direction:column;gap:5px;min-width:0}
+.panel .gm-sp-search{width:100%;min-height:0;height:24px;margin:0;padding:2px 6px;border:1px solid #8a8a8a;border-radius:3px;background:#fff;color:#222;font:12px "Tyler GMod",Tahoma,sans-serif;box-shadow:inset 0 1px 2px rgba(0,0,0,.15)}
+.panel .gm-sp-search:focus{outline:2px solid #5ab2ff;outline-offset:-1px}
+.gm-sp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(58px,1fr));gap:4px;max-height:220px;overflow:auto;padding:4px;background:#d0d0d0;border:1px solid #9a9a9a;border-radius:3px}
+.panel .gm-icon{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:62px;min-height:0;margin:0;padding:3px 2px;overflow:hidden;border:1px solid #9a9a9a;border-radius:4px;background:linear-gradient(180deg,#f4f4f4,#c9c9c9);box-shadow:inset 0 1px 0 #fff;color:#222;cursor:pointer}
+.gm-icon i{position:absolute;left:50%;top:7px;width:28px;height:24px;margin-left:-14px;background:#5ab2ff;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 14'%3E%3Cpath d='M1 4h3l4-4v14l-4-4H1zM10 4.5a3 3 0 0 1 0 5M12 2a6.5 6.5 0 0 1 0 10' fill='%23000' stroke='%23000' stroke-width='1.4'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 14'%3E%3Cpath d='M1 4h3l4-4v14l-4-4H1zM10 4.5a3 3 0 0 1 0 5M12 2a6.5 6.5 0 0 1 0 10' fill='%23000' stroke='%23000' stroke-width='1.4'/%3E%3C/svg%3E") center/contain no-repeat}
+.gm-icon[data-fav=true]::before{content:"★";position:absolute;right:3px;top:1px;font-size:10px;color:#e8a020}
+.gm-icon span{position:relative;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:10px}
+.panel .gm-icon:hover,.panel .gm-icon:focus-visible{border-color:#2a83d6;box-shadow:0 0 0 2px rgba(90,178,255,.6),inset 0 1px 0 #fff;outline:none}
+.gm-icon.spawned{animation:gm-spawn .4s ease-out}
+@keyframes gm-spawn{30%{transform:scale(.9)}}
+.gm-sp-empty{grid-column:1/-1;margin:8px;color:#555}
+.gm-sp-tools{display:flex;flex-direction:column;gap:2px;padding:4px;background:#f4f4f4;border:1px solid #9a9a9a;border-radius:3px}
+.gm-sp-tools>b{padding:2px 4px 4px;border-bottom:1px solid #ccc;margin-bottom:2px;font-weight:700}
+.panel .gm-tool{display:flex;flex-direction:column;align-items:flex-start;min-height:0;margin:0;padding:3px 6px;border:0;border-radius:3px;background:transparent;box-shadow:none;color:#222;text-align:left;font:12px "Tyler GMod",Tahoma,sans-serif;cursor:pointer}
+.gm-tool small{font-size:10px;color:#666}
+.panel .gm-tool:hover,.panel .gm-tool:focus-visible{background:#5ab2ff;color:#fff;outline:none}.panel .gm-tool:hover small,.panel .gm-tool:focus-visible small{color:#e8f4ff}
+
+/* ── Ricochet (v2.22): points that pop out of the score, Press start while paused, a new high score. */
+.rc-score>div{position:relative}
+.rc-plus{position:absolute;left:70px;top:8px;font:14px "Tyler Ricochet",sans-serif;color:#ffe36a;text-shadow:0 0 8px #ffb400;pointer-events:none;animation:rc-plus 1.1s ease-out forwards}
+@keyframes rc-plus{from{opacity:0;transform:translateY(6px) scale(.8)}20%{opacity:1;transform:none}to{opacity:0;transform:translateY(-16px)}}
+.panel .rc-start{display:none;min-height:0;margin:4px 0 0;padding:2px 8px;border:1px solid #ffb400;border-radius:999px;background:rgba(255,180,0,.12);box-shadow:0 0 10px rgba(255,180,0,.35);color:#ffe36a;font:11px "Tyler Ricochet Text",sans-serif;letter-spacing:.12em;text-transform:uppercase;cursor:pointer;animation:rc-attract 1.6s ease-in-out infinite}
+.rc-score[data-attract=true] .rc-start{display:inline-block}
+.rc-score[data-attract=true] .rc-power{display:none}
+.panel .rc-start:hover,.panel .rc-start:focus-visible{background:rgba(255,180,0,.3);outline:none;animation:none}
+@keyframes rc-attract{50%{opacity:.45}}
+.rc-newhi{color:#ffe36a;text-shadow:0 0 14px #ffb400}
+
+/* ── Day of Defeat (v2.22): radio commands from the callsign, the radio line, static between channels,
+   and objectives on the briefing. */
+.panel .dod-call{min-height:0;margin:0;padding:1px 5px;border:1px solid #6b5a2b;border-radius:2px;background:#2b2a1c;box-shadow:inset 0 1px 0 rgba(255,255,255,.06);color:#e9dfbf;font:700 10px "Tyler DoD Log",monospace;letter-spacing:.06em;cursor:pointer}
+.panel .dod-call:hover,.panel .dod-call:focus-visible,.panel .dod-call[aria-expanded=true]{background:#f2c14e;color:#2b2416;border-color:#f2c14e;outline:none}
+.dod-line{display:none;grid-column:1/-1;margin-top:-2px;padding:3px 6px;background:rgba(0,0,0,.35);border-left:2px solid #f2c14e;font:11px "Tyler DoD Log",monospace;color:#e9dfbf;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dod-radio[data-line=on] .dod-line{display:block;animation:fx-in .18s ease-out}
+.dod-line b{color:#f2c14e;font-weight:700}
+.dod-scale{position:relative}
+.dod-scale::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:0;background:repeating-linear-gradient(0deg,rgba(43,36,22,.28) 0 1px,transparent 1px 3px),repeating-linear-gradient(90deg,rgba(255,255,255,.18) 0 2px,transparent 2px 5px)}
+.dod-scale.dod-static::after{animation:dod-static .38s ease-out}
+@keyframes dod-static{0%{opacity:1;transform:translateX(-1px)}40%{opacity:.7;transform:translateX(1px)}100%{opacity:0;transform:none}}
+.dod-menu{background:#2b2a1c;border:1px solid #6b5a2b;border-radius:2px;box-shadow:0 8px 22px rgba(0,0,0,.6),inset 0 0 0 1px rgba(0,0,0,.4);font-family:"Tyler DoD Log",monospace}
+.dod-menu .fx-menu-head{color:#f2c14e;letter-spacing:.14em}
+.dod-menu .fx-menu-item{background:transparent;color:#e9dfbf;font-size:12px;border-radius:0}
+.dod-menu .fx-menu-item:hover,.dod-menu .fx-menu-item:focus-visible{background:#f2c14e;color:#2b2416}
+.dod-menu .fx-menu-mark{color:#f2c14e;font-weight:700}.dod-menu .fx-menu-item:hover .fx-menu-mark,.dod-menu .fx-menu-item:focus-visible .fx-menu-mark,.dod-menu .fx-menu-item:hover .fx-menu-hint,.dod-menu .fx-menu-item:focus-visible .fx-menu-hint{color:#2b2416}
+.dod-menu .fx-menu-hint{color:#9a8a5e}
+.dod-obj-head{display:block;margin:10px 0 3px;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#6b5a2b}
+.dod-obj{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:2px}
+.dod-obj li{display:flex;align-items:center;gap:6px}
+.dod-obj li::before{content:"";flex:0 0 12px;height:12px;border:1.5px solid #2b2416;background:transparent}
+.dod-obj li[data-done=true]::before{background:linear-gradient(135deg,transparent 42%,#2f6b2a 42% 58%,transparent 58%),linear-gradient(45deg,transparent 42%,#2f6b2a 42% 58%,transparent 58%);border-color:#2f6b2a}
+.dod-obj li[data-done=true] button{text-decoration:line-through;text-decoration-color:rgba(47,107,42,.7);color:#4a5a3a}
+.panel .dod-obj button{min-height:0;margin:0;padding:1px 2px;border:0;border-radius:0;background:transparent;box-shadow:none;color:#2b2416;font:12px "Tyler DoD Log",monospace;text-align:left;text-transform:none;letter-spacing:0;cursor:pointer}
+.panel .dod-obj button:hover,.panel .dod-obj button:focus-visible{background:rgba(107,90,43,.18);outline:none}
+.dod-brief .dod-stamp{animation:dod-thunk .35s cubic-bezier(.3,1.5,.6,1) .15s both}
+@keyframes dod-thunk{from{opacity:0;transform:rotate(-12deg) scale(1.8)}}

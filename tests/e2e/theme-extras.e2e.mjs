@@ -80,6 +80,31 @@ test('themed menus and screens: open, fit, keyboard, Escape, real actions',{time
   assert.equal(await page.evaluate(R+'.querySelector(".pd-assault")?.dataset.phase'),'fade');
   await click('.pd-timer');assert.equal(await count('.pd-payday'),1);await fits('.pd-payday');assert.match(await text('.pd-payday'),/Cleaner costs/);
   await page.keyboard.press('Escape');assert.equal(await count('.pd-payday'),0);
+
+  // Dreamcast: the memory card is the File screen; Music goes to the Room tab (the Music DJ).
+  await setTheme('dreamcast');await page.waitForTimeout(1400);await click('.dc-vmu');
+  assert.equal(await count('.dc-memory .dc-bios-item'),4);assert.equal(await count('.dc-file'),6);await fits('.dc-memory');
+  await page.evaluate(R+'.querySelectorAll(".dc-file")[2].focus()');assert.match(await text('.dc-info'),/SOUNDS/);
+  await page.evaluate(R+'.querySelector(".dc-bios-item[data-k=music]").click()');assert.equal(await count('.dc-memory'),0);assert.match(await tab(),/room/);
+
+  // Garry's Mod: Q opens the spawn menu; the search filters the spawn icons; an icon plays its sound.
+  await setTheme('gmod');await page.evaluate(()=>TylerCompanion.showTab('conversation'));await over();await page.keyboard.press('q');
+  assert.equal(await count('.gm-spawn'),1);await fits('.gm-spawn');const icons=await count('.gm-icon');assert.ok(icons>=2);
+  await page.keyboard.type('air');assert.ok(await page.evaluate(R+'.querySelectorAll(".gm-icon:not([hidden])").length')<icons,'search filters');
+  await page.keyboard.press('q');assert.equal(await count('.gm-spawn'),1,'Q typed in the search box stays in the search box');await page.keyboard.press('Backspace');
+  await page.evaluate(R+'.querySelector(".gm-icon:not([hidden])").click()');assert.equal((await page.evaluate(()=>window.__played)).length,2);
+  await page.keyboard.press('Escape');assert.equal(await count('.gm-spawn'),0);
+
+  // Ricochet: Press start shows while Tyler is paused.
+  await setTheme('ricochet');await page.evaluate(()=>TylerCompanion.setActivity('PAUSED — Off — paused'));await page.waitForTimeout(100);
+  assert.equal(await page.evaluate(R+'.querySelector(".rc-score").dataset.attract'),'true');
+  assert.equal(await page.evaluate('getComputedStyle('+R+'.querySelector(".rc-start")).display'),'inline-block');
+
+  // Day of Defeat: Z opens the radio commands; 3 sends "Sound off!" (the voice check) as a radio line.
+  await setTheme('dod');await page.evaluate(()=>TylerCompanion.setActivity('LISTENING — speak normally, then pause'));await over();await page.keyboard.press('z');
+  assert.equal(await count('.dod-menu'),1);await fits('.dod-menu',true);await page.keyboard.press('3');
+  assert.equal(await count('.dod-menu'),0);assert.match(await text('.dod-line'),/Sound off!/);
+  await click('.dod-chip');assert.equal(await count('.dod-obj li'),4);await page.keyboard.press('Escape');assert.equal(await count('.dod-brief'),0);
   assert.deepEqual(errors,[]);
  }finally{await browser.close();server.close();}
 });
