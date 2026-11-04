@@ -11,6 +11,7 @@
       <strong class="wordmark">ROBOTIC TYLER</strong>
       <span id="platformChip" class="ident-sub">Steam companion</span>
     </div>
+    <div id="fxBar" class="fx-slot fx-bar"></div>
     <button id="collapse" class="icon-btn" type="button" aria-label="Collapse panel" data-tip="Collapse panel (Ctrl+Shift+U)" aria-expanded="true">
       <!--@icon:minimize-->
     </button>
@@ -38,6 +39,8 @@
     <div class="stat"><dt>Text spend</dt><dd id="hudSpend">$0.0000</dd><small id="hudSpendMeta">Reported by provider</small></div>
     <div class="stat"><dt>Last reply</dt><dd id="hudLatency">—</dd><small id="hudLatencyMeta">Waiting for a turn</small></div>
   </dl>
+
+  <div id="fxDeck" class="fx-slot fx-deck"></div>
 
   <nav class="tabs" role="tablist" aria-label="Companion sections">
     <button id="tab-conversation" role="tab" aria-controls="view-conversation" data-tab="conversation" aria-selected="true" type="button"><!--@icon:chat--><span class="tab-label">Chat</span></button>
@@ -192,10 +195,12 @@
     </section>
   </div>
 
+  <div id="fxFoot" class="fx-slot fx-foot"></div>
   <footer class="foot">
     <span class="owner-dot" aria-hidden="true"></span>
     <small id="footerState">Bot account · keep this tab open</small>
     <button id="quickStop" class="btn ghost sm" type="button"><!--@icon:pause-->Pause AI</button>
     <button id="stop" class="btn danger sm" type="button" data-capability="voice"><!--@icon:stop-->Stop audio</button>
   </footer>
+  <div id="fxLayer" class="fx-layer" aria-hidden="true"></div>
 </aside>

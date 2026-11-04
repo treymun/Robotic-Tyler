@@ -25,8 +25,12 @@
  // Each theme has its own Tyler logo (ui-logos.js); the vector logo stays until it's drawn.
  const mark=root.querySelector('.mark'),markArt=root.querySelector('.mark-art');
  const paintLogo=()=>globalThis.TylerLogos?.paint(markArt,uiTheme).then(ok=>{if(!ok)return;const first=!mark.dataset.logo;mark.dataset.logo=uiTheme;if(first)return globalThis.TylerLogos.paint(markArt,uiTheme);}).catch(()=>{});
- const setTheme=value=>{uiTheme=THEMES.includes(value)?value:'steam';globalThis.TylerFonts?.load(uiTheme);for(const el of themed)if(el.isConnected||el===panel)el.dataset.rtTheme=uiTheme;paintLogo();};
+ const setTheme=value=>{const next=THEMES.includes(value)?value:'steam';uiTheme=next;globalThis.TylerFonts?.load(uiTheme);for(const el of themed)if(el.isConnected||el===panel)el.dataset.rtTheme=uiTheme;paintLogo();emit?.('theme',{theme:next});};
  const themeElement=el=>{if(!el)return;themed.add(el);el.dataset.rtTheme=uiTheme;};
+ // UI events for theme features (theme-features.js, v2.20): state, theme, tab, hud, mini, reply,
+ // chat, sound, music. Listeners are isolated-world code only; nothing here reaches Steam's page.
+ const uiListeners=new Set();
+ const emit=(type,data={})=>{for(const fn of uiListeners){try{fn(type,data);}catch(error){console.warn('[ROBOTIC TYLER] theme feature:',error?.message||error);}}};
  setTheme('steam');
  globalThis.TylerStorage?.get(['uiTheme']).then(v=>setTheme(v?.uiTheme)).catch(()=>{});
  globalThis.TylerStorage?.onChanged?.addListener(changes=>{if(changes.uiTheme)setTheme(changes.uiTheme.newValue);});
@@ -70,8 +74,9 @@
   const [state,label]=TylerUIState(text);
   if(state==='error'){const shown=displayText(text,label);if(shown!==lastProblem){lastProblem=shown;notify({kind:'error',title:label,text:shown,action:problemAction(shown)});}}else lastProblem='';
   $('activity').textContent=displayText(text,label);
+  const before=$('activityCard').dataset.state;
   $('activityCard').dataset.state=state;$('activityLabel').textContent=label;
-  traceState(label);
+  traceState(label);emit('state',{state,label,text:displayText(text,label),before});
  };
  const status=s=>{$('status').textContent=s;if(!autoActive)setActivity(s);};
 
@@ -83,6 +88,7 @@
    const name=key[0].toUpperCase()+key.slice(1);
    $('hud'+name).textContent=hudState[key];$('hud'+name+'Meta').textContent=hudState[key+'Meta'];
   }
+  emit('hud',{...hudState});
  }
  function showUsage(usage={}){
   const compact=new Intl.NumberFormat('en',{notation:'compact',maximumFractionDigits:1});
@@ -130,6 +136,7 @@
   if(was&&!mini){host.classList.add('expanding');expandTimer=setTimeout(()=>host.classList.remove('expanding'),260);}
   const b=$('collapse');b.setAttribute('aria-expanded',String(!mini));
   b.setAttribute('aria-label',mini?'Expand panel':'Collapse panel');
+  emit('mini',{mini});
   b.innerHTML=mini?'<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8h9M8 3.5v9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>':'<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 8h9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
  }
  $('collapse').onclick=()=>setMini(!host.classList.contains('mini'));
@@ -145,6 +152,7 @@
   for(const b of root.querySelectorAll('[data-tab]')){const active=b.dataset.tab===name;b.setAttribute('aria-selected',String(active));b.tabIndex=active?0:-1;}
   for(const view of root.querySelectorAll('[data-view]'))view.hidden=view.dataset.view!==name;
   scroll.scrollTop=targetScroll;
+  emit('tab',{tab:name});
  };
  for(const button of root.querySelectorAll('[data-tab]')){
   button.onclick=()=>showTab(button.dataset.tab);
@@ -200,7 +208,7 @@
    if(composer.textContent.trim())throw Error('The selected message box contains a draft. Clear it first.');
    document.execCommand('insertText',false,formatted);composer.dispatchEvent(new InputEvent('input',{bubbles:true,inputType:'insertText',data:formatted}));
   }
-  rememberEcho(formatted);TylerChatTag.remember(formatted);
+  rememberEcho(formatted);TylerChatTag.remember(formatted);emit('reply',{chars:formatted.length});
   composer.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',code:'Enter',keyCode:13,which:13,bubbles:true}));
   composer.dispatchEvent(new KeyboardEvent('keyup',{key:'Enter',code:'Enter',keyCode:13,which:13,bubbles:true}));
   status('Submitted to the chosen message box. Confirm it appears in Steam; if it stays as a draft, press Enter manually.');
@@ -336,7 +344,9 @@
   getMount:()=>$('automaticMount'),getFeatureMount:()=>$('featureMount'),getSoundboardMount:()=>$('soundboardMount'),getSetupMount:()=>$('automaticSetupMount'),
   getQuickMount:()=>$('quickMount'),getQuickOptions:()=>$('quickOptions'),getStyleSheet:()=>sheet,themeElement,getTheme:()=>uiTheme,
   locateChat,chooseTarget,prepareBridge,getDiscovery:()=>discovery,setChatHint:v=>{chatHint=['text','voice-room'].includes(v)?v:null;},getChatKind:()=>composer?.isConnected?TylerSelection.kind(composer):null,getVoiceState:()=>voiceReport,getChatScope:()=>TylerSetup.scope(region,document),request,showTab,setActivity,
-  notify,confirm:confirmBox,
+  notify,confirm:confirmBox,emit,
+  // Theme features (theme-features.js): the panel, live state and a subscription. Isolated world only.
+  ui:{root,panel,host,onUI:fn=>{uiListeners.add(fn);return ()=>uiListeners.delete(fn);},state:()=>({state:$('activityCard').dataset.state,label:$('activityLabel').textContent,text:$('activity').textContent,tab:currentTab,hud:{...hudState},mini:host.classList.contains('mini'),theme:uiTheme,owner})},
   isOwner:()=>owner,setAutomaticActive:value=>autoActive=value,getComposer:()=>composer,getRegion:()=>region,getSample:()=>sampleElement,getEpoch:()=>epoch,
   platform};
 })();

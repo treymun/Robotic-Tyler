@@ -1,0 +1,136 @@
+// Theme features (v2.20): each of the 20 themes adds its own components to Tyler's panel: instruments
+// that show what Tyler is really doing, game-style navigation, notifications and easter eggs. The
+// packs (theme-pack-1/2/3.js) define them; this file keeps the live state they read and mounts only
+// the current theme's features, so the other 19 cost nothing. Every feature is an extra way to see
+// or reach something the panel already has: no capability depends on a theme.
+//
+// Live state comes from content.js events (state, theme, tab, hud, mini, reply) and from the feature
+// modules (chat, sound, music). Nothing here reads chat text, and nothing is stored.
+(() => {
+ 'use strict';
+ const api=globalThis.TylerCompanion,ui=api?.ui;
+ if(!ui||globalThis.TylerThemeFeatures)return;
+ const {root,panel}=ui;const $=id=>root.getElementById(id);
+ const slots={bar:$('fxBar'),deck:$('fxDeck'),foot:$('fxFoot'),layer:$('fxLayer')};
+ if(!slots.deck||!slots.layer)return;
+ const reduced=globalThis.matchMedia?.('(prefers-reduced-motion: reduce)');
+
+ // ── Live state ────────────────────────────────────────────────────────────
+ const now=()=>Date.now();
+ const S={started:now(),since:now(),state:'ready',label:'Ready',text:'',tab:'conversation',mini:false,hud:{},theme:'steam',
+  replies:0,spoken:0,heard:0,errors:0,sounds:0,lastSound:'',music:'',musicBy:'',turns:[],thinkingSince:0,streak:0,best:0,
+  errorAt:[],log:[],spend:0,tokens:'',chatBurst:0,flood:false,model:'',provider:'',keyOk:null};
+ const parseMoney=v=>Number(String(v||'').replace(/[^0-9.]/g,''))||0;
+ function log(kind,text){S.log.push({at:now(),kind,text:String(text).slice(0,140)});if(S.log.length>80)S.log.shift();}
+ /** 0–100: knocked down by recent errors, back up as time passes without one. */
+ function health(){
+  const t=now();S.errorAt=S.errorAt.filter(a=>t-a<300000);
+  let h=100-S.errorAt.reduce((n,a)=>n+Math.max(0,30-Math.floor((t-a)/10000)),0);
+  if(S.state==='error')h=Math.min(h,25);if(S.state==='paused'||S.state==='standby')h=Math.min(h,60);
+  return Math.max(1,Math.min(100,h));
+ }
+ const avgTurn=()=>S.turns.length?S.turns.slice(-8).reduce((a,b)=>a+b,0)/Math.min(8,S.turns.length):2500;
+ function voice(){const v=api.getVoiceState?.()||null;return {armed:!!v?.enabled,peers:Number(v?.peers)||0,attached:Number(v?.attached)||0};}
+ function systems(){
+  const v=voice(),chat=!!(api.getComposer?.()?.isConnected&&api.getRegion?.()?.isConnected);
+  return [
+   {id:'ai',name:'AI',tab:'setup',level:S.keyOk===false?0:S.state==='error'&&/key|provider|openrouter|gemini|quota|model/i.test(S.text)?1:S.keyOk?3:2,detail:S.keyOk===false?'No key saved':S.model?S.model:'Checking…'},
+   {id:'chat',name:'Chat',tab:'setup',level:chat?3:1,detail:chat?'Watching chat':'Not connected'},
+   {id:'voice',name:'Voice',tab:'checks',level:v.armed?(v.peers?3:2):1,detail:v.armed?(v.peers?v.peers+' in call':'Armed, call empty'):'Off'},
+   {id:'music',name:'Music',tab:'room',level:S.music?3:2,detail:S.music?S.music:'Idle'},
+  ];
+ }
+ async function refreshModel(){try{const r=await api.request?.({type:'connection'});if(r?.ok!==false){S.keyOk=!!r.keyConfigured;S.model=r.model||'';S.provider=r.provider||'';emitLocal('model');}}catch{}}
+
+ // ── Helpers for packs ─────────────────────────────────────────────────────
+ function h(tag,cls,text){const e=document.createElement(tag);if(cls)e.className=cls;if(text!=null)e.textContent=text;return e;}
+ function svg(markup,cls){const t=document.createElement('template');t.innerHTML=markup.trim();const e=t.content.firstElementChild;if(cls)e.classList.add(...cls.split(' '));return e;}
+ const ms=v=>!Number.isFinite(v)?'—':v<1000?Math.round(v)+' ms':(v/1000).toFixed(v<10000?1:0)+' s';
+ const clock=v=>{const s=Math.max(0,Math.floor(v/1000)),m=Math.floor(s/60),hh=Math.floor(m/60);return (hh?hh+':'+String(m%60).padStart(2,'0'):String(m))+':'+String(s%60).padStart(2,'0');};
+ const pad=(n,w=2)=>String(Math.max(0,Math.floor(n))).padStart(w,'0');
+ const TABS=['conversation','room','soundboard','setup','checks'];
+ const TAB_NAMES={conversation:'Chat',room:'Room',soundboard:'Sounds',setup:'Setup',checks:'Checks'};
+ const actions={
+  tab:name=>api.showTab?.(name),pause:()=>$('quickStop')?.click(),stopAudio:()=>$('stop')?.click(),beep:()=>$('beep')?.click(),
+  checks:()=>api.showTab?.('checks'),collapse:()=>$('collapse')?.click(),settings:()=>$('settings')?.click(),
+  playSound:slot=>api.playSound?.(slot),sounds:()=>api.listSounds?.()||{slots:[],favorites:[]},
+ };
+
+ // ── Mounting ──────────────────────────────────────────────────────────────
+ const packs=new Map();let mounted=[],hovering=false,ticker=0;
+ panel.addEventListener('pointerenter',()=>hovering=true);panel.addEventListener('pointerleave',()=>hovering=false);
+ /** Keys are only taken while the pointer is over the panel or focus is inside it, never while typing. */
+ const typing=el=>!!el?.matches?.('input,textarea,select,[contenteditable=true],[contenteditable=""],[role=textbox]');
+ function keyActive(e){
+  if(S.mini||e.ctrlKey||e.metaKey||e.altKey)return false;
+  // The panel's shadow root is closed in Steam's page: from the document, keys typed inside it come
+  // from the host element, and the shadow root knows what has focus.
+  const inPanel=e.target===ui.host||e.composedPath().includes(panel);
+  if(inPanel)return !typing(root.activeElement)&&!typing(e.composedPath()[0]);
+  if(typing(document.activeElement))return false;
+  return hovering;
+ }
+ function makeCtx(){
+  const own=new Set(),timers=new Set(),offs=[];let tick=null;
+  const ctx={S,api,actions,h,svg,ms,clock,pad,health,avgTurn,voice,systems,TABS,TAB_NAMES,root,panel,slots,
+   get reduced(){return !!reduced?.matches;},
+   add(slot,el){(slots[slot]||slots.deck).append(el);own.add(el);return el;},
+   later(fn,delay){const t=setTimeout(()=>{timers.delete(t);fn();},delay);timers.add(t);return t;},
+   cancel(t){clearTimeout(t);timers.delete(t);},
+   every(fn){tick=fn;start();},
+   key(fn){const k=e=>{if(keyActive(e))fn(e);};document.addEventListener('keydown',k,true);offs.push(()=>document.removeEventListener('keydown',k,true));},
+   on(target,type,fn,opts){target.addEventListener(type,fn,opts);offs.push(()=>target.removeEventListener(type,fn,opts));},
+   /** A short-lived element in the overlay layer (notifications, transitions). */
+   flash(el,life=1800){slots.layer.append(el);own.add(el);ctx.later(()=>{el.remove();own.delete(el);},life);return el;},
+   destroy(){for(const t of timers)clearTimeout(t);timers.clear();for(const el of own)el.remove();own.clear();for(const off of offs)off();tick=null;},
+   get tick(){return tick;},
+   /** Pixels from the panel's top to the bottom of an element (to place overlays under the tabs, say). */
+   below(selector){const el=root.querySelector(selector),p=panel.getBoundingClientRect();return el?Math.round(el.getBoundingClientRect().bottom-p.top):0;},
+  };
+  return ctx;
+ }
+ function start(){if(ticker)return;ticker=setInterval(()=>{if(document.hidden||S.mini&&S.theme!=='dreamcast')return;for(const m of mounted){try{m.ctx.tick?.();}catch(e){console.warn('[ROBOTIC TYLER] theme feature tick:',e?.message);}}},1000);}
+ function stopTicker(){if(ticker&&!mounted.some(m=>m.ctx.tick)){clearInterval(ticker);ticker=0;}}
+ function unmount(){for(const m of mounted){try{m.instance?.unmount?.();}catch{}m.ctx.destroy();}mounted=[];panel.removeAttribute('data-fx');stopTicker();}
+ function mount(theme){
+  unmount();S.theme=theme;const list=packs.get(theme)||[];
+  for(const feature of list){const ctx=makeCtx();try{const instance=feature.mount(ctx)||{};mounted.push({feature,ctx,instance});}catch(error){ctx.destroy();console.warn('[ROBOTIC TYLER] theme feature '+feature.id+':',error?.message||error);}}
+  panel.dataset.fx=mounted.map(m=>m.feature.id).join(' ');
+  for(const slot of Object.values(slots))slot?.toggleAttribute('data-filled',!!slot.childElementCount);
+  stopTicker();if(mounted.some(m=>m.ctx.tick))start();
+ }
+ function deliver(type,data){for(const m of mounted){try{m.instance?.update?.(type,data);}catch(error){console.warn('[ROBOTIC TYLER] theme feature '+m.feature.id+':',error?.message||error);}}}
+ function emitLocal(type,data={}){deliver(type,data);}
+
+ // ── Events from the panel ─────────────────────────────────────────────────
+ ui.onUI((type,data)=>{
+  const t=now();
+  if(type==='theme'){if(data.theme!==S.theme||!mounted.length)mount(data.theme);return;}
+  if(type==='state'){
+   const prev=S.state;if(data.state!==prev)S.since=t;
+   S.state=data.state;S.label=data.label;S.text=data.text||'';
+   if(data.state==='thinking'&&prev!=='thinking')S.thinkingSince=t;
+   if(data.state==='speaking'&&prev!=='speaking'){S.spoken++;turnDone(t);log('spoke','Spoke in voice');}
+   if(data.state==='error'&&prev!=='error'){S.errors++;S.errorAt.push(t);S.streak=0;log('error',S.text||'Needs attention');}
+   if(data.state!==prev&&data.state!=='error')log('state',data.label);
+  }
+  if(type==='tab')S.tab=data.tab;
+  if(type==='mini')S.mini=!!data.mini;
+  if(type==='hud'){S.hud=data;S.spend=parseMoney(data.spend);S.tokens=data.spendMeta||'';}
+  if(type==='reply'){S.replies++;turnDone(t);log('reply','Replied in chat ('+data.chars+' characters)');}
+  if(type==='chat'){S.heard++;S.chatBurst=data.recent||0;S.flood=!!data.flood;}
+  if(type==='sound'){S.sounds++;S.lastSound=data.name||'';log('sound','Played '+S.lastSound);}
+  if(type==='music'){S.music=data.title||'';S.musicBy=data.by||'';if(S.music)log('music','Now playing '+S.music);}
+  deliver(type,data);
+ });
+ function turnDone(t){if(S.thinkingSince&&t-S.thinkingSince<120000){const d=t-S.thinkingSince;S.turns.push(d);if(S.turns.length>40)S.turns.shift();S.thinkingSince=0;S.streak++;S.best=Math.max(S.best,S.streak);deliver('turn',{ms:d});}}
+
+ globalThis.TylerThemeFeatures=Object.freeze({
+  /** Packs call this once per theme with that theme's features: [{id, mount(ctx) → {update?, unmount?}}]. */
+  define(theme,features){packs.set(theme,features);if(theme===(api.getTheme?.()||'steam'))mount(theme);},
+  state:()=>S,health,systems,mounted:()=>mounted.map(m=>m.feature.id),
+ });
+ const initial=ui.state();S.state=initial.state||'ready';S.label=initial.label||'';S.tab=initial.tab||'conversation';S.mini=!!initial.mini;S.hud=initial.hud||{};S.spend=parseMoney(S.hud.spend);S.tokens=S.hud.spendMeta||'';S.theme=initial.theme||'steam';
+ void refreshModel();
+ globalThis.TylerStorage?.onChanged?.addListener?.((changes,area)=>{if(area==='local'&&(changes.aiProvider||changes.brain||changes.geminiTextModel||changes.smartRouting))void refreshModel();});
+})();

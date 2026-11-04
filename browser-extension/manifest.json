@@ -96,7 +96,11 @@
         "music.js",
         "moderation-core.js",
         "moderation.js",
-        "admin.js"
+        "admin.js",
+        "theme-features.js",
+        "theme-pack-1.js",
+        "theme-pack-2.js",
+        "theme-pack-3.js"
       ],
       "run_at": "document_idle"
     },

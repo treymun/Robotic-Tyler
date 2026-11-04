@@ -23,7 +23,7 @@
  const identify=node=>globalThis.TylerTriviaIdentity?.identify(node,region)||null;
  const identifyAccount=node=>globalThis.TylerTriviaIdentity?.identifyAccount(node,region)||null;
  const senderStatus=(speaker,account,node)=>{const loaded=node?.getAttribute?.('data-tyler-sender-bridge')==='2.3.26';$('musicSender').textContent=account?'Sender check · v2.3.26: '+account.name+' · ready for skip/stop votes.':'Sender check · v2.3.26: '+(speaker?speaker.name+' · name only; account votes cannot count yet.':'Sender not detected.')+(loaded?' Updated message reader is loaded.':' Close and reopen Steam chat to load the updated message reader.');};
- function reset(){generation++;chatRevision++;cancelNotice();session=TylerMusic.createSession();paused=false;display();}
+ function reset(){generation++;chatRevision++;cancelNotice();session=TylerMusic.createSession();paused=false;display();api.emit?.('music',{title:''});}
  async function next(){
   if(paused||!sharing||api.isOwner?.()===false||session.current)return;
   const track=session.next();display();
@@ -82,8 +82,8 @@
   if(m?.source!=='tyler-music-event')return;
   void schedule(async()=>{
    const track=session.current;if(!track||m.token!==track.token)return;
-   if(m.event==='playing'){track.title=String(m.title||track.query).slice(0,160);status('Playing: '+track.title);display();if(!track.reported){track.reported=true;announce(TylerMusic.nowCard(track,session.waiting),2);}}
-   if(m.event==='ended'){session.finish(track.token);await next();}
+   if(m.event==='playing'){track.title=String(m.title||track.query).slice(0,160);status('Playing: '+track.title);display();api.emit?.('music',{title:track.title,by:track.by||''});if(!track.reported){track.reported=true;announce(TylerMusic.nowCard(track,session.waiting),2);}}
+   if(m.event==='ended'){session.finish(track.token);api.emit?.('music',{title:''});await next();}
    if(m.event==='blocked')status('Click Play in the YouTube '+(desktop?'window':'tab')+' once, then use music resume.');
    if(m.event==='error')status('YouTube could not play this video. Use music skip or the DJ’s Skip now button.');
    if(m.event==='missing')status('YouTube showed no video to play for “'+track.query.slice(0,80)+'”. Check the YouTube '+(desktop?'window':'tab')+', then use music skip or request it another way.');

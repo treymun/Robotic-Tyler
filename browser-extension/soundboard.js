@@ -9,7 +9,7 @@
  $('clearArcadeScores').onclick=async()=>{arcadeStats={total:0,winners:{}};await TylerStorage.remove('tylerArcadeStats');updateArcadeStats();status('Arcade statistics cleared from this local profile.');};
 
  async function ask(m){const r=await chrome.runtime.sendMessage(m);if(!r?.ok)throw Error(r?.error||'Soundboard unavailable');return r;}
- async function refresh(){try{const r=await ask({type:'soundboard:list'});TylerSoundboard.slots=r.slots;prefs=r.preferences||prefs;const favorites=r.favorites||[];$('bank').value=r.boardBank||'Arcade';for(const b of root.querySelectorAll('.bank-tab'))b.setAttribute('aria-pressed',String(b.dataset.bank===$('bank').value));
+ async function refresh(){try{const r=await ask({type:'soundboard:list'});TylerSoundboard.slots=r.slots;prefs=r.preferences||prefs;const favorites=r.favorites||[];TylerSoundboard.favorites=favorites;$('bank').value=r.boardBank||'Arcade';for(const b of root.querySelectorAll('.bank-tab'))b.setAttribute('aria-pressed',String(b.dataset.bank===$('bank').value));
  $('commandCard').value=r.slots.map(item=>(item.trigger||'sound '+item.slot)+'  —  '+item.name).join('\n');
  $('copyStatus').textContent='';
  const selected=$('slot').value;
@@ -46,7 +46,7 @@
  bankPick.addEventListener('change',syncRail);syncRail();
  $('bank').onchange=async()=>{try{endPreview();epoch++;await ask({type:'soundboard:bank',bank:$('bank').value});await refresh();}catch(e){status(e.message);}};
  $('pin').onclick=async()=>{try{await ask({type:'soundboard:pin',slot:Number($('slot').value)});await refresh();}catch(e){status(e.message);}};
- async function play(slot,fromChat=false,speaker=null,game=null){if(pending){status('Sound trigger skipped while loading the previous clip.');return;}if(fromChat&&!game&&Date.now()-last<3000){status('Sound trigger skipped — 3-second cooldown.');return;}pending=true;const current=epoch;try{const r=await ask({type:'soundboard:play',slot,fromChat,speaker});if(current!==epoch||!$('enabled').checked&&fromChat)return;if(!game||Date.now()-last>=3000){last=Date.now();api.bridge('board-play',{slot:r.slot,clip:r.clip,volume:r.volume});status('Requested sound '+slot+' in voice.');}
+ async function play(slot,fromChat=false,speaker=null,game=null){if(pending){status('Sound trigger skipped while loading the previous clip.');return;}if(fromChat&&!game&&Date.now()-last<3000){status('Sound trigger skipped — 3-second cooldown.');return;}pending=true;const current=epoch;try{const r=await ask({type:'soundboard:play',slot,fromChat,speaker});if(current!==epoch||!$('enabled').checked&&fromChat)return;if(!game||Date.now()-last>=3000){last=Date.now();api.bridge('board-play',{slot:r.slot,clip:r.clip,volume:r.volume});status('Requested sound '+slot+' in voice.');api.emit?.('sound',{slot,name:TylerSoundboard.slots?.find?.(s=>s.slot===slot)?.name||'Sound '+slot});}
  if(game){
    const region=watched,composer=api.getComposer();api.send(game.text);const previousWins=Number(arcadeState.wins||0);arcadeState=game.next;$('arcadeScore').textContent='Room clears: '+arcadeState.wins;if(Number(arcadeState.wins||0)>previousWins)await recordArcadeWin(speaker);
    if($('gameAI').checked&&[4,5].includes(game.slot)){
@@ -111,6 +111,8 @@
  };
  $('startDeck').onclick=()=>api.startSoundboard?.();
  api.enableBoardTriggers=()=>{$('enabled').checked=true;};
+ // Theme features (v2.20): play a slot like its pad button does, and list the slots and favorites.
+ api.playSound=slot=>play(Number(slot));api.listSounds=()=>({slots:(TylerSoundboard.slots||[]).map(s=>({slot:s.slot,name:s.name})),favorites:[...(globalThis.TylerSoundboard?.favorites||[])]});
  $('access').onchange=()=>dirtyAccess=true;$('allowedIDs').oninput=()=>dirtyAccess=true;
  $('saveTrigger').onclick=async()=>{try{await ask({type:'soundboard:trigger',slot:Number($('slot').value),trigger:$('trigger').value});await refresh();status('Chat command saved.');}catch(e){status(e.message);}};
  $('rename').onclick=async()=>{try{await ask({type:'soundboard:rename',slot:Number($('slot').value),name:$('clipName').value});await refresh();status('Sound name saved — numbered triggers still work.');}catch(e){status(e.message);}};
