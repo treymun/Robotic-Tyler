@@ -13,7 +13,7 @@ const isYouTube=u=>{try{const x=new URL(u);return x.protocol==='https:'&&(x.host
 // YouTube needs its consent and sign-in pages too; anything else opens in the normal browser.
 const youtubeMayOpen=u=>{try{const x=new URL(u);return x.protocol==='https:'&&/(^|\.)(youtube\.com|google\.com|googleusercontent\.com|gstatic\.com)$/.test(x.hostname);}catch{return false;}};
 
-function setupDesktopMedia({BrowserWindow,desktopCapturer,ipcMain,shell,steamSession,windowDefaults={},icon,dir,isVoiceWindow,isSteamFrame,parent=()=>null,log=()=>{},onClosed=()=>{},choose}){
+function setupDesktopMedia({BrowserWindow,desktopCapturer,ipcMain,shell,steamSession,windowDefaults={},icon,dir,isVoiceWindow,isSteamFrame,parent=()=>null,log=()=>{},onClosed=()=>{},choose,userAgent}){
  let youtube=null;
  const alive=()=>!!youtube&&!youtube.isDestroyed()&&!youtube.webContents.isDestroyed();
  async function openYouTube(url='https://www.youtube.com/'){
@@ -22,6 +22,8 @@ function setupDesktopMedia({BrowserWindow,desktopCapturer,ipcMain,shell,steamSes
    youtube=new BrowserWindow({...windowDefaults,show:true,width:1120,height:760,minWidth:640,minHeight:420,title:'ROBOTIC TYLER · Music (YouTube)',icon,
     webPreferences:{...(windowDefaults.webPreferences||{}),partition:'persist:robotic-tyler-youtube',backgroundThrottling:false,autoplayPolicy:'no-user-gesture-required',preload:path.join(dir,'youtube-preload.cjs')}});
    const wc=youtube.webContents,id=wc.id;
+   // YouTube gets Google Chrome's name, as in the Steam window, so it serves its usual desktop site.
+   if(userAgent)wc.setUserAgent(userAgent);
    wc.setWindowOpenHandler(({url:next})=>{if(isYouTube(next))void wc.loadURL(next);else if(/^https:\/\//.test(next))void shell.openExternal(next);return {action:'deny'};});
    wc.on('will-navigate',(event,next)=>{if(!youtubeMayOpen(next)){event.preventDefault();if(/^https:\/\//.test(next))void shell.openExternal(next);}});
    wc.session.setPermissionRequestHandler((_wc,permission,callback)=>callback(!['media','audioCapture','videoCapture','geolocation','notifications'].includes(permission)));

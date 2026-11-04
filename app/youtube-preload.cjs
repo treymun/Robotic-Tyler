@@ -3,15 +3,31 @@
 // Do not edit by hand. The desktop app's Music window (app/desktop-media.cjs): youtube-music.js with
 // chrome.runtime.sendMessage going to the main process, which accepts only its music messages.
 const {ipcRenderer}=require('electron');
-if(process.isMainFrame!==false&&/^https://(?:www.)?youtube.com//.test(location.href)){
+if(process.isMainFrame!==false&&/^https:\/\/(?:www\.)?youtube\.com\//.test(location.href)){
  globalThis.chrome={runtime:{sendMessage:message=>ipcRenderer.invoke('tyler:youtube',message)}};
  const run=()=>{
 ;/* youtube-music.js */
 // Controls the ordinary visible YouTube player. No media URL/API extraction.
+//
+// v2.19.1: YouTube now serves search results in two layouts (the older ytd-video-renderer and the
+// newer yt-lockup-view-model), so the first regular result is found in either, skipping ads and
+// Shorts shelves. If clicking it doesn't open the video, the controller opens that video's own
+// page instead; if no result shows up, it says so.
 (()=>{
- let activeToken='',lastAction='',bound,reported='',endSent=false;
+ let activeToken='',lastAction='',bound,reported='',endSent=false,pick=null,searchSince=0,searchToken='';
  const send=async message=>{try{return await chrome.runtime.sendMessage(message);}catch{return null;}};
  async function event(state,type,title=''){if(reported===state.token+'|'+type)return;reported=state.token+'|'+type;await send({type:'music:event',token:state.token,event:type,title});}
+ // Ads, Shorts and other shelves are never "the first regular result".
+ const SKIP='ytd-ad-slot-renderer,ytd-promoted-video-renderer,ytd-promoted-sparkles-web-renderer,ytd-in-feed-ad-layout-renderer,ytd-display-ad-renderer,ytd-search-pyv-renderer,ytd-reel-shelf-renderer,ytd-shelf-renderer,ytd-horizontal-card-list-renderer,ytd-rich-shelf-renderer,grid-shelf-view-model,ytm-shorts-lockup-view-model,ytm-shorts-lockup-view-model-v2,[is-ad]';
+ // Title links of results, older layout first, then the newer one.
+ const TITLES='ytd-video-renderer a#video-title,yt-lockup-view-model a.ytLockupMetadataViewModelTitle,yt-lockup-view-model .ytLockupMetadataViewModelHeadingReset a,yt-lockup-view-model a[class*="LockupMetadataViewModelTitle"]';
+ const videoId=a=>{try{const u=new URL(a.href,location.href),v=u.searchParams.get('v')||'';return u.hostname==='www.youtube.com'&&u.pathname==='/watch'&&/^[\w-]{11}$/.test(v)?v:'';}catch{return '';}};
+ function firstResult(){
+  const root=document.querySelector('ytd-search')||document;
+  for(const list of [root.querySelectorAll(TITLES),root.querySelectorAll('a[href*="/watch?v="]')])
+   for(const a of list){if(a.closest(SKIP)||!a.getClientRects().length)continue;const id=videoId(a);if(id)return {a,id};}
+  return null;
+ }
  async function tick(){
   const r=await send({type:'music:pending'}),state=r?.command;if(!state)return;
   const video=document.querySelector('video');
@@ -22,11 +38,19 @@ if(process.isMainFrame!==false&&/^https://(?:www.)?youtube.com//.test(location.h
   }
   if(state.action!=='play')return;
   if(location.pathname==='/results'){
-   if(activeToken===state.token)return;
-   const link=[...document.querySelectorAll('ytd-video-renderer a#video-title')].find(a=>{try{return new URL(a.href).hostname==='www.youtube.com'&&new URL(a.href).pathname==='/watch';}catch{return false;}});
-   if(link){activeToken=state.token;endSent=false;reported='';lastAction='';link.click();}return;
+   if(searchToken!==state.token){searchToken=state.token;searchSince=Date.now();}
+   if(activeToken===state.token){
+    // Clicked, but still on the results: open the video's own page.
+    if(pick&&Date.now()-pick.at>4000){const id=pick.id;pick=null;location.assign('https://www.youtube.com/watch?v='+id);}
+    return;
+   }
+   const hit=firstResult();
+   if(hit){activeToken=state.token;endSent=false;reported='';lastAction='';pick={id:hit.id,at:Date.now()};hit.a.click();}
+   else if(Date.now()-searchSince>20000)await event(state,'missing');
+   return;
   }
   if(location.pathname!=='/watch'||!video)return;
+  pick=null;
   if(activeToken!==state.token){activeToken=state.token;endSent=false;reported='';}
   if(bound!==video){bound=video;video.addEventListener('ended',()=>{if(document.querySelector('.ad-showing'))return;video.pause();if(!endSent){endSent=true;void event({token:activeToken},'ended');}});}
   if(lastAction!=='play|'+state.token){lastAction='play|'+state.token;endSent=false;video.muted=false;try{await video.play();}catch{await event(state,'blocked');}}

@@ -84,8 +84,9 @@
    const track=session.current;if(!track||m.token!==track.token)return;
    if(m.event==='playing'){track.title=String(m.title||track.query).slice(0,160);status('Playing: '+track.title);display();if(!track.reported){track.reported=true;announce(TylerMusic.nowCard(track,session.waiting),2);}}
    if(m.event==='ended'){session.finish(track.token);await next();}
-   if(m.event==='blocked')status('Click Play in the YouTube tab once, then use music resume.');
+   if(m.event==='blocked')status('Click Play in the YouTube '+(desktop?'window':'tab')+' once, then use music resume.');
    if(m.event==='error')status('YouTube could not play this video. Use music skip or the DJ’s Skip now button.');
+   if(m.event==='missing')status('YouTube showed no video to play for “'+track.query.slice(0,80)+'”. Check the YouTube '+(desktop?'window':'tab')+', then use music skip or request it another way.');
   });
  });
  api.musicConsumesText=text=>!!TylerMusic.parse(text);globalThis.TylerCommands?.set('music',{enabled:()=>!chatLocked});

@@ -84,6 +84,6 @@ function setupSteamVoice({session,ipcMain,extensionDir,chromeVersion,isVoiceWind
   webContents.on('render-process-gone',()=>closeWindow(id));
   webContents.on('destroyed',()=>closeWindow(id));
  }
- return {applyMode,applyPermissions,watch,onConnect:{addListener:fn=>connectListeners.push(fn)},openPorts:()=>ports.size};
+ return {applyMode,applyPermissions,watch,onConnect:{addListener:fn=>connectListeners.push(fn)},openPorts:()=>ports.size,chromeAgent:chromeUserAgent(major)};
 }
 module.exports={SCHEME,chromeUserAgent,registerScheme,setupSteamVoice,neuralFile};

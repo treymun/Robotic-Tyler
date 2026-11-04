@@ -21,7 +21,7 @@ function fakeElectron(){
  class BrowserWindow{
   constructor(options){this.options=options;this.destroyed=false;const id=nextId++;const self=this;
    this.webContents={id,url:'',isDestroyed:()=>self.destroyed,getURL(){return this.url;},send:(channel,message)=>sent.push({id,channel,message}),
-    setWindowOpenHandler(){},on(){},once(){},reload(){},mainFrame:{},session:options?.webPreferences?.partition?sessionFor(options.webPreferences.partition):{setPermissionRequestHandler(){},setPermissionCheckHandler(){}}};
+    setWindowOpenHandler(){},on(){},once(){},reload(){},setUserAgent(ua){this.userAgent=ua;},mainFrame:{},session:options?.webPreferences?.partition?sessionFor(options.webPreferences.partition):{setPermissionRequestHandler(){},setPermissionCheckHandler(){}}};
    contents.set(id,this.webContents);windows.push(this);}
   loadURL(url){this.webContents.url=url;return Promise.resolve();}
   loadFile(file){this.webContents.url='file://'+file;return Promise.resolve();}
@@ -99,6 +99,7 @@ test('desktop main process boots the shared background and relays storage change
   // Music DJ: YouTube opens in the app's own Music window, which may only ask for its music state.
   const yt=await globalThis.chrome.tabs.create({url:'https://www.youtube.com/',active:true});
   const ytWin=fake.windows.find(w=>w.options.title==='ROBOTIC TYLER · Music (YouTube)');assert.ok(ytWin,'Music window opens');assert.equal(yt.id,ytWin.webContents.id);
+  assert.match(ytWin.webContents.userAgent,/Chrome\/\d+\.0\.0\.0 Safari\/537\.36$/,'YouTube sees Google Chrome\'s name');assert.doesNotMatch(ytWin.webContents.userAgent,/Electron|robotic-tyler/i);
   assert.equal(ytWin.options.webPreferences.partition,'persist:robotic-tyler-youtube');
   const ytFrame={url:'https://www.youtube.com/'};ytWin.webContents.mainFrame=ytFrame;
   const fromYt=fake.handlers.get('tyler:youtube');

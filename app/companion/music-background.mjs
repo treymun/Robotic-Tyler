@@ -7,7 +7,7 @@ export function createMusicRouter(chrome){
   if(!state||state.youtubeTab!==s.tab.id)return {};
   if(m.type==='music:pending')return {command:state};
   if(m.type==='music:event'&&m.token===state.token){
-   if(!['playing','ended','blocked','error','paused'].includes(m.event))return {};
+   if(!['playing','ended','blocked','error','paused','missing'].includes(m.event))return {};
    await chrome.tabs.sendMessage(state.steamTab,{source:'tyler-music-event',token:state.token,event:m.event,title:String(m.title||'').slice(0,160)}).catch(()=>{});
   }
   return {};

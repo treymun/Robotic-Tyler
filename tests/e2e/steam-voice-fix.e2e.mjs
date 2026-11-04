@@ -52,7 +52,9 @@ async function run(withFix){
 }
 test('the bot stays in the call through leaves and a rejoin with the leave fix (and drops without it)',async()=>{
  const without=await run(false);
- assert.match(String(without.failed),/leave: .*Failed to set up audio demuxing/,'the mock reproduces the live failure without the fix');
+ // Without the fix the remembered MID breaks routing at the leave or, depending on packet timing,
+ // already when Steam lists the person's own section (both end Steam's call).
+ assert.match(String(without.failed),/(?:listed|leave): .*(?:Failed to set up audio demuxing|Failed to apply demuxer criteria)/,'the mock reproduces the live failure without the fix');
  const withFix=await run(true);
  assert.equal(withFix.failed,null,withFix.failed);
  assert.deepEqual(withFix.steps,['join','listed','leave','rejoin','leave again']);

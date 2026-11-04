@@ -1,3 +1,17 @@
+# ROBOTIC TYLER v2.19.1: Music DJ plays your request again
+
+## Fixed
+- **Desktop app: Music DJ searched YouTube but never played the song.** The Music window's YouTube controller didn't load at all in 2.19.0 (a broken line in its generated startup script, which Electron skips without an error), so nothing picked the result. It loads again, and a new test checks that every desktop startup script is valid and that the Music window's controller starts.
+- **Music DJ finds the first result in YouTube's newer search layout too** (Chrome extension and desktop app). YouTube now shows search results in two different layouts; Tyler used to look only for the older one. He now picks the first regular video in either, skipping ads and Shorts shelves. If clicking the result doesn't open it, he opens the video's own page instead, and if no video shows up he says so in the Music DJ status instead of waiting forever.
+- Desktop app: the Music window now tells YouTube it's Google Chrome, like the Steam chat window, so YouTube serves its usual desktop site.
+- "Click Play in the YouTube tab" now says "window" in the desktop app.
+
+## Tested
+- **Real YouTube, from a cloud computer (not your PC, no Steam):** the desktop app's Music window in Electron (Chromium 156) loaded the controller, searched and opened the top result (2.19.0 stayed on the results page); the Chrome extension's controller in Chromium did the same. YouTube didn't let that computer play the video ("Video unavailable"), so actual playback, and so the sound reaching Steam voice, was not tested.
+- **Mocks:** both search layouts with an ad and a Shorts shelf first, a result whose click does nothing, and no results (headless Chromium, mock YouTube pages); 247 unit and integration tests and 14 end-to-end tests.
+- **Not tested:** Music DJ in a real Steam voice call with the installed desktop app.
+
+---
 # ROBOTIC TYLER v2.19.0: voice right in the desktop app, and a new Setup
 
 ## New

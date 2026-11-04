@@ -324,7 +324,7 @@ function buildYoutubePreload(){
 // Do not edit by hand. The desktop app's Music window (app/desktop-media.cjs): ${yt.join(', ')} with
 // chrome.runtime.sendMessage going to the main process, which accepts only its music messages.
 const {ipcRenderer}=require('electron');
-if(process.isMainFrame!==false&&/^https:\/\/(?:www\.)?youtube\.com\//.test(location.href)){
+if(process.isMainFrame!==false&&/^https:\\/\\/(?:www\\.)?youtube\\.com\\//.test(location.href)){
  globalThis.chrome={runtime:{sendMessage:message=>ipcRenderer.invoke('tyler:youtube',message)}};
  const run=()=>{
 ${bundle(yt)}
