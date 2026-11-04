@@ -15,6 +15,8 @@
 
 <p align="center"><b>Tyler is an AI squadmate for Steam.</b> He sits in your group chat and voice channel, talks like one of the crew, and keeps the night going with trivia, votes, sounds and music.</p>
 
+<p align="center"><a href="CHANGES.md"><img src="assets/readme/whats-new.png" width="100%" alt="What's new since v2.20.1: Phone remote (v2.25, v2.26), Stay connected (v2.24), a docked and resizable panel (v2.23), themes with their own menus and screens (v2.22), smoother voice (v2.21), music that sounds right (v2.20.2, v2.20.3), the full check and repeat protection (v2.20.1)."></a></p>
+
 ---
 
 ## What he does
@@ -26,11 +28,15 @@
 </tr>
 <tr>
 <td valign="top"><img src="assets/readme/icon-sounds.png" width="52" align="left" alt="">&nbsp;<b>Soundboard</b><br>&nbsp;Clips straight into the call through his own microphone. No API key needed for the sounds.</td>
-<td valign="top"><img src="assets/readme/icon-music.png" width="52" align="left" alt="">&nbsp;<b>Music DJ</b><br>&nbsp;<code>!play artist song</code> in chat: a YouTube queue played into voice, with skip votes and per-person limits.</td>
+<td valign="top"><img src="assets/readme/icon-music.png" width="52" align="left" alt="">&nbsp;<b>Music DJ</b><br>&nbsp;<code>!play artist song</code> in chat: a YouTube queue played into voice in stereo, with skip votes, Auto quality and a dip while Tyler talks.</td>
 </tr>
 <tr>
 <td valign="top"><img src="assets/readme/icon-games.png" width="52" align="left" alt="">&nbsp;<b>Trivia, votes and games</b><br>&nbsp;500-question trivia races, an arcade (<code>play vault</code>, <code>play hangman</code>, <code>play riddle</code> …), squad votes and optional mute or kick votes.</td>
-<td valign="top"><img src="assets/readme/icon-themes.png" width="52" align="left" alt="">&nbsp;<b>20 themes</b><br>&nbsp;Steam, TF2, CS2, Portal, DOOM, Deadlock, PAYDAY 2 and more, each with its own Tyler, status strip and extras: a Quake console, a Pip-Boy, a CS2 sound wheel, a Dreamcast VMU…</td>
+<td valign="top"><img src="assets/readme/icon-themes.png" width="52" align="left" alt="">&nbsp;<b>20 themes</b><br>&nbsp;Steam, TF2, CS2, Portal, DOOM, Deadlock, PAYDAY 2 and more, each with its own Tyler, status strip, menus and screens: a Quake console, a Pip-Boy radio, a CS2 buy wheel, a working Dreamcast VMU…</td>
+</tr>
+<tr>
+<td valign="top"><img src="assets/readme/icon-remote.png" width="52" align="left" alt="">&nbsp;<b>Phone remote</b> <sup>new</sup><br>&nbsp;Tyler's panel on your phone, live and in your theme. Start or pause him, play clips, run the music, type in chat, switch the theme. Nothing to install.</td>
+<td valign="top"><img src="assets/readme/icon-stay.png" width="52" align="left" alt="">&nbsp;<b>Stays in the call</b> <sup>new</sup><br>&nbsp;A soft hum after 45 quiet minutes keeps Steam from dropping him, and he reconnects to the chat by himself. A full check tests every part in one pass.</td>
 </tr>
 </table>
 
@@ -39,7 +45,9 @@
 <p align="center"><img src="assets/readme/feature-voice.png" width="100%" alt="Voice: Settings → Voice with the Standard and Gemini Live engines, and Tyler's panel listening in Steam chat."></p>
 <p align="center"><img src="assets/readme/feature-personality.png" width="100%" alt="Personality: presets, humor, edginess, helpfulness and chaos sliders, a written description, roast intensity, reply length, speed and talkativeness."></p>
 <p align="center"><img src="assets/readme/feature-room.png" width="100%" alt="Room tools: the panel's Room tab with Music DJ open, and the Sounds tab with its soundboard pads."></p>
-<p align="center"><img src="assets/readme/feature-desktop.png" width="100%" alt="The desktop app: Tyler's panel on air in the app's own Steam chat window, and its settings for where Tyler joins voice and getting started."></p>
+<p align="center"><img src="assets/readme/feature-desktop.png" width="100%" alt="The desktop app: its own Steam chat window, with Tyler's panel on air docked beside the chat."></p>
+<p align="center"><img src="assets/readme/feature-remote.png" width="100%" alt="Phone remote: Tyler's panel on three phones, in the Steam, PAYDAY 2 and Pip-Boy themes, the last one showing the theme picker."></p>
+<p align="center"><img src="assets/readme/feature-reliability.png" width="100%" alt="Long nights: the panel's Stay connected settings (hum after 45 quiet minutes, keep the chat connected) and the Checks tab with Run full check."></p>
 
 <sub>Screenshots of the real panel and settings with sample data (the text spend and names are examples).</sub>
 
@@ -49,6 +57,7 @@
 2. Open ROBOTIC TYLER and sign in to your bot's Steam account in its Steam chat window.
 3. In **Settings**, add an **OpenRouter** or **Google Gemini** key and pick a personality.
 4. Open your group chat, then **Tyler's panel → Connect & start**, and join the voice channel. That's it: no virtual audio cable, no extra microphone.
+5. *Optional:* **Settings → Overview → Phone remote**, scan the QR code with your phone and type the 6-digit code. Add the page to your home screen and Tyler is one tap away.
 
 > Setup isn't code-signed. If Windows says *"Windows protected your PC"*, choose **More info → Run anyway**. Setup checks each download's SHA-256 before it runs it, and the desktop app updates itself.
 
@@ -58,7 +67,10 @@
 |---|---|---|
 | What it is | One Windows app with its own Steam chat window | Tyler inside Steam web chat in Google Chrome |
 | Voice | In its Steam window, Tyler's own synthetic microphone. No VB-CABLE. | In the Steam tab, same synthetic microphone |
+| Tyler's panel | Docked beside the chat (or floating), resizable | Floating over the chat, resizable |
 | Music DJ and screen commentary | In-app YouTube window and screen picker | A YouTube tab and Chrome's share picker |
+| Phone remote | Yes: a page on your home Wi-Fi | No (an extension can't serve one) |
+| Staying connected | Quiet-call hum, chat reconnect | The same, and the tab stays awake in the background |
 | Install and updates | Setup installs it, it updates itself | Setup unpacks it; Chrome needs *Developer mode → Load unpacked* once |
 | Good for | A dedicated bot PC or account | Running Tyler next to your normal browsing |
 
@@ -70,17 +82,20 @@ Both run the same engine, settings and themes. Prefer the older desktop route th
 - **Text models:** OpenRouter with Llama 3.3 70B, Mistral Small 3.2 or **Venice Uncensored** (each with its own provider routing, never Parasail), or Google Gemini with **3.1 Flash-Lite, 3.5 Flash-Lite or 3.8 Flash** (all on Google's free tier). **Test selected model** in Settings checks yours.
 - **Gemini Live** is a real-time conversation with Google: Tyler hears the call as people talk, answers in about a second and stops when someone talks over him. It needs a Google AI key, and Google bills the audio while a session runs, so you start and stop every session yourself.
 
+- **How he sounds:** Gemini Live replies play without crackle, the second half of a reply starts on the exact sample the first ends, and every reply comes out at the same loudness. Friends' voices reach his speech recognition through a proper filter, so "s" sounds don't turn into noise.
+
 Your personality, reply length and rules always apply, and people in the call can't change them.
 
 <p align="center"><img src="assets/readme/themes.png" width="100%" alt="The theme gallery: the real panel in each of the 20 themes, with its Tyler logo: Steam, Classic Steam, Team Fortress 2, Counter-Strike 2, Portal, Counter-Strike 1.6, HEV suit, Left 4 Dead, Windows XP, DOOM, Quake, Pip-Boy, Combine, Deadlock, Minecraft, PAYDAY 2, Dreamcast, Garry's Mod, Ricochet, Day of Defeat"></p>
 
-**Settings → Appearance** shows every theme as a live preview card; **Apply** changes every Tyler window at once. Game themes follow each game's own menu colors and shapes, with free look-alike fonts (bundled, SIL Open Font License). No game fonts are included.
+**Settings → Appearance** shows every theme as a live preview card, with the theme's real extras reacting as Tyler listens, thinks, talks, pauses or hits a problem; **Apply** changes every Tyler window at once (so does the phone remote's Setup tab). Every theme adds its own controls on top: Steam's persona menu and achievements, the Windows XP Start menu, a PAYDAY heist plan with a drill timer, a Minecraft hotbar of sound discs, a Deadlock shop, a Day of Defeat field radio and more. Game themes follow each game's own menu colors and shapes, with free look-alike fonts (bundled, SIL Open Font License). No game fonts are included.
 
 ## Privacy and consent
 
 - Tyler only hears the Steam voice call he's in, and only after you confirm everyone knows he's listening. He never uses your physical microphone: his voice is a synthetic microphone that only carries what he says and plays.
 - Your keys stay on your PC (encrypted by Windows in the desktop app) and never reach Steam's pages.
 - Screen commentary only sees the window you pick, as still pictures, and only while you share it.
+- The phone remote is off until you turn it on. It answers only devices on your home network, and only after pairing with a code from Settings. The phone sees what the panel shows, never your keys or the chat's messages. Remove a phone (or all of them) in Settings at any time.
 
 ## Trivia
 
