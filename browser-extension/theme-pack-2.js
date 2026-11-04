@@ -112,7 +112,7 @@
   }},
   {id:'qk-medals',mount(c){
    const counts={};let lastTurn=0;
-   function award(key,name){counts[key]=(counts[key]||0)+1;const el=c.h('div','fx qk-medal '+key);el.append(c.h('span','qk-medal-icon'),c.h('b',null,name),c.h('small',null,'×'+counts[key]));el.setAttribute('role','status');c.flash(el,1700);}
+   function award(key,name){counts[key]=c.best('quake:'+key,(Number(c.life?.best?.['quake:'+key])||counts[key]||0)+1);const el=c.h('div','fx qk-medal '+key);el.append(c.h('span','qk-medal-icon'),c.h('b',null,name),c.h('small',null,'×'+counts[key]));el.setAttribute('role','status');c.flash(el,1700);}
    return {update(type,d){if(type!=='turn')return;const t=Date.now();
     if(d.ms<1200)award('impressive','Impressive');else if(lastTurn&&t-lastTurn<10000)award('excellent','Excellent');
     if(c.S.streak&&c.S.streak%5===0)award('perfect','Perfect');lastTurn=t;}};
@@ -157,6 +157,21 @@
    function say(t){const s=c.h('span','cb-line',t.toUpperCase());text.replaceChildren(s);}
    say(DISPATCH[c.S.state]||DISPATCH.ready);
    return {update(type,d){if(type==='state'&&d.state!==d.before)say(DISPATCH[d.state]||d.label);if(type==='turn')say('Response delivered. Code '+(d.ms/1000).toFixed(1));if(type==='sound')say('Audio deterrent deployed: '+d.name);if(type==='chat'&&d.flood)say('Civil disturbance in sector chat. Unit throttling');}};
+  }},
+  {id:'cb-terminal',mount(c){
+   // Click DISPATCH (or press T over the panel) for the unit's record: the recent dispatch log and
+   // lifetime totals, as a Civil Protection terminal.
+   let term=null;const close=()=>{term?.remove();term=null;};
+   const code=k=>({reply:'10-4',spoke:'11-6',sound:'10-91',music:'10-22',error:'10-108',state:'10-8'})[k]||'10-9';
+   function open(){if(term)return close();const S=c.S,L=c.life,v=c.voice();term=c.h('div','fx cb-term fx-interactive');term.setAttribute('role','dialog');term.setAttribute('aria-label','Unit record');
+    const head=c.h('div','cb-term-head');head.append(c.h('b',null,'UNIT ROBOTIC TYLER'),c.h('span',null,'SECTOR STATUS: '+(S.state==='error'?'NON-COMPLIANT':'COMPLIANT')));
+    const facts=c.h('div','cb-term-facts');for(const [k,val] of [['RESPONSES',L?L.replies+L.spoken:S.replies+S.spoken],['CITIZENS HEARD',L?L.heard:S.heard],['VIOLATIONS',L?L.errors:S.errors],['SUBJECTS ON BAND',v.peers],['AVG RESPONSE',c.ms(c.avgTurn())],['DEPLOYMENTS',L?L.sessions:1]]){const f=c.h('div');f.append(c.h('small',null,k),c.h('b',null,String(val)));facts.append(f);}
+    const log=c.h('div','cb-term-log');log.setAttribute('role','log');for(const e of S.log.slice(-10).reverse()){const r=c.h('div');if(e.kind==='error')r.className='bad';r.append(c.h('span',null,new Date(e.at).toLocaleTimeString([],{hour12:false})),c.h('i',null,code(e.kind)),c.h('span',null,e.text.toUpperCase()));log.append(r);}
+    if(!S.log.length)log.append(c.h('div',null,'NO DISPATCHES THIS SHIFT'));
+    const x=c.h('button','cb-term-close','Close terminal');x.type='button';x.onclick=close;term.append(head,facts,log,x);term.style.setProperty('--fx-top',(c.below('.tabs')+6)+'px');c.slots.layer.append(term);x.focus();}
+   const tag=c.root.querySelector('.cb-ticker>b');if(tag){tag.tabIndex=0;tag.setAttribute('role','button');tag.title='Open the unit record (T)';tag.onclick=open;tag.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open();}};}
+   c.key(e=>{if((e.key==='t'||e.key==='T')&&!e.repeat){e.preventDefault();open();}else if(term&&e.key==='Escape'){e.preventDefault();close();}});
+   return {unmount:close};
   }},
   {id:'cb-scan',mount(c){
    let last=0;

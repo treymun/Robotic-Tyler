@@ -61,7 +61,7 @@
    if(m.type==='music-volume'){if(musicGain){const level=Math.max(0,Math.min(2,Number(m.volume)||0));musicGain.gain.setTargetAtTime(level,ctx.currentTime,.08);}return;}
    if(m.type==='music-capture'){
     disconnectMusic();setup();
-    const stream=await navigator.mediaDevices.getDisplayMedia({video:true,audio:true,selfBrowserSurface:'exclude',systemAudio:'exclude'});
+    const stream=await navigator.mediaDevices.getDisplayMedia({video:{displaySurface:'browser'},audio:true,preferCurrentTab:false,selfBrowserSurface:'exclude',systemAudio:'exclude',monitorTypeSurfaces:'exclude',surfaceSwitching:'include'});
     const video=stream.getVideoTracks()[0],audio=stream.getAudioTracks();
     if(!audio.length||video?.getSettings?.().displaySurface!=='browser'||/steam/i.test(video?.label||'')){for(const t of stream.getTracks())t.stop();throw Error('Select the YouTube browser tab and enable Share tab audio. Do not select Steam, a window or your screen.');}
     musicStream=stream;musicSource=ctx.createMediaStreamSource(new MediaStream(audio));musicGain=ctx.createGain();musicGain.gain.value=Math.max(0,Math.min(2,(Number.isFinite(Number(m.volume))?Number(m.volume):.35)));musicSource.connect(musicGain);musicLimiter=ctx.createDynamicsCompressor();musicLimiter.threshold.value=-3;musicLimiter.knee.value=6;musicLimiter.ratio.value=20;musicLimiter.attack.value=.003;musicLimiter.release.value=.15;musicGain.connect(musicLimiter);musicLimiter.connect(destination);

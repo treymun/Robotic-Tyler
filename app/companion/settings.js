@@ -2,7 +2,7 @@
 'use strict';
 const $=id=>document.getElementById(id);
 let noiseChanged=false;
-const fields=['aiProvider','personality','length','brain','geminiTextModel','roastMode','talkativeness','insideJokes','callbackGap','nicknameAliases','textSpeed','spendingCapUSD','streamAI','friendMemory','smartRouting','libraryAllowedIds','activityEnabled','activitySteamIds','voiceEngine','geminiVoice','geminiTtsModel','liveModel','liveVoice','liveInterrupt','liveSilenceMs','liveStartSensitivity','liveEndSensitivity','speechVoice','noiseLevel','fastSpeech','desktopVoice','voiceOutputDevice','voiceListenDevice','voiceListenConsent','chatTagEnabled','chatTagName'];
+const fields=['aiProvider','personality','length','brain','geminiTextModel','themeStats','roastMode','talkativeness','insideJokes','callbackGap','nicknameAliases','textSpeed','spendingCapUSD','streamAI','friendMemory','smartRouting','libraryAllowedIds','activityEnabled','activitySteamIds','voiceEngine','geminiVoice','geminiTtsModel','liveModel','liveVoice','liveInterrupt','liveSilenceMs','liveStartSensitivity','liveEndSensitivity','speechVoice','noiseLevel','fastSpeech','desktopVoice','voiceOutputDevice','voiceListenDevice','voiceListenConsent','chatTagEnabled','chatTagName'];
 const sliderIds=['humorLevel','edgeLevel','helpLevel','chaosLevel'];
 const sliderLabels={humorLevel:['Dry','Light','High','Unhinged'],edgeLevel:['Soft','Spicy','Rowdy','Savage'],helpLevel:['Low','Balanced','Helpful','Coach mode'],chaosLevel:['Controlled','Loose','Chaotic','Gremlin']};
 const presetMap={
@@ -144,6 +144,8 @@ $('save').onclick=async()=>{
   }finally{$('save').disabled=false;}
 };
 window.tylerSettingsLoaded=load();
+// Theme stats (v2.20.1): reset now, independent of Save.
+document.getElementById('themeStatsReset')?.addEventListener('click',async()=>{if(!window.confirm('Reset every theme\'s lifetime stats (achievements, levels, high scores)?'))return;await storage().remove('tylerLifetime');document.getElementById('themeStatsNote').textContent='Theme stats reset.';});
 // The Voice page fills its model and voice lists after this script runs, then loads the values again.
 window.tylerSettingsReload=load;
 

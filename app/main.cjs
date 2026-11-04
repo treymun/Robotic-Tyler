@@ -65,7 +65,7 @@ if(!app.requestSingleInstanceLock()){app.quit();}else{
    query:async({url}={})=>{const tab=steamTab();if(!tab)return [];if(url&&!/steamcommunity\.com\/chat/.test(String(url)))return [];return isChat(tab.url)?[tab]:[];},
    sendMessage:async(id,message)=>{if(id===-1){voice?.backgroundMessage(message);return;}const wc=webContents.fromId(id);if(!wc||wc.isDestroyed())throw Error('Tab closed');wc.send('tyler:message',message);},
    // YouTube opens in the app's Music window (Music DJ); anything else in the normal browser.
-   create:async({url}={})=>{if(windowVoice&&isYouTube(url))return media.openYouTube(url);if(/^https:\/\//.test(String(url||'')))await shell.openExternal(url);return {id:-2};},
+   create:async({url,active}={})=>{if(windowVoice&&isYouTube(url))return media.openYouTube(url,{background:active===false});if(/^https:\/\//.test(String(url||'')))await shell.openExternal(url);return {id:-2};},
    update:async(id,props={})=>{media.update(id,props);return {id};},
    onRemoved:{addListener(fn){removed.push(fn);}}}};
  await import(pathToFileURL(path.join(__dirname,'companion','background.js')).href);

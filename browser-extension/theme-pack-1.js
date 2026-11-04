@@ -10,7 +10,8 @@
    const box=c.add('deck',c.h('button','fx st-activity'));box.type='button';box.title='Reply times this session. Opens Checks.';
    const head=c.h('span','st-act-head'),title=c.h('b','st-act-title','Activity'),stats=c.h('span','st-act-stats');
    const cur=c.h('b',null,'—'),peak=c.h('b',null,'—'),total=c.h('b',null,'0');
-   stats.append('CURRENT ',cur,' PEAK ',peak,' REPLIES ',total);head.append(title,stats);
+   stats.append('CURRENT ',cur,' PEAK ',peak,' REPLIES ',total);
+   box.title='Reply times this session. Lifetime: replies and achievements in the tooltip. Opens Checks.';head.append(title,stats);
    const bars=c.h('span','st-bars');const cells=Array.from({length:28},()=>bars.appendChild(c.h('i')));
    box.append(head,bars);box.onclick=()=>c.actions.tab('checks');
    function render(){
@@ -18,31 +19,45 @@
     cells.forEach((cell,i)=>{const v=t[i-(cells.length-t.length)];cell.style.height=v?Math.max(8,Math.round(v/max*100))+'%':'0';cell.classList.toggle('live',false);});
     if(c.S.state==='thinking'){const live=cells[cells.length-1];live.classList.add('live');}
     cur.textContent=t.length?c.ms(t[t.length-1]):'—';peak.textContent=t.length?c.ms(Math.max(...t)):'—';total.textContent=String(c.S.replies+c.S.spoken);
+    const L=c.life;box.title='Reply times this session. Opens Checks.'+(L?' Lifetime: '+(L.replies+L.spoken).toLocaleString()+' replies, '+L.sessions+' sessions, '+(L.ach||[]).filter(a=>a.startsWith('st:')).length+' of 12 achievements.':'');
     box.dataset.state=c.S.state;
    }
-   render();return {update(type){if(type==='turn'||type==='reply'||type==='state')render();}};
+   render();return {update(type){if(type==='turn'||type==='reply'||type==='state'||type==='life'||type==='report')render();}};
   }},
   {id:'st-achievements',mount(c){
-   const got=new Set();let queue=Promise.resolve();
-   function unlock(key,name,desc,glyph){
-    if(got.has(key))return;got.add(key);
+   // Lifetime achievements (kept between sessions unless Settings → Appearance turns stats off).
+   let queue=Promise.resolve();
+   const total=k=>Math.max(Number(c.life?.[k])||0,Number(c.S[k])||0);
+   const LIST=[
+    ['ice','Breaking the Ice','First reply in chat.','✉',()=>total('replies')>=1],
+    ['voice','First Words','Tyler spoke in a voice call.','◖',()=>total('spoken')>=1],
+    ['ten','Chatterbox','10 replies.','10',()=>total('replies')+total('spoken')>=10],
+    ['hundred','Life of the Party','100 replies.','C',()=>total('replies')+total('spoken')>=100],
+    ['thousand','Legend of the Lobby','1,000 replies.','M',()=>total('replies')+total('spoken')>=1000],
+    ['sound','Soundcheck','First soundboard clip in voice.','♫',()=>total('sounds')>=1],
+    ['dj','Resident DJ','First song from the Music DJ.','♪',()=>total('songs')>=1||!!c.S.music],
+    ['fast','Speed Demon','A reply in under a second.','⚡',(type,d)=>type==='report'?Number(d?.ms)<1000:type==='turn'?(c.S.turns.at(-1)??99999)<1000:type==='life'&&(c.life?.fastest||99999)<1000],
+    ['streak','Unstoppable','15 replies in a row without a problem.','★',()=>Math.max(c.life?.bestStreak||0,c.S.best)>=15],
+    ['regular','Regular','Tyler joined the squad 10 times.','⌂',()=>(c.life?.sessions||0)>=10],
+    ['marathon','Marathon','10 hours on duty.','⏱',()=>(c.life?.timeMs||0)>=36e6],
+    ['back','Back Online','Recovered after a problem.','↺',()=>false],
+   ];
+   function toast(name,desc,glyph){
     queue=queue.then(()=>new Promise(done=>{
      const el=c.h('div','fx st-ach'),icon=c.h('span','st-ach-icon',glyph),text=c.h('span','st-ach-text');
      text.append(c.h('small',null,'Achievement unlocked'),c.h('b',null,name),c.h('span',null,desc));el.append(icon,text);
      el.setAttribute('role','status');c.flash(el,5200);c.later(done,1400);
     }));
    }
-   return {update(type,d){
-    const S=c.S;
-    if(type==='reply'&&S.replies===1)unlock('ice','Breaking the Ice','Tyler sent his first reply in chat.','✉');
-    if((type==='reply'||type==='state')&&S.replies+S.spoken===10)unlock('ten','Chatterbox','10 replies this session.','10');
-    if(type==='state'&&d.state==='speaking'&&S.spoken===1)unlock('voice','First Words','Tyler spoke in the voice call.','◖');
-    if(type==='turn'&&d.ms<1000)unlock('fast','Speed Demon','A reply in under a second.','⚡');
-    if(type==='sound'&&S.sounds===1)unlock('sound','Soundcheck','First soundboard clip in voice.','♫');
-    if(type==='music'&&d.title)unlock('dj','Resident DJ','First song from the Music DJ.','♪');
-    if(type==='state'&&d.before==='error'&&['ready','listening'].includes(d.state))unlock('back','Back Online','Recovered after a problem.','↺');
-    if(type==='turn'&&S.streak===15)unlock('streak','Unstoppable','15 replies in a row without a problem.','★');
-   },unmount(){}};
+   function check(type,d){
+    for(const [key,name,desc,glyph,test] of LIST){
+     const met=key==='back'?type==='state'&&d?.before==='error'&&['ready','listening'].includes(d?.state):test(type,d);
+     if(met&&c.unlock('st:'+key))toast(name,desc,glyph);
+    }
+   }
+   c.later(()=>check('life'),1500);
+   // A turn's own timing (report) can follow its end by a moment, so speed is judged after it.
+   return {update(type,d){if(type==='turn')c.later(()=>check('turn',d),1500);else if(['reply','state','sound','music','life','report'].includes(type))check(type,d);}};
   }},
  ]);
 

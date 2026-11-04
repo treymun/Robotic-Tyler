@@ -66,3 +66,23 @@ test('music routing is independent from AI stop and controls do not fetch or ext
  assert.match(source('music.js'),/v22:stop/);
  assert.doesNotMatch(source('youtube-music.js'),/fetch\(|getUserMedia|chrome\.storage|\.currentSrc/);
 });
+test('one-click Start Music DJ opens YouTube behind Steam and asks for the share in the same click (v2.20.1)',async()=>{
+ const data={},created=[],updates=[];
+ const chrome={storage:{session:{get:async()=>data,set:async values=>Object.assign(data,values)}},tabs:{create:async options=>{created.push(options);return {id:30};},get:async()=>({id:30}),update:async(id,values)=>updates.push({id,...values}),sendMessage:async()=>{}}};
+ const router=createMusicRouter(chrome),steam={tab:{id:10},url:'https://steamcommunity.com/chat/'};
+ await router.command({action:'open',background:true},steam);
+ assert.equal(created[0].active,false,'the YouTube tab opens without taking focus');
+ await router.command({action:'open',background:true},steam);assert.equal(updates.filter(u=>u.active).length,0,'a second Start does not pull YouTube to the front');
+ await router.command({action:'open'},steam);assert.equal(updates.at(-1).active,true,'Reopen YouTube still brings it forward');
+ // The panel: one button, the share request in the click itself (getDisplayMedia needs the click).
+ const music=source('music.js');
+ assert.match(music,/id="musicStart"[^>]*>▶ Start Music DJ/);
+ const start=music.slice(music.indexOf("$('musicStart').onclick"),music.indexOf("api.musicStatus"));
+ assert.match(start,/command\('open',\{background:true\}\)/);
+ assert.match(start,/api\.bridge\('music-capture'/);
+ assert.ok(start.indexOf("api.bridge('music-capture'")>start.indexOf('void schedule('),'the share is requested synchronously, not after awaiting the tab');
+ assert.doesNotMatch(start,/await[^;]*api\.bridge\('music-capture'/);
+ // The share stays the YouTube tab's audio only: no system audio, no Steam tab.
+ const bridge=source('audio-bridge.js');
+ assert.match(bridge,/systemAudio:'exclude'/);assert.match(bridge,/selfBrowserSurface:'exclude'/);
+});

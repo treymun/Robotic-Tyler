@@ -25,3 +25,13 @@ test('the framework loads before the packs, in Chrome and in the desktop app',()
  assert.ok(preload.indexOf('/* theme-features.js */')<preload.indexOf('/* theme-pack-3.js */'));
  assert.match(read('browser-extension/ui-template.js'),/fx-layer/,'feature styles are compiled into the panel');
 });
+test('content scripts may keep lifetime theme stats but never change the setting that allows them',async()=>{
+ const {contentStorage,readable}=await import('../browser-extension/content-storage.mjs');
+ const store={data:{},get:async k=>Object.fromEntries(k.filter(x=>x in store.data).map(x=>[x,store.data[x]])),set:async v=>Object.assign(store.data,v),remove:async k=>{for(const x of k)delete store.data[x];}};
+ assert.ok(readable.has('tylerLifetime')&&readable.has('themeStats'));
+ await contentStorage(store,{action:'set',values:{tylerLifetime:{v:1,replies:3}}});
+ assert.equal((await contentStorage(store,{action:'get',keys:['tylerLifetime']})).values.tylerLifetime.replies,3);
+ await assert.rejects(contentStorage(store,{action:'set',values:{themeStats:true}}),/not allowed/);
+ await assert.rejects(contentStorage(store,{action:'get',keys:['geminiKey']}),/not allowed/);
+ await contentStorage(store,{action:'remove',keys:['tylerLifetime']});assert.deepEqual(store.data,{});
+});

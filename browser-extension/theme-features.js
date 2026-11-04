@@ -30,7 +30,25 @@
   return Math.max(1,Math.min(100,h));
  }
  const avgTurn=()=>S.turns.length?S.turns.slice(-8).reduce((a,b)=>a+b,0)/Math.min(8,S.turns.length):2500;
- function voice(){const v=api.getVoiceState?.()||null;return {armed:!!v?.enabled,peers:Number(v?.peers)||0,attached:Number(v?.attached)||0};}
+ // People in the call: the incoming voice tracks Tyler hears (a Steam call is one connection with a
+ // track per person), counted only while his microphone is on.
+ function voice(){const v=api.getVoiceState?.()||null,heard=api.getIncoming?.()||null;const armed=!!v?.enabled,inCall=Number(v?.connectedPeers)>0;
+  return {armed,inCall,peers:armed&&inCall?Math.max(0,Number(heard?.tracks)||0):0,attached:Number(v?.attached)||0};}
+
+ // ── Lifetime stats (v2.20.1): kept between sessions unless Settings → Appearance turns it off ─
+ // Counts only (no chat text, no names): replies, voice replies, messages heard, sounds, songs,
+ // problems, reply times, best streak, sessions, time and the achievements a theme unlocked.
+ const LIFE0={v:1,replies:0,spoken:0,heard:0,sounds:0,songs:0,errors:0,turns:0,turnMs:0,fastest:0,bestStreak:0,sessions:0,timeMs:0,ach:[],firstAt:0,best:{}};
+ let life=null,lifeTimer=0,lifeMark=now();
+ function lifeSave(soon=true){if(!life)return;clearTimeout(lifeTimer);const run=()=>{if(!life)return;const t=now();if(!document.hidden)life.timeMs+=Math.min(t-lifeMark,120000);lifeMark=t;void globalThis.TylerStorage?.set?.({tylerLifetime:life}).catch(()=>{});};if(soon)lifeTimer=setTimeout(run,4000);else run();}
+ function bump(key,n=1){if(!life)return;life[key]=(Number(life[key])||0)+n;lifeSave();}
+ async function lifeLoad(){
+  try{const r=await globalThis.TylerStorage?.get?.(['tylerLifetime','themeStats']);
+   if(r?.themeStats===false){life=null;}else{const saved=r?.tylerLifetime;life={...LIFE0,...(saved&&saved.v===1?saved:{}),best:{...(saved?.best||{})},ach:Array.isArray(saved?.ach)?saved.ach.slice(0,200):[]};life.sessions++;if(!life.firstAt)life.firstAt=now();lifeSave();}
+   deliver('life',{});}catch{}
+ }
+ document.addEventListener('visibilitychange',()=>{if(document.hidden)lifeSave(false);else lifeMark=now();});
+ addEventListener('pagehide',()=>lifeSave(false));
  function systems(){
   const v=voice(),chat=!!(api.getComposer?.()?.isConnected&&api.getRegion?.()?.isConnected);
   return [
@@ -73,6 +91,12 @@
  function makeCtx(){
   const own=new Set(),timers=new Set(),offs=[];let tick=null;
   const ctx={S,api,actions,h,svg,ms,clock,pad,health,avgTurn,voice,systems,TABS,TAB_NAMES,root,panel,slots,
+   /** Lifetime totals, or null when Settings turns them off. */
+   get life(){return life;},
+   /** Unlock a lifetime achievement once; true the first time (also when lifetime stats are off, per session). */
+   unlock(key){if(life){if(life.ach.includes(key))return false;life.ach.push(key);lifeSave();return true;}if(ctx._session.has(key))return false;ctx._session.add(key);return true;},_session:new Set(),
+   /** A theme's best value (high score…), kept with the lifetime totals. */
+   best(key,value){if(!life)return value;const old=Number(life.best[key])||0;if(value>old){life.best[key]=value;lifeSave();}return Math.max(old,value);},
    get reduced(){return !!reduced?.matches;},
    add(slot,el){(slots[slot]||slots.deck).append(el);own.add(el);return el;},
    later(fn,delay){const t=setTimeout(()=>{timers.delete(t);fn();},delay);timers.add(t);return t;},
@@ -128,27 +152,35 @@
    S.state=data.state;S.label=data.label;S.text=data.text||'';
    if(data.state==='thinking'&&prev!=='thinking')S.thinkingSince=t;
    if(data.state==='speaking'&&prev!=='speaking'){S.spoken++;turnDone(t);log('spoke','Spoke in voice');}
-   if(data.state==='error'&&prev!=='error'){S.errors++;S.errorAt.push(t);S.streak=0;log('error',S.text||'Needs attention');}
+   if(data.state==='error'&&prev!=='error'){S.errors++;S.errorAt.push(t);S.streak=0;bump('errors');log('error',S.text||'Needs attention');}
+   if(data.state==='speaking'&&prev!=='speaking')bump('spoken');
    if(data.state!==prev&&data.state!=='error')log('state',data.label);
   }
   if(type==='state')strip(data.state!==data.before);
   if(type==='tab')S.tab=data.tab;
   if(type==='mini')S.mini=!!data.mini;
   if(type==='hud'){S.hud=data;S.spend=parseMoney(data.spend);S.tokens=data.spendMeta||'';}
-  if(type==='reply'){S.replies++;turnDone(t);log('reply','Replied in chat ('+data.chars+' characters)');}
-  if(type==='chat'){S.heard++;S.chatBurst=data.recent||0;S.flood=!!data.flood;}
-  if(type==='sound'){S.sounds++;S.lastSound=data.name||'';log('sound','Played '+S.lastSound);}
-  if(type==='music'){S.music=data.title||'';S.musicBy=data.by||'';if(S.music)log('music','Now playing '+S.music);}
+  if(type==='reply'){S.replies++;bump('replies');turnDone(t);log('reply','Replied in chat ('+data.chars+' characters)');}
+  if(type==='chat'){S.heard++;bump('heard');S.chatBurst=data.recent||0;S.flood=!!data.flood;}
+  if(type==='sound'){S.sounds++;bump('sounds');S.lastSound=data.name||'';log('sound','Played '+S.lastSound);}
+  if(type==='music'){S.music=data.title||'';S.musicBy=data.by||'';if(S.music){bump('songs');log('music','Now playing '+S.music);}}
+  // Automatic replies and Gemini Live measure their own time: use it for the turn just counted.
+  // The reply's own timing (automatic.js / Live) replaces the state-based estimate of the same turn.
+  if(type==='report'){const last=S.turns.length-1,ms=Math.max(1,Number(data.ms)||0);
+   if(last>=0&&t-S.lastTurnAt<4000){const old=S.turns[last];S.turns[last]=ms;if(life&&S.lastLife){life.turnMs+=ms-old;life.fastest=S.lastLife.fastest?Math.min(S.lastLife.fastest,ms):ms;lifeSave();}S.lastLife=null;}
+   else if(!S.thinkingSince){S.turns.push(ms);if(S.turns.length>40)S.turns.shift();if(life){life.turns++;life.turnMs+=ms;life.fastest=life.fastest?Math.min(life.fastest,ms):ms;lifeSave();}}}
   deliver(type,data);
  });
- function turnDone(t){if(S.thinkingSince&&t-S.thinkingSince<120000){const d=t-S.thinkingSince;S.turns.push(d);if(S.turns.length>40)S.turns.shift();S.thinkingSince=0;S.streak++;S.best=Math.max(S.best,S.streak);deliver('turn',{ms:d});}}
+ function turnDone(t){if(S.thinkingSince&&t-S.thinkingSince<120000){const d=t-S.thinkingSince;S.turns.push(d);if(S.turns.length>40)S.turns.shift();S.thinkingSince=0;S.lastTurnAt=t;S.streak++;S.best=Math.max(S.best,S.streak);
+  if(life){S.lastLife={fastest:life.fastest};life.turns++;life.turnMs+=d;life.fastest=life.fastest?Math.min(life.fastest,d):d;life.bestStreak=Math.max(life.bestStreak,S.streak);lifeSave();}deliver('turn',{ms:d});}}
 
  globalThis.TylerThemeFeatures=Object.freeze({
   /** Packs call this once per theme with that theme's features: [{id, mount(ctx) → {update?, unmount?}}]. */
   define(theme,features){packs.set(theme,features);if(theme===(api.getTheme?.()||'steam'))mount(theme);},
-  state:()=>S,health,systems,mounted:()=>mounted.map(m=>m.feature.id),
+  state:()=>S,health,systems,life:()=>life,mounted:()=>mounted.map(m=>m.feature.id),
  });
  const initial=ui.state();S.state=initial.state||'ready';S.label=initial.label||'';S.tab=initial.tab||'conversation';S.mini=!!initial.mini;S.hud=initial.hud||{};S.spend=parseMoney(S.hud.spend);S.tokens=S.hud.spendMeta||'';S.theme=initial.theme||'steam';
- void refreshModel();
+ void refreshModel();void lifeLoad();
+ globalThis.TylerStorage?.onChanged?.addListener?.((changes,area)=>{if(area==='local'&&changes.themeStats){if(changes.themeStats.newValue===false){if(life){clearTimeout(lifeTimer);life=null;deliver('life',{});}}else if(!life)void lifeLoad();}if(area==='local'&&changes.tylerLifetime&&changes.tylerLifetime.newValue==null&&life){life={...LIFE0,sessions:1,firstAt:now()};deliver('life',{});}});
  globalThis.TylerStorage?.onChanged?.addListener?.((changes,area)=>{if(area==='local'&&(changes.aiProvider||changes.brain||changes.geminiTextModel||changes.smartRouting))void refreshModel();});
 })();

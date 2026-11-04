@@ -10,12 +10,12 @@
    const hearts=c.h('span','mc-row mc-hearts'),food=c.h('span','mc-row mc-food'),xp=c.h('div','mc-xp'),fill=c.h('i'),lvl=c.h('b','mc-level');
    for(let i=0;i<10;i++){hearts.append(c.h('i'));food.append(c.h('i'));}
    xp.append(fill,lvl);const top=c.h('div','mc-top');top.append(hearts,food);box.append(top,xp);
-   hearts.title='Health: Tyler\'s connection health';food.title='Hunger: what\'s left of your spending cap (full when no cap is set)';xp.title='Experience: replies this session (a level every 5)';
+   hearts.title='Health: Tyler\'s connection health';food.title='Hunger: what\'s left of your spending cap (full when no cap is set)';xp.title='Experience: replies';
    let cap=0,level=-1;
    globalThis.TylerStorage?.get?.(['spendingCapUSD']).then(v=>{cap=Number(v?.spendingCapUSD)||0;render();}).catch(()=>{});
    function render(){const h=c.health()/10;[...hearts.children].forEach((x,i)=>x.dataset.v=h>=i+1?'full':h>i+.4?'half':'empty');
     const left=cap>0?Math.max(0,1-c.S.spend/cap)*10:10;[...food.children].forEach((x,i)=>x.dataset.v=left>=i+1?'full':left>i+.4?'half':'empty');
-    const n=c.S.replies+c.S.spoken,l=Math.floor(n/5);fill.style.width=((n%5)/5*100)+'%';lvl.textContent=String(l);
+    const L=c.life,n=L?L.replies+L.spoken:c.S.replies+c.S.spoken,l=Math.floor(Math.sqrt(n/2.5));const from=2.5*l*l,to=2.5*(l+1)*(l+1);fill.style.width=Math.round((n-from)/(to-from)*100)+'%';lvl.textContent=String(l);xp.title='Experience: '+n+' replies'+(L?' in all':' this session')+'. Level '+(l+1)+' at '+Math.ceil(to)+'.';
     if(level>=0&&l>level){const up=c.h('div','fx mc-levelup','Level up! '+l);c.flash(up,1600);}level=l;}
    render();c.every(render);return {update:render};
   }},
@@ -39,8 +39,8 @@
    render();c.every(render);return {update:render};
   }},
   {id:'pd-timer',mount(c){
-   const t=c.add('bar',c.h('span','fx pd-timer'));t.title='Heist time: how long this panel has been running';
-   const render=()=>{t.textContent=c.clock(Date.now()-c.S.started);};render();c.every(render);return {};
+   const t=c.add('bar',c.h('span','fx pd-timer'));const n=c.h('small'),time=c.h('span');t.append(n,time);
+   const render=()=>{const L=c.life;n.textContent=L?'#'+L.sessions:'';time.textContent=c.clock(Date.now()-c.S.started);t.title='Heist time: how long this panel has been running'+(L?'. Heist #'+L.sessions+', career '+(L.timeMs/36e5).toFixed(1)+' h, '+(L.replies+L.spoken).toLocaleString()+' jobs done':'');};render();c.every(render);return {update(type){if(type==='life')render();}};
   }},
   {id:'pd-assault',mount(c){
    let banner=null;
@@ -59,13 +59,22 @@
    const icon=c.svg('<svg viewBox="0 0 16 16" shape-rendering="crispEdges"><path/></svg>','dc-icon');const right=c.h('div','dc-lcd-right'),clock=c.h('b'),count=c.h('small');right.append(clock,count);lcd.append(icon,right);tally.append(lcd);
    // The VMU in the controller: a small one in the header, the big screen when the panel is collapsed.
    const vmu=c.add('bar',c.h('button','fx dc-vmu'));vmu.type='button';vmu.title='VMU: Tyler\'s status. Click to collapse into the VMU.';vmu.setAttribute('aria-label','Collapse into the VMU');
-   const small=c.svg('<svg viewBox="0 0 16 16" shape-rendering="crispEdges"><path/></svg>','dc-vmu-icon');const screen=c.h('span','dc-vmu-lcd');screen.append(small);vmu.append(screen,c.h('i','dc-vmu-a'),c.h('i','dc-vmu-b'));vmu.onclick=()=>c.actions.collapse();
+   const small=c.svg('<svg viewBox="0 0 16 16" shape-rendering="crispEdges"><path/></svg>','dc-vmu-icon');const screen=c.h('span','dc-vmu-lcd');screen.append(small);vmu.append(screen,c.h('i','dc-vmu-a'),c.h('i','dc-vmu-b'));vmu.title='VMU: Tyler\'s status. Click for his memory card.';vmu.setAttribute('aria-label','Open Tyler\'s memory card');
+   let mem=null;const close=()=>{mem?.remove();mem=null;};
+   vmu.onclick=()=>{if(mem)return close();const L=c.life,S=c.S;mem=c.h('div','fx dc-memory fx-interactive');mem.setAttribute('role','dialog');mem.setAttribute('aria-label','Memory card');
+    mem.append(c.h('b',null,'Visual Memory · Tyler'));const grid=c.h('div','dc-files');
+    for(const [name,value,color] of [['Replies',L?L.replies+L.spoken:S.replies+S.spoken,'#ff6a00'],['Heard',L?L.heard:S.heard,'#1e88e5'],['Sounds',L?L.sounds:S.sounds,'#43a047'],['Songs',L?L.songs:(S.music?1:0),'#8e24aa'],['Sessions',L?L.sessions:1,'#fdd835'],['Hours',L?(L.timeMs/36e5).toFixed(1):'—','#00acc1']]){const f=c.h('div','dc-file');f.style.setProperty('--file',color);f.append(c.h('i'),c.h('small',null,name),c.h('b',null,String(value)));grid.append(f);}
+    const blocks=L?Math.max(0,200-Math.min(200,Math.ceil(JSON.stringify(L).length/128))):200;
+    mem.append(grid,c.h('small','dc-free',L?blocks+' blocks free':'Memory off: Settings → Appearance keeps these between sessions'));
+    const row=c.h('div','dc-row'),mini=c.h('button',null,'Collapse to VMU'),x=c.h('button',null,'Back');mini.type=x.type='button';mini.onclick=()=>{close();c.actions.collapse();};x.onclick=close;row.append(x,mini);mem.append(row);mem.style.setProperty('--fx-top',(c.below('.tabs')+6)+'px');c.slots.layer.append(mem);x.focus();};
+   c.key(e=>{if(mem&&e.key==='Escape'){e.preventDefault();close();}});
    function render(){const d=VMU_ICON[c.S.state]||VMU_ICON.ready;icon.querySelector('path').setAttribute('d',d);small.querySelector('path').setAttribute('d',d);clock.textContent=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',hour12:false});count.textContent='RPL '+c.pad(c.S.replies+c.S.spoken,3);vmu.dataset.state=c.S.state;}
-   render();c.every(render);return {update:render,unmount(){lcd.remove();}};
+   render();c.every(render);return {update:render,unmount(){lcd.remove();close();}};
   }},
   {id:'dc-swirl',mount(c){
    const play=()=>{if(c.reduced)return;const s=c.h('div','fx dc-swirl');s.append(c.svg('<svg viewBox="0 0 100 100"><path d="M50 50 m0 -6 a6 6 0 1 1 -6 6 a12 12 0 0 1 12 -12 a18 18 0 1 1 -18 18 a24 24 0 0 1 24 -24 a30 30 0 1 1 -30 30"/></svg>'));c.flash(s,1300);};
-   return {update(type,d){if(type==='mini'&&!d.mini)play();if(type==='state'&&['paused','standby'].includes(d.before)&&['ready','listening'].includes(d.state))play();}};
+   c.later(play,250);
+   return {update(type,d){if(type==='mini'&&!d.mini)play();if(type==='state'&&['paused','standby','error'].includes(d.before)&&['ready','listening'].includes(d.state))play();}};
   }},
  ]);
 
@@ -104,8 +113,18 @@
    let points=0,lives=3,clean=0;
    function render(){score.textContent=String(points).padStart(6,'0');discs.replaceChildren(...Array.from({length:3},(_,i)=>{const d=c.h('i');if(i<lives)d.className='on';return d;}));
     const last=c.S.turns.at(-1);power.textContent=c.S.streak>=3?'Multi ×'+c.S.streak:last&&last<1200?'Fast shot':'—';power.dataset.on=String(power.textContent!=='—');}
-   render();
-   return {update(type,d){if(type==='turn'){points+=100+Math.max(0,Math.round((3000-d.ms)/30))+c.S.streak*25;if(++clean>=3&&lives<3){lives++;clean=0;}render();box.classList.remove('hit');void box.offsetWidth;box.classList.add('hit');}
+   const hi=c.h('small','rc-hi');left.append(hi);
+   const showHi=()=>{const best=c.best('ricochet',points);hi.textContent='HI '+String(best).padStart(6,'0');};
+   box.tabIndex=0;box.setAttribute('role','button');box.title='Arcade score. Click for the high-score table.';
+   let table=null;const close=()=>{table?.remove();table=null;};
+   const open=()=>{if(table)return close();const L=c.life;table=c.h('div','fx rc-table fx-interactive');table.setAttribute('role','dialog');table.setAttribute('aria-label','High scores');table.append(c.h('b',null,'High scores'));
+    const rows=[['This game',points],['Best ever',Number(L?.best?.ricochet)||points],['Fastest reply',L?.fastest?c.ms(L.fastest):'—'],['Longest streak',Math.max(L?.bestStreak||0,c.S.best)],['Games played',L?.sessions||1]];
+    for(const [k,v] of rows){const r=c.h('div','rc-row');r.append(c.h('span',null,k),c.h('b',null,typeof v==='number'?String(v).padStart(k.includes('streak')||k.includes('played')?1:6,'0'):String(v)));table.append(r);}
+    const x=c.h('button','rc-close','Continue');x.type='button';x.onclick=close;table.append(x);table.style.setProperty('--fx-top',(c.below('.tabs')+6)+'px');c.slots.layer.append(table);x.focus();};
+   box.onclick=open;box.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open();}};
+   c.key(e=>{if(table&&e.key==='Escape'){e.preventDefault();close();}});
+   render();showHi();
+   return {unmount:close,update(type,d){if(type==='life')showHi();if(type==='turn'){c.later(showHi,0);points+=100+Math.max(0,Math.round((3000-d.ms)/30))+c.S.streak*25;if(++clean>=3&&lives<3){lives++;clean=0;}render();box.classList.remove('hit');void box.offsetWidth;box.classList.add('hit');}
     if(type==='state'&&d.state==='error'&&d.before!=='error'){lives=Math.max(0,lives-1);clean=0;render();if(!lives){const o=c.h('div','fx rc-over','Game over. Insert coin');c.flash(o,2200);lives=3;c.later(render,2200);}}}};
   }},
   {id:'rc-disc',mount(c){

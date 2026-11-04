@@ -68,7 +68,7 @@
    return;
   }
   if(m.type==='transcript'){if(m.who==='friends'){heard=(heard+m.text).slice(-400);$('liveHeard').textContent='Friends: '+heard;}else{said=(said+m.text).slice(-400);$('liveSaid').textContent='Tyler: '+said;}return;}
-  if(m.type==='latency'){$('liveInfo').textContent=$('liveInfo').textContent.replace(/ · last reply .*$/,'')+' · last reply started '+(m.ms/1000).toFixed(2)+' s after people stopped talking';return;}
+  if(m.type==='latency'){api?.reportTurn?.({ms:m.ms,spoken:true,live:true});$('liveInfo').textContent=$('liveInfo').textContent.replace(/ · last reply .*$/,'')+' · last reply started '+(m.ms/1000).toFixed(2)+' s after people stopped talking';return;}
   if(m.type==='note'){show('LIVE · '+m.text);return;}
   if(m.type==='restart'){show('LIVE · Voice settings changed. Stop and start again to use them.');return;}
   if(m.type==='error'){end('Live voice could not run: '+m.text);}

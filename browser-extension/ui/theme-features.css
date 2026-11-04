@@ -417,3 +417,67 @@
 .dod-stamp[data-ok=true]{border-color:#2f6b2a;color:#2f6b2a}
 @keyframes dod-stamp{from{transform:rotate(-12deg) scale(2.2);opacity:0}}
 .dod-close{margin:10px 0 0;min-height:0;padding:3px 12px;border:1px solid #2b2416;border-radius:0;background:transparent;color:#2b2416;font:inherit;text-transform:uppercase;box-shadow:none}
+
+/* ── v2.20.1 ─────────────────────────────────────────── */
+/* Full check: the first row sums it up; every theme's own row styles still apply. */
+/* The box is drawn outside the row (a shadow for the fill, an outline for the edge), so each theme's
+   own row padding and markers stay where they are. */
+.checklist li.check-summary{--fx-sum-bg:color-mix(in srgb,var(--rt-ink) 7%,transparent);margin:8px 0 18px;background:var(--fx-sum-bg);box-shadow:0 0 0 7px var(--fx-sum-bg);outline:1px solid var(--rt-line-strong);outline-offset:7px}
+.checklist li.check-summary b{font-size:var(--rt-text-md)}
+.checklist li.check-summary[data-result=ok]{outline-color:var(--rt-success)}
+.checklist li.check-summary[data-result=fail]{outline-color:var(--rt-danger)}
+.checklist li.check-summary+li{border-top:0}
+#copyReport{margin-top:6px}
+
+/* Overlays opened from a theme component (Combine terminal, Ricochet high scores, Dreamcast memory). */
+.cb-term,.rc-table,.dc-memory{position:absolute;left:10px;right:10px;top:var(--fx-top,70px);max-height:calc(100% - var(--fx-top,70px) - 12px);overflow:auto;animation:fx-in .18s ease-out}
+
+/* Combine: unit record terminal */
+.cb-term{display:flex;flex-direction:column;gap:8px;padding:10px;background:#090c0e;border:1px solid #3a4a52;box-shadow:0 0 0 1px #0d1114,0 8px 30px rgba(0,0,0,.6),inset 0 0 30px rgba(159,231,255,.06);font:11px/1.35 "Tyler Combine",monospace;color:#cfe9f2;text-transform:uppercase;letter-spacing:.06em}
+.cb-term-head{display:flex;justify-content:space-between;gap:8px;padding-bottom:6px;border-bottom:1px solid #3a4a52}
+.cb-term-head b{padding:1px 5px;background:#9fe7ff;color:#0d1114;font-weight:600}
+.cb-term-head span{color:#9fe7ff}
+.cb-term-facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.cb-term-facts>div{padding:4px 6px;border:1px solid #26333a;background:#0d1114}
+.cb-term-facts small{display:block;font-size:9px;color:#6f8a96}.cb-term-facts b{font-size:14px;font-weight:600;color:#fff}
+.cb-term-log{display:flex;flex-direction:column;gap:2px;max-height:150px;overflow:auto;padding:4px 6px;border:1px solid #26333a;background:#070a0c}
+.cb-term-log>div{display:flex;gap:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cb-term-log span:first-child{color:#6f8a96;flex-shrink:0}.cb-term-log i{font-style:normal;color:#9fe7ff;flex-shrink:0}
+.cb-term-log span:last-child{overflow:hidden;text-overflow:ellipsis}
+.cb-term-log .bad,.cb-term-log .bad i{color:#ff3a30}
+.cb-term-log:empty::before{content:"NO ENTRIES";color:#6f8a96}
+.cb-term-close{align-self:flex-end;min-height:0;margin:0;padding:3px 10px;border:1px solid #9fe7ff;border-radius:0;background:transparent;color:#9fe7ff;font:11px "Tyler Combine",monospace!important;text-transform:uppercase;letter-spacing:.1em;box-shadow:none}
+.cb-term-close:hover,.cb-term-close:focus-visible{background:#9fe7ff;color:#0d1114}
+.cb-ticker>b[role=button]{cursor:pointer}.cb-ticker>b[role=button]:hover,.cb-ticker>b[role=button]:focus-visible{background:#fff;outline:none}
+
+/* Ricochet: HI score and the high score table */
+.rc-hi{display:block;margin-top:2px;font:10px "Tyler Ricochet Text",sans-serif;letter-spacing:.12em;color:#ffe36a;text-shadow:0 0 6px rgba(255,180,0,.5)}
+.rc-score[role=button]{cursor:pointer}.rc-score[role=button]:hover,.rc-score[role=button]:focus-visible{border-color:#9fe9ff;outline:none}
+.rc-table{left:24px;right:24px;padding:12px 14px;background:linear-gradient(180deg,rgba(10,20,40,.97),rgba(5,10,24,.98));border:1px solid rgba(80,200,255,.6);border-radius:12px;box-shadow:0 0 24px rgba(60,180,255,.35),inset 0 0 18px rgba(60,180,255,.15);font-family:"Tyler Ricochet",sans-serif;color:#fff}
+.rc-table>b{display:block;margin-bottom:8px;text-align:center;font-size:16px;letter-spacing:.14em;text-transform:uppercase;color:#5fc8ff;text-shadow:0 0 10px #3ab4ff}
+.rc-row{display:flex;justify-content:space-between;gap:10px;padding:4px 2px;border-top:1px solid rgba(80,200,255,.18)}
+.rc-row span{font:11px "Tyler Ricochet Text",sans-serif;letter-spacing:.1em;text-transform:uppercase;color:#9fd8ff}
+.rc-row b{font-size:14px;letter-spacing:.08em;font-variant-numeric:tabular-nums}
+.rc-row:nth-of-type(2) b{color:#ffe36a;text-shadow:0 0 8px #ffb400}
+.rc-close{display:block;margin:10px auto 0;min-height:0;padding:4px 16px;border:1px solid #5fc8ff;border-radius:999px;background:rgba(60,180,255,.12);color:#fff;font:11px "Tyler Ricochet Text",sans-serif!important;letter-spacing:.14em;text-transform:uppercase;box-shadow:0 0 10px rgba(60,180,255,.3)}
+.rc-close:hover,.rc-close:focus-visible{background:rgba(60,180,255,.3)}
+
+/* Dreamcast: VMU memory card screen */
+.dc-vmu{cursor:pointer}
+.dc-memory{left:18px;right:18px;padding:12px;background:#f4f1ea;border:1px solid #cfc8ba;border-radius:10px 10px 18px 18px;box-shadow:0 10px 30px rgba(0,0,0,.35);font-family:var(--rt-font);color:#2a2a2a}
+.dc-memory>b{display:block;margin-bottom:8px;padding:4px 8px;border-radius:4px;background:linear-gradient(90deg,#ff6a00,#ff9a3c);color:#fff;font-size:12px;letter-spacing:.04em}
+.dc-files{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.dc-file{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 4px;border:1px solid #ddd6c8;border-radius:6px;background:#fff}
+.dc-file i{width:22px;height:22px;border-radius:5px;background:var(--file,#ff6a00);box-shadow:inset 0 -3px 0 rgba(0,0,0,.18)}
+.dc-file small{font-size:10px;color:#6a6458}.dc-file b{font-size:15px;font-variant-numeric:tabular-nums}
+.dc-free{display:block;margin:8px 2px 0;font:12px "Tyler VMU",monospace;color:#3f5a34;padding:3px 6px;border-radius:3px;background:#a9c59a;box-shadow:inset 0 0 0 1px #6f8463}
+.dc-row{display:flex;justify-content:space-between;gap:8px;margin-top:10px}
+.dc-row button{flex:1;min-height:0;margin:0;padding:5px 8px;border:1px solid #cfc8ba;border-radius:999px;background:#fff;color:#2a2a2a;font-size:11px!important;box-shadow:inset 0 -2px 0 #e4ded2}
+.dc-row button:first-child{background:#ff6a00;border-color:#e05a00;color:#fff;box-shadow:inset 0 -2px 0 #c44d00}
+.dc-row button:hover,.dc-row button:focus-visible{filter:brightness(1.06)}
+
+/* PAYDAY: sessions played before the heist clock */
+.pd-timer small{margin-right:6px;font:600 10px "Tyler PAYDAY",sans-serif;color:#4ea1ff;letter-spacing:.04em}
+.pd-timer small:empty{display:none}
+
+@media (prefers-reduced-motion:reduce){.cb-term,.rc-table,.dc-memory{animation:none}}

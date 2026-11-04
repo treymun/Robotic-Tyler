@@ -43,7 +43,11 @@
   const handlers={
     'lease:claim':()=>({owner:true}),'lease:check':()=>({owner:true}),
     connection:()=>({keyConfigured:true,provider:'OpenRouter',model:'Llama 3.3 70B',speechVoice:'rex',noiseLevel:'balanced',talkativeness:'active',textSpeed:'balanced',quickSetup:{mode:'auto',botName:'ROBOTIC TYLER'}}),
-    'storage:content':m=>m.action==='get'?{values:{usage,activityEnabled:false,tylerArcadeStats:{},v22Latency:latency,uiTheme:params.get('theme')||'steam'}}:{},
+    // An in-memory store (sessionStorage keeps theme stats across a reload, as a real profile would).
+    'storage:content':m=>{let saved={};try{saved=JSON.parse(sessionStorage.getItem('tylerPreviewStore')||'{}');}catch{}const store={usage,activityEnabled:false,tylerArcadeStats:{},v22Latency:latency,uiTheme:params.get('theme')||'steam',...saved};
+     if(m.action==='get')return {values:store};
+     if(m.action==='set')Object.assign(saved,m.values);else if(m.action==='remove')for(const k of [].concat(m.keys))delete saved[k];
+     try{sessionStorage.setItem('tylerPreviewStore',JSON.stringify(saved));}catch{}return {};},
     'soundboard:list':()=>({preferences:{volume:.6,access:'everyone',allowedIDs:''},slots:names.map((name,i)=>({slot:i+1,name,trigger:i===1?'!airhorn':'',custom:false})),boardBank:'Arcade',favorites:[2]}),
     'suite:status':()=>({options:{hudEnabled:true},queue:[],party:null,votes:(window.__votes||[{title:'Deep Rock Galactic',count:3},{title:'Lethal Company',count:2},{title:'Golf With Your Friends',count:1}]),leaderboard:[],xp:[{id:'Alex',level:4,xp:410},{id:'Sam',level:2,xp:150}],diagnostics:{model:'demo'},usage:{requests:42,reportedCostUSD:0.0314}}),
   };

@@ -150,13 +150,14 @@
 
     <section id="view-checks" class="view" role="tabpanel" aria-labelledby="tab-checks" data-view="checks" hidden>
       <div class="view-head">
-        <h2>Systems check</h2>
-        <p>Checks chat, incoming voice, the audio sender and API access in one pass. Uses one short AI request and one speech preview. If the voice bridge is on, a beep plays in Steam voice.</p>
+        <h2>Full check</h2>
+        <p>Checks chat, Tyler's microphone and the voice call, the Music DJ, your AI key and model, and speech, in one pass. Uses one short AI request and one speech preview; if Tyler's microphone is on, a beep plays in Steam voice.</p>
       </div>
-      <button id="diagnose" class="btn primary block" type="button"><!--@icon:checks-->Run connection checks</button>
+      <button id="diagnose" class="btn primary block" type="button"><!--@icon:checks-->Run full check</button>
       <ul id="diagnostics" class="checklist">
         <li><b>Ready when you are</b><span>Connect your chat and voice first, then run the checks.</span></li>
       </ul>
+      <button id="copyReport" class="btn ghost sm" type="button" hidden>Copy report</button>
       <div id="hearingConfirm" class="confirm" hidden>
         <p>Did your main account hear the test beep?</p>
         <div class="btn-row">

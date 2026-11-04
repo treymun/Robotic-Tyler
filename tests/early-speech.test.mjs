@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 // One second of a 220 Hz tone as 16 kHz mono 16-bit PCM, the format the voice listener sends.
 const wav=(()=>{const rate=16000,frames=rate,b=Buffer.alloc(44+frames*2);b.write('RIFF',0);b.writeUInt32LE(36+frames*2,4);b.write('WAVE',8);b.write('fmt ',12);b.writeUInt32LE(16,16);b.writeUInt16LE(1,20);b.writeUInt16LE(1,22);b.writeUInt32LE(rate,24);b.writeUInt32LE(rate*2,28);b.writeUInt16LE(2,32);b.writeUInt16LE(16,34);b.write('data',36);b.writeUInt32LE(frames*2,40);for(let i=0;i<frames;i++)b.writeInt16LE(Math.round(Math.sin(2*Math.PI*220*i/rate)*8000),44+i*2);return b.toString('base64');})();
 const store={openrouterKey:'sk-or-test',aiProvider:'openrouter'};
-const sent=[],speechInputs=[];let listener,streamParts=[],nextStreams=[];
+const sent=[],speechInputs=[],chatBodies=[];let listener,streamParts=[],nextStreams=[];
 const area={get:async keys=>{const list=keys==null?Object.keys(store):typeof keys==='string'?[keys]:Array.isArray(keys)?keys:Object.keys(keys);return structuredClone(Object.fromEntries(list.filter(k=>k in store).map(k=>[k,store[k]])));},
  set:async values=>{Object.assign(store,structuredClone(values));},remove:async keys=>{for(const k of [].concat(keys))delete store[k];},setAccessLevel:async()=>{}};
 const session={};
@@ -20,7 +20,7 @@ const encoder=new TextEncoder();
 globalThis.fetch=async(url,options={})=>{
  if(url.endsWith('/audio/transcriptions'))return new Response(JSON.stringify({text:'tyler what did you think of that round'}),{headers:{'content-type':'application/json'}});
  if(url.endsWith('/audio/speech')){const input=JSON.parse(options.body).input;speechInputs.push(input);return new Response(new Uint8Array([73,68,51,input.length%250]),{headers:{'content-type':'audio/mpeg'}});}
- if(url.endsWith('/chat/completions')){
+ if(url.endsWith('/chat/completions')){chatBodies.push(JSON.parse(options.body));
   const parts=nextStreams.length?nextStreams.shift():streamParts;
   const body=new ReadableStream({async start(controller){
    for(const part of parts){await new Promise(r=>setTimeout(r,15));controller.enqueue(encoder.encode('data: '+JSON.stringify({choices:[{delta:{content:part}}]})+'\n\n'));}
@@ -68,8 +68,9 @@ test('turning the setting off restores single-clip speech',async()=>{
 });
 
 test('if the opening changes after post-processing, the early clip is cancelled',async()=>{
- // The same reply as turn 1 is now in history, so the repeat filter forces a fresh reply.
- nextStreams=[['That round was ','pure chaos, honestly. ','Next time push mid ','together and trade.'],['Fresh take: ','that clutch was all luck. ','Run it back.']];sent.length=0;speechInputs.length=0;
+ // A new first sentence is spoken early, but the rest is turn 1 again, so repeat protection asks for
+ // a different reply and the early clip is cancelled.
+ nextStreams=[['Okay, real talk for a second. ','That round was pure chaos, honestly. ','Next time push mid together and trade.'],['Fresh take: ','that clutch was all luck. ','Run it back.']];sent.length=0;speechInputs.length=0;chatBodies.length=0;
  const r=await voiceTurn('turn-4');
  assert.equal(r.ok,true,r.error);
  assert.equal(r.early,undefined,'full reply spoken as one clip');
@@ -78,4 +79,25 @@ test('if the opening changes after post-processing, the early clip is cancelled'
  assert.ok(sent.some(m=>m.source==='tyler-early-cancel'&&m.requestId==='turn-4'),'early clip cancelled');
  assert.equal(r.text,'Fresh take: that clutch was all luck. Run it back.');
  assert.equal(speechInputs.at(-1),'Fresh take: that clutch was all luck. Run it back.');
+ assert.equal(chatBodies.length,2,'one retry');
+ assert.match(chatBodies[1].messages.at(-1).content,/nearly the same as something you already said/);
+});
+
+test('repeat protection (v2.20.1): a reworded repeat is never spoken early and is asked for again',async()=>{
+ nextStreams=[['Clean trade by Sam there, ','honestly. ','Rotate after the next fight.'],['Different idea: ','hold B and let them come to you.']];sent.length=0;speechInputs.length=0;chatBodies.length=0;
+ const r=await voiceTurn('turn-5');
+ assert.equal(r.ok,true,r.error);
+ assert.equal(sent.some(m=>m.source==='tyler-early-audio'&&m.requestId==='turn-5'),false,'the repeated first sentence was not spoken');
+ assert.equal(r.text,'Different idea: hold B and let them come to you.');
+ assert.deepEqual(speechInputs,['Different idea: hold B and let them come to you.']);
+ assert.equal(chatBodies.length,2);
+});
+
+test('repeat protection: if the second try repeats too, an automatic turn stays quiet',async()=>{
+ nextStreams=[['Absolutely cooked ','that round, bro.'],['Absolutely cooked ','that whole round.']];sent.length=0;speechInputs.length=0;chatBodies.length=0;
+ const r=await voiceTurn('turn-6');
+ assert.equal(r.ok,true,r.error);
+ assert.equal(r.ignored,true);assert.match(r.reason,/repeated an earlier one/);
+ assert.deepEqual(speechInputs,[],'nothing spoken');
+ assert.equal(chatBodies.length,2,'no third request');
 });

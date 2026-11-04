@@ -214,6 +214,13 @@
   status('Submitted to the chosen message box. Confirm it appears in Steam; if it stays as a draft, press Enter manually.');
  }
  const formatMs=ms=>ms<1000?ms+' ms':(ms/1000).toFixed(1)+' s';
+ // Automatic replies and Gemini Live report their timing here too (v2.20.1), so "Last reply"
+ // shows real numbers in normal use, not only after a manual command.
+ function reportTurn({ms,spoken=false,live=false}={}){
+  const value=Math.max(0,Math.round(Number(ms)||0));if(!value)return;
+  setHud({latency:formatMs(value),latencyMeta:(live?'Gemini Live · until he starts talking':(spoken?'Voice reply':'Text reply')+' · automatic')+' · '+new Date().toLocaleTimeString([],{hour:'numeric',minute:'2-digit'})});
+  emit('report',{ms:value,spoken,live});
+ }
  async function run(text,fromChat=false,testOnly=false){
   if(pending){status('Busy. Command skipped; try again after the current one finishes.');return;}
   pending=true;lastHudActionStart=Date.now();setHud({latency:'Working…',latencyMeta:'Processing command'});const current=epoch;
@@ -306,33 +313,55 @@
  window.addEventListener('message',e=>{if(e.source!==window||e.origin!==location.origin)return;if(e.data?.source==='tyler-listener'&&e.data.type==='state')incomingReport=e.data;});
 
  // ── Systems check ───────────────────────────────────────────────────────
+ // Full check (v2.20.1): every part Tyler needs, one pass, a summary first, and a plain-text report
+ // to copy (no keys, no chat text) so a friend can send you exactly what failed.
+ let lastReport='';
  $('diagnose').onclick=async()=>{
-  const inputSnapshot=incomingReport;const button=$('diagnose');globalThis.TylerCompanion.stopAutomatic?.('Paused for connection checks');
-  button.disabled=true;$('diagnostics').replaceChildren();$('hearingConfirm').hidden=true;
+  const inputSnapshot=incomingReport;const button=$('diagnose');globalThis.TylerCompanion.stopAutomatic?.('Paused for the full check');
+  button.disabled=true;$('diagnostics').replaceChildren();$('hearingConfirm').hidden=true;$('copyReport').hidden=true;
   // data-result (v2.18) lets a theme mark each line: ok (✓), fail (!) or unknown (?).
   const result=t=>t.startsWith('✓')?'ok':t.startsWith('!')?'fail':'unknown';
-  const row=(title,detail)=>{const li=document.createElement('li'),b=document.createElement('b'),span=document.createElement('span');li.dataset.result=result(title);b.textContent=title;span.textContent=detail;li.append(b,span);$('diagnostics').append(li);};
+  const lines=[],summary=document.createElement('li');summary.className='check-summary';summary.dataset.result='unknown';
+  const sb=document.createElement('b'),ss=document.createElement('span');sb.textContent='Checking…';ss.textContent='This takes a few seconds and uses one short AI request.';summary.append(sb,ss);$('diagnostics').append(summary);
+  const row=(title,detail)=>{const li=document.createElement('li'),b=document.createElement('b'),span=document.createElement('span');li.dataset.result=result(title);b.textContent=title;span.textContent=detail;li.append(b,span);$('diagnostics').append(li);lines.push(title+' — '+detail);};
+  const version=globalThis.TylerUI?.version||'';
   try{
+   row('✓ ROBOTIC TYLER '+version,platform.label+(platform.voice===false?' (voice through the Windows audio helper)':''));
    row(owner?'✓ Active tab':'! Standby tab',owner?'Only this tab may answer or play clips.':'Take over this tab before testing AI/audio.');
    const ready=TylerSelection.readiness(globalThis.TylerCompanion);row(ready.startsWith('READY')?'✓ Chat reader ready':'! Chat needs setup',ready);
    if(platform.voice!==false){
-    bridge('status');await new Promise(r=>setTimeout(r,300));
-    row(voiceReport?.attached?'✓ Outgoing sender attached':'! Outgoing audio not verified',voiceReport?.attached?'A test beep still needs confirmation from your main account.':'Enable bridge and rejoin Steam voice; then test the beep.');
-    row(inputSnapshot?.tracks?'✓ Incoming tracks seen before checks':'? Incoming voice not verified',inputSnapshot?.tracks?inputSnapshot.tracks+' remote track(s) were seen. Checks pause AI; use the live meter afterwards to verify speech.':'Start automatic mode with a friend in voice to check incoming tracks.');
+    bridge('status');await new Promise(r=>setTimeout(r,300));const v=voiceReport||{};
+    row(v.enabled?'✓ Tyler\'s microphone is on':'! Tyler\'s microphone is off',v.enabled?'Steam gets Tyler\'s own microphone ('+(v.requests||0)+' request'+(v.requests===1?'':'s')+' so far), never your real one.':'Press Connect & start (or Start live voice) before joining the voice channel.');
+    row(v.connectedPeers?'✓ In a Steam voice call':'? Not in a voice call',v.connectedPeers?v.connectedPeers+' voice connection'+(v.connectedPeers===1?'':'s')+' active.':'Join the voice channel with the bot account, then run the check again.');
+    row(v.attached?'✓ Outgoing audio attached':'! Outgoing audio not attached',v.attached?'A test beep still needs confirmation from your main account.':'Rejoin the voice channel after Connect & start. If it stays like this, reload Steam chat.');
+    row(inputSnapshot?.tracks?'✓ Hearing the call':'? Incoming voice not verified',inputSnapshot?.tracks?inputSnapshot.tracks+' incoming voice track(s) seen.':'Start automatic mode with a friend in voice to check incoming tracks.');
    }
-   const c=await ask({type:'connection'});row(c.keyConfigured?'✓ Key configured':'! No API key',c.keyConfigured?'Testing API access next…':'Add the key in Personality & API settings.');
+   const music=globalThis.TylerCompanion.musicStatus?.();
+   if(music)row(music.sharing?'✓ Music DJ shared':music.open?'? Music DJ not shared':'? Music DJ off',music.sharing?'The YouTube '+(platform.id==='desktop'?'window':'tab')+'\'s sound goes into the call.':music.open?'Press Start Music DJ again and share the YouTube '+(platform.id==='desktop'?'window':'tab')+'.':'Optional. Start it from Room → Music DJ.');
+   const c=await ask({type:'connection'});
+   row(c.keyConfigured?'✓ '+c.provider+' key saved':'! No API key',c.keyConfigured?'Model: '+c.model+'. Testing it next…':'Add a key in Settings → AI & personality.');
    if(owner&&c.keyConfigured){
-    const text=await ask({type:'command',text:'ask Reply with one short sentence confirming you can respond.'});row(text.text?'✓ AI text responded':'! No text reply',text.text||text.warning||'No response');
-    if(platform.voice!==false){
+    const started=performance.now();
+    const text=await ask({type:'command',text:'ask Reply with one short sentence confirming you can respond.'}).catch(e=>({warning:e.message}));
+    row(text.text?'✓ AI answered in '+formatMs(Math.round(performance.now()-started)):'! No AI reply',text.text?String(text.text).slice(0,80):(text.warning||'No response'));
+    if(platform.voice!==false&&text.text){
      await new Promise(r=>setTimeout(r,3100));
-     const speech=await ask({type:'command',text:'say Voice connection check.'});
-     if(speech.audio){bridge('preview',{audio:speech.audio});row('✓ Speech audio generated','A short preview plays locally. This does not prove Steam transmission.');}else row('! Speech failed',speech.warning||'No audio returned');
+     const speech=await ask({type:'command',text:'say Voice connection check.'}).catch(e=>({warning:e.message}));
+     if(speech.audio){bridge('preview',{audio:speech.audio});row('✓ Speech works','A short preview plays here. The beep below checks that Steam hears Tyler.');}else row('! Speech failed',speech.warning||'No audio returned');
     }
    }
    if(owner&&voiceReport?.enabled){bridge('sound',{sound:'beep'});$('hearingConfirm').hidden=false;}
   }catch(e){row('! Check stopped',e.message);}
-  finally{button.disabled=false;}
+  finally{
+   button.disabled=false;
+   const bad=[...$('diagnostics').children].filter(li=>li.dataset.result==='fail').length,unsure=[...$('diagnostics').children].filter(li=>li!==summary&&li.dataset.result==='unknown').length;
+   summary.dataset.result=bad?'fail':unsure?'unknown':'ok';sb.textContent=bad?bad+' problem'+(bad===1?'':'s')+' found':unsure?'Working, '+unsure+' thing'+(unsure===1?'':'s')+' not verified':'All good';
+   ss.textContent=bad?'Each "!" line says what to do. Copy the report and send it to whoever set Tyler up.':unsure?'"?" lines need a voice call or a friend to verify.':'Tyler is ready: chat, AI'+(platform.voice!==false?', speech and his microphone':'')+' all check out.';
+   lastReport='ROBOTIC TYLER full check · '+new Date().toLocaleString()+'\n'+sb.textContent+'\n'+lines.join('\n');$('copyReport').hidden=false;
+   emit('check',{problems:bad,unsure});
+  }
  };
+ $('copyReport').onclick=async()=>{const b=$('copyReport');try{await navigator.clipboard.writeText(lastReport);b.textContent='Copied';}catch{const t=document.createElement('textarea');t.value=lastReport;root.append(t);t.select();try{document.execCommand('copy');b.textContent='Copied';}catch{b.textContent='Copy failed';}t.remove();}setTimeout(()=>{b.textContent='Copy report';},1800);};
  const note=text=>{$('hearingConfirm').hidden=true;const li=document.createElement('li');li.dataset.result=text.startsWith('✓')?'ok':'fail';li.textContent=text;$('diagnostics').append(li);};
  $('heardYes').onclick=()=>note('✓ Steam transmission confirmed by you');
  $('heardNo').onclick=()=>note('! Beep not received — enable bridge, rejoin voice, and check Steam mute/output settings.');
@@ -347,7 +376,7 @@
   notify,confirm:confirmBox,emit,
   // Theme features (theme-features.js): the panel, live state and a subscription. Isolated world only.
   ui:{root,panel,host,onUI:fn=>{uiListeners.add(fn);return ()=>uiListeners.delete(fn);},state:()=>({state:$('activityCard').dataset.state,label:$('activityLabel').textContent,text:$('activity').textContent,tab:currentTab,hud:{...hudState},mini:host.classList.contains('mini'),theme:uiTheme,owner})},
-  isOwner:()=>owner,setAutomaticActive:value=>autoActive=value,getComposer:()=>composer,getRegion:()=>region,getSample:()=>sampleElement,getEpoch:()=>epoch,
+  isOwner:()=>owner,setAutomaticActive:value=>autoActive=value,reportTurn,getIncoming:()=>incomingReport,getComposer:()=>composer,getRegion:()=>region,getSample:()=>sampleElement,getEpoch:()=>epoch,
   platform};
 })();
 

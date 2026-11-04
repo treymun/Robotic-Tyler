@@ -16,7 +16,8 @@ const youtubeMayOpen=u=>{try{const x=new URL(u);return x.protocol==='https:'&&/(
 function setupDesktopMedia({BrowserWindow,desktopCapturer,ipcMain,shell,steamSession,windowDefaults={},icon,dir,isVoiceWindow,isSteamFrame,parent=()=>null,log=()=>{},onClosed=()=>{},choose,userAgent}){
  let youtube=null;
  const alive=()=>!!youtube&&!youtube.isDestroyed()&&!youtube.webContents.isDestroyed();
- async function openYouTube(url='https://www.youtube.com/'){
+ // background:true (Start Music DJ): open without taking focus, so Steam stays in front.
+ async function openYouTube(url='https://www.youtube.com/',{background=false}={}){
   if(!isYouTube(url))url='https://www.youtube.com/';
   if(!alive()){
    youtube=new BrowserWindow({...windowDefaults,show:true,width:1120,height:760,minWidth:640,minHeight:420,title:'ROBOTIC TYLER · Music (YouTube)',icon,
@@ -30,8 +31,10 @@ function setupDesktopMedia({BrowserWindow,desktopCapturer,ipcMain,shell,steamSes
    youtube.on('closed',()=>{youtube=null;onClosed(id);});
    log('Music window opened');
   }
-  await youtube.loadURL(url);youtube.show();
-  return {id:youtube.webContents.id};
+  const win=youtube,load=win.loadURL(url);
+  if(background){if(!win.isVisible())win.showInactive();}else win.show();
+  await load;
+  return {id:win.webContents.id};
  }
  function update(id,props={}){
   if(!alive()||youtube.webContents.id!==id)return false;
@@ -50,7 +53,9 @@ function setupDesktopMedia({BrowserWindow,desktopCapturer,ipcMain,shell,steamSes
    if(!isVoiceWindow())return deny('the Steam window is text only');
    if(!isSteamFrame(request.frame))return deny('not the Steam chat window');
    if(request.audioRequested){
-    // Music DJ: the YouTube window's own picture and sound.
+    // Music DJ: the YouTube window's own picture and sound. Start Music DJ asks for the share in the
+    // same click that opens the window, so give the window a moment to appear.
+    for(let i=0;i<40&&!alive();i++)await new Promise(r=>setTimeout(r,100));
     if(!alive())return deny('open the YouTube music window first');
     const frame=youtube.webContents.mainFrame;log('Music share','the YouTube window');
     return callback({video:frame,audio:frame});

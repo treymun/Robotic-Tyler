@@ -17,8 +17,10 @@ export function createMusicRouter(chrome){
   let {tylerMusicTab:state}=await store.get('tylerMusicTab');
   if(state){try{await chrome.tabs.get(state.youtubeTab);}catch{state=null;}}
   if(m.action==='open'){
-   if(!state){const tab=await chrome.tabs.create({url:'https://www.youtube.com/',active:true});state={steamTab:s.tab.id,youtubeTab:tab.id,token:'idle',action:'idle'};await store.set({tylerMusicTab:state});}
-   else {state={...state,steamTab:s.tab.id,action:'stop'};await store.set({tylerMusicTab:state});await chrome.tabs.update(state.youtubeTab,{active:true});}return {};
+   // background:true (Start Music DJ) keeps Steam in front, so the share picker can open over it.
+   const front=m.background!==true;
+   if(!state){const tab=await chrome.tabs.create({url:'https://www.youtube.com/',active:front});state={steamTab:s.tab.id,youtubeTab:tab.id,token:'idle',action:'idle'};await store.set({tylerMusicTab:state});}
+   else {state={...state,steamTab:s.tab.id,action:'stop'};await store.set({tylerMusicTab:state});if(front)await chrome.tabs.update(state.youtubeTab,{active:true});}return {};
   }
   if(!state)throw Error('Open the music tab using Tyler’s Music panel first.');
   if(state.steamTab!==s.tab.id)throw Error('Music belongs to a different Steam tab. Stop it there before starting another session.');
