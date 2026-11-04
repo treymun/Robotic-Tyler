@@ -18,7 +18,12 @@
    let last=0,haze=null;
    function horde(){if(Date.now()-last<20000)return;last=Date.now();const el=c.h('div','fx l4d-horde');el.setAttribute('role','status');el.append(c.h('b',null,'Here they come!'),c.h('span',null,c.S.chatBurst+' messages in 30 seconds. Tyler slows down so he doesn\'t flood the chat.'));c.flash(el,3200);
     haze?.remove();haze=c.flash(c.h('div','fx l4d-haze'),3200);}
-   return {update(type,d){if(type==='chat'&&(d.flood||d.recent>=9))horde();}};
+   // v2.22: the safe room: a full check with no problems is a checkpoint; a problem incapacitates
+   // Tyler, and coming back is a rescue.
+   function banner(cls,title,sub){const el=c.h('div','fx l4d-safe '+cls);el.setAttribute('role','status');el.append(c.h('b',null,title),c.h('span',null,sub));c.flash(el,2800);}
+   return {update(type,d){if(type==='chat'&&(d.flood||d.recent>=9))horde();
+    if(type==='check')banner(d.problems?'down':'ok',d.problems?'Survivor incapacitated':'Safe room reached',d.problems?d.problems+' problem'+(d.problems===1?'':'s')+' found. Each “!” line says how to help Tyler up.':'Every check passed. Close the door and catch your breath.');
+    if(type==='state'&&d.before==='error'&&['ready','listening'].includes(d.state))banner('ok','Tyler is back up','Revived. Keep moving.');}};
   }},
  ]);
 

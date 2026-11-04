@@ -249,6 +249,18 @@
     const h=c.health();[...bar.children].forEach((x,i)=>x.classList.toggle('on',i<Math.round(h/10)));
     const on={ai:S.keyOk===true,chat:sys[1].level===3,voice:v.armed,people:v.peers>0,music:!!S.music,sound:S.sounds>0};
     for(const [k,w] of lit){w.classList.toggle('on',!!on[k]);w.setAttribute('aria-label',w.title+(on[k]?': yes':': no'));}box.dataset.state=S.state;}
+   // v2.22: the sign opens the chamber report (Enter or click): what each tile means and the numbers.
+   box.tabIndex=0;box.setAttribute('role','button');box.title='Test chamber report';
+   function report(){const S=c.S,v=c.voice(),L=c.life,o=c.overlay('po-report','Test chamber report');
+    const head=c.h('div','po-r-head');head.append(c.h('b',null,c.pad(S.replies+S.spoken)),c.h('span',null,'Test chamber report · subject: Robotic Tyler'));
+    const rows=[['Tests passed',S.replies+S.spoken],['Tests failed',S.errors],['Fastest test',S.turns.length?c.ms(Math.min(...S.turns)):'—'],['Average test',S.turns.length?c.ms(c.avgTurn()):'—'],['Subject health',c.health()+'%'],['Observers in the call',v.peers],['Lifetime tests',L?(L.replies+L.spoken).toLocaleString():'—']];
+    const t=c.h('div','po-r-rows');for(const [k,val] of rows){const r=c.h('div');r.append(c.h('span',null,k),c.h('b',null,String(val)));t.append(r);}
+    const legend=c.h('div','po-r-legend');for(const w of icons.children){const r=c.h('div');r.append(w.cloneNode(true),c.h('span',null,w.title+(w.classList.contains('on')?': yes':': not yet')));legend.append(r);}
+    const x=c.h('button','po-r-close','Continue testing');x.type='button';x.onclick=o.close;o.el.append(head,t,legend,x);x.focus({preventScroll:true});}
+   box.onclick=report;box.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();report();}};
+   const mark=c.root.querySelector('.mark');let quip=0;
+   const LINES=['Thank you for testing. Your participation has been noted.','This next test involves talking. Please keep talking.','The subject is performing within acceptable parameters.','Remain calm. The chat will not harm you.'];
+   c.on(mark,'dblclick',()=>{const el=c.h('div','fx po-quip');el.append(c.h('small',null,'Enrichment Center announcement'),c.h('span',null,LINES[quip++%LINES.length]));c.flash(el,3200);mark.classList.add('po-blink');c.later(()=>mark.classList.remove('po-blink'),700);});
    render();c.every(render);return {update:render};
   }},
   {id:'po-portal',mount(c){
@@ -266,23 +278,29 @@
  F.define('cs16',[
   {id:'c16-score',mount(c){
    const chip=c.add('bar',c.h('button','fx fx-chip c16-chip','Score'));chip.type='button';chip.title='Scoreboard';
-   let board=null;
+   let board=null,table=null,title=null,last='';
    function close(){board?.remove();board=null;chip.setAttribute('aria-pressed','false');}
-   function open(){
-    if(board)return close();const S=c.S,v=c.voice();
-    board=c.h('div','fx c16-board fx-interactive');board.setAttribute('role','dialog');board.setAttribute('aria-label','Scoreboard');
-    const title=c.h('div','c16-title');title.append(c.h('b',null,'ROBOTIC TYLER'),c.h('span',null,'Session '+c.clock(Date.now()-S.started)));
-    const table=c.h('table');const head=table.insertRow();for(const t of ['Name','Score','Deaths','Latency'])head.append(c.h('th',null,t));
-    const add=(name,score,deaths,lat,cls)=>{const r=table.insertRow();if(cls)r.className=cls;for(const t of [name,score,deaths,lat])r.insertCell().textContent=String(t);};
-    add('ROBOTIC TYLER',S.replies+S.spoken,S.errors,S.turns.length?Math.round(c.avgTurn()):'—','me');
+   // v2.22: the scoreboard refreshes itself every second while it's open; Tyler's row flashes when his score changes.
+   function fill(){const S=c.S,v=c.voice();title.lastChild.textContent='Session '+c.clock(Date.now()-S.started);table.replaceChildren();
+    const head=table.insertRow();for(const t of ['Name','Score','Deaths','Latency'])head.append(c.h('th',null,t));
+    const add=(name,score,deaths,lat,cls)=>{const r=table.insertRow();if(cls)r.className=cls;for(const t of [name,score,deaths,lat])r.insertCell().textContent=String(t);return r;};
+    const me=add('ROBOTIC TYLER',S.replies+S.spoken,S.errors,S.turns.length?Math.round(c.avgTurn()):'—','me');
     add('Chat reader',S.heard,0,'—');add('Voice bridge',v.armed?v.peers+' in call':'off',0,'—');add('Soundboard',S.sounds,0,'—');add('Music DJ',S.music?'playing':'idle',0,'—');
+    const now=[S.replies+S.spoken,S.errors].join('|');if(last&&now!==last)me.classList.add('c16-up');last=now;}
+   function open(){
+    if(board)return close();
+    board=c.h('div','fx c16-board fx-interactive');board.setAttribute('role','dialog');board.setAttribute('aria-label','Scoreboard');
+    title=c.h('div','c16-title');title.append(c.h('b',null,'ROBOTIC TYLER'),c.h('span',null,''));table=c.h('table');last='';fill();
     const x=c.h('button','c16-close','Close');x.type='button';x.onclick=close;board.append(title,table,x);c.slots.layer.append(board);chip.setAttribute('aria-pressed','true');x.focus();
    }
+   c.every(()=>{if(board)fill();});
    chip.onclick=open;c.key(e=>{if(board&&e.key==='Escape'){e.preventDefault();close();}});return {unmount:close};
   }},
   {id:'c16-radio',mount(c){
    const chip=c.add('bar',c.h('button','fx fx-chip c16-chip','Radio'));chip.type='button';chip.title='Radio commands (V)';
-   const items=[['Pause AI',c.actions.pause,'Hold this position.'],['Stop audio',c.actions.stopAudio,'Fire in the hole!'],['Test beep',c.actions.beep,'Check, check.'],['Run checks',()=>c.actions.tab('checks'),'Need backup.'],['Collapse panel',c.actions.collapse,'Sector clear.']];
+   const items=[['Pause AI',c.actions.pause,'Hold this position.'],['Stop audio',c.actions.stopAudio,'Fire in the hole!'],['Test beep',c.actions.beep,'Check, check.'],['Run checks',()=>c.actions.tab('checks'),'Need backup.'],['Collapse panel',c.actions.collapse,'Sector clear.'],
+    // v2.22: Go go go! starts Tyler (Connect & start); Report in runs the full check.
+    ['Go go go! (Connect & start)',c.actions.connect,'Go go go!'],['Report in (full check)',c.actions.fullCheck,'Reporting in.']];
    let menu=null;
    function close(){menu?.remove();menu=null;}
    function choose(i){const it=items[i];close();if(!it)return;it[1]();const msg=c.h('div','fx c16-roger');msg.append(c.h('b',null,'ROBOTIC TYLER (RADIO): '),it[2]);c.flash(msg,2200);}
@@ -290,7 +308,7 @@
     items.forEach((it,i)=>{const b=c.h('button','c16-item');b.type='button';b.setAttribute('role','menuitem');b.append(c.h('span',null,(i+1)+'.'),' '+it[0]);b.onclick=()=>choose(i);menu.append(b);});
     const x=c.h('button','c16-item');x.type='button';x.append(c.h('span',null,'0.'),' Exit');x.onclick=close;menu.append(x);c.slots.layer.append(menu);menu.querySelector('button').focus();}
    chip.onclick=open;
-   c.key(e=>{if((e.key==='v'||e.key==='V')&&!e.repeat){e.preventDefault();open();}else if(menu&&/^[0-5]$/.test(e.key)){e.preventDefault();e.key==='0'?close():choose(Number(e.key)-1);}else if(menu&&e.key==='Escape'){e.preventDefault();close();}});
+   c.key(e=>{if((e.key==='v'||e.key==='V')&&!e.repeat){e.preventDefault();open();}else if(menu&&/^[0-7]$/.test(e.key)){e.preventDefault();e.key==='0'?close():choose(Number(e.key)-1);}else if(menu&&e.key==='Escape'){e.preventDefault();close();}});
    return {unmount:close};
   }},
  ]);
@@ -305,7 +323,15 @@
    return {update(type,d){if(type==='state'&&d.state!==d.before&&HEV[d.state])say(HEV[d.state]);if(type==='music'&&d.title)say('Audio playback: '+d.title.slice(0,40));}};
   }},
   {id:'hev-damage',mount(c){
-   return {update(type,d){if(type!=='state'||d.state!=='error'||d.before==='error')return;const el=c.h('div','fx hev-hit');for(const s of ['t','r','b','l'])el.append(c.h('i',s));c.flash(el,1400);}};
+   // v2.22: the status strip is a suit charger: click it to recharge (refresh the voice bridge and
+   // re-read every system). Low health gets the suit's critical warning.
+   const tally=c.root.getElementById('activityCard');let warned=false;
+   const charge=()=>{c.actions.refreshVoice();tally.classList.remove('hev-charging');void tally.offsetWidth;tally.classList.add('hev-charging');c.later(()=>tally.classList.remove('hev-charging'),1200);const el=c.h('div','fx hev-say');el.setAttribute('role','status');el.textContent='SUIT CHARGER: POWER LEVEL '+c.health()+'%';c.flash(el,2600);};
+   c.on(tally,'click',charge);tally.title='Suit charger: click to recharge (refresh voice status)';tally.style.cursor='pointer';
+   return {update(type,d){
+    if(type==='state'){const h=c.health();if(h<30&&!warned){warned=true;const el=c.h('div','fx hev-say hev-crit');el.setAttribute('role','status');el.textContent='WARNING: VITAL SIGNS CRITICAL';c.flash(el,3000);}if(h>=60)warned=false;}
+    if(type!=='state'||d.state!=='error'||d.before==='error')return;const el=c.h('div','fx hev-hit');for(const s of ['t','r','b','l'])el.append(c.h('i',s));c.flash(el,1400);},
+    unmount(){tally.removeAttribute('title');tally.style.cursor='';tally.classList.remove('hev-charging');}};
   }},
   {id:'hev-light',mount(c){
    const b=c.add('bar',c.h('button','fx fx-chip hev-lamp'));b.type='button';b.setAttribute('aria-pressed','false');b.title='Flashlight: brighter, higher-contrast panel (F)';b.setAttribute('aria-label','Flashlight');
