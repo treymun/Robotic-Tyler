@@ -306,13 +306,11 @@
 .dl-rule::after{content:"";position:absolute;left:50%;top:-3px;width:7px;height:7px;transform:translateX(-50%) rotate(45deg);border:1px solid #c8a46a;background:#1a150f}
 .dl-flex{display:flex;align-items:center;gap:4px}.dl-flex i{width:9px;height:9px;transform:rotate(45deg);border:1px solid #8a6a3a}.dl-flex i.on{background:#4fe0c8;border-color:#7ff0dc;box-shadow:0 0 6px #4fe0c8}
 .dl-thread{position:absolute;left:4px;width:16px;fill:none;stroke-width:1.4;opacity:.75;filter:drop-shadow(0 0 3px rgba(79,224,200,.8))}
-.dl-thread path{stroke:#4fe0c8;stroke-dasharray:6 5;animation:dl-drift 6s linear infinite}
-.dl-thread .dl-t2{opacity:.5;animation-duration:9s;animation-direction:reverse}
-.dl-thread[data-state=thinking] path{animation-duration:1.4s}
-.dl-thread[data-state=speaking] path{stroke:#9ffff0;stroke-dasharray:2 3;animation-duration:.6s}
-.dl-thread[data-state=error] path{stroke:#ff5a4a;stroke-dasharray:1 7;animation:none}
-.dl-thread[data-state=paused] path,.dl-thread[data-state=standby] path{opacity:.3;animation:none}
-@keyframes dl-drift{to{stroke-dashoffset:-110}}
+.dl-thread path{stroke:#4fe0c8;stroke-dasharray:6 5}
+.dl-thread .dl-t2{opacity:.5}
+.dl-thread[data-state=speaking] path{stroke:#9ffff0;stroke-dasharray:2 3}
+.dl-thread[data-state=error] path{stroke:#ff5a4a;stroke-dasharray:1 7}
+.dl-thread[data-state=paused] path,.dl-thread[data-state=standby] path{opacity:.3}
 
 /* ── Minecraft ────────────────────────────────────────── */
 .mc-status{display:flex;flex-direction:column;gap:3px;padding:5px 8px;background:rgba(0,0,0,.35);image-rendering:pixelated;font-family:"Tyler Minecraft",monospace}
@@ -342,8 +340,9 @@
 .pd-step{display:flex;flex-direction:column;align-items:flex-start;min-height:0;margin:0;padding:4px 5px;border:1px solid rgba(78,161,255,.3);border-radius:0;background:rgba(255,255,255,.03);color:#9fb0c4;text-align:left;box-shadow:none;line-height:1.2}
 .pd-step small{font-size:9px;color:#4ea1ff}.pd-step b{font:600 10px "Tyler PAYDAY",sans-serif;text-transform:uppercase;letter-spacing:.05em;color:#dfe8f2}.pd-step span{font-size:9px}
 .pd-step[data-done=true]{border-color:#58e08b}.pd-step[data-done=true] small::after{content:" ✓";color:#58e08b}
-.pd-step[data-next=true]{border-color:#ffcf3a;box-shadow:inset 0 0 12px rgba(255,207,58,.18);animation:pd-glow 1.6s ease-in-out infinite}
-@keyframes pd-glow{50%{box-shadow:inset 0 0 18px rgba(255,207,58,.35)}}
+.pd-step[data-next=true]{position:relative;border-color:#ffcf3a;box-shadow:inset 0 0 12px rgba(255,207,58,.18)}
+.pd-step[data-next=true]::after{content:"";position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 18px rgba(255,207,58,.35);opacity:0;animation:pd-glow 1.6s ease-in-out infinite}
+@keyframes pd-glow{50%{opacity:1}}
 .pd-timer{padding:2px 6px;font:600 13px "Tyler PAYDAY",sans-serif;letter-spacing:.06em;color:#fff;background:rgba(0,0,0,.4);border:1px solid rgba(78,161,255,.4);font-variant-numeric:tabular-nums}
 .pd-assault{position:absolute;left:0;right:0;top:300px;height:24px;overflow:hidden;background:repeating-linear-gradient(135deg,#c41e1e 0 14px,#1a1a1a 14px 28px);animation:pd-flash 1s steps(2) infinite}
 .pd-assault span{display:block;margin:3px auto;width:max-content;padding:0 10px;background:#c41e1e;font:700 12px "Tyler PAYDAY",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#fff}

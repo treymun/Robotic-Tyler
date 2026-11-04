@@ -217,8 +217,12 @@ html[data-rt-theme=portal]{scrollbar-color:#9aa1a8 transparent}
 [data-rt-theme=portal] :is(.view:not([hidden]),.sheet,section[data-view]:not([hidden])){animation:p-iris .34s cubic-bezier(.4,0,.2,1) backwards}
 [data-rt-theme=portal] .rt-toast:not(.rt-leaving){animation:p-sign .24s ease-out backwards}
 [data-rt-theme=portal] :is(button,.btn):active:not(:disabled){transform:translateY(1px)}
-[data-rt-theme=portal] .panel:has(.tally[data-state=speaking]) .mark[data-logo],.panel[data-rt-theme=portal]:has(.tally[data-state=speaking]) .mark[data-logo]{--ring:#ff8a00;border-radius:50%;animation:p-ring 1.1s ease-in-out infinite}
-[data-rt-theme=portal] .panel:has(.tally[data-state=listening]) .mark[data-logo],.panel[data-rt-theme=portal]:has(.tally[data-state=listening]) .mark[data-logo]{--ring:#00a2ff;border-radius:50%;animation:p-ring 1.8s ease-in-out infinite}
+[data-rt-theme=portal] .panel:has(.tally[data-state=speaking]) .mark[data-logo],.panel[data-rt-theme=portal]:has(.tally[data-state=speaking]) .mark[data-logo]{--ring:#ff8a00;--ring-time:1.1s}
+[data-rt-theme=portal] .panel:has(.tally[data-state=listening]) .mark[data-logo],.panel[data-rt-theme=portal]:has(.tally[data-state=listening]) .mark[data-logo]{--ring:#00a2ff;--ring-time:1.8s}
+/* v2.21: the same ring pulse as before, as a wide ring fading over the narrow one (no repaint per frame). */
+[data-rt-theme=portal] .panel:has(.tally:is([data-state=speaking],[data-state=listening])) .mark[data-logo],.panel[data-rt-theme=portal]:has(.tally:is([data-state=speaking],[data-state=listening])) .mark[data-logo]{border-radius:50%;box-shadow:0 0 0 2px var(--ring),0 0 6px 1px var(--ring)}
+[data-rt-theme=portal] .panel:has(.tally:is([data-state=speaking],[data-state=listening])) .mark[data-logo]::after,.panel[data-rt-theme=portal]:has(.tally:is([data-state=speaking],[data-state=listening])) .mark[data-logo]::after{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;box-shadow:0 0 0 3px var(--ring),0 0 14px 3px var(--ring);opacity:0;animation:p-ring-glow var(--ring-time) ease-in-out infinite}
+@keyframes p-ring-glow{50%{opacity:1}}
 
 /* ── v2.16 polish: Portal ──
    The header is a test-chamber sign: its number follows the section you're in (01–05) and the bar

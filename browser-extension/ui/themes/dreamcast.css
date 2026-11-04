@@ -116,7 +116,8 @@ html[data-rt-theme=dreamcast]{scrollbar-color:#cfcac1 transparent}
    thinks, spins faster while he talks, and turns red on an error. */
 [data-rt-theme=dreamcast] .tally{background:#fff;border:1px solid #e7e3dc;border-radius:var(--rt-r-lg);box-shadow:0 3px 10px rgba(80,70,60,.08)}
 [data-rt-theme=dreamcast] .tally-light{width:22px;height:22px;flex:0 0 22px;align-self:center;border-radius:50%;background:radial-gradient(circle,#fff 0 3px,transparent 3.5px),repeating-conic-gradient(from 0deg,var(--tone) 0 40deg,color-mix(in srgb,var(--tone) 35%,#fff) 40deg 90deg);box-shadow:0 1px 3px rgba(0,0,0,.18)!important}
-[data-rt-theme=dreamcast] .tally[data-state=listening] .tally-light{animation:dc-breathe 2s ease-in-out infinite}
+/* v2.21: the listening light had an animation that never showed (two animations shared a name, and the
+   light's !important shadow wins over the one that applied), but still cost a restyle every frame. */
 [data-rt-theme=dreamcast] .tally[data-state=thinking] .tally-light{animation:dc-spin 1.4s linear infinite}
 [data-rt-theme=dreamcast] .tally[data-state=speaking] .tally-light{animation:dc-spin .7s linear infinite}
 [data-rt-theme=dreamcast] .tally-label{font-weight:700;color:var(--tone)}
@@ -205,8 +206,8 @@ html[data-rt-theme=dreamcast]{scrollbar-color:#cfcac1 transparent}
 /* ── v2.18 motion: Dreamcast ──
    A playing tile breathes orange; an arriving vote resolves its marker with the swirl; menu dots
    pop in beside new check lines. */
-[data-rt-theme=dreamcast] .pad.playing{animation:dc-breathe 1.4s ease-in-out infinite}
-@keyframes dc-breathe{50%{box-shadow:0 0 0 3px rgba(240,106,29,.35),0 6px 16px rgba(240,106,29,.2)}}
+[data-rt-theme=dreamcast] .pad.playing{animation:dc-pad-glow 1.4s ease-in-out infinite}
+@keyframes dc-pad-glow{50%{box-shadow:0 0 0 3px rgba(240,106,29,.35),0 6px 16px rgba(240,106,29,.2)}}
 [data-rt-theme=dreamcast] .vote[data-arrived] .vote-marker{animation:dc-spin .5s cubic-bezier(.2,.9,.3,1)}
 @keyframes dc-spin{from{transform:rotate(-1turn) scale(.4);opacity:0}}
 [data-rt-theme=dreamcast] .checklist li::before{animation:dc-dot .3s cubic-bezier(.3,1.6,.6,1) backwards}

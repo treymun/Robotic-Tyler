@@ -1,3 +1,31 @@
+# ROBOTIC TYLER v2.21.0: Tyler sounds smoother, hears better, and the themes run lighter
+
+## Improved: how Tyler sounds
+- **No more crackle in Gemini Live replies.** Live sends Tyler's voice in small pieces, and each piece used to be converted to the page's audio rate on its own, which left a tiny click at every join (around 25 a second). Now the pieces go through one continuous converter and are lined up sample for sample.
+- **No hiccup in the middle of a reply.** With "Start speaking sooner", the rest of a reply used to start 2–10 ms after the first sentence ended. Now it starts on the exact sample the first sentence ends.
+- **Even volume.** Each spoken reply is brought to the same loudness, so a quiet voice and a loud one come out about the same, and the two parts of a reply share one level. Gemini Live's voice is matched slowly the same way.
+- **Music ducking.** While Tyler talks, the Music DJ drops about 10 dB and comes back half a second after he stops, so friends can hear him. You can turn it off in Room → Music DJ; the choice is kept.
+
+## Improved: how Tyler hears your friends
+- **Gemini Live gets a clean copy of the call.** Friends' voices are converted to Gemini's 16 kHz with a proper filter now, instead of averaging every few samples. Before, high sounds like "s" folded back in as noise, and the 40 ms pieces were each handled on their own, leaving a small glitch at every join and dropping a fraction of a sample each time.
+- **The same converter for Standard voice**, on the clip sent for speech-to-text, and on the desktop app's audio-helper recordings.
+
+## Improved: lighter themes
+- Some theme animations made the browser redo the panel's styles on every screen refresh, even while nothing happened. They now run on the graphics card with the same motion: the L4D heartbeat glow and flashlight sweep, the PAYDAY next-step glow, the CS2 scan line and the Portal logo ring. Deadlock's spirit thread is driven 30 times a second instead of on every refresh. Dreamcast had a status-light animation that never showed but still ran every frame; it's gone.
+- The status wave bars (Steam, Portal, Dreamcast, Combine, Garry's Mod) keep their old animation. Moving them to the graphics card blurred their 2 px dots, so they stay as they were.
+
+## Tested
+- **Measured in Chromium, no Steam:**
+  - Live playback: before, about 40% of 20 ms windows had a click at a join, the worst at −27 dB. After, the pieces are scheduled back to back with no gap and the conversion has no join error above −77 dB.
+  - Reply parts: before, the second part started 1.7–10.4 ms late; now 0.
+  - Hearing: an 11 kHz tone came through at about −7 dB before and is now removed. The joins went from 46% of windows glitching (worst −18 dB) on a 48 kHz page to none; no samples are lost.
+  - Levels: two replies 16 dB apart came out within 2 dB.
+  - Ducking: the music dipped more than 7 dB under a reply and came back within 1.5 dB.
+- **Theme load, restyles per second in the listening state:** L4D 62 → 7, PAYDAY 62 → 6, Deadlock 62 → 33; PAYDAY on standby 61 → 5. Every changed animation was compared with v2.20.3 frame by frame, frozen at the same moments, in headless Chromium: L4D, PAYDAY and CS2 match within anti-aliasing, the Portal ring within about 14% at a few edge pixels, and Deadlock's dashes have the same look at a different starting point.
+- **Not tested:** a real Steam call, a real Gemini Live session, and the desktop app on Windows. 272 unit and integration tests and 18 end-to-end tests, plus the desktop check in Electron with a mock Steam page.
+
+---
+
 # ROBOTIC TYLER v2.20.3: music quality from chat, Auto quality, and a quiet Steam window
 
 ## New

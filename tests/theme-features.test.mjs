@@ -35,3 +35,18 @@ test('content scripts may keep lifetime theme stats but never change the setting
  await assert.rejects(contentStorage(store,{action:'get',keys:['geminiKey']}),/not allowed/);
  await contentStorage(store,{action:'remove',keys:['tylerLifetime']});assert.deepEqual(store.data,{});
 });
+test('long-running theme animations stay off the main thread where the look allows (v2.21)',()=>{
+ const css=f=>fs.readFileSync(new URL('../browser-extension/ui/'+f,import.meta.url),'utf8');
+ const kf=(text,name)=>(text.match(new RegExp('@keyframes '+name+'\\{[^@]*?\\}\\}'))||[''])[0];
+ // Same motion as before, as transform or opacity (checked frame by frame against v2.20.3 in headless Chromium).
+ assert.match(kf(css('themes/l4d.css'),'l4d-torch'),/transform:translateX\(-55%\).*translateX\(193%\)/);
+ assert.doesNotMatch(kf(css('themes/l4d.css'),'l4d-beat'),/box-shadow/);
+ assert.match(kf(css('themes/cs2.css'),'cs2-scan'),/translateX/);
+ assert.match(kf(css('theme-features.css'),'pd-glow'),/opacity/);
+ assert.match(kf(css('themes/portal.css'),'p-ring-glow'),/opacity/);
+ assert.doesNotMatch(css('theme-features.css'),/dl-drift/,'Deadlock\'s thread is moved by a 30 fps timer');
+ // The Dreamcast pad glow no longer shares a name with another animation.
+ assert.equal((css('themes/dreamcast.css').match(/@keyframes dc-breathe\{/g)||[]).length,1);
+ // The status wave keeps its height animation: as a transform its 2 px dots came out blurred.
+ assert.match(css('panel.css'),/@keyframes rt-wave\{0%,100%\{height:2px\}50%\{height:13px\}\}/);
+});

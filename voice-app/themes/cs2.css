@@ -149,7 +149,9 @@ html[data-rt-theme=cs2]{scrollbar-color:#3a4a5a transparent}
 [data-rt-theme=cs2] .tally[data-state] .tally-wave i:nth-child(5){animation-delay:.64s!important}
 [data-rt-theme=cs2] .tally[data-state] .tally-wave i:nth-child(1){animation-delay:0s!important}
 [data-rt-theme=cs2] .tally::after{content:"";position:absolute;left:0;right:0;bottom:0;height:3px;background:var(--tone);opacity:.35;transform-origin:left}
-[data-rt-theme=cs2] .tally[data-state=listening]::after{opacity:1;background:linear-gradient(90deg,transparent,var(--cs-ct),transparent) 0 0/30% 100% no-repeat;animation:cs2-scan 1.6s ease-in-out infinite}
+/* v2.21: the scan glow is its own 30%-wide strip moved with transform: the same path as the old
+   background-position sweep (-45% → 145%), without a restyle on every frame. */
+[data-rt-theme=cs2] .tally[data-state=listening]::after{opacity:1;right:auto;width:30%;background:linear-gradient(90deg,transparent,var(--cs-ct),transparent);animation:cs2-scan 1.6s ease-in-out infinite}
 [data-rt-theme=cs2] .tally[data-state=thinking]::after{opacity:1;background:var(--cs-t);animation:cs2-timer 3s linear infinite}
 [data-rt-theme=cs2] .tally[data-state=speaking]::after{opacity:1;background:linear-gradient(90deg,#2e7d32,#65e46a);box-shadow:0 0 8px rgba(101,228,106,.6);animation:cs2-timer 2.6s linear infinite}
 [data-rt-theme=cs2] .tally[data-state=error]::after{opacity:1}
@@ -157,7 +159,7 @@ html[data-rt-theme=cs2]{scrollbar-color:#3a4a5a transparent}
 @keyframes cs2-c4{0%{opacity:1}5%{opacity:.15}30%{opacity:1}34%{opacity:.15}52%{opacity:1}55%{opacity:.15}68%{opacity:1}70.5%{opacity:.15}80%{opacity:1}82%{opacity:.15}88%{opacity:1}89.5%{opacity:.15}93%{opacity:1}94%{opacity:.15}96%{opacity:1}97%{opacity:.15}98.5%{opacity:1}}
 @keyframes cs2-search{0%{background:rgba(150,200,250,.85);box-shadow:inset 0 0 0 1px #96c8fa}40%,100%{background:transparent;box-shadow:inset 0 0 0 1px rgba(204,204,204,.4)}}
 @keyframes cs2-accept{0%{background:transparent;box-shadow:inset 0 0 0 1px rgba(204,204,204,.4)}12%{background:#4caf50;box-shadow:inset 0 0 0 1px #65e46a,0 0 6px rgba(101,228,106,.6)}88%{background:transparent;box-shadow:inset 0 0 0 1px rgba(204,204,204,.4)}}
-@keyframes cs2-scan{from{background-position:-45% 0}to{background-position:145% 0}}
+@keyframes cs2-scan{from{transform:translateX(-105%)}to{transform:translateX(338.33%)}}
 @keyframes cs2-timer{from{transform:scaleX(1)}to{transform:scaleX(0)}}
 
 /* ── v2.13: Premier-style rating plates ──

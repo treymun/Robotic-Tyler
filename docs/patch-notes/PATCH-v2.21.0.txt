@@ -1,0 +1,17 @@
+ROBOTIC TYLER v2.21.0 — patch notes
+
+Improved (sound)
+- Gemini Live replies: no more crackle at the joins between pieces (one continuous converter, sample-exact scheduling).
+- "Start speaking sooner": the rest of a reply starts on the exact sample the first sentence ends (was 2–10 ms late).
+- Even volume: each reply leveled; both parts of a reply share one level; Live matched slowly.
+- Music ducking: the DJ drops ~10 dB while Tyler talks (Room → Music DJ toggle, kept).
+
+Improved (hearing)
+- Gemini Live input and Standard voice clips: proper 16 kHz conversion (no folded-back "s" noise, no glitches or lost samples at frame joins).
+
+Improved (themes)
+- L4D, PAYDAY, CS2, Portal and Deadlock animations no longer restyle the panel every frame; Dreamcast's invisible animation removed. Same look (checked frame by frame against v2.20.3). The wave bars keep their old animation.
+
+Tested
+- Measured in Chromium (no Steam): Live joins clean, reply parts 0 ms apart, 11 kHz alias removed, levels within 2 dB, ducking > 7 dB; restyles/s L4D 62→7, PAYDAY 62→6, Deadlock 62→33.
+- Not tested: real Steam, real Gemini Live, Windows. 272 unit and 18 end-to-end tests; desktop check in Electron.

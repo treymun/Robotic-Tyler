@@ -198,6 +198,17 @@
    const thread=c.add('layer',c.svg('<svg viewBox="0 0 40 200" preserveAspectRatio="none"><path class="dl-t1" d="M20 0 C 5 30, 35 60, 20 100 S 5 170, 20 200"/><path class="dl-t2" d="M20 0 C 35 35, 5 70, 20 100 S 35 165, 20 200"/></svg>','fx dl-thread'));
    function place(){const tally=c.root.getElementById('activityCard'),p=c.panel.getBoundingClientRect(),t=tally.getBoundingClientRect();thread.style.top=(t.top-p.top-6)+'px';thread.style.height=(t.height+12)+'px';}
    place();c.later(place,300);
+   // v2.21: the dashes crawl from a 30-a-second timer instead of a CSS animation, which made the
+   // browser restyle the panel on every screen refresh (about 5% of a core at 60 Hz, more at 144 Hz).
+   // Same speeds as before: one dash cycle in 6 s (9 s the other way), 1.4 s while thinking.
+   // Same timing as the old CSS: 6 s per dash cycle (9 s the other way), 1.4 s thinking, 0.6 s speaking;
+   // still (offset 0) when there's a problem, paused or on standby.
+   const p1=thread.querySelector('.dl-t1'),p2=thread.querySelector('.dl-t2'),still=globalThis.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;let o1=0,o2=0,last=performance.now();
+   const crawl=()=>{const t=performance.now(),dt=Math.min(100,t-last),st=thread.dataset.state;last=t;
+    if(st==='error'||st==='paused'||st==='standby'){if(o1||o2){o1=o2=0;p1.style.strokeDashoffset=p2.style.strokeDashoffset='0';}c.later(crawl,250);return;}
+    if(!document.hidden){const d1=st==='thinking'?1400:st==='speaking'?600:6000,d2=st==='thinking'?1400:st==='speaking'?600:9000;o1=(o1-110/d1*dt)%110;o2=(o2+110/d2*dt)%110;p1.style.strokeDashoffset=o1.toFixed(2);p2.style.strokeDashoffset=o2.toFixed(2);}
+    c.later(crawl,33);};
+   if(!still)crawl();
    return {update(type,d){if(type==='state')thread.dataset.state=d.state;if(type==='mini'||type==='theme')c.later(place,260);}};
   }},
  ]);

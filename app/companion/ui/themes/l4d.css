@@ -136,10 +136,14 @@
 [data-rt-theme=l4d] .tally:is([data-state=error],[data-state=standby],[data-state=paused]) .tally-trace svg{display:none}
 [data-rt-theme=l4d] .tally:is([data-state=error],[data-state=standby],[data-state=paused]) .tally-trace{background:linear-gradient(currentColor,currentColor) 0 13px/100% 2px no-repeat,linear-gradient(rgba(76,207,76,.09) 1px,transparent 1px) 0 0/100% 5.5px,linear-gradient(90deg,rgba(76,207,76,.09) 1px,transparent 1px) 0 0/11px 100%;filter:drop-shadow(0 0 3px currentColor)}
 [data-rt-theme=l4d] .tally[data-state=error] .tally-trace{animation:l4d-alarm 1s steps(1) infinite}
-[data-rt-theme=l4d] .tally-light{width:6px;flex:0 0 6px;border-radius:0;animation:l4d-beat calc(var(--beat,2.6s) / 2) ease-out infinite}
+[data-rt-theme=l4d] .tally-light{position:relative;width:6px;flex:0 0 6px;border-radius:0;animation:l4d-beat calc(var(--beat,2.6s) / 2) ease-out infinite}
+/* v2.21: the glow is its own layer, so the beat only changes opacity (no repaint every frame). */
+[data-rt-theme=l4d] .tally-light::before{content:"";position:absolute;inset:0;box-shadow:0 0 12px var(--tone);opacity:0;animation:l4d-glow calc(var(--beat,2.6s) / 2) ease-out infinite}
 [data-rt-theme=l4d] .tally:is([data-state=error],[data-state=standby],[data-state=paused]) .tally-light{animation:none}
+[data-rt-theme=l4d] .tally:is([data-state=error],[data-state=standby],[data-state=paused]) .tally-light::before{animation:none}
 @keyframes l4d-scroll{to{transform:translateX(-50%)}}
-@keyframes l4d-beat{0%,40%,100%{opacity:.45}48%{opacity:1;box-shadow:0 0 12px var(--tone)}}
+@keyframes l4d-beat{0%,40%,100%{opacity:.45}48%{opacity:1}}
+@keyframes l4d-glow{0%,40%,100%{opacity:0}48%{opacity:1}}
 @keyframes l4d-alarm{0%{opacity:1}50%{opacity:.3}}
 
 /* ── v2.13: the logo sits on a splash of blood-red paint, poster style. ── */
@@ -185,9 +189,10 @@
 /* ── v2.17 authenticity: L4D ──
    While Tyler listens, a flashlight beam sweeps slowly across the status strip, like a
    survivor checking a dark corner. */
-[data-rt-theme=l4d] .tally[data-state=listening]::after{content:"";position:absolute;inset:0;pointer-events:none;
-  background:radial-gradient(closest-side,rgba(255,248,215,.28),rgba(255,248,215,.08) 55%,transparent) no-repeat;background-size:42% 170%;background-position:-40% 50%;animation:l4d-torch 4.4s ease-in-out infinite alternate}
-@keyframes l4d-torch{from{background-position:-40% 50%}to{background-position:140% 50%}}
+[data-rt-theme=l4d] .tally[data-state=listening]::after{content:"";position:absolute;top:0;bottom:0;left:0;width:42%;pointer-events:none;
+  background:radial-gradient(closest-side,rgba(255,248,215,.28),rgba(255,248,215,.08) 55%,transparent) no-repeat center/100% 170%;animation:l4d-torch 4.4s ease-in-out infinite alternate;will-change:transform}
+/* v2.21: the same sweep as before (background-position -40% → 140%), moved with transform so it stays off the main thread. */
+@keyframes l4d-torch{from{transform:translateX(-55%)}to{transform:translateX(193%)}}
 
 /* ── v2.18 visual pass: Left 4 Dead ──
    Pads are torn tape tiles three across with the slot number painted big; the playing clip gets
