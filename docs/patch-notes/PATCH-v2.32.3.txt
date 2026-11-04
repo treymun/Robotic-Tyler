@@ -1,0 +1,6 @@
+ROBOTIC TYLER v2.32.3 — patch notes
+
+- Full check, voice connection: the encryption handshake (DTLS state, role, version, cipher; "The encrypted voice connection failed" when it does, with the alert code if reported), a Connection steps line with times, and a snapshot saved the moment a connection goes wrong ("Last connection problem"). The check now waits for the counters instead of 0.3 s.
+- Steam's voice log: the repeated "Still trying to connect…" line shows once, so the earlier steps stay in view.
+- Why: the stuck desktop app's last check showed failed/disconnected, which in Chromium normally means the route worked and the encryption failed; this shows which step fails. Found: the app's engine (Electron 45 / Chromium 156) uses DTLS 1.3 by default.
+- Tested: stand-in calls in Chromium (working, and encryption made to fail); all tests; desktop check. Not tested: a real Steam call.

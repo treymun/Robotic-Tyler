@@ -116,7 +116,11 @@
  // with addresses, ports and long ids hidden.
  function voiceLog(ctx){
   try{const vc=get(get(ctx.chat,'ChatStore'),'VoiceChat');const text=String(call(vc,'GetVoiceLogs')||'');
-   return text.split(/\r?\n/).filter(l=>/^\((?:VoiceChat|WebRTC)\)/.test(l)&&!/Description\)|SDP/i.test(l)).slice(-14).map(line=>clean(line.replace(/\b\d{1,3}(?:\.\d{1,3}){3}(?::\d+)?\b/g,'[address]').replace(/\b[0-9a-f]{0,4}(?::[0-9a-f]{0,4}){2,7}\b/gi,'[address]').replace(/\b\d{9,}\b/g,'[id]').replace(/(ufrag|pwd|fingerprint|candidate)\S*/gi,'$1 [hidden]'),200));}
+   const lines=text.split(/\r?\n/).filter(l=>/^\((?:VoiceChat|WebRTC)\)/.test(l)&&!/Description\)|SDP/i.test(l));
+   // v2.32.3: "Still trying to connect…" repeats every two seconds; only the latest one is kept, so the
+   // steps before it stay in view.
+   let lastTry=-1;lines.forEach((l,i)=>{if(/Still trying/i.test(l))lastTry=i;});
+   return lines.filter((l,i)=>i===lastTry||!/Still trying/i.test(l)).slice(-14).map(line=>clean(line.replace(/\b\d{1,3}(?:\.\d{1,3}){3}(?::\d+)?\b/g,'[address]').replace(/\b[0-9a-f]{0,4}(?::[0-9a-f]{0,4}){2,7}\b/gi,'[address]').replace(/\b\d{9,}\b/g,'[id]').replace(/(ufrag|pwd|fingerprint|candidate)\S*/gi,'$1 [hidden]'),200));}
   catch{return [];}
  }
  async function handle(node,request){

@@ -1,3 +1,26 @@
+# ROBOTIC TYLER v2.32.3: the full check shows where a voice connection fails
+
+## Changed
+- **Full check, voice connection:**
+  - It now shows the **encryption handshake** (DTLS): its state, which side started it, the version and the cipher. If that handshake fails, the line says so: *"The encrypted voice connection failed"*, with Steam's alert code when the browser reports one.
+  - A new **Connection steps** line lists each step of the connection with its time: connection, ICE (the route), encryption and gathering.
+  - The moment a connection goes wrong, its counters and steps are **saved**. The check still shows them after Steam gives up on that connection and opens a new one (*"Last connection problem"*).
+  - The check now **waits for the counters** instead of reading them after 0.3 s. The last check showed none, possibly because they weren't ready yet.
+- **Steam's voice log:** the *"Still trying to connect…"* line, which Steam repeats every two seconds, shows only once. The steps before it stay in view.
+
+## Why
+- The last check from the stuck desktop app showed the connection as `failed/disconnected`. In Chromium, that state normally means the route to Steam's voice server worked for a moment and the encryption failed after it. The check before showed no answers at all. This version shows which of the two happens.
+- **Found while testing:** the app's engine (Electron 45, Chromium 156) uses **DTLS 1.3** by default, between two connections on this machine.
+
+## Tested
+- **Chromium, stand-in calls:**
+  - A working connection shows answered checks, encryption connected, DTLS 1.3 and the route.
+  - A connection whose encryption is made to fail (wrong certificate fingerprint) shows as connected on ICE and failed on encryption, with a saved snapshot. There are no addresses anywhere.
+- All unit and end-to-end tests, and the desktop check.
+- **Not tested:** a real Steam call.
+
+---
+
 # ROBOTIC TYLER v2.32.2: compare a working voice connection with a stuck one
 
 ## Changed

@@ -330,7 +330,10 @@
    row(owner?'✓ Active tab':'! Standby tab',owner?'Only this tab may answer or play clips.':'Take over this tab before testing AI/audio.');
    const ready=TylerSelection.readiness(globalThis.TylerCompanion);row(ready.startsWith('READY')?'✓ Chat reader ready':'! Chat needs setup',ready);
    if(platform.voice!==false){
-    bridge('status');await new Promise(r=>setTimeout(r,300));const v=voiceReport||{};
+    // v2.32.3: wait for this check's own answer (reading the counters can take longer than a moment).
+    await new Promise(resolve=>{const done=()=>{clearTimeout(t);window.removeEventListener('message',on);resolve();},t=setTimeout(done,3000),
+     on=e=>{if(e.source===window&&e.data?.source==='tyler-audio-status'&&e.data.text==='Voice connection checked.')done();};window.addEventListener('message',on);bridge('status');});
+    const v=voiceReport||{};
     row(v.enabled?'✓ Tyler\'s microphone is on':'! Tyler\'s microphone is off',v.enabled?'Steam gets Tyler\'s own microphone ('+(v.requests||0)+' request'+(v.requests===1?'':'s')+' so far), never your real one.':'Press Connect & start (or Start live voice) before joining the voice channel.');
     // v2.32: the call as Steam itself sees it (voice-call.js): its own call state and, when it is
     // stuck or failed, the last lines of Steam's voice log, so it's clear which step stopped.
@@ -341,14 +344,28 @@
       call.state==='connected'?(call.room||'Voice')+(call.people?' · '+call.people+' other'+(call.people===1?'':'s'):' · nobody else yet')+'.':
       call.state==='joining'||call.state==='failed'&&call.roomId?'Stuck at: '+STEP(call.steamState||0)+(call.room?' ('+call.room+')':'')+'. Leave voice and join again; if it keeps stopping here with nothing changed in Tyler, it is on Steam\'s side.':
       'Press Join voice (Chat tab) or join the voice channel with the bot account, then run the check again.');
-     if(call.state!=='connected'&&call.log?.length)row('? Steam\'s voice log',call.log.slice(-4).join(' · '));
+     if(call.state!=='connected'&&call.log?.length)row('? Steam\'s voice log',call.log.slice(-6).join(' · '));
+     // v2.32.3: the encryption handshake (DTLS) and each connection's steps, as the browser reports them.
+     const ALERT={10:'unexpected message',20:'bad record MAC',40:'handshake failure',42:'bad certificate',43:'unsupported certificate',47:'illegal parameter',50:'decode error',51:'decrypt error',70:'protocol version',71:'insufficient security',80:'internal error',109:'missing extension',110:'unsupported extension'};
+     const named=s=>String(s||'').replace(/(sent|received) alert (\d+)/g,(m,w,n)=>m+(ALERT[n]?' ('+ALERT[n]+')':''));
+     const stepText=list=>(list||[]).slice(-16).map(s=>(s.at/1000).toFixed(1)+' s '+({connection:'connection',ice:'ICE',dtls:'encryption',gathering:'gathering'}[s.what]||s.what)+' '+s.state+(s.extra?' ['+named(s.extra)+']':'')).join(' · ');
+     const enc=r=>r?.dtls?' · encryption: '+(r.dtls.state||'unknown')+(r.dtls.role?' as '+r.dtls.role:'')+(r.dtls.version?', '+r.dtls.version:'')+(r.dtls.cipher?', '+r.dtls.cipher:'')+(r.route?' · route: '+r.route:''):'';
+     const counters=ice=>ice?' · '+ice.checks+' connection check'+(ice.checks===1?'':'s')+' sent, '+ice.answers+' answered (this PC: '+(ice.local.join(', ')||'none')+'; Steam: '+(ice.remote.join(', ')||'none')+'; pairs: '+(Object.entries(ice.states||{}).map(([k,n])=>n+' '+k).join(', ')||'none')+')'+enc(ice):'';
+     const recent=v.failure&&Date.now()-v.failure.at<10*60000?v.failure:null;
      if(call.state!=='connected'&&(call.state==='joining'||call.roomId)){
       // v2.32.1: the browser's own counters say whether Steam's voice server answers at all.
-      const ice=v.ice,blocked=!!ice&&ice.checks>0&&ice.answers===0;
-      row(blocked?'! Steam\'s voice server isn\'t answering':'? Voice connection','Steam call step '+(call.steamState??'unknown')+' · connections: '+((v.peerStates||[]).join(', ')||'none yet')+(ice?' · '+ice.checks+' connection check'+(ice.checks===1?'':'s')+' sent, '+ice.answers+' answered (this PC: '+(ice.local.join(', ')||'none')+'; Steam: '+(ice.remote.join(', ')||'none')+'; pairs: '+Object.entries(ice.states||{}).map(([k,n])=>n+' '+k).join(', ')+')':'')+'.'+
-       (blocked?' The checks leave but nothing comes back: something between '+(platform.id==='desktop'?'ROBOTIC TYLER':'this browser')+' and Steam\'s voice server is stopping the voice traffic (a firewall, VPN or antivirus rule for this program, or the network).':''));
+      const ice=v.ice||recent?.report||null,steps=v.trace||recent?.steps||[];
+      const reached=steps.some(s=>s.what==='ice'&&['connected','completed'].includes(s.state))||ice?.answers>0;
+      const dtlsError=steps.findLast(s=>s.what==='dtls'&&s.state==='error');
+      const dtlsFailed=ice?.dtls?.state==='failed'||steps.some(s=>s.what==='dtls'&&s.state==='failed')||!!dtlsError;
+      const blocked=!!ice&&ice.checks>0&&ice.answers===0&&!reached;
+      row(dtlsFailed?'! The encrypted voice connection failed':blocked?'! Steam\'s voice server isn\'t answering':'? Voice connection','Steam call step '+(call.steamState??'unknown')+' · connections: '+((v.peerStates||[]).join(', ')||'none yet')+counters(ice)+'.'+
+       (dtlsFailed?' '+(reached?'The route to Steam\'s voice server worked (its connection checks were answered), then':'Then')+' setting up the call\'s encryption (DTLS) failed'+(dtlsError?.extra?': '+named(dtlsError.extra):'')+'. That handshake is between '+(platform.id==='desktop'?'ROBOTIC TYLER\'s built-in browser engine':'this browser')+' and Steam\'s voice server.':
+        blocked?' The checks leave but nothing comes back: something between '+(platform.id==='desktop'?'ROBOTIC TYLER':'this browser')+' and Steam\'s voice server is stopping the voice traffic (a firewall, VPN or antivirus rule for this program, or the network).':''));
+      if(steps.length)row('? Connection steps',stepText(steps)+'.');
      }
-     if(call.state==='connected'&&v.ice)row('✓ Voice connection',v.ice.checks+' connection checks sent, '+v.ice.answers+' answered (this PC: '+(v.ice.local.join(', ')||'none')+'; Steam: '+(v.ice.remote.join(', ')||'none')+').');
+     if(recent&&JSON.stringify(recent.steps)!==JSON.stringify(v.trace||[]))row('? Last connection problem',new Date(recent.at).toLocaleTimeString()+' · '+stepText(recent.steps)+counters(recent.report)+'.');
+     if(call.state==='connected'&&v.ice)row('✓ Voice connection',v.ice.checks+' connection checks sent, '+v.ice.answers+' answered (this PC: '+(v.ice.local.join(', ')||'none')+'; Steam: '+(v.ice.remote.join(', ')||'none')+')'+enc(v.ice)+'.');
     }else row(v.connectedPeers?'✓ In a Steam voice call':'? Not in a voice call',v.connectedPeers?v.connectedPeers+' voice connection'+(v.connectedPeers===1?'':'s')+' active.':'Join the voice channel with the bot account, then run the check again.');
     row(v.attached?'✓ Outgoing audio attached':'! Outgoing audio not attached',v.attached?'A test beep still needs confirmation from your main account.':'Rejoin the voice channel after Connect & start. If it stays like this, reload Steam chat.');
     // Steam's codec settings for Tyler's audio and his send rate (v2.20.2): what the call allows.

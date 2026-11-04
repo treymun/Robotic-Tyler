@@ -63,4 +63,9 @@ test('Steam\'s voice log: its tagged lines only, with addresses, ports, ids and 
  const v=await s.handle({op:'voice-state',logs:true});
  assert.deepEqual(v.log,['(VoiceChat) Call to room 901 now initating getUserMedia/WebRTC','(WebRTC) WebRTC session connected [address] => [address]','(VoiceChat) Join for [id] ufrag [hidden] failed: timed out']);
  assert.equal((await s.handle({op:'voice-state'})).log,undefined,'only when asked (the full check)');
+ // v2.32.3: Steam's "Still trying…" every two seconds collapses to the latest, so the earlier steps stay.
+ const t=steam();t.log.push('(VoiceChat) Call to room 901 now initating getUserMedia/WebRTC','(WebRTC) Set remote description','(WebRTC) ICE state checking');
+ for(let n=1;n<=20;n++)t.log.push('(VoiceChat) Still trying to connect to voice chat/webrtc InitiatedWebRTCSession(5) '+n*2000+'ms elapsed...');
+ const w=await t.handle({op:'voice-state',logs:true});
+ assert.deepEqual(w.log,['(VoiceChat) Call to room 901 now initating getUserMedia/WebRTC','(WebRTC) Set remote description','(WebRTC) ICE state checking','(VoiceChat) Still trying to connect to voice chat/webrtc InitiatedWebRTCSession(5) 40000ms elapsed...']);
 });

@@ -52,14 +52,50 @@
   const n=a.split('.').map(Number);if(n.length!==4||n.some(x=>!(x>=0&&x<=255)))return 'unknown';
   if(n[0]===10||n[0]===172&&n[1]>=16&&n[1]<=31||n[0]===192&&n[1]===168)return 'IPv4 private';if(n[0]===100&&n[1]>=64&&n[1]<=127)return 'IPv4 shared (CGNAT/VPN)';
   if(n[0]===169&&n[1]===254)return 'IPv4 link-local';if(n[0]===127)return 'IPv4 loopback';return 'IPv4 public';};
- async function iceReport(){const out={checks:0,answers:0,pairs:0,local:[],remote:[],states:{}};let any=false;
-  for(const peer of peers){if(closed(peer))continue;try{const st=await peer.getStats(),cand=new Map();st.forEach(x=>{if(x.type==='local-candidate'||x.type==='remote-candidate')cand.set(x.id,x);});
-   st.forEach(x=>{if(x.type!=='candidate-pair')return;any=true;out.pairs++;out.checks+=Number(x.requestsSent)||0;out.answers+=Number(x.responsesReceived)||0;const sk=String(x.state||'?')+(x.nominated?' nominated':'');out.states[sk]=(out.states[sk]||0)+1;
-    for(const [k,id] of [['local',x.localCandidateId],['remote',x.remoteCandidateId]]){const c=cand.get(id);if(c){const tag=(c.candidateType||'?')+' '+(c.protocol||'?')+' '+kind(c.address||c.ip)+(k==='local'&&c.networkType?' '+c.networkType:'');if(!out[k].includes(tag)&&out[k].length<4)out[k].push(tag);}}});}catch{}}
+ // v2.32.3: plus the encryption handshake (DTLS) from the transport's own stats (state, role, version,
+ // cipher) and the kind of route in use. Still no addresses.
+ const short=(s,n)=>String(s??'').replace(/\b\d{1,3}(?:\.\d{1,3}){3}(?::\d+)?\b/g,'[address]').replace(/[\u0000-\u001f\u007f]/g,' ').trim().slice(0,n);
+ const TLS={FEFF:'DTLS 1.0',FEFD:'DTLS 1.2',FEFC:'DTLS 1.3'};
+ async function peerReport(peer){const out={checks:0,answers:0,pairs:0,local:[],remote:[],states:{},dtls:null,route:''};let any=false;
+  try{const st=await peer.getStats(),cand=new Map(),pairs=new Map();st.forEach(x=>{if(x.type==='local-candidate'||x.type==='remote-candidate')cand.set(x.id,x);if(x.type==='candidate-pair')pairs.set(x.id,x);});
+   const tag=(c,local)=>c?(c.candidateType||'?')+' '+(c.protocol||'?')+' '+kind(c.address||c.ip)+(local&&c.networkType?' '+c.networkType:''):'?';
+   for(const x of pairs.values()){any=true;out.pairs++;out.checks+=Number(x.requestsSent)||0;out.answers+=Number(x.responsesReceived)||0;const sk=String(x.state||'?')+(x.nominated?' nominated':'');out.states[sk]=(out.states[sk]||0)+1;
+    for(const [k,id] of [['local',x.localCandidateId],['remote',x.remoteCandidateId]]){const c=cand.get(id);if(c){const t=tag(c,k==='local');if(!out[k].includes(t)&&out[k].length<4)out[k].push(t);}}}
+   st.forEach(x=>{if(x.type!=='transport'||out.dtls?.state)return;any=true;const v=String(x.tlsVersion||'').toUpperCase();
+    out.dtls={state:short(x.dtlsState,20),role:short(x.dtlsRole,20),version:TLS[v]||short(v,12),cipher:short(x.dtlsCipher,60),srtp:short(x.srtpCipher,40),ice:short(x.iceState,20),sent:Number(x.packetsSent)||0,received:Number(x.packetsReceived)||0};
+    const sel=pairs.get(x.selectedCandidatePairId);out.route=sel?tag(cand.get(sel.localCandidateId),true)+' \u2192 '+tag(cand.get(sel.remoteCandidateId)):'';});
+  }catch{}
   return any?out:null;}
+ // Every live Steam connection together, the newest first (its encryption and route are the ones shown).
+ async function iceReport(){let out=null;
+  for(const peer of [...peers].reverse()){if(closed(peer))continue;const r=await peerReport(peer);if(!r)continue;if(!out){out=r;continue;}
+   out.checks+=r.checks;out.answers+=r.answers;out.pairs+=r.pairs;for(const [s,n] of Object.entries(r.states))out.states[s]=(out.states[s]||0)+n;
+   for(const k of ['local','remote'])for(const t of r[k])if(!out[k].includes(t)&&out[k].length<4)out[k].push(t);}
+  return out;}
+ // v2.32.3: each Steam connection's steps as the browser reports them (connection, ICE, encryption,
+ // with the time since Steam opened it), and a snapshot of its counters the moment it goes wrong, so
+ // the full check still has them after Steam gives up on that connection. States, times, alert codes.
+ const traces=new Map(),dtlsSeen=new WeakSet();let lastFailure=null;
+ function step(peer,what,state,extra=''){const t=traces.get(peer);if(!t)return;const last=t.steps.findLast(s=>s.what===what);if(last&&last.state===state&&!extra)return;
+  if(t.steps.length<40)t.steps.push(extra?{at:Math.round(Date.now()-t.t0),what,state,extra}:{at:Math.round(Date.now()-t.t0),what,state});}
+ function watchDtls(peer){
+  let list=[];try{list=[...peer.getSenders(),...peer.getReceivers()];}catch{}
+  for(const x of list){const d=x.transport;if(!d||dtlsSeen.has(d))continue;dtlsSeen.add(d);step(peer,'dtls',d.state);
+   d.addEventListener('statechange',()=>{step(peer,'dtls',d.state);if(d.state==='failed')void snapshot(peer);});
+   d.addEventListener('error',e=>{const er=e.error||{};step(peer,'dtls','error',short([er.errorDetail,er.sentAlert!=null?'sent alert '+er.sentAlert:'',er.receivedAlert!=null?'received alert '+er.receivedAlert:'',er.message].filter(Boolean).join(', '),160));});}
+ }
+ async function snapshot(peer){const t=traces.get(peer);if(!t)return;const report=await peerReport(peer);lastFailure={at:Date.now(),steps:t.steps.slice(),report};announce('Steam connection problem recorded.');}
+ function trackPeer(peer){
+  traces.set(peer,{t0:Date.now(),steps:[]});while(traces.size>4)traces.delete(traces.keys().next().value);step(peer,'connection','new');
+  peer.addEventListener('iceconnectionstatechange',()=>{watchDtls(peer);step(peer,'ice',peer.iceConnectionState);if(['disconnected','failed'].includes(peer.iceConnectionState))void snapshot(peer);});
+  peer.addEventListener('icegatheringstatechange',()=>{if(peer.iceGatheringState==='complete')step(peer,'gathering','complete');});
+  peer.addEventListener('signalingstatechange',()=>watchDtls(peer));
+  peer.addEventListener('connectionstatechange',()=>{watchDtls(peer);step(peer,'connection',peer.connectionState);if(peer.connectionState==='failed')void snapshot(peer);});
+ }
+ const latestTrace=()=>{const t=[...traces.values()].at(-1);return t?t.steps.slice():null;};
  async function codecReport(){for(const peer of peers){if(closed(peer)||peer.connectionState!=='connected')continue;try{const st=await peer.getStats();let out=null;st.forEach(x=>{if(x.type==='outbound-rtp'&&x.kind==='audio'&&(!out||x.bytesSent>out.bytesSent))out=x;});if(!out)continue;const c=out.codecId?st.get(out.codecId):null;return {codec:String(c?.mimeType||'').split('/')[1]||'',fmtp:String(c?.sdpFmtpLine||'').slice(0,200),kbps:Math.round((Number(out.targetBitrate)||0)/1000)};}catch{}}return null;}
  let board;let previewNode;let enabled=false,ctx,destination,gain,monitor,meter=null,active=[],queued=[],audioJobs=Promise.resolve(),requests=0,attached=0;const peers=new Set(),replaced=new WeakSet();
- const announce=(text,ok=true)=>window.postMessage({source:'tyler-audio-status',text,ok,voice:{enabled,requests,attached,player:ctx?.state||'not started',peers:peers.size,observing:!!OriginalPeer,connectedPeers:[...peers].filter(p=>p.connectionState==='connected').length,peerStates:[...peers].filter(p=>p.signalingState!=='closed'&&p.connectionState!=='closed').slice(-3).map(p=>p.connectionState+'/'+p.iceConnectionState+'/'+p.signalingState),codec:lastCodec,ice:lastIce}},location.origin);
+ const announce=(text,ok=true)=>window.postMessage({source:'tyler-audio-status',text,ok,voice:{enabled,requests,attached,player:ctx?.state||'not started',peers:peers.size,observing:!!OriginalPeer,connectedPeers:[...peers].filter(p=>p.connectionState==='connected').length,peerStates:[...peers].filter(p=>p.signalingState!=='closed'&&p.connectionState!=='closed').slice(-3).map(p=>p.connectionState+'/'+p.iceConnectionState+'/'+p.signalingState),codec:lastCodec,ice:lastIce,trace:latestTrace(),failure:lastFailure}},location.origin);
  function setup(){if(ctx)return;ctx=new AudioContext();destination=ctx.createMediaStreamDestination();gain=ctx.createGain();gain.gain.value=.35;gain.connect(destination);monitor=ctx.createGain();monitor.gain.value=0;gain.connect(monitor);monitor.connect(ctx.destination);meter=ctx.createAnalyser?.()||null;if(meter){meter.fftSize=2048;gain.connect(meter);}}
  function boardPlayer(){if(!board)board=new TylerBoardAudio(ctx,gain,text=>window.postMessage({source:'tyler-soundboard-status',text},location.origin));return board;}
  async function resumePlayer(){let timer;try{await Promise.race([ctx.resume(),new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('Audio player is suspended. Click Enable again or check this tab is allowed to play sound.')),2500);})]);}finally{clearTimeout(timer);}}
@@ -132,7 +168,7 @@
   if(addTrack)proto.addTrack=function(track,...streams){if(enabled&&track?.kind==='audio'){track=synthetic();const sender=addTrack.call(this,track,...streams);replaced.add(sender);attached++;void retune();announce('Synthetic audio added to an outgoing Steam connection. Confirm with Test beep.');return sender;}return addTrack.call(this,track,...streams);};
   if(addTransceiver)proto.addTransceiver=function(...args){const result=addTransceiver.apply(this,args);void attach(this);return result;};
   if(setLocal)proto.setLocalDescription=async function(...args){await attach(this);return setLocal.apply(this,args);};
-  window.RTCPeerConnection=new Proxy(OriginalPeer,{construct(Target,args){const peer=Reflect.construct(Target,args);peers.add(peer);peer.addEventListener('connectionstatechange',()=>{if(peer.connectionState==='closed')peers.delete(peer);announce('Steam connection state: '+peer.connectionState);});return peer;}});
+  window.RTCPeerConnection=new Proxy(OriginalPeer,{construct(Target,args){const peer=Reflect.construct(Target,args);peers.add(peer);trackPeer(peer);peer.addEventListener('connectionstatechange',()=>{if(peer.connectionState==='closed')peers.delete(peer);announce('Steam connection state: '+peer.connectionState);});return peer;}});
  }
  function tone(frequency,start,duration,type='sine'){const osc=ctx.createOscillator(),envelope=ctx.createGain();osc.frequency.value=frequency;osc.type=type;envelope.gain.setValueAtTime(0,start);envelope.gain.linearRampToValueAtTime(.20,start+.015);envelope.gain.linearRampToValueAtTime(0,start+duration);osc.connect(envelope);envelope.connect(gain);osc.start(start);osc.stop(start+duration+.01);active.push(osc);playing(true);osc.onended=()=>{osc.disconnect();envelope.disconnect();active=active.filter(n=>n!==osc);if(!active.length)playing(false);};}
  // v2.24: keep Tyler in quiet calls. Steam removes a call member who has sent no sound for about an
