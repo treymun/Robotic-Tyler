@@ -1,0 +1,27 @@
+{
+  "repository": "treymun/Robotic-Tyler",
+  "commit": "f321af764b4a5362cad67e1cd01e7c680ec5e4f5",
+  "builtInNames": [
+    "Beep",
+    "Airhorn",
+    "Drumroll",
+    "Victory",
+    "Sad trombone",
+    "Alert",
+    "Coin",
+    "Jump",
+    "Laser",
+    "Countdown"
+  ],
+  "auditedFiles": {
+    "browser-extension/soundboard-core.js": "4a04cbd44641adc1170183b186dcb28678a9b48c",
+    "browser-extension/soundboard-audio.js": "681006ade0a2040211c9c0e22e0ead674180eb14",
+    "browser-extension/theme.js": "4f4602c3ebf1b4d31a849489c6282c2e3e1cb6b6"
+  },
+  "clipContract": {
+    "audio": "Base64-encoded audio, at most 700000 characters",
+    "seconds": "Greater than zero and at most 12",
+    "name": "At most 60 characters"
+  },
+  "note": "This pack supplies assets and an integration handoff; it does not modify the repository."
+}

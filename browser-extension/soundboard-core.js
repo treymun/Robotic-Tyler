@@ -3,7 +3,9 @@
  function slug(value){return String(value||'').toLowerCase().replace(/\.[a-z0-9]{2,5}$/,'').replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim().slice(0,50);}
  function parse(text,slots=globalThis.TylerSoundboard?.slots){const input=String(text||'').trim().toLowerCase();const alias=slots?.find(s=>s.trigger&&s.trigger===input);if(alias)return alias.slot;const m=input.match(/^sound\s+([^\n]+)$/i);if(!m)return null;if(/^[1-9]\d?$/.test(m[1])){const n=Number(m[1]);return n<=10||slots?.some(s=>s.slot===n)?n:null;}if(/^[0-9]+$/.test(m[1]))return null;const key=slug(m[1]);if(!key)return null;const matches=(slots||names.map((name,i)=>({name,slot:i+1}))).filter(s=>slug(s.name)===key||slug(names[s.slot-1])===key);return matches.length===1?matches[0].slot:null;}
  function preferences(value={}){return {volume:Math.max(0,Math.min(1,Number.isFinite(Number(value.volume))?Number(value.volume):.6)),access:value.access==='selected'?'selected':'everyone',allowedIDs:[...new Set(String(value.allowedIDs||'').match(/\b7656119\d{10}\b/g)||[])].slice(0,50).join('\n')};}
- function validClip(clip){return clip&&typeof clip.audio==='string'&&clip.audio.length<=700000&&/^[A-Za-z0-9+/]+={0,2}$/.test(clip.audio)&&Number.isFinite(clip.seconds)&&clip.seconds>0&&clip.seconds<=12&&typeof clip.name==='string'&&clip.name.length<=60;}
+ // A clip: base64 audio (at most 700,000 characters), seconds (0–12) and a name. v2.31: a themed pad's
+ // packaged clip also has a level, its playback gain in dB (−12 to +12; uploaded clips have none).
+ function validClip(clip){return !!clip&&typeof clip.audio==='string'&&clip.audio.length<=700000&&/^[A-Za-z0-9+/]+={0,2}$/.test(clip.audio)&&Number.isFinite(clip.seconds)&&clip.seconds>0&&clip.seconds<=12&&typeof clip.name==='string'&&clip.name.length<=60&&(clip.level===undefined||Number.isFinite(clip.level)&&clip.level>=-12&&clip.level<=12);}
  function game(text,random=Math.random){
  const cmd=String(text).trim().toLowerCase();
  if(cmd==='!game roll'){const n=1+Math.floor(random()*6);return {slot:n>=4?4:5,text:'High roller: '+n+'/6. '+(n>=4?'You win!':'Four or higher wins. Try again!')};}

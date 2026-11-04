@@ -1,0 +1,251 @@
+﻿Theme ID,Theme,Slot,Soundboard name,Themed cue,File,Seconds,Provenance,Source IDs
+steam,Steam,1,Beep,Message ping,audio/steam/01-beep.mp3,0.790604,source-recording,steam.b
+steam,Steam,2,Airhorn,Mention burst,audio/steam/02-airhorn.mp3,1.275146,source-derived-arrangement,steam.h
+steam,Steam,3,Drumroll,Chat-ping flutter,audio/steam/03-drumroll.mp3,1.660271,source-derived-arrangement,steam.d
+steam,Steam,4,Victory,Friend-join chime,audio/steam/04-victory.mp3,1.391875,source-recording,steam.v
+steam,Steam,5,Sad trombone,Falling presence chime,audio/steam/05-sad-trombone.mp3,1.328375,source-derived-arrangement,steam.s
+steam,Steam,6,Alert,Group-chat alert,audio/steam/06-alert.mp3,1.308792,source-derived-arrangement,steam.a
+steam,Steam,7,Coin,Online sparkle,audio/steam/07-coin.mp3,0.346333,source-derived-arrangement,steam.c
+steam,Steam,8,Jump,Join swoop,audio/steam/08-jump.mp3,0.648979,source-derived-arrangement,steam.j
+steam,Steam,9,Laser,Mention sweep,audio/steam/09-laser.mp3,1.285229,source-derived-arrangement,steam.l
+steam,Steam,10,Countdown,Message-ping countdown,audio/steam/10-countdown.mp3,2.489542,source-derived-arrangement,steam.t
+classic,Classic Steam (2004),1,Beep,Legacy Steam message,audio/classic/01-beep.mp3,0.571917,source-recording,classic.b
+classic,Classic Steam (2004),2,Airhorn,VGUI buzzer burst,audio/classic/02-airhorn.mp3,1.359146,source-derived-arrangement,classic.h
+classic,Classic Steam (2004),3,Drumroll,Beveled-button rattle,audio/classic/03-drumroll.mp3,1.759313,source-derived-arrangement,classic.d
+classic,Classic Steam (2004),4,Victory,Legacy friend join,audio/classic/04-victory.mp3,0.603854,source-recording,classic.v
+classic,Classic Steam (2004),5,Sad trombone,GoldSrc denial fall,audio/classic/05-sad-trombone.mp3,1.236729,source-derived-arrangement,classic.s
+classic,Classic Steam (2004),6,Alert,Legacy friend-online alert,audio/classic/06-alert.mp3,1.383792,source-derived-arrangement,classic.a
+classic,Classic Steam (2004),7,Coin,Amber button pickup,audio/classic/07-coin.mp3,0.336979,source-derived-arrangement,classic.c
+classic,Classic Steam (2004),8,Jump,VGUI lift,audio/classic/08-jump.mp3,0.648979,source-derived-arrangement,classic.j
+classic,Classic Steam (2004),9,Laser,Old-client electronic sweep,audio/classic/09-laser.mp3,1.072667,source-derived-arrangement,classic.l
+classic,Classic Steam (2004),10,Countdown,Legacy blip countdown,audio/classic/10-countdown.mp3,2.373396,source-derived-arrangement,classic.t
+tf2,Team Fortress 2,1,Beep,TF2 menu click,audio/tf2/01-beep.mp3,0.1585,source-recording,tf2.b
+tf2,Team Fortress 2,2,Airhorn,PASS Time airhorn,audio/tf2/02-airhorn.mp3,3.093,source-recording,tf2.h
+tf2,Team Fortress 2,3,Drumroll,Crate-opening suspense,audio/tf2/03-drumroll.mp3,3.093,source-recording,tf2.d
+tf2,Team Fortress 2,4,Victory,Administrator victory,audio/tf2/04-victory.mp3,2.201625,source-recording,tf2.v
+tf2,Team Fortress 2,5,Sad trombone,Administrator failure,audio/tf2/05-sad-trombone.mp3,1.976813,source-recording,tf2.s
+tf2,Team Fortress 2,6,Alert,TF2 notification,audio/tf2/06-alert.mp3,3.144979,source-recording,tf2.a
+tf2,Team Fortress 2,7,Coin,Mann vs. Machine money,audio/tf2/07-coin.mp3,0.658312,source-recording,tf2.c
+tf2,Team Fortress 2,8,Jump,Scout jump,audio/tf2/08-jump.mp3,1.514438,source-recording,tf2.j
+tf2,Team Fortress 2,9,Laser,Cow Mangler shot,audio/tf2/09-laser.mp3,1.926583,source-recording,tf2.l
+tf2,Team Fortress 2,10,Countdown,"Administrator: three, two, one",audio/tf2/10-countdown.mp3,2.803,source-derived-arrangement,tf2.t3; tf2.t2; tf2.t1
+cs2,Counter-Strike 2,1,Beep,CS2 UI beep,audio/cs2/01-beep.mp3,0.174229,source-recording,cs2.b
+cs2,Counter-Strike 2,2,Airhorn,Match-ready call,audio/cs2/02-airhorn.mp3,3.093,source-recording,cs2.h
+cs2,Counter-Strike 2,3,Drumroll,Inventory scratch roll,audio/cs2/03-drumroll.mp3,1.940646,source-derived-arrangement,cs2.d
+cs2,Counter-Strike 2,4,Victory,Let's roll confirmation,audio/cs2/04-victory.mp3,2.107438,source-recording,cs2.v
+cs2,Counter-Strike 2,5,Sad trombone,Invalid-menu failure,audio/cs2/05-sad-trombone.mp3,1.328375,source-derived-arrangement,cs2.s
+cs2,Counter-Strike 2,6,Alert,Chat-wheel alert,audio/cs2/06-alert.mp3,0.214938,source-recording,cs2.a
+cs2,Counter-Strike 2,7,Coin,CS2 coin pickup,audio/cs2/07-coin.mp3,1.770229,source-recording,cs2.c
+cs2,Counter-Strike 2,8,Jump,Jump launch,audio/cs2/08-jump.mp3,0.632146,source-recording,cs2.j
+cs2,Counter-Strike 2,9,Laser,Zeus electrical shot,audio/cs2/09-laser.mp3,1.131438,source-recording,cs2.l
+cs2,Counter-Strike 2,10,Countdown,C4 beep countdown,audio/cs2/10-countdown.mp3,2.612417,source-derived-arrangement,cs2.t
+portal,Portal,1,Beep,Test-chamber button,audio/portal/01-beep.mp3,0.114833,source-recording,portal.b
+portal,Portal,2,Airhorn,Portal-gun power surge,audio/portal/02-airhorn.mp3,1.401146,source-recording,portal.h
+portal,Portal,3,Drumroll,Aperture mechanism roll,audio/portal/03-drumroll.mp3,2.045271,source-derived-arrangement,portal.d
+portal,Portal,4,Victory,Elevator completion chime,audio/portal/04-victory.mp3,2.776417,source-recording,portal.v
+portal,Portal,5,Sad trombone,Invalid portal surface,audio/portal/05-sad-trombone.mp3,1.083208,source-recording,portal.s
+portal,Portal,6,Alert,Turret deployment,audio/portal/06-alert.mp3,0.801687,source-recording,portal.a
+portal,Portal,7,Coin,Portal-open sparkle,audio/portal/07-coin.mp3,0.354333,source-derived-arrangement,portal.c
+portal,Portal,8,Jump,Portal travel,audio/portal/08-jump.mp3,1.874354,source-recording,portal.j
+portal,Portal,9,Laser,Blue portal shot,audio/portal/09-laser.mp3,0.792979,source-recording,portal.l
+portal,Portal,10,Countdown,Chamber-ready countdown,audio/portal/10-countdown.mp3,2.249083,source-derived-arrangement,portal.t
+cs16,Counter-Strike 1.6,1,Beep,C4 keypad beep,audio/cs16/01-beep.mp3,1.271854,source-recording,cs16.b
+cs16,Counter-Strike 1.6,2,Airhorn,"Go, go, go!",audio/cs16/02-airhorn.mp3,1.461271,source-recording,cs16.h
+cs16,Counter-Strike 1.6,3,Drumroll,Bomb-keypad rattle,audio/cs16/03-drumroll.mp3,1.788729,source-derived-arrangement,cs16.d
+cs16,Counter-Strike 1.6,4,Victory,Counter-terrorists win,audio/cs16/04-victory.mp3,1.969708,source-recording,cs16.v
+cs16,Counter-Strike 1.6,5,Sad trombone,Negative: radio failure,audio/cs16/05-sad-trombone.mp3,1.048771,source-recording,cs16.s
+cs16,Counter-Strike 1.6,6,Alert,Enemy spotted,audio/cs16/06-alert.mp3,1.336417,source-recording,cs16.a
+cs16,Counter-Strike 1.6,7,Coin,Bomb-defused reward,audio/cs16/07-coin.mp3,0.336979,source-recording,cs16.c
+cs16,Counter-Strike 1.6,8,Jump,GoldSrc jump,audio/cs16/08-jump.mp3,0.64375,source-recording,cs16.j
+cs16,Counter-Strike 1.6,9,Laser,Scope chirp sweep,audio/cs16/09-laser.mp3,1.255458,source-derived-arrangement,cs16.l
+cs16,Counter-Strike 1.6,10,Countdown,Classic C4 countdown,audio/cs16/10-countdown.mp3,2.432292,source-derived-arrangement,cs16.t
+hev,Half-Life HEV suit,1,Beep,HEV beep,audio/hev/01-beep.mp3,0.309521,source-recording,hev.b
+hev,Half-Life HEV suit,2,Airhorn,Evacuate area,audio/hev/02-airhorn.mp3,2.209563,source-recording,hev.h
+hev,Half-Life HEV suit,3,Drumroll,Suit telemetry roll,audio/hev/03-drumroll.mp3,1.768188,source-derived-arrangement,hev.d
+hev,Half-Life HEV suit,4,Victory,Suit activated,audio/hev/04-victory.mp3,0.96675,source-recording,hev.v
+hev,Half-Life HEV suit,5,Sad trombone,HEV flatline,audio/hev/05-sad-trombone.mp3,4.086938,source-recording,hev.s
+hev,Half-Life HEV suit,6,Alert,HEV alert,audio/hev/06-alert.mp3,0.950417,source-recording,hev.a
+hev,Half-Life HEV suit,7,Coin,Suit-charge confirmation,audio/hev/07-coin.mp3,1.570104,source-recording,hev.c
+hev,Half-Life HEV suit,8,Jump,HEV movement,audio/hev/08-jump.mp3,0.559312,source-recording,hev.j
+hev,Half-Life HEV suit,9,Laser,Gauss shot,audio/hev/09-laser.mp3,1.548667,source-recording,hev.l
+hev,Half-Life HEV suit,10,Countdown,"HEV: three, two, one",audio/hev/10-countdown.mp3,2.516146,source-derived-arrangement,hev.t3; hev.t2; hev.t1
+l4d,Left 4 Dead,1,Beep,Survivor UI tone,audio/l4d/01-beep.mp3,0.949667,source-recording,l4d.b
+l4d,Left 4 Dead,2,Airhorn,Distant foghorn,audio/l4d/02-airhorn.mp3,3.093,source-recording,l4d.h
+l4d,Left 4 Dead,3,Drumroll,Menu suspense rattle,audio/l4d/03-drumroll.mp3,1.924646,source-derived-arrangement,l4d.d
+l4d,Left 4 Dead,4,Victory,Survivor reward,audio/l4d/04-victory.mp3,1.175312,source-recording,l4d.v
+l4d,Left 4 Dead,5,Sad trombone,The end,audio/l4d/05-sad-trombone.mp3,1.917646,source-recording,l4d.s
+l4d,Left 4 Dead,6,Alert,Critical event,audio/l4d/06-alert.mp3,3.073896,source-recording,l4d.a
+l4d,Left 4 Dead,7,Coin,Small survivor reward,audio/l4d/07-coin.mp3,1.250333,source-recording,l4d.c
+l4d,Left 4 Dead,8,Jump,Survivor landing,audio/l4d/08-jump.mp3,0.809917,source-recording,l4d.j
+l4d,Left 4 Dead,9,Laser,Survivor sci-fi pickup,audio/l4d/09-laser.mp3,1.449583,source-recording,l4d.l
+l4d,Left 4 Dead,10,Countdown,Safe-room countdown,audio/l4d/10-countdown.mp3,2.804542,source-derived-arrangement,l4d.t
+winxp,Windows XP,1,Beep,XP default beep,audio/winxp/01-beep.mp3,0.570312,source-recording,winxp.b
+winxp,Windows XP,2,Airhorn,XP exclamation burst,audio/winxp/02-airhorn.mp3,1.359146,source-derived-arrangement,winxp.h
+winxp,Windows XP,3,Drumroll,Menu-command flutter,audio/winxp/03-drumroll.mp3,2.000167,source-derived-arrangement,winxp.d
+winxp,Windows XP,4,Victory,Windows tada,audio/winxp/04-victory.mp3,1.908813,source-recording,winxp.v
+winxp,Windows XP,5,Sad trombone,Windows XP shutdown,audio/winxp/05-sad-trombone.mp3,3.037542,source-recording,winxp.s
+winxp,Windows XP,6,Alert,Critical stop,audio/winxp/06-alert.mp3,0.929708,source-recording,winxp.a
+winxp,Windows XP,7,Coin,XP ding,audio/winxp/07-coin.mp3,0.480979,source-recording,winxp.c
+winxp,Windows XP,8,Jump,Window restore,audio/winxp/08-jump.mp3,0.510521,source-recording,winxp.j
+winxp,Windows XP,9,Laser,Minimize sweep,audio/winxp/09-laser.mp3,1.285229,source-derived-arrangement,winxp.l
+winxp,Windows XP,10,Countdown,XP notification countdown,audio/winxp/10-countdown.mp3,2.489542,source-derived-arrangement,winxp.t
+doom,DOOM (1993),1,Beep,Switch-on click,audio/doom/01-beep.mp3,0.657458,source-recording,doom.b
+doom,DOOM (1993),2,Airhorn,Baron roar,audio/doom/02-airhorn.mp3,1.338354,source-recording,doom.h
+doom,DOOM (1993),3,Drumroll,Shotgun-mechanism roll,audio/doom/03-drumroll.mp3,1.990729,source-derived-arrangement,doom.d
+doom,DOOM (1993),4,Victory,Power-up celebration,audio/doom/04-victory.mp3,0.726,source-derived-arrangement,doom.v
+doom,DOOM (1993),5,Sad trombone,Doomguy failure fall,audio/doom/05-sad-trombone.mp3,1.328375,source-derived-arrangement,doom.s
+doom,DOOM (1993),6,Alert,Demon sighting,audio/doom/06-alert.mp3,1.326021,source-recording,doom.a
+doom,DOOM (1993),7,Coin,Item pickup,audio/doom/07-coin.mp3,0.295375,source-recording,doom.c
+doom,DOOM (1993),8,Jump,Teleport motion,audio/doom/08-jump.mp3,1.494563,source-recording,doom.j
+doom,DOOM (1993),9,Laser,Imp fireball,audio/doom/09-laser.mp3,1.427062,source-recording,doom.l
+doom,DOOM (1993),10,Countdown,Classic HUD countdown,audio/doom/10-countdown.mp3,2.308333,source-derived-arrangement,doom.t
+quake,Quake (1996),1,Beep,Bronze-menu click,audio/quake/01-beep.mp3,0.600979,source-recording,quake.b
+quake,Quake (1996),2,Airhorn,Chthon sighting,audio/quake/02-airhorn.mp3,2.332375,source-recording,quake.h
+quake,Quake (1996),3,Drumroll,Shotgun-mechanism roll,audio/quake/03-drumroll.mp3,1.746188,source-derived-arrangement,quake.d
+quake,Quake (1996),4,Victory,Secret-found celebration,audio/quake/04-victory.mp3,0.759,source-derived-arrangement,quake.v
+quake,Quake (1996),5,Sad trombone,Ranger failure fall,audio/quake/05-sad-trombone.mp3,1.364375,source-derived-arrangement,quake.s
+quake,Quake (1996),6,Alert,Quake message alert,audio/quake/06-alert.mp3,1.280812,source-derived-arrangement,quake.a
+quake,Quake (1996),7,Coin,Armor pickup,audio/quake/07-coin.mp3,0.781542,source-recording,quake.c
+quake,Quake (1996),8,Jump,Ranger jump,audio/quake/08-jump.mp3,0.438583,source-recording,quake.j
+quake,Quake (1996),9,Laser,Lightning start,audio/quake/09-laser.mp3,1.368979,source-recording,quake.l
+quake,Quake (1996),10,Countdown,Rune-menu countdown,audio/quake/10-countdown.mp3,2.699542,source-derived-arrangement,quake.t
+pipboy,Fallout Pip-Boy,1,Beep,Pip-Boy select,audio/pipboy/01-beep.mp3,0.262125,source-recording,pipboy.b
+pipboy,Fallout Pip-Boy,2,Airhorn,Geiger burst,audio/pipboy/02-airhorn.mp3,1.359146,source-derived-arrangement,pipboy.h
+pipboy,Fallout Pip-Boy,3,Drumroll,Terminal-character roll,audio/pipboy/03-drumroll.mp3,1.902646,source-derived-arrangement,pipboy.d
+pipboy,Fallout Pip-Boy,4,Victory,Quest complete,audio/pipboy/04-victory.mp3,4.269438,source-recording,pipboy.v
+pipboy,Fallout Pip-Boy,5,Sad trombone,Hacking failure,audio/pipboy/05-sad-trombone.mp3,0.2945,source-recording,pipboy.s
+pipboy,Fallout Pip-Boy,6,Alert,New quest,audio/pipboy/06-alert.mp3,3.693,source-recording,pipboy.a
+pipboy,Fallout Pip-Boy,7,Coin,Bottle-cap pickup,audio/pipboy/07-coin.mp3,0.485479,source-recording,pipboy.c
+pipboy,Fallout Pip-Boy,8,Jump,Pip-Boy access swoop,audio/pipboy/08-jump.mp3,0.61675,source-recording,pipboy.j
+pipboy,Fallout Pip-Boy,9,Laser,Radio-tuner sweep,audio/pipboy/09-laser.mp3,0.731667,source-derived-arrangement,pipboy.l
+pipboy,Fallout Pip-Boy,10,Countdown,Vault-terminal countdown,audio/pipboy/10-countdown.mp3,2.545979,source-derived-arrangement,pipboy.t
+combine,Half-Life 2 Combine,1,Beep,Combine console,audio/combine/01-beep.mp3,0.686688,source-recording,combine.b
+combine,Half-Life 2 Combine,2,Airhorn,Citadel alarm,audio/combine/02-airhorn.mp3,3.093,source-recording,combine.h
+combine,Half-Life 2 Combine,3,Drumroll,Civil Protection gear roll,audio/combine/03-drumroll.mp3,1.818271,source-derived-arrangement,combine.d
+combine,Half-Life 2 Combine,4,Victory,Suit-charge confirmation,audio/combine/04-victory.mp3,0.693,source-derived-arrangement,combine.v
+combine,Half-Life 2 Combine,5,Sad trombone,Combine access denied,audio/combine/05-sad-trombone.mp3,0.870896,source-recording,combine.s
+combine,Half-Life 2 Combine,6,Alert,Overwatch attention,audio/combine/06-alert.mp3,0.768979,source-recording,combine.a
+combine,Half-Life 2 Combine,7,Coin,Battery pickup,audio/combine/07-coin.mp3,0.700792,source-recording,combine.c
+combine,Half-Life 2 Combine,8,Jump,Combine movement lift,audio/combine/08-jump.mp3,0.564146,source-derived-arrangement,combine.j
+combine,Half-Life 2 Combine,9,Laser,AR2 pulse shot,audio/combine/09-laser.mp3,1.551688,source-recording,combine.l
+combine,Half-Life 2 Combine,10,Countdown,"Overwatch: three, two, one",audio/combine/10-countdown.mp3,2.146417,source-derived-arrangement,combine.t3; combine.t2; combine.t1
+deadlock,Deadlock,1,Beep,Occult chat ping,audio/deadlock/01-beep.mp3,0.386708,source-recording,deadlock.b
+deadlock,Deadlock,2,Airhorn,Bebop uppercut,audio/deadlock/02-airhorn.mp3,2.380854,source-recording,deadlock.h
+deadlock,Deadlock,3,Drumroll,Shop-mod anticipation,audio/deadlock/03-drumroll.mp3,1.977729,source-derived-arrangement,deadlock.d
+deadlock,Deadlock,4,Victory,Seasonal achievement,audio/deadlock/04-victory.mp3,2.314229,source-recording,deadlock.v
+deadlock,Deadlock,5,Sad trombone,Bebop hook miss,audio/deadlock/05-sad-trombone.mp3,0.795396,source-recording,deadlock.s
+deadlock,Deadlock,6,Alert,Matchmaking ready,audio/deadlock/06-alert.mp3,3.693,source-recording,deadlock.a
+deadlock,Deadlock,7,Coin,Gold pickup,audio/deadlock/07-coin.mp3,0.566438,source-recording,deadlock.c
+deadlock,Deadlock,8,Jump,Hero jump landing,audio/deadlock/08-jump.mp3,0.679229,source-recording,deadlock.j
+deadlock,Deadlock,9,Laser,Bebop Hyper Beam,audio/deadlock/09-laser.mp3,2.354938,source-recording,deadlock.l
+deadlock,Deadlock,10,Countdown,Occult tech countdown,audio/deadlock/10-countdown.mp3,2.579458,source-derived-arrangement,deadlock.t
+minecraft,Minecraft,1,Beep,Menu click,audio/minecraft/01-beep.mp3,0.268854,source-recording,minecraft.b
+minecraft,Minecraft,2,Airhorn,Ghast horn,audio/minecraft/02-airhorn.mp3,1.073146,source-recording,minecraft.h
+minecraft,Minecraft,3,Drumroll,Note-block snare roll,audio/minecraft/03-drumroll.mp3,2.116354,source-derived-arrangement,minecraft.d
+minecraft,Minecraft,4,Victory,Level up,audio/minecraft/04-victory.mp3,1.311229,source-recording,minecraft.v
+minecraft,Minecraft,5,Sad trombone,Villager failure fall,audio/minecraft/05-sad-trombone.mp3,1.400375,source-derived-arrangement,minecraft.s
+minecraft,Minecraft,6,Alert,Anvil warning,audio/minecraft/06-alert.mp3,0.764167,source-recording,minecraft.a
+minecraft,Minecraft,7,Coin,Experience orb,audio/minecraft/07-coin.mp3,0.547625,source-recording,minecraft.c
+minecraft,Minecraft,8,Jump,Slime bounce,audio/minecraft/08-jump.mp3,0.296479,source-recording,minecraft.j
+minecraft,Minecraft,9,Laser,Enchanted bow sweep,audio/minecraft/09-laser.mp3,0.793229,source-derived-arrangement,minecraft.l
+minecraft,Minecraft,10,Countdown,Note-block countdown,audio/minecraft/10-countdown.mp3,2.699542,source-derived-arrangement,minecraft.t
+payday,PAYDAY 2,1,Beep,Crime.net pager,audio/payday/01-beep.mp3,0.363,hybrid-source-and-original-design,payday-cloaker
+payday,PAYDAY 2,2,Airhorn,Police-assault burst,audio/payday/02-airhorn.mp3,3.093,source-recording,payday-assault
+payday,PAYDAY 2,3,Drumroll,Heist drill rattle,audio/payday/03-drumroll.mp3,1.993,original-theme-matched-design,
+payday,PAYDAY 2,4,Victory,Another win for the Payday gang,audio/payday/04-victory.mp3,2.805312,source-recording,payday-victory
+payday,PAYDAY 2,5,Sad trombone,Big mistake,audio/payday/05-sad-trombone.mp3,1.305521,source-recording,payday-fail
+payday,PAYDAY 2,6,Alert,Cloaker charge,audio/payday/06-alert.mp3,3.693,source-recording,payday-cloaker
+payday,PAYDAY 2,7,Coin,Cash-counter pickup,audio/payday/07-coin.mp3,0.463,original-theme-matched-design,
+payday,PAYDAY 2,8,Jump,Cloaker rush,audio/payday/08-jump.mp3,0.648979,source-derived-arrangement,payday-cloaker
+payday,PAYDAY 2,9,Laser,Tactical electrical sweep,audio/payday/09-laser.mp3,1.285229,source-derived-arrangement,payday-cloaker
+payday,PAYDAY 2,10,Countdown,Heist pager countdown,audio/payday/10-countdown.mp3,2.633,hybrid-source-and-original-design,payday-cloaker
+dreamcast,Sega Dreamcast,1,Beep,BIOS select,audio/dreamcast/01-beep.mp3,0.224917,source-recording,dreamcast.b
+dreamcast,Sega Dreamcast,2,Airhorn,Disc-check burst,audio/dreamcast/02-airhorn.mp3,1.359146,source-derived-arrangement,dreamcast.h
+dreamcast,Sega Dreamcast,3,Drumroll,VMU selection roll,audio/dreamcast/03-drumroll.mp3,1.799271,source-derived-arrangement,dreamcast.d
+dreamcast,Sega Dreamcast,4,Victory,Dreamcast boot,audio/dreamcast/04-victory.mp3,6.893,source-recording,dreamcast.v
+dreamcast,Sega Dreamcast,5,Sad trombone,VMU error,audio/dreamcast/05-sad-trombone.mp3,0.394813,source-recording,dreamcast.s
+dreamcast,Sega Dreamcast,6,Alert,VMU configuration,audio/dreamcast/06-alert.mp3,0.525479,source-recording,dreamcast.a
+dreamcast,Sega Dreamcast,7,Coin,BIOS confirmation,audio/dreamcast/07-coin.mp3,0.919125,source-recording,dreamcast.c
+dreamcast,Sega Dreamcast,8,Jump,Menu-back lift,audio/dreamcast/08-jump.mp3,0.648979,source-derived-arrangement,dreamcast.j
+dreamcast,Sega Dreamcast,9,Laser,Disc-drive sweep,audio/dreamcast/09-laser.mp3,1.285229,source-derived-arrangement,dreamcast.l
+dreamcast,Sega Dreamcast,10,Countdown,Dreamcast menu countdown,audio/dreamcast/10-countdown.mp3,2.283979,source-derived-arrangement,dreamcast.t
+gmod,Garry's Mod,1,Beep,Derma click,audio/gmod/01-beep.mp3,0.22025,source-recording,gmod.b
+gmod,Garry's Mod,2,Airhorn,PHX kaboom,audio/gmod/02-airhorn.mp3,2.551188,source-recording,gmod.h
+gmod,Garry's Mod,3,Drumroll,Sandbox metal roll,audio/gmod/03-drumroll.mp3,1.958729,source-derived-arrangement,gmod.d
+gmod,Garry's Mod,4,Victory,Sandbox save/load,audio/gmod/04-victory.mp3,2.523062,source-recording,gmod.v
+gmod,Garry's Mod,5,Sad trombone,Skidding failure,audio/gmod/05-sad-trombone.mp3,3.358417,source-recording,gmod.s
+gmod,Garry's Mod,6,Alert,Balloon-pop alert,audio/gmod/06-alert.mp3,1.13875,source-derived-arrangement,gmod.a
+gmod,Garry's Mod,7,Coin,Content downloaded,audio/gmod/07-coin.mp3,0.305021,source-recording,gmod.c
+gmod,Garry's Mod,8,Jump,Rocket thruster,audio/gmod/08-jump.mp3,1.893,source-recording,gmod.j
+gmod,Garry's Mod,9,Laser,Supercharged physics shot,audio/gmod/09-laser.mp3,1.358604,source-recording,gmod.l
+gmod,Garry's Mod,10,Countdown,Spawn-menu countdown,audio/gmod/10-countdown.mp3,2.424979,source-derived-arrangement,gmod.t
+ricochet,Ricochet,1,Beep,Returning disc,audio/ricochet/01-beep.mp3,1.343,source-recording,ricochet.b
+ricochet,Ricochet,2,Airhorn,Rocket blast,audio/ricochet/02-airhorn.mp3,1.936104,source-recording,ricochet.h
+ricochet,Ricochet,3,Drumroll,Disc-impact roll,audio/ricochet/03-drumroll.mp3,1.926187,source-derived-arrangement,ricochet.d
+ricochet,Ricochet,4,Victory,Power-up acquired,audio/ricochet/04-victory.mp3,1.600854,source-recording,ricochet.v
+ricochet,Ricochet,5,Sad trombone,Arena death,audio/ricochet/05-sad-trombone.mp3,1.008979,source-recording,ricochet.s
+ricochet,Ricochet,6,Alert,Player-spawn alert,audio/ricochet/06-alert.mp3,1.458792,source-derived-arrangement,ricochet.a
+ricochet,Ricochet,7,Coin,Pickup ping,audio/ricochet/07-coin.mp3,0.38675,source-recording,ricochet.c
+ricochet,Ricochet,8,Jump,Jump pad,audio/ricochet/08-jump.mp3,0.660354,source-recording,ricochet.j
+ricochet,Ricochet,9,Laser,Alternate disc fire,audio/ricochet/09-laser.mp3,1.054875,source-recording,ricochet.l
+ricochet,Ricochet,10,Countdown,"Arena: three, two, one",audio/ricochet/10-countdown.mp3,2.026167,source-derived-arrangement,ricochet.t3; ricochet.t2; ricochet.t1
+dod,Day of Defeat: Source,1,Beep,Field-menu click,audio/dod/01-beep.mp3,0.456979,source-recording,dod.b
+dod,Day of Defeat: Source,2,Airhorn,Battlefield bell,audio/dod/02-airhorn.mp3,3.093,source-recording,dod.h
+dod,Day of Defeat: Source,3,Drumroll,MG42 chain rattle,audio/dod/03-drumroll.mp3,2.088979,source-derived-arrangement,dod.d
+dod,Day of Defeat: Source,4,Victory,Objective secure,audio/dod/04-victory.mp3,1.403,source-recording,dod.v
+dod,Day of Defeat: Source,5,Sad trombone,Fall back,audio/dod/05-sad-trombone.mp3,1.093438,source-recording,dod.s
+dod,Day of Defeat: Source,6,Alert,Heavy field bell,audio/dod/06-alert.mp3,2.723021,source-recording,dod.a
+dod,Day of Defeat: Source,7,Coin,Garand clip ping,audio/dod/07-coin.mp3,1.245146,source-recording,dod.c
+dod,Day of Defeat: Source,8,Jump,Bolt-action lift,audio/dod/08-jump.mp3,0.410542,source-derived-arrangement,dod.j
+dod,Day of Defeat: Source,9,Laser,Radio spark sweep,audio/dod/09-laser.mp3,1.285229,source-derived-arrangement,dod.l
+dod,Day of Defeat: Source,10,Countdown,Field-radio countdown,audio/dod/10-countdown.mp3,2.608396,source-derived-arrangement,dod.t
+rust,Rust,1,Beep,Pager beep,audio/rust/01-beep.mp3,0.844854,source-recording,rust.b
+rust,Rust,2,Airhorn,Nexus ferry horn,audio/rust/02-airhorn.mp3,1.894646,source-recording,rust.h
+rust,Rust,3,Drumroll,Barrel-impact roll,audio/rust/03-drumroll.mp3,1.774271,source-derived-arrangement,rust.d
+rust,Rust,4,Victory,Item unlocked,audio/rust/04-victory.mp3,2.667562,source-recording,rust.v
+rust,Rust,5,Sad trombone,Mission failed,audio/rust/05-sad-trombone.mp3,3.7,source-recording,rust.s
+rust,Rust,6,Alert,Turret target acquired,audio/rust/06-alert.mp3,0.450292,source-recording,rust.a
+rust,Rust,7,Coin,Gold loot bag,audio/rust/07-coin.mp3,1.605021,source-recording,rust.c
+rust,Rust,8,Jump,Boots jump,audio/rust/08-jump.mp3,0.415417,source-recording,rust.j
+rust,Rust,9,Laser,Flint-spark sweep,audio/rust/09-laser.mp3,0.92875,source-derived-arrangement,rust.l
+rust,Rust,10,Countdown,Capture-point countdown,audio/rust/10-countdown.mp3,2.299917,source-derived-arrangement,rust.t
+x360,Xbox 360 Blades,1,Beep,Blades hover,audio/x360/01-beep.mp3,0.264979,source-recording,x360.b
+x360,Xbox 360 Blades,2,Airhorn,Blade-open burst,audio/x360/02-airhorn.mp3,1.087354,source-derived-arrangement,x360.h
+x360,Xbox 360 Blades,3,Drumroll,Guide-hover roll,audio/x360/03-drumroll.mp3,1.753729,source-derived-arrangement,x360.d
+x360,Xbox 360 Blades,4,Victory,Xbox achievement,audio/x360/04-victory.mp3,0.426396,source-recording,x360.v
+x360,Xbox 360 Blades,5,Sad trombone,Blades-back failure fall,audio/x360/05-sad-trombone.mp3,1.328375,source-derived-arrangement,x360.s
+x360,Xbox 360 Blades,6,Alert,Dashboard notification,audio/x360/06-alert.mp3,0.580812,source-recording,x360.a
+x360,Xbox 360 Blades,7,Coin,Blades selection,audio/x360/07-coin.mp3,0.346458,source-recording,x360.c
+x360,Xbox 360 Blades,8,Jump,Guide-open lift,audio/x360/08-jump.mp3,0.436042,source-derived-arrangement,x360.j
+x360,Xbox 360 Blades,9,Laser,Blade-switch sweep,audio/x360/09-laser.mp3,1.172813,source-derived-arrangement,x360.l
+x360,Xbox 360 Blades,10,Countdown,Guide-button countdown,audio/x360/10-countdown.mp3,2.340292,source-derived-arrangement,x360.t
+ipod,iPod classic,1,Beep,Piezo confirmation,audio/ipod/01-beep.mp3,0.243,original-theme-matched-design,
+ipod,iPod classic,2,Airhorn,Click-wheel alarm,audio/ipod/02-airhorn.mp3,1.153,original-theme-matched-design,
+ipod,iPod classic,3,Drumroll,Fast wheel-scroll roll,audio/ipod/03-drumroll.mp3,1.840292,original-theme-matched-design,
+ipod,iPod classic,4,Victory,Pocket-device completion,audio/ipod/04-victory.mp3,1.133,original-theme-matched-design,
+ipod,iPod classic,5,Sad trombone,Piezo failure fall,audio/ipod/05-sad-trombone.mp3,1.153,original-theme-matched-design,
+ipod,iPod classic,6,Alert,Pocket-device alert,audio/ipod/06-alert.mp3,1.003,original-theme-matched-design,
+ipod,iPod classic,7,Coin,Click-wheel bonus,audio/ipod/07-coin.mp3,0.463,original-theme-matched-design,
+ipod,iPod classic,8,Jump,Pocket-arcade hop,audio/ipod/08-jump.mp3,0.483,original-theme-matched-design,
+ipod,iPod classic,9,Laser,Piezo arcade sweep,audio/ipod/09-laser.mp3,0.743,original-theme-matched-design,
+ipod,iPod classic,10,Countdown,Pocket-device countdown,audio/ipod/10-countdown.mp3,2.443,original-theme-matched-design,
+msn,MSN Messenger,1,Beep,Messenger message,audio/msn/01-beep.mp3,0.771458,source-recording,msn.b
+msn,MSN Messenger,2,Airhorn,Messenger nudge burst,audio/msn/02-airhorn.mp3,1.359146,source-derived-arrangement,msn.h
+msn,MSN Messenger,3,Drumroll,Typing-ping flutter,audio/msn/03-drumroll.mp3,2.072646,source-derived-arrangement,msn.d
+msn,MSN Messenger,4,Victory,Contact-online celebration,audio/msn/04-victory.mp3,0.792,source-derived-arrangement,msn.v
+msn,MSN Messenger,5,Sad trombone,Falling contact chime,audio/msn/05-sad-trombone.mp3,1.400375,source-derived-arrangement,msn.s
+msn,MSN Messenger,6,Alert,Messenger nudge,audio/msn/06-alert.mp3,1.533792,source-derived-arrangement,msn.a
+msn,MSN Messenger,7,Coin,Online sparkle,audio/msn/07-coin.mp3,0.362333,source-derived-arrangement,msn.c
+msn,MSN Messenger,8,Jump,Message swoop,audio/msn/08-jump.mp3,0.648979,source-derived-arrangement,msn.j
+msn,MSN Messenger,9,Laser,Nudge sweep,audio/msn/09-laser.mp3,1.285229,source-derived-arrangement,msn.l
+msn,MSN Messenger,10,Countdown,Messenger-ping countdown,audio/msn/10-countdown.mp3,2.804542,source-derived-arrangement,msn.t
+xmb,PlayStation 3 XMB,1,Beep,XMB option,audio/xmb/01-beep.mp3,0.132083,source-recording,xmb.b
+xmb,PlayStation 3 XMB,2,Airhorn,XMB system-denied burst,audio/xmb/02-airhorn.mp3,1.2665,source-derived-arrangement,xmb.h
+xmb,PlayStation 3 XMB,3,Drumroll,XMB navigation roll,audio/xmb/03-drumroll.mp3,1.957083,source-derived-arrangement,xmb.d
+xmb,PlayStation 3 XMB,4,Victory,PlayStation trophy,audio/xmb/04-victory.mp3,0.958562,source-recording,xmb.v
+xmb,PlayStation 3 XMB,5,Sad trombone,XMB cancel failure fall,audio/xmb/05-sad-trombone.mp3,1.01225,source-derived-arrangement,xmb.s
+xmb,PlayStation 3 XMB,6,Alert,System attention,audio/xmb/06-alert.mp3,1.308792,source-derived-arrangement,xmb.a
+xmb,PlayStation 3 XMB,7,Coin,XMB system OK,audio/xmb/07-coin.mp3,0.254437,source-recording,xmb.c
+xmb,PlayStation 3 XMB,8,Jump,Gameboot lift,audio/xmb/08-jump.mp3,0.648979,source-derived-arrangement,xmb.j
+xmb,PlayStation 3 XMB,9,Laser,Coldboot sweep,audio/xmb/09-laser.mp3,1.285229,source-derived-arrangement,xmb.l
+xmb,PlayStation 3 XMB,10,Countdown,XMB option countdown,audio/xmb/10-countdown.mp3,2.219958,source-derived-arrangement,xmb.t

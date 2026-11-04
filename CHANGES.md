@@ -1,3 +1,79 @@
+# ROBOTIC TYLER v2.31.0: a soundboard for every theme
+
+## New
+- **The ten built-in pads sound like your theme.** Beep, Airhorn, Drumroll, Victory, Sad trombone, Alert, Coin, Jump, Laser and Countdown each have their own sound in all 25 themes: 250 clips from the owner's *25-theme soundboard pack*.
+  - In the DOOM theme, the pads use DOOM sounds; in Windows XP, XP's sounds; and so on.
+  - They replace the synthesized tones, which come back if a clip can't be loaded.
+- **Same names, same commands.** The pads keep their names and numbers, so `sound 1`, `sound countdown`, your triggers and your favourites work as before.
+  - Each pad's tooltip, and the list of sounds, says what the theme's sound is ("Steam sound: Message ping").
+- **Changing the theme changes the next sound you play.** It doesn't play anything, and it doesn't interrupt Tyler or the music.
+- **Your sounds stay yours.**
+  - Sound 11 onward is the same collection in every theme: the same clips, names, order, triggers, favourites and settings.
+  - A clip you uploaded over one of the first ten pads plays in every theme. *Reset* puts that pad back to the theme's sound.
+  - Switching themes, restarting and upgrading never write to your soundboard. The theme sounds are kept apart from your clips.
+- **Sound banks:** the first ten pads follow the theme in each bank, and each bank keeps its own clips.
+
+## How the sounds are played
+- They're packaged with the app on every platform: the Chrome extension, the desktop app and Setup. Each one is read only when you play it, and the last few are kept ready.
+- Nothing is downloaded, and Steam's page security is untouched.
+- They play exactly like an uploaded clip: the soundboard volume, Tyler's microphone into the call, your listen-locally choice, Stop, the access list, triggers and the 3-second cooldown.
+- **Loudness:** measured through the soundboard's own player at the default volume, the clips were about 3 dB quieter than the old built-in tones. All 250 now play 3 dB up, so they sit where the old pads were. Their balance, dynamics and stereo stay as supplied, with no other processing.
+
+## The sounds, by theme
+The pack marks which clips are the original sounds, which are edited arrangements of them, and which are new designs. Not every clip is an untouched official sound: the iPod set is newly designed, and the PAYDAY drill and cash counter are original designs. Credits and provenance ship with the app (`sounds/CREDITS.md`, `sounds/SOUND-MAP.csv`), and the full pack is kept in the source tree (`assets/theme-sounds`).
+
+| Theme | Clips | First three pads |
+| --- | --- | --- |
+| Steam | 2 source recordings, 8 edited | Beep: Message ping, Airhorn: Mention burst, Drumroll: Chat-ping flutter… |
+| Classic Steam (2004) | 2 source recordings, 8 edited | Beep: Legacy Steam message, Airhorn: VGUI buzzer burst, Drumroll: Beveled-button rattle… |
+| Team Fortress 2 | 9 source recordings, 1 edited | Beep: TF2 menu click, Airhorn: PASS Time airhorn, Drumroll: Crate-opening suspense… |
+| Counter-Strike 2 | 7 source recordings, 3 edited | Beep: CS2 UI beep, Airhorn: Match-ready call, Drumroll: Inventory scratch roll… |
+| Portal | 7 source recordings, 3 edited | Beep: Test-chamber button, Airhorn: Portal-gun power surge, Drumroll: Aperture mechanism roll… |
+| Counter-Strike 1.6 | 7 source recordings, 3 edited | Beep: C4 keypad beep, Airhorn: Go, go, go!, Drumroll: Bomb-keypad rattle… |
+| Half-Life HEV suit | 8 source recordings, 2 edited | Beep: HEV beep, Airhorn: Evacuate area, Drumroll: Suit telemetry roll… |
+| Left 4 Dead | 8 source recordings, 2 edited | Beep: Survivor UI tone, Airhorn: Distant foghorn, Drumroll: Menu suspense rattle… |
+| Windows XP | 6 source recordings, 4 edited | Beep: XP default beep, Airhorn: XP exclamation burst, Drumroll: Menu-command flutter… |
+| DOOM (1993) | 6 source recordings, 4 edited | Beep: Switch-on click, Airhorn: Baron roar, Drumroll: Shotgun-mechanism roll… |
+| Quake (1996) | 5 source recordings, 5 edited | Beep: Bronze-menu click, Airhorn: Chthon sighting, Drumroll: Shotgun-mechanism roll… |
+| Fallout Pip-Boy | 6 source recordings, 4 edited | Beep: Pip-Boy select, Airhorn: Geiger burst, Drumroll: Terminal-character roll… |
+| Half-Life 2 Combine | 6 source recordings, 4 edited | Beep: Combine console, Airhorn: Citadel alarm, Drumroll: Civil Protection gear roll… |
+| Deadlock | 8 source recordings, 2 edited | Beep: Occult chat ping, Airhorn: Bebop uppercut, Drumroll: Shop-mod anticipation… |
+| Minecraft | 6 source recordings, 4 edited | Beep: Menu click, Airhorn: Ghast horn, Drumroll: Note-block snare roll… |
+| PAYDAY 2 | 4 source recordings, 2 edited, 2 hybrid, 2 new designs | Beep: Crime.net pager, Airhorn: Police-assault burst, Drumroll: Heist drill rattle… |
+| Sega Dreamcast | 5 source recordings, 5 edited | Beep: BIOS select, Airhorn: Disc-check burst, Drumroll: VMU selection roll… |
+| Garry's Mod | 7 source recordings, 3 edited | Beep: Derma click, Airhorn: PHX kaboom, Drumroll: Sandbox metal roll… |
+| Ricochet | 7 source recordings, 3 edited | Beep: Returning disc, Airhorn: Rocket blast, Drumroll: Disc-impact roll… |
+| Day of Defeat: Source | 6 source recordings, 4 edited | Beep: Field-menu click, Airhorn: Battlefield bell, Drumroll: MG42 chain rattle… |
+| Rust | 7 source recordings, 3 edited | Beep: Pager beep, Airhorn: Nexus ferry horn, Drumroll: Barrel-impact roll… |
+| Xbox 360 Blades | 4 source recordings, 6 edited | Beep: Blades hover, Airhorn: Blade-open burst, Drumroll: Guide-hover roll… |
+| iPod classic | 10 new designs | Beep: Piezo confirmation, Airhorn: Click-wheel alarm, Drumroll: Fast wheel-scroll roll… |
+| MSN Messenger | 1 source recording, 9 edited | Beep: Messenger message, Airhorn: Messenger nudge burst, Drumroll: Typing-ping flutter… |
+| PlayStation 3 XMB | 3 source recordings, 7 edited | Beep: XMB option, Airhorn: XMB system-denied burst, Drumroll: XMB navigation roll… |
+
+## Fixed
+- The desktop installer no longer includes the icon and sound packs' source folders (`assets/theme-icons`, `assets/theme-icons-pack-2`, `assets/theme-sounds`). The app only uses its own copies.
+
+## Tested
+- **Unit (the real background script in Node, as the desktop app runs it):**
+  - every pad of every theme returns its packaged clip, byte for byte, with the clip contract and its level;
+  - sound 11, sound 12 and an upload over pad 2 stay the same in all 25 themes, as do the pads' names, order, triggers, favourites and settings;
+  - nothing is written to storage;
+  - another bank follows the theme too, Reset goes back to the theme's sound, and a missing file falls back to the built-in tone;
+  - `sound 1`, `sound 10`, `sound countdown`, `sound 11` and a trigger name the right pads;
+  - the 250 clips and their credits ship on both surfaces, and the previews and source packs don't.
+- **Chromium (real Web Audio):**
+  - all 250 clips decode and play their length through the real player, audible and with headroom at full volume, and the level is +3 dB;
+  - through the real audio bridge into a stand-in call (two connections on this machine, Chromium's Opus encoder), a themed clip reaches the other side as Tyler's microphone;
+  - a second request while it plays is refused, Stop silences it, and the cooldown holds.
+- **The real Chrome extension with a stand-in Steam page:**
+  - pads 1 and 10 play the theme's packaged clip in all 25 themes;
+  - your names, order, sound 11, sound 12 and pad 2 upload stay the same;
+  - nothing is written, and it's all still there after a restart.
+- **Electron:** a clip is read from inside the app's archive, as the installed desktop app does; the desktop check (mock Steam page) passes.
+- **Not tested:** a real Steam call (what friends actually hear, and how loud), listening quality, and the Windows app.
+
+---
+
 # ROBOTIC TYLER v2.30.0: the phone remote away from home, the chat check from the phone, DOOM's damaged face, and Pack 2's original artwork
 
 ## New

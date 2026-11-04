@@ -10,6 +10,7 @@ import {GEMINI_VOICES,geminiVoiceFor,Pcm} from './live-core.mjs';
 import {LiveHost} from './live-host.mjs';
 import {TabLease} from './lease.mjs';
 import './soundboard-core.js';
+import {themeSound} from './theme-sounds.mjs';
 import './trivia-bank.js';
 import {temporary,voiceControl,normalizeExtras,conversationGuide,ownerStyle,modelStyle} from './conversation.mjs';
 import './identity.js';
@@ -23,6 +24,21 @@ const speech=new Speech((...args)=>fetch(...args));
 import './wav-codec.js';
 import './chat-tag.js';
 import {Host} from './host.mjs';
+// v2.31: the built-in pads' themed sounds (theme-sounds.mjs), read from the packaged files only when
+// played and kept for the last few (the theme's ten fit). The same clip contract as an uploaded clip,
+// plus its level. If a file can't be read, the pad plays its synthesized sound as before.
+const themedAudio=new Map();
+function toBase64(bytes){let s='';for(let i=0;i<bytes.length;i+=0x8000)s+=String.fromCharCode.apply(null,bytes.subarray(i,i+0x8000));return btoa(s);}
+async function packagedFile(file){const url=new URL(file,import.meta.url);
+ // The desktop app runs this file in Node, where packaged files are read from disk.
+ // (A plain path, not a URL object: Electron reads files inside its app archive by path.)
+ if(url.protocol==='file:'){const [{readFile},{fileURLToPath}]=await Promise.all([import('node:fs/promises'),import('node:url')]);return new Uint8Array(await readFile(fileURLToPath(url)));}
+ const r=await fetch(url);if(!r.ok)throw Error('HTTP '+r.status);return new Uint8Array(await r.arrayBuffer());}
+async function themedClip(theme,slot,name){const p=themeSound(theme,slot);if(!p)return null;
+ try{let audio=themedAudio.get(p.file);if(!audio){audio=toBase64(await packagedFile(p.file));themedAudio.set(p.file,audio);while(themedAudio.size>12)themedAudio.delete(themedAudio.keys().next().value);}
+  return {audio,seconds:p.seconds,name:String(name||TylerSoundboard.names[slot-1]).slice(0,60),level:p.level};}
+ catch(error){console.warn('[ROBOTIC TYLER] themed sound '+p.file+' unavailable, using the built-in tone:',error?.message||error);return null;}}
+
 const hosts=new Map(),busy=new Set(),last=new Map(),histories=new Map();
 const memory=new Memory(chrome.storage.local);
 const jobs=new Map();
@@ -203,7 +219,7 @@ async function handleGameUnlocked(message,sender){
  if((['command','voice'].includes(message.type)||message.type==='soundboard:play')&&!sender.native&&!await lease.check(tab))throw Error('Another Steam tab owns this bot. Use Take over in Setup.');
 
  if(message.type?.startsWith('soundboard:')){const store=chrome.storage.local;
- const {boardBank='Arcade'}=await store.get('boardBank');
+ const {boardBank='Arcade',uiTheme='steam'}=await store.get(['boardBank','uiTheme']);
  const banks=['Arcade','Inside jokes','Music cues'];
  if(message.type==='soundboard:bank'){if(!banks.includes(message.bank))throw Error('Unknown bank');await store.set({boardBank:message.bank});return {};}
  const suffix=boardBank==='Arcade'?'':':'+boardBank;
@@ -213,7 +229,9 @@ async function handleGameUnlocked(message,sender){
  const soundboardPreferences=data.soundboardPreferences||{};
  const write=values=>store.set(Object.fromEntries(Object.entries(values).map(([k,v])=>[k+suffix,v])));
  const prefs=TylerSoundboard.preferences(soundboardPreferences),slot=Number(message.slot);
- const slots=Array.from({length:32},(_,i)=>i+1).filter(n=>n<=10||soundboardSlots[n]).map(n=>({slot:n,name:soundboardLabels[n]||soundboardSlots[n]?.name||TylerSoundboard.names[n-1],trigger:soundboardTriggers[n]||'',custom:!!soundboardSlots[n]}));
+ // v2.31: a built-in pad (1–10) without a clip of yours plays the theme's sound for it (cue: what it is).
+ const themed=n=>n<=10&&!soundboardSlots[n]?themeSound(uiTheme,n):null;
+ const slots=Array.from({length:32},(_,i)=>i+1).filter(n=>n<=10||soundboardSlots[n]).map(n=>({slot:n,name:soundboardLabels[n]||soundboardSlots[n]?.name||TylerSoundboard.names[n-1],trigger:soundboardTriggers[n]||'',custom:!!soundboardSlots[n],...(themed(n)?{cue:themed(n).cue,cueTheme:themed(n).themeName}:{})}));
  if(message.type==='soundboard:list')return {preferences:prefs,slots,boardBank,favorites};
  if(message.type==='soundboard:preferences'){await store.set({soundboardPreferences:TylerSoundboard.preferences(message.values)});return {};}
  if(!Number.isInteger(slot)||slot<1||slot>32)throw Error('Choose a slot from 1 to 32.');
@@ -223,9 +241,9 @@ async function handleGameUnlocked(message,sender){
  await write({boardFavorites:next});return {};
  }
  if(message.type==='soundboard:trigger'){const trigger=String(message.trigger||'').trim().toLowerCase();if(trigger&&(!/^[a-z0-9!][a-z0-9! _-]{0,39}$/.test(trigger)||/^(sound|!tyler|!game)(?:\s|$)/.test(trigger)))throw Error('Use up to 40 letters, numbers, spaces, !, _ or -. Choose a phrase outside the sound and !tyler commands.');if(trigger&&slots.some(s=>s.slot!==slot&&s.trigger===trigger))throw Error('Another sound already uses that phrase.');if(trigger)soundboardTriggers[slot]=trigger;else delete soundboardTriggers[slot];await write({soundboardTriggers});return {};}
- if(message.type==='soundboard:play'){if(message.fromChat&&prefs.access==='selected'){const speaker=TylerIdentity.valid(message.speaker);if(!speaker||!prefs.allowedIDs.split('\n').includes(speaker.id))throw Error('Sound blocked: this sender is not on the confirmed-account allowlist.');}return {slot,volume:prefs.volume,clip:soundboardSlots[slot]||null};}
+ if(message.type==='soundboard:play'){if(message.fromChat&&prefs.access==='selected'){const speaker=TylerIdentity.valid(message.speaker);if(!speaker||!prefs.allowedIDs.split('\n').includes(speaker.id))throw Error('Sound blocked: this sender is not on the confirmed-account allowlist.');}return {slot,volume:prefs.volume,clip:soundboardSlots[slot]||await themedClip(uiTheme,slot,slots.find(s=>s.slot===slot)?.name)};}
  if(message.type==='soundboard:rename'){const label=String(message.name||'').trim().slice(0,50);if(!TylerSoundboard.slug(label)||/^\d+$/.test(label))throw Error('Enter a name with letters or numbers.');const key=TylerSoundboard.slug(label);if(TylerSoundboard.names.some((name,i)=>i+1!==slot&&TylerSoundboard.slug(name)===key)||Object.entries(soundboardLabels).some(([n,name])=>Number(n)!==slot&&TylerSoundboard.slug(name)===key))throw Error('Choose a unique sound name.');soundboardLabels[slot]=label;await write({soundboardLabels});return {};}
- if(message.type==='soundboard:save'){if(!TylerSoundboard.validClip(message.clip))throw Error('Clip must be at most 512 KB and 12 seconds.');soundboardSlots[slot]=message.clip;}else if(message.type==='soundboard:clear'){delete soundboardSlots[slot];delete soundboardLabels[slot];delete soundboardTriggers[slot];}else throw Error('Unknown soundboard action');await write({soundboardSlots,soundboardLabels,soundboardTriggers,boardFavorites:message.type==='soundboard:clear'&&slot>10?favorites.filter(n=>n!==slot):favorites});return {};}
+ if(message.type==='soundboard:save'){if(!TylerSoundboard.validClip(message.clip))throw Error('Clip must be at most 512 KB and 12 seconds.');const {level,...clip}=message.clip;soundboardSlots[slot]=clip;}else if(message.type==='soundboard:clear'){delete soundboardSlots[slot];delete soundboardLabels[slot];delete soundboardTriggers[slot];}else throw Error('Unknown soundboard action');await write({soundboardSlots,soundboardLabels,soundboardTriggers,boardFavorites:message.type==='soundboard:clear'&&slot>10?favorites.filter(n=>n!==slot):favorites});return {};}
 
  const settings=await chrome.storage.local.get(['openrouterKey','geminiKey','aiProvider','personality','length','brain','noiseLevel','roastMode','speechVoice','voiceThreshold','minVoiced','replyPause','talkativeness','voiceControls','keyboardFilter','callbackGap','nicknameAliases','insideJokes','callbackState','quickSetup','usage','textSpeed','spendingCapUSD','streamAI','friendMemory','voiceBargeIn','voiceBargeDelay','smartRouting','suiteProfiles','suiteOptions','v23Persona','fastSpeech','geminiVoice','geminiTtsModel','voiceEngine','chatTagEnabled','chatTagName','geminiTextModel']);
  const google=settings.aiProvider==='gemini', selectedKey=google?settings.geminiKey:settings.openrouterKey;

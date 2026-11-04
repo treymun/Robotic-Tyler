@@ -25,6 +25,7 @@ import {compileTrivia} from './trivia/compile.mjs';
 import {ICONS,iconSvg} from './icons/icons.mjs';
 import {BRAND} from './brand/map.mjs';
 import {cleanBrandSvg} from './brand/clean.mjs';
+import {compileThemeSounds} from './sounds/compile.mjs';
 
 const ROOT=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const EXT=path.join(ROOT,'browser-extension');
@@ -308,8 +309,10 @@ function desktopSettingsHtml(){
  if(!html.includes('data-desktop="false"'))throw Error('settings.html must carry data-desktop="false" on <body>');
  return html.replace('data-desktop="false"','data-desktop="true"');
 }
+let SOUND_FILES=[]; // v2.31: the themed soundboard clips and their credits (tools/sounds/compile.mjs)
 function buildCompanion(){
  const files=new Set(moduleGraph('background.js'));
+ for(const f of SOUND_FILES)files.add(f);
  for(const f of PLATFORM.settingsPage)files.add(f);
  for(const f of PLATFORM.remotePage)files.add(f);
  for(const f of [...files].sort()){
@@ -410,6 +413,8 @@ emit(path.join(EXT,'ui-fonts.js'),compileFonts());
 emit(path.join(EXT,'ui-logos.js'),compileLogos());
 emit(path.join(EXT,'ui-brand.js'),compileBrand());
 emit(path.join(EXT,'ui-icons.js'),compileIcons());
+{const s=compileThemeSounds({root:ROOT,themes:['steam',...THEMES.map(t=>t.replace(/\.css$/,''))] /* Steam is the default look: no stylesheet */});emit(path.join(EXT,'theme-sounds.mjs'),s.module);
+ for(const [rel,bytes] of s.files)emit(path.join(EXT,rel),bytes);SOUND_FILES=s.files.map(([rel])=>rel);}
 const companionFiles=buildCompanion();
 emit(path.join(ROOT,'app','steam-preload.cjs'),buildPreload());
 emit(path.join(ROOT,'app','youtube-preload.cjs'),buildYoutubePreload());

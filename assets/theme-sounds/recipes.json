@@ -1,0 +1,3221 @@
+{
+  "sampleRate": 48000,
+  "channels": 2,
+  "format": "mp3",
+  "bitrate": 160000,
+  "slotNames": [
+    "Beep",
+    "Airhorn",
+    "Drumroll",
+    "Victory",
+    "Sad trombone",
+    "Alert",
+    "Coin",
+    "Jump",
+    "Laser",
+    "Countdown"
+  ],
+  "policy": {
+    "themedSlots": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10
+    ],
+    "sharedSlotsStart": 11,
+    "additionalSounds": "Every sound after slot 10 remains one shared user collection across all themes; no slot 11+ assets or mappings are supplied.",
+    "existingOverrides": "Explicit user overrides remain authoritative. Theme defaults must not overwrite saved custom clips."
+  },
+  "themes": [
+    {
+      "id": "steam",
+      "name": "Steam",
+      "index": 0,
+      "appearance": "dark",
+      "clips": [
+        {
+          "slot": 1,
+          "slotName": "Beep",
+          "slug": "beep",
+          "caption": "Message ping",
+          "operation": "direct",
+          "sourceIds": [
+            "steam.b"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/steam/01-beep.mp3"
+        },
+        {
+          "slot": 2,
+          "slotName": "Airhorn",
+          "slug": "airhorn",
+          "caption": "Mention burst",
+          "operation": "stabs",
+          "sourceIds": [
+            "steam.h"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/steam/02-airhorn.mp3"
+        },
+        {
+          "slot": 3,
+          "slotName": "Drumroll",
+          "slug": "drumroll",
+          "caption": "Chat-ping flutter",
+          "operation": "roll",
+          "sourceIds": [
+            "steam.d"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/steam/03-drumroll.mp3"
+        },
+        {
+          "slot": 4,
+          "slotName": "Victory",
+          "slug": "victory",
+          "caption": "Friend-join chime",
+          "operation": "direct",
+          "sourceIds": [
+            "steam.v"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/steam/04-victory.mp3"
+        },
+        {
+          "slot": 5,
+          "slotName": "Sad trombone",
+          "slug": "sad-trombone",
+          "caption": "Falling presence chime",
+          "operation": "fall",
+          "sourceIds": [
+            "steam.s"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/steam/05-sad-trombone.mp3"
+        },
+        {
+          "slot": 6,
+          "slotName": "Alert",
+          "slug": "alert",
+          "caption": "Group-chat alert",
+          "operation": "alert",
+          "sourceIds": [
+            "steam.a"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/steam/06-alert.mp3"
+        },
+        {
+          "slot": 7,
+          "slotName": "Coin",
+          "slug": "coin",
+          "caption": "Online sparkle",
+          "operation": "sparkle",
+          "sourceIds": [
+            "steam.c"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/steam/07-coin.mp3"
+        },
+        {
+          "slot": 8,
+          "slotName": "Jump",
+          "slug": "jump",
+          "caption": "Join swoop",
+          "operation": "rise",
+          "sourceIds": [
+            "steam.j"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/steam/08-jump.mp3"
+        },
+        {
+          "slot": 9,
+          "slotName": "Laser",
+          "slug": "laser",
+          "caption": "Mention sweep",
+          "operation": "zap",
+          "sourceIds": [
+            "steam.l"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/steam/09-laser.mp3"
+        },
+        {
+          "slot": 10,
+          "slotName": "Countdown",
+          "slug": "countdown",
+          "caption": "Message-ping countdown",
+          "operation": "count",
+          "sourceIds": [
+            "steam.t"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/steam/10-countdown.mp3"
+        }
+      ]
+    },
+    {
+      "id": "classic",
+      "name": "Classic Steam (2004)",
+      "index": 1,
+      "appearance": "dark",
+      "clips": [
+        {
+          "slot": 1,
+          "slotName": "Beep",
+          "slug": "beep",
+          "caption": "Legacy Steam message",
+          "operation": "direct",
+          "sourceIds": [
+            "classic.b"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/classic/01-beep.mp3"
+        },
+        {
+          "slot": 2,
+          "slotName": "Airhorn",
+          "slug": "airhorn",
+          "caption": "VGUI buzzer burst",
+          "operation": "stabs",
+          "sourceIds": [
+            "classic.h"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/classic/02-airhorn.mp3"
+        },
+        {
+          "slot": 3,
+          "slotName": "Drumroll",
+          "slug": "drumroll",
+          "caption": "Beveled-button rattle",
+          "operation": "roll",
+          "sourceIds": [
+            "classic.d"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/classic/03-drumroll.mp3"
+        },
+        {
+          "slot": 4,
+          "slotName": "Victory",
+          "slug": "victory",
+          "caption": "Legacy friend join",
+          "operation": "direct",
+          "sourceIds": [
+            "classic.v"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/classic/04-victory.mp3"
+        },
+        {
+          "slot": 5,
+          "slotName": "Sad trombone",
+          "slug": "sad-trombone",
+          "caption": "GoldSrc denial fall",
+          "operation": "fall",
+          "sourceIds": [
+            "classic.s"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/classic/05-sad-trombone.mp3"
+        },
+        {
+          "slot": 6,
+          "slotName": "Alert",
+          "slug": "alert",
+          "caption": "Legacy friend-online alert",
+          "operation": "alert",
+          "sourceIds": [
+            "classic.a"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/classic/06-alert.mp3"
+        },
+        {
+          "slot": 7,
+          "slotName": "Coin",
+          "slug": "coin",
+          "caption": "Amber button pickup",
+          "operation": "sparkle",
+          "sourceIds": [
+            "classic.c"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/classic/07-coin.mp3"
+        },
+        {
+          "slot": 8,
+          "slotName": "Jump",
+          "slug": "jump",
+          "caption": "VGUI lift",
+          "operation": "rise",
+          "sourceIds": [
+            "classic.j"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/classic/08-jump.mp3"
+        },
+        {
+          "slot": 9,
+          "slotName": "Laser",
+          "slug": "laser",
+          "caption": "Old-client electronic sweep",
+          "operation": "zap",
+          "sourceIds": [
+            "classic.l"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/classic/09-laser.mp3"
+        },
+        {
+          "slot": 10,
+          "slotName": "Countdown",
+          "slug": "countdown",
+          "caption": "Legacy blip countdown",
+          "operation": "count",
+          "sourceIds": [
+            "classic.t"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/classic/10-countdown.mp3"
+        }
+      ]
+    },
+    {
+      "id": "tf2",
+      "name": "Team Fortress 2",
+      "index": 2,
+      "appearance": "dark",
+      "clips": [
+        {
+          "slot": 1,
+          "slotName": "Beep",
+          "slug": "beep",
+          "caption": "TF2 menu click",
+          "operation": "direct",
+          "sourceIds": [
+            "tf2.b"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/tf2/01-beep.mp3"
+        },
+        {
+          "slot": 2,
+          "slotName": "Airhorn",
+          "slug": "airhorn",
+          "caption": "PASS Time airhorn",
+          "operation": "direct",
+          "sourceIds": [
+            "tf2.h"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/tf2/02-airhorn.mp3"
+        },
+        {
+          "slot": 3,
+          "slotName": "Drumroll",
+          "slug": "drumroll",
+          "caption": "Crate-opening suspense",
+          "operation": "direct",
+          "sourceIds": [
+            "tf2.d"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/tf2/03-drumroll.mp3"
+        },
+        {
+          "slot": 4,
+          "slotName": "Victory",
+          "slug": "victory",
+          "caption": "Administrator victory",
+          "operation": "direct",
+          "sourceIds": [
+            "tf2.v"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/tf2/04-victory.mp3"
+        },
+        {
+          "slot": 5,
+          "slotName": "Sad trombone",
+          "slug": "sad-trombone",
+          "caption": "Administrator failure",
+          "operation": "direct",
+          "sourceIds": [
+            "tf2.s"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/tf2/05-sad-trombone.mp3"
+        },
+        {
+          "slot": 6,
+          "slotName": "Alert",
+          "slug": "alert",
+          "caption": "TF2 notification",
+          "operation": "direct",
+          "sourceIds": [
+            "tf2.a"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/tf2/06-alert.mp3"
+        },
+        {
+          "slot": 7,
+          "slotName": "Coin",
+          "slug": "coin",
+          "caption": "Mann vs. Machine money",
+          "operation": "direct",
+          "sourceIds": [
+            "tf2.c"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/tf2/07-coin.mp3"
+        },
+        {
+          "slot": 8,
+          "slotName": "Jump",
+          "slug": "jump",
+          "caption": "Scout jump",
+          "operation": "direct",
+          "sourceIds": [
+            "tf2.j"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/tf2/08-jump.mp3"
+        },
+        {
+          "slot": 9,
+          "slotName": "Laser",
+          "slug": "laser",
+          "caption": "Cow Mangler shot",
+          "operation": "direct",
+          "sourceIds": [
+            "tf2.l"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/tf2/09-laser.mp3"
+        },
+        {
+          "slot": 10,
+          "slotName": "Countdown",
+          "slug": "countdown",
+          "caption": "Administrator: three, two, one",
+          "operation": "voice-count",
+          "sourceIds": [
+            "tf2.t3",
+            "tf2.t2",
+            "tf2.t1"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/tf2/10-countdown.mp3"
+        }
+      ]
+    },
+    {
+      "id": "cs2",
+      "name": "Counter-Strike 2",
+      "index": 3,
+      "appearance": "dark",
+      "clips": [
+        {
+          "slot": 1,
+          "slotName": "Beep",
+          "slug": "beep",
+          "caption": "CS2 UI beep",
+          "operation": "direct",
+          "sourceIds": [
+            "cs2.b"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/cs2/01-beep.mp3"
+        },
+        {
+          "slot": 2,
+          "slotName": "Airhorn",
+          "slug": "airhorn",
+          "caption": "Match-ready call",
+          "operation": "direct",
+          "sourceIds": [
+            "cs2.h"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/cs2/02-airhorn.mp3"
+        },
+        {
+          "slot": 3,
+          "slotName": "Drumroll",
+          "slug": "drumroll",
+          "caption": "Inventory scratch roll",
+          "operation": "roll",
+          "sourceIds": [
+            "cs2.d"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/cs2/03-drumroll.mp3"
+        },
+        {
+          "slot": 4,
+          "slotName": "Victory",
+          "slug": "victory",
+          "caption": "Let's roll confirmation",
+          "operation": "direct",
+          "sourceIds": [
+            "cs2.v"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/cs2/04-victory.mp3"
+        },
+        {
+          "slot": 5,
+          "slotName": "Sad trombone",
+          "slug": "sad-trombone",
+          "caption": "Invalid-menu failure",
+          "operation": "fall",
+          "sourceIds": [
+            "cs2.s"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/cs2/05-sad-trombone.mp3"
+        },
+        {
+          "slot": 6,
+          "slotName": "Alert",
+          "slug": "alert",
+          "caption": "Chat-wheel alert",
+          "operation": "direct",
+          "sourceIds": [
+            "cs2.a"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/cs2/06-alert.mp3"
+        },
+        {
+          "slot": 7,
+          "slotName": "Coin",
+          "slug": "coin",
+          "caption": "CS2 coin pickup",
+          "operation": "direct",
+          "sourceIds": [
+            "cs2.c"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/cs2/07-coin.mp3"
+        },
+        {
+          "slot": 8,
+          "slotName": "Jump",
+          "slug": "jump",
+          "caption": "Jump launch",
+          "operation": "direct",
+          "sourceIds": [
+            "cs2.j"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/cs2/08-jump.mp3"
+        },
+        {
+          "slot": 9,
+          "slotName": "Laser",
+          "slug": "laser",
+          "caption": "Zeus electrical shot",
+          "operation": "direct",
+          "sourceIds": [
+            "cs2.l"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/cs2/09-laser.mp3"
+        },
+        {
+          "slot": 10,
+          "slotName": "Countdown",
+          "slug": "countdown",
+          "caption": "C4 beep countdown",
+          "operation": "count",
+          "sourceIds": [
+            "cs2.t"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/cs2/10-countdown.mp3"
+        }
+      ]
+    },
+    {
+      "id": "portal",
+      "name": "Portal",
+      "index": 4,
+      "appearance": "light",
+      "clips": [
+        {
+          "slot": 1,
+          "slotName": "Beep",
+          "slug": "beep",
+          "caption": "Test-chamber button",
+          "operation": "direct",
+          "sourceIds": [
+            "portal.b"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/portal/01-beep.mp3"
+        },
+        {
+          "slot": 2,
+          "slotName": "Airhorn",
+          "slug": "airhorn",
+          "caption": "Portal-gun power surge",
+          "operation": "direct",
+          "sourceIds": [
+            "portal.h"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/portal/02-airhorn.mp3"
+        },
+        {
+          "slot": 3,
+          "slotName": "Drumroll",
+          "slug": "drumroll",
+          "caption": "Aperture mechanism roll",
+          "operation": "roll",
+          "sourceIds": [
+            "portal.d"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/portal/03-drumroll.mp3"
+        },
+        {
+          "slot": 4,
+          "slotName": "Victory",
+          "slug": "victory",
+          "caption": "Elevator completion chime",
+          "operation": "direct",
+          "sourceIds": [
+            "portal.v"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/portal/04-victory.mp3"
+        },
+        {
+          "slot": 5,
+          "slotName": "Sad trombone",
+          "slug": "sad-trombone",
+          "caption": "Invalid portal surface",
+          "operation": "direct",
+          "sourceIds": [
+            "portal.s"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/portal/05-sad-trombone.mp3"
+        },
+        {
+          "slot": 6,
+          "slotName": "Alert",
+          "slug": "alert",
+          "caption": "Turret deployment",
+          "operation": "direct",
+          "sourceIds": [
+            "portal.a"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/portal/06-alert.mp3"
+        },
+        {
+          "slot": 7,
+          "slotName": "Coin",
+          "slug": "coin",
+          "caption": "Portal-open sparkle",
+          "operation": "sparkle",
+          "sourceIds": [
+            "portal.c"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/portal/07-coin.mp3"
+        },
+        {
+          "slot": 8,
+          "slotName": "Jump",
+          "slug": "jump",
+          "caption": "Portal travel",
+          "operation": "direct",
+          "sourceIds": [
+            "portal.j"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/portal/08-jump.mp3"
+        },
+        {
+          "slot": 9,
+          "slotName": "Laser",
+          "slug": "laser",
+          "caption": "Blue portal shot",
+          "operation": "direct",
+          "sourceIds": [
+            "portal.l"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/portal/09-laser.mp3"
+        },
+        {
+          "slot": 10,
+          "slotName": "Countdown",
+          "slug": "countdown",
+          "caption": "Chamber-ready countdown",
+          "operation": "count",
+          "sourceIds": [
+            "portal.t"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/portal/10-countdown.mp3"
+        }
+      ]
+    },
+    {
+      "id": "cs16",
+      "name": "Counter-Strike 1.6",
+      "index": 5,
+      "appearance": "dark",
+      "clips": [
+        {
+          "slot": 1,
+          "slotName": "Beep",
+          "slug": "beep",
+          "caption": "C4 keypad beep",
+          "operation": "direct",
+          "sourceIds": [
+            "cs16.b"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/cs16/01-beep.mp3"
+        },
+        {
+          "slot": 2,
+          "slotName": "Airhorn",
+          "slug": "airhorn",
+          "caption": "Go, go, go!",
+          "operation": "direct",
+          "sourceIds": [
+            "cs16.h"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/cs16/02-airhorn.mp3"
+        },
+        {
+          "slot": 3,
+          "slotName": "Drumroll",
+          "slug": "drumroll",
+          "caption": "Bomb-keypad rattle",
+          "operation": "roll",
+          "sourceIds": [
+            "cs16.d"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/cs16/03-drumroll.mp3"
+        },
+        {
+          "slot": 4,
+          "slotName": "Victory",
+          "slug": "victory",
+          "caption": "Counter-terrorists win",
+          "operation": "direct",
+          "sourceIds": [
+            "cs16.v"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/cs16/04-victory.mp3"
+        },
+        {
+          "slot": 5,
+          "slotName": "Sad trombone",
+          "slug": "sad-trombone",
+          "caption": "Negative: radio failure",
+          "operation": "direct",
+          "sourceIds": [
+            "cs16.s"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/cs16/05-sad-trombone.mp3"
+        },
+        {
+          "slot": 6,
+          "slotName": "Alert",
+          "slug": "alert",
+          "caption": "Enemy spotted",
+          "operation": "direct",
+          "sourceIds": [
+            "cs16.a"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/cs16/06-alert.mp3"
+        },
+        {
+          "slot": 7,
+          "slotName": "Coin",
+          "slug": "coin",
+          "caption": "Bomb-defused reward",
+          "operation": "direct",
+          "sourceIds": [
+            "cs16.c"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/cs16/07-coin.mp3"
+        },
+        {
+          "slot": 8,
+          "slotName": "Jump",
+          "slug": "jump",
+          "caption": "GoldSrc jump",
+          "operation": "direct",
+          "sourceIds": [
+            "cs16.j"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/cs16/08-jump.mp3"
+        },
+        {
+          "slot": 9,
+          "slotName": "Laser",
+          "slug": "laser",
+          "caption": "Scope chirp sweep",
+          "operation": "zap",
+          "sourceIds": [
+            "cs16.l"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/cs16/09-laser.mp3"
+        },
+        {
+          "slot": 10,
+          "slotName": "Countdown",
+          "slug": "countdown",
+          "caption": "Classic C4 countdown",
+          "operation": "count",
+          "sourceIds": [
+            "cs16.t"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/cs16/10-countdown.mp3"
+        }
+      ]
+    },
+    {
+      "id": "hev",
+      "name": "Half-Life HEV suit",
+      "index": 6,
+      "appearance": "dark",
+      "clips": [
+        {
+          "slot": 1,
+          "slotName": "Beep",
+          "slug": "beep",
+          "caption": "HEV beep",
+          "operation": "direct",
+          "sourceIds": [
+            "hev.b"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/hev/01-beep.mp3"
+        },
+        {
+          "slot": 2,
+          "slotName": "Airhorn",
+          "slug": "airhorn",
+          "caption": "Evacuate area",
+          "operation": "direct",
+          "sourceIds": [
+            "hev.h"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/hev/02-airhorn.mp3"
+        },
+        {
+          "slot": 3,
+          "slotName": "Drumroll",
+          "slug": "drumroll",
+          "caption": "Suit telemetry roll",
+          "operation": "roll",
+          "sourceIds": [
+            "hev.d"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/hev/03-drumroll.mp3"
+        },
+        {
+          "slot": 4,
+          "slotName": "Victory",
+          "slug": "victory",
+          "caption": "Suit activated",
+          "operation": "direct",
+          "sourceIds": [
+            "hev.v"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/hev/04-victory.mp3"
+        },
+        {
+          "slot": 5,
+          "slotName": "Sad trombone",
+          "slug": "sad-trombone",
+          "caption": "HEV flatline",
+          "operation": "direct",
+          "sourceIds": [
+            "hev.s"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/hev/05-sad-trombone.mp3"
+        },
+        {
+          "slot": 6,
+          "slotName": "Alert",
+          "slug": "alert",
+          "caption": "HEV alert",
+          "operation": "direct",
+          "sourceIds": [
+            "hev.a"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/hev/06-alert.mp3"
+        },
+        {
+          "slot": 7,
+          "slotName": "Coin",
+          "slug": "coin",
+          "caption": "Suit-charge confirmation",
+          "operation": "direct",
+          "sourceIds": [
+            "hev.c"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/hev/07-coin.mp3"
+        },
+        {
+          "slot": 8,
+          "slotName": "Jump",
+          "slug": "jump",
+          "caption": "HEV movement",
+          "operation": "direct",
+          "sourceIds": [
+            "hev.j"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/hev/08-jump.mp3"
+        },
+        {
+          "slot": 9,
+          "slotName": "Laser",
+          "slug": "laser",
+          "caption": "Gauss shot",
+          "operation": "direct",
+          "sourceIds": [
+            "hev.l"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/hev/09-laser.mp3"
+        },
+        {
+          "slot": 10,
+          "slotName": "Countdown",
+          "slug": "countdown",
+          "caption": "HEV: three, two, one",
+          "operation": "voice-count",
+          "sourceIds": [
+            "hev.t3",
+            "hev.t2",
+            "hev.t1"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/hev/10-countdown.mp3"
+        }
+      ]
+    },
+    {
+      "id": "l4d",
+      "name": "Left 4 Dead",
+      "index": 7,
+      "appearance": "dark",
+      "clips": [
+        {
+          "slot": 1,
+          "slotName": "Beep",
+          "slug": "beep",
+          "caption": "Survivor UI tone",
+          "operation": "direct",
+          "sourceIds": [
+            "l4d.b"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/l4d/01-beep.mp3"
+        },
+        {
+          "slot": 2,
+          "slotName": "Airhorn",
+          "slug": "airhorn",
+          "caption": "Distant foghorn",
+          "operation": "direct",
+          "sourceIds": [
+            "l4d.h"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/l4d/02-airhorn.mp3"
+        },
+        {
+          "slot": 3,
+          "slotName": "Drumroll",
+          "slug": "drumroll",
+          "caption": "Menu suspense rattle",
+          "operation": "roll",
+          "sourceIds": [
+            "l4d.d"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/l4d/03-drumroll.mp3"
+        },
+        {
+          "slot": 4,
+          "slotName": "Victory",
+          "slug": "victory",
+          "caption": "Survivor reward",
+          "operation": "direct",
+          "sourceIds": [
+            "l4d.v"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/l4d/04-victory.mp3"
+        },
+        {
+          "slot": 5,
+          "slotName": "Sad trombone",
+          "slug": "sad-trombone",
+          "caption": "The end",
+          "operation": "direct",
+          "sourceIds": [
+            "l4d.s"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/l4d/05-sad-trombone.mp3"
+        },
+        {
+          "slot": 6,
+          "slotName": "Alert",
+          "slug": "alert",
+          "caption": "Critical event",
+          "operation": "direct",
+          "sourceIds": [
+            "l4d.a"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/l4d/06-alert.mp3"
+        },
+        {
+          "slot": 7,
+          "slotName": "Coin",
+          "slug": "coin",
+          "caption": "Small survivor reward",
+          "operation": "direct",
+          "sourceIds": [
+            "l4d.c"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/l4d/07-coin.mp3"
+        },
+        {
+          "slot": 8,
+          "slotName": "Jump",
+          "slug": "jump",
+          "caption": "Survivor landing",
+          "operation": "direct",
+          "sourceIds": [
+            "l4d.j"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/l4d/08-jump.mp3"
+        },
+        {
+          "slot": 9,
+          "slotName": "Laser",
+          "slug": "laser",
+          "caption": "Survivor sci-fi pickup",
+          "operation": "direct",
+          "sourceIds": [
+            "l4d.l"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/l4d/09-laser.mp3"
+        },
+        {
+          "slot": 10,
+          "slotName": "Countdown",
+          "slug": "countdown",
+          "caption": "Safe-room countdown",
+          "operation": "count",
+          "sourceIds": [
+            "l4d.t"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/l4d/10-countdown.mp3"
+        }
+      ]
+    },
+    {
+      "id": "winxp",
+      "name": "Windows XP",
+      "index": 8,
+      "appearance": "light",
+      "clips": [
+        {
+          "slot": 1,
+          "slotName": "Beep",
+          "slug": "beep",
+          "caption": "XP default beep",
+          "operation": "direct",
+          "sourceIds": [
+            "winxp.b"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/winxp/01-beep.mp3"
+        },
+        {
+          "slot": 2,
+          "slotName": "Airhorn",
+          "slug": "airhorn",
+          "caption": "XP exclamation burst",
+          "operation": "stabs",
+          "sourceIds": [
+            "winxp.h"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/winxp/02-airhorn.mp3"
+        },
+        {
+          "slot": 3,
+          "slotName": "Drumroll",
+          "slug": "drumroll",
+          "caption": "Menu-command flutter",
+          "operation": "roll",
+          "sourceIds": [
+            "winxp.d"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/winxp/03-drumroll.mp3"
+        },
+        {
+          "slot": 4,
+          "slotName": "Victory",
+          "slug": "victory",
+          "caption": "Windows tada",
+          "operation": "direct",
+          "sourceIds": [
+            "winxp.v"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/winxp/04-victory.mp3"
+        },
+        {
+          "slot": 5,
+          "slotName": "Sad trombone",
+          "slug": "sad-trombone",
+          "caption": "Windows XP shutdown",
+          "operation": "direct",
+          "sourceIds": [
+            "winxp.s"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/winxp/05-sad-trombone.mp3"
+        },
+        {
+          "slot": 6,
+          "slotName": "Alert",
+          "slug": "alert",
+          "caption": "Critical stop",
+          "operation": "direct",
+          "sourceIds": [
+            "winxp.a"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/winxp/06-alert.mp3"
+        },
+        {
+          "slot": 7,
+          "slotName": "Coin",
+          "slug": "coin",
+          "caption": "XP ding",
+          "operation": "direct",
+          "sourceIds": [
+            "winxp.c"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/winxp/07-coin.mp3"
+        },
+        {
+          "slot": 8,
+          "slotName": "Jump",
+          "slug": "jump",
+          "caption": "Window restore",
+          "operation": "direct",
+          "sourceIds": [
+            "winxp.j"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/winxp/08-jump.mp3"
+        },
+        {
+          "slot": 9,
+          "slotName": "Laser",
+          "slug": "laser",
+          "caption": "Minimize sweep",
+          "operation": "zap",
+          "sourceIds": [
+            "winxp.l"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/winxp/09-laser.mp3"
+        },
+        {
+          "slot": 10,
+          "slotName": "Countdown",
+          "slug": "countdown",
+          "caption": "XP notification countdown",
+          "operation": "count",
+          "sourceIds": [
+            "winxp.t"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/winxp/10-countdown.mp3"
+        }
+      ]
+    },
+    {
+      "id": "doom",
+      "name": "DOOM (1993)",
+      "index": 9,
+      "appearance": "dark",
+      "clips": [
+        {
+          "slot": 1,
+          "slotName": "Beep",
+          "slug": "beep",
+          "caption": "Switch-on click",
+          "operation": "direct",
+          "sourceIds": [
+            "doom.b"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/doom/01-beep.mp3"
+        },
+        {
+          "slot": 2,
+          "slotName": "Airhorn",
+          "slug": "airhorn",
+          "caption": "Baron roar",
+          "operation": "direct",
+          "sourceIds": [
+            "doom.h"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/doom/02-airhorn.mp3"
+        },
+        {
+          "slot": 3,
+          "slotName": "Drumroll",
+          "slug": "drumroll",
+          "caption": "Shotgun-mechanism roll",
+          "operation": "roll",
+          "sourceIds": [
+            "doom.d"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/doom/03-drumroll.mp3"
+        },
+        {
+          "slot": 4,
+          "slotName": "Victory",
+          "slug": "victory",
+          "caption": "Power-up celebration",
+          "operation": "fanfare",
+          "sourceIds": [
+            "doom.v"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/doom/04-victory.mp3"
+        },
+        {
+          "slot": 5,
+          "slotName": "Sad trombone",
+          "slug": "sad-trombone",
+          "caption": "Doomguy failure fall",
+          "operation": "fall",
+          "sourceIds": [
+            "doom.s"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/doom/05-sad-trombone.mp3"
+        },
+        {
+          "slot": 6,
+          "slotName": "Alert",
+          "slug": "alert",
+          "caption": "Demon sighting",
+          "operation": "direct",
+          "sourceIds": [
+            "doom.a"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/doom/06-alert.mp3"
+        },
+        {
+          "slot": 7,
+          "slotName": "Coin",
+          "slug": "coin",
+          "caption": "Item pickup",
+          "operation": "direct",
+          "sourceIds": [
+            "doom.c"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/doom/07-coin.mp3"
+        },
+        {
+          "slot": 8,
+          "slotName": "Jump",
+          "slug": "jump",
+          "caption": "Teleport motion",
+          "operation": "direct",
+          "sourceIds": [
+            "doom.j"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/doom/08-jump.mp3"
+        },
+        {
+          "slot": 9,
+          "slotName": "Laser",
+          "slug": "laser",
+          "caption": "Imp fireball",
+          "operation": "direct",
+          "sourceIds": [
+            "doom.l"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/doom/09-laser.mp3"
+        },
+        {
+          "slot": 10,
+          "slotName": "Countdown",
+          "slug": "countdown",
+          "caption": "Classic HUD countdown",
+          "operation": "count",
+          "sourceIds": [
+            "doom.t"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/doom/10-countdown.mp3"
+        }
+      ]
+    },
+    {
+      "id": "quake",
+      "name": "Quake (1996)",
+      "index": 10,
+      "appearance": "dark",
+      "clips": [
+        {
+          "slot": 1,
+          "slotName": "Beep",
+          "slug": "beep",
+          "caption": "Bronze-menu click",
+          "operation": "direct",
+          "sourceIds": [
+            "quake.b"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/quake/01-beep.mp3"
+        },
+        {
+          "slot": 2,
+          "slotName": "Airhorn",
+          "slug": "airhorn",
+          "caption": "Chthon sighting",
+          "operation": "direct",
+          "sourceIds": [
+            "quake.h"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/quake/02-airhorn.mp3"
+        },
+        {
+          "slot": 3,
+          "slotName": "Drumroll",
+          "slug": "drumroll",
+          "caption": "Shotgun-mechanism roll",
+          "operation": "roll",
+          "sourceIds": [
+            "quake.d"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/quake/03-drumroll.mp3"
+        },
+        {
+          "slot": 4,
+          "slotName": "Victory",
+          "slug": "victory",
+          "caption": "Secret-found celebration",
+          "operation": "fanfare",
+          "sourceIds": [
+            "quake.v"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/quake/04-victory.mp3"
+        },
+        {
+          "slot": 5,
+          "slotName": "Sad trombone",
+          "slug": "sad-trombone",
+          "caption": "Ranger failure fall",
+          "operation": "fall",
+          "sourceIds": [
+            "quake.s"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/quake/05-sad-trombone.mp3"
+        },
+        {
+          "slot": 6,
+          "slotName": "Alert",
+          "slug": "alert",
+          "caption": "Quake message alert",
+          "operation": "alert",
+          "sourceIds": [
+            "quake.a"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/quake/06-alert.mp3"
+        },
+        {
+          "slot": 7,
+          "slotName": "Coin",
+          "slug": "coin",
+          "caption": "Armor pickup",
+          "operation": "direct",
+          "sourceIds": [
+            "quake.c"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/quake/07-coin.mp3"
+        },
+        {
+          "slot": 8,
+          "slotName": "Jump",
+          "slug": "jump",
+          "caption": "Ranger jump",
+          "operation": "direct",
+          "sourceIds": [
+            "quake.j"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/quake/08-jump.mp3"
+        },
+        {
+          "slot": 9,
+          "slotName": "Laser",
+          "slug": "laser",
+          "caption": "Lightning start",
+          "operation": "direct",
+          "sourceIds": [
+            "quake.l"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/quake/09-laser.mp3"
+        },
+        {
+          "slot": 10,
+          "slotName": "Countdown",
+          "slug": "countdown",
+          "caption": "Rune-menu countdown",
+          "operation": "count",
+          "sourceIds": [
+            "quake.t"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/quake/10-countdown.mp3"
+        }
+      ]
+    },
+    {
+      "id": "pipboy",
+      "name": "Fallout Pip-Boy",
+      "index": 11,
+      "appearance": "dark",
+      "clips": [
+        {
+          "slot": 1,
+          "slotName": "Beep",
+          "slug": "beep",
+          "caption": "Pip-Boy select",
+          "operation": "direct",
+          "sourceIds": [
+            "pipboy.b"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/pipboy/01-beep.mp3"
+        },
+        {
+          "slot": 2,
+          "slotName": "Airhorn",
+          "slug": "airhorn",
+          "caption": "Geiger burst",
+          "operation": "stabs",
+          "sourceIds": [
+            "pipboy.h"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/pipboy/02-airhorn.mp3"
+        },
+        {
+          "slot": 3,
+          "slotName": "Drumroll",
+          "slug": "drumroll",
+          "caption": "Terminal-character roll",
+          "operation": "roll",
+          "sourceIds": [
+            "pipboy.d"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/pipboy/03-drumroll.mp3"
+        },
+        {
+          "slot": 4,
+          "slotName": "Victory",
+          "slug": "victory",
+          "caption": "Quest complete",
+          "operation": "direct",
+          "sourceIds": [
+            "pipboy.v"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/pipboy/04-victory.mp3"
+        },
+        {
+          "slot": 5,
+          "slotName": "Sad trombone",
+          "slug": "sad-trombone",
+          "caption": "Hacking failure",
+          "operation": "direct",
+          "sourceIds": [
+            "pipboy.s"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/pipboy/05-sad-trombone.mp3"
+        },
+        {
+          "slot": 6,
+          "slotName": "Alert",
+          "slug": "alert",
+          "caption": "New quest",
+          "operation": "direct",
+          "sourceIds": [
+            "pipboy.a"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/pipboy/06-alert.mp3"
+        },
+        {
+          "slot": 7,
+          "slotName": "Coin",
+          "slug": "coin",
+          "caption": "Bottle-cap pickup",
+          "operation": "direct",
+          "sourceIds": [
+            "pipboy.c"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/pipboy/07-coin.mp3"
+        },
+        {
+          "slot": 8,
+          "slotName": "Jump",
+          "slug": "jump",
+          "caption": "Pip-Boy access swoop",
+          "operation": "direct",
+          "sourceIds": [
+            "pipboy.j"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/pipboy/08-jump.mp3"
+        },
+        {
+          "slot": 9,
+          "slotName": "Laser",
+          "slug": "laser",
+          "caption": "Radio-tuner sweep",
+          "operation": "zap",
+          "sourceIds": [
+            "pipboy.l"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/pipboy/09-laser.mp3"
+        },
+        {
+          "slot": 10,
+          "slotName": "Countdown",
+          "slug": "countdown",
+          "caption": "Vault-terminal countdown",
+          "operation": "count",
+          "sourceIds": [
+            "pipboy.t"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/pipboy/10-countdown.mp3"
+        }
+      ]
+    },
+    {
+      "id": "combine",
+      "name": "Half-Life 2 Combine",
+      "index": 12,
+      "appearance": "dark",
+      "clips": [
+        {
+          "slot": 1,
+          "slotName": "Beep",
+          "slug": "beep",
+          "caption": "Combine console",
+          "operation": "direct",
+          "sourceIds": [
+            "combine.b"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/combine/01-beep.mp3"
+        },
+        {
+          "slot": 2,
+          "slotName": "Airhorn",
+          "slug": "airhorn",
+          "caption": "Citadel alarm",
+          "operation": "direct",
+          "sourceIds": [
+            "combine.h"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/combine/02-airhorn.mp3"
+        },
+        {
+          "slot": 3,
+          "slotName": "Drumroll",
+          "slug": "drumroll",
+          "caption": "Civil Protection gear roll",
+          "operation": "roll",
+          "sourceIds": [
+            "combine.d"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/combine/03-drumroll.mp3"
+        },
+        {
+          "slot": 4,
+          "slotName": "Victory",
+          "slug": "victory",
+          "caption": "Suit-charge confirmation",
+          "operation": "fanfare",
+          "sourceIds": [
+            "combine.v"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/combine/04-victory.mp3"
+        },
+        {
+          "slot": 5,
+          "slotName": "Sad trombone",
+          "slug": "sad-trombone",
+          "caption": "Combine access denied",
+          "operation": "direct",
+          "sourceIds": [
+            "combine.s"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/combine/05-sad-trombone.mp3"
+        },
+        {
+          "slot": 6,
+          "slotName": "Alert",
+          "slug": "alert",
+          "caption": "Overwatch attention",
+          "operation": "direct",
+          "sourceIds": [
+            "combine.a"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/combine/06-alert.mp3"
+        },
+        {
+          "slot": 7,
+          "slotName": "Coin",
+          "slug": "coin",
+          "caption": "Battery pickup",
+          "operation": "direct",
+          "sourceIds": [
+            "combine.c"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/combine/07-coin.mp3"
+        },
+        {
+          "slot": 8,
+          "slotName": "Jump",
+          "slug": "jump",
+          "caption": "Combine movement lift",
+          "operation": "rise",
+          "sourceIds": [
+            "combine.j"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/combine/08-jump.mp3"
+        },
+        {
+          "slot": 9,
+          "slotName": "Laser",
+          "slug": "laser",
+          "caption": "AR2 pulse shot",
+          "operation": "direct",
+          "sourceIds": [
+            "combine.l"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/combine/09-laser.mp3"
+        },
+        {
+          "slot": 10,
+          "slotName": "Countdown",
+          "slug": "countdown",
+          "caption": "Overwatch: three, two, one",
+          "operation": "voice-count",
+          "sourceIds": [
+            "combine.t3",
+            "combine.t2",
+            "combine.t1"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/combine/10-countdown.mp3"
+        }
+      ]
+    },
+    {
+      "id": "deadlock",
+      "name": "Deadlock",
+      "index": 13,
+      "appearance": "dark",
+      "clips": [
+        {
+          "slot": 1,
+          "slotName": "Beep",
+          "slug": "beep",
+          "caption": "Occult chat ping",
+          "operation": "direct",
+          "sourceIds": [
+            "deadlock.b"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/deadlock/01-beep.mp3"
+        },
+        {
+          "slot": 2,
+          "slotName": "Airhorn",
+          "slug": "airhorn",
+          "caption": "Bebop uppercut",
+          "operation": "direct",
+          "sourceIds": [
+            "deadlock.h"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/deadlock/02-airhorn.mp3"
+        },
+        {
+          "slot": 3,
+          "slotName": "Drumroll",
+          "slug": "drumroll",
+          "caption": "Shop-mod anticipation",
+          "operation": "roll",
+          "sourceIds": [
+            "deadlock.d"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/deadlock/03-drumroll.mp3"
+        },
+        {
+          "slot": 4,
+          "slotName": "Victory",
+          "slug": "victory",
+          "caption": "Seasonal achievement",
+          "operation": "direct",
+          "sourceIds": [
+            "deadlock.v"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/deadlock/04-victory.mp3"
+        },
+        {
+          "slot": 5,
+          "slotName": "Sad trombone",
+          "slug": "sad-trombone",
+          "caption": "Bebop hook miss",
+          "operation": "direct",
+          "sourceIds": [
+            "deadlock.s"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/deadlock/05-sad-trombone.mp3"
+        },
+        {
+          "slot": 6,
+          "slotName": "Alert",
+          "slug": "alert",
+          "caption": "Matchmaking ready",
+          "operation": "direct",
+          "sourceIds": [
+            "deadlock.a"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/deadlock/06-alert.mp3"
+        },
+        {
+          "slot": 7,
+          "slotName": "Coin",
+          "slug": "coin",
+          "caption": "Gold pickup",
+          "operation": "direct",
+          "sourceIds": [
+            "deadlock.c"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/deadlock/07-coin.mp3"
+        },
+        {
+          "slot": 8,
+          "slotName": "Jump",
+          "slug": "jump",
+          "caption": "Hero jump landing",
+          "operation": "direct",
+          "sourceIds": [
+            "deadlock.j"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/deadlock/08-jump.mp3"
+        },
+        {
+          "slot": 9,
+          "slotName": "Laser",
+          "slug": "laser",
+          "caption": "Bebop Hyper Beam",
+          "operation": "direct",
+          "sourceIds": [
+            "deadlock.l"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/deadlock/09-laser.mp3"
+        },
+        {
+          "slot": 10,
+          "slotName": "Countdown",
+          "slug": "countdown",
+          "caption": "Occult tech countdown",
+          "operation": "count",
+          "sourceIds": [
+            "deadlock.t"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/deadlock/10-countdown.mp3"
+        }
+      ]
+    },
+    {
+      "id": "minecraft",
+      "name": "Minecraft",
+      "index": 14,
+      "appearance": "light",
+      "clips": [
+        {
+          "slot": 1,
+          "slotName": "Beep",
+          "slug": "beep",
+          "caption": "Menu click",
+          "operation": "direct",
+          "sourceIds": [
+            "minecraft.b"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/minecraft/01-beep.mp3"
+        },
+        {
+          "slot": 2,
+          "slotName": "Airhorn",
+          "slug": "airhorn",
+          "caption": "Ghast horn",
+          "operation": "direct",
+          "sourceIds": [
+            "minecraft.h"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/minecraft/02-airhorn.mp3"
+        },
+        {
+          "slot": 3,
+          "slotName": "Drumroll",
+          "slug": "drumroll",
+          "caption": "Note-block snare roll",
+          "operation": "roll",
+          "sourceIds": [
+            "minecraft.d"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/minecraft/03-drumroll.mp3"
+        },
+        {
+          "slot": 4,
+          "slotName": "Victory",
+          "slug": "victory",
+          "caption": "Level up",
+          "operation": "direct",
+          "sourceIds": [
+            "minecraft.v"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/minecraft/04-victory.mp3"
+        },
+        {
+          "slot": 5,
+          "slotName": "Sad trombone",
+          "slug": "sad-trombone",
+          "caption": "Villager failure fall",
+          "operation": "fall",
+          "sourceIds": [
+            "minecraft.s"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/minecraft/05-sad-trombone.mp3"
+        },
+        {
+          "slot": 6,
+          "slotName": "Alert",
+          "slug": "alert",
+          "caption": "Anvil warning",
+          "operation": "direct",
+          "sourceIds": [
+            "minecraft.a"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/minecraft/06-alert.mp3"
+        },
+        {
+          "slot": 7,
+          "slotName": "Coin",
+          "slug": "coin",
+          "caption": "Experience orb",
+          "operation": "direct",
+          "sourceIds": [
+            "minecraft.c"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/minecraft/07-coin.mp3"
+        },
+        {
+          "slot": 8,
+          "slotName": "Jump",
+          "slug": "jump",
+          "caption": "Slime bounce",
+          "operation": "direct",
+          "sourceIds": [
+            "minecraft.j"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/minecraft/08-jump.mp3"
+        },
+        {
+          "slot": 9,
+          "slotName": "Laser",
+          "slug": "laser",
+          "caption": "Enchanted bow sweep",
+          "operation": "zap",
+          "sourceIds": [
+            "minecraft.l"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/minecraft/09-laser.mp3"
+        },
+        {
+          "slot": 10,
+          "slotName": "Countdown",
+          "slug": "countdown",
+          "caption": "Note-block countdown",
+          "operation": "count",
+          "sourceIds": [
+            "minecraft.t"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/minecraft/10-countdown.mp3"
+        }
+      ]
+    },
+    {
+      "id": "payday",
+      "name": "PAYDAY 2",
+      "index": 15,
+      "appearance": "dark",
+      "clips": [
+        {
+          "slot": 1,
+          "slotName": "Beep",
+          "slug": "beep",
+          "caption": "Crime.net pager",
+          "operation": "payday-beep",
+          "sourceIds": [
+            "payday-cloaker"
+          ],
+          "provenanceKind": "hybrid-source-and-original-design",
+          "file": "audio/payday/01-beep.mp3"
+        },
+        {
+          "slot": 2,
+          "slotName": "Airhorn",
+          "slug": "airhorn",
+          "caption": "Police-assault burst",
+          "operation": "direct",
+          "sourceIds": [
+            "payday-assault"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/payday/02-airhorn.mp3"
+        },
+        {
+          "slot": 3,
+          "slotName": "Drumroll",
+          "slug": "drumroll",
+          "caption": "Heist drill rattle",
+          "operation": "payday-roll",
+          "sourceIds": [],
+          "provenanceKind": "original-theme-matched-design",
+          "file": "audio/payday/03-drumroll.mp3"
+        },
+        {
+          "slot": 4,
+          "slotName": "Victory",
+          "slug": "victory",
+          "caption": "Another win for the Payday gang",
+          "operation": "direct",
+          "sourceIds": [
+            "payday-victory"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/payday/04-victory.mp3"
+        },
+        {
+          "slot": 5,
+          "slotName": "Sad trombone",
+          "slug": "sad-trombone",
+          "caption": "Big mistake",
+          "operation": "direct",
+          "sourceIds": [
+            "payday-fail"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/payday/05-sad-trombone.mp3"
+        },
+        {
+          "slot": 6,
+          "slotName": "Alert",
+          "slug": "alert",
+          "caption": "Cloaker charge",
+          "operation": "direct",
+          "sourceIds": [
+            "payday-cloaker"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/payday/06-alert.mp3"
+        },
+        {
+          "slot": 7,
+          "slotName": "Coin",
+          "slug": "coin",
+          "caption": "Cash-counter pickup",
+          "operation": "payday-coin",
+          "sourceIds": [],
+          "provenanceKind": "original-theme-matched-design",
+          "file": "audio/payday/07-coin.mp3"
+        },
+        {
+          "slot": 8,
+          "slotName": "Jump",
+          "slug": "jump",
+          "caption": "Cloaker rush",
+          "operation": "rise",
+          "sourceIds": [
+            "payday-cloaker"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/payday/08-jump.mp3"
+        },
+        {
+          "slot": 9,
+          "slotName": "Laser",
+          "slug": "laser",
+          "caption": "Tactical electrical sweep",
+          "operation": "zap",
+          "sourceIds": [
+            "payday-cloaker"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/payday/09-laser.mp3"
+        },
+        {
+          "slot": 10,
+          "slotName": "Countdown",
+          "slug": "countdown",
+          "caption": "Heist pager countdown",
+          "operation": "payday-count",
+          "sourceIds": [
+            "payday-cloaker"
+          ],
+          "provenanceKind": "hybrid-source-and-original-design",
+          "file": "audio/payday/10-countdown.mp3"
+        }
+      ]
+    },
+    {
+      "id": "dreamcast",
+      "name": "Sega Dreamcast",
+      "index": 16,
+      "appearance": "light",
+      "clips": [
+        {
+          "slot": 1,
+          "slotName": "Beep",
+          "slug": "beep",
+          "caption": "BIOS select",
+          "operation": "direct",
+          "sourceIds": [
+            "dreamcast.b"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/dreamcast/01-beep.mp3"
+        },
+        {
+          "slot": 2,
+          "slotName": "Airhorn",
+          "slug": "airhorn",
+          "caption": "Disc-check burst",
+          "operation": "stabs",
+          "sourceIds": [
+            "dreamcast.h"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/dreamcast/02-airhorn.mp3"
+        },
+        {
+          "slot": 3,
+          "slotName": "Drumroll",
+          "slug": "drumroll",
+          "caption": "VMU selection roll",
+          "operation": "roll",
+          "sourceIds": [
+            "dreamcast.d"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/dreamcast/03-drumroll.mp3"
+        },
+        {
+          "slot": 4,
+          "slotName": "Victory",
+          "slug": "victory",
+          "caption": "Dreamcast boot",
+          "operation": "direct",
+          "sourceIds": [
+            "dreamcast.v"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/dreamcast/04-victory.mp3"
+        },
+        {
+          "slot": 5,
+          "slotName": "Sad trombone",
+          "slug": "sad-trombone",
+          "caption": "VMU error",
+          "operation": "direct",
+          "sourceIds": [
+            "dreamcast.s"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/dreamcast/05-sad-trombone.mp3"
+        },
+        {
+          "slot": 6,
+          "slotName": "Alert",
+          "slug": "alert",
+          "caption": "VMU configuration",
+          "operation": "direct",
+          "sourceIds": [
+            "dreamcast.a"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/dreamcast/06-alert.mp3"
+        },
+        {
+          "slot": 7,
+          "slotName": "Coin",
+          "slug": "coin",
+          "caption": "BIOS confirmation",
+          "operation": "direct",
+          "sourceIds": [
+            "dreamcast.c"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/dreamcast/07-coin.mp3"
+        },
+        {
+          "slot": 8,
+          "slotName": "Jump",
+          "slug": "jump",
+          "caption": "Menu-back lift",
+          "operation": "rise",
+          "sourceIds": [
+            "dreamcast.j"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/dreamcast/08-jump.mp3"
+        },
+        {
+          "slot": 9,
+          "slotName": "Laser",
+          "slug": "laser",
+          "caption": "Disc-drive sweep",
+          "operation": "zap",
+          "sourceIds": [
+            "dreamcast.l"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/dreamcast/09-laser.mp3"
+        },
+        {
+          "slot": 10,
+          "slotName": "Countdown",
+          "slug": "countdown",
+          "caption": "Dreamcast menu countdown",
+          "operation": "count",
+          "sourceIds": [
+            "dreamcast.t"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/dreamcast/10-countdown.mp3"
+        }
+      ]
+    },
+    {
+      "id": "gmod",
+      "name": "Garry's Mod",
+      "index": 17,
+      "appearance": "light",
+      "clips": [
+        {
+          "slot": 1,
+          "slotName": "Beep",
+          "slug": "beep",
+          "caption": "Derma click",
+          "operation": "direct",
+          "sourceIds": [
+            "gmod.b"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/gmod/01-beep.mp3"
+        },
+        {
+          "slot": 2,
+          "slotName": "Airhorn",
+          "slug": "airhorn",
+          "caption": "PHX kaboom",
+          "operation": "direct",
+          "sourceIds": [
+            "gmod.h"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/gmod/02-airhorn.mp3"
+        },
+        {
+          "slot": 3,
+          "slotName": "Drumroll",
+          "slug": "drumroll",
+          "caption": "Sandbox metal roll",
+          "operation": "roll",
+          "sourceIds": [
+            "gmod.d"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/gmod/03-drumroll.mp3"
+        },
+        {
+          "slot": 4,
+          "slotName": "Victory",
+          "slug": "victory",
+          "caption": "Sandbox save/load",
+          "operation": "direct",
+          "sourceIds": [
+            "gmod.v"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/gmod/04-victory.mp3"
+        },
+        {
+          "slot": 5,
+          "slotName": "Sad trombone",
+          "slug": "sad-trombone",
+          "caption": "Skidding failure",
+          "operation": "direct",
+          "sourceIds": [
+            "gmod.s"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/gmod/05-sad-trombone.mp3"
+        },
+        {
+          "slot": 6,
+          "slotName": "Alert",
+          "slug": "alert",
+          "caption": "Balloon-pop alert",
+          "operation": "alert",
+          "sourceIds": [
+            "gmod.a"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/gmod/06-alert.mp3"
+        },
+        {
+          "slot": 7,
+          "slotName": "Coin",
+          "slug": "coin",
+          "caption": "Content downloaded",
+          "operation": "direct",
+          "sourceIds": [
+            "gmod.c"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/gmod/07-coin.mp3"
+        },
+        {
+          "slot": 8,
+          "slotName": "Jump",
+          "slug": "jump",
+          "caption": "Rocket thruster",
+          "operation": "direct",
+          "sourceIds": [
+            "gmod.j"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/gmod/08-jump.mp3"
+        },
+        {
+          "slot": 9,
+          "slotName": "Laser",
+          "slug": "laser",
+          "caption": "Supercharged physics shot",
+          "operation": "direct",
+          "sourceIds": [
+            "gmod.l"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/gmod/09-laser.mp3"
+        },
+        {
+          "slot": 10,
+          "slotName": "Countdown",
+          "slug": "countdown",
+          "caption": "Spawn-menu countdown",
+          "operation": "count",
+          "sourceIds": [
+            "gmod.t"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/gmod/10-countdown.mp3"
+        }
+      ]
+    },
+    {
+      "id": "ricochet",
+      "name": "Ricochet",
+      "index": 18,
+      "appearance": "dark",
+      "clips": [
+        {
+          "slot": 1,
+          "slotName": "Beep",
+          "slug": "beep",
+          "caption": "Returning disc",
+          "operation": "direct",
+          "sourceIds": [
+            "ricochet.b"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/ricochet/01-beep.mp3"
+        },
+        {
+          "slot": 2,
+          "slotName": "Airhorn",
+          "slug": "airhorn",
+          "caption": "Rocket blast",
+          "operation": "direct",
+          "sourceIds": [
+            "ricochet.h"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/ricochet/02-airhorn.mp3"
+        },
+        {
+          "slot": 3,
+          "slotName": "Drumroll",
+          "slug": "drumroll",
+          "caption": "Disc-impact roll",
+          "operation": "roll",
+          "sourceIds": [
+            "ricochet.d"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/ricochet/03-drumroll.mp3"
+        },
+        {
+          "slot": 4,
+          "slotName": "Victory",
+          "slug": "victory",
+          "caption": "Power-up acquired",
+          "operation": "direct",
+          "sourceIds": [
+            "ricochet.v"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/ricochet/04-victory.mp3"
+        },
+        {
+          "slot": 5,
+          "slotName": "Sad trombone",
+          "slug": "sad-trombone",
+          "caption": "Arena death",
+          "operation": "direct",
+          "sourceIds": [
+            "ricochet.s"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/ricochet/05-sad-trombone.mp3"
+        },
+        {
+          "slot": 6,
+          "slotName": "Alert",
+          "slug": "alert",
+          "caption": "Player-spawn alert",
+          "operation": "alert",
+          "sourceIds": [
+            "ricochet.a"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/ricochet/06-alert.mp3"
+        },
+        {
+          "slot": 7,
+          "slotName": "Coin",
+          "slug": "coin",
+          "caption": "Pickup ping",
+          "operation": "direct",
+          "sourceIds": [
+            "ricochet.c"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/ricochet/07-coin.mp3"
+        },
+        {
+          "slot": 8,
+          "slotName": "Jump",
+          "slug": "jump",
+          "caption": "Jump pad",
+          "operation": "direct",
+          "sourceIds": [
+            "ricochet.j"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/ricochet/08-jump.mp3"
+        },
+        {
+          "slot": 9,
+          "slotName": "Laser",
+          "slug": "laser",
+          "caption": "Alternate disc fire",
+          "operation": "direct",
+          "sourceIds": [
+            "ricochet.l"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/ricochet/09-laser.mp3"
+        },
+        {
+          "slot": 10,
+          "slotName": "Countdown",
+          "slug": "countdown",
+          "caption": "Arena: three, two, one",
+          "operation": "voice-count",
+          "sourceIds": [
+            "ricochet.t3",
+            "ricochet.t2",
+            "ricochet.t1"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/ricochet/10-countdown.mp3"
+        }
+      ]
+    },
+    {
+      "id": "dod",
+      "name": "Day of Defeat: Source",
+      "index": 19,
+      "appearance": "dark",
+      "clips": [
+        {
+          "slot": 1,
+          "slotName": "Beep",
+          "slug": "beep",
+          "caption": "Field-menu click",
+          "operation": "direct",
+          "sourceIds": [
+            "dod.b"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/dod/01-beep.mp3"
+        },
+        {
+          "slot": 2,
+          "slotName": "Airhorn",
+          "slug": "airhorn",
+          "caption": "Battlefield bell",
+          "operation": "direct",
+          "sourceIds": [
+            "dod.h"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/dod/02-airhorn.mp3"
+        },
+        {
+          "slot": 3,
+          "slotName": "Drumroll",
+          "slug": "drumroll",
+          "caption": "MG42 chain rattle",
+          "operation": "roll",
+          "sourceIds": [
+            "dod.d"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/dod/03-drumroll.mp3"
+        },
+        {
+          "slot": 4,
+          "slotName": "Victory",
+          "slug": "victory",
+          "caption": "Objective secure",
+          "operation": "direct",
+          "sourceIds": [
+            "dod.v"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/dod/04-victory.mp3"
+        },
+        {
+          "slot": 5,
+          "slotName": "Sad trombone",
+          "slug": "sad-trombone",
+          "caption": "Fall back",
+          "operation": "direct",
+          "sourceIds": [
+            "dod.s"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/dod/05-sad-trombone.mp3"
+        },
+        {
+          "slot": 6,
+          "slotName": "Alert",
+          "slug": "alert",
+          "caption": "Heavy field bell",
+          "operation": "direct",
+          "sourceIds": [
+            "dod.a"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/dod/06-alert.mp3"
+        },
+        {
+          "slot": 7,
+          "slotName": "Coin",
+          "slug": "coin",
+          "caption": "Garand clip ping",
+          "operation": "direct",
+          "sourceIds": [
+            "dod.c"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/dod/07-coin.mp3"
+        },
+        {
+          "slot": 8,
+          "slotName": "Jump",
+          "slug": "jump",
+          "caption": "Bolt-action lift",
+          "operation": "rise",
+          "sourceIds": [
+            "dod.j"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/dod/08-jump.mp3"
+        },
+        {
+          "slot": 9,
+          "slotName": "Laser",
+          "slug": "laser",
+          "caption": "Radio spark sweep",
+          "operation": "zap",
+          "sourceIds": [
+            "dod.l"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/dod/09-laser.mp3"
+        },
+        {
+          "slot": 10,
+          "slotName": "Countdown",
+          "slug": "countdown",
+          "caption": "Field-radio countdown",
+          "operation": "count",
+          "sourceIds": [
+            "dod.t"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/dod/10-countdown.mp3"
+        }
+      ]
+    },
+    {
+      "id": "rust",
+      "name": "Rust",
+      "index": 20,
+      "appearance": "dark",
+      "clips": [
+        {
+          "slot": 1,
+          "slotName": "Beep",
+          "slug": "beep",
+          "caption": "Pager beep",
+          "operation": "direct",
+          "sourceIds": [
+            "rust.b"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/rust/01-beep.mp3"
+        },
+        {
+          "slot": 2,
+          "slotName": "Airhorn",
+          "slug": "airhorn",
+          "caption": "Nexus ferry horn",
+          "operation": "direct",
+          "sourceIds": [
+            "rust.h"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/rust/02-airhorn.mp3"
+        },
+        {
+          "slot": 3,
+          "slotName": "Drumroll",
+          "slug": "drumroll",
+          "caption": "Barrel-impact roll",
+          "operation": "roll",
+          "sourceIds": [
+            "rust.d"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/rust/03-drumroll.mp3"
+        },
+        {
+          "slot": 4,
+          "slotName": "Victory",
+          "slug": "victory",
+          "caption": "Item unlocked",
+          "operation": "direct",
+          "sourceIds": [
+            "rust.v"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/rust/04-victory.mp3"
+        },
+        {
+          "slot": 5,
+          "slotName": "Sad trombone",
+          "slug": "sad-trombone",
+          "caption": "Mission failed",
+          "operation": "direct",
+          "sourceIds": [
+            "rust.s"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/rust/05-sad-trombone.mp3"
+        },
+        {
+          "slot": 6,
+          "slotName": "Alert",
+          "slug": "alert",
+          "caption": "Turret target acquired",
+          "operation": "direct",
+          "sourceIds": [
+            "rust.a"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/rust/06-alert.mp3"
+        },
+        {
+          "slot": 7,
+          "slotName": "Coin",
+          "slug": "coin",
+          "caption": "Gold loot bag",
+          "operation": "direct",
+          "sourceIds": [
+            "rust.c"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/rust/07-coin.mp3"
+        },
+        {
+          "slot": 8,
+          "slotName": "Jump",
+          "slug": "jump",
+          "caption": "Boots jump",
+          "operation": "direct",
+          "sourceIds": [
+            "rust.j"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/rust/08-jump.mp3"
+        },
+        {
+          "slot": 9,
+          "slotName": "Laser",
+          "slug": "laser",
+          "caption": "Flint-spark sweep",
+          "operation": "zap",
+          "sourceIds": [
+            "rust.l"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/rust/09-laser.mp3"
+        },
+        {
+          "slot": 10,
+          "slotName": "Countdown",
+          "slug": "countdown",
+          "caption": "Capture-point countdown",
+          "operation": "count",
+          "sourceIds": [
+            "rust.t"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/rust/10-countdown.mp3"
+        }
+      ]
+    },
+    {
+      "id": "x360",
+      "name": "Xbox 360 Blades",
+      "index": 21,
+      "appearance": "light",
+      "clips": [
+        {
+          "slot": 1,
+          "slotName": "Beep",
+          "slug": "beep",
+          "caption": "Blades hover",
+          "operation": "direct",
+          "sourceIds": [
+            "x360.b"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/x360/01-beep.mp3"
+        },
+        {
+          "slot": 2,
+          "slotName": "Airhorn",
+          "slug": "airhorn",
+          "caption": "Blade-open burst",
+          "operation": "stabs",
+          "sourceIds": [
+            "x360.h"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/x360/02-airhorn.mp3"
+        },
+        {
+          "slot": 3,
+          "slotName": "Drumroll",
+          "slug": "drumroll",
+          "caption": "Guide-hover roll",
+          "operation": "roll",
+          "sourceIds": [
+            "x360.d"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/x360/03-drumroll.mp3"
+        },
+        {
+          "slot": 4,
+          "slotName": "Victory",
+          "slug": "victory",
+          "caption": "Xbox achievement",
+          "operation": "direct",
+          "sourceIds": [
+            "x360.v"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/x360/04-victory.mp3"
+        },
+        {
+          "slot": 5,
+          "slotName": "Sad trombone",
+          "slug": "sad-trombone",
+          "caption": "Blades-back failure fall",
+          "operation": "fall",
+          "sourceIds": [
+            "x360.s"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/x360/05-sad-trombone.mp3"
+        },
+        {
+          "slot": 6,
+          "slotName": "Alert",
+          "slug": "alert",
+          "caption": "Dashboard notification",
+          "operation": "direct",
+          "sourceIds": [
+            "x360.a"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/x360/06-alert.mp3"
+        },
+        {
+          "slot": 7,
+          "slotName": "Coin",
+          "slug": "coin",
+          "caption": "Blades selection",
+          "operation": "direct",
+          "sourceIds": [
+            "x360.c"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/x360/07-coin.mp3"
+        },
+        {
+          "slot": 8,
+          "slotName": "Jump",
+          "slug": "jump",
+          "caption": "Guide-open lift",
+          "operation": "rise",
+          "sourceIds": [
+            "x360.j"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/x360/08-jump.mp3"
+        },
+        {
+          "slot": 9,
+          "slotName": "Laser",
+          "slug": "laser",
+          "caption": "Blade-switch sweep",
+          "operation": "zap",
+          "sourceIds": [
+            "x360.l"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/x360/09-laser.mp3"
+        },
+        {
+          "slot": 10,
+          "slotName": "Countdown",
+          "slug": "countdown",
+          "caption": "Guide-button countdown",
+          "operation": "count",
+          "sourceIds": [
+            "x360.t"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/x360/10-countdown.mp3"
+        }
+      ]
+    },
+    {
+      "id": "ipod",
+      "name": "iPod classic",
+      "index": 22,
+      "appearance": "light",
+      "clips": [
+        {
+          "slot": 1,
+          "slotName": "Beep",
+          "slug": "beep",
+          "caption": "Piezo confirmation",
+          "operation": "ipod",
+          "sourceIds": [],
+          "provenanceKind": "original-theme-matched-design",
+          "file": "audio/ipod/01-beep.mp3"
+        },
+        {
+          "slot": 2,
+          "slotName": "Airhorn",
+          "slug": "airhorn",
+          "caption": "Click-wheel alarm",
+          "operation": "ipod",
+          "sourceIds": [],
+          "provenanceKind": "original-theme-matched-design",
+          "file": "audio/ipod/02-airhorn.mp3"
+        },
+        {
+          "slot": 3,
+          "slotName": "Drumroll",
+          "slug": "drumroll",
+          "caption": "Fast wheel-scroll roll",
+          "operation": "ipod",
+          "sourceIds": [],
+          "provenanceKind": "original-theme-matched-design",
+          "file": "audio/ipod/03-drumroll.mp3"
+        },
+        {
+          "slot": 4,
+          "slotName": "Victory",
+          "slug": "victory",
+          "caption": "Pocket-device completion",
+          "operation": "ipod",
+          "sourceIds": [],
+          "provenanceKind": "original-theme-matched-design",
+          "file": "audio/ipod/04-victory.mp3"
+        },
+        {
+          "slot": 5,
+          "slotName": "Sad trombone",
+          "slug": "sad-trombone",
+          "caption": "Piezo failure fall",
+          "operation": "ipod",
+          "sourceIds": [],
+          "provenanceKind": "original-theme-matched-design",
+          "file": "audio/ipod/05-sad-trombone.mp3"
+        },
+        {
+          "slot": 6,
+          "slotName": "Alert",
+          "slug": "alert",
+          "caption": "Pocket-device alert",
+          "operation": "ipod",
+          "sourceIds": [],
+          "provenanceKind": "original-theme-matched-design",
+          "file": "audio/ipod/06-alert.mp3"
+        },
+        {
+          "slot": 7,
+          "slotName": "Coin",
+          "slug": "coin",
+          "caption": "Click-wheel bonus",
+          "operation": "ipod",
+          "sourceIds": [],
+          "provenanceKind": "original-theme-matched-design",
+          "file": "audio/ipod/07-coin.mp3"
+        },
+        {
+          "slot": 8,
+          "slotName": "Jump",
+          "slug": "jump",
+          "caption": "Pocket-arcade hop",
+          "operation": "ipod",
+          "sourceIds": [],
+          "provenanceKind": "original-theme-matched-design",
+          "file": "audio/ipod/08-jump.mp3"
+        },
+        {
+          "slot": 9,
+          "slotName": "Laser",
+          "slug": "laser",
+          "caption": "Piezo arcade sweep",
+          "operation": "ipod",
+          "sourceIds": [],
+          "provenanceKind": "original-theme-matched-design",
+          "file": "audio/ipod/09-laser.mp3"
+        },
+        {
+          "slot": 10,
+          "slotName": "Countdown",
+          "slug": "countdown",
+          "caption": "Pocket-device countdown",
+          "operation": "ipod",
+          "sourceIds": [],
+          "provenanceKind": "original-theme-matched-design",
+          "file": "audio/ipod/10-countdown.mp3"
+        }
+      ]
+    },
+    {
+      "id": "msn",
+      "name": "MSN Messenger",
+      "index": 23,
+      "appearance": "light",
+      "clips": [
+        {
+          "slot": 1,
+          "slotName": "Beep",
+          "slug": "beep",
+          "caption": "Messenger message",
+          "operation": "direct",
+          "sourceIds": [
+            "msn.b"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/msn/01-beep.mp3"
+        },
+        {
+          "slot": 2,
+          "slotName": "Airhorn",
+          "slug": "airhorn",
+          "caption": "Messenger nudge burst",
+          "operation": "stabs",
+          "sourceIds": [
+            "msn.h"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/msn/02-airhorn.mp3"
+        },
+        {
+          "slot": 3,
+          "slotName": "Drumroll",
+          "slug": "drumroll",
+          "caption": "Typing-ping flutter",
+          "operation": "roll",
+          "sourceIds": [
+            "msn.d"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/msn/03-drumroll.mp3"
+        },
+        {
+          "slot": 4,
+          "slotName": "Victory",
+          "slug": "victory",
+          "caption": "Contact-online celebration",
+          "operation": "fanfare",
+          "sourceIds": [
+            "msn.v"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/msn/04-victory.mp3"
+        },
+        {
+          "slot": 5,
+          "slotName": "Sad trombone",
+          "slug": "sad-trombone",
+          "caption": "Falling contact chime",
+          "operation": "fall",
+          "sourceIds": [
+            "msn.s"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/msn/05-sad-trombone.mp3"
+        },
+        {
+          "slot": 6,
+          "slotName": "Alert",
+          "slug": "alert",
+          "caption": "Messenger nudge",
+          "operation": "alert",
+          "sourceIds": [
+            "msn.a"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/msn/06-alert.mp3"
+        },
+        {
+          "slot": 7,
+          "slotName": "Coin",
+          "slug": "coin",
+          "caption": "Online sparkle",
+          "operation": "sparkle",
+          "sourceIds": [
+            "msn.c"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/msn/07-coin.mp3"
+        },
+        {
+          "slot": 8,
+          "slotName": "Jump",
+          "slug": "jump",
+          "caption": "Message swoop",
+          "operation": "rise",
+          "sourceIds": [
+            "msn.j"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/msn/08-jump.mp3"
+        },
+        {
+          "slot": 9,
+          "slotName": "Laser",
+          "slug": "laser",
+          "caption": "Nudge sweep",
+          "operation": "zap",
+          "sourceIds": [
+            "msn.l"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/msn/09-laser.mp3"
+        },
+        {
+          "slot": 10,
+          "slotName": "Countdown",
+          "slug": "countdown",
+          "caption": "Messenger-ping countdown",
+          "operation": "count",
+          "sourceIds": [
+            "msn.t"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/msn/10-countdown.mp3"
+        }
+      ]
+    },
+    {
+      "id": "xmb",
+      "name": "PlayStation 3 XMB",
+      "index": 24,
+      "appearance": "dark",
+      "clips": [
+        {
+          "slot": 1,
+          "slotName": "Beep",
+          "slug": "beep",
+          "caption": "XMB option",
+          "operation": "direct",
+          "sourceIds": [
+            "xmb.b"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/xmb/01-beep.mp3"
+        },
+        {
+          "slot": 2,
+          "slotName": "Airhorn",
+          "slug": "airhorn",
+          "caption": "XMB system-denied burst",
+          "operation": "stabs",
+          "sourceIds": [
+            "xmb.h"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/xmb/02-airhorn.mp3"
+        },
+        {
+          "slot": 3,
+          "slotName": "Drumroll",
+          "slug": "drumroll",
+          "caption": "XMB navigation roll",
+          "operation": "roll",
+          "sourceIds": [
+            "xmb.d"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/xmb/03-drumroll.mp3"
+        },
+        {
+          "slot": 4,
+          "slotName": "Victory",
+          "slug": "victory",
+          "caption": "PlayStation trophy",
+          "operation": "direct",
+          "sourceIds": [
+            "xmb.v"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/xmb/04-victory.mp3"
+        },
+        {
+          "slot": 5,
+          "slotName": "Sad trombone",
+          "slug": "sad-trombone",
+          "caption": "XMB cancel failure fall",
+          "operation": "fall",
+          "sourceIds": [
+            "xmb.s"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/xmb/05-sad-trombone.mp3"
+        },
+        {
+          "slot": 6,
+          "slotName": "Alert",
+          "slug": "alert",
+          "caption": "System attention",
+          "operation": "alert",
+          "sourceIds": [
+            "xmb.a"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/xmb/06-alert.mp3"
+        },
+        {
+          "slot": 7,
+          "slotName": "Coin",
+          "slug": "coin",
+          "caption": "XMB system OK",
+          "operation": "direct",
+          "sourceIds": [
+            "xmb.c"
+          ],
+          "provenanceKind": "source-recording",
+          "file": "audio/xmb/07-coin.mp3"
+        },
+        {
+          "slot": 8,
+          "slotName": "Jump",
+          "slug": "jump",
+          "caption": "Gameboot lift",
+          "operation": "rise",
+          "sourceIds": [
+            "xmb.j"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/xmb/08-jump.mp3"
+        },
+        {
+          "slot": 9,
+          "slotName": "Laser",
+          "slug": "laser",
+          "caption": "Coldboot sweep",
+          "operation": "zap",
+          "sourceIds": [
+            "xmb.l"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/xmb/09-laser.mp3"
+        },
+        {
+          "slot": 10,
+          "slotName": "Countdown",
+          "slug": "countdown",
+          "caption": "XMB option countdown",
+          "operation": "count",
+          "sourceIds": [
+            "xmb.t"
+          ],
+          "provenanceKind": "source-derived-arrangement",
+          "file": "audio/xmb/10-countdown.mp3"
+        }
+      ]
+    }
+  ]
+}

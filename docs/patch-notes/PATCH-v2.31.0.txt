@@ -1,0 +1,21 @@
+ROBOTIC TYLER v2.31.0 — patch notes
+
+A soundboard for every theme
+- The ten built-in pads (Beep, Airhorn, Drumroll, Victory, Sad trombone, Alert, Coin, Jump, Laser, Countdown) have their own sounds in all 25 themes: 250 clips from the owner's 25-theme soundboard pack.
+- Same names and numbers, so sound 1, sound countdown, triggers and favourites work as before. Each pad's tooltip says what the theme's sound is.
+- Changing the theme changes the next sound you play. Nothing plays by itself, and Tyler and the music aren't interrupted.
+- Sound 11 onward is the same collection in every theme. Your uploads, including over pads 1–10, stay yours. Switching themes, restarting and upgrading never write to your soundboard. Reset puts a pad back to the theme's sound.
+- Packaged with the app (Chrome, desktop, Setup), read only when played. Nothing is downloaded, and Steam's page security is untouched.
+- Played like an uploaded clip: soundboard volume, Tyler's microphone, Stop, access list, triggers, 3-second cooldown. If a clip can't be loaded, the old tone plays.
+- Loudness: measured through the soundboard's player, the clips were about 3 dB quieter than the old tones, so all 250 play 3 dB up. Nothing else is changed.
+- Credits and what each clip is (source recording, edited, hybrid or new design): sounds/CREDITS.md and sounds/SOUND-MAP.csv.
+
+Fixed
+- The desktop installer no longer includes the icon and sound packs' source folders.
+
+Tested
+- Unit (real background script in Node): all 250 pads return their packaged clip; sound 11+, uploads, names, order, triggers and settings stay the same in all 25 themes; nothing is written; missing-file fallback; commands; packaging.
+- Chromium: all 250 clips decode and play their length with headroom; a themed clip reaches a stand-in call (two local connections, real Opus encoder) as Tyler's microphone; overlap refused, Stop, cooldown.
+- Real Chrome extension with a stand-in Steam page: pads 1 and 10 in all 25 themes, your sounds unchanged, and after a restart.
+- Electron: a clip is read from inside the app archive; the desktop check (mock Steam page) passes.
+- Not tested: a real Steam call (what friends hear and how loud), listening quality, the Windows app.

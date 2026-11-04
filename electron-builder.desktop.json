@@ -15,6 +15,9 @@
     "browser-extension/neural-host.mjs",
     "browser-extension/neural/**/*",
     "!assets/theme-logos/**/*",
+    "!assets/theme-icons/**/*",
+    "!assets/theme-icons-pack-2/**/*",
+    "!assets/theme-sounds/**/*",
     "!**/*.map",
     "!**/node_modules/.cache/**/*",
     "!app/desktop-overrides/**/*"
