@@ -166,3 +166,44 @@ test('themed menus and screens: open, fit, keyboard, Escape, real actions',{time
   assert.deepEqual(errors,[]);
  }finally{await browser.close();server.close();}
 });
+
+// v2.30: DOOM's face takes damage with Tyler's health, like the game's status bar: clean from 80%,
+// bloodier at 60, 40, 20 and under 20%, a red flash when he's hit (none with reduced motion), and
+// the header logo shows the same. Preview page, mocked runtime; the health comes from the panel's
+// real error tracking (errors are put in its log here, not caused by a real provider).
+test('v2.30: DOOM face damage on the status bar and the header logo',{timeout:120000},async()=>{
+ const server=http.createServer((req,res)=>{const file=path.join(ROOT,decodeURIComponent(new URL(req.url,'http://x').pathname));if(!file.startsWith(ROOT)||!fs.existsSync(file)||fs.statSync(file).isDirectory()){res.writeHead(404);res.end();return;}res.writeHead(200,{'content-type':types[path.extname(file)]||'application/octet-stream'});fs.createReadStream(file).pipe(res);}).listen(0);
+ const browser=await chromium.launch();
+ try{
+  for(const reduced of [false,true]){
+   const page=await browser.newPage({viewport:{width:1000,height:900},deviceScaleFactor:2,reducedMotion:reduced?'reduce':'no-preference'});const errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(/theme feature/.test(m.text()))errors.push(m.text());});
+   await page.goto('http://127.0.0.1:'+server.address().port+'/tools/preview/panel.html?theme=doom');
+   await page.waitForFunction(()=>window.__tylerReady===true&&TylerThemeFeatures.mounted().includes('doom-face'));
+   const look=()=>page.evaluate(()=>{const r=document.getElementById('tyler-companion-root').shadowRoot,f=r.querySelector('.doom-face'),o=r.querySelector('.mark .doom-pain'),c=f.querySelector('canvas');
+    // Blood-red pixels on the face (not the eyepiece's brighter red): what the damage adds.
+    const red=cv=>{const d=cv.getContext('2d').getImageData(0,0,cv.width,cv.height).data;let n=0;for(let i=0;i<d.length;i+=4)if(d[i+3]>200&&d[i]>70&&d[i]<220&&d[i+1]<30&&d[i+2]<40)n++;return n;};
+    return {pain:f.dataset.pain,mood:f.dataset.mood,hits:Number(f.dataset.hits||0),flashes:Number(f.dataset.flashes||0),title:f.title,size:c.width,face:red(c),
+     over:o?{hidden:o.hidden,pain:o.dataset.pain,size:o.width,css:Math.round(o.getBoundingClientRect().width),art:Math.round(r.querySelector('.mark-art').getBoundingClientRect().width),red:o.hidden?0:red(o)}:null};});
+   const hurt=n=>page.evaluate(n=>{const S=TylerThemeFeatures.state(),t=Date.now();S.errorAt=Array.from({length:n},()=>t);TylerCompanion.setActivity('LISTENING — speak normally, then pause');},n);
+   const settle=()=>page.waitForTimeout(700);
+   await settle();let s=await look();
+   assert.equal(s.pain,'0','healthy: a clean face');assert.equal(s.over.hidden,true,'and the header logo as drawn');assert.equal(s.size,104,'drawn at the screen\'s own pixels');assert.match(s.title,/100% health/);
+   const clean=s.face,levels=[];
+   for(const [n,want] of [[1,'1'],[2,'2'],[3,'4']]){await hurt(n);await settle();s=await look();levels.push(s);
+    assert.equal(s.pain,want,n+' recent problems');assert.equal(s.over.hidden,false);assert.equal(s.over.pain,want,'the header logo matches');
+    if(process.env.DOOM_SHOT_DIR&&!reduced)await page.screenshot({path:path.join(process.env.DOOM_SHOT_DIR,'doom-'+want+'.png'),clip:{x:0,y:0,width:1000,height:900}});
+    assert.equal(s.over.css,s.over.art,'exactly over the logo');assert.equal(s.over.size,s.over.css*2,'at the screen\'s own pixels');}
+   assert.ok(levels[0].face>clean&&levels[1].face>levels[0].face&&levels[2].face>levels[1].face,'bloodier at each level '+[clean,...levels.map(l=>l.face)]);
+   // A new problem: the "ouch" face and two red flashes (none with reduced motion), then the damage.
+   await hurt(0);await settle();const before=(await look()).hits;
+   await page.evaluate(()=>TylerCompanion.setActivity('NEEDS ATTENTION — Gemini 429 failed · quota reached'));
+   s=await look();assert.equal(s.hits,before+1,'hit');assert.equal(s.mood,'ouch');assert.equal(s.flashes>0,!reduced,reduced?'no flash with reduced motion':'a red flash');
+   await page.waitForFunction(()=>document.getElementById('tyler-companion-root').shadowRoot.querySelector('.doom-face').dataset.mood==='hurt',null,{timeout:3000});
+   s=await look();assert.equal(s.pain,'3','a problem holds him at 25%');
+   // Back to normal with no recent problems: clean again; a reply lands: the evil grin.
+   await hurt(0);await settle();s=await look();assert.equal(s.pain,'0');assert.equal(s.over.hidden,true);
+   await page.evaluate(()=>TylerCompanion.emit('reply',{chars:42}));assert.equal((await look()).mood,'grin','a reply lands: the evil grin');
+   assert.deepEqual(errors,[]);await page.close();
+  }
+ }finally{await browser.close();server.close();}
+});

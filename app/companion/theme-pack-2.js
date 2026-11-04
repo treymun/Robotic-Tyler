@@ -90,21 +90,68 @@
  ]);
 
  // ── DOOM: the status face, the screen melt and pickup messages ────────────
+ // v2.30: Tyler's face takes damage the way the DOOM marine's does: clean from 80% health, then four
+ // bloodier looks (60, 40, 20 and under 20%), a red "ouch" flash the moment he's hit, and the evil
+ // grin when a reply or a clip lands. Health is his real connection health (theme-features.js). The
+ // same damage is drawn on the status bar's face and over the header logo, in the logo's own pixels
+ // (rectangles on a 64-unit grid over the 128-pixel art), so it stays crisp at any size.
+ const PAIN=[[],[['R',18,38,2,1],['R',19,39,2,1],['R',20,40,2,1],['D',18,39,1,1],['R',24,26,2,2],['B',24,26,1,1]],[['D',29,24,3,1],['R',29,25,3,2],['B',30,25,1,1],['D',30,27,1,2],['R',31,38,2,2],['R',32,40,1,1],['D',32,41,1,1]],[['D',39,38,1,1],['R',40,39,2,1],['R',41,40,2,1],['B',41,40,1,1],['D',42,41,1,1],['R',26,42,2,1],['R',26,43,1,2],['D',26,45,1,1],['P',21,33,7,2],['P',20,30,2,4],['P',27,33,2,1]],[['R',23,28,2,1],['R',22,29,1,1],['R',19,35,2,3],['R',18,41,2,2],['D',18,43,1,2],['R',36,37,2,2],['R',37,39,1,3],['D',37,42,1,2],['R',31,44,1,2],['D',31,46,1,1],['R',33,25,2,2],['D',34,27,1,1],['R',28,42,2,1],['R',29,43,1,2],['D',29,45,1,1],['R',34,42,2,1],['R',34,43,1,3],['D',34,46,1,1],['B',28,42,1,1]]]; // per level, added to the ones before: [colour, x, y, w, h]
+ const BLOOD={D:'#5a0000',R:'#a00c0c',B:'#d4261b',P:'rgba(78,22,76,.78)'};
+ const painLevel=h=>h>=80?0:h>=60?1:h>=40?2:h>=20?3:4;
+ /** Draws the DOOM logo at px×px into g at (o,o), with the damage for `level` and the hit flash. */
+ async function hurtFace(g,px,level,flash,o=0,fallback=null){
+  const art=await globalThis.TylerLogos?.render?.('doom',px).catch?.(()=>null)||null;
+  g.imageSmoothingEnabled=false;g.clearRect(0,0,g.canvas.width,g.canvas.height);
+  if(art)g.drawImage(art,o,o);else if(fallback?.width)g.drawImage(fallback,0,0,fallback.width,fallback.height,o,o,px,px);else return false;
+  if(level>=3){try{const im=g.getImageData(o,o,px,px),d=im.data,k=level>3?[.88,.66,.62]:[.95,.8,.78];
+   // Skin only (orange, not the hair, helmet or red eyepiece): bruised, then pale and bloody.
+   for(let i=0;i<d.length;i+=4){const r=d[i],G=d[i+1],b=d[i+2];if(d[i+3]&&r>150&&G>80&&b<150&&r>G+25&&G>b+10){d[i]=r*k[0];d[i+1]=G*k[1];d[i+2]=b*k[2];}}
+   g.putImageData(im,o,o);}catch{}}
+  const u=px/64,at=v=>o+Math.round(v*u);
+  for(let l=1;l<=level;l++)for(const [c,x,y,w,h] of PAIN[l]){g.fillStyle=BLOOD[c];const x0=at(x),y0=at(y);g.fillRect(x0,y0,Math.max(1,at(x+w)-x0),Math.max(1,at(y+h)-y0));}
+  if(flash){g.globalCompositeOperation='source-atop';g.fillStyle='rgba(255,24,0,.5)';g.fillRect(o,o,px,px);g.globalCompositeOperation='source-over';}
+  return true;
+ }
+ globalThis.TylerDoomFace=Object.freeze({level:painLevel,draw:hurtFace,PAIN});
+
  F.define('doom',[
   {id:'doom-face',mount(c){
    const box=c.add('deck',c.h('div','fx doom-bar'));
    const ammo=c.h('div','doom-cell'),face=c.h('div','doom-face'),hp=c.h('div','doom-cell');
    const ammoN=c.h('b'),hpN=c.h('b');ammo.append(ammoN,c.h('small',null,'Replies'));hp.append(hpN,c.h('small',null,'Health'));
    const art=c.root.querySelector('.mark-art');const img=c.h('canvas');img.width=64;img.height=64;face.append(img);
-   const draw=()=>{try{const g=img.getContext('2d');g.imageSmoothingEnabled=false;g.clearRect(0,0,64,64);g.drawImage(art,0,0,art.width,art.height,4,4,56,56);}catch{}};
+   // v2.30: the header logo gets the same damage, on a canvas laid over it (the logo itself is untouched).
+   const mark=c.root.querySelector('.mark'),over=mark?c.add('deck',c.h('canvas','doom-pain')):null;if(over){over.hidden=true;mark.append(over);}
+   const ratio=()=>Math.min(3,Math.max(1,globalThis.devicePixelRatio||1));
+   let level=-1,flash=false,drawn='',ouchUntil=0,grinUntil=0,lastH=c.health(),busy=null;
+   const draw=async(force=false)=>{
+    const W=Math.round(52*ratio()),A=Math.round(W*56/64),o=Math.round((W-A)/2),M=over?Math.round((art?.getBoundingClientRect().width||0)*ratio()):0; // the logo's box (the overlay's own is 0 while hidden)
+    const key=[level,flash,W,M,c.S.theme].join();if(!force&&key===drawn)return;drawn=key;
+    try{if(img.width!==W){img.width=W;img.height=W;}await hurtFace(img.getContext('2d'),A,level,flash,o,art);}catch{}
+    if(over){const show=(level>0||flash)&&M>0;over.hidden=!show;over.dataset.pain=String(level);
+     if(show){try{if(over.width!==M){over.width=M;over.height=M;}await hurtFace(over.getContext('2d'),M,level,flash,0,art);}catch{}}}
+   };
+   const redraw=(force=false)=>{busy=(busy||Promise.resolve()).then(()=>draw(force));return busy;};
+   // The hit: two red flashes (none with reduced motion) and the "ouch" face for a moment.
+   let hits=0,flashes=0;
+   const ouch=()=>{if(Date.now()<ouchUntil)return;ouchUntil=Date.now()+900;face.dataset.hits=String(++hits);if(c.reduced)return;face.dataset.flashes=String(flashes+=2);flash=true;void redraw();c.later(()=>{flash=false;void redraw();},140);c.later(()=>{flash=true;void redraw();},280);c.later(()=>{flash=false;void redraw();},420);};
    // v2.22: the key cards, like the status bar's: blue = AI key saved, yellow = chat linked, red = voice armed.
    const keys=c.h('div','doom-keys');const cards={blue:c.h('i','doom-key blue'),yellow:c.h('i','doom-key yellow'),red:c.h('i','doom-key red')};for(const [k,el] of Object.entries(cards)){const bi=c.brand(k+'-keycard','doom-key-bi');if(bi){el.classList.add('doom-key-b');el.append(bi);}keys.append(el);}
    // v2.28: the status bar's own pickups beside the numbers: the ammo for replies, the medikit for health.
    for(const [cell,id] of [[ammo,'ammo'],[hp,'health']]){const bi=c.brand(id,'doom-cell-bi');if(bi)cell.prepend(bi);}
    box.append(ammo,face,hp,keys);face.title='Tyler\'s status';
-   function render(){ammoN.textContent=String(c.S.replies+c.S.spoken);const h=c.health();hpN.textContent=h+'%';face.dataset.mood=c.S.state==='error'?'hurt':c.S.state==='speaking'?'grin':c.S.state==='thinking'?'squint':h<50?'hurt':'idle';box.dataset.low=String(h<40);
+   function render(){ammoN.textContent=String(c.S.replies+c.S.spoken);const h=c.health(),t=Date.now();hpN.textContent=h+'%';
+    if(h<lastH-4)ouch();lastH=h;
+    face.dataset.mood=t<ouchUntil?'ouch':c.S.state==='error'?'hurt':c.S.state==='speaking'||t<grinUntil?'grin':c.S.state==='thinking'?'squint':'idle';box.dataset.low=String(h<40);
+    const next=painLevel(h);if(next!==level){level=next;face.dataset.pain=String(level);}face.title='Tyler\'s status: '+h+'% health';void redraw();
     const sys=c.systems(),v=c.voice(),have={blue:c.S.keyOk===true,yellow:sys[1].level===3,red:v.armed};for(const [k,el] of Object.entries(cards)){el.dataset.have=String(!!have[k]);el.title=({blue:'Blue key: AI key',yellow:'Yellow key: chat linked',red:'Red key: voice armed'})[k]+(have[k]?'':' (missing)');}}
-   draw();c.later(draw,800);c.later(draw,2500);render();c.every(render);return {update(type){if(type==='theme')c.later(draw,500);render();}};
+   render();c.later(()=>redraw(true),800);c.later(()=>redraw(true),2500);c.every(render);
+   // The panel's tick stops in compact mode, where the header logo is what shows: heal there too.
+   const heal=()=>{if(c.S.mini)render();c.later(heal,5000);};c.later(heal,5000);
+   return {update(type,d){if(type==='theme'||type==='mini')c.later(()=>redraw(true),500);
+    if(type==='state'&&d?.state==='error'&&d.before!=='error')ouch();
+    if(type==='reply'||type==='sound'||(type==='turn'&&d?.ms<1000))grinUntil=Date.now()+1200;
+    render();}};
   }},
   {id:'doom-melt',mount(c){
    const scroll=c.root.querySelector('.scroll');let prev=c.S.tab;

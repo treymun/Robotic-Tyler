@@ -61,3 +61,16 @@ test('the panel keeps its own size and dock setting (v2.23), and nothing else of
  const src=fs.readFileSync(new URL('../browser-extension/panel-layout.js',import.meta.url),'utf8');
  assert.doesNotMatch(src,/createElement\('style'\)/,'Steam\'s page is narrowed through element.style, which a strict page policy allows');
 });
+
+// v2.30: DOOM's damage levels (the status bar's five faces). Mocked: no browser; the end-to-end test
+// draws them on the real panel.
+test('v2.30: DOOM face damage follows the game\'s health steps and stays on Tyler\'s face',async()=>{
+ const {default:vm}=await import('node:vm'),{readFileSync}=await import('node:fs'),{fileURLToPath}=await import('node:url');
+ const ctx={TylerThemeFeatures:{define(){}}};ctx.globalThis=ctx;vm.createContext(ctx);
+ vm.runInContext(readFileSync(fileURLToPath(new URL('../browser-extension/theme-pack-2.js',import.meta.url)),'utf8'),ctx);
+ const D=ctx.TylerDoomFace;
+ for(const [h,l] of [[100,0],[80,0],[79,1],[60,1],[59,2],[40,2],[39,3],[25,3],[20,3],[19,4],[1,4]])assert.equal(D.level(h),l,h+'%');
+ assert.equal(D.PAIN.length,5);assert.equal(D.PAIN[0].length,0,'clean at full health');
+ for(let l=1;l<5;l++){assert.ok(D.PAIN[l].length>=5,'level '+l+' adds damage');
+  for(const [c,x,y,w,h] of D.PAIN[l]){assert.ok('DRBP'.includes(c),c);assert.ok(x>=16&&x+w<=44&&y>=22&&y+h<=48,'on the face, not the helmet: '+[x,y,w,h]);}}
+});

@@ -238,7 +238,11 @@
 .doom-face[data-mood=idle] canvas{animation:doom-look 4s steps(1) infinite}
 .doom-face[data-mood=squint] canvas{transform:scaleY(.86)}
 .doom-face[data-mood=grin] canvas{animation:doom-grin .45s steps(2) infinite}
-.doom-face[data-mood=hurt] canvas{filter:sepia(1) saturate(4) hue-rotate(-30deg) brightness(.9);animation:doom-ouch .3s steps(2) 3}
+.doom-face[data-mood=hurt] canvas{animation:doom-look 2s steps(1) infinite}
+.doom-face[data-mood=ouch] canvas{animation:doom-ouch .3s steps(2) 3}
+/* v2.30: the header logo's damage (theme-pack-2.js), exactly over the logo. */
+.mark .doom-pain{position:absolute;left:var(--logo-pad,0px);top:var(--logo-pad,0px);width:calc(100% - 2 * var(--logo-pad,0px));height:calc(100% - 2 * var(--logo-pad,0px));image-rendering:pixelated;pointer-events:none}
+.mark:not([data-logo]) .doom-pain,.mark .doom-pain[hidden]{display:none}
 @keyframes doom-look{0%,40%{transform:none}45%,60%{transform:translateX(-4px) scaleX(-1)}65%,85%{transform:translateX(4px)}}
 @keyframes doom-grin{50%{transform:translateY(-2px) scale(1.06)}}
 @keyframes doom-ouch{50%{transform:translateX(3px)}}
