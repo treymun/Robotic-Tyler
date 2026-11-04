@@ -1,52 +1,31 @@
-/* Tyler's phone remote (v2.25). The page follows Tyler's theme through the same colour tokens as the
-   panel and settings (ui/tokens.css + ui/themes/<theme>.css), so it looks like the rest of Tyler. */
-*,*::before,*::after{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%;background:var(--rt-bg-deep,#0e141b)}
-body{margin:0;min-height:100vh;background:var(--rt-bg,#1b2838);color:var(--rt-ink,#c7d5e0);font:400 16px/1.45 var(--rt-font,system-ui,sans-serif)}
-.rr{max-width:560px;margin:0 auto;padding:calc(10px + env(safe-area-inset-top)) 14px calc(24px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px}
-.rr-head{position:sticky;top:0;z-index:2;display:flex;align-items:center;gap:10px;margin:-10px -14px 0;padding:calc(10px + env(safe-area-inset-top)) 14px 10px;background:var(--rt-bar,#171a21);box-shadow:0 1px 0 var(--rt-line,rgba(255,255,255,.08))}
-.rr-logo{width:40px;height:40px;flex-shrink:0;object-fit:contain}
-.rr-ident{flex:1;min-width:0;display:flex;flex-direction:column}
-.rr-word{font:700 17px/1.1 var(--rt-font-display,var(--rt-font));letter-spacing:.06em;color:var(--rt-ink-strong,#fff);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.rr-ident small{font-size:12px;color:var(--rt-ink-2,#b8c4cf)}
-.rr-link{display:inline-flex;align-items:center;gap:6px;padding:4px 9px;border-radius:var(--rt-r-pill,999px);background:var(--rt-block,rgba(0,0,0,.2));font-size:12px;color:var(--rt-ink-3,#8f98a0);white-space:nowrap}
-.rr-link i{width:8px;height:8px;border-radius:50%;background:var(--rt-ink-4,#556)}
-.rr-link[data-on=true] i{background:var(--rt-success,#8fb93b);box-shadow:0 0 6px var(--rt-success,#8fb93b)}
-.rr-card{padding:14px;border-radius:var(--rt-r-md,6px);background:var(--rt-surface,#16202d);border:1px solid var(--rt-line,rgba(255,255,255,.08))}
-.rr-card h1,.rr-card h2{margin:0 0 10px;font:600 15px/1.2 var(--rt-font-display,var(--rt-font));letter-spacing:var(--rt-track,.04em);text-transform:uppercase;color:var(--rt-ink-strong,#fff)}
-.rr-card h1{font-size:19px}
-.rr-text{margin:0 0 10px;color:var(--rt-ink-2,#b8c4cf)}
-.rr-status{border-left:4px solid var(--tone,var(--rt-state-ready,#67c1f5))}
-.rr-status[data-state=listening]{--tone:var(--rt-state-listening,#67c1f5)}.rr-status[data-state=thinking]{--tone:var(--rt-state-thinking,#e4b400)}
-.rr-status[data-state=speaking]{--tone:var(--rt-state-speaking,#8fb93b)}.rr-status[data-state=error]{--tone:var(--rt-state-error,#e35e5e)}
-.rr-status:is([data-state=paused],[data-state=standby]){--tone:var(--rt-state-standby,#8f98a0)}.rr-status[data-state=waiting]{--tone:var(--rt-state-waiting,#b48ead)}
-.rr-state{display:flex;align-items:center;gap:8px;margin-bottom:4px}
-.rr-state b{font:700 18px/1.2 var(--rt-font-display,var(--rt-font));letter-spacing:var(--rt-track,.04em);text-transform:uppercase;color:var(--tone,#fff)}
-.rr-dot{width:10px;height:10px;border-radius:50%;background:var(--tone,#67c1f5);box-shadow:0 0 8px var(--tone,#67c1f5)}
-.rr-facts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0}
-.rr-facts div{padding:8px;border-radius:var(--rt-r-sm,4px);background:var(--rt-block,rgba(0,0,0,.2))}
-.rr-facts dt{font-size:11px;letter-spacing:var(--rt-track,.04em);text-transform:uppercase;color:var(--rt-ink-3,#8f98a0)}
-.rr-facts dd{margin:2px 0 0;font-weight:700;color:var(--rt-ink-strong,#fff);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.rr-row{display:flex;gap:10px}.rr-row>*{flex:1}
-.rr .rr-btn{min-height:46px;margin:0;padding:10px 14px;border:1px solid var(--rt-line-strong,rgba(255,255,255,.16));border-radius:var(--rt-r-sm,4px);background:var(--rt-surface-2,#1e2b3b);color:var(--rt-ink-strong,#fff);font:600 15px/1.2 var(--rt-font,system-ui);cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
-.rr .rr-btn:active{transform:scale(.98)}
-.rr .rr-btn:disabled{opacity:.45}
-.rr .rr-btn:focus-visible,.rr input:focus-visible{outline:2px solid var(--rt-focus,#67c1f5);outline-offset:2px}
-.rr .rr-primary{background:var(--rt-accent-fill,#5c7e10);border-color:transparent;color:var(--rt-on-accent,#fff)}
-.rr .rr-danger{background:var(--rt-danger,#c0392b);border-color:transparent;color:#fff}
-.rr .rr-big{min-height:58px;font-size:17px}
-.rr .rr-quiet{min-height:36px;padding:6px 10px;background:transparent;font-size:13px;color:var(--rt-ink-3,#8f98a0)}
-.rr-sounds{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
-.rr .rr-sound{min-height:52px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.rr-inline{display:flex;gap:8px;margin-bottom:10px}
-.rr input{flex:1;min-width:0;min-height:46px;padding:10px 12px;border:1px solid var(--rt-line-strong,rgba(255,255,255,.16));border-radius:var(--rt-r-sm,4px);background:var(--rt-input,#0e141b);color:var(--rt-ink-strong,#fff);font:400 16px var(--rt-font,system-ui)}
-.rr-code{text-align:center;font:600 28px/1 var(--rt-font-mono,ui-monospace,monospace)!important;letter-spacing:.2em}
-.rr-pair form{display:flex;flex-direction:column;gap:10px}
-.rr-msg{min-height:1.4em;margin:10px 0 0;color:var(--rt-ink-2,#b8c4cf)}
-.rr-empty{margin:0;color:var(--rt-ink-3,#8f98a0)}
-.rr-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:13px;color:var(--rt-ink-2,#b8c4cf)}
-.rr-toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));transform:translateX(-50%);max-width:calc(100% - 28px);margin:0;padding:10px 16px;border-radius:var(--rt-r-md,6px);background:var(--rt-surface-3,#2a3f5a);color:var(--rt-ink-strong,#fff);box-shadow:0 6px 20px rgba(0,0,0,.4);font-size:14px;z-index:5}
-.rr-toast[data-bad=true]{background:var(--rt-danger,#c0392b)}
-@media (prefers-reduced-motion:reduce){.rr-btn:active{transform:none}}
-#remote{display:flex;flex-direction:column;gap:12px}
-#remote[hidden]{display:none}
+/* Tyler's phone remote (v2.26): added to the panel's own stylesheet inside the copy of the panel
+   (remote.js). The panel's stylesheet and the theme do the look; this only makes the panel fill the
+   phone's screen and styles the few parts the remote has that the panel doesn't (pairing, the theme
+   picker). */
+:host{display:block}
+.panel{position:fixed!important;top:0!important;left:0!important;right:0!important;bottom:0!important;width:auto!important;max-width:none!important;height:auto!important;max-height:none!important;
+  border-radius:0!important;box-shadow:none!important;z-index:1!important}
+:host(.mini) .panel{bottom:auto!important;width:auto!important}
+.panel .scroll{-webkit-overflow-scrolling:touch}
+
+/* Not paired yet: only the pairing card under the status strip. */
+.panel[data-remote=pair] :is(.tabs,.stats,.fx-deck,.fx-bar,.fx-foot,.fx-layer,#quickStop,#stop){display:none!important}
+.panel[data-remote=connecting] :is(.tabs,.foot button){visibility:hidden}
+.rm-code{font-size:28px!important;letter-spacing:.3em;text-align:center;font-variant-numeric:tabular-nums;padding:10px!important}
+
+/* Connection to the PC, on the line under the wordmark. */
+.panel:is([data-link=reconnecting],[data-link=lost],[data-link=pc]) .ident-sub{color:var(--rt-state-error,#e5534b)}
+
+/* Theme picker: each theme's Tyler logo and name. */
+.rm-themes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:0 0 14px}
+.panel .rm-themes .rm-theme{display:flex;align-items:center;justify-content:flex-start;gap:8px;min-width:0;min-height:44px;margin:0;padding:6px 8px;text-align:left;
+  font-size:var(--rt-text-sm);line-height:1.2}
+.rm-theme span{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.rm-theme-logo{width:28px;height:28px;flex-shrink:0}
+.panel:is([data-rt-theme=doom],[data-rt-theme=minecraft]) .rm-theme-logo{image-rendering:pixelated}
+.panel .rm-themes .rm-theme[aria-pressed=true]{box-shadow:inset 0 0 0 2px var(--rt-active),0 0 0 1px var(--rt-active)}
+
+/* Labels with their value next to them (volumes). */
+.panel .board-tools label{display:block}
+.panel .board-tools svg{width:14px;height:14px;vertical-align:-2px;margin-right:4px}
+.check small.hint{display:block;margin-top:2px}

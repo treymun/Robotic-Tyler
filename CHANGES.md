@@ -1,3 +1,71 @@
+# ROBOTIC TYLER v2.26.0: the phone remote is Tyler's panel
+
+## The phone shows Tyler's real panel, in your theme, live
+- **The remote is now a copy of Tyler's panel.** It's built from the panel's own markup and stylesheet, so it has the same header and logo, status strip, numbers, tabs (Chat, Room, Sounds, Setup, Checks), footer and notifications, in whichever of the 20 themes you use.
+- **Live status animations.** Tyler's state reaches the phone the moment it changes on the PC (Listening, Thinking, On air, Paused, Recovering…). The status strip's colours, wave, timer and pulse move with it, as they do on the PC. Before, the phone checked every 2 seconds.
+- **Each theme's own extras run on the phone too,** from the same code as the panel, for example:
+  - TF2's killfeed and class-select flash;
+  - PAYDAY's heist plan and drill timer;
+  - the Pip-Boy's gauges and radio;
+  - Minecraft's hearts, hunger and hotbar;
+  - the Dreamcast VMU;
+  - the Windows XP taskbar and clock;
+  - DOOM's status face;
+  - Steam's achievements.
+- **The extras start where the PC's are:** reply count, reply times, lifetime totals and achievements. Their buttons and hotkeys work from the phone, for example the CS2 buy wheel's clips, Pip-Boy radio Skip and Off, and the full check from a theme's menu.
+
+## New things the remote can do
+- **Switch the theme:** Setup → Theme shows all 20 themes with their Tyler logos. Tapping one changes every Tyler window on the PC (the panel, an open Settings window, the window and tray icons) and the remote.
+- **Chat tab:**
+  - choose Auto, Text or Voice for the next Connect & start;
+  - turn Stay connected's quiet-call hum on or off, set its minutes, and turn on keeping the chat connected.
+- **Room tab:**
+  - Start Music DJ (it opens the YouTube window on the PC and shares only its sound);
+  - music volume;
+  - sound quality (Auto, High, Medium or Low);
+  - lowering the music while Tyler talks.
+- **Sounds tab:** the soundboard pads in the theme's style (they light up when a clip plays), Stop clips, and clip volume.
+- **Setup tab:**
+  - Tyler's voice volume;
+  - Mute the call in Tyler's window (for when you're in the same call on Steam with your own account);
+  - this phone's details and Unpair.
+- **Checks tab:**
+  - run the full check and see its results as they come in, including answering "Did you hear the beep?";
+  - Test beep in voice and Refresh voice status;
+  - the signal trail.
+- The collapse button folds the remote down to the status strip, like the panel's mini mode.
+
+## Faster to open
+- The panel's files are compressed and kept on the phone for a day, so they load again only after an update.
+
+## Safety, unchanged and extended
+- Everything that shows or changes Tyler still needs a paired phone.
+- Live updates stop when the phone closes the page or is removed, and the Steam window sends them only while a phone is watching.
+- They carry only what the panel already shows: status, numbers, clip and song names. They never include chat messages.
+- The phone can change two settings: the theme, and muting the call in Tyler's window. It can't change any others, and it still never sees your keys.
+- Every action passes only its own fields, with values kept in range.
+
+## Tested
+- **Real HTTP and live events on this machine, mocked Steam window (unit test):**
+  - Only the listed panel files are served; they're compressed and kept for a day.
+  - Live events reach paired phones only, and malformed events are dropped.
+  - The theme and call settings accept only valid values.
+  - Each new action passes only its own fields, clamped.
+  - A phone can't ask for events itself, and removing it ends its stream.
+- **The panel preview as Tyler's Steam window, the real server, and an iPhone-sized Chromium (end-to-end):**
+  - Pairing works, and the pairing screen is already in Tyler's theme.
+  - The phone runs the same theme extras as the PC, and three state changes on the PC reach its status strip.
+  - Clips, chat messages, the talk mode and the call mute reach the panel.
+  - The Music DJ start button shows; unpairing works.
+  - All 20 themes chosen from the phone: the PC follows, and both run the same extras.
+  - On the Steam window's side, the new actions change the panel's own controls; invalid options are refused; events are sent only while a phone watches.
+- **Desktop check in real Electron:**
+  - Live events travel through the app's own channel: a pause from the "phone" arrives back as the Steam window's own state change.
+  - The Steam window can share the YouTube window for Start Music DJ without a click there.
+- **Not tested:** a real phone on real Wi-Fi, Windows' firewall prompt, the real Steam page, and how quickly updates arrive over Wi-Fi. 281 unit and integration tests and 25 end-to-end tests.
+
+---
+
 # ROBOTIC TYLER v2.25.0: control Tyler from your phone
 
 ## New: Phone remote (desktop app)

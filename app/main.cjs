@@ -98,7 +98,7 @@ if(!app.requestSingleInstanceLock()){app.quit();}else{
  }
  try{tray=new Tray(nativeImage.createFromPath(path.join(__dirname,'..','assets','robotic-tyler-tray.png')).resize({width:16,height:16}));tray.on('double-click',()=>bot?.show());buildTray();}catch(err){eventLog('Tray unavailable',err.message);}
 
- ipcMain.handle('tyler:request',(event,message)=>{if(!bot||event.sender.id!==bot.webContents.id||event.senderFrame!==event.sender.mainFrame||!isChat(event.senderFrame.url))throw Error('Only the Steam chat window can use the companion.');if(!message||typeof message!=='object'||JSON.stringify(message).length>2200000)throw Error('Invalid request');if(message.type==='remote:result'){remoteAnswer(message);return {ok:true};}eventLog('Steam text request',String(message.type||'unknown'));return new Promise(resolve=>listener(message,{url:event.senderFrame.url,tab:{id:event.sender.id}},resolve));});
+ ipcMain.handle('tyler:request',(event,message)=>{if(!bot||event.sender.id!==bot.webContents.id||event.senderFrame!==event.sender.mainFrame||!isChat(event.senderFrame.url))throw Error('Only the Steam chat window can use the companion.');if(!message||typeof message!=='object'||JSON.stringify(message).length>2200000)throw Error('Invalid request');if(message.type==='remote:result'){remoteAnswer(message);return {ok:true};}if(message.type==='remote:event'){remote?.push(message.events);return {ok:true};}eventLog('Steam text request',String(message.type||'unknown'));return new Promise(resolve=>listener(message,{url:event.senderFrame.url,tab:{id:event.sender.id}},resolve));});
  // Phone remote (v2.25, app/remote.cjs): a paired phone on the home network asks the Steam window
  // (remote-control.js) for Tyler's status and a fixed list of actions; answers come back here.
  const remoteJobs=new Map();let remoteSeq=0;
@@ -107,7 +107,13 @@ if(!app.requestSingleInstanceLock()){app.quit();}else{
   const id='r'+(++remoteSeq),timer=setTimeout(()=>{remoteJobs.delete(id);reject(Error('Tyler\u2019s Steam window didn\u2019t answer. Is Steam chat loaded?'));},8000);
   remoteJobs.set(id,{resolve,reject,timer});bot.webContents.send('tyler:message',{type:'remote:action',id,action,args});});}
  function remoteAnswer(m){const job=remoteJobs.get(m?.id);if(!job)return;remoteJobs.delete(m.id);clearTimeout(job.timer);m.ok?job.resolve(m.data&&typeof m.data==='object'?m.data:{}):job.reject(Error(String(m.error||'Tyler couldn\u2019t do that.')));}
- remote=setupRemote({vault,log:eventLog,ask:askSteamWindow,pageDir:path.join(__dirname,'remote'),uiDir:path.join(__dirname,'companion','ui'),version:app.getVersion(),theme:async()=>(await vault.get('uiTheme')).uiTheme||'steam'});
+ // v2.26: the phone may change two settings here (the theme and muting the call in this window), and
+ // Start Music DJ gets the click its screen-share needs (the share itself is still only the YouTube window).
+ remote=setupRemote({vault,log:eventLog,ask:askSteamWindow,pageDir:path.join(__dirname,'remote'),uiDir:path.join(__dirname,'companion','ui'),libDir:path.join(__dirname,'companion'),version:app.getVersion(),theme:async()=>(await vault.get('uiTheme')).uiTheme||'steam',
+  prefs:{get:async()=>{const v=await vault.get(['uiTheme','desktopMuteCall']);return {theme:v.uiTheme||'steam',muteCall:v.desktopMuteCall===true};},theme:t=>local.set({uiTheme:t}),muteCall:on=>local.set({desktopMuteCall:on===true})},
+  gesture:async()=>{if(bot&&!bot.isDestroyed()&&!bot.webContents.isDestroyed())await bot.webContents.executeJavaScript('0',true);}});
+ // A theme chosen elsewhere (the phone remote) reaches an open settings window too.
+ changeListeners.push(changes=>{if(changes.uiTheme&&options&&!options.isDestroyed())options.webContents.send('tyler:theme',changes.uiTheme.newValue);});
  // The Music window may only ask for its own music state and report what its player does.
  ipcMain.handle('tyler:youtube',async(event,message)=>{if(!media.isYouTubeFrame(event))throw Error('Only the Music window can use this.');if(!['music:pending','music:event'].includes(message?.type)||JSON.stringify(message).length>4000)throw Error('Invalid request');return new Promise(resolve=>listener(message,{url:event.senderFrame.url,tab:{id:event.sender.id}},resolve));});
  ipcMain.handle('tyler:settings',async(event,request)=>{if(!options||event.sender.id!==options.webContents.id||event.senderFrame!==event.sender.mainFrame||!isLocal(event.senderFrame.url,settingsPath))throw Error('Settings are available only in the local settings window.');

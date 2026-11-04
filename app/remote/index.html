@@ -2,77 +2,23 @@
 <html lang="en" data-rt-theme="steam">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#1b2838">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="theme-color" content="#171a21">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Tyler">
 <title>Tyler Remote</title>
+<!-- The theme fonts (the panel's stylesheet names them; @font-face works only at page level). -->
 <link rel="stylesheet" href="/ui/fonts/fonts.css">
-<link rel="stylesheet" href="/ui/tokens.css">
-<link rel="stylesheet" id="themeCss" href="/ui/themes/steam.css">
-<link rel="stylesheet" href="/remote.css">
+<style>
+html,body{margin:0;height:100%;background:#1b2838;color:#c6d4df;-webkit-text-size-adjust:100%;text-size-adjust:100%;overscroll-behavior:none}
+#boot{position:fixed;inset:0;display:grid;place-items:center;padding:24px;font:500 15px/1.5 system-ui,sans-serif;text-align:center}
+</style>
 <script src="/remote.js" defer></script>
 </head>
 <body>
-<main class="rr" id="app">
-  <header class="rr-head">
-    <img id="logo" class="rr-logo" src="/ui/logos/steam.png" alt="">
-    <div class="rr-ident"><b class="rr-word">ROBOTIC TYLER</b><small id="sub">Phone remote</small></div>
-    <span id="link" class="rr-link" data-on="false" title="Connection to your PC"><i></i><span>Connecting</span></span>
-  </header>
-
-  <section id="pair" class="rr-card rr-pair" hidden>
-    <h1>Pair this phone</h1>
-    <p>On your PC, open Tyler's <b>Settings → Overview → Phone remote</b> and type the 6-digit code shown there.</p>
-    <form id="pairForm" autocomplete="off">
-      <input id="code" class="rr-code" inputmode="numeric" pattern="[0-9 ]*" maxlength="7" placeholder="000 000" aria-label="Pairing code" required>
-      <button class="rr-btn rr-primary" type="submit">Pair</button>
-    </form>
-    <p id="pairMsg" class="rr-msg" role="status"></p>
-  </section>
-
-  <div id="remote" hidden>
-    <section class="rr-card rr-status" id="statusCard" data-state="ready">
-      <div class="rr-state"><i class="rr-dot"></i><b id="stateLabel">Ready</b></div>
-      <p id="stateText" class="rr-text">Waiting for Tyler…</p>
-      <dl class="rr-facts">
-        <div><dt>Voice</dt><dd id="voice">–</dd></div>
-        <div><dt>Replies</dt><dd id="replies">0</dd></div>
-        <div><dt>Spend</dt><dd id="spend">–</dd></div>
-      </dl>
-    </section>
-
-    <section class="rr-row">
-      <button id="toggle" class="rr-btn rr-primary rr-big" type="button" data-action="pause">Pause AI</button>
-      <button id="stopAudio" class="rr-btn rr-danger rr-big" type="button">Stop audio</button>
-    </section>
-
-    <section class="rr-card">
-      <h2>Soundboard</h2>
-      <div id="sounds" class="rr-sounds"><p class="rr-empty">No clips yet.</p></div>
-    </section>
-
-    <section class="rr-card">
-      <h2>Music DJ</h2>
-      <p id="nowPlaying" class="rr-text">Nothing playing.</p>
-      <form id="musicForm" class="rr-inline" autocomplete="off">
-        <input id="query" type="search" placeholder="Song or artist" aria-label="Song or artist" maxlength="120">
-        <button class="rr-btn rr-primary" type="submit">Play</button>
-      </form>
-      <div class="rr-row"><button id="skip" class="rr-btn" type="button">Skip</button><button id="musicStop" class="rr-btn" type="button">Stop music</button></div>
-    </section>
-
-    <section class="rr-card">
-      <h2>Say in chat</h2>
-      <form id="sayForm" class="rr-inline" autocomplete="off">
-        <input id="say" type="text" placeholder="Tyler types this in the chat" aria-label="Message" maxlength="300">
-        <button class="rr-btn rr-primary" type="submit">Send</button>
-      </form>
-    </section>
-
-    <footer class="rr-foot"><span id="device"></span><button id="forget" class="rr-btn rr-quiet" type="button">Unpair this phone</button></footer>
-  </div>
-  <p id="toast" class="rr-toast" role="status" hidden></p>
-</main>
+<!-- Tyler's panel is built here from its own markup and stylesheet (remote.js). -->
+<div id="tyler"></div>
+<p id="boot" role="status">Loading Tyler’s remote…</p>
 </body>
 </html>

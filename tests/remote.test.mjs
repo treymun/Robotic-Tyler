@@ -59,3 +59,52 @@ test('phone remote: pair with the code, then status and actions; nothing without
   await remote.handle('disable');await assert.rejects(request(port),/ECONNREFUSED/);
  }finally{await remote.stop();}
 });
+
+// v2.26: the panel's own files for the phone's copy of the panel, live events, and the two settings
+// the phone may change. Mocked Steam window and settings; real HTTP on 127.0.0.1.
+test('v2.26: panel files, live events to paired phones only, theme and call mute from the phone',async()=>{
+ const vault=memoryStorage(),asked=[],prefs={theme:'steam',muteCall:false,calls:[]};
+ const remote=setupRemote({vault,ask:async(action,args)=>{asked.push([action,args]);if(action==='state')return {ready:true,now:Date.now(),state:'listening',label:'Listening',theme:'steam',fx:{replies:3}};return {};},
+  pageDir:path.join(ROOT,'app','remote'),uiDir:path.join(ROOT,'app','companion','ui'),libDir:path.join(ROOT,'app','companion'),version:'9.9.9',
+  prefs:{get:async()=>({theme:prefs.theme,muteCall:prefs.muteCall}),theme:async t=>{prefs.calls.push(['theme',t]);prefs.theme=t;},muteCall:async on=>{prefs.calls.push(['muteCall',on]);prefs.muteCall=on;}}});
+ try{
+  const s=await remote.handle('enable'),port=s.port;
+  // Only the listed files, compressed, kept for a day when the address carries this version.
+  const lib=await request(port,{path:'/lib/ui-template.js?v=9.9.9',headers:{'accept-encoding':'gzip'}});
+  assert.equal(lib.status,200);assert.equal(lib.headers['content-encoding'],'gzip');assert.match(lib.headers['cache-control'],/max-age=86400/);
+  assert.equal((await request(port,{path:'/lib/theme-features.js'})).headers['cache-control'],'no-store','an old address is not kept');
+  for(const p of ['/lib/background.js','/lib/settings.js','/lib/..%2Fmain.cjs','/lib/remote.cjs'])assert.equal((await request(port,{path:p})).status,404,p);
+  assert.equal((await request(port,{path:'/whoami'})).json.theme,'steam','the pairing screen is in Tyler\'s theme');
+  // Live events need a paired phone.
+  assert.equal((await request(port,{path:'/events'})).status,401);
+  const ok=await request(port,{method:'POST',path:'/pair',headers:H,body:{code:s.code}}),cookie=String(ok.headers['set-cookie']).split(';')[0];
+  const stream=await new Promise((resolve,reject)=>{const req=http.request({host:'127.0.0.1',port,path:'/events',headers:{host:'127.0.0.1:'+port,cookie}},res=>{res.setEncoding('utf8');const got=[];let buf='';
+   const out={res,req,got,next:type=>new Promise(r=>{const look=()=>{const i=got.findIndex(e=>e.event===type);if(i>=0)return r(got.splice(i,1)[0]);setTimeout(look,20);};look();})};
+   res.on('data',c=>{buf+=c;let i;while((i=buf.indexOf('\n\n'))>=0){const block=buf.slice(0,i);buf=buf.slice(i+2);const ev=/^event: (\w+)/m.exec(block)?.[1],data=/^data: (.*)$/m.exec(block)?.[1];if(ev&&data)got.push({event:ev,data:JSON.parse(data)});}});resolve(out);});req.on('error',reject);req.end();});
+  assert.equal(stream.res.headers['content-type'],'text/event-stream; charset=utf-8');
+  const snap=await stream.next('snap');assert.equal(snap.data.ready,true);assert.equal(snap.data.fx.replies,3);assert.deepEqual(snap.data.prefs,{theme:'steam',muteCall:false});
+  assert.ok(asked.some(([a,x])=>a==='watch'&&x.on===true),'the Steam window is asked to send events');
+  remote.push([{type:'state',data:{state:'speaking',label:'On air'},at:1},{type:'bad'},null,{type:'reply',data:{chars:12},at:2}]);
+  const ui=await stream.next('ui');assert.deepEqual(ui.data.events.map(e=>e.type),['state','reply'],'malformed events are dropped');
+  // Settings from the phone: only a known theme, only true/false for the call.
+  const post=body=>request(port,{method:'POST',path:'/action',headers:{...H,cookie},body});
+  assert.equal((await post({action:'theme',theme:'payday'})).status,200);assert.equal((await post({action:'theme',theme:'evil'})).status,409);
+  assert.equal((await post({action:'mute-call',on:'yes'})).status,200);assert.equal((await post({action:'mute-call',on:true})).status,200);
+  assert.deepEqual(prefs.calls,[['theme','payday'],['muteCall',false],['muteCall',true]]);
+  await new Promise(r=>setTimeout(r,1100)); // the rate limit
+  // The Steam window's actions get only their own fields, clamped.
+  await post({action:'keepalive',call:'yes',chat:false,minutes:999,extra:1});assert.deepEqual(asked.at(-1),['keepalive',{chat:false,minutes:'120'}]);
+  await post({action:'music-volume',value:900});assert.deepEqual(asked.at(-1),['music-volume',{value:200}]);
+  await post({action:'clip-volume',value:-3});assert.deepEqual(asked.at(-1),['clip-volume',{value:0}]);
+  await post({action:'voice-volume',value:5});assert.deepEqual(asked.at(-1),['voice-volume',{value:.7}]);
+  await post({action:'mode',mode:'voice',x:1});assert.deepEqual(asked.at(-1),['mode',{mode:'voice'}]);
+  await new Promise(r=>setTimeout(r,1100));
+  assert.equal((await post({action:'watch',on:true})).status,400,'the phone can\'t ask for events itself');
+  assert.equal((await post({action:'state'})).status,400);
+  // Removing the phone ends its stream, and the Steam window stops sending.
+  const ended=new Promise(r=>stream.res.on('end',r));
+  await remote.handle('forget',{id:(await remote.handle('status')).devices[0].id});await ended;
+  assert.equal(remote.watching,0);await new Promise(r=>setTimeout(r,50));
+  assert.deepEqual(asked.filter(a=>a[0]==='watch').at(-1),['watch',{on:false}]);
+ }finally{await remote.stop();}
+});

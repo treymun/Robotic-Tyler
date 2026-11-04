@@ -5,4 +5,6 @@ contextBridge.exposeInMainWorld('tylerSettings',{activity:()=>ipcRenderer.invoke
  ai:request=>ipcRenderer.invoke('tyler:settings',{action:'ai',request}),
  // Settings → Overview → Phone remote (v2.25): turn it on, show a pairing code, remove phones.
  remote:(op,extra={})=>ipcRenderer.invoke('tyler:settings',{...extra,action:'remote',op}),
+ // v2.26: the theme changed somewhere else (the phone remote), so this window follows it.
+ onTheme:fn=>{ipcRenderer.on('tyler:theme',(_event,theme)=>fn(theme));},
  voice:{devices:()=>ipcRenderer.invoke('tyler:settings',{action:'voice-devices'}),tone:device=>ipcRenderer.invoke('tyler:settings',{action:'voice-tone',device}),test:({engine,values})=>ipcRenderer.invoke('tyler:settings',{action:'voice-test',engine,values})}});

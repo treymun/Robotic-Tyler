@@ -19,7 +19,8 @@ app.whenReady().then(async()=>{
  // The shared background is not part of this check: every request gets a plain refusal.
  // except the phone remote's answers (v2.25), which reach the app's remote server as in app/main.cjs.
  const remoteJobs=new Map();let remoteSeq=0;
- ipcMain.handle('tyler:request',(_e,m)=>{if(m?.type==='remote:result'){const job=remoteJobs.get(m.id);if(job){remoteJobs.delete(m.id);m.ok?job.resolve(m.data||{}):job.reject(Error(m.error||'failed'));}return {ok:true};}return {ok:false,error:'not part of this check'};});
+ let liveRemote=null;
+ipcMain.handle('tyler:request',(_e,m)=>{if(m?.type==='remote:event'){liveRemote?.push(m.events);return {ok:true};}if(m?.type==='remote:result'){const job=remoteJobs.get(m.id);if(job){remoteJobs.delete(m.id);m.ok?job.resolve(m.data||{}):job.reject(Error(m.error||'failed'));}return {ok:true};}return {ok:false,error:'not part of this check'};});
  const ask=(action,args)=>new Promise((resolve,reject)=>{const id='r'+(++remoteSeq);setTimeout(()=>{if(remoteJobs.delete(id))reject(Error('no answer'));},8000);remoteJobs.set(id,{resolve,reject});win.webContents.send('tyler:message',{type:'remote:action',id,action,args});});
  win=new BrowserWindow({show:false,width:1380,height:920,webPreferences:{partition:'persist:desktop-voice-check',contextIsolation:true,sandbox:true,nodeIntegration:false,backgroundThrottling:false,autoplayPolicy:'no-user-gesture-required',preload:path.join(ROOT,'app','steam-preload.cjs')}});
  setup.applyPermissions();setup.watch(win.webContents);
@@ -53,9 +54,26 @@ app.whenReady().then(async()=>{
   try{const st=await remote.handle('enable'),port=st.port;
    const req=(method,p,body,cookie)=>new Promise((resolve,reject)=>{const r=http.request({host:'127.0.0.1',port,method,path:p,headers:{'content-type':'application/json','x-tyler-remote':'1',...(cookie?{cookie}:{})}},res=>{const parts=[];res.on('data',c=>parts.push(c));res.on('end',()=>resolve({status:res.statusCode,cookie:String(res.headers['set-cookie']||'').split(';')[0],json:JSON.parse(Buffer.concat(parts).toString()||'{}')}));});r.on('error',reject);if(body)r.write(JSON.stringify(body));r.end();});
    const paired=await req('POST','/pair',{code:st.code}),state=await req('GET','/state',null,paired.cookie);
-   return {paired:paired.status,state:state.status,ready:state.json.ready===true,tylerState:state.json.state||state.json.error,hasSounds:Array.isArray(state.json.sounds)};
+   // v2.26: live events. Open /events as the phone does, pause Tyler from the "phone", and the
+   // Steam window's own state change arrives over the stream.
+   liveRemote=remote;
+   const live=await new Promise(resolve=>{let buf='',snap=false;const got=[];const done=v=>{clearTimeout(t);r.destroy();resolve(v);};
+    const t=setTimeout(()=>done({snap,events:got.map(e=>e.type+':'+(e.data.state||'')),timeout:true}),12000);
+    const r=http.request({host:'127.0.0.1',port,method:'GET',path:'/events',headers:{cookie:paired.cookie}},res=>{res.setEncoding('utf8');res.on('data',c=>{buf+=c;let i;while((i=buf.indexOf('\n\n'))>=0){const block=buf.slice(0,i);buf=buf.slice(i+2);const ev=/^event: (\w+)/m.exec(block)?.[1],data=/^data: (.*)$/m.exec(block)?.[1];if(!ev||!data)continue;const j=JSON.parse(data);
+      if(ev==='snap'){snap=j.ready===true&&!!j.fx&&Array.isArray(j.controls?.trail);void req('POST','/action',{action:'pause'},paired.cookie);}
+      if(ev==='ui'){got.push(...j.events);if(j.events.some(e=>e.type==='state'&&e.data.state==='paused'))done({snap,events:got.map(e=>e.type+':'+(e.data.state||''))});}}});});
+    r.on('error',e=>done({error:e.message}));r.end();});
+   const theme=await req('POST','/action',{action:'theme',theme:'payday'},paired.cookie);
+   return {paired:paired.status,state:state.status,ready:state.json.ready===true,tylerState:state.json.state||state.json.error,hasSounds:Array.isArray(state.json.sounds),live,themeWithoutPrefs:theme.status};
   }catch(e){return {error:e.message};}finally{await remote.stop();}
  })();
+ // v2.26: Start Music DJ from the phone remote has no click in this window. The app gives the
+ // window a user gesture first (app/main.cjs, gesture()), then the panel asks for the share. Electron 45
+ // shares without one too (noGesture); the gesture is there in case a later Electron asks for it.
+ const share='navigator.mediaDevices.getDisplayMedia({video:{frameRate:1},audio:false}).then(s=>{s.getTracks().forEach(t=>t.stop());return "ok";},e=>e.name+": "+e.message)';
+ const noGesture=await win.webContents.executeJavaScript(share,false);
+ await win.webContents.executeJavaScript('0',true);const withGesture=await win.webContents.executeJavaScript(share,false);
+ shares.remoteGesture={noGesture,withGesture};
  // One click (v2.20.1): Start Music DJ opens the Music window in the background and asks for the
  // share in the same click, before the window exists; the app waits for it and shares its sound.
  const old=media.youtubeId();if(old!==null)BrowserWindow.fromWebContents(webContents.fromId(old))?.destroy();

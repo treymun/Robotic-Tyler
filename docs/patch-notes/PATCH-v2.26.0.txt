@@ -1,0 +1,25 @@
+ROBOTIC TYLER v2.26.0 — patch notes
+
+Phone remote (desktop app): it's now Tyler's panel
+- The phone shows a copy of Tyler's real panel in your theme: header and logo, status strip, numbers, tabs, footer, themed notifications.
+- Live: Tyler's state reaches the phone as it changes (no more 2-second checks), with the status strip's own animations.
+- Each theme's extras run on the phone from the panel's own code (killfeed, heist plan, Pip-Boy gauges, Minecraft hearts, VMU, XP taskbar, DOOM face, achievements…), starting from the PC's numbers; their buttons and hotkeys work.
+
+New on the remote
+- Switch the theme for every Tyler window (Setup → Theme, all 20 with logos).
+- Talk mode (auto / text / voice); Stay connected (quiet-call hum, minutes, keep chat connected).
+- Start Music DJ; music volume; sound quality; lower music while Tyler talks.
+- Soundboard pads that light up; Stop clips; clip volume.
+- Tyler's voice volume; Mute the call in Tyler's window.
+- Full check with live results and the beep question; Test beep; Refresh voice; signal trail.
+- Collapse to the status strip, like the panel's mini mode.
+- Faster to open: panel files compressed and kept for a day.
+
+Safety
+- Paired phones only. Live updates are sent only while a phone watches and carry only what the panel shows (never chat messages). The phone can change only the theme and the call mute; never sees keys. Every action passes only its own fields, clamped.
+
+Tested
+- Unit test, real HTTP and live events with a mocked Steam window: files, events, settings, action fields, stream end.
+- End-to-end, the panel preview as the Steam window plus an iPhone-sized Chromium: pairing, same extras as the PC, live state, buttons, all 20 themes from the phone, the Steam window's side.
+- Real Electron desktop check: live events through the app's channel; Start Music DJ's share works without a click in the window.
+- Not tested: a real phone on real Wi-Fi, the Windows firewall prompt, the real Steam page, update speed over Wi-Fi. 281 unit and 25 end-to-end tests.

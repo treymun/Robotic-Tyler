@@ -52,6 +52,8 @@
  try{apply(localStorage.getItem('tylerTheme'));}catch{apply('steam');}
  Promise.resolve(store?.get?.(['uiTheme'])).then(v=>apply(v?.uiTheme)).catch(()=>{});
  globalThis.chrome?.storage?.onChanged?.addListener?.((changes,area)=>{if(area==='local'&&changes.uiTheme)apply(changes.uiTheme.newValue);});
+ // Desktop settings window (v2.26): the main process says when the theme changed elsewhere.
+ globalThis.tylerSettings?.onTheme?.(theme=>apply(theme));
  document.addEventListener('DOMContentLoaded',()=>{setLogo(root.dataset.rtTheme);setLabel(root.dataset.rtTheme);});
  // Saves the theme for every Tyler window (panel, settings, Voice Studio, toolbar icon).
  async function save(value){const theme=apply(value);await store?.set?.({uiTheme:theme});return theme;}
