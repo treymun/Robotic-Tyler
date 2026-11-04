@@ -24,7 +24,7 @@
   const pub=state();for(const fn of listeners){try{fn(pub);}catch{}}api.emit?.('voice-call',pub);render();
  }
  /** What the panel, the phone and the full check show. */
- function state(){return {state:S.state,room:S.room,roomId:S.roomId,groupId:S.groupId,people:S.people,error:S.error,reason:S.reason,since:S.since,pending:!!pending,rooms:S.rooms.map(r=>({id:r.id,name:r.name,count:r.count})),steamState:S.steam};}
+ function state(){return {state:S.state,room:S.room,roomId:S.roomId,groupId:S.groupId,people:S.people,elsewhere:!!last?.elsewhere,error:S.error,reason:S.reason,since:S.since,pending:!!pending,rooms:S.rooms.map(r=>({id:r.id,name:r.name,count:r.count})),steamState:S.steam};}
  // One look at Steam: the group's voice channels, which one Steam's call is in, and its state.
  async function observe(logs=false){
   const node=anchor();
