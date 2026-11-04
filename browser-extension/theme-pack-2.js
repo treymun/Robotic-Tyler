@@ -200,34 +200,66 @@
 
  // ── Combine: the Overwatch dispatch ticker and biosignal scans ────────────
  const DISPATCH={ready:'Overwatch acknowledges. Unit ROBOTIC TYLER on standby for dispatch',listening:'Biosignal audio detected. Unit monitoring',thinking:'Unit composing response. Stand by',speaking:'Unit transmitting on voice band',waiting:'Unit recalibrating. Hold position',error:'Anticitizen data anomaly. Unit requires inspection',paused:'Unit suspended by sector control',standby:'Secondary unit holds jurisdiction'};
+ const CB_CODE={ready:'10-8',listening:'10-8',thinking:'10-6',speaking:'11-6',waiting:'10-20',error:'10-108',paused:'10-7',standby:'10-7'};
  F.define('combine',[
   {id:'cb-dispatch',mount(c){
    const bar=c.add('foot',c.h('div','fx cb-ticker'));bar.setAttribute('role','log');bar.setAttribute('aria-label','Dispatch');
-   const tag=c.h('b',null,'DISPATCH'),text=c.h('span','cb-text');bar.append(tag,text);
-   function say(t){const s=c.h('span','cb-line',t.toUpperCase());text.replaceChildren(s);}
-   say(DISPATCH[c.S.state]||DISPATCH.ready);
-   return {update(type,d){if(type==='state'&&d.state!==d.before)say(DISPATCH[d.state]||d.label);if(type==='turn')say('Response delivered. Code '+(d.ms/1000).toFixed(1));if(type==='sound')say('Audio deterrent deployed: '+d.name);if(type==='chat'&&d.flood)say('Civil disturbance in sector chat. Unit throttling');}};
+   const tag=c.h('b',null,'DISPATCH'),code=c.h('i','cb-code'),text=c.h('span','cb-text');bar.append(tag,code,text);
+   // v2.22: every line carries its radio code, and a line too long for the strip rolls once to show its end.
+   let roll=0;
+   function say(t,k='10-8'){c.cancel(roll);const s=c.h('span','cb-line',t.toUpperCase());text.replaceChildren(s);text.title=t;code.textContent=k;code.dataset.k=k;
+    if(!c.reduced)roll=c.later(()=>{const over=s.scrollWidth-text.clientWidth;if(over>6){s.style.setProperty('--cb-roll',-(over+6)+'px');s.style.setProperty('--cb-roll-t',(3+over/40).toFixed(1)+'s');s.classList.add('cb-roll');}},1600);}
+   say(DISPATCH[c.S.state]||DISPATCH.ready,CB_CODE[c.S.state]);
+   return {update(type,d){
+    if(type==='state'&&d.state!==d.before){if(d.before==='error'&&(d.state==='ready'||d.state==='listening'))say('Sociostability restored. Unit returns to code','10-8');else say(DISPATCH[d.state]||d.label,CB_CODE[d.state]);}
+    if(type==='turn')say('Response delivered. Code '+(d.ms/1000).toFixed(1),'10-4');
+    if(type==='sound')say('Audio deterrent deployed: '+d.name,'10-91');
+    if(type==='music'&&d.title)say('Sector broadcast: '+d.title,'10-22');
+    if(type==='check')say(d.problems?'Inspection complete. '+d.problems+' violation'+(d.problems===1?'':'s')+' on file':'Inspection complete. Sector compliant',d.problems?'10-108':'10-97');
+    if(type==='chat'&&d.flood)say('Civil disturbance in sector chat. Unit throttling','11-44');}};
   }},
   {id:'cb-terminal',mount(c){
    // Click DISPATCH (or press T over the panel) for the unit's record: the recent dispatch log and
-   // lifetime totals, as a Civil Protection terminal.
+   // lifetime totals, as a Civil Protection terminal. v2.22: a sociostability gauge (Tyler's health)
+   // and an Inspect sector directive (the full check).
    let term=null;const close=()=>{term?.remove();term=null;};
    const code=k=>({reply:'10-4',spoke:'11-6',sound:'10-91',music:'10-22',error:'10-108',state:'10-8'})[k]||'10-9';
-   function open(){if(term)return close();const S=c.S,L=c.life,v=c.voice();term=c.h('div','fx cb-term fx-interactive');term.setAttribute('role','dialog');term.setAttribute('aria-label','Unit record');
+   function open(){if(term)return close();const S=c.S,L=c.life,v=c.voice(),hp=c.health();term=c.h('div','fx cb-term fx-interactive');term.setAttribute('role','dialog');term.setAttribute('aria-label','Unit record');
     const head=c.h('div','cb-term-head');head.append(c.h('b',null,'UNIT ROBOTIC TYLER'),c.h('span',null,'SECTOR STATUS: '+(S.state==='error'?'NON-COMPLIANT':'COMPLIANT')));
+    const gauge=c.h('div','cb-socio');gauge.dataset.level=hp>=80?'stable':hp>=50?'marginal':'critical';const meter=c.h('span','cb-socio-bar');for(let i=0;i<20;i++){const seg=c.h('i');if(i<Math.round(hp/5))seg.className='on';meter.append(seg);}
+    gauge.append(c.h('small',null,'SOCIOSTABILITY'),meter,c.h('b',null,(hp>=80?'STABLE':hp>=50?'MARGINAL':'CRITICAL')+' · '+hp+'%'));
     const facts=c.h('div','cb-term-facts');for(const [k,val] of [['RESPONSES',L?L.replies+L.spoken:S.replies+S.spoken],['CITIZENS HEARD',L?L.heard:S.heard],['VIOLATIONS',L?L.errors:S.errors],['SUBJECTS ON BAND',v.peers],['AVG RESPONSE',c.ms(c.avgTurn())],['DEPLOYMENTS',L?L.sessions:1]]){const f=c.h('div');f.append(c.h('small',null,k),c.h('b',null,String(val)));facts.append(f);}
     const log=c.h('div','cb-term-log');log.setAttribute('role','log');for(const e of S.log.slice(-10).reverse()){const r=c.h('div');if(e.kind==='error')r.className='bad';r.append(c.h('span',null,new Date(e.at).toLocaleTimeString([],{hour12:false})),c.h('i',null,code(e.kind)),c.h('span',null,e.text.toUpperCase()));log.append(r);}
     if(!S.log.length)log.append(c.h('div',null,'NO DISPATCHES THIS SHIFT'));
-    const x=c.h('button','cb-term-close','Close terminal');x.type='button';x.onclick=close;term.append(head,facts,log,x);term.style.setProperty('--fx-top',(c.below('.tabs')+6)+'px');c.slots.layer.append(term);x.focus();}
+    const row=c.h('div','cb-term-row'),ins=c.h('button','cb-term-close','Inspect sector'),x=c.h('button','cb-term-close','Close terminal');ins.type=x.type='button';ins.title='Run the full check';ins.onclick=()=>{close();c.actions.fullCheck();};x.onclick=close;row.append(ins,x);
+    term.append(head,gauge,facts,log,row);term.style.setProperty('--fx-top',(c.below('.tabs')+6)+'px');c.slots.layer.append(term);x.focus();}
    const tag=c.root.querySelector('.cb-ticker>b');if(tag){tag.tabIndex=0;tag.setAttribute('role','button');tag.title='Open the unit record (T)';tag.onclick=open;tag.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open();}};}
    c.key(e=>{if((e.key==='t'||e.key==='T')&&!e.repeat){e.preventDefault();open();}else if(term&&e.key==='Escape'){e.preventDefault();close();}});
+   c.on(c.panel,'tyler-fx',e=>{if(e.detail==='cb-terminal'&&!term)open();});
    return {unmount:close};
+  }},
+  // v2.22: the unit plate in the header. Its lens flashes like a city scanner's camera when Tyler hears
+  // a chat message, goes red on a problem and dark while suspended. Click it for Overwatch directives.
+  {id:'cb-unit',mount(c){
+   const chip=c.add('bar',c.h('button','fx cb-unit'));chip.type='button';chip.setAttribute('aria-haspopup','menu');chip.setAttribute('aria-expanded','false');
+   const lens=c.h('i','cb-lens');chip.append(lens,c.h('span',null,'CP-17'));let shot=0;
+   function render(){const s=c.S.state;chip.dataset.state=s==='error'?'alert':s==='paused'||s==='standby'?'off':s==='speaking'||s==='thinking'?'busy':'on';chip.title='Unit CP-17: '+(DISPATCH[s]||c.S.label)+'. The lens flashes when Tyler hears chat. Click for directives.';}
+   function snap(){if(c.reduced||Date.now()-shot<2500)return;shot=Date.now();lens.classList.remove('snap');void lens.offsetWidth;lens.classList.add('snap');}
+   chip.onclick=()=>{if(chip.getAttribute('aria-expanded')==='true'){c._menu?.close();return;}const paused=c.actions.paused();
+    c.menu(chip,[{heading:'Overwatch directives · CP-17'},
+     paused?{mark:'▶',label:'Deploy unit',hint:'Connect & start',run:c.actions.connect}:{mark:'❚❚',label:'Suspend unit',hint:'Pause AI',run:c.actions.pause},
+     {mark:'◎',label:'Inspect sector',hint:'Full check',run:c.actions.fullCheck},
+     {mark:'≋',label:'Re-scan voice band',hint:'Voice check',run:c.actions.refreshVoice},
+     {mark:'■',label:'Silence audio',hint:'Stop audio',run:c.actions.stopAudio},
+     'sep',{mark:'▤',label:'Unit record',hint:'T',run:()=>c.panel.dispatchEvent(new CustomEvent('tyler-fx',{detail:'cb-terminal'}))},
+     {mark:'⚙',label:'Overwatch config',hint:'Settings',run:c.actions.settings}],{cls:'cb-menu',label:'Overwatch directives',align:'right'});};
+   render();return {update(type){if(type==='state')render();if(type==='chat')snap();}};
   }},
   {id:'cb-scan',mount(c){
    let last=0;
    return {update(type,d){if(type!=='state'||d.state===d.before)return;
-    if(d.state==='listening'&&Date.now()-last>15000&&!c.reduced){last=Date.now();const v=c.voice(),scan=c.h('div','fx cb-scan');scan.append(c.h('i'),c.h('b',null,'Biosignal scan: '+(v.peers||'no')+' subject'+(v.peers===1?'':'s')+' in call'));c.flash(scan,2000);}
-    if(d.state==='error'){const a=c.h('div','fx cb-alert');a.style.setProperty('--cb-top',(c.below('.tabs')+8)+'px');a.append(c.h('b',null,'Anomaly'),c.h('span',null,(d.text||'').slice(0,90)));c.flash(a,3200);}}};
+    if(d.state==='listening'&&Date.now()-last>15000&&!c.reduced){last=Date.now();const v=c.voice(),scan=c.h('div','fx cb-scan');scan.style.setProperty('--cb-top',(c.below('#activityCard')-12)+'px');scan.append(c.h('i'),c.h('b',null,'Biosignal scan: '+(v.peers||'no')+' subject'+(v.peers===1?'':'s')+' in call'));c.flash(scan,2000);}
+    if(d.state==='error'){const a=c.h('div','fx cb-alert'),band=c.h('div','cb-alert-band');band.style.top=(c.below('.tabs')+4)+'px';band.append(c.h('b',null,'Anomaly'),c.h('i',null,'10-108'),c.h('span',null,(d.text||'Unit requires inspection').slice(0,90)));a.append(band);c.flash(a,3200);}}};
   }},
  ]);
 
@@ -240,7 +272,7 @@
    left.title='Souls: tokens Tyler has used (1 soul per 10 tokens)';flex.title='Flex slots: people in the voice call';
    let shown=0,target=0,anim=0;
    const tokens=()=>{const m=/([\d.,]+)\s*([KMB]?)/i.exec(c.S.tokens||'');if(!m)return 0;return Number(m[1].replace(/,/g,''))*({K:1e3,M:1e6,B:1e9}[m[2].toUpperCase()]||1);};
-   function render(){target=Math.round(tokens()/10);if(target!==shown&&!anim){const step=()=>{shown+=Math.ceil((target-shown)/6);if(Math.abs(target-shown)<2)shown=target;souls.textContent=shown.toLocaleString();if(shown!==target)anim=requestAnimationFrame(step);else{anim=0;orb.classList.remove('gain');}};orb.classList.add('gain');anim=requestAnimationFrame(step);}else souls.textContent=shown.toLocaleString();
+   function render(){target=Math.round(tokens()/10);if(target>shown&&shown>0&&!anim&&!c.reduced){const plus=c.h('span','dl-plus','+'+(target-shown).toLocaleString());left.append(plus);c.later(()=>plus.remove(),1300);}if(target!==shown&&!anim){const step=()=>{shown+=Math.ceil((target-shown)/6);if(Math.abs(target-shown)<2)shown=target;souls.textContent=shown.toLocaleString();if(shown!==target)anim=requestAnimationFrame(step);else{anim=0;orb.classList.remove('gain');}};orb.classList.add('gain');anim=requestAnimationFrame(step);}else souls.textContent=shown.toLocaleString();
     const v=c.voice();flex.replaceChildren(...Array.from({length:4},(_,i)=>{const p=c.h('i');if(i<v.peers)p.className='on';return p;}),c.h('small',null,'Flex'));}
    render();c.every(render);return {update:render,unmount(){cancelAnimationFrame(anim);}};
   }},
@@ -260,6 +292,42 @@
     c.later(crawl,33);};
    if(!still)crawl();
    return {update(type,d){if(type==='state')thread.dataset.state=d.state;if(type==='mini'||type==='theme')c.later(place,260);}};
+  }},
+  // v2.22: the shop. Click the souls (or press B over the panel) for Tyler's actions sorted like
+  // Deadlock's shop into Weapon, Vitality and Spirit, each card showing the live figure it acts on.
+  {id:'dl-shop',mount(c){
+   const left=c.root.querySelector('.dl-plate .dl-left');if(!left)return {};
+   left.tabIndex=0;left.setAttribute('role','button');left.setAttribute('aria-haspopup','dialog');left.title='Souls: tokens Tyler has used (1 soul per 10 tokens). Click for the shop (B).';
+   const CATS=[['weapon','Weapon'],['vitality','Vitality'],['spirit','Spirit']];let cat='weapon',o=null;
+   function items(k){const S=c.S,v=c.voice(),snd=c.actions.sounds(),paused=c.actions.paused(),fav=snd.favorites.map(n=>snd.slots.find(x=>x.slot===n)).find(Boolean);
+    if(k==='weapon')return [['Soundboard',snd.slots.length+' clips · '+S.sounds+' played','◆',()=>c.actions.tab('soundboard')],fav?['Quick cast',fav.name,'✦',()=>c.actions.playSound(fav.slot)]:['Quick cast','Star a clip in Sounds first','✦',null],['Silence','Stops clips, music and voice','■',c.actions.stopAudio]];
+    if(k==='vitality')return [['Full check','Health '+c.health()+'%','✚',c.actions.fullCheck],['Voice check',v.armed?(v.peers?v.peers+' in the call':'Armed, call empty'):'Microphone off','◖',c.actions.refreshVoice],['Checks','Problems and fixes','☰',()=>c.actions.tab('checks')]];
+    return [[paused?'Connect & start':'Pause AI',S.label||'Ready','❚',paused?c.actions.connect:c.actions.pause],['Setup',S.model||(S.keyOk===false?'No AI key saved':'Chat and AI'),'⚙',()=>c.actions.tab('setup')],['Settings','Voice, theme and keys','✧',c.actions.settings]];}
+   function render(focusTab){if(!o)return;const el=o.el;el.replaceChildren();el.dataset.cat=cat;
+    const head=c.h('div','dl-shop-head');const bank=c.h('span','dl-shop-bank');bank.append(c.h('i','dl-orb'),c.h('b',null,(c.root.querySelector('.dl-souls')?.textContent||'0')));head.append(c.h('b',null,'Shop'),bank);
+    const tabs=c.h('div','dl-shop-tabs');tabs.setAttribute('role','tablist');
+    for(const [k,name] of CATS){const t=c.h('button','dl-shop-tab',name);t.type='button';t.dataset.cat=k;t.setAttribute('role','tab');t.setAttribute('aria-selected',String(k===cat));t.tabIndex=k===cat?0:-1;t.onclick=()=>{cat=k;render(true);};
+     t.onkeydown=e=>{const i=CATS.findIndex(x=>x[0]===cat);if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();cat=CATS[(i+(e.key==='ArrowRight'?1:2))%3][0];render(true);}};tabs.append(t);}
+    const grid=c.h('div','dl-shop-grid');grid.setAttribute('role','tabpanel');
+    items(cat).forEach(([name,stat,glyph,run],i)=>{const b=c.h('button','dl-item');b.type='button';b.disabled=!run;b.append(c.h('span','dl-item-top'),c.h('span','dl-item-glyph',glyph),c.h('b',null,name),c.h('small',null,stat),c.h('span','dl-item-tier','I'.repeat(i+1)));b.onclick=()=>{o?.close();run?.();};grid.append(b);});
+    const x=c.h('button','dl-shop-close','Close');x.type='button';x.onclick=()=>o?.close();
+    el.append(head,tabs,grid,c.h('small','dl-shop-note','Arrows switch category · B or Esc closes'),x);
+    (focusTab?tabs.querySelector('[aria-selected=true]'):grid.querySelector('button:not(:disabled)'))?.focus();}
+   function open(){if(o){o.close();return;}o=c.overlay('dl-shop','Shop',{onClose:()=>{o=null;left.focus({preventScroll:true});}});render(false);}
+   left.onclick=open;left.onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open();}};
+   c.key(e=>{if((e.key==='b'||e.key==='B')&&!e.repeat){e.preventDefault();open();}});
+   return {unmount(){o?.close();}};
+  }},
+  // v2.22: when Tyler goes down (a problem), the souls plate turns grey and counts how long he has been
+  // down, with Rejuvenate (the full check); when he comes back, a Rejuvenated banner.
+  {id:'dl-respawn',mount(c){
+   const plate=c.root.querySelector('.dl-plate');if(!plate)return {};
+   const down=c.h('div','dl-down'),t=c.h('b'),btn=c.h('button','dl-rejuv','Rejuvenate');btn.type='button';btn.title='Run the full check';btn.onclick=c.actions.fullCheck;down.append(c.h('small',null,'Down'),t,btn);down.title='Tyler is down: a problem stopped him. Rejuvenate runs the full check.';plate.append(down);
+   let since=0;const tick=()=>{if(since)t.textContent=c.clock(Date.now()-since);};
+   function set(on){if(on&&!since){since=Date.now();tick();}if(!on)since=0;plate.dataset.down=String(on);}
+   set(c.S.state==='error');c.every(tick);
+   return {update(type,d){if(type!=='state')return;set(d.state==='error');
+    if(d.before==='error'&&(d.state==='ready'||d.state==='listening')){const b=c.h('div','fx dl-banner');b.style.top=(c.below('.dl-plate')+6)+'px';b.append(c.h('i'),c.h('b',null,'Rejuvenated'),c.h('small',null,'Tyler is back in the lane'));c.flash(b,2600);}}};
   }},
  ]);
 })();

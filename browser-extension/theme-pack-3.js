@@ -3,6 +3,9 @@
  'use strict';
  const F=globalThis.TylerThemeFeatures;if(!F)return;
 
+ // v2.22: a music disc for the inventory (a 14×14 pixel circle) and the label colours it takes.
+ const MC_DISC=(()=>{let d='';for(let y=0;y<14;y++){const r=Math.sqrt(Math.max(0,49-(y-6.5)**2)),a=Math.round(7-r),b=Math.round(7+r);if(b>a)d+='M'+a+' '+y+'h'+(b-a)+'v1h-'+(b-a)+'z';}return d;})();
+ const MC_LABELS=['#e0b42c','#d9483b','#4cb84c','#3a8fd6','#b45ad6','#e07b2c','#3fc8c8','#e85ca0','#9acd32'];
  // ── Minecraft: hearts, hunger and XP, and block-breaking while thinking ───
  F.define('minecraft',[
   {id:'mc-status',mount(c){
@@ -13,10 +16,12 @@
    hearts.title='Health: Tyler\'s connection health';food.title='Hunger: what\'s left of your spending cap (full when no cap is set)';xp.title='Experience: replies';
    let cap=0,level=-1;
    globalThis.TylerStorage?.get?.(['spendingCapUSD']).then(v=>{cap=Number(v?.spendingCapUSD)||0;render();}).catch(()=>{});
-   function render(){const h=c.health()/10;[...hearts.children].forEach((x,i)=>x.dataset.v=h>=i+1?'full':h>i+.4?'half':'empty');
+   // v2.22: the hearts blink when Tyler takes damage (a problem knocks his health down), as in the game.
+   let prevH=null;
+   function render(){const h=c.health()/10;if(prevH!==null&&h<prevH-.3&&!c.reduced){hearts.classList.remove('mc-hurt');void hearts.offsetWidth;hearts.classList.add('mc-hurt');}prevH=h;[...hearts.children].forEach((x,i)=>x.dataset.v=h>=i+1?'full':h>i+.4?'half':'empty');
     const left=cap>0?Math.max(0,1-c.S.spend/cap)*10:10;[...food.children].forEach((x,i)=>x.dataset.v=left>=i+1?'full':left>i+.4?'half':'empty');
     const L=c.life,n=L?L.replies+L.spoken:c.S.replies+c.S.spoken,l=Math.floor(Math.sqrt(n/2.5));const from=2.5*l*l,to=2.5*(l+1)*(l+1);fill.style.width=Math.round((n-from)/(to-from)*100)+'%';lvl.textContent=String(l);xp.title='Experience: '+n+' replies'+(L?' in all':' this session')+'. Level '+(l+1)+' at '+Math.ceil(to)+'.';
-    if(level>=0&&l>level){const up=c.h('div','fx mc-levelup','Level up! '+l);c.flash(up,1600);}level=l;}
+    if(level>=0&&l>level){const up=c.h('div','fx mc-levelup','Level up! '+l);up.style.top=(c.below('.mc-status')-30)+'px';c.flash(up,1600);}level=l;}
    render();c.every(render);return {update:render};
   }},
   {id:'mc-break',mount(c){
@@ -24,6 +29,49 @@
    function stop(pop){if(timer)c.cancel(timer);timer=0;crack?.remove();crack=null;if(pop&&!c.reduced){const item=c.h('div','fx mc-pop');c.flash(item,900);}}
    function stage(i,est){if(!crack)return;crack.dataset.stage=String(i);if(i<9)timer=c.later(()=>stage(i+1,est),est/10);}
    return {update(type,d){if(type!=='state')return;if(d.state==='thinking'&&d.before!=='thinking'){stop(false);crack=c.h('span','fx mc-crack');tally.append(crack);stage(0,Math.max(900,c.avgTurn()));}else if(d.state!=='thinking'&&crack)stop(d.state==='speaking'||d.state==='ready');},unmount:()=>stop(false)};
+  }},
+  // v2.22: the inventory (E over the panel, or the chest in the header): Tyler's soundboard
+  // as music discs, favourites on the hotbar. Click a disc, or press 1–9 for the hotbar, to play it.
+  {id:'mc-inventory',mount(c){
+   let o=null,tipEl=null,bar=[];
+   const chest=c.add('bar',c.h('button','fx mc-chest'));chest.type='button';chest.title='Inventory: Tyler\'s sounds as music discs (E)';chest.setAttribute('aria-label','Open the inventory');chest.setAttribute('aria-haspopup','dialog');
+   chest.append(c.svg('<svg viewBox="0 0 12 11" shape-rendering="crispEdges"><path fill="#2a1a0a" d="M0 0h12v11H0z"/><path fill="#9c6a2f" d="M1 1h10v3H1zM1 5h10v5H1z"/><path fill="#c48a44" d="M1 1h10v1H1zM1 5h10v1H1z"/><path fill="#d8d8d8" d="M5 3h2v4H5z"/><path fill="#2a1a0a" d="M5 4h2v1H5z"/></svg>'));
+   const label=n=>{let x=0;for(const ch of String(n))x=(x*31+ch.charCodeAt(0))>>>0;return MC_LABELS[x%MC_LABELS.length];};
+   const tip=t=>{if(tipEl)tipEl.textContent=t;};
+   function slot(s,i,hot,favs){const b=c.h('button','mc-slot');b.type='button';if(!s){b.disabled=true;b.setAttribute('aria-label','Empty slot');return b;}
+    b.append(c.svg('<svg viewBox="0 0 14 14" shape-rendering="crispEdges"><path fill="#1b1b1b" d="'+MC_DISC+'"/><path fill="#333" d="M2 6h1v2H2zM11 6h1v2h-1zM6 2h2v1H6zM6 11h2v1H6z"/><path fill="'+label(s.name)+'" d="M5 5h4v4H5z"/><path fill="#1b1b1b" d="M6 6h2v2H6z"/><path fill="#7a7a7a" d="M3 3h1v1H3zM4 2h2v1H4z"/></svg>','mc-disc'));
+    if(hot)b.append(c.h('small',null,String(i+1)));const fav=favs.includes(s.slot);
+    b.setAttribute('aria-label','Play '+s.name+(hot?', hotbar '+(i+1):''));b.title=s.name+(fav?' ★':'');
+    b.onmouseenter=b.onfocus=()=>tip(s.name+(fav?' ★ favourite':'')+(hot?' · '+(i+1):''));
+    b.onclick=()=>{c.actions.playSound(s.slot);b.classList.remove('used');void b.offsetWidth;b.classList.add('used');tip('♪ '+s.name);};return b;}
+   function open(){if(o){o.close();return;}
+    const {slots,favorites}=c.actions.sounds();
+    o=c.overlay('mc-inv','Inventory',{onClose:()=>{o=null;bar=[];tipEl=null;chest.focus({preventScroll:true});}});const el=o.el;
+    const hot=[...favorites.map(n=>slots.find(s=>s.slot===n)).filter(Boolean),...slots.filter(s=>!favorites.includes(s.slot))].slice(0,9),rest=slots.filter(s=>!hot.includes(s));
+    const grid=c.h('div','mc-inv-grid'),rows=Math.max(3,Math.ceil(rest.length/9));for(let i=0;i<rows*9;i++)grid.append(slot(rest[i],i,false,favorites));
+    const hb=c.h('div','mc-inv-grid mc-hotbar');bar=[];for(let i=0;i<9;i++){const b=slot(hot[i],i,true,favorites);bar.push(hot[i]?b:null);hb.append(b);}
+    tipEl=c.h('div','mc-inv-tip',slots.length?'Click a disc, or press 1–9, to play it in voice':'No sounds yet: the Sounds tab sets up the soundboard.');tipEl.setAttribute('aria-live','polite');
+    const row=c.h('div','mc-inv-row'),go=c.h('button','mc-btn','Sounds tab'),x=c.h('button','mc-btn','Done');go.type=x.type='button';go.onclick=()=>{o.close();c.actions.tab('soundboard');};x.onclick=()=>o.close();row.append(go,x);
+    el.append(c.h('b','mc-inv-title','Inventory'),grid,c.h('b','mc-inv-title','Hotbar'),hb,tipEl,row);(hb.querySelector('.mc-slot:not(:disabled)')||x).focus();}
+   chest.onclick=open;
+   c.key(e=>{if((e.key==='e'||e.key==='E')&&!e.repeat){e.preventDefault();open();}else if(o&&/^[1-9]$/.test(e.key)&&!e.repeat){const b=bar[Number(e.key)-1];if(b){e.preventDefault();b.focus();b.click();}}});
+   return {unmount(){o?.close();}};
+  }},
+  // v2.22: "Advancement Made!" toasts for Tyler's milestones, kept with the lifetime stats.
+  {id:'mc-advance',mount(c){
+   const total=k=>Math.max(Number(c.life?.[k])||0,Number(c.S[k])||0),replies=()=>total('replies')+total('spoken');
+   const LIST=[['r1','Stone Age','Tyler\'s first reply','#9a9a9a',()=>replies()>=1],['r10','Acquire Hardware','10 replies','#e6e6e6',()=>replies()>=10],['r100','Diamonds!','100 replies','#5ff0e8',()=>replies()>=100],['r1000','Cover Me with Diamonds','1,000 replies','#2fc9c4',()=>replies()>=1000],
+    ['song','Sound of Music','A song from the Music DJ','#e0b42c',()=>total('songs')>=1||!!c.S.music],['back','Postmortal','Back after a problem','#f2c94c',()=>false],['regular','We Need to Go Deeper','10 sessions with Tyler','#9b5cf0',()=>(c.life?.sessions||0)>=10],['marathon','Adventuring Time','10 hours with Tyler','#5bb04a',()=>(c.life?.timeMs||0)>=36e6]];
+   let queue=Promise.resolve(),ready=false;
+   function toast(name,desc,color){queue=queue.then(()=>new Promise(done=>{const el=c.h('div','fx mc-adv');el.style.top=(c.below('.bar')+8)+'px';el.setAttribute('role','status');el.title=desc;
+    const icon=c.svg('<svg viewBox="0 0 10 9" shape-rendering="crispEdges"><path fill="'+color+'" d="M3 1h4v1H3zM2 2h6v1H2zM1 3h8v2H1zM2 5h6v1H2zM3 6h4v1H3zM4 7h2v1H4z"/><path fill="#fff" fill-opacity=".7" d="M3 2h1v1H3zM2 3h1v1H2z"/><path fill="#000" fill-opacity=".25" d="M6 5h2v1H6zM5 6h2v1H5z"/></svg>','mc-adv-icon');
+    const t=c.h('span','mc-adv-text');t.append(c.h('small',null,'Advancement Made!'),c.h('b',null,name));el.append(icon,t);c.flash(el,4200);c.later(done,1300);}));}
+   function check(type,d,first){if(!ready&&!first)return;ready=true;const got=[];
+    for(const [key,name,desc,color,test] of LIST){const met=key==='back'?type==='state'&&d?.before==='error'&&['ready','listening'].includes(d?.state):test();if(met&&c.unlock('mc:'+key))got.push([name,desc,color]);}
+    // On the first look, things done before (in another theme or session) unlock quietly but the last.
+    for(const g of first?got.slice(-1):got)toast(...g);}
+   c.later(()=>check('life',null,true),1500);
+   return {update(type,d){if(['reply','state','music','life','turn'].includes(type))check(type,d,false);}};
   }},
  ]);
 
@@ -33,20 +81,53 @@
    const box=c.add('deck',c.h('div','fx pd-plan'));const steps=[];
    const defs=[['Gear up','AI key','setup',()=>c.S.keyOk===true],['Case the place','Chat linked','setup',()=>c.systems()[1].level===3],['Get in','Voice armed','checks',()=>c.voice().armed],['Crew','People in voice','checks',()=>c.voice().peers>0]];
    const title=c.h('div','pd-title');const status=c.h('b');title.append(c.h('small',null,'Heist plan'),status);box.append(title);
+   // v2.22: the drill. While Tyler writes, a drill timer runs to his usual reply time; past twice that,
+   // "The drill's jammed!"; then "Drill done".
+   const drill=c.h('div','pd-drill'),bar=c.h('span','pd-drill-bar'),fill=c.h('i'),dt=c.h('small');bar.append(fill);drill.append(c.h('b',null,'Drill'),bar,dt);box.append(drill);
    const row=c.h('div','pd-steps');box.append(row);
    defs.forEach(([name,detail,tab],i)=>{const b=c.h('button','pd-step');b.type='button';b.append(c.h('small',null,String(i+1)),c.h('b',null,name),c.h('span',null,detail));b.onclick=()=>c.actions.tab(tab);row.append(b);steps.push(b);});
+   let jam=0,done=0;
    function render(){let first=-1;defs.forEach((d,i)=>{const ok=d[3]();steps[i].dataset.done=String(ok);if(!ok&&first<0)first=i;steps[i].dataset.next=String(i===first);});status.textContent=first<0?'Ready. Go loud.':'Next: '+defs[first][0];box.dataset.ready=String(first<0);}
-   render();c.every(render);return {update:render};
+   function drillState(st){c.cancel(jam);
+    if(st==='thinking'){c.cancel(done);const est=Math.max(900,c.avgTurn());drill.dataset.on='run';dt.textContent='≈ '+c.ms(est);fill.style.animation='none';void fill.offsetWidth;fill.style.animation='';fill.style.animationDuration=est+'ms';jam=c.later(()=>{drill.dataset.on='jam';dt.textContent='The drill\'s jammed!';},est*2);}
+    else if(drill.dataset.on==='run'||drill.dataset.on==='jam'){const ok=st==='speaking'||st==='ready'||st==='listening';drill.dataset.on=ok?'done':'';dt.textContent=ok?'Drill done':'';if(ok)done=c.later(()=>{drill.dataset.on='';},1600);}}
+   render();c.every(render);return {update(type,d){if(type==='state'&&d.state!==d.before)drillState(d.state);render();}};
   }},
   {id:'pd-timer',mount(c){
-   const t=c.add('bar',c.h('span','fx pd-timer'));const n=c.h('small'),time=c.h('span');t.append(n,time);
-   const render=()=>{const L=c.life;n.textContent=L?'#'+L.sessions:'';time.textContent=c.clock(Date.now()-c.S.started);t.title='Heist time: how long this panel has been running'+(L?'. Heist #'+L.sessions+', career '+(L.timeMs/36e5).toFixed(1)+' h, '+(L.replies+L.spoken).toLocaleString()+' jobs done':'');};render();c.every(render);return {update(type){if(type==='life')render();}};
+   // v2.22: the heist timer is a button: the PAYDAY screen with this heist's take and the career totals.
+   const t=c.add('bar',c.h('button','fx pd-timer'));t.type='button';t.setAttribute('aria-haspopup','dialog');const n=c.h('small'),time=c.h('span');t.append(n,time);
+   const render=()=>{const L=c.life;n.textContent=L?'#'+L.sessions:'';time.textContent=c.clock(Date.now()-c.S.started);t.title='Heist time: how long this panel has been running'+(L?'. Heist #'+L.sessions+', career '+(L.timeMs/36e5).toFixed(1)+' h, '+(L.replies+L.spoken).toLocaleString()+' jobs done':'')+'. Click for the PAYDAY screen.';};
+   const plural=(n,w)=>n.toLocaleString()+' '+w+(n===1?'':'s');
+   function payday(){const S=c.S,L=c.life,o=c.overlay('pd-payday','PAYDAY');
+    const head=c.h('div','pd-pay-head');head.append(c.h('b',null,'PAYDAY'),c.h('span',null,(L?'Heist #'+L.sessions+' · ':'')+c.clock(Date.now()-S.started)));
+    const take=c.h('div','pd-pay-grid');for(const [k,v] of [['Jobs done',S.replies+S.spoken],['Crew heard',S.heard],['Bags secured',S.sounds],['Alarms raised',S.errors],['Average job',c.ms(c.avgTurn())],['Best streak',S.best]]){const f=c.h('div');f.append(c.h('small',null,k),c.h('b',null,String(v)));take.append(f);}
+    const cost=c.h('div','pd-pay-cost');cost.append(c.h('small',null,'Cleaner costs (AI text spend)'),c.h('b',null,'$'+S.spend.toFixed(4)));
+    o.el.append(head,c.h('small','pd-pay-sub','This heist'),take,cost);
+    if(L){const car=c.h('div','pd-pay-career');car.append(c.h('small',null,'Career'),c.h('span',null,plural(L.sessions,'heist')+' · '+(L.timeMs/36e5).toFixed(1)+' h · '+plural(L.replies+L.spoken,'job')+' · '+plural(L.errors,'assault')));o.el.append(car);}
+    const x=c.h('button','pd-pay-close','Back to the safehouse');x.type='button';x.onclick=o.close;o.el.append(x);x.focus({preventScroll:true});}
+   t.onclick=()=>{if(c._overlay)c._overlay.close();else payday();};
+   render();c.every(render);return {update(type){if(type==='life')render();}};
   }},
   {id:'pd-assault',mount(c){
-   let banner=null;
-   const show=()=>{if(banner)return;banner=c.add('layer',c.h('div','fx pd-assault'));banner.style.top=(c.below('.tabs')+2)+'px';banner.setAttribute('role','status');const inner=c.h('span',null,'Police assault in progress');banner.append(inner);};
-   const hide=()=>{banner?.remove();banner=null;};
-   return {update(type,d){if(type!=='state')return;if(d.state==='error'||d.state==='waiting')show();else hide();},unmount:hide};
+   // v2.22: the assault banner sits on top of the heist plan instead of over the page, shows "Assault
+   // ending" after a recovery, and has the pager: hold it (or F over the panel) to run the full check.
+   const plan=c.root.querySelector('.pd-plan');let banner=null,hold=0,fade=0;
+   const PAGER=1100;
+   function cancelHold(){if(!hold)return;c.cancel(hold);hold=0;banner?.querySelector('.pd-pager')?.classList.remove('holding');}
+   function startHold(){if(hold||!banner)return;const p=banner.querySelector('.pd-pager');p.classList.add('holding');hold=c.later(()=>{hold=0;p.classList.remove('holding');p.classList.add('answered');c.actions.fullCheck();},PAGER);}
+   function show(phase){c.cancel(fade);
+    if(!banner){banner=c.h('div','fx pd-assault');banner.setAttribute('role','status');
+     if(plan)plan.prepend(banner);else{c.add('layer',banner);banner.style.top=(c.below('.tabs')+2)+'px';}
+     const inner=c.h('span','pd-assault-text'),pager=c.h('button','pd-pager fx-interactive');pager.type='button';pager.title='Hold to answer the pager: runs the full check (or hold F over the panel)';pager.append(c.h('i'),c.h('b',null,'Pager'),c.h('small',null,'hold F'));
+     pager.onpointerdown=e=>{e.preventDefault();startHold();};pager.onpointerup=pager.onpointerleave=pager.onpointercancel=cancelHold;pager.onclick=e=>{if(e.detail===0)c.actions.fullCheck();};
+     banner.append(inner,pager);}
+    banner.dataset.phase=phase;banner.querySelector('.pd-assault-text').textContent=phase==='fade'?'Assault ending':'Police assault in progress';
+    if(phase==='fade')fade=c.later(hide,6000);}
+   function hide(){cancelHold();banner?.remove();banner=null;}
+   c.key(e=>{if((e.key==='f'||e.key==='F')&&banner?.dataset.phase==='assault'&&!e.repeat){e.preventDefault();startHold();}});
+   c.on(document,'keyup',e=>{if(e.key==='f'||e.key==='F')cancelHold();},true);
+   if(c.S.state==='error'||c.S.state==='waiting')show('assault');
+   return {update(type,d){if(type!=='state'||d.state===d.before)return;if(d.state==='error'||d.state==='waiting')show('assault');else if(banner&&banner.dataset.phase==='assault')show('fade');},unmount:hide};
   }},
  ]);
 

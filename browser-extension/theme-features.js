@@ -149,7 +149,11 @@
     const el=h('div','fx fx-overlay fx-interactive '+cls);el.setAttribute('role','dialog');el.setAttribute('aria-label',label);el.style.setProperty('--fx-top',(ctx.below('.tabs')+6)+'px');
     el.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();e.stopPropagation();close();}});
     function close(){if(!el.isConnected)return;el.remove();own.delete(el);if(ctx._overlay?.el===el)ctx._overlay=null;onClose?.();}
-    slots.layer.append(el);own.add(el);ctx._overlay={el,close};return ctx._overlay;
+    slots.layer.append(el);own.add(el);ctx._overlay={el,close};
+    // Filled by the caller right after this returns: if it doesn't fit under the tabs (a short window,
+    // a tall deck), it moves up under the header instead and starts at its top.
+    requestAnimationFrame(()=>{if(el.isConnected&&el.scrollHeight>el.clientHeight+2){el.style.setProperty('--fx-top',(ctx.below('.bar')+6)+'px');el.scrollTop=0;}});
+    return ctx._overlay;
    },
   };
   return ctx;
