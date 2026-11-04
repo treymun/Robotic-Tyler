@@ -35,3 +35,14 @@
 .rm-notice p{margin:6px 0 0}
 .rm-notice .btn-row{margin-bottom:0}
 .rm-notice .btn{min-height:44px}
+
+/* v2.32: the Steam voice call: what Steam shows, and Join / Leave, thumb-sized. */
+.rm-call{margin:12px 0;padding:10px 12px;border-radius:var(--rt-r-sm);background:var(--rt-block)}
+.rm-call-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.rm-call p{margin:6px 0 0}
+.rm-call-btns{display:grid!important;grid-template-columns:1fr 1fr;gap:8px}
+.rm-call .btn{min-height:48px;margin:0}
+.rm-call .pill::before{content:"";width:8px;height:8px;border-radius:50%;flex-shrink:0;background:var(--rt-state-standby,#9a9a9a)}
+.rm-call[data-state=connected] .pill::before{background:var(--rt-state-speaking,#90ba3c)}
+.rm-call:is([data-state=joining],[data-state=leaving]) .pill::before{background:var(--rt-state-thinking,#dba520)}
+.rm-call[data-state=failed] .pill::before{background:var(--rt-state-error,#ec6767)}

@@ -332,7 +332,18 @@
    if(platform.voice!==false){
     bridge('status');await new Promise(r=>setTimeout(r,300));const v=voiceReport||{};
     row(v.enabled?'✓ Tyler\'s microphone is on':'! Tyler\'s microphone is off',v.enabled?'Steam gets Tyler\'s own microphone ('+(v.requests||0)+' request'+(v.requests===1?'':'s')+' so far), never your real one.':'Press Connect & start (or Start live voice) before joining the voice channel.');
-    row(v.connectedPeers?'✓ In a Steam voice call':'? Not in a voice call',v.connectedPeers?v.connectedPeers+' voice connection'+(v.connectedPeers===1?'':'s')+' active.':'Join the voice channel with the bot account, then run the check again.');
+    // v2.32: the call as Steam itself sees it (voice-call.js): its own call state and, when it is
+    // stuck or failed, the last lines of Steam's voice log, so it's clear which step stopped.
+    const call=await globalThis.TylerVoiceCall?.diagnose?.().catch(()=>null);
+    const STEP=n=>n>=9?'connected':n===8?'waiting for Steam to accept the bot into the call':n>=3?'setting up the connection with Steam\'s voice server':n>=1?'getting the microphone':'not in a call';
+    if(call&&call.state!=='unavailable'){
+     row(call.state==='connected'?'✓ In the Steam voice call':call.state==='joining'||call.state==='failed'&&call.roomId?'! Steam is still connecting the call':'? Not in a voice call',
+      call.state==='connected'?(call.room||'Voice')+(call.people?' · '+call.people+' other'+(call.people===1?'':'s'):' · nobody else yet')+'.':
+      call.state==='joining'||call.state==='failed'&&call.roomId?'Stuck at: '+STEP(call.steamState||0)+(call.room?' ('+call.room+')':'')+'. Leave voice and join again; if it keeps stopping here with nothing changed in Tyler, it is on Steam\'s side.':
+      'Press Join voice (Chat tab) or join the voice channel with the bot account, then run the check again.');
+     if(call.state!=='connected'&&call.log?.length)row('? Steam\'s voice log',call.log.slice(-4).join(' · '));
+     if(call.state!=='connected'&&(call.state==='joining'||call.roomId))row('? Voice connection','Steam call step '+(call.steamState??'unknown')+' · connections: '+((v.peerStates||[]).join(', ')||'none yet')+'.');
+    }else row(v.connectedPeers?'✓ In a Steam voice call':'? Not in a voice call',v.connectedPeers?v.connectedPeers+' voice connection'+(v.connectedPeers===1?'':'s')+' active.':'Join the voice channel with the bot account, then run the check again.');
     row(v.attached?'✓ Outgoing audio attached':'! Outgoing audio not attached',v.attached?'A test beep still needs confirmation from your main account.':'Rejoin the voice channel after Connect & start. If it stays like this, reload Steam chat.');
     // Steam's codec settings for Tyler's audio and his send rate (v2.20.2): what the call allows.
     const codec=v.codec;if(codec?.codec)row('✓ Call audio: '+codec.codec.replace(/^opus$/i,'Opus')+(codec.kbps?' · '+codec.kbps+' kbps':''),'Steam\'s settings: '+(codec.fmtp||'none listed')+(/maxplaybackrate=(8|12|16|24)000/.test(codec.fmtp)?' (Steam limits the call\'s audio range; music loses its highest notes)':''));

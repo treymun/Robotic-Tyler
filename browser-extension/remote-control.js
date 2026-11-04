@@ -54,7 +54,8 @@
    paused:['paused','standby'].includes(st.state)||!(api.isAutomaticActive?.()||api.liveActive?.()),automatic:!!api.isAutomaticActive?.(),live:!!api.liveActive?.(),
    voice:{armed,inCall,peers:armed&&inCall?Math.max(0,Number(heard.tracks)||0):0,attached:Number(v.attached)||0},
    chat:!!(api.getComposer?.()?.isConnected&&api.getRegion?.()?.isConnected),
-   notice:!!api.noticePending, // v2.30: Connect & start is waiting for the one-time chat check
+   notice:!!api.noticePending,
+   call:globalThis.TylerVoiceCall?.state?.()||null, // v2.32: the Steam voice call as Steam shows it (voice-call.js) // v2.30: Connect & start is waiting for the one-time chat check
    replies:(Number(S.replies)||0)+(Number(S.spoken)||0),spend:clean(st.hud?.spend,16),
    hud:Object.fromEntries(['voice','voiceMeta','spend','spendMeta','latency','latencyMeta'].map(k=>[k,clean(st.hud?.[k],60)])),
    footer:text('footerState'),platform:clean($('platformChip')?.textContent,40),
@@ -67,7 +68,7 @@
  // ── Live events while a phone watches ─────────────────────────────────────
  // Only these events, with only these fields (all of them are already on the panel).
  const FIELDS={state:['state','label','text','before'],hud:['voice','voiceMeta','spend','spendMeta','latency','latencyMeta'],reply:['chars'],chat:['recent','flood'],
-  sound:['slot','name'],music:['title','by'],report:['ms','spoken','live'],check:['problems','unsure'],keepalive:['reason'],theme:['theme'],'chat-check':['on']};
+  sound:['slot','name'],music:['title','by'],report:['ms','spoken','live'],check:['problems','unsure'],keepalive:['reason'],theme:['theme'],'chat-check':['on'],'voice-call':['state','room','roomId','people','error','reason','since','pending','steamState']};
  let watchUntil=0,queue=[],flushTimer=0;
  function pick(type,data){const out={};for(const k of FIELDS[type]){const v=data?.[k];if(v===undefined)continue;out[k]=typeof v==='string'?clean(v,k==='text'?200:120):typeof v==='number'||typeof v==='boolean'?v:clean(v,60);}return out;}
  function flush(){flushTimer=0;if(!queue.length)return;const events=queue.splice(0,60);queue=[];send({type:'remote:event',events});}
@@ -92,6 +93,10 @@
   pause:()=>{click('quickStop');return {};},
   start:()=>{api.connectAndStart?.();return {};},
   // v2.30: answers Connect & start's chat check from the phone (the same boxes as on the PC).
+  // v2.32: Steam's own Join / Leave for the group's voice channel. They return once Steam has the request;
+  // the phone shows Connected only when Steam does (the 'voice-call' events and the status).
+  'voice-join':async({roomId})=>{const vc=globalThis.TylerVoiceCall;if(!vc)throw Error('Voice calls aren’t available in this window.');return {call:await vc.join(/^\d{1,20}$/.test(String(roomId||''))?String(roomId):'')};},
+  'voice-leave':async()=>{const vc=globalThis.TylerVoiceCall;if(!vc)throw Error('Voice calls aren’t available in this window.');return {call:await vc.leave()};},
   notice:({always})=>{if(!api.answerNotice?.(always===true))throw Error('Nothing is waiting for the chat check.');return {};},
   'stop-audio':()=>{click('stop');return {};},
   sound:({slot})=>{const n=Number(slot),list=api.listSounds?.()?.slots||[];if(!list.some(s=>s.slot===n))throw Error('That clip isn’t on the soundboard.');api.playSound?.(n);return {};},

@@ -282,6 +282,16 @@ pre:empty{display:none}
 
 /* Callouts */
 .callout,.quick-help{margin:10px 0;padding:11px 12px;border-radius:var(--rt-r-sm);background:var(--rt-block)}
+/* v2.32: Steam voice call (voice-call.js): what Steam shows, and Join / Leave. */
+.voice-call{margin:10px 0;padding:10px 12px;border-radius:var(--rt-r-sm);background:var(--rt-block)}
+.voice-call-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.voice-call .hint{margin:4px 0 0}
+.voice-call .btn-row{margin:8px 0 0}
+/* The state's colour is a dot; the words keep the theme's own readable pill colours. */
+.voice-call .pill::before{content:"";width:7px;height:7px;border-radius:50%;flex-shrink:0;background:var(--rt-state-standby,#9a9a9a)}
+.voice-call[data-state=connected] .pill::before{background:var(--rt-state-speaking,#90ba3c)}
+.voice-call:is([data-state=joining],[data-state=leaving]) .pill::before{background:var(--rt-state-thinking,#dba520)}
+.voice-call[data-state=failed] .pill::before{background:var(--rt-state-error,#ec6767)}
 .quick-help{background:linear-gradient(90deg,rgba(26,159,255,.18),rgba(0,0,0,.2) 80%);border-left:3px solid var(--rt-active)}
 .quick-help p{margin-top:0;color:var(--rt-ink-strong)}
 .quick-help button{margin-top:8px}

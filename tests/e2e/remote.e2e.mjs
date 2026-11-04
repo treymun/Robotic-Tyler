@@ -151,6 +151,72 @@ test('v2.30: the phone sees Connect & start waiting for the chat check and answe
  }finally{await b.close();await browser.close();}
 });
 
+// v2.32: Steam voice Join / Leave from the phone. The PC's Steam is a stand-in shaped like Steam's
+// real chat code (read from Steam's friendsui.js: a voice channel's StartVoiceChat starts the call,
+// Steam's call state reaches 9 when its WebRTC session and voice chat are up, the server's member list
+// says who is in, and the "Leave voice chat" button is .chatEndVoiceChat). Real server, phone-sized
+// Chromium and Tyler's real steam-chat-main.js / voice-call.js. Not Steam: whether Steam's real voice
+// server connects is tested on the owner's machine.
+const FAKE_STEAM=`(()=>{
+ const log=[],self={accountid:2},friend={accountid:3};let members=[];
+ const VC={m_VoiceCallState:{m_eState:0,m_chatRoom:null},
+  InitiateRoomChat(g,c){this.m_VoiceCallState={m_eState:1,m_chatRoom:{groupID:g,chatID:c}};log.push('(VoiceChat) Call to room '+c+' now initating getUserMedia/WebRTC');window.__steam.started.push(c);},
+  IsVoiceActiveForRoom(g,c){const s=this.m_VoiceCallState;return !!s.m_chatRoom&&s.m_chatRoom.groupID===g&&s.m_chatRoom.chatID===c&&s.m_eState!==0;},
+  OnUserEndVoiceChat(){this.m_VoiceCallState={m_eState:0,m_chatRoom:null};members=members.filter(m=>m!==self);log.push('(VoiceChat) Ended');window.__steam.ended++;},
+  GetVoiceLogs(){return log.join('\\r\\n');}};
+ const room=(id,name)=>({GetRoomID:()=>id,name,GetVoiceAllowed:()=>true,ChatStore:{VoiceChat:VC},
+  StartVoiceChat(){if(!this.BVoiceActive())VC.InitiateRoomChat('12345',id);},ToggleVoiceChat(){this.BVoiceActive()?VC.OnUserEndVoiceChat():this.StartVoiceChat();},
+  BVoiceActive(){return VC.IsVoiceActiveForRoom('12345',id);},get voice_active_contains_self(){return VC.m_VoiceCallState.m_chatRoom?.chatID===id&&members.includes(self);},
+  get voice_active_member_list(){return {member_list:VC.m_VoiceCallState.m_chatRoom?.chatID===id?members:[friend]};}});
+ const rooms=[room('901','General Voice')];
+ const group={GetGroupID:()=>'12345',get voiceRoomList(){return rooms;}};
+ const text={GetGroup:()=>group,GetVoiceAllowed:()=>false,self,ChatStore:{VoiceChat:VC}};
+ const region=document.createElement('div'),sample=document.createElement('div');sample.className='msgText';sample.textContent='hi';
+ region.append(sample);document.body.append(region);sample.__reactProps$steam={msg:{unAccountID:3,rtTimestamp:Date.now()/1000,unOrdinal:1},chatView:{chat:text}};
+ // Steam's Leave button, rendered while a call is active.
+ const leave=document.createElement('div');leave.className='VoiceControlPanelButton chatEndVoiceChat';leave.title='Leave voice chat';leave.onclick=()=>VC.OnUserEndVoiceChat();
+ window.__steam={started:[],ended:0,region,sample,rooms,room,
+  connect(){VC.m_VoiceCallState.m_eState=9;members=[self,friend];log.push('(WebRTC) WebRTC session connected');document.body.append(leave);},
+  step(n){VC.m_VoiceCallState.m_eState=n;},
+  drop(){VC.m_VoiceCallState={m_eState:0,m_chatRoom:null};members=[];log.push('(VoiceChat) Voice chat failed: timed out');leave.remove();},
+  manual(id){const r=rooms.find(x=>x.GetRoomID()===id);r.StartVoiceChat();this.connect();}};
+})();`;
+
+test('v2.32: Join Voice / Leave Voice from the phone follow Steam\'s own state (stand-in Steam on the PC)',{timeout:120000},async()=>{
+ const browser=await chromium.launch();const b=await bridge(browser,{theme:'steam'});
+ try{
+  const {pc,phone}=b;
+  await pc.addScriptTag({path:path.join(ROOT,'browser-extension/steam-chat-main.js')});await pc.addScriptTag({content:FAKE_STEAM});
+  await pc.evaluate(()=>{Object.assign(TylerCompanion,{getRegion:()=>__steam.region,getSample:()=>__steam.sample,getVoiceState:()=>({enabled:true,attached:1,connectedPeers:0})});});
+  await phone.goto(b.base+'/?code='+b.code);await phone.waitForFunction(()=>globalThis.__tylerRemote?.state().link==='live',null,{timeout:30000});
+  const ui=()=>inPhone(phone,r=>({state:r.getElementById('rmCall').dataset.state,label:r.getElementById('rmCallState').textContent,text:r.getElementById('rmCallText').textContent,join:r.getElementById('rmJoin').disabled,leave:r.getElementById('rmLeave').disabled}));
+  const until=async(want,ms=8000)=>{const t=Date.now();let u;while(Date.now()-t<ms){u=await ui();if(u.state===want)return u;await phone.waitForTimeout(100);}throw Error('phone shows '+JSON.stringify(u)+', not '+want);};
+  let u=await until('disconnected');assert.equal(u.label,'Disconnected');assert.equal(u.join,false);assert.equal(u.leave,true,'nothing to leave');
+  // Join: Steam's own StartVoiceChat runs once, even if the button is tapped twice; Joining until Steam says connected.
+  await tap(phone,'rmJoin');await tap(phone,'rmJoin');
+  u=await until('joining');assert.equal(u.label,'Joining…');assert.equal(u.join,true,'no second join while one is on its way');
+  await phone.waitForTimeout(1500);assert.deepEqual(await pc.evaluate(()=>__steam.started),['901']);
+  assert.equal((await ui()).state,'joining','the request alone is not "Connected"');
+  await pc.evaluate(()=>__steam.step(8));await phone.waitForTimeout(1300);assert.equal((await ui()).state,'joining','still not connected at Steam\'s step 8');
+  await pc.evaluate(()=>__steam.connect());u=await until('connected');assert.equal(u.label,'Connected');assert.match(u.text,/General Voice · 1 other/);assert.equal(u.join,true);assert.equal(u.leave,false);
+  if(SHOTS){await inPhone(phone,r=>r.getElementById('rmCall').scrollIntoView({block:'center'}));await phone.screenshot({path:path.join(SHOTS,'remote-call.png')});await pc.screenshot({path:path.join(SHOTS,'pc-call.png')});}
+  // Leave: Steam's own Leave button.
+  await tap(phone,'rmLeave');u=await until('disconnected');assert.equal(await pc.evaluate(()=>__steam.ended),1);
+  // Someone joins the bot in Steam itself: the phone follows. Then Steam drops it: Disconnected.
+  await pc.evaluate(()=>__steam.manual('901'));u=await until('connected');
+  await pc.evaluate(()=>__steam.drop());u=await until('disconnected');
+  // A join Steam never finishes: Failed with Steam's reason, and Leave cancels it.
+  await tap(phone,'rmJoin');await until('joining');await pc.evaluate(()=>__steam.drop());u=await until('failed');assert.match(u.text,/ended the call before it connected/);
+  // A second voice channel: Tyler goes back to the one the bot was last connected in.
+  await pc.evaluate(()=>{__steam.rooms.push(__steam.room('902','Raid'));});
+  await tap(phone,'rmJoin');await until('joining');await phone.waitForTimeout(300);assert.equal(await pc.evaluate(()=>__steam.started.at(-1)),'901');
+  await pc.evaluate(()=>__steam.connect());await until('connected');await tap(phone,'rmLeave');await until('disconnected');
+  // The PC's panel has the same control.
+  assert.equal(await pc.evaluate(()=>!!document.getElementById('tyler-companion-root').shadowRoot.querySelector('.voice-call #vcJoin')),true);
+  assert.deepEqual(b.errors,[]);
+ }finally{await b.close();await browser.close();}
+});
+
 test('Steam window side: status, actions through the panel\'s controls, events only while a phone watches (panel preview as the desktop app)',{timeout:120000},async()=>{
  const browser=await chromium.launch();const b=await bridge(browser,{theme:'steam'});
  try{

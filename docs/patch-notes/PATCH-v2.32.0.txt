@@ -1,0 +1,19 @@
+ROBOTIC TYLER v2.32.0 — patch notes
+
+Join Voice / Leave Voice
+- In Tyler's panel (Chat tab, Steam voice call) and on the phone remote.
+- Join does what clicking the group's voice channel in Steam does (Steam's own "start voice chat"), with Tyler's microphone in place first. Leave presses Steam's own "Leave voice chat" button.
+- Only the group Tyler is connected to; an existing call elsewhere is never taken over. With several voice channels, the one the bot was last in (or you choose).
+- The status is Steam's: Disconnected, Joining…, Connected, Leaving…, Failed. Connected only when Steam's call is connected and lists the bot. A double tap doesn't join twice. Joins and leaves made in Steam show up within a few seconds. Failed says why. Leave cancels a stuck join.
+
+Full check: the call as Steam sees it
+- When the call is stuck: the step Steam stopped at, the last lines of Steam's own voice log (addresses and secrets hidden), and the voice connections' state.
+
+Known issue
+- Desktop app: the bot can get stuck "connecting" while the Chrome extension joins at once. Run the full check while it's stuck and send it: it shows where Steam stops.
+
+Tested
+- Unit: against a stand-in shaped like Steam's chat code (start once, Connected only at Steam's connected state, Leave button, choice of channel, no takeover, log hiding).
+- Phone remote: real server, iPhone-sized Chromium, stand-in Steam on the PC: every state, double taps, Steam-side joins and drops, failures.
+- Real Electron with a mock Steam page: desktop check passes.
+- Not tested: a real Steam call; the desktop app's stuck connecting.

@@ -20,7 +20,7 @@ const DEFAULT_PORT=47820,CODE_MS=600000,MAX_TRIES=8,MAX_DEVICES=8,COOKIE='rt_rem
 const THEMES=new Set(['steam','classic','tf2','cs2','portal','cs16','hev','l4d','winxp','doom','quake','pipboy','combine','deadlock','minecraft','payday','dreamcast','gmod','ricochet','dod','rust','x360','ipod','msn','xmb']);
 // Each action and the only fields it passes on (anything else a request carries is dropped).
 const num=(v,min,max)=>{const n=Number(v);return Number.isFinite(n)?Math.min(max,Math.max(min,n)):min;};
-const ACTIONS={pause:()=>({}),start:()=>({}),notice:b=>({always:b.always===true}),'stop-audio':()=>({}),sound:b=>({slot:Number(b.slot)}),'clips-stop':()=>({}),'clip-volume':b=>({value:num(b.value,0,1)}),
+const ACTIONS={pause:()=>({}),start:()=>({}),notice:b=>({always:b.always===true}),'voice-join':b=>({roomId:/^\d{1,20}$/.test(String(b.roomId||''))?String(b.roomId):''}),'voice-leave':()=>({}),'stop-audio':()=>({}),sound:b=>({slot:Number(b.slot)}),'clips-stop':()=>({}),'clip-volume':b=>({value:num(b.value,0,1)}),
  'music-start':()=>({}),'music-play':b=>({query:String(b.query||'').slice(0,120)}),'music-skip':()=>({}),'music-stop':()=>({}),'music-volume':b=>({value:num(b.value,0,200)}),
  'music-quality':b=>({level:String(b.level||'')}),'music-duck':b=>({on:b.on===true}),'voice-volume':b=>({value:num(b.value,0,.7)}),mode:b=>({mode:String(b.mode||'')}),
  keepalive:b=>{const o={};if(typeof b.call==='boolean')o.call=b.call;if(typeof b.chat==='boolean')o.chat=b.chat;if(b.minutes!==undefined)o.minutes=String(Math.round(num(b.minutes,1,120)));return o;},

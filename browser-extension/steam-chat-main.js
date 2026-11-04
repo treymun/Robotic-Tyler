@@ -97,6 +97,28 @@
   const ids=list.map(f=>steam(get(f,'accountid')));if(ids.some(id=>!id)||!ids.includes(steam(ctx.self)))return {known:false};
   const others=[...new Set(ids)].filter(id=>id!==steam(ctx.self));return {known:true,groupId:ctx.id,otherCount:others.length,soloId:others.length===1?others[0]:null};
  }
+ // v2.32: the connected group's voice channels and Steam's own call state, to join and leave them the
+ // way Steam's controls do: clicking a voice channel calls the room's StartVoiceChat (its onSelect), and
+ // Steam's "Leave voice chat" button is .chatEndVoiceChat. Steam's call state reaches 9 only once its
+ // WebRTC session and the voice chat are both connected.
+ function voiceCall(ctx){
+  const cs=get(get(get(ctx.chat,'ChatStore'),'VoiceChat'),'m_VoiceCallState'),e=Number(get(cs,'m_eState')),at=get(cs,'m_chatRoom');
+  let rooms=[];try{rooms=[...(get(ctx.group,'voiceRoomList')||[])].slice(0,40);}catch{}
+  const list=rooms.map(room=>{let self=false,count=0,active=false,id='';
+   try{id=String(call(room,'GetRoomID'));self=get(room,'voice_active_contains_self')===true;const m=get(get(room,'voice_active_member_list'),'member_list');count=Array.isArray(m)?Math.min(m.length,256):0;active=call(room,'BVoiceActive')===true;}catch{}
+   return {id,name:clean(get(room,'name'),60)||'Voice',self,count,active,room};}).filter(r=>/^\d{1,20}$/.test(r.id));
+  const state=Number.isFinite(e)?e:null,here=list.find(r=>r.active)||null;
+  return {groupId:ctx.id,state,activeRoom:here?.id||null,elsewhere:state!==null&&state>0&&!here&&!(at&&String(get(at,'groupID')??'')===ctx.id),rooms:list};
+ }
+ const voicePublic=v=>({...v,rooms:v.rooms.map(({room,...r})=>r)});
+ // The last lines of Steam's own voice log (VoiceChat.GetVoiceLogs, what Steam's voice settings show),
+ // to see where a call stopped: Steam's tagged lines only (not the call descriptions it also logs),
+ // with addresses, ports and long ids hidden.
+ function voiceLog(ctx){
+  try{const vc=get(get(ctx.chat,'ChatStore'),'VoiceChat');const text=String(call(vc,'GetVoiceLogs')||'');
+   return text.split(/\r?\n/).filter(l=>/^\((?:VoiceChat|WebRTC)\)/.test(l)&&!/Description\)|SDP/i.test(l)).slice(-14).map(line=>clean(line.replace(/\b\d{1,3}(?:\.\d{1,3}){3}(?::\d+)?\b/g,'[address]').replace(/\b[0-9a-f]{0,4}(?::[0-9a-f]{0,4}){2,7}\b/gi,'[address]').replace(/\b\d{9,}\b/g,'[id]').replace(/(ufrag|pwd|fingerprint|candidate)\S*/gi,'$1 [hidden]'),200));}
+  catch{return [];}
+ }
  async function handle(node,request){
   if(request.op==='disarm'){armed.clear();muteArmed.clear();adminArmed.clear();mutes.clear();return {};}
   if(request.op==='disarm-moderation'){armed.clear();return {};}
@@ -105,6 +127,22 @@
   const ctx=context(node);
   if(request.op==='group')return groupInfo(ctx);
   if(request.op==='voice')return voiceInfo(ctx);
+  if(request.op==='voice-state'){const v=voicePublic(voiceCall(ctx));if(request.logs===true)v.log=voiceLog(ctx);return v;}
+  if(request.op==='voice-join'){
+   const v=voiceCall(ctx);if(!v.rooms.length)throw Error('This Steam group has no voice channel.');
+   const here=v.rooms.find(r=>r.active);if(here)return {...voicePublic(v),started:false,roomId:here.id};
+   if(v.elsewhere)throw Error('The bot is already in another Steam voice call. Leave that call first.');
+   const room=v.rooms.find(r=>r.id===String(request.roomId||''))||(v.rooms.length===1?v.rooms[0]:null);
+   if(!room)return {...voicePublic(v),started:false,choose:true};
+   call(room.room,'StartVoiceChat');return {...voicePublic(voiceCall(ctx)),started:true,roomId:room.id};
+  }
+  if(request.op==='voice-leave'){
+   const v=voiceCall(ctx),here=v.rooms.find(r=>r.active);if(!here)return {...voicePublic(v),left:false};
+   // Steam's own Leave button when it's on screen; otherwise the room's toggle, which Steam's other leave controls use.
+   const button=[...document.querySelectorAll('.chatEndVoiceChat')].find(b=>b.isConnected&&b.getClientRects?.().length);
+   if(button)button.click();else call(here.room,'ToggleVoiceChat');
+   return {...voicePublic(voiceCall(ctx)),left:true,via:button?'button':'room'};
+  }
   // v2.24: which Steam channel a message reader belongs to. Steam keeps one chat object per channel
   // while it redraws the view, so "the same object" means "the same channel", without reading names.
   if(request.op==='chat-mark'){const key=String(request.key||'');if(!/^[\w-]{1,32}$/.test(key))throw Error('Invalid chat mark.');chatMarks.set(key,new WeakRef(ctx.chat));return {groupId:ctx.id};}

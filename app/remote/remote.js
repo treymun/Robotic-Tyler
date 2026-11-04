@@ -39,6 +39,10 @@
   <button id="connect" class="btn primary block" type="button">${icon('play')}Connect &amp; start</button>
   <button id="rmPause" class="btn block" type="button" hidden>${icon('pause')}Pause AI</button>
   <p id="rmRunHint" class="hint">Tyler connects to the chat open on your PC.</p>
+  <div id="rmCall" class="rm-call" data-state="unavailable"><div class="rm-call-head"><b>Steam voice call</b><span id="rmCallState" class="pill" role="status" aria-live="polite">Not connected</span></div>
+   <p id="rmCallText" class="hint">Connect Tyler to the group chat first.</p><div id="rmCallRooms" class="btn-row" hidden></div>
+   <div class="btn-row rm-call-btns"><button id="rmJoin" class="btn primary" type="button">Join Voice</button><button id="rmLeave" class="btn" type="button">Leave Voice</button></div>
+   <small class="hint">Leave Voice takes the bot out of the call. Pause AI and Stop audio keep him in it.</small></div>
   <label class="field">Use Tyler for<select id="rmMode"><option value="auto">Auto: text when alone, voice when friends join</option><option value="text">Text conversation only</option><option value="voice">Voice conversation only</option></select></label>
   <small class="hint">A new mode starts the next time you press Connect &amp; start.</small>
   <details class="feature" open><summary><span class="feature-title">Say in chat</span><span class="feature-meta">Tyler types it</span></summary>
@@ -144,9 +148,25 @@
  const setCheck=(id,v)=>{const el=$(id);if(el&&el.dataset.dragging!=='true')el.checked=!!v;};
  const pct=v=>Math.round(Number(v)*100)+'%';
  let padsKey='',checksKey='',trailKey='';
+ // v2.32: the Steam voice call as Tyler's Steam window sees it. Connected only when Steam says so;
+ // a tap only sends the request, and the buttons wait while one is on its way.
+ const CALL={unavailable:'Not connected',disconnected:'Disconnected',joining:'Joining…',connected:'Connected',leaving:'Leaving…',failed:'Failed'};
+ let callBusy=false;
+ function renderCall(c){
+  live.call=c;const st=c.state||'unavailable',box=$('rmCall');box.dataset.state=st;$('rmCallState').textContent=CALL[st]||st;
+  $('rmCallText').textContent=st==='connected'?(c.room||'Voice')+(c.people?' · '+c.people+' other'+(c.people===1?'':'s')+' in the call':' · nobody else yet'):
+   st==='joining'?'Steam is connecting'+(c.room?' to '+c.room:'')+'…':st==='leaving'?'Steam is taking the bot out of the call…':st==='failed'?(c.error||'Steam didn’t finish.'):st==='unavailable'?(c.reason||'Connect Tyler to the group chat first.'):'The bot isn’t in the group’s voice call.';
+  const pending=callBusy||c.pending===true;
+  $('rmJoin').disabled=pending||st==='connected'||st==='joining'||st==='leaving'||st==='unavailable';
+  $('rmLeave').disabled=pending&&st==='leaving'||!(st==='connected'||st==='joining'||st==='failed'&&!!c.roomId);
+  const rooms=Array.isArray(c.rooms)?c.rooms:[],choose=st==='failed'&&rooms.length>1&&/Choose one/.test(c.error||''),list=$('rmCallRooms');list.hidden=!choose;
+  if(choose)list.replaceChildren(...rooms.map(r=>{const b=document.createElement('button');b.type='button';b.className='btn';b.textContent=r.name+(r.count?' · '+r.count:'');b.onclick=()=>void callAct('voice-join',{roomId:r.id});return b;}));
+ }
+ async function callAct(action,extra={}){if(callBusy)return;callBusy=true;renderCall(live.call||{});try{await act(action,extra);}finally{callBusy=false;renderCall(live.call||{});pollSoon(300);}}
  function renderControls(s){
   const c=s.controls||{};
   live.paused=!!s.paused;$('connect').hidden=!live.paused;$('rmPause').hidden=live.paused;
+  if(s.call)renderCall(s.call);
   // v2.30: Connect & start is waiting for the chat check: answer it here.
   $('rmNotice').hidden=!s.notice;if(s.notice)$('connect').hidden=true; // it's already connecting
   $('rmRunHint').textContent=live.paused?'Tyler connects to the chat open on your PC.':'Tyler is running'+(s.automatic?' automatically':s.live?' in Live voice':'')+'. Pause AI stops his replies; Stop audio silences him.';
@@ -247,6 +267,7 @@
   $('quickStop').onclick=$('rmPause').onclick=()=>void act('pause',{},'Tyler paused');
   $('stop').onclick=()=>void act('stop-audio',{},'Audio stopped');
   $('connect').onclick=()=>void act('start',{},'Connecting…');
+  $('rmJoin').onclick=()=>void callAct('voice-join');$('rmLeave').onclick=()=>void callAct('voice-leave');
   $('rmNoticeYes').onclick=()=>void act('notice',{always:false},'Continuing…');
   $('rmNoticeAlways').onclick=()=>void act('notice',{always:true},'Continuing. Tyler won’t ask again.');
   $('settings').onclick=()=>showTab('setup');
@@ -341,6 +362,7 @@
    if(e.type==='state'){setActivity(d.state,d.label,d.text);continue;}
    if(e.type==='hud'){setHud(d);continue;}
    if(e.type==='theme'){setTheme(d.theme);continue;}
+   if(e.type==='voice-call'){renderCall({...live.call,...d,pending:d.pending===true});continue;}
    if(e.type==='chat-check'){const n=$('rmNotice');n.hidden=d.on!==true;$('connect').hidden=d.on===true||!live.paused;if(d.on===true){for(const x of n.getRootNode().querySelectorAll('.rt-toast .rt-x'))x.click();/* nothing covers its buttons */if($('tab-conversation')?.getAttribute('aria-selected')==='true')n.scrollIntoView({block:'center'});else toast('info','Tyler is waiting for you','Answer the one-time chat check on the Chat tab.');}continue;}
    if(e.type==='sound')flashPad(d.slot);
    if(e.type==='music'){live.music={...live.music,title:d.title||'',by:d.by||''};nowPlaying();}
