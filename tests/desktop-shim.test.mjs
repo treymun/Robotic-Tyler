@@ -67,6 +67,9 @@ test('desktop main process boots the shared background and relays storage change
   for(let i=0;i<50&&!fake.sent.some(s=>s.message?.type==='storage:changed');i++)await new Promise(r=>setTimeout(r,10));
   const relay=fake.sent.find(s=>s.message?.type==='storage:changed');
   assert.ok(relay,'storage change relayed to the Steam window');
+  // v2.20: Settings → AI test and preview run in the shared background with the vault's keys.
+  const aiTest=await globalThis.tylerSettingsAI({action:'test',aiProvider:'gemini',geminiTextModel:'gemini-3.8-flash'});
+  assert.equal(aiTest.ok,false);assert.equal(aiTest.model,'Gemini 3.8 Flash');assert.match(aiTest.error,/No Google Gemini key/);
   assert.equal(relay.id,bot.webContents.id);
   assert.equal(relay.message.changes.usage.newValue.requests,3);
 

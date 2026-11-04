@@ -110,6 +110,11 @@ if(!app.requestSingleInstanceLock()){app.quit();}else{
   if(request.action==='voice-devices')return voice.devices();
   if(request.action==='voice-tone')return voice.tone(String(request.device||''),beep);
   if(request.action==='voice-test')return voiceTest(request.engine,request.values||{});
+  // Settings → AI (v2.20): Test selected model / Preview a reply, with the saved keys (or a key typed for this one request).
+  if(request.action==='ai'){const r=request.request||{},text=v=>typeof v==='string'?v.slice(0,1500):'';
+   const keyOf=v=>typeof v==='string'&&v.trim().length<=1024?v.trim():'';
+   return globalThis.tylerSettingsAI({action:r.action==='preview'?'preview':'test',aiProvider:r.aiProvider==='gemini'?'gemini':'openrouter',brain:text(r.brain),smartRouting:r.smartRouting===true,geminiTextModel:text(r.geminiTextModel),kind:r.kind==='roast'?'roast':'normal',prompt:text(r.prompt),
+    values:{personality:text(r.values?.personality),roastMode:text(r.values?.roastMode),length:text(r.values?.length),v23Persona:text(r.values?.v23Persona)},openrouterKey:keyOf(r.openrouterKey),geminiKey:keyOf(r.geminiKey)});}
   throw Error('Unknown settings action');});
  // Settings → Voice → Test voice: the key stays here; only the audio goes back to the page.
  async function voiceTest(engine,values){

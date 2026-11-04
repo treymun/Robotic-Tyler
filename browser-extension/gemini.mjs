@@ -1,20 +1,39 @@
 import {speechChunks} from './speech.mjs';
-export const geminiModel='gemini-3.1-flash-lite';
+import {geminiTextModel,geminiProblem,GEMINI_TRANSCRIBE_MODEL,GEMINI_TEXT_DEFAULT} from './models.mjs';
+export const geminiModel=GEMINI_TEXT_DEFAULT;
 export const geminiSpeech='gemini-2.5-flash-preview-tts';
-async function generate(key,model,body,signal){
- const response=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+model+':generateContent',{method:'POST',redirect:'error',headers:{'Content-Type':'application/json','x-goog-api-key':key},body:JSON.stringify(body),signal:AbortSignal.any([AbortSignal.timeout(35000),signal])});
- if(!response.ok)throw Error('Gemini '+response.status+(response.status===429?' · Google quota reached. Try again later.':response.status===403||response.status===400?' · Check your Google key and model access.':' · Google could not complete this request.'));
- const data=await response.json();return data.candidates?.[0]?.content?.parts||[];
+const pause=(ms,signal)=>new Promise((resolve,reject)=>{const t=setTimeout(resolve,ms);signal?.addEventListener?.('abort',()=>{clearTimeout(t);reject(signal.reason||Error('Cancelled'));},{once:true});});
+// One request; a short per-minute limit or a busy Google gets one retry after the delay Google asks for.
+async function generate(key,model,body,signal,{full=false}={}){
+ for(let attempt=0;;attempt++){
+  const response=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+model+':generateContent',{method:'POST',redirect:'error',headers:{'Content-Type':'application/json','x-goog-api-key':key},body:JSON.stringify(body),signal:AbortSignal.any([AbortSignal.timeout(35000),signal||new AbortController().signal])});
+  if(response.ok){const data=await response.json();return full?data:data.candidates?.[0]?.content?.parts||[];}
+  const problem=geminiProblem(response.status,await response.json().catch(()=>null),model);
+  if(attempt===0&&problem.retryMs>0){await pause(problem.retryMs+Math.round(Math.random()*400),signal);continue;}
+  const error=Error('Gemini '+response.status+' · '+problem.text);error.status=response.status;throw error;
+ }
 }
 function textOf(parts){return parts.filter(p=>!p.thought).map(p=>p.text||'').join('').trim();}
-export async function geminiReply(key,messages,cap,signal){
- const system=messages.filter(m=>m.role==='system').map(m=>m.content).join('\n');
- const contents=messages.filter(m=>m.role!=='system').map(m=>({role:m.role==='assistant'?'model':'user',parts:[{text:m.content}]}));
- const text=textOf(await generate(key,geminiModel,{systemInstruction:{parts:[{text:system}]},contents,generationConfig:{maxOutputTokens:cap,thinkingConfig:{thinkingLevel:'minimal'}}},signal));
- if(!text)throw Error('Gemini returned no reply.');return text;
+/** Chat history → Gemini contents. Gemini 3.5 and later reject a request that ends on a model turn. */
+export function geminiContents(messages){
+ const contents=messages.filter(m=>m.role!=='system').map(m=>({role:m.role==='assistant'?'model':'user',parts:[{text:String(m.content||'')}]}));
+ while(contents.length&&contents.at(-1).role==='model')contents.pop();
+ return contents;
+}
+/** The request body for one text model: its own thinking level, and room for its thinking. */
+export function geminiTextBody(messages,cap,modelId){
+ const model=geminiTextModel(modelId),system=messages.filter(m=>m.role==='system').map(m=>m.content).join('\n');
+ return {systemInstruction:{parts:[{text:system}]},contents:geminiContents(messages),generationConfig:{maxOutputTokens:cap+model.headroom,thinkingConfig:{thinkingLevel:model.thinking}}};
+}
+export async function geminiReply(key,messages,cap,signal,modelId){
+ const model=geminiTextModel(modelId);
+ const data=await generate(key,model.id,geminiTextBody(messages,cap,model.id),signal,{full:true});
+ const candidate=data.candidates?.[0],text=textOf(candidate?.content?.parts||[]);
+ if(!text)throw Error(candidate?.finishReason==='MAX_TOKENS'?model.label+' used its whole reply budget before answering. Try a longer reply length.':candidate?.finishReason==='SAFETY'||data.promptFeedback?.blockReason?model.label+' declined to answer that one (Google safety filter).':'Gemini returned no reply.');
+ return text;
 }
 export async function geminiHear(key,audio,signal){
- return textOf(await generate(key,geminiModel,{contents:[{parts:[{text:'Transcribe only the spoken words. Return an empty string for silence or noise.'},{inlineData:{mimeType:'audio/wav',data:audio}}]}]},signal));
+ return textOf(await generate(key,GEMINI_TRANSCRIBE_MODEL,{contents:[{parts:[{text:'Transcribe only the spoken words. Return an empty string for silence or noise.'},{inlineData:{mimeType:'audio/wav',data:audio}}]}]},signal));
 }
 // Gemini text-to-speech. 2.5 Flash TTS (the model used before v2.15) stays the default; the 3.8
 // models read the text exactly as written, so they get no "Read aloud:" lead-in.

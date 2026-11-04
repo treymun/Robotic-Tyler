@@ -2,14 +2,15 @@
 'use strict';
 const $=id=>document.getElementById(id);
 let noiseChanged=false;
-const fields=['aiProvider','personality','length','brain','roastMode','talkativeness','insideJokes','callbackGap','nicknameAliases','textSpeed','spendingCapUSD','streamAI','friendMemory','smartRouting','libraryAllowedIds','activityEnabled','activitySteamIds','voiceEngine','geminiVoice','geminiTtsModel','liveModel','liveVoice','liveInterrupt','liveSilenceMs','liveStartSensitivity','liveEndSensitivity','speechVoice','noiseLevel','fastSpeech','desktopVoice','voiceOutputDevice','voiceListenDevice','voiceListenConsent','chatTagEnabled','chatTagName'];
+const fields=['aiProvider','personality','length','brain','geminiTextModel','roastMode','talkativeness','insideJokes','callbackGap','nicknameAliases','textSpeed','spendingCapUSD','streamAI','friendMemory','smartRouting','libraryAllowedIds','activityEnabled','activitySteamIds','voiceEngine','geminiVoice','geminiTtsModel','liveModel','liveVoice','liveInterrupt','liveSilenceMs','liveStartSensitivity','liveEndSensitivity','speechVoice','noiseLevel','fastSpeech','desktopVoice','voiceOutputDevice','voiceListenDevice','voiceListenConsent','chatTagEnabled','chatTagName'];
 const sliderIds=['humorLevel','edgeLevel','helpLevel','chaosLevel'];
 const sliderLabels={humorLevel:['Dry','Light','High','Unhinged'],edgeLevel:['Soft','Spicy','Rowdy','Savage'],helpLevel:['Low','Balanced','Helpful','Coach mode'],chaosLevel:['Controlled','Loose','Chaotic','Gremlin']};
 const presetMap={
   rowdy:{roastMode:'rowdy',length:'short',talkativeness:'active',textSpeed:'balanced',personality:'A witty gaming homie who throws playful profanity, talks like a real friend, keeps replies tight unless someone genuinely needs more detail, and never acts robotic.'},
   coach:{roastMode:'custom',length:'normal',talkativeness:'occasional',textSpeed:'balanced',personality:'A sharp but encouraging gaming coach who explains things clearly, points out mistakes without sounding lame, and mixes practical advice with light trash talk.'},
   chaos:{roastMode:'savage',length:'short',talkativeness:'active',textSpeed:'balanced',personality:'A chaotic party goblin who reacts fast, jokes hard, loves absurd one-liners, and keeps the room lively without derailing every conversation.'},
-  chill:{roastMode:'custom',length:'normal',talkativeness:'quiet',textSpeed:'cautious',personality:'A chill, funny wingman who sounds natural, adds smooth banter, and only jumps in when it can say something actually worth hearing.'}
+  chill:{roastMode:'custom',length:'normal',talkativeness:'quiet',textSpeed:'cautious',personality:'A chill, funny wingman who sounds natural, adds smooth banter, and only jumps in when it can say something actually worth hearing.'},
+  nofilter:{roastMode:'unhinged',length:'short',talkativeness:'active',textSpeed:'balanced',personality:'The most unhinged friend in the squad: swears like breathing, crude jokes, savage comebacks, zero corporate polish. Still actually funny and quick, still has your back, and gives a straight answer when someone really needs one.'}
 };
 const suiteIds={votingEnabled:'suiteVoting',eventsEnabled:'suiteEvents',arcadeEnabled:'suiteArcade',friendProfilesEnabled:'suiteProfiles',coachingEnabled:'suiteCoaching',hudEnabled:'suiteHud',awarenessEnabled:'suiteAwareness',directorEnabled:'suiteDirector',partyEnabled:'suiteParty',adaptiveEnabled:'suiteAdaptive',nudgesEnabled:'suiteNudges'};
 function readSuite(){return Object.fromEntries(Object.entries(suiteIds).map(([k,id])=>[k,document.getElementById(id).checked]));}
@@ -110,49 +111,7 @@ for(const button of document.querySelectorAll('.preset'))button.onclick=()=>{
 $('forgePrompt').onclick=()=>{composePersonality();saveDraft();$('status').textContent='Personality rebuilt from the sliders. Save if you want to keep it.';};
 $('clear').onclick=async()=>{await storage().remove(['openrouterKey','geminiKey','speechKey']);await load();};
 $('steam').onclick=()=>openSteam();
-async function currentKeys(){
-  const saved=await storage().get(['openrouterKey','geminiKey']);
-  return {
-    openrouter:$('openrouterKey').value.trim()||saved.openrouterKey||'',
-    gemini:$('geminiKey').value.trim()||saved.geminiKey||''
-  };
-}
-function openRouterModel(input=''){if($('smartRouting').checked){const deep=input.length>260||/\b(explain|compare|difference|strategy|walk me through|step by step|calculate|why|how do i|debug|troubleshoot|recommend|build|optimiz|analysis|plan)\b/i.test(input);return deep?'meta-llama/llama-3.3-70b-instruct':'mistralai/mistral-small-3.2-24b-instruct';}return $('brain').value==='budget'?'mistralai/mistral-small-3.2-24b-instruct':'meta-llama/llama-3.3-70b-instruct';}
-async function previewReply(kind='normal'){
-  const prompt=$('previewPrompt').value.trim()||(kind==='roast'?'Your friend says: Tyler roast me for missing every shot.':'Your friend says: Tyler, what do you think?');
-  $('previewOutput').textContent='Generating preview…';
-  const provider=$('aiProvider').value;
-  const keys=await currentKeys();
-  const personality=[$('personality').value.trim(), $('roastMode').value==='savage'?'Use strong profanity and sharp gaming roasts when natural.':$('roastMode').value==='rowdy'?'Use playful profanity and rowdy gaming banter when natural.':'', kind==='roast'?'Lean into a playful roast.':''].filter(Boolean).join('\n');
-  try{
-    let text='';
-    if(provider==='gemini'){
-      if(!keys.gemini)throw Error('No Gemini key is available.');
-      const body={
-        systemInstruction:{parts:[{text:personality}]},
-        contents:[{role:'user',parts:[{text:prompt}]}],
-        generationConfig:{maxOutputTokens:$('length').value==='detailed'?180:$('length').value==='short'?80:120,thinkingConfig:{thinkingLevel:'minimal'}}
-      };
-      const response=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite:generateContent',{method:'POST',headers:{'Content-Type':'application/json','x-goog-api-key':keys.gemini},body:JSON.stringify(body),redirect:'error',signal:AbortSignal.timeout(30000)});
-      if(!response.ok)throw Error('Gemini preview failed with HTTP '+response.status+'.');
-      const data=await response.json();
-      text=(data.candidates?.[0]?.content?.parts||[]).filter(x=>!x.thought).map(x=>x.text||'').join('').trim();
-    }else{
-      if(!keys.openrouter)throw Error('No OpenRouter key is available.');
-      const response=await fetch('https://openrouter.ai/api/v1/chat/completions',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+keys.openrouter},body:JSON.stringify({model:openRouterModel(prompt),messages:[{role:'system',content:personality},{role:'user',content:prompt}],max_tokens:$('length').value==='detailed'?180:$('length').value==='short'?80:120,temperature:0.9}),redirect:'error',signal:AbortSignal.timeout(30000)});
-      if(response.status===401||response.status===403)throw Error('OpenRouter rejected this key.');
-      if(!response.ok)throw Error('OpenRouter preview failed with HTTP '+response.status+'.');
-      const data=await response.json();
-      text=data.choices?.[0]?.message?.content?.trim()||'';
-    }
-    if(!text)throw Error('Preview returned no reply.');
-    $('previewOutput').textContent=text;
-  }catch(error){
-    $('previewOutput').textContent='Preview failed: '+String(error.message||error).replace(/sk-or-[\w-]+/gi,'[hidden]');
-  }
-}
-$('previewReply').onclick=()=>previewReply('normal');
-$('previewRoast').onclick=()=>previewReply('roast');
+// Preview a reply and Test selected model: ai-settings.js (v2.20), with the real model and routing.
 $('save').onclick=async()=>{
   $('save').disabled=true;
   try{
@@ -169,8 +128,8 @@ $('save').onclick=async()=>{
     if($('openrouterKey').value.trim())s.openrouterKey=$('openrouterKey').value.trim();
     if($('geminiKey').value.trim())s.geminiKey=$('geminiKey').value.trim();
     if(s.geminiKey){
-      const response=await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-lite',{headers:{'x-goog-api-key':s.geminiKey},redirect:'error',signal:AbortSignal.timeout(12000)});
-      if(!response.ok)throw Error('Google key check returned HTTP '+response.status+'. Check the key and project access.');
+      const response=await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+encodeURIComponent(s.geminiTextModel||'gemini-3.1-flash-lite'),{headers:{'x-goog-api-key':s.geminiKey},redirect:'error',signal:AbortSignal.timeout(12000)});
+      if(!response.ok)throw Error('Google key check returned HTTP '+response.status+(response.status===404?' for the selected Gemini model. Pick another model or check the key\'s project.':'. Check the key and project access.'));
     }
     if(s.openrouterKey){$('status').textContent='Checking your key with OpenRouter…';await verifyOpenRouterKey(s.openrouterKey);}
     await storage().set(s);
@@ -184,7 +143,7 @@ $('save').onclick=async()=>{
     $('status').textContent='Settings stayed open. '+String(error.message||'Save failed').replace(/sk-or-[\w-]+/gi,'[hidden]');
   }finally{$('save').disabled=false;}
 };
-load();
+window.tylerSettingsLoaded=load();
 // The Voice page fills its model and voice lists after this script runs, then loads the values again.
 window.tylerSettingsReload=load;
 

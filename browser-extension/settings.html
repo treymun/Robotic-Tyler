@@ -120,15 +120,27 @@
 <section class="sheet" id="studio" data-ui-zone="ai">
   <div class="sheet-head">
     <h2>Provider and model</h2>
-    <p>One key powers text<span class="only-chrome"> and voice</span>. Keys stay in this profile and are checked with the provider when you save.</p>
+    <p>Pick who answers and which model, then test it. One key powers text<span class="only-chrome"> and voice</span>; keys stay <span class="only-chrome">in this profile</span><span class="only-desktop">on this PC</span> and are checked with the provider when you save.</p>
   </div>
   <div class="grid two">
     <label>AI provider
       <select id="aiProvider"><option value="openrouter">OpenRouter</option><option value="gemini">Google Gemini</option></select>
     </label>
-    <label>OpenRouter conversation model
-      <select id="brain"><option value="fast">Llama 3.3 70B, Groq preferred (default)</option><option value="budget">Mistral Small 3.2, budget</option></select>
+    <label class="for-openrouter">Text model
+      <select id="brain"><option value="fast">Llama 3.3 70B · default</option><option value="budget">Mistral Small 3.2 · budget</option><option value="venice">Venice Uncensored · no filter</option></select>
     </label>
+    <label class="for-gemini">Text model
+      <select id="geminiTextModel"><option value="gemini-3.1-flash-lite">Fast · Gemini 3.1 Flash-Lite</option><option value="gemini-3.5-flash-lite">Balanced · Gemini 3.5 Flash-Lite (recommended)</option><option value="gemini-3.8-flash">Advanced · Gemini 3.8 Flash</option></select>
+    </label>
+  </div>
+  <div class="model-card" id="modelCard">
+    <div class="mc-head"><span class="mc-tier" id="mcTier"></span><b class="mc-name" id="mcName"></b><span class="mc-badge" id="mcBadge"></span><code class="mc-id" id="mcId"></code></div>
+    <p class="mc-strengths" id="mcStrengths"></p>
+    <dl class="mc-facts"><div><dt>Served by</dt><dd id="mcProvider"></dd></div><div><dt>Price</dt><dd id="mcPrice"></dd></div><div><dt id="mcExtraLabel">Routing</dt><dd id="mcExtra"></dd></div></dl>
+    <p class="mc-note" id="mcNote"></p>
+    <div class="mc-test"><button type="button" id="modelTest" class="secondary"><span data-icon="checks"></span>Test selected model</button><span id="modelTestResult" class="mc-result" role="status" aria-live="polite"></span></div>
+  </div>
+  <div class="grid two">
     <label>OpenRouter API key
       <input id="openrouterKey" type="password" autocomplete="off" placeholder="Leave blank to keep the saved key">
     </label>
@@ -137,14 +149,14 @@
     </label>
   </div>
   <div class="toggle-grid">
-    <label class="toggle"><input id="smartRouting" type="checkbox"><span><b>Smart model routing</b><small>Casual comments use the budget model; longer or complex questions use Llama. No extra classifier call.</small></span></label>
-    <label class="toggle"><input id="streamAI" type="checkbox" checked><span><b>Stream AI text</b><small>Use OpenRouter streaming for a faster first reply.</small></span></label>
+    <label class="toggle for-openrouter"><input id="smartRouting" type="checkbox"><span><b>Smart model routing</b><small>With Llama 3.3 or Mistral Small selected: casual comments use Mistral Small, longer or complex questions Llama 3.3. Venice and Gemini models are never switched.</small></span></label>
+    <label class="toggle for-openrouter"><input id="streamAI" type="checkbox" checked><span><b>Stream AI text</b><small>Use OpenRouter streaming for a faster first reply.</small></span></label>
     <label class="toggle"><input id="friendMemory" type="checkbox"><span><b>Remember verified friends</b><small>Separate local memory for confirmed Steam accounts, kept for 7 days.</small></span></label>
   </div>
   <label class="narrow">Local text spending cap (USD, 0 = off)
     <input id="spendingCapUSD" type="number" min="0" max="100" step="0.25" value="0">
   </label>
-  <p class="hint">This cap uses provider-reported text costs only. Set a hard limit on your OpenRouter key too.</p>
+  <p class="hint">This cap uses provider-reported text costs only (OpenRouter). Set a hard limit on your OpenRouter key too; for Gemini, use Google's own billing limits.</p>
 </section>
 
 <section class="sheet" id="personalitySheet" data-ui-zone="ai">
@@ -157,6 +169,7 @@
     <button type="button" class="preset" data-preset="coach">Helpful coach</button>
     <button type="button" class="preset" data-preset="chaos">Chaos goblin</button>
     <button type="button" class="preset" data-preset="chill">Chill wingman</button>
+    <button type="button" class="preset" data-preset="nofilter">No filter</button>
   </div>
   <div class="slider-grid">
     <label>Humor <small id="humorLevelLabel">High</small>
@@ -178,7 +191,7 @@
   </label>
   <div class="grid two">
     <label>Roast intensity
-      <select id="roastMode"><option value="savage">Savage: strong profanity and sharp roasts</option><option value="rowdy">Rowdy: playful profanity</option><option value="custom">Custom personality only</option></select>
+      <select id="roastMode"><option value="savage">Savage: strong profanity and sharp roasts</option><option value="rowdy">Rowdy: playful profanity</option><option value="unhinged">No filter: crude, constant profanity (best with Venice)</option><option value="custom">Custom personality only</option></select>
     </label>
     <label>Reply length
       <select id="length"><option value="short">Fast: short banter</option><option value="normal">Adaptive: concise, longer when helpful</option><option value="detailed">Detailed: up to two short paragraphs</option></select>
@@ -210,7 +223,7 @@
 <section class="sheet" id="playground" data-ui-zone="ai">
   <div class="sheet-head">
     <h2>Preview a reply</h2>
-    <p>Uses your chosen provider and the current, unsaved form values.</p>
+    <p>Uses the model selected above, its real provider routing and your current, unsaved personality. Nothing is saved or counted as usage.</p>
   </div>
   <label>What a friend says
     <textarea id="previewPrompt" rows="3" placeholder="Tyler, who's throwing this match?"></textarea>
@@ -219,7 +232,8 @@
     <button id="previewReply" type="button">Preview reply</button>
     <button id="previewRoast" type="button" class="secondary">Preview roast</button>
   </div>
-  <pre id="previewOutput" class="output">Previews appear here before you save.</pre>
+  <pre id="previewOutput" class="output" aria-live="polite">Previews appear here before you save.</pre>
+  <p class="hint" id="previewMeta"></p>
 </section>
 
 <!-- ── Voice: one page for both engines (voice-settings.js) ─────── -->
@@ -444,5 +458,6 @@
 <script src="v23-settings.js"></script>
 <script src="theme-gallery.js"></script>
 <script src="voice-settings.js" type="module"></script>
+<script src="ai-settings.js" type="module"></script>
 </body>
 </html>

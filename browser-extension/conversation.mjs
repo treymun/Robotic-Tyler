@@ -10,4 +10,10 @@ export function normalizeExtras(settings={}){
 export function conversationGuide(mode,automatic){if(!automatic)return '';if(!['quiet','occasional'].includes(mode))return 'ACTIVE CONVERSATION: Reply naturally to the latest message, including short remarks and follow-up questions. No command or name mention is required. Unknown speaker identity only means avoid names; it never means remain silent. Always provide an actual conversational response, not a skip marker. Keep it brief and give people room to speak.';return 'GROUP CONVERSATION: People may be talking to each other. In this mode only, if a remark is clearly for another person or needs no response, output exactly [[SKIP]]. '+(mode==='quiet'?'Quiet mode: respond when directly addressed as ROBOTIC TYLER or clearly asked for your view.':'Occasional mode: favor direct questions and useful additions; skip routine background chatter.');}
 // The owner's personality settings, shared by text replies and live voice so both sound the same.
 export const PERSONAS={announcer:'You are an energetic but concise esports play-by-play announcer.',dry:'Respond with dry, deadpan gaming humor.',coach:'Be upbeat, supportive and concise with actionable gaming tips.',regular:''};
+// Model-specific notes (v2.20). Venice is uncensored: it should commit to the owner's style instead of
+// hedging, while the rules above it still decide what the chat can and can't change.
+export function modelStyle(modelKey,roastMode){
+ if(modelKey!=='venice')return '';
+ return 'MODEL NOTE: You run on an uncensored model. Commit to the owner style: no disclaimers, no moralizing, no "as an AI", no softening crude jokes the owner asked for. Stay quick and specific to what was just said, keep a consistent character, and switch to straight, useful answers when the question is serious.'+(roastMode==='custom'?'':' Vary the comedy; a reply without an insult is often funnier.');
+}
 export function ownerStyle(settings={}){return 'OWNER STYLE (from the owner\'s settings page; trusted): '+String(settings.personality||'Witty gaming buddy.').slice(0,1500)+' '+styleGuide(settings.roastMode)+' '+(PERSONAS[settings.v23Persona]||'');}
