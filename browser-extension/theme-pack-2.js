@@ -50,12 +50,14 @@
     const cols=c.h('div','xp-menu-cols'),list=c.h('div','xp-menu-list'),places=c.h('div','xp-menu-places');
     const item=(parent,cls,label,sub,run,icon)=>{const b=c.h('button',cls);b.type='button';b.setAttribute('role','menuitem');const bi=icon&&c.brand(icon,'xp-mi-bi');if(bi){b.classList.add('xp-has-bi');b.append(bi);const t=c.h('span','xp-mi-text');t.append(c.h('b',null,label));if(sub)t.append(c.h('small',null,sub));b.append(t);}else{b.append(c.h('b',null,label));if(sub)b.append(c.h('small',null,sub));}b.onclick=()=>{close();run();};parent.append(b);return b;};
     const SUB={conversation:'Replies and participation',room:'Music, squad and extras',soundboard:'Play clips in voice',setup:'Connect Tyler to this chat',checks:'Find and fix problems'};
-    const XI={conversation:'information',room:'folder',soundboard:'speaker',setup:'my-computer',checks:'network'};
+    // v2.30: XP's own shell32 icons (Pack 2, the 24 x 24 frames) where it has the same thing: a folder,
+    // My Computer, My Network Places, Help and Support, Turn Off. The others keep Pack 1's drawings.
+    const XI={conversation:'information',room:'source-shell32-4',soundboard:'speaker',setup:'source-shell32-16',checks:'source-shell32-18'};
     for(const t of c.TABS)item(list,'xp-mi',c.TAB_NAMES[t],SUB[t],()=>c.actions.tab(t),XI[t]);
     list.append(c.h('i','xp-menu-sep'));item(list,'xp-mi xp-all','All Programs','',()=>c.actions.settings());
-    item(places,'xp-pl',"Tyler's Settings",'',c.actions.settings,'my-computer');item(places,'xp-pl','Run full check','',c.actions.fullCheck,'network');item(places,'xp-pl','Stop audio','',c.actions.stopAudio,'speaker');places.append(c.h('i','xp-menu-sep'));item(places,'xp-pl','Help and Support','',()=>c.actions.tab('checks'),'information');
+    item(places,'xp-pl',"Tyler's Settings",'',c.actions.settings,'source-shell32-16');item(places,'xp-pl','Run full check','',c.actions.fullCheck,'source-shell32-18');item(places,'xp-pl','Stop audio','',c.actions.stopAudio,'speaker');places.append(c.h('i','xp-menu-sep'));item(places,'xp-pl','Help and Support','',()=>c.actions.tab('checks'),'source-shell32-24');
     cols.append(list,places);
-    const off=c.h('div','xp-menu-foot'),logoff=c.h('button','xp-off xp-logoff','Log Off'),hide=c.h('button','xp-off','Turn Off');logoff.type=hide.type='button';logoff.title='Pause AI';hide.title='Collapse the panel';
+    const off=c.h('div','xp-menu-foot'),logoff=c.h('button','xp-off xp-logoff','Log Off'),hide=c.h('button','xp-off','Turn Off');logoff.type=hide.type='button';logoff.title='Pause AI';hide.title='Collapse the panel';{const ti=c.brand('source-shell32-28','xp-off-bi');if(ti){hide.classList.add('xp-has-bi');hide.prepend(ti);}}
     logoff.onclick=()=>{close();c.actions.pause();};hide.onclick=()=>{close();c.actions.collapse();};off.append(logoff,hide);
     menu.append(cols,off);menu.style.bottom=(c.panel.getBoundingClientRect().bottom-foot.getBoundingClientRect().top)+'px';c.slots.layer.append(menu);start.setAttribute('aria-expanded','true');list.querySelector('button').focus();
     // (Escape closes the menu from the document first, so the handler works on its own copy.)
@@ -357,8 +359,8 @@
    left.tabIndex=0;left.setAttribute('role','button');left.setAttribute('aria-haspopup','dialog');left.title='Souls: tokens Tyler has used (1 soul per 10 tokens). Click for the shop (B).';
    const CATS=[['weapon','Weapon'],['vitality','Vitality'],['spirit','Spirit']];let cat='weapon',o=null;
    function items(k){const S=c.S,v=c.voice(),snd=c.actions.sounds(),paused=c.actions.paused(),fav=snd.favorites.map(n=>snd.slots.find(x=>x.slot===n)).find(Boolean);
-    if(k==='weapon')return [['Soundboard',snd.slots.length+' clips · '+S.sounds+' played','◆',()=>c.actions.tab('soundboard')],fav?['Quick cast',fav.name,'bi:spirit-flame',()=>c.actions.playSound(fav.slot)]:['Quick cast','Star a clip in Sounds first','bi:spirit-flame',null],['Silence','Stops clips, music and voice','■',c.actions.stopAudio]];
-    if(k==='vitality')return [['Full check','Health '+c.health()+'%','✚',c.actions.fullCheck],['Voice check',v.armed?(v.peers?v.peers+' in the call':'Armed, call empty'):'Microphone off','bi:spectral-radio',c.actions.refreshVoice],['Checks','Problems and fixes','☰',()=>c.actions.tab('checks')]];
+    if(k==='weapon')return [['Soundboard',snd.slots.length+' clips · '+S.sounds+' played',c.brand('source-ammo-icon')?'bi:source-ammo-icon':'◆',()=>c.actions.tab('soundboard')],fav?['Quick cast',fav.name,'bi:spirit-flame',()=>c.actions.playSound(fav.slot)]:['Quick cast','Star a clip in Sounds first','bi:spirit-flame',null],['Silence','Stops clips, music and voice','■',c.actions.stopAudio]];
+    if(k==='vitality')return [['Full check','Health '+c.health()+'%',c.brand('source-health-regen-icon')?'bi:source-health-regen-icon':'✚',c.actions.fullCheck],['Voice check',v.armed?(v.peers?v.peers+' in the call':'Armed, call empty'):'Microphone off','bi:spectral-radio',c.actions.refreshVoice],['Checks','Problems and fixes','☰',()=>c.actions.tab('checks')]];
     return [[paused?'Connect & start':'Pause AI',S.label||'Ready','❚',paused?c.actions.connect:c.actions.pause],['Setup',S.model||(S.keyOk===false?'No AI key saved':'Chat and AI'),'bi:patron-totem',()=>c.actions.tab('setup')],['Settings','Voice, theme and keys','✧',c.actions.settings]];}
    function render(focusTab){if(!o)return;const el=o.el;el.replaceChildren();el.dataset.cat=cat;
     const head=c.h('div','dl-shop-head');const bank=c.h('span','dl-shop-bank');bank.append(c.brand('soul-currency','dl-orb-bi')||c.h('i','dl-orb'),c.h('b',null,(c.root.querySelector('.dl-souls')?.textContent||'0')));head.append(c.h('b',null,'Shop'),bank);

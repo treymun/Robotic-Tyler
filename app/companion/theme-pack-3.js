@@ -208,8 +208,8 @@
     search.oninput=()=>{const q=search.value.trim().toLowerCase();for(const b of grid.querySelectorAll('.gm-icon'))b.hidden=!!q&&!b.dataset.name.includes(q);};
     left.append(search,grid);
     const tools=c.h('div','gm-sp-tools');{const tl=c.h('b',null,'Tools'),ti=c.brand('tool-gun','gm-sp-bi');if(ti)tl.prepend(ti);tools.append(tl);}
-    for(const [name,hint,run] of [paused?['Unfreeze','Connect & start',c.actions.connect]:['Freeze','Pause AI',c.actions.pause],['Remover','Stop audio',c.actions.stopAudio],['Inspector','Full check',c.actions.fullCheck],['Voice check','People in the call',c.actions.refreshVoice],['Options','Settings',c.actions.settings]]){
-     const t=c.h('button','gm-tool');t.type='button';t.append(c.h('span',null,name),c.h('small',null,hint));t.onclick=()=>{o?.close();run();};tools.append(t);}
+    for(const [name,hint,run,silk] of [paused?['Unfreeze','Connect & start',c.actions.connect,'lock']:['Freeze','Pause AI',c.actions.pause,'lock'],['Remover','Stop audio',c.actions.stopAudio,'delete'],['Inspector','Full check',c.actions.fullCheck,'find'],['Voice check','People in the call',c.actions.refreshVoice,'sound'],['Options','Settings',c.actions.settings,'cog']]){
+     const t=c.h('button','gm-tool');t.type='button';const si=c.brand('source-silk-'+silk,'gm-tool-bi');if(si){t.classList.add('gm-tool-b');t.append(si);}t.append(c.h('span',null,name),c.h('small',null,hint));t.onclick=()=>{o?.close();run();};tools.append(t);}
     const body=c.h('div','gm-sp-body');body.append(left,tools);
     const x=c.h('button','gm-sp-close','×');x.type='button';x.title='Close (Q or Esc)';x.setAttribute('aria-label','Close the spawn menu');x.onclick=()=>o?.close();tabs.append(x);
     el.append(tabs,body);(list.length?search:tools.querySelector('button')).focus({preventScroll:true});}

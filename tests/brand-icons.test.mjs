@@ -12,6 +12,7 @@ const read=f=>fs.readFileSync(path.join(ROOT,f),'utf8');
 const ORIGINAL=['steam','classic','tf2','cs2','portal','cs16','hev','l4d','winxp','doom','quake','pipboy','combine','deadlock','minecraft','payday','dreamcast','gmod','ricochet','dod'];
 const NEWER=['rust','x360','ipod','msn','xmb'],ALL=[...ORIGINAL,...NEWER];
 const PACK={x360:'xbox360',xmb:'ps3'};
+const P2=JSON.parse(read('assets/theme-icons-pack-2/derived/index.json'));
 
 test('every theme has branded icons (the pack\'s keys for Xbox 360 and PS3 differ)',()=>{
  assert.deepEqual(Object.keys(BRAND).sort(),[...ALL].sort());
@@ -21,8 +22,10 @@ test('every theme has branded icons (the pack\'s keys for Xbox 360 and PS3 diffe
   const ids=new Set(manifest.themes.find(t=>t.id===(PACK[theme]||theme)).assets.map(a=>a.id));
   assert.ok(ids.has(cfg.mark),theme+' mark');
   assert.ok(Object.keys(cfg.icons).length>=2,theme+' replaces at least two of the app\'s icons');
-  for(const [name,id] of Object.entries(cfg.icons)){assert.ok(ICONS[name],theme+': '+name+' is an app icon');assert.ok(ids.has(id),theme+': '+id);}
-  for(const [state,id] of Object.entries(cfg.states||{})){assert.ok(['ready','listening','thinking','speaking','paused','waiting','error'].includes(state),theme+': '+state);assert.ok(ids.has(id),theme+': '+id);}
+  const p2=new Set(Object.keys(P2[theme]||{})),has=id=>id.startsWith('source-')?p2.has(id):ids.has(id);
+  for(const [name,id] of Object.entries(cfg.icons)){assert.ok(ICONS[name],theme+': '+name+' is an app icon');assert.ok(has(id),theme+': '+id);}
+  for(const [state,id] of Object.entries(cfg.states||{})){assert.ok(['ready','listening','thinking','speaking','paused','waiting','error'].includes(state),theme+': '+state);assert.ok(has(id),theme+': '+id);}
+  for(const id of cfg.extra||[])assert.ok(has(id),theme+' extra: '+id);
   assert.equal(!!cfg.pixel,['doom','minecraft'].includes(theme),theme+' pixel art');
  }
 });
@@ -64,4 +67,28 @@ test('every surface loads the branded icons, with their credits and licences shi
   assert.ok(fs.existsSync(path.join(ROOT,'browser-extension/ui/brand',f)),f);assert.ok(fs.existsSync(path.join(ROOT,'app/companion/ui/brand',f)),'desktop: '+f);}
  assert.equal(read('app/companion/ui-brand.js'),read('browser-extension/ui-brand.js'));
  assert.equal(read('voice-app/ui-brand.js'),read('browser-extension/ui-brand.js'));
+});
+
+// v2.30: Pack 2 (assets/theme-icons-pack-2): only the chosen assets are drawn, each from a sourced
+// original, each is used, and each collection's notice ships with them. Mocked: no browser.
+test('v2.30: Pack 2\'s chosen artwork is sourced, used, shipped with its notices, and kept separate',()=>{
+ const manifest=JSON.parse(read('assets/theme-icons-pack-2/manifest.json'));
+ const used=new Set(Object.entries(BRAND).flatMap(([t,c])=>[c.mark,...Object.values(c.icons),...Object.values(c.states||{}),...(c.extra||[])].map(id=>t+'/'+id)));
+ let n=0;
+ for(const [theme,list] of Object.entries(P2))for(const [id,info] of Object.entries(list)){n++;
+  const a=manifest.themes.find(t=>t.id===theme).assets.find(x=>x.id===id);
+  assert.equal(a.category,'sourced',id+' is original artwork, not one of the pack\'s new drawings');
+  assert.ok(fs.existsSync(path.join(ROOT,'assets/theme-icons-pack-2',a.originalFile)),id+': its original is kept');
+  assert.ok(used.has(theme+'/'+id),theme+'/'+id+' is used');
+  assert.ok(['vector','pixels','trace'].includes(info.mode));if(info.mode==='pixels')assert.ok(info.native?.[0]>=16&&info.native[0]<=32,id+' native size');}
+ assert.ok(n>=40&&n<=60,'a selection, not the whole pack ('+n+')');
+ assert.ok(fs.existsSync(path.join(ROOT,'assets/theme-icons/manifest.json')),'Pack 1 stays as it was');
+ const credits=read('browser-extension/ui/brand/Pack-2-CREDITS.md');
+ for(const f of ['Counter-Strike-Icons-LICENSE.txt','TF2Stadium-Assets.txt','MSN-Emoticons.txt','FamFamFam-Silk.txt','Windows-UI-Assets.txt','PS3-XMB-Web.txt','DashX360.txt','Rust-Game-Icons.txt','Deadlock-Data.txt']){
+  assert.ok(fs.existsSync(path.join(ROOT,'browser-extension/ui/brand/Pack-2-'+f)),f);assert.ok(fs.existsSync(path.join(ROOT,'app/companion/ui/brand/Pack-2-'+f)),'desktop: '+f);assert.match(credits,new RegExp(f.replace(/[.]/g,'\\.')));}
+ const ctx={};vm.createContext(ctx);ctx.globalThis=ctx;vm.runInContext(read('browser-extension/ui-brand.js'),ctx);
+ assert.match(ctx.TylerBrand.svg('xmb','source-category-music'),/fill="currentColor"/,'a traced glyph takes the theme\'s colour');
+ assert.match(ctx.TylerBrand.svg('msn','source-smile'),/viewBox="0 0 19 19" shape-rendering="crispEdges"/,'an emoticon stays a 19 px bitmap');
+ assert.equal(ctx.TylerBrand.native('winxp','source-shell32-16'),24);assert.equal(ctx.TylerBrand.native('xmb','source-category-music'),0);
+ assert.equal(ctx.TylerBrand.svg('steam','source-smile'),'','one theme\'s artwork is not another\'s');
 });

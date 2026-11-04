@@ -151,7 +151,8 @@ test('themed menus and screens: open, fit, keyboard, Escape, real actions',{time
   // MSN Messenger: the display picture opens the status menu; Emoticons play clips; the contact list groups Tyler's parts.
   await setTheme('msn');await page.evaluate(()=>TylerCompanion.showTab('conversation'));
   await click('.msn-dp');assert.equal(await count('.fx-menu.msn-menu'),1);await fits('.msn-menu',true);await page.keyboard.press('Escape');assert.equal(await count('.fx-menu'),0);
-  await click('.msn-tool:nth-child(2)');assert.ok(await count('.msn-emo .fx-menu-item')>=2);const m=(await page.evaluate(()=>window.__played)).length;
+  await click('.msn-tool:nth-child(2)');assert.ok(await count('.msn-emo .fx-menu-item')>=2);await fits('.msn-emo',true);
+  assert.equal(await count('.msn-emo .fx-menu-mark-bi [data-bi^="msn/source-"]'),await count('.msn-emo .fx-menu-item'),'v2.30: Messenger\'s own emoticons (Pack 2)');const m=(await page.evaluate(()=>window.__played)).length;
   await page.evaluate(R+'.querySelector(".msn-emo .fx-menu-item").click()');assert.equal((await page.evaluate(()=>window.__played)).length,m+1);
   assert.equal(await count('.msn-contact'),4);assert.match(await text('.msn-presence'),/\(Online\)/);
   await page.evaluate(()=>TylerCompanion.setActivity('THINKING — preparing a typed reply…'));await page.waitForTimeout(80);assert.equal(await page.evaluate(R+'.querySelector(".msn-typing").hidden'),false);
@@ -205,5 +206,50 @@ test('v2.30: DOOM face damage on the status bar and the header logo',{timeout:12
    await page.evaluate(()=>TylerCompanion.emit('reply',{chars:42}));assert.equal((await look()).mood,'grin','a reply lands: the evil grin');
    assert.deepEqual(errors,[]);await page.close();
   }
+ }finally{await browser.close();server.close();}
+});
+
+// v2.30: Pack 2's original artwork in the places chosen for it, the bitmaps at their own size.
+// Preview page, mocked runtime (no Steam): what is drawn and how big, not how the games look.
+test('v2.30: Pack 2 artwork in its places, bitmaps at their native size',{timeout:120000},async()=>{
+ const server=http.createServer((req,res)=>{const file=path.join(ROOT,decodeURIComponent(new URL(req.url,'http://x').pathname));if(!file.startsWith(ROOT)||!fs.existsSync(file)||fs.statSync(file).isDirectory()){res.writeHead(404);res.end();return;}res.writeHead(200,{'content-type':types[path.extname(file)]||'application/octet-stream'});fs.createReadStream(file).pipe(res);}).listen(0);
+ const browser=await chromium.launch();
+ try{
+  const page=await browser.newPage({viewport:{width:1000,height:900}});const errors=[];page.on('pageerror',e=>errors.push(e.message));page.on('console',m=>{if(/theme feature/.test(m.text()))errors.push(m.text());});
+  await page.goto('http://127.0.0.1:'+server.address().port+'/tools/preview/panel.html?theme=steam');
+  await page.waitForFunction(()=>window.__tylerReady===true&&window.TylerThemeFeatures);
+  const R='document.getElementById("tyler-companion-root").shadowRoot';
+  const setTheme=async t=>{await page.evaluate(t=>{for(const fn of listeners)fn({type:'storage:changed',changes:{uiTheme:{newValue:t}}});},t);await page.waitForTimeout(150);};
+  const q=(sel,fn='el=>!!el')=>page.evaluate(([R,sel,fn])=>{const r=eval(R);return eval(fn)(r.querySelector(sel));},[R,sel,fn]);
+  const all=sel=>page.evaluate(([R,sel])=>[...eval(R).querySelectorAll(sel)].map(e=>e.dataset.bi+' '+Math.round(e.getBoundingClientRect().width)),[R,sel]);
+  const tabIcons=()=>page.evaluate(R+'.querySelectorAll(".tabs svg.ic")').then(()=>page.evaluate('['+'...'+R+'.querySelectorAll(".tabs svg.ic")].map(i=>i.dataset.b||"")'));
+  // PS3: the XMB's own category icons on the category row.
+  await setTheme('xmb');assert.deepEqual(await tabIcons(),['friends','users','music','settings','network'].map(n=>'xmb/source-category-'+n));
+  // CS2: the extracted message, settings and defuser icons on the tabs.
+  await setTheme('cs2');const cs=await tabIcons();assert.equal(cs[0],'cs2/source-ui-message');assert.equal(cs[3],'cs2/source-ui-settings');assert.equal(cs[4],'cs2/source-equipment-defuser');
+  // TF2: the class emblem on the class caption.
+  await setTheme('tf2');await page.evaluate(R+'.getElementById("tab-room").click()');await page.waitForTimeout(100);
+  assert.deepEqual((await all('.tf-class [data-bi]')).map(x=>x.split(' ')[0]),['tf2/source-class-engineer'],'(it pops in, so no size)');await page.evaluate(R+'.getElementById("tab-conversation").click()');
+  // Windows XP: shell32's 24 x 24 icons in the Start menu, at 24 px.
+  await setTheme('winxp');await page.evaluate(R+'.querySelector(".xp-start").click()');
+  const xp=await all('.xp-menu [data-bi^="winxp/source-"]');assert.equal(xp.length,7,xp.join());assert.ok(xp.every(x=>x.endsWith(' 24')),xp.join());
+  await page.keyboard.press('Escape');
+  // GMod: Silk on the spawn menu's tools, at 16 px.
+  await setTheme('gmod');await page.mouse.move(800,400);await page.keyboard.press('q');await page.waitForTimeout(100);
+  const gm=await all('.gm-tool [data-bi^="gmod/source-silk"]');assert.equal(gm.length,5,gm.join());assert.ok(gm.every(x=>x.endsWith(' 16')));await page.keyboard.press('Escape');
+  // Rust: the HUD's own symbols on the vitals, and Bleeding on a problem.
+  await setTheme('rust');assert.equal((await all('.rs-bar [data-bi^="rust/source-ui"]')).length,3);
+  await page.evaluate(()=>TylerCompanion.setActivity('NEEDS ATTENTION — Gemini 429 failed · quota reached'));await page.waitForTimeout(1200);
+  assert.deepEqual((await all('.rs-effect:not([hidden]) [data-bi]')).map(x=>x.split(' ')[0]),['rust/source-ui-bleeding']);
+  await page.evaluate(()=>TylerCompanion.setActivity('LISTENING — speak normally, then pause'));
+  // Xbox 360: the Blades gamerscore glyph on the gamer card.
+  await setTheme('x360');assert.deepEqual(await all('.x-card [data-bi]'),['x360/source-gscore 16']);
+  // Deadlock: the health-regen symbol on the shop's Full check.
+  await setTheme('deadlock');await page.evaluate(R+'.querySelector(".dl-plate .dl-left").click()');await page.waitForTimeout(150);
+  await page.evaluate('['+'...'+R+'.querySelectorAll("button")].find(b=>/^Vitality/.test(b.textContent.trim())).click()');
+  assert.ok((await all('[data-bi^="deadlock/source-"]')).some(x=>x.startsWith('deadlock/source-health-regen-icon')));
+  // A theme without Pack 2 artwork has none.
+  await page.keyboard.press('Escape');await setTheme('steam');assert.equal((await all('[data-bi*="/source-"]')).length,0);
+  assert.deepEqual(errors,[]);
  }finally{await browser.close();server.close();}
 });

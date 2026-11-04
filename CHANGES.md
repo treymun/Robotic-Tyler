@@ -1,3 +1,54 @@
+# ROBOTIC TYLER v2.30.0: the phone remote away from home, the chat check from the phone, DOOM's damaged face, and Pack 2's original artwork
+
+## New
+- **Phone remote away from home:** Settings → Phone remote → *Away from home* lets the remote work when your phone isn't on your Wi-Fi, through Tailscale (free; install it on the PC and the phone, signed in to the same account). It's off by default.
+  - Only your own Tailscale devices can reach it. Its traffic is encrypted end to end, and the phone still has to pair with the code.
+  - There's no server in between: nothing is hosted, and the remote stays closed to the rest of the internet.
+  - A phone paired at home pairs once more for the Tailscale address (a different address counts as a different site).
+- **The chat check, once:** Connect & start's one-time check ("have you told the chat its messages go to your AI provider?") now has *Don't ask again*. Settings → AI → *Telling each chat* turns the check back on.
+- **The chat check from the phone:** when Connect & start is waiting for the check, the phone shows it too, with *Yes, continue* and *Yes, don't ask again*. You can start Tyler entirely from the phone.
+- **DOOM: Tyler's face takes damage, like the game's status bar.**
+  - The face is clean from 80% health, then four bloodier looks: a scratch at 60%, a cut forehead and bloody nose at 40%, a black eye and gashes at 20%, and blood everywhere under 20%.
+  - The face flashes red when he's hit (not with reduced motion) and shows the evil grin when a reply or clip lands.
+  - The damage shows on the status bar's face and on his logo in the header (and in compact mode), drawn in the logo's own pixels.
+  - Health is his real connection health: problems knock it down, and it comes back while things work.
+
+## Pack 2: original artwork where it's more faithful
+The owner's *Icon and Branding Pack 2* is kept as supplied in `assets/theme-icons-pack-2/`, separate from Pack 1. Only the pieces below are used, and only they ship (the pack's credits and each collection's notice ship with them: `ui/brand/Pack-2-*`). The Tyler logos are unchanged.
+- **PlayStation 3:** the XMB's own category icons on the category row: Friends (Chat), Users (Room), Music (Sounds), Settings (Setup) and Network (Checks).
+- **Windows XP:** XP's own shell32 icons, the 24 × 24 frames at 24 px, in the Start menu: the folder, My Computer, My Network Places, Help and Support, and Turn Off.
+- **MSN Messenger:** the original 19 px emoticons in the Emoticons menu (smile, wink, thumbs up and down, nerd, light bulb, note, star and more), instead of text codes. The menu now opens leftwards, so it no longer runs off the panel.
+- **Xbox 360:** the Blades dashboard's own icons at 32 px for unlocked achievements and achievement and party pop-ups, and its gamerscore G on the gamer card.
+- **Garry's Mod:** Silk icons at 16 px on the spawn menu's tools (Freeze, Remover, Inspector, Voice check, Options), as Derma menus have them.
+- **Rust:** the HUD's own symbols for health, calories and hydration, and the Bleeding effect.
+- **Counter-Strike 2:** CS2's extracted icons for Chat, Setup and Checks (the defuser), play, pause and stop, the C4 while Tyler writes, the armor when he's ready, and the CT emblem on a round win.
+- **Team Fortress 2:** the class emblem on each tab's class caption (Scout, Engineer, Soldier, Medic, Sniper).
+- **Deadlock:** the game's stat symbols on two shop items: ammo for the Soundboard and health regen for the full check.
+- **Kept as they were:** Steam, Classic Steam, CS 1.6, HEV, Left 4 Dead, DOOM, Quake, Pip-Boy, Combine, Minecraft, PAYDAY 2, Dreamcast, Ricochet, Day of Defeat and iPod.
+  - The pack's new vector controls are generic line icons, no closer to these games than the themes' own icons, and its section frames and dividers aren't details these interfaces have.
+  - Portal's signs would give the test-chamber tiles meanings they don't have.
+  - Minecraft's textures are from 1.8, older than the advancements they'd illustrate.
+- **How they're drawn:** bitmaps are copied pixel for pixel and shown at their own size; large one-colour glyphs are traced at full resolution; vectors are cleaned. Everything is inline SVG, so Steam's page allows it, and each piece passes the same safety check as Pack 1.
+
+## Tested
+- **Unit:**
+  - Tailscale addresses (100.64.0.0/10 and fd7a:115c:a1e0::/48) are accepted only with Away from home on.
+  - The away setting is remembered and kept when the remote turns on and off.
+  - The phone's chat-check answer reaches Tyler with only its own field.
+  - DOOM's health steps match the game's, and the damage stays on the face.
+  - Every piece of Pack 2 artwork that ships is original artwork from the pack and is used, its notices ship on both surfaces, and Pack 1 is untouched.
+- **Chromium with the panel preview and a mocked Steam page (no real Steam, Windows audio or Gemini Live):**
+  - the DOOM face at every damage level, on the status bar and over the header logo, at the screen's own pixels;
+  - the red flash, and no flash with reduced motion;
+  - every piece of Pack 2 artwork in its place, with the bitmaps at their native size;
+  - the Messenger menu fits the panel;
+  - all 25 themes still switch live, with their extras, menus, compact mode and keyboard use.
+- **The phone remote:** a real server, an iPhone-sized Chromium and a mocked chat on the PC. The phone sees Connect & start waiting for the chat check, answers *don't ask again*, and the PC saves it.
+- **Real Electron (Linux) with a mock Steam page:** the desktop check passes.
+- **Not tested:** a real Tailscale network or a phone on mobile data, the real Steam page, the Windows desktop app and a real phone.
+
+---
+
 # ROBOTIC TYLER v2.29.0: branded icons for the five newer themes
 
 Rust, Xbox 360, iPod classic, MSN Messenger and PlayStation 3 now use their icons from your "Branded Icon Packs" as well, the same way as the original 20. The Tyler logos are unchanged.

@@ -142,13 +142,15 @@
  ]);
 
  // ── Team Fortress 2: class-select navigation, a killfeed and a taunt ──────
+ // v2.30: each tab's class emblem (Pack 2): the talker is the Scout.
+ const TF_CLASS={conversation:'source-class-scout',room:'source-class-engineer',soundboard:'source-class-soldier',setup:'source-class-medic',checks:'source-class-sniper'};
  const ROLES={conversation:['Chat','The talker. Keeps the banter going.'],room:['Room','The engineer. Builds the party.'],soundboard:['Sounds','The soldier. Loudest one here.'],setup:['Setup','The medic. Keeps Tyler alive.'],checks:['Checks','The sniper. Finds the problem.']};
  F.define('tf2',[
   {id:'tf-class',mount(c){
    let caption=null;
    c.key(e=>{const n=Number(e.key);if(n>=1&&n<=5&&!e.repeat){e.preventDefault();c.actions.tab(c.TABS[n-1]);}});
    return {update(type,d){if(type!=='tab')return;caption?.remove();const [name,role]=ROLES[d.tab]||[];if(!name)return;
-    caption=c.h('div','fx tf-class');caption.append(c.h('small',null,'Class '+(c.TABS.indexOf(d.tab)+1)),c.h('b',null,name),c.h('span',null,role));c.flash(caption,1500);}};
+    caption=c.h('div','fx tf-class');const em=c.brand(TF_CLASS[d.tab],'tf-class-bi');if(em)caption.append(em);caption.append(c.h('small',null,'Class '+(c.TABS.indexOf(d.tab)+1)),c.h('b',null,name),c.h('span',null,role));c.flash(caption,1500);}};
   }},
   {id:'tf-killfeed',mount(c){
    const feed=c.add('layer',c.h('div','fx tf-feed'));feed.setAttribute('role','log');feed.setAttribute('aria-label','Activity');
@@ -230,7 +232,7 @@
   }},
   {id:'cs-banner',mount(c){
    let last=0;
-   function show(kind,title,sub){if(Date.now()-last<2500)return;last=Date.now();const el=c.h('div','fx cs-banner '+kind);const ic=c.brand(kind==='win'?'round-win':'c4-timer','cs-banner-bi');if(ic)el.append(ic);el.append(c.h('b',null,title),c.h('span',null,sub));c.flash(el,1900);}
+   function show(kind,title,sub){if(Date.now()-last<2500)return;last=Date.now();const el=c.h('div','fx cs-banner '+kind);const ic=kind==='win'?c.brand('source-ct-logo','cs-banner-bi cs-banner-ct')||c.brand('round-win','cs-banner-bi'):c.brand('source-equipment-c4','cs-banner-bi')||c.brand('c4-timer','cs-banner-bi');if(ic)el.append(ic);el.append(c.h('b',null,title),c.h('span',null,sub));c.flash(el,1900);}
    return {update(type,d){if(type==='turn')show('win','Round won',(d.ms<1500?'MVP · ':'')+'Tyler answered in '+c.ms(d.ms));if(type==='state'&&d.state==='error'&&d.before!=='error')show('loss','Round lost','Tyler needs attention');}};
   }},
  ]);

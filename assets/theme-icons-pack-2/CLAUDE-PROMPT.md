@@ -1,0 +1,21 @@
+Use the attached Robotic-Tyler-Icon-Branding-Pack-2.zip to review and selectively polish all 25 existing Robotic Tyler themes. Preserve the existing Tyler mascot logos, working features, and theme identities.
+
+The highest priority is authenticity. Each theme should look as close as practical to the actual game or platform interface it draws from. Compare against real references for the correct version and era. Match typography, proportions, colors, spacing, row heights, borders, bevels, shadows, icon geometry, selection highlights, menu treatments, notifications, and state behavior. Aim for a faithful recreation of that source interface within Robotic Tyler.
+
+Treat the original interface as the visual specification. Aim for a screenshot that could plausibly belong to that game or platform, adapting it only where Robotic Tyler's functionality requires it. Reproduce recognizable source controls and branding accurately, using suitable original artwork directly when available. A matching palette and a few logos alone do not fulfill this goal. Keep the current Tyler mascots and all essential app controls intact.
+
+Keep the references consistent: Classic Steam 2004, GoldSrc Counter-Strike 1.6, classic 1993 DOOM, Quake 1996, Windows XP Luna, PAYDAY 2 Crime.net, original Xbox 360 Blades, click-wheel iPod Classic, mid-2000s Messenger, and PS3 XMB. Use the established reference for the other themes too. Avoid mixing newer versions, unrelated design systems, or different console generations into a theme. Preserve Tyler's intentional custom mascot identity.
+
+Treat this pack as an optional asset library. Inspect every theme, but do not impose an icon count, a replacement quota, or a requirement that every theme must change. Use an asset only when it improves authenticity, clarity, visual quality, or consistency in that specific location. Keep an existing icon or component when it is already closer to the reference. A theme can remain unchanged. Do not decorate empty space just to use more artwork, repeat brand emblems everywhere, or replace an understandable control with an obscure game object.
+
+Read manifest.json, AUTHENTICITY.md, GAP-REVIEW.md, the visual catalog, and the source notices. Prioritize suitable original or faithfully sourced artwork. The pack distinguishes extracted/source-supplied artwork, community recreations, and custom supporting vectors; do not assume every file is an official game asset. Preserve original pixels and silhouettes where appropriate. Do not redraw authentic source artwork into a generic modern style. Use the color-flexible SVG alternatives only when they fit the source interface better.
+
+Inspect the current theme registry and renderer before mapping files. Current app keys are:
+steam, classic, tf2, cs2, portal, cs16, hev, l4d, winxp, doom, quake, pipboy, combine, deadlock, minecraft, payday, dreamcast, gmod, ricochet, dod, rust, x360, ipod, msn, xmb.
+Pack 1 used xbox360 and ps3 for the Xbox 360 and PS3 asset folders; map those to x360 and xmb rather than renaming the app's themes.
+
+Review the chat panel, compact mode, existing theme extras, menus, settings, Appearance gallery, Voice Studio, and relevant launcher surfaces. Refine surrounding styling where necessary to make a selected asset belong naturally. Preserve real state-driven meters, participant rings, inventories, playback controls, and status displays. Never add fictional live measurements or achievements merely to justify an icon.
+
+Integrate selected assets through the project's shared mappings and build pipeline. Keep source packs separate, regenerate generated files through the build, preserve credits/notices, and ship only what the app actually uses. Handle raster assets through the existing safe image/canvas or embedding approach, and retain each asset's aspect ratio, native detail, and intended viewBox. Keep pixel art crisp and check small icons at their real display sizes.
+
+Visually compare all 25 themes with their references, run relevant existing checks, and verify theme switching, compact layouts, focus states, contrast, and packaged paths. Complete the implementation. Finish with a concise account of what improved, what you deliberately kept, and what was verified.

@@ -1,0 +1,681 @@
+{
+ "cs2": {
+  "source-ct-logo": {
+   "from": "originals/cs2/source-ct-logo.svg",
+   "kind": "extracted-game-vector",
+   "mode": "vector",
+   "name": "CS2 ct logo",
+   "size": [
+    256.0,
+    256.0
+   ],
+   "source": "https://github.com/Juknum/counter-strike-icons/blob/main/cs2/panorama/images/icons/ct_logo.svg"
+  },
+  "source-equipment-armor": {
+   "from": "originals/cs2/source-equipment-armor.svg",
+   "kind": "extracted-game-vector",
+   "mode": "vector",
+   "name": "CS2 armor",
+   "size": [
+    26.0,
+    32.0
+   ],
+   "source": "https://github.com/Juknum/counter-strike-icons/blob/main/cs2/panorama/images/icons/equipment/armor.svg"
+  },
+  "source-equipment-c4": {
+   "from": "originals/cs2/source-equipment-c4.svg",
+   "kind": "extracted-game-vector",
+   "mode": "vector",
+   "name": "CS2 c4",
+   "size": [
+    32.0,
+    32.0
+   ],
+   "source": "https://github.com/Juknum/counter-strike-icons/blob/main/cs2/panorama/images/icons/equipment/c4.svg"
+  },
+  "source-equipment-defuser": {
+   "from": "originals/cs2/source-equipment-defuser.svg",
+   "kind": "extracted-game-vector",
+   "mode": "vector",
+   "name": "CS2 defuser",
+   "size": [
+    36.0,
+    32.0
+   ],
+   "source": "https://github.com/Juknum/counter-strike-icons/blob/main/cs2/panorama/images/icons/equipment/defuser.svg"
+  },
+  "source-ui-message": {
+   "from": "originals/cs2/source-ui-message.svg",
+   "kind": "extracted-game-vector",
+   "mode": "vector",
+   "name": "CS2 message",
+   "size": [
+    32.0,
+    32.0
+   ],
+   "source": "https://github.com/Juknum/counter-strike-icons/blob/main/cs2/panorama/images/icons/ui/message.svg"
+  },
+  "source-ui-pause": {
+   "from": "originals/cs2/source-ui-pause.svg",
+   "kind": "extracted-game-vector",
+   "mode": "vector",
+   "name": "CS2 pause",
+   "size": [
+    32.0,
+    32.0
+   ],
+   "source": "https://github.com/Juknum/counter-strike-icons/blob/main/cs2/panorama/images/icons/ui/pause.svg"
+  },
+  "source-ui-play": {
+   "from": "originals/cs2/source-ui-play.svg",
+   "kind": "extracted-game-vector",
+   "mode": "vector",
+   "name": "CS2 play",
+   "size": [
+    32.0,
+    32.0
+   ],
+   "source": "https://github.com/Juknum/counter-strike-icons/blob/main/cs2/panorama/images/icons/ui/play.svg"
+  },
+  "source-ui-settings": {
+   "from": "originals/cs2/source-ui-settings.svg",
+   "kind": "extracted-game-vector",
+   "mode": "vector",
+   "name": "CS2 settings",
+   "size": [
+    32.0,
+    32.0
+   ],
+   "source": "https://github.com/Juknum/counter-strike-icons/blob/main/cs2/panorama/images/icons/ui/settings.svg"
+  },
+  "source-ui-stop": {
+   "from": "originals/cs2/source-ui-stop.svg",
+   "kind": "extracted-game-vector",
+   "mode": "vector",
+   "name": "CS2 stop",
+   "size": [
+    32.0,
+    32.0
+   ],
+   "source": "https://github.com/Juknum/counter-strike-icons/blob/main/cs2/panorama/images/icons/ui/stop.svg"
+  }
+ },
+ "deadlock": {
+  "source-ammo-icon": {
+   "from": "originals/deadlock/source-ammo-icon.png",
+   "kind": "extracted-game-art",
+   "mode": "trace",
+   "name": "Deadlock ammo",
+   "size": [
+    40,
+    40
+   ],
+   "source": "https://github.com/simon-lund/deadlock-data/blob/main/data/stat-icons/ammo-icon.png"
+  },
+  "source-health-regen-icon": {
+   "from": "originals/deadlock/source-health-regen-icon.png",
+   "kind": "extracted-game-art",
+   "mode": "trace",
+   "name": "Deadlock health regen",
+   "size": [
+    40,
+    40
+   ],
+   "source": "https://github.com/simon-lund/deadlock-data/blob/main/data/stat-icons/health-regen-icon.png"
+  }
+ },
+ "gmod": {
+  "source-silk-cog": {
+   "from": "originals/gmod/source-silk-cog.png",
+   "kind": "original-silk-art",
+   "mode": "pixels",
+   "name": "Source-era Silk cog",
+   "native": [
+    16,
+    16
+   ],
+   "size": [
+    16,
+    16
+   ],
+   "source": "https://github.com/markjames/famfamfam-silk-icons/blob/master/icons/cog.png"
+  },
+  "source-silk-delete": {
+   "from": "originals/gmod/source-silk-delete.png",
+   "kind": "original-silk-art",
+   "mode": "pixels",
+   "name": "Source-era Silk delete",
+   "native": [
+    16,
+    16
+   ],
+   "size": [
+    16,
+    16
+   ],
+   "source": "https://github.com/markjames/famfamfam-silk-icons/blob/master/icons/delete.png"
+  },
+  "source-silk-find": {
+   "from": "originals/gmod/source-silk-find.png",
+   "kind": "original-silk-art",
+   "mode": "pixels",
+   "name": "Source-era Silk find",
+   "native": [
+    16,
+    16
+   ],
+   "size": [
+    16,
+    16
+   ],
+   "source": "https://github.com/markjames/famfamfam-silk-icons/blob/master/icons/find.png"
+  },
+  "source-silk-lock": {
+   "from": "originals/gmod/source-silk-lock.png",
+   "kind": "original-silk-art",
+   "mode": "pixels",
+   "name": "Source-era Silk lock",
+   "native": [
+    16,
+    16
+   ],
+   "size": [
+    16,
+    16
+   ],
+   "source": "https://github.com/markjames/famfamfam-silk-icons/blob/master/icons/lock.png"
+  },
+  "source-silk-sound": {
+   "from": "originals/gmod/source-silk-sound.png",
+   "kind": "original-silk-art",
+   "mode": "pixels",
+   "name": "Source-era Silk sound",
+   "native": [
+    16,
+    16
+   ],
+   "size": [
+    16,
+    16
+   ],
+   "source": "https://github.com/markjames/famfamfam-silk-icons/blob/master/icons/sound.png"
+  }
+ },
+ "msn": {
+  "source-be-right-back": {
+   "from": "originals/msn/source-be-right-back.png",
+   "kind": "archived-platform-art",
+   "mode": "pixels",
+   "name": "Original Messenger be right back",
+   "native": [
+    19,
+    19
+   ],
+   "size": [
+    19,
+    19
+   ],
+   "source": "https://github.com/bernzrdo/msn-emoticons/blob/main/original/be-right-back.png"
+  },
+  "source-light-bulb": {
+   "from": "originals/msn/source-light-bulb.png",
+   "kind": "archived-platform-art",
+   "mode": "pixels",
+   "name": "Original Messenger light bulb",
+   "native": [
+    19,
+    19
+   ],
+   "size": [
+    19,
+    19
+   ],
+   "source": "https://github.com/bernzrdo/msn-emoticons/blob/main/original/light-bulb.png"
+  },
+  "source-nerd-smile": {
+   "from": "originals/msn/source-nerd-smile.png",
+   "kind": "archived-platform-art",
+   "mode": "pixels",
+   "name": "Original Messenger nerd smile",
+   "native": [
+    19,
+    19
+   ],
+   "size": [
+    19,
+    19
+   ],
+   "source": "https://github.com/bernzrdo/msn-emoticons/blob/main/original/nerd-smile.png"
+  },
+  "source-note": {
+   "from": "originals/msn/source-note.png",
+   "kind": "archived-platform-art",
+   "mode": "pixels",
+   "name": "Original Messenger note",
+   "native": [
+    19,
+    19
+   ],
+   "size": [
+    19,
+    19
+   ],
+   "source": "https://github.com/bernzrdo/msn-emoticons/blob/main/original/note.png"
+  },
+  "source-sleeping-half-moon": {
+   "from": "originals/msn/source-sleeping-half-moon.png",
+   "kind": "archived-platform-art",
+   "mode": "pixels",
+   "name": "Original Messenger sleeping half moon",
+   "native": [
+    19,
+    19
+   ],
+   "size": [
+    19,
+    19
+   ],
+   "source": "https://github.com/bernzrdo/msn-emoticons/blob/main/original/sleeping-half-moon.png"
+  },
+  "source-smile": {
+   "from": "originals/msn/source-smile.png",
+   "kind": "archived-platform-art",
+   "mode": "pixels",
+   "name": "Original Messenger smile",
+   "native": [
+    19,
+    19
+   ],
+   "size": [
+    19,
+    19
+   ],
+   "source": "https://github.com/bernzrdo/msn-emoticons/blob/main/original/smile.png"
+  },
+  "source-star": {
+   "from": "originals/msn/source-star.png",
+   "kind": "archived-platform-art",
+   "mode": "pixels",
+   "name": "Original Messenger star",
+   "native": [
+    19,
+    19
+   ],
+   "size": [
+    19,
+    19
+   ],
+   "source": "https://github.com/bernzrdo/msn-emoticons/blob/main/original/star.png"
+  },
+  "source-telephone-receiver": {
+   "from": "originals/msn/source-telephone-receiver.png",
+   "kind": "archived-platform-art",
+   "mode": "pixels",
+   "name": "Original Messenger telephone receiver",
+   "native": [
+    19,
+    19
+   ],
+   "size": [
+    19,
+    19
+   ],
+   "source": "https://github.com/bernzrdo/msn-emoticons/blob/main/original/telephone-receiver.png"
+  },
+  "source-thinking-smile-static": {
+   "from": "originals/msn/source-thinking-smile-static.png",
+   "kind": "archived-platform-art",
+   "mode": "pixels",
+   "name": "Original Messenger thinking smile static",
+   "native": [
+    19,
+    19
+   ],
+   "size": [
+    19,
+    19
+   ],
+   "source": "https://github.com/bernzrdo/msn-emoticons/blob/main/original/thinking-smile-static.png"
+  },
+  "source-thumbs-down": {
+   "from": "originals/msn/source-thumbs-down.png",
+   "kind": "archived-platform-art",
+   "mode": "pixels",
+   "name": "Original Messenger thumbs down",
+   "native": [
+    19,
+    19
+   ],
+   "size": [
+    19,
+    19
+   ],
+   "source": "https://github.com/bernzrdo/msn-emoticons/blob/main/original/thumbs-down.png"
+  },
+  "source-thumbs-up": {
+   "from": "originals/msn/source-thumbs-up.png",
+   "kind": "archived-platform-art",
+   "mode": "pixels",
+   "name": "Original Messenger thumbs up",
+   "native": [
+    19,
+    19
+   ],
+   "size": [
+    19,
+    19
+   ],
+   "source": "https://github.com/bernzrdo/msn-emoticons/blob/main/original/thumbs-up.png"
+  },
+  "source-winking-smile-static": {
+   "from": "originals/msn/source-winking-smile-static.png",
+   "kind": "archived-platform-art",
+   "mode": "pixels",
+   "name": "Original Messenger winking smile static",
+   "native": [
+    19,
+    19
+   ],
+   "size": [
+    19,
+    19
+   ],
+   "source": "https://github.com/bernzrdo/msn-emoticons/blob/main/original/winking-smile-static.png"
+  }
+ },
+ "rust": {
+  "source-ui-bleeding": {
+   "from": "originals/rust/source-ui-bleeding.png",
+   "kind": "extracted-game-art",
+   "mode": "trace",
+   "name": "Rust UI bleeding",
+   "size": [
+    256,
+    256
+   ],
+   "source": "https://github.com/LehaSex/rust-game-icons/blob/main/gui/ui/bleeding.png"
+  },
+  "source-ui-cup-water": {
+   "from": "originals/rust/source-ui-cup-water.png",
+   "kind": "extracted-game-art",
+   "mode": "trace",
+   "name": "Rust UI cup water",
+   "size": [
+    256,
+    256
+   ],
+   "source": "https://github.com/LehaSex/rust-game-icons/blob/main/gui/ui/cup_water.png"
+  },
+  "source-ui-food-cooked": {
+   "from": "originals/rust/source-ui-food-cooked.png",
+   "kind": "extracted-game-art",
+   "mode": "trace",
+   "name": "Rust UI food cooked",
+   "size": [
+    256,
+    256
+   ],
+   "source": "https://github.com/LehaSex/rust-game-icons/blob/main/gui/ui/food_cooked.png"
+  },
+  "source-ui-health": {
+   "from": "originals/rust/source-ui-health.png",
+   "kind": "extracted-game-art",
+   "mode": "trace",
+   "name": "Rust UI health",
+   "size": [
+    256,
+    256
+   ],
+   "source": "https://github.com/LehaSex/rust-game-icons/blob/main/gui/ui/health.png"
+  }
+ },
+ "tf2": {
+  "source-class-engineer": {
+   "from": "originals/tf2/source-class-engineer.svg",
+   "kind": "faithful-community-vector",
+   "mode": "vector",
+   "name": "TF2 engineer class emblem",
+   "size": [
+    50.0,
+    50.0
+   ],
+   "source": "https://github.com/TF2Stadium/Assets/blob/master/img/icons/class/engineer-white.svg"
+  },
+  "source-class-medic": {
+   "from": "originals/tf2/source-class-medic.svg",
+   "kind": "faithful-community-vector",
+   "mode": "vector",
+   "name": "TF2 medic class emblem",
+   "size": [
+    50.0,
+    50.0
+   ],
+   "source": "https://github.com/TF2Stadium/Assets/blob/master/img/icons/class/medic-white.svg"
+  },
+  "source-class-scout": {
+   "from": "originals/tf2/source-class-scout.svg",
+   "kind": "faithful-community-vector",
+   "mode": "vector",
+   "name": "TF2 scout class emblem",
+   "size": [
+    50.0,
+    50.0
+   ],
+   "source": "https://github.com/TF2Stadium/Assets/blob/master/img/icons/class/scout-white.svg"
+  },
+  "source-class-sniper": {
+   "from": "originals/tf2/source-class-sniper.svg",
+   "kind": "faithful-community-vector",
+   "mode": "vector",
+   "name": "TF2 sniper class emblem",
+   "size": [
+    50.0,
+    50.0
+   ],
+   "source": "https://github.com/TF2Stadium/Assets/blob/master/img/icons/class/sniper-white.svg"
+  },
+  "source-class-soldier": {
+   "from": "originals/tf2/source-class-soldier.svg",
+   "kind": "faithful-community-vector",
+   "mode": "vector",
+   "name": "TF2 soldier class emblem",
+   "size": [
+    50.0,
+    50.0
+   ],
+   "source": "https://github.com/TF2Stadium/Assets/blob/master/img/icons/class/soldier-white.svg"
+  }
+ },
+ "winxp": {
+  "source-shell32-16": {
+   "from": "originals/winxp/source-shell32-16.ico#24x24",
+   "kind": "extracted-platform-art",
+   "mode": "pixels",
+   "name": "Windows XP shell32 resource 16",
+   "native": [
+    24,
+    24
+   ],
+   "size": [
+    24,
+    24
+   ],
+   "source": "https://github.com/bartekl1/windows-ui-assets/blob/main/Icons/Windows%20XP/ico/shell32.dll/ICON16_1.ico"
+  },
+  "source-shell32-18": {
+   "from": "originals/winxp/source-shell32-18.ico#24x24",
+   "kind": "extracted-platform-art",
+   "mode": "pixels",
+   "name": "Windows XP shell32 resource 18",
+   "native": [
+    24,
+    24
+   ],
+   "size": [
+    24,
+    24
+   ],
+   "source": "https://github.com/bartekl1/windows-ui-assets/blob/main/Icons/Windows%20XP/ico/shell32.dll/ICON18_1.ico"
+  },
+  "source-shell32-24": {
+   "from": "originals/winxp/source-shell32-24.ico#24x24",
+   "kind": "extracted-platform-art",
+   "mode": "pixels",
+   "name": "Windows XP shell32 resource 24",
+   "native": [
+    24,
+    24
+   ],
+   "size": [
+    24,
+    24
+   ],
+   "source": "https://github.com/bartekl1/windows-ui-assets/blob/main/Icons/Windows%20XP/ico/shell32.dll/ICON24_1.ico"
+  },
+  "source-shell32-28": {
+   "from": "originals/winxp/source-shell32-28.ico#24x24",
+   "kind": "extracted-platform-art",
+   "mode": "pixels",
+   "name": "Windows XP shell32 resource 28",
+   "native": [
+    24,
+    24
+   ],
+   "size": [
+    24,
+    24
+   ],
+   "source": "https://github.com/bartekl1/windows-ui-assets/blob/main/Icons/Windows%20XP/ico/shell32.dll/ICON28_1.ico"
+  },
+  "source-shell32-4": {
+   "from": "originals/winxp/source-shell32-4.ico#24x24",
+   "kind": "extracted-platform-art",
+   "mode": "pixels",
+   "name": "Windows XP shell32 resource 4",
+   "native": [
+    24,
+    24
+   ],
+   "size": [
+    24,
+    24
+   ],
+   "source": "https://github.com/bartekl1/windows-ui-assets/blob/main/Icons/Windows%20XP/ico/shell32.dll/ICON4_1.ico"
+  }
+ },
+ "x360": {
+  "source-achievements": {
+   "from": "originals/x360/source-achievements.png",
+   "kind": "source-supplied-blades-art",
+   "mode": "pixels",
+   "name": "Blades Achievements",
+   "native": [
+    32,
+    32
+   ],
+   "size": [
+    32,
+    32
+   ],
+   "source": "https://github.com/ZivvoZ/dashx360/blob/main/Assets/Blades/ProvidedIcons/games/Achievements.png"
+  },
+  "source-friends": {
+   "from": "originals/x360/source-friends.png",
+   "kind": "source-supplied-blades-art",
+   "mode": "pixels",
+   "name": "Blades Friends",
+   "native": [
+    32,
+    32
+   ],
+   "size": [
+    32,
+    32
+   ],
+   "source": "https://github.com/ZivvoZ/dashx360/blob/main/Assets/Blades/ProvidedIcons/xbox%20live/Friends.png"
+  },
+  "source-gscore": {
+   "from": "originals/x360/source-gscore.png",
+   "kind": "source-supplied-blades-art",
+   "mode": "pixels",
+   "name": "Blades GScore",
+   "native": [
+    32,
+    32
+   ],
+   "size": [
+    32,
+    32
+   ],
+   "source": "https://github.com/ZivvoZ/dashx360/blob/main/Assets/Blades/ProvidedIcons/profile/GScore.png"
+  }
+ },
+ "xmb": {
+  "source-category-friends": {
+   "from": "originals/xmb/source-category-friends.png",
+   "kind": "firmware-derived-per-upstream",
+   "mode": "trace",
+   "name": "PS3 XMB Friends",
+   "size": [
+    512,
+    512
+   ],
+   "source": "https://github.com/TheGammaSqueeze/xmb-web/blob/main/icons/xmb_icon_007.png"
+  },
+  "source-category-game": {
+   "from": "originals/xmb/source-category-game.png",
+   "kind": "firmware-derived-per-upstream",
+   "mode": "trace",
+   "name": "PS3 XMB Game",
+   "size": [
+    512,
+    512
+   ],
+   "source": "https://github.com/TheGammaSqueeze/xmb-web/blob/main/icons/xmb_icon_005.png"
+  },
+  "source-category-music": {
+   "from": "originals/xmb/source-category-music.png",
+   "kind": "firmware-derived-per-upstream",
+   "mode": "trace",
+   "name": "PS3 XMB Music",
+   "size": [
+    512,
+    512
+   ],
+   "source": "https://github.com/TheGammaSqueeze/xmb-web/blob/main/icons/xmb_icon_003.png"
+  },
+  "source-category-network": {
+   "from": "originals/xmb/source-category-network.png",
+   "kind": "firmware-derived-per-upstream",
+   "mode": "trace",
+   "name": "PS3 XMB Network",
+   "size": [
+    512,
+    512
+   ],
+   "source": "https://github.com/TheGammaSqueeze/xmb-web/blob/main/icons/xmb_icon_006.png"
+  },
+  "source-category-settings": {
+   "from": "originals/xmb/source-category-settings.png",
+   "kind": "firmware-derived-per-upstream",
+   "mode": "trace",
+   "name": "PS3 XMB Settings",
+   "size": [
+    512,
+    512
+   ],
+   "source": "https://github.com/TheGammaSqueeze/xmb-web/blob/main/icons/xmb_icon_001.png"
+  },
+  "source-category-users": {
+   "from": "originals/xmb/source-category-users.png",
+   "kind": "firmware-derived-per-upstream",
+   "mode": "trace",
+   "name": "PS3 XMB Users",
+   "size": [
+    512,
+    512
+   ],
+   "source": "https://github.com/TheGammaSqueeze/xmb-web/blob/main/icons/xmb_icon_000.png"
+  }
+ }
+}

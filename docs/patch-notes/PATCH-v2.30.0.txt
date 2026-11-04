@@ -1,0 +1,33 @@
+ROBOTIC TYLER v2.30.0 — patch notes
+
+Phone remote away from home
+- Settings → Phone remote → Away from home: the remote works off your Wi-Fi through Tailscale (free; on the PC and the phone, same account). Off by default.
+- Only your own Tailscale devices can reach it, encrypted end to end, and the phone still pairs with the code. No server in between.
+- A phone paired at home pairs once more for the Tailscale address.
+
+The chat check
+- Connect & start's one-time check has "Don't ask again". Settings → AI → Telling each chat turns it back on.
+- When Connect & start waits for the check, the phone shows it too: start Tyler entirely from the phone.
+
+DOOM: Tyler's face takes damage
+- Clean from 80% health, then bloodier at 60, 40, 20 and under 20%, like the game's status bar.
+- A red flash when he's hit (none with reduced motion), the evil grin when a reply or clip lands.
+- On the status bar's face and on his header logo. Health is his real connection health.
+
+Pack 2: original artwork where it's more faithful (kept separate in assets/theme-icons-pack-2; only what's used ships, with its notices)
+- PS3: the XMB's category icons on the category row.
+- Windows XP: shell32's own 24 px icons in the Start menu, including Turn Off.
+- MSN Messenger: the original 19 px emoticons in the Emoticons menu, which now fits the panel.
+- Xbox 360: Blades icons for achievements and pop-ups, and the gamerscore G.
+- Garry's Mod: Silk icons on the spawn menu's tools.
+- Rust: the HUD's health, calories, hydration and Bleeding symbols.
+- CS2: extracted icons for Chat, Setup, Checks, play/pause/stop, the C4 and armor badges, and the CT emblem on a round win.
+- TF2: class emblems on the class captions. Deadlock: two stat symbols in the shop.
+- Kept as they were: the other 16 themes (the pack's new drawings were no closer to their games). The Tyler logos are unchanged.
+
+Tested
+- Unit: Tailscale addresses only with Away from home on; the phone's answer; DOOM's health steps; Pack 2's artwork is sourced, used and credited.
+- Chromium with the panel preview and a mocked Steam page (no real Steam, Windows audio or Gemini Live): DOOM's damage levels, flash and reduced motion; Pack 2's artwork in place at native size; all 25 themes.
+- Phone remote: real server, iPhone-sized Chromium, mocked chat on the PC: the phone answers the chat check.
+- Real Electron (Linux) with a mock Steam page: the desktop check passes.
+- Not tested: a real Tailscale network or mobile data, the real Steam page, the Windows desktop app, a real phone.

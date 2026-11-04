@@ -12,6 +12,8 @@
 
  // ── Rust: vitals and status effects, the belt, crafting, the Tool Cupboard, wounded ─────────────
  // Small white pictograms on the coloured squares, drawn here (not Rust's own icons).
+ // v2.30: Rust's own HUD symbols (Pack 2) for health, calories, hydration and Bleeding.
+ const RS_HUD={health:'source-ui-health',food:'source-ui-food-cooked',water:'source-ui-cup-water',bleed:'source-ui-bleeding'};
  const RS={
   health:'<svg viewBox="0 0 16 16"><path d="M6 2.5h4v3.5h3.5v4H10v3.5H6V10H2.5V6H6z"/></svg>',
   food:'<svg viewBox="0 0 16 16"><path d="M4.5 2v4.5a1.5 1.5 0 0 0 3 0V2M6 2v12M11.5 2c-2 1.5-2 5 0 6v6"/></svg>',
@@ -29,14 +31,14 @@
   {id:'rs-vitals',mount(c){
    const box=c.add('deck',c.h('div','fx rs-vitals'));const effects=c.h('div','rs-effects'),bars=c.h('div','rs-bars');box.append(effects,bars);
    const cap=capOf(c);
-   const bar=(key,title)=>{const row=c.h('div','rs-bar rs-'+key),track=c.h('span','rs-track'),fill=c.h('i'),val=c.h('b');row.title=title;track.append(fill,val);row.append(c.svg(RS[key],'rs-ic'),track);bars.append(row);return {fill,val};};
+   const bar=(key,title)=>{const row=c.h('div','rs-bar rs-'+key),track=c.h('span','rs-track'),fill=c.h('i'),val=c.h('b');row.title=title;track.append(fill,val);row.append(c.brand(RS_HUD[key],'rs-ic rs-ic-b')||c.svg(RS[key],'rs-ic'),track);bars.append(row);return {fill,val};};
    const hp=bar('health','Health: Tyler’s connection health. Problems knock it down; it comes back while things work.');
    const food=bar('food','Calories: what’s left of your spending cap (Settings → AI). Full when no cap is set.');
    const water=bar('water','Hydration: how fast Tyler replies. Quick replies keep it full.');
    // Status effects stack above the vitals, as in Rust: each shows only while it applies.
    const EFFECTS=[['priv','Building privilege','Tyler is watching this chat',()=>c.systems()[1].level===3],['comfort','Comfort','Friends are in the voice call with Tyler',()=>c.voice().peers>0],
     ['craft','Crafting','Tyler is writing a reply',()=>c.S.state==='thinking'],['radio','Radio','The Music DJ is playing',()=>!!c.S.music],['raid','Raid alarm','The chat is busy: Tyler paces his replies',()=>!!c.S.flood],['bleed','Bleeding','Something needs attention: open the Checks tab',()=>c.S.state==='error']];
-   const chips=EFFECTS.map(([key,label,title])=>{const e=c.h('button','rs-effect rs-'+key);e.type='button';e.title=title;e.append(c.svg(RS[key],'rs-ic'),c.h('span',null,label));e.hidden=true;e.onclick=()=>c.actions.tab(key==='radio'?'room':key==='bleed'||key==='comfort'?'checks':'conversation');effects.append(e);return e;});
+   const chips=EFFECTS.map(([key,label,title])=>{const e=c.h('button','rs-effect rs-'+key);e.type='button';e.title=title;e.append((RS_HUD[key]&&c.brand(RS_HUD[key],'rs-ic rs-ic-b'))||c.svg(RS[key],'rs-ic'),c.h('span',null,label));e.hidden=true;e.onclick=()=>c.actions.tab(key==='radio'?'room':key==='bleed'||key==='comfort'?'checks':'conversation');effects.append(e);return e;});
    function render(){
     const h=c.health();hp.fill.style.transform='scaleX('+(h/100).toFixed(3)+')';hp.val.textContent=String(Math.round(h));
     const k=cap(),left=k>0?clamp(1-c.S.spend/k):1;food.fill.style.transform='scaleX('+left.toFixed(3)+')';food.val.textContent=String(Math.round(left*500));
@@ -161,7 +163,7 @@
  const X_PEOPLE='<svg viewBox="0 0 16 16"><path d="M5.5 7.5a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4zM1.8 13c.4-2.3 1.8-3.6 3.7-3.6S8.8 10.7 9.2 13M11 7.3a1.9 1.9 0 1 0 0-3.8M11.4 9.4c1.5.2 2.5 1.4 2.8 3.6"/></svg>';
  const X_POWER='<svg viewBox="0 0 16 16"><path d="M5.2 4.3a5 5 0 1 0 5.6 0M8 2v5.5"/></svg>';
  // The console's pop-up: a dark pill rising from the bottom centre, with a round icon.
- function xPop(c,icon,small,text){const el=c.h('div','fx x-pop');const ic=c.h('span','x-pop-ic');const bi=c.brand(({[X_TROPHY]:'achievement',[X_PEOPLE]:'player',[X_POWER]:'ring-of-light'})[icon],'x-pop-bi');if(bi){ic.classList.add('x-pop-ic-b');ic.append(bi);}else ic.append(c.svg(icon));const t=c.h('div');t.append(c.h('small',null,small),c.h('b',null,text));el.append(ic,t);
+ function xPop(c,icon,small,text){const el=c.h('div','fx x-pop');const ic=c.h('span','x-pop-ic');const bi=c.brand(({[X_TROPHY]:'source-achievements',[X_PEOPLE]:'source-friends'})[icon],'x-pop-bi x-blades')||c.brand(({[X_TROPHY]:'achievement',[X_PEOPLE]:'player',[X_POWER]:'ring-of-light'})[icon],'x-pop-bi');if(bi){ic.classList.add('x-pop-ic-b');ic.append(bi);}else ic.append(c.svg(icon));const t=c.h('div');t.append(c.h('small',null,small),c.h('b',null,text));el.append(ic,t);
   el.style.bottom=(c.panel.querySelector('.foot')?.offsetHeight||40)+12+'px';c.flash(el,4200);return el;}
  F.define('x360',[
   {id:'x-ring',mount(c){
@@ -176,13 +178,13 @@
    // The gamer card: picture, gamertag, gamerscore, reputation stars, zone and motto.
    const card=c.add('deck',c.h('button','fx x-card'));card.type='button';card.setAttribute('aria-haspopup','dialog');card.title='Gamer card: achievements';
    const pic=c.h('canvas','x-pic');pic.width=pic.height=96;const info=c.h('div','x-info'),tag=c.h('b','x-tag','ROBOTIC TYLER'),score=c.h('span','x-score'),stars=c.h('span','x-stars'),zone=c.h('small','x-zone'),motto=c.h('small','x-motto');
-   const row=c.h('div','x-row');row.append(score,stars,zone);info.append(tag,row,motto);card.append(pic,info);
+   const row=c.h('div','x-row'),gs=c.brand('source-gscore','x-gs-bi');if(gs){score.classList.add('x-score-b');row.append(gs);}row.append(score,stars,zone);info.append(tag,row,motto);card.append(pic,info);
    requestAnimationFrame(()=>globalThis.TylerLogos?.paint(pic,'x360'));
    function render(){score.textContent=xScore(c).toLocaleString();score.title='Gamerscore: '+xScore(c)+' of '+XG;const h=c.health(),n=Math.max(1,Math.round(h/20));stars.textContent='★'.repeat(n)+'☆'.repeat(5-n);stars.title='Reputation: Tyler’s health ('+Math.round(h)+'%)';
     zone.textContent=c.voice().peers?'Party · '+(c.voice().peers+1):'Pro';motto.textContent=c.S.music?'♫ '+c.S.music:c.S.label+(c.S.text?' · '+c.S.text:'');}
    function open(){const o=c.overlay('x-ach','Achievements');const got=XA.filter(a=>xHas(c,a[0])).length;
     const head=c.h('div','x-ach-head');head.append(c.h('b',null,'Achievements'),c.h('span',null,got+' of '+XA.length+' unlocked · '+xScore(c)+' of '+XG+' G'));o.el.append(head);
-    for(const [key,g,name,desc] of XA){const on=xHas(c,key),it=c.h('div','x-ach-item');it.dataset.on=String(on);const ic=c.h('span','x-ach-ic');const ab=on&&c.brand('achievement','x-ach-bi');if(ab){ic.classList.add('x-ach-ic-b');ic.append(ab);}else ic.append(c.svg(X_TROPHY));
+    for(const [key,g,name,desc] of XA){const on=xHas(c,key),it=c.h('div','x-ach-item');it.dataset.on=String(on);const ic=c.h('span','x-ach-ic');const ab=on&&(c.brand('source-achievements','x-ach-bi x-blades')||c.brand('achievement','x-ach-bi'));if(ab){ic.classList.add('x-ach-ic-b');ic.append(ab);}else ic.append(c.svg(X_TROPHY));
      const t=c.h('div');t.append(c.h('b',null,on?name:'Locked achievement'),c.h('small',null,on?desc:desc));it.append(ic,t,c.h('span','x-ach-g',g+'G'));o.el.append(it);}
     const x=c.h('button','x-back');x.type='button';x.append(c.h('i','x-btn-b','B'),c.h('span',null,'Back'));x.onclick=o.close;o.el.append(x);x.focus({preventScroll:true});}
    card.onclick=()=>{if(c._overlay)c._overlay.close();else open();};
@@ -301,7 +303,9 @@
 
  // ── MSN Messenger: presence, What I'm listening to, the contact list, notices, Nudge, emoticons ──
  const MSN_PRES={ready:['Online','on'],listening:['Online','on'],thinking:['Online','on'],speaking:['On the Phone','busy'],waiting:['Be Right Back','away'],paused:['Away','away'],standby:['Appear Offline','off'],error:['Busy','busy']};
- const MSN_EMO=[':)',':D',';)',':P','(Y)','8-)',':O',':(','(L)','(H)','(*)','(K)'];
+ // v2.30: Messenger's original emoticons (Pack 2) with their shortcuts; the text ones stay as the fallback.
+ const MSN_EMO=[':)',';)','(Y)','(N)','*-)','8-|','(I)','(8)','(*)','(T)','(S)','(brb)'];
+ const MSN_EMO_IC=['smile','winking-smile-static','thumbs-up','thumbs-down','thinking-smile-static','nerd-smile','light-bulb','note','star','telephone-receiver','sleeping-half-moon','be-right-back'].map(n=>'source-'+n);
  function msnPop(c,title,text){const el=c.h('div','fx msn-pop');const head=c.h('div','msn-pop-head');head.append(...[c.brand('msn-butterfly','msn-pop-bf')].filter(Boolean),c.h('b',null,'MSN Messenger'));const body=c.h('div','msn-pop-body'),pic=c.h('canvas','msn-pop-pic');pic.width=pic.height=72;
   const t=c.h('div');t.append(c.h('b',null,title),c.h('span',null,text));body.append(pic,t);el.append(head,body);requestAnimationFrame(()=>globalThis.TylerLogos?.paint(pic,'msn'));
   el.style.bottom=(c.panel.querySelector('.foot')?.offsetHeight||40)+10+'px';c.flash(el,5200);}
@@ -334,9 +338,9 @@
    // The conversation toolbar: Nudge and emoticons (each one plays a clip).
    const bar=c.h('div','msn-tools'),nudge=c.h('button','msn-tool',null),emo=c.h('button','msn-tool');nudge.type=emo.type='button';
    nudge.append(c.brand('nudge','msn-tool-bi')||c.h('i','msn-nudge-ic'),c.h('span',null,'Nudge'));nudge.title='Send a Nudge: a test beep in Steam voice';nudge.onclick=()=>{c.actions.beep();c.panel.classList.remove('msn-shake');void c.panel.offsetWidth;if(!c.reduced)c.panel.classList.add('msn-shake');};
-   emo.append(c.h('i','msn-emo-ic',':)'),c.h('span',null,'Emoticons'));emo.title='Emoticons: each one plays a soundboard clip';emo.setAttribute('aria-haspopup','menu');
+   emo.append(c.brand('source-smile','msn-emo-bi')||c.h('i','msn-emo-ic',':)'),c.h('span',null,'Emoticons'));emo.title='Emoticons: each one plays a soundboard clip';emo.setAttribute('aria-haspopup','menu');
    emo.onclick=()=>{const s=c.actions.sounds(),list=(s.slots||[]).slice(0,12);if(!list.length){c.actions.tab('soundboard');return;}
-    c.menu(emo,list.map((it,i)=>({label:it.name,mark:MSN_EMO[i%MSN_EMO.length],run:()=>c.actions.playSound(it.slot)})),{cls:'msn-menu msn-emo',label:'Emoticons'});};
+    c.menu(emo,list.map((it,i)=>({label:it.name,icon:MSN_EMO_IC[i%MSN_EMO_IC.length],mark:MSN_EMO[i%MSN_EMO.length],run:()=>c.actions.playSound(it.slot)})),{cls:'msn-menu msn-emo',label:'Emoticons',align:'right'});}; // from the button's right edge: it is at the panel's right
    bar.append(nudge,emo);box.append(bar);
    function render(){const sys=c.systems(),on=sys.filter(x=>x.level===3),off=sys.filter(x=>x.level!==3);
     for(const [k,list,label] of [['on',on,'Online'],['off',off,'Not online']]){heads[k].textContent=(open[k]?'▾ ':'▸ ')+label+' ('+list.length+')';heads[k].hidden=!list.length;groups[k].hidden=!open[k]||!list.length;groups[k].replaceChildren();
