@@ -1,0 +1,17 @@
+ROBOTIC TYLER v2.20.0 — patch notes
+
+New
+- Venice Uncensored text model (OpenRouter, Venice only, no fallback, price-capped). Works for chat and Standard voice. New "No filter" roast mode and preset.
+- Per-model OpenRouter provider routing; Parasail is never used. Manual model choices are never swapped (smart routing only between Llama 3.3 and Mistral Small).
+- Three Gemini text models: 3.1 Flash-Lite (fast, default for existing setups), 3.5 Flash-Lite (balanced, recommended), 3.8 Flash (advanced). Free-tier explanation and links in Settings.
+- Test selected model (latency, provider); Preview a reply uses the real model, routing and rules (desktop: works with saved keys).
+- Every theme has 2-3 of its own extras in the panel (activity graph and achievements, server browser, class hotkeys and killfeed, round HUD and sound wheel, console, Pip-Boy categories and gauges, VMU, field radio and more). Settings → Appearance lists them.
+- Status strip in every theme: time in state, a pulse on each change, full status tooltip.
+
+Fixed
+- Clearer provider and quota errors; one retry for Gemini per-minute limits; never a switch of model, provider or billing.
+
+Tested
+- Venice ID, provider and price checked against OpenRouter's public API; Gemini IDs and free tier checked against Google's docs. No real Venice or Gemini reply generated here (no key).
+- Mocks: background with mocked APIs, all 20 themes in headless Chromium, the desktop Steam window in Electron; 260 unit and 15 end-to-end tests.
+- Not tested: themes in a real Steam chat; the desktop app on Windows.

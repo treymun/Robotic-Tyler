@@ -1,3 +1,45 @@
+# ROBOTIC TYLER v2.20.0: Venice Uncensored, three Gemini models, and 20 themes that each do their own thing
+
+## New: AI models
+- **Venice Uncensored** (`cognitivecomputations/dolphin-mistral-24b-venice-edition`) joins Llama 3.3 70B and Mistral Small 3.2 under **Settings → AI & personality → Text model**. It runs only on Venice through OpenRouter (no fallback provider, price-capped just above Venice's listed $0.20 in / $0.90 out per million tokens), streams like the others, and works for chat replies and Standard voice. With **Roast intensity → No filter** (or the new **No filter** preset) Tyler swears freely, goes crude and roasts hard, but still varies his jokes and answers properly when a question is serious. The chat-takeover protection and your rules still apply.
+- **Every OpenRouter model now has its own provider routing**: Llama 3.3 prefers Groq, then DeepInfra and SambaNova; Mistral Small prefers DeepInfra, Venice and Mistral; Venice uses Venice only. **Parasail is never used, for any model.** A model you pick is never swapped for another: smart routing only moves between Llama 3.3 and Mistral Small, and only when one of those two is selected.
+- **Three Gemini text models**, each on the Gemini API free tier: **Gemini 3.1 Flash-Lite** (fast, the model Tyler already used, so existing setups don't change), **Gemini 3.5 Flash-Lite** (balanced, recommended: better at staying in character) and **Gemini 3.8 Flash** (advanced: smartest of the three, thinks briefly first). Each gets its own thinking and output settings. Settings explains what the free tier means: free within Google's per-project limits and only while billing is off, with links to Google's pricing and your limits in AI Studio.
+- **Test selected model** in Settings sends one tiny request with your key and shows whether the model answered, how fast and which provider served it. **Preview a reply** now uses exactly the selected model, its routing and your real personality rules (and on the desktop app it now works with your saved key).
+- Clearer errors: Venice unavailable, out of OpenRouter credits, Gemini per-minute vs daily free-tier limits (a per-minute limit or a busy Google is retried once after Google's delay; a daily limit is explained). Tyler never switches model, provider or billing on his own.
+
+## New: every theme has its own extras (2–3 each, in Tyler's panel)
+- **Steam:** an activity graph like the downloads page (reply times, peak, total) and session achievements.
+- **Classic Steam:** a server browser of Tyler's services (AI, chat, voice, music) and a VGUI progress dialog while he writes.
+- **Team Fortress 2:** class-select hotkeys 1–5 for the tabs, an activity killfeed, and a taunt (double-click the logo).
+- **Counter-Strike 2:** a round HUD (replies vs messages heard, session clock, people in voice), a sound buy wheel (B) and round-won/lost banners.
+- **Portal:** a tests-passed sign with live status icons and portal transitions between tabs.
+- **Counter-Strike 1.6:** a scoreboard and a radio-command menu (V: pause, stop audio, beep, checks).
+- **HEV suit:** suit-voice callouts for every state, damage indicators on errors, and a flashlight for extra contrast (F).
+- **Left 4 Dead:** the survivor team (each part of Tyler with a health bar) and the Director's horde warning when chat floods.
+- **Windows XP:** a Start menu and system tray (owner, voice, connection, music, clock) in the taskbar, and XP error dialogs.
+- **DOOM:** a status face that reacts to Tyler's state, the screen melt between tabs, and pickup messages.
+- **Quake:** a drop-down console with real commands (~: status, tab, pause, stopaudio, beep, log) and arena medals.
+- **Pip-Boy:** DATA / MAP / INV / STAT / RADIO categories (Q / E), analog gauges, and a radio readout for the Music DJ.
+- **Combine:** an Overwatch dispatch ticker and biosignal scans.
+- **Deadlock:** a souls counter and a spirit thread that follows Tyler's state.
+- **Minecraft:** hearts (health), hunger (spending cap) and XP (replies), and block-breaking while Tyler thinks.
+- **PAYDAY 2:** a heist plan of the setup steps, a heist timer and police-assault banners.
+- **Dreamcast:** a working VMU in the header and when collapsed, and the boot swirl.
+- **Garry's Mod:** Lua-error problem reports, spawn notices and properties (right-click the stats).
+- **Ricochet:** an arcade score with discs and power-ups, and a flying disc between tabs.
+- **Day of Defeat:** a field-radio channel dial for the tabs and an operation briefing.
+- Everything they show is real (Tyler's state, replies, timings, voice, music, sounds, setup); nothing is stored. Only the current theme's extras exist, keys only work while the pointer or focus is on the panel and never while you type, and every capability stays reachable in every theme. **Settings → Appearance** lists each theme's extras.
+
+## Improved
+- **Status strip, every theme:** how long Tyler has been listening, thinking or talking; a pulse in the state's colour on each change; the full status as a tooltip. The HEV AUX POWER meter shows Tyler's real health when idle, and the Day of Defeat RX needle swings, trembles and drops with his state.
+
+## Tested
+- **Checked live, without a key:** Venice's model ID, provider (Venice only), price ($0.20 / $0.90 per million tokens) and status against OpenRouter's public models API on November 3, 2026; the Gemini model IDs, free tier and thinking levels against Google's models, pricing and developer pages.
+- **Not tested with a real key:** no real Venice or Gemini reply was generated here. Use **Test selected model** in Settings to check yours.
+- **Mocks:** the real background script with mocked OpenRouter and Gemini APIs (model and routing in real replies, previews and tests, Venice outage, Gemini quota retry and daily limit, no switching); all 20 themes in the real panel in headless Chromium (2–3 features each, 47 in total, theme switches, the interactive ones, typing never triggers them); the desktop app's Steam window in Electron against a mock Steam page. 260 unit and integration tests and 15 end-to-end tests.
+- **Not tested:** the themes in a real Steam chat, and the desktop app on Windows.
+
+---
 # ROBOTIC TYLER v2.19.1: Music DJ plays your request again
 
 ## Fixed

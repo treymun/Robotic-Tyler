@@ -30,7 +30,7 @@
 </tr>
 <tr>
 <td valign="top"><img src="assets/readme/icon-games.png" width="52" align="left" alt="">&nbsp;<b>Trivia, votes and games</b><br>&nbsp;500-question trivia races, an arcade (<code>play vault</code>, <code>play hangman</code>, <code>play riddle</code> …), squad votes and optional mute or kick votes.</td>
-<td valign="top"><img src="assets/readme/icon-themes.png" width="52" align="left" alt="">&nbsp;<b>20 themes</b><br>&nbsp;Steam, TF2, CS2, Portal, DOOM, Deadlock, PAYDAY 2 and more, each with its own Tyler and animated status strip.</td>
+<td valign="top"><img src="assets/readme/icon-themes.png" width="52" align="left" alt="">&nbsp;<b>20 themes</b><br>&nbsp;Steam, TF2, CS2, Portal, DOOM, Deadlock, PAYDAY 2 and more, each with its own Tyler, status strip and extras: a Quake console, a Pip-Boy, a CS2 sound wheel, a Dreamcast VMU…</td>
 </tr>
 </table>
 
@@ -67,6 +67,7 @@ Both run the same engine, settings and themes. Prefer the older desktop route th
 ## Voice engines
 
 - **Standard** waits for a pause, writes a reply with your AI provider (OpenRouter or Gemini) and speaks it, with Grok voices through OpenRouter or Google's voices with a Gemini key. Long replies are spoken in full.
+- **Text models:** OpenRouter with Llama 3.3 70B, Mistral Small 3.2 or **Venice Uncensored** (each with its own provider routing, never Parasail), or Google Gemini with **3.1 Flash-Lite, 3.5 Flash-Lite or 3.8 Flash** (all on Google's free tier). **Test selected model** in Settings checks yours.
 - **Gemini Live** is a real-time conversation with Google: Tyler hears the call as people talk, answers in about a second and stops when someone talks over him. It needs a Google AI key, and Google bills the audio while a session runs, so you start and stop every session yourself.
 
 Your personality, reply length and rules always apply, and people in the call can't change them.

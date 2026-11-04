@@ -290,8 +290,8 @@
 @keyframes cb-sweep{from{top:0}to{top:100%}}
 .cb-scan b{position:absolute;left:50%;top:44%;transform:translateX(-50%);padding:4px 10px;background:rgba(13,17,20,.9);border:1px solid #9fe7ff;font:12px "Tyler Combine",monospace;color:#9fe7ff;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;animation:fx-fade 2s linear forwards}
 .cb-alert{position:absolute;inset:0;border:3px solid #ff3a30;box-shadow:inset 0 0 40px rgba(255,58,48,.35);animation:cb-flash .5s steps(2) 3,fx-fade 3.2s linear forwards}
-.cb-alert b{position:absolute;left:10px;top:120px;padding:2px 8px;background:#ff3a30;color:#000;font:600 12px "Tyler Combine",monospace;letter-spacing:.12em;text-transform:uppercase}
-.cb-alert span{position:absolute;left:10px;top:144px;right:10px;font:11px "Tyler Combine",monospace;color:#ffb3ae}
+.cb-alert b{position:absolute;left:10px;top:var(--cb-top,300px);padding:2px 8px;background:#ff3a30;color:#000;font:600 12px "Tyler Combine",monospace;letter-spacing:.12em;text-transform:uppercase}
+.cb-alert span{position:absolute;left:10px;top:calc(var(--cb-top,300px) + 22px);right:10px;padding:2px 6px;background:rgba(13,17,20,.92);font:11px "Tyler Combine",monospace;color:#ffb3ae}
 @keyframes cb-flash{50%{opacity:.3}}
 
 /* ── Deadlock ─────────────────────────────────────────── */

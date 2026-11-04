@@ -162,7 +162,7 @@
    let last=0;
    return {update(type,d){if(type!=='state'||d.state===d.before)return;
     if(d.state==='listening'&&Date.now()-last>15000&&!c.reduced){last=Date.now();const v=c.voice(),scan=c.h('div','fx cb-scan');scan.append(c.h('i'),c.h('b',null,'Biosignal scan: '+(v.peers||'no')+' subject'+(v.peers===1?'':'s')+' in call'));c.flash(scan,2000);}
-    if(d.state==='error'){const a=c.h('div','fx cb-alert');a.append(c.h('b',null,'Anomaly'),c.h('span',null,(d.text||'').slice(0,90)));c.flash(a,3200);}}};
+    if(d.state==='error'){const a=c.h('div','fx cb-alert');a.style.setProperty('--cb-top',(c.below('.tabs')+8)+'px');a.append(c.h('b',null,'Anomaly'),c.h('span',null,(d.text||'').slice(0,90)));c.flash(a,3200);}}};
   }},
  ]);
 
