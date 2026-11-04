@@ -40,9 +40,9 @@ themes or a missing file fall back to the Steam logo. Theme keys: steam, classic
 tf2, cs2, portal, cs16, hev, l4d, winxp, doom, quake, pipboy, combine, deadlock, minecraft,
 payday, dreamcast, gmod, ricochet, dod, rust, x360, ipod, msn, xmb.
 
-Brand marks (v2.27): `tools/art/export.py` cuts the Messenger butterfly, the PlayStation logo and the
-Apple logo from the five-theme pack's backgrounds into `tools/art/marks/`; the build embeds them in
-`ui-art.js`, drawn on canvases like the logos. The backgrounds themselves aren't used in the apps.
+`tools/art/export.py` cuts the Messenger butterfly from the five-theme pack's Messenger background for
+`mirror.py`. The backgrounds themselves aren't used in the apps; the themes' smaller icons and emblems
+come from the branded icon pack (`tools/brand/`).
 
 Note: the HEV, Windows XP and Portal logos include those games' and Windows' own
 symbols (the λ, the four-colour flag, the Aperture badge), and the Dreamcast logo shows an

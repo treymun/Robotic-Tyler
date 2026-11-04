@@ -4,10 +4,11 @@
 // prefixes dropped, simple inline styles turned into attributes. Throws on anything else.
 const SVG_TAGS=new Set(['svg','g','path','rect','circle','ellipse','polygon','polyline','line','text','tspan']);
 const SVG_ATTRS=new Set(['xmlns','viewBox','x','y','x1','y1','x2','y2','width','height','d','cx','cy','r','rx','ry','points','transform','fill','fill-opacity','fill-rule','clip-rule','stroke','stroke-width','stroke-linecap','stroke-linejoin','stroke-miterlimit','stroke-opacity','stroke-dasharray','opacity','font-family','font-size','font-weight','text-anchor','dominant-baseline','letter-spacing','shape-rendering']);
-// Two drawings in the pack have one rectangle's attributes shifted by one (rx holds the stroke
+// Three drawings in the pack have one rectangle's attributes shifted by one (rx holds the stroke
 // colour, stroke the corner radius); fixed here, the pack itself stays as supplied.
 const BRAND_FIXES={'svg/pipboy/pip-boy-device.svg':[['rx="#7bff62" fill="none" stroke="2"','rx="2" fill="none" stroke="#7bff62"']],
- 'svg/hev/battery.svg':[['rx="#7f5825" fill="none" stroke="3"','rx="3" fill="none" stroke="#7f5825"']]};
+ 'svg/hev/battery.svg':[['rx="#7f5825" fill="none" stroke="3"','rx="3" fill="none" stroke="#7f5825"']],
+ 'svg/ipod/battery.svg':[['rx="#717f89" fill="none" stroke="3"','rx="3" fill="none" stroke="#717f89"']]};
 const NUMERIC=new Set(['x','y','x1','y1','x2','y2','width','height','cx','cy','r','rx','ry','stroke-width','stroke-miterlimit','opacity','fill-opacity','stroke-opacity','font-size']);
 export function cleanBrandSvg(src,file){
  for(const [a,b] of BRAND_FIXES[file]||[])src=src.replace(a,b);

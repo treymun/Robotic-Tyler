@@ -6,8 +6,6 @@
  'use strict';
  const F=globalThis.TylerThemeFeatures;if(!F)return;
  const clamp=(v,a=0,b=1)=>Math.min(b,Math.max(a,v));
- // One of the brand marks cut from the owner's theme artwork (ui-art.js), drawn on a canvas.
- const markOf=(c,name,cls)=>{const k=c.h('canvas','fx-mark '+cls);k.width=k.height=32;k.setAttribute('aria-hidden','true');requestAnimationFrame(()=>globalThis.TylerArt?.mark(k,name));return k;};
  // Two parts that belong together, mounted as one feature.
  const both=(...ms)=>c=>{const parts=ms.map(m=>m(c)||{});return {update(t,d){for(const p of parts)p.update?.(t,d);},unmount(){for(const p of parts)p.unmount?.();}};};
  const capOf=c=>{let cap=0;globalThis.TylerStorage?.get?.(['spendingCapUSD']).then(v=>{cap=Number(v?.spendingCapUSD)||0;}).catch(()=>{});return ()=>cap;};
@@ -64,7 +62,7 @@
   {id:'rs-craft',mount(c){
    // Crafting (Q): Tyler's actions as blueprints. Craft runs the real action; the queue at the
    // bottom right shows it until it's done (the full check: until its result arrives).
-   const chip=c.add('bar',c.h('button','fx fx-chip rs-chip'));chip.type='button';chip.append(c.svg(RS.craft,'rs-ic'),c.h('span',null,'Craft'));chip.title='Crafting (Q): checks, tests and Connect & start';chip.setAttribute('aria-haspopup','dialog');
+   const chip=c.add('bar',c.h('button','fx fx-chip rs-chip'));chip.type='button';chip.append(c.brand('hammer','rs-chip-bi')||c.svg(RS.craft,'rs-ic'),c.h('span',null,'Craft'));chip.title='Crafting (Q): checks, tests and Connect & start';chip.setAttribute('aria-haspopup','dialog');
    const queue=c.add('layer',c.h('div','fx rs-queue'));queue.setAttribute('aria-live','polite');
    const BP=[
     {id:'check',name:'Full check',time:'≈ 10 s',ms:30000,parts:'1 × AI request · 1 × speech preview · 1 × beep in voice',run:()=>c.actions.fullCheck(),until:'check'},
@@ -90,7 +88,7 @@
   }},
   {id:'rs-tc',mount(c){
    // The Tool Cupboard: upkeep is the time until Tyler's quiet-call hum keeps him in the call.
-   const chip=c.add('bar',c.h('button','fx fx-chip rs-chip rs-tc'));chip.type='button';const time=c.h('span');chip.append(c.svg(RS.lock,'rs-ic'),time);chip.setAttribute('aria-haspopup','dialog');
+   const chip=c.add('bar',c.h('button','fx fx-chip rs-chip rs-tc'));chip.type='button';const time=c.h('span');chip.append(c.brand('tool-cupboard','rs-chip-bi')||c.svg(RS.lock,'rs-ic'),time);chip.setAttribute('aria-haspopup','dialog');
    const K=()=>globalThis.TylerKeepAlive?.info?.()||null;
    const left=k=>k&&k.call&&k.inCall?Math.max(0,k.minutes*60000-k.idleMs):null;
    function render(){const k=K(),l=left(k);time.textContent=l==null?'TC':Math.ceil(l/60000)+'m';chip.dataset.on=String(l!=null);
@@ -122,7 +120,7 @@
     bleed=c.later(dead,BLEED);}
    function dead(){el?.remove();el=c.add('layer',c.h('div','fx fx-interactive rs-dead'));el.setAttribute('role','alert');
     const by=c.h('small',null,'Killed by: '+(c.S.text||'a problem').slice(0,90));
-    const respawn=c.h('button','primary','Respawn');respawn.type='button';respawn.title='Connect & start';respawn.onclick=()=>{clear();c.actions.connect();};
+    const respawn=c.h('button','primary','Respawn');{const bag=c.brand('sleeping-bag','rs-respawn-bi');if(bag)respawn.prepend(bag);}respawn.type='button';respawn.title='Connect & start';respawn.onclick=()=>{clear();c.actions.connect();};
     const checks=c.h('button',null,'Checks');checks.type='button';checks.onclick=()=>{clear();c.actions.checks();};
     const row=c.h('div','rs-dead-actions');row.append(respawn,checks);el.append(c.h('b',null,'You are dead'),by,row);el.style.top=(c.below('.tabs')+10)+'px';respawn.focus({preventScroll:true});}
    return {update(type,d){if(type!=='state')return;if(d.state==='error'&&d.before!=='error')wounded();else if(d.state!=='error'&&el){const back=['ready','listening','speaking','thinking'].includes(d.state);clear();
@@ -131,7 +129,7 @@
   {id:'rs-pickup-part',mount(c){
    // Pickup notices at the bottom right: scrap for each reply, the clip's name, the song.
    const stack=c.add('layer',c.h('div','fx rs-picks'));
-   function pick(icon,text,n){const p=c.h('div','rs-pick');p.append(c.svg(RS[icon],'rs-ic'),c.h('span',null,text));if(n)p.append(c.h('b',null,'+'+n));stack.append(p);while(stack.children.length>4)stack.firstElementChild.remove();c.later(()=>p.remove(),2800);
+   function pick(icon,text,n){const p=c.h('div','rs-pick');p.append((icon==='scrap'&&c.brand('scrap','rs-pick-bi'))||c.svg(RS[icon],'rs-ic'),c.h('span',null,text));if(n)p.append(c.h('b',null,'+'+n));stack.append(p);while(stack.children.length>4)stack.firstElementChild.remove();c.later(()=>p.remove(),2800);
     stack.style.bottom=(c.panel.querySelector('.foot')?.offsetHeight||40)+(c.root.querySelector('.rs-belt:not([hidden])')?.offsetHeight||0)+6+'px';}
    // The logo, double-clicked: what every fresh spawn says.
    const mark=c.root.querySelector('.mark');if(mark)c.on(mark,'dblclick',()=>{const b=c.h('div','fx rs-hello','Hello? I’m friendly!');c.flash(b,2400);});
@@ -163,7 +161,7 @@
  const X_PEOPLE='<svg viewBox="0 0 16 16"><path d="M5.5 7.5a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4zM1.8 13c.4-2.3 1.8-3.6 3.7-3.6S8.8 10.7 9.2 13M11 7.3a1.9 1.9 0 1 0 0-3.8M11.4 9.4c1.5.2 2.5 1.4 2.8 3.6"/></svg>';
  const X_POWER='<svg viewBox="0 0 16 16"><path d="M5.2 4.3a5 5 0 1 0 5.6 0M8 2v5.5"/></svg>';
  // The console's pop-up: a dark pill rising from the bottom centre, with a round icon.
- function xPop(c,icon,small,text){const el=c.h('div','fx x-pop');const ic=c.h('span','x-pop-ic');ic.append(c.svg(icon));const t=c.h('div');t.append(c.h('small',null,small),c.h('b',null,text));el.append(ic,t);
+ function xPop(c,icon,small,text){const el=c.h('div','fx x-pop');const ic=c.h('span','x-pop-ic');const bi=c.brand(({[X_TROPHY]:'achievement',[X_PEOPLE]:'player',[X_POWER]:'ring-of-light'})[icon],'x-pop-bi');if(bi){ic.classList.add('x-pop-ic-b');ic.append(bi);}else ic.append(c.svg(icon));const t=c.h('div');t.append(c.h('small',null,small),c.h('b',null,text));el.append(ic,t);
   el.style.bottom=(c.panel.querySelector('.foot')?.offsetHeight||40)+12+'px';c.flash(el,4200);return el;}
  F.define('x360',[
   {id:'x-ring',mount(c){
@@ -184,7 +182,7 @@
     zone.textContent=c.voice().peers?'Party · '+(c.voice().peers+1):'Pro';motto.textContent=c.S.music?'♫ '+c.S.music:c.S.label+(c.S.text?' · '+c.S.text:'');}
    function open(){const o=c.overlay('x-ach','Achievements');const got=XA.filter(a=>xHas(c,a[0])).length;
     const head=c.h('div','x-ach-head');head.append(c.h('b',null,'Achievements'),c.h('span',null,got+' of '+XA.length+' unlocked · '+xScore(c)+' of '+XG+' G'));o.el.append(head);
-    for(const [key,g,name,desc] of XA){const on=xHas(c,key),it=c.h('div','x-ach-item');it.dataset.on=String(on);const ic=c.h('span','x-ach-ic');ic.append(c.svg(X_TROPHY));
+    for(const [key,g,name,desc] of XA){const on=xHas(c,key),it=c.h('div','x-ach-item');it.dataset.on=String(on);const ic=c.h('span','x-ach-ic');const ab=on&&c.brand('achievement','x-ach-bi');if(ab){ic.classList.add('x-ach-ic-b');ic.append(ab);}else ic.append(c.svg(X_TROPHY));
      const t=c.h('div');t.append(c.h('b',null,on?name:'Locked achievement'),c.h('small',null,on?desc:desc));it.append(ic,t,c.h('span','x-ach-g',g+'G'));o.el.append(it);}
     const x=c.h('button','x-back');x.type='button';x.append(c.h('i','x-btn-b','B'),c.h('span',null,'Back'));x.onclick=o.close;o.el.append(x);x.focus({preventScroll:true});}
    card.onclick=()=>{if(c._overlay)c._overlay.close();else open();};
@@ -199,7 +197,7 @@
   }},
   {id:'x-guide',mount(c){
    // The Guide (G): the quick menu, with the controller's A and B prompts.
-   const b=c.add('bar',c.h('button','fx x-guide-btn'));b.type='button';b.title='Guide (G): quick actions';b.setAttribute('aria-haspopup','dialog');b.append(c.svg(X_POWER));
+   const b=c.add('bar',c.h('button','fx x-guide-btn'));b.type='button';b.title='Guide (G): quick actions';b.setAttribute('aria-haspopup','dialog');b.append(c.brand('guide','x-guide-bi')||c.svg(X_POWER));
    function open(){const o=c.overlay('x-guide','Guide'),paused=c.actions.paused();
     const head=c.h('div','x-guide-head'),pic=c.h('canvas','x-pic');pic.width=pic.height=64;const t=c.h('div');t.append(c.h('b',null,'ROBOTIC TYLER'),c.h('small',null,xScore(c)+' G · '+(paused?'Away':'Online')));head.append(pic,t);o.el.append(head);
     requestAnimationFrame(()=>globalThis.TylerLogos?.paint(pic,'x360'));
@@ -241,7 +239,7 @@
    function render(){const h=c.health();bat.style.setProperty('--lvl',(h/100).toFixed(2));bat.dataset.low=String(h<25);bat.dataset.charge=String(c.S.state==='waiting');play.hidden=!(c.S.state==='speaking'||c.S.music);bat.title='Battery: Tyler’s health ('+Math.round(h)+'%)'+(c.S.state==='waiting'?', charging while he recovers':'');}
    // Starting Tyler turns the iPod on: the white start-up screen with the Apple logo, for a moment.
    let last=c.S.state;
-   const boot=()=>{if(c.reduced||c.preview)return;const b=c.h('div','fx ip-boot');b.append(markOf(c,'apple','ip-boot-apple'));b.style.top=c.below('.bar')+'px';c.flash(b,1600);};
+   const boot=()=>{if(c.reduced||c.preview)return;const b=c.h('div','fx ip-boot');b.append(...[c.brand('apple-mark','ip-boot-apple')].filter(Boolean));b.style.top=c.below('.bar')+'px';c.flash(b,1600);};
    render();c.every(render);return {update(type,d){render();if(type==='state'){if(['paused','standby'].includes(last)&&['ready','listening'].includes(d.state))boot();last=d.state;}}};
   }},
   {id:'ip-wheel',mount(c){
@@ -304,7 +302,7 @@
  // ── MSN Messenger: presence, What I'm listening to, the contact list, notices, Nudge, emoticons ──
  const MSN_PRES={ready:['Online','on'],listening:['Online','on'],thinking:['Online','on'],speaking:['On the Phone','busy'],waiting:['Be Right Back','away'],paused:['Away','away'],standby:['Appear Offline','off'],error:['Busy','busy']};
  const MSN_EMO=[':)',':D',';)',':P','(Y)','8-)',':O',':(','(L)','(H)','(*)','(K)'];
- function msnPop(c,title,text){const el=c.h('div','fx msn-pop');const head=c.h('div','msn-pop-head');head.append(markOf(c,'msn-butterfly','msn-pop-bf'),c.h('b',null,'MSN Messenger'));const body=c.h('div','msn-pop-body'),pic=c.h('canvas','msn-pop-pic');pic.width=pic.height=72;
+ function msnPop(c,title,text){const el=c.h('div','fx msn-pop');const head=c.h('div','msn-pop-head');head.append(...[c.brand('msn-butterfly','msn-pop-bf')].filter(Boolean),c.h('b',null,'MSN Messenger'));const body=c.h('div','msn-pop-body'),pic=c.h('canvas','msn-pop-pic');pic.width=pic.height=72;
   const t=c.h('div');t.append(c.h('b',null,title),c.h('span',null,text));body.append(pic,t);el.append(head,body);requestAnimationFrame(()=>globalThis.TylerLogos?.paint(pic,'msn'));
   el.style.bottom=(c.panel.querySelector('.foot')?.offsetHeight||40)+10+'px';c.flash(el,5200);}
  F.define('msn',[
@@ -322,9 +320,9 @@
    // Click the display picture: the status menu.
    const mark=c.root.querySelector('.mark');if(!mark)return {};mark.classList.add('fx-interactive','msn-dp');mark.setAttribute('role','button');mark.tabIndex=0;mark.title='Change your status';
    const open=()=>{const paused=c.actions.paused(),[word]=MSN_PRES[c.S.state]||MSN_PRES.ready;
-    c.menu(mark,[{heading:'My status: '+word},{label:'Online',mark:'●',hint:paused?'Connect & start':'',current:!paused,run:()=>{if(c.actions.paused())c.actions.connect();}},
-     {label:'Away',mark:'●',hint:'Pause AI',current:paused,run:()=>c.actions.pause()},{label:'Appear Offline',mark:'●',hint:'Collapse the window',run:()=>c.actions.collapse()},'sep',
-     {label:'Send a Nudge',hint:'Test beep in voice',run:()=>c.actions.beep()},{label:'Change Display Picture…',hint:'Settings → Appearance',run:()=>c.actions.settings()}],{cls:'msn-menu',label:'Status'});};
+    c.menu(mark,[{heading:'My status: '+word},{label:'Online',mark:'●',icon:'online',hint:paused?'Connect & start':'',current:!paused,run:()=>{if(c.actions.paused())c.actions.connect();}},
+     {label:'Away',mark:'●',icon:'away',hint:'Pause AI',current:paused,run:()=>c.actions.pause()},{label:'Appear Offline',mark:'●',icon:'offline',hint:'Collapse the window',run:()=>c.actions.collapse()},'sep',
+     {label:'Send a Nudge',icon:'nudge',hint:'Test beep in voice',run:()=>c.actions.beep()},{label:'Change Display Picture…',hint:'Settings → Appearance',run:()=>c.actions.settings()}],{cls:'msn-menu',label:'Status'});};
    c.on(mark,'click',open);c.on(mark,'keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open();}});
    return {unmount(){mark.classList.remove('fx-interactive','msn-dp');mark.removeAttribute('role');mark.removeAttribute('tabindex');mark.removeAttribute('title');}};
   }},
@@ -335,14 +333,14 @@
    for(const k of ['on','off']){heads[k].type='button';heads[k].onclick=()=>{open[k]=!open[k];render();};box.append(heads[k],groups[k]);}
    // The conversation toolbar: Nudge and emoticons (each one plays a clip).
    const bar=c.h('div','msn-tools'),nudge=c.h('button','msn-tool',null),emo=c.h('button','msn-tool');nudge.type=emo.type='button';
-   nudge.append(c.h('i','msn-nudge-ic'),c.h('span',null,'Nudge'));nudge.title='Send a Nudge: a test beep in Steam voice';nudge.onclick=()=>{c.actions.beep();c.panel.classList.remove('msn-shake');void c.panel.offsetWidth;if(!c.reduced)c.panel.classList.add('msn-shake');};
+   nudge.append(c.brand('nudge','msn-tool-bi')||c.h('i','msn-nudge-ic'),c.h('span',null,'Nudge'));nudge.title='Send a Nudge: a test beep in Steam voice';nudge.onclick=()=>{c.actions.beep();c.panel.classList.remove('msn-shake');void c.panel.offsetWidth;if(!c.reduced)c.panel.classList.add('msn-shake');};
    emo.append(c.h('i','msn-emo-ic',':)'),c.h('span',null,'Emoticons'));emo.title='Emoticons: each one plays a soundboard clip';emo.setAttribute('aria-haspopup','menu');
    emo.onclick=()=>{const s=c.actions.sounds(),list=(s.slots||[]).slice(0,12);if(!list.length){c.actions.tab('soundboard');return;}
     c.menu(emo,list.map((it,i)=>({label:it.name,mark:MSN_EMO[i%MSN_EMO.length],run:()=>c.actions.playSound(it.slot)})),{cls:'msn-menu msn-emo',label:'Emoticons'});};
    bar.append(nudge,emo);box.append(bar);
    function render(){const sys=c.systems(),on=sys.filter(x=>x.level===3),off=sys.filter(x=>x.level!==3);
     for(const [k,list,label] of [['on',on,'Online'],['off',off,'Not online']]){heads[k].textContent=(open[k]?'▾ ':'▸ ')+label+' ('+list.length+')';heads[k].hidden=!list.length;groups[k].hidden=!open[k]||!list.length;groups[k].replaceChildren();
-     for(const x of list){const r=c.h('button','msn-contact');r.type='button';r.dataset.level=String(x.level);r.append(c.h('i','msn-dot'),c.h('b',null,x.name),c.h('small',null,x.detail));r.title='Open '+x.name;r.onclick=()=>c.actions.tab(x.tab);groups[k].append(r);}}}
+     for(const x of list){const r=c.h('button','msn-contact');r.type='button';r.dataset.level=String(x.level);r.append(c.brand(['offline','busy','away','online'][x.level]||'offline','msn-dot-bi')||c.h('i','msn-dot'),c.h('b',null,x.name),c.h('small',null,x.detail));r.title='Open '+x.name;r.onclick=()=>c.actions.tab(x.tab);groups[k].append(r);}}}
    render();c.every(render);return {update(){render();},unmount(){c.panel.classList.remove('msn-shake');}};
   }},
   {id:'msn-notices',mount(c){
@@ -373,7 +371,7 @@
  const xtLevel=c=>{const pts=XT.reduce((n,t)=>n+(xtHas(c,t[0])?XT_PTS[t[1]]:0),0);return {pts,level:1+Math.floor(pts/60),pct:Math.round((pts%60)/60*100)};};
  const XB_TROPHY='<svg viewBox="0 0 16 16"><path d="M5 2.5h6v3.2a3 3 0 0 1-6 0zM5 3.5H2.8v1a2.3 2.3 0 0 0 2.4 2.3M11 3.5h2.2v1a2.3 2.3 0 0 1-2.4 2.3M8 8.7v2.6M5.5 13.5h5M6.3 11.3h3.4"/></svg>';
  const XB_INFO='<svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M8 7.2v4M8 4.8v.2"/></svg>';
- function xbNotice(c,icon,line,sub,tier){const el=c.h('div','fx xb-note');if(tier)el.dataset.tier=tier;const ic=c.h('span','xb-note-ic');ic.append(icon==='ps'?markOf(c,'ps-logo','xb-ps'):c.svg(icon));if(icon==='ps')el.dataset.tier='psn';const t=c.h('div');t.append(c.h('b',null,line),c.h('small',null,sub));el.append(ic,t);
+ function xbNotice(c,icon,line,sub,tier){const el=c.h('div','fx xb-note');if(tier)el.dataset.tier=tier;const ic=c.h('span','xb-note-ic');ic.append(icon==='ps'?(c.brand('playstation-mark','xb-ps')||c.h('i')):c.svg(icon));if(icon==='ps')el.dataset.tier='psn';const t=c.h('div');t.append(c.h('b',null,line),c.h('small',null,sub));el.append(ic,t);
   el.style.top=(c.below('.bar')+6)+'px';c.flash(el,5000);}
  F.define('xmb',[
   {id:'xb-clock',mount(c){
@@ -391,7 +389,9 @@
     const items=[[paused?'Connect & start':'Pause AI',()=>paused?c.actions.connect():c.actions.pause()],['Stop audio',()=>c.actions.stopAudio()],['Run full check',()=>c.actions.fullCheck()],['Information',()=>c.panel.dispatchEvent(new CustomEvent('tyler-fx',{detail:{open:'xb-info'}}))],['Trophies',()=>c.panel.dispatchEvent(new CustomEvent('tyler-fx',{detail:{open:'xb-trophies'}}))],['Settings',()=>c.actions.settings()],['Collapse',()=>c.actions.collapse()]];
     const list=c.h('div','xb-opt-list');for(const [label,run] of items){const it=c.h('button','xb-opt-item',label);it.type='button';it.onclick=()=>{o.close();run();};list.append(it);}
     list.addEventListener('keydown',e=>{const all=[...list.children],i=all.indexOf(c.root.activeElement);if(e.key==='ArrowDown'){e.preventDefault();all[(i+1)%all.length].focus();}if(e.key==='ArrowUp'){e.preventDefault();all[(i-1+all.length)%all.length].focus();}});
-    o.el.append(list);list.firstElementChild.focus({preventScroll:true});}
+    // The console's prompts along the bottom: ✕ to enter, ○ to go back (Enter and Escape here).
+    const hints=c.h('div','xb-hints');for(const [id,label] of [['cross','Enter'],['circle','Back']]){const h=c.h('span','xb-hint');const bi=c.brand(id,'xb-hint-bi');if(bi)h.append(bi);h.append(c.h('span',null,label));hints.append(h);}
+    o.el.append(list,hints);list.firstElementChild.focus({preventScroll:true});}
    b.onclick=()=>{if(c._overlay)c._overlay.close();else open();};
    c.key(e=>{if(e.key==='o'||e.key==='O'){e.preventDefault();b.click();}});
    // Left and right move along the cross-media bar, as on the console (not while a tab button has focus: it moves itself).
@@ -403,7 +403,7 @@
    function earn(t){xbNotice(c,XB_TROPHY,'You have earned a trophy.','['+t[1][0].toUpperCase()+t[1].slice(1)+'] '+t[2],t[1]);}
    function check(){for(const t of XT)if(t[4]&&t[4](c)&&c.unlock('xmb:'+t[0]))earn(t);}
    function list(){const o=c.overlay('xb-screen','Trophies'),L=xtLevel(c),got=XT.filter(t=>xtHas(c,t[0])).length;
-    const head=c.h('div','xb-screen-head');head.append(c.h('b',null,'Trophies'),c.h('span',null,'Level '+L.level+' · '+got+' of '+XT.length+' earned'));const bar=c.h('span','xb-level'),f=c.h('i');f.style.transform='scaleX('+(L.pct/100)+')';bar.append(f);head.append(bar);o.el.append(head);
+    const head=c.h('div','xb-screen-head xb-info-head');head.append(c.h('b',null,'Trophies'),...[c.brand('trophy','xb-info-ps')].filter(Boolean),c.h('span',null,'Level '+L.level+' · '+got+' of '+XT.length+' earned'));const bar=c.h('span','xb-level'),f=c.h('i');f.style.transform='scaleX('+(L.pct/100)+')';bar.append(f);head.append(bar);o.el.append(head);
     for(const t of XT){const on=xtHas(c,t[0]),r=c.h('div','xb-trophy');r.dataset.tier=t[1];r.dataset.on=String(on);const ic=c.h('span','xb-trophy-ic');ic.append(c.svg(XB_TROPHY));const tx=c.h('div');tx.append(c.h('b',null,on?t[2]:'Hidden trophy'),c.h('small',null,t[3]));r.append(ic,tx);o.el.append(r);}
     const x=c.h('button','xb-back','Back');x.type='button';x.onclick=o.close;o.el.append(x);x.focus({preventScroll:true});}
    c.on(c.panel,'tyler-fx',e=>{if(e.detail?.open==='xb-trophies')list();});
@@ -416,7 +416,7 @@
   {id:'xb-info',mount(c){
    // Information: the system screen's list, for this session (and the lifetime totals).
    function open(){const o=c.overlay('xb-screen','Information'),S=c.S,L=c.life,T=xtLevel(c);
-    const head=c.h('div','xb-screen-head xb-info-head');head.append(c.h('b',null,'Information'),markOf(c,'ps-logo','xb-info-ps'));o.el.append(head);
+    const head=c.h('div','xb-screen-head xb-info-head');head.append(c.h('b',null,'Information'),...[c.brand('playstation-mark','xb-info-ps')].filter(Boolean));o.el.append(head);
     const rows=[['Name','ROBOTIC TYLER'],['State',S.label+(S.text?' · '+S.text:'')],['Time played',c.clock(Date.now()-S.started)],['Replies',String(S.replies)],['Voice replies',String(S.spoken)],['Messages heard',String(S.heard)],['Clips played',String(S.sounds)],['Now playing',S.music||'—'],['Average reply',c.ms(c.avgTurn())],['Problems',String(S.errors)],['Trophy level',T.level+' ('+T.pct+'%)'],['Model',S.model||'—']];
     if(L)rows.push(['All sessions',L.sessions+' · '+(L.timeMs/36e5).toFixed(1)+' h · '+(L.replies+L.spoken).toLocaleString()+' replies']);
     const dl=c.h('dl','xb-info-list');for(const [k,v] of rows){const d=c.h('div');d.append(c.h('dt',null,k),c.h('dd',null,v));dl.append(d);}o.el.append(dl);

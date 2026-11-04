@@ -1206,7 +1206,7 @@
 .msn-pop-head{display:flex;align-items:center;gap:5px;padding:3px 8px;background:linear-gradient(180deg,#8dbcf0,#4a8ad8);color:#fff;font:700 11px/14px var(--rt-font);text-shadow:0 1px 0 rgba(0,0,0,.25)}
 .msn-pop-body{display:flex;gap:8px;align-items:center;padding:8px}
 /* v2.27: the owner's butterfly, cut from the Messenger artwork */
-.msn-pop-bf{width:17px;height:13px;flex-shrink:0;filter:drop-shadow(0 1px 0 rgba(0,0,0,.2))}
+.msn-pop-bf{width:16px;height:16px;flex-shrink:0;filter:drop-shadow(0 1px 0 rgba(0,0,0,.2))}
 .msn-pop-head b{font:inherit;color:inherit}
 .msn-pop-pic{width:36px;height:36px;flex-shrink:0;padding:2px;background:#fff;border-radius:5px;box-shadow:0 0 0 2px #38b23c,0 0 0 3px rgba(0,0,0,.15)}
 .msn-pop b{display:block;font:700 12px/1.3 var(--rt-font);color:#16458c}
@@ -1231,7 +1231,7 @@
 .xb-note-ic{display:grid;place-items:center;width:32px;height:32px;flex-shrink:0;border-radius:6px;background:linear-gradient(180deg,rgba(255,255,255,.3),rgba(255,255,255,.08));box-shadow:inset 0 0 0 1px rgba(255,255,255,.35)}
 .xb-note[data-tier=bronze] .xb-note-ic{background:linear-gradient(180deg,#e0a46a,#8a5a2b)}.xb-note[data-tier=silver] .xb-note-ic{background:linear-gradient(180deg,#f2f4f7,#9aa3ad)}.xb-note[data-tier=gold] .xb-note-ic{background:linear-gradient(180deg,#ffe08a,#b8860b)}
 .xb-note[data-tier=psn] .xb-note-ic{background:linear-gradient(180deg,#2b2350,#120e24);box-shadow:inset 0 0 0 1px rgba(255,255,255,.25)}
-.xb-ps{width:24px;height:20px}
+.xb-ps{width:24px;height:24px}
 .xb-note-ic svg{width:18px;height:18px;fill:none;stroke:#fff;stroke-width:1.6;stroke-linejoin:round;stroke-linecap:round;filter:drop-shadow(0 1px 1px rgba(0,0,0,.4))}
 .xb-note b{display:block;font:400 12.5px/1.3 var(--rt-font)}
 .panel .xb-note small{display:block;font:300 11.5px/1.3 var(--rt-font);color:#dbe4f7}
@@ -1246,7 +1246,7 @@
 /* Trophies and Information */
 .xb-screen{padding:12px;background:linear-gradient(180deg,rgba(34,27,64,.97),rgba(16,12,32,.98));border:1px solid rgba(255,255,255,.16);border-radius:10px;box-shadow:0 16px 40px rgba(0,0,0,.6);color:#fff}
 .xb-screen-head{display:flex;flex-direction:column;gap:3px;margin:0 0 10px}
-.xb-info-head{position:relative;padding-right:44px}.xb-info-ps{position:absolute;right:0;top:0;width:36px;height:30px;opacity:.9}
+.xb-info-head{position:relative;padding-right:44px}.xb-info-ps{position:absolute;right:0;top:0;width:34px;height:34px;opacity:.92}
 .xb-screen-head b{font:300 19px/1.2 var(--rt-font);text-shadow:0 0 6px rgba(255,255,255,.45)}
 .xb-screen-head span{font:300 12px/1.3 var(--rt-font);color:#b9c6e2}
 .xb-level{display:block;height:4px;margin-top:4px;background:rgba(255,255,255,.15);border-radius:2px;overflow:hidden}
@@ -1267,7 +1267,7 @@
 
 /* v2.27 iPod: the start-up screen (the Apple logo cut from the owner's iPod artwork), when Tyler starts */
 .ip-boot{position:absolute;left:6px;right:6px;bottom:0;display:grid;place-items:center;background:#fff;animation:ip-boot 1.6s ease forwards}
-.ip-boot-apple{width:56px;height:66px;animation:ip-boot-logo 1.6s ease forwards}
+.ip-boot-apple{width:64px;height:64px;animation:ip-boot-logo 1.6s ease forwards}
 @keyframes ip-boot{0%,70%{opacity:1}100%{opacity:0}}
 @keyframes ip-boot-logo{0%{opacity:0}18%,70%{opacity:1}100%{opacity:0}}
 
@@ -1362,3 +1362,22 @@
 .dod-sheet-bi{float:right;width:34px;height:34px;margin:0 0 4px 8px}
 /* Brand marks beside a heading or in a menu */
 .fx-menu-mark-bi .fx-menu-bi{width:16px;height:16px}
+
+/* ── v2.29 branded icons in the five newer themes ─────────────────────────────────────────── */
+/* Rust: the hammer and the Tool Cupboard on the header chips, scrap on its pickup, the sleeping bag on Respawn */
+.panel .rs-chip .rs-chip-bi{width:16px;height:16px}
+.rs-pick-bi{width:22px;height:22px;flex-shrink:0}
+.rs-respawn-bi{width:18px;height:18px;margin-right:6px;vertical-align:-4px}
+/* Xbox 360: the Guide button, the pop-ups' icons, unlocked achievements */
+.panel .x-guide-btn .x-guide-bi{width:22px;height:22px}
+.x-pop-ic.x-pop-ic-b{background:radial-gradient(circle at 50% 35%,#5a5d5b,#2a2c2b);box-shadow:0 0 0 2px rgba(255,255,255,.25)}
+.x-pop-bi{width:26px;height:26px}
+.x-ach-ic.x-ach-ic-b{background:none;box-shadow:none}
+.x-ach-bi{width:26px;height:26px}
+/* MSN Messenger: presence on the contact list, the Nudge button */
+.msn-dot-bi{width:15px;height:15px;flex-shrink:0}
+.msn-tool-bi{width:16px;height:16px}
+/* PlayStation 3: the console's prompts in Options */
+.xb-hints{display:flex;gap:14px;justify-content:flex-end;margin-top:10px;padding:8px 14px 0;border-top:1px solid rgba(255,255,255,.14);font:300 11.5px/1 var(--rt-font);color:#dbe4f7}
+.xb-hint{display:inline-flex;align-items:center;gap:5px}
+.xb-hint-bi{width:16px;height:16px}

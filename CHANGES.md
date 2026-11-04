@@ -1,3 +1,51 @@
+# ROBOTIC TYLER v2.29.0: branded icons for the five newer themes
+
+Rust, Xbox 360, iPod classic, MSN Messenger and PlayStation 3 now use their icons from your "Branded Icon Packs" as well, the same way as the original 20. The Tyler logos are unchanged.
+
+- **Rust:**
+  - Tabs: the Tool Cupboard for Room and the hammer for Setup.
+  - The header chips show the hammer (Craft) and the Tool Cupboard (TC).
+  - Scrap pickups show the scrap icon, and Respawn on the death screen shows the sleeping bag.
+  - Badges: the furnace while Tyler writes, the sleeping bag when paused, the radiation barrel on a problem.
+- **Xbox 360:**
+  - Tabs: messages, players and the controller.
+  - The Guide button is the Xbox Guide button.
+  - Pop-ups: the achievement medal for unlocks, the player for party joins, the Ring of Light for signing in.
+  - Unlocked achievements show the medal.
+  - The Ring of Light badge shows while Tyler is ready or listening.
+- **iPod classic:**
+  - Tabs: shuffle for Sounds and the click wheel for Setup.
+  - Earbuds show while Tyler talks.
+  - The start-up screen shows the Apple logo from the pack (sharper than the cut-out before).
+- **MSN Messenger:**
+  - Tabs: the typing bubble for Chat and the two buddies for Room.
+  - The contact list shows each part's presence: Online, Away, Busy or Offline.
+  - The status menu shows the presence icons and the Nudge icon, and the Nudge button has its icon.
+  - Pop-ups show the butterfly.
+- **PlayStation 3:**
+  - Tabs: the controller for Setup.
+  - Options shows the console's prompts: ✕ Enter, ○ Back.
+  - Trophies, Information and the sign-in notice show the trophy and the PlayStation logo from the pack.
+- **Appearance and Settings:** all 25 themes now show an emblem on their gallery card and on Settings' theme chip.
+
+## Changed
+- The butterfly, PlayStation logo and Apple logo now come from the icon pack (sharp vector drawings). The canvas marks cut from the theme backgrounds (`ui-art.js`) are gone. The butterfly cut-out stays only for turning the butterfly back the right way round on the mirrored Messenger logo.
+- One more supplied drawing (the iPod battery) had a rectangle's attributes shifted by one. It's fixed at build time, like the HEV battery and the Pip-Boy device.
+
+## Tested
+- **Unit:** all 25 themes map to real icons in the pack, including the pack's own keys for Xbox 360 (`xbox360`) and PS3 (`ps3`). The drawings pass the safety checks, and every surface loads them.
+- **Chromium with the panel preview and a mocked Steam page (no real Steam, Windows audio or Gemini Live):**
+  - all 25 themes show branded tabs, and none keeps an icon from another theme;
+  - Messenger and PS3 show presence their own way, so they have no badge;
+  - the butterfly, PlayStation logo and Apple logo are drawn;
+  - the newer themes' menus and screens still open, fit and work with the keyboard;
+  - without the icon file, the drawn icons come back.
+- **Screenshots:** the five themes' panels, compact mode, the Xbox achievements and sign-in pop-up, the Messenger status menu, PS3 Options, the Rust scrap pickup and the iPod start-up screen.
+- **Real Electron (Linux) with a mock Steam page:** the desktop check passes.
+- **Not tested:** the real Steam page, the Windows desktop app and a real phone. The Rust death screen appears only after a minute of being wounded, so its Respawn icon was checked in code, not on screen.
+
+---
+
 # ROBOTIC TYLER v2.28.0: branded icons for the original 20 themes
 
 The original 20 themes now use your "Branded Icon Packs" for their smaller icons, emblems and badges. The Tyler logos are unchanged.

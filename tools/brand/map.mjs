@@ -1,4 +1,4 @@
-// Branded icons for the original 20 themes (v2.28): which of the owner's "Branded Icon Packs"
+// Branded icons for all 25 themes (v2.28, the five newer ones v2.29): which of the owner's "Branded Icon Packs"
 // (assets/theme-icons, see its CREDITS.md and licenses/) each theme uses, and for what.
 //   icons   the app's own icon names (tools/icons/icons.mjs) that this theme draws with its branded
 //           icon instead: tabs, buttons, notifications, dialogs, Settings and the Voice Studio.
@@ -7,6 +7,7 @@
 //   states  the status strip's badge for Tyler's real state (listening, thinking, speaking, paused,
 //           waiting, error, ready). A state without one shows no badge.
 //   pixel   pixel art: drawn with hard edges.
+//   pack    the pack's own key, where it differs from the app's (xbox360 → x360, ps3 → xmb).
 // tools/build.mjs turns this and the SVGs into browser-extension/ui-brand.js.
 export const BRAND={
  steam:{mark:'steam-mark',
@@ -69,4 +70,20 @@ export const BRAND={
  dod:{mark:'game-emblem',
   icons:{room:'compass',sounds:'field-radio',setup:'orders',checks:'field-medic',voice:'field-radio',success:'capture-flag'},
   states:{ready:'helmet',speaking:'field-radio'}},
+ // v2.29: the five newer themes.
+ rust:{mark:'rust-game-mark',
+  icons:{room:'tool-cupboard',setup:'hammer',advanced:'pickaxe',warning:'radiation-barrel',error:'radiation-barrel'},
+  states:{thinking:'furnace',paused:'sleeping-bag',error:'radiation-barrel'}},
+ x360:{pack:'xbox360',mark:'xbox-sphere',
+  icons:{chat:'messages',room:'player',setup:'controller',squad:'player',apps:'guide',success:'achievement'},
+  states:{ready:'ring-of-light',listening:'ring-of-light'}},
+ ipod:{mark:'apple-mark',
+  icons:{sounds:'shuffle',setup:'click-wheel',voice:'earbuds'},
+  states:{speaking:'earbuds'}},
+ msn:{mark:'msn-butterfly',
+  icons:{chat:'typing',room:'messenger-buddies',squad:'messenger-buddies'},
+  states:{}},
+ xmb:{pack:'ps3',mark:'playstation-mark',
+  icons:{setup:'controller',success:'trophy'},
+  states:{}},
 };

@@ -115,10 +115,11 @@ test('themed menus and screens: open, fit, keyboard, Escape, real actions',{time
   await page.evaluate(()=>TylerCompanion.setActivity('NEEDS ATTENTION — Gemini 429 failed · quota reached'));await page.waitForTimeout(80);assert.deepEqual(await shown(),[],'Portal has no error badge, so none shows');
   await setTheme('winxp');await page.evaluate(()=>TylerCompanion.setActivity('LISTENING — speak normally, then pause'));await click('.xp-start');
   assert.equal(await count('.xp-menu-list .xp-mi-bi'),5,'Start menu entries carry XP icons');assert.equal(await count('.xp-menu-places .xp-mi-bi'),4);assert.equal(await count('.xp-start .xp-flag'),1);await page.keyboard.press('Escape');
-  await page.evaluate(()=>{delete globalThis.TylerBrand;});await setTheme('doom');await setTheme('winxp');
+  await page.evaluate(()=>{window.__brand=globalThis.TylerBrand;delete globalThis.TylerBrand;});await setTheme('doom');await setTheme('winxp');
   assert.equal(await count('.xp-start .xp-flag'),0,'no pack: the drawn flag');assert.equal(await count('.xp-ti.voice'),1);await click('.xp-start');assert.equal(await count('.xp-menu .xp-mi'),6,'the Start menu still opens');await page.keyboard.press('Escape');
-  // How much of a canvas is drawn (the brand marks come from ui-art.js).
-  const ink=(sel)=>page.evaluate(R+'.querySelector('+JSON.stringify(sel)+')?.getContext("2d")?.getImageData(0,0,'+R+'.querySelector('+JSON.stringify(sel)+').width,'+R+'.querySelector('+JSON.stringify(sel)+').height).data.filter((v,i)=>i%4===3&&v>40).length||0');
+  await page.evaluate(()=>{globalThis.TylerBrand=window.__brand;});await setTheme('doom');
+  // How much of a brand mark is drawn: the shapes of a branded icon (ui-brand.js, inline SVG).
+  const ink=sel=>page.evaluate('(()=>{const e='+R+'.querySelector('+JSON.stringify(sel)+');return e&&e.matches("svg[data-bi]")?e.querySelectorAll("path,rect,circle,ellipse,polygon").length*100:0;})()');
   // v2.27 Rust: Q opens crafting; Craft runs the full check and queues it; the Tool Cupboard opens; 1 plays the first belt slot.
   await setTheme('rust');await page.evaluate(()=>{TylerCompanion.showTab('conversation');TylerCompanion.setActivity('LISTENING — speak normally, then pause');});await over();await page.keyboard.press('q');
   assert.equal(await count('.rs-craft-menu'),1);await fits('.rs-craft-menu');assert.equal(await count('.rs-bp'),6);
@@ -154,7 +155,7 @@ test('themed menus and screens: open, fit, keyboard, Escape, real actions',{time
   await page.evaluate(R+'.querySelector(".msn-emo .fx-menu-item").click()');assert.equal((await page.evaluate(()=>window.__played)).length,m+1);
   assert.equal(await count('.msn-contact'),4);assert.match(await text('.msn-presence'),/\(Online\)/);
   await page.evaluate(()=>TylerCompanion.setActivity('THINKING — preparing a typed reply…'));await page.waitForTimeout(80);assert.equal(await page.evaluate(R+'.querySelector(".msn-typing").hidden'),false);
-  // The pop-ups carry the butterfly cut from the owner's Messenger artwork (ui-art.js draws it).
+  // The pop-ups carry the Messenger butterfly from the branded icon pack.
   await page.evaluate(()=>TylerCompanion.emit('music',{title:'One More Time',by:'Sam'}));await page.waitForTimeout(250);assert.ok(await ink('.msn-pop-bf')>50,'the butterfly is drawn');
 
   // PlayStation 3: O opens Options from the right; Information and Trophies open; → moves along the cross-media bar.

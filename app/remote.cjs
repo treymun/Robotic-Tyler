@@ -28,7 +28,7 @@ const ACTIONS={pause:()=>({}),start:()=>({}),'stop-audio':()=>({}),sound:b=>({sl
  // Settings on this PC, done here rather than in the Steam window.
  theme:b=>({theme:String(b.theme||'')}),'mute-call':b=>({on:b.on===true})};
 // The panel's own stylesheet, logos, icons, notifications and theme code (generated into app/companion).
-const LIB=new Set(['ui-template.js','ui-logos.js','ui-art.js','ui-brand.js','ui-icons.js','ui-kit.js','theme-features.js','theme-pack-1.js','theme-pack-2.js','theme-pack-3.js','theme-pack-4.js']);
+const LIB=new Set(['ui-template.js','ui-logos.js','ui-brand.js','ui-icons.js','ui-kit.js','theme-features.js','theme-pack-1.js','theme-pack-2.js','theme-pack-3.js','theme-pack-4.js']);
 const MAX_STREAMS=8;
 const TYPES={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.png':'image/png','.woff2':'font/woff2','.svg':'image/svg+xml'};
 

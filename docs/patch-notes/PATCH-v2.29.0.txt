@@ -1,0 +1,19 @@
+ROBOTIC TYLER v2.29.0 — patch notes
+
+Branded icons for Rust, Xbox 360, iPod classic, MSN Messenger and PlayStation 3, from the owner's icon pack (the Tyler logos are unchanged).
+- Rust: Tool Cupboard and hammer tabs and chips, scrap pickups, a sleeping bag on Respawn, and furnace, sleeping bag and radiation barrel badges.
+- Xbox 360: messages, players and controller tabs, the Guide button, achievement, party and sign-in pop-ups with their icons, and the Ring of Light badge.
+- iPod: shuffle and click-wheel tabs, earbuds while talking, and the pack's Apple logo on the start-up screen.
+- MSN Messenger: typing and buddies tabs, presence icons on the contact list and status menu, the Nudge icon, and the butterfly on pop-ups.
+- PlayStation 3: a controller tab, the ✕ Enter and ○ Back prompts in Options, and the trophy and PlayStation logo on Trophies, Information and sign-in.
+- All 25 themes show their emblem in Appearance and on Settings' theme chip.
+
+Changed
+- The butterfly, PlayStation logo and Apple logo come from the icon pack (vector). The canvas cut-outs (ui-art.js) are retired.
+- One more supplied drawing (the iPod battery) is fixed at build time.
+
+Tested
+- Unit: all 25 mappings, the safety checks, surfaces.
+- Chromium with a mocked Steam page: branded tabs in all 25, no leftovers, the marks drawn, menus and the fallback.
+- Screenshots of the five themes and their menus. Real Electron (Linux) with a mock Steam page: the desktop check passes.
+- Not tested: the real Steam page, the Windows app and a real phone.
