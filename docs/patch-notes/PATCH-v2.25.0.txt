@@ -1,0 +1,13 @@
+ROBOTIC TYLER v2.25.0 — patch notes
+
+New (desktop app): Phone remote
+- Settings → Overview → Phone remote: turn it on, scan the QR code (or open the address shown) on your phone, enter the 6-digit code. No app to install.
+- From the phone: Tyler's status and who's in the call; Pause AI / Connect & start; Stop audio; soundboard clips; queue, skip or stop music (Music DJ running on the PC); send a message in chat. Follows Tyler's theme; add it to your home screen.
+- Safety: off by default; home network only, by IP address; one-time 10-minute codes (8 tries); a key per phone kept only as a hash; remove phones in Settings; never sees keys, settings or chat messages; off closes the port.
+- Windows may ask to allow network access: allow on private networks. Chrome extension: not available (an extension can't run a network page).
+
+Tested
+- Real HTTP on this machine with a mocked Steam window: pairing, refusals, actions, limits, removal, port closing.
+- iPhone-sized Chromium: pairing from the QR link, theme, buttons, errors, unpairing.
+- Electron desktop check: a phone pairs and reads Tyler's status through the real Steam-window preload.
+- Not tested: a real phone on real Wi-Fi, the Windows firewall prompt, the real Steam page. 280 unit and 24 end-to-end tests.

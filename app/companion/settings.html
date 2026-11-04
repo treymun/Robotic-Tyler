@@ -102,6 +102,34 @@
   <p id="easyStatus" class="hint" role="status">Checking saved setup…</p>
 </section>
 
+<!-- ── Phone remote (desktop app, remote-settings.js, app/remote.cjs) ─────────── -->
+<section class="sheet" id="phoneRemote" data-ui-zone="overview">
+  <div class="sheet-head">
+    <h2>Phone remote</h2>
+    <p class="only-desktop">Control Tyler from your phone's browser on the same Wi-Fi: pause him, play clips, queue music and type in chat. Nothing to install. The phone never sees your keys, settings or chat messages.</p>
+    <p class="only-chrome">The phone remote is part of the desktop app: it runs a small page on your home network, which a Chrome extension can't do.</p>
+  </div>
+  <div class="only-desktop">
+    <div class="toggle-grid"><label class="toggle"><input id="remoteOn" type="checkbox"><span><b>Let my phone control Tyler</b><small>Only devices on your home network can reach it, and only after pairing with a code from this page. Use it on your own Wi-Fi, not on public networks.</small></span></label></div>
+    <div id="remotePanel" class="remote-panel" hidden>
+      <div class="remote-pair">
+        <canvas id="remoteQr" class="remote-qr" width="232" height="232" aria-label="QR code with the remote's address and pairing code"></canvas>
+        <div class="remote-steps">
+          <p><b>1.</b> On your phone, scan the code with the camera, or open <b id="remoteUrl" class="remote-url"></b> <button type="button" id="remoteCopy" class="secondary remote-copy">Copy</button></p>
+          <p><b>2.</b> Enter this pairing code: <b id="remoteCode" class="remote-code">––– –––</b></p>
+          <p class="hint" id="remoteExpiry"></p>
+          <div class="actions"><button type="button" id="remoteNewCode" class="secondary">New code</button><select id="remoteAddress" aria-label="This PC's address" hidden></select></div>
+          <p class="hint">If Windows asks whether ROBOTIC TYLER may use the network, allow it on <b>private networks</b>. Tip: on the phone, add the page to your home screen.</p>
+        </div>
+      </div>
+      <h3>Paired phones</h3>
+      <ul id="remoteDevices" class="remote-devices"><li class="hint">No phones yet.</li></ul>
+      <div class="actions"><button type="button" id="remoteForgetAll" class="secondary" hidden>Remove all phones</button></div>
+    </div>
+    <p id="remoteStatus" class="hint" role="status"></p>
+  </div>
+</section>
+
 <section class="sheet" id="usagePulse" data-ui-zone="overview">
   <div class="sheet-head">
     <h2>This profile's usage</h2>
@@ -468,6 +496,7 @@
 <script src="theme-pack-2.js"></script>
 <script src="theme-pack-3.js"></script>
 <script src="theme-gallery.js"></script>
+<script src="remote-settings.js"></script>
 <script src="voice-settings.js" type="module"></script>
 <script src="ai-settings.js" type="module"></script>
 </body>

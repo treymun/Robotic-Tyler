@@ -15,7 +15,7 @@ const definitions=[
  ['appearance','Appearance','Theme gallery for every Tyler window',icon('appearance')],
  ['advanced','Advanced','Memory, usage, safety tools and experimental options',icon('advanced')],
 ];
-const mapping={appearance:'appearance',quickStart:'overview',usagePulse:'overview',top:'overview',studio:'ai',personalitySheet:'ai',chatTagSheet:'ai',playground:'ai',voice:'voice',voiceStandard:'voice',voiceLive:'voice',voiceDevices:'voice',voiceTestSheet:'voice',steamActivity:'games',suiteSettings:'squad',approvedFriends:'squad',friendProfiles:'squad',social:'advanced',usageSection:'advanced',v22Tools:'advanced',v23Tools:'advanced'};
+const mapping={appearance:'appearance',quickStart:'overview',phoneRemote:'overview',usagePulse:'overview',top:'overview',studio:'ai',personalitySheet:'ai',chatTagSheet:'ai',playground:'ai',voice:'voice',voiceStandard:'voice',voiceLive:'voice',voiceDevices:'voice',voiceTestSheet:'voice',steamActivity:'games',suiteSettings:'squad',approvedFriends:'squad',friendProfiles:'squad',social:'advanced',usageSection:'advanced',v22Tools:'advanced',v23Tools:'advanced'};
 document.getElementById('uiPlatform').textContent=isDesktop?'Desktop settings':'Chrome settings';
 globalThis.TylerIcons?.fill(document);
 

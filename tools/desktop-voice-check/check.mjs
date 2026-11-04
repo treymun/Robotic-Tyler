@@ -32,6 +32,7 @@ if(!res.muted?.windowMuted||!(res.muted?.heardPeak>0.05))bad.push('muted window:
 if(res.screen?.error||res.screen?.audioTracks!==0)bad.push('screen share: '+JSON.stringify(res.screen));
 if(!res.picked?.length)bad.push('the screen picker was not asked');
 if(!(res.keepQuiet?.hums>=1)||!(res.keepQuiet?.heardPeak>0.01))bad.push('a quiet call must get the keep-alive hum: '+JSON.stringify(res.keepQuiet));
+if(res.remote?.paired!==200||res.remote?.state!==200||!res.remote?.ready||!res.remote?.hasSounds)bad.push('phone remote: '+JSON.stringify(res.remote));
 if(res.dock?.dock!=='side'||res.dock.window-res.dock.body<340)bad.push('the panel did not dock beside the chat: '+JSON.stringify(res.dock));
 if(bad.length){console.error('FAILED:\n'+bad.join('\n'));process.exit(1);}
 console.log('PASS (mock Steam page in Electron)');

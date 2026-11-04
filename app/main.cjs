@@ -11,13 +11,13 @@
 const {app,BrowserWindow,ipcMain,Menu,shell,safeStorage,webContents,Tray,nativeImage,dialog,session,protocol,desktopCapturer}=require('electron');
 const path=require('node:path'),fs=require('node:fs'),{pathToFileURL}=require('node:url'),{execFile,spawn}=require('node:child_process');
 const {setupUpdates}=require('./updates.cjs'),{Vault,memoryStorage}=require('./vault.cjs'),{isChat,isSteam,isLocal,settingsKeys,sanitizeSettings}=require('./guards.cjs');
-const {NativeVoice}=require('./native-voice.cjs'),{importVoiceStudio}=require('./migrate.cjs'),steamVoice=require('./steam-voice.cjs'),{setupDesktopMedia,isYouTube}=require('./desktop-media.cjs');
+const {setupRemote}=require('./remote.cjs'),{NativeVoice}=require('./native-voice.cjs'),{importVoiceStudio}=require('./migrate.cjs'),steamVoice=require('./steam-voice.cjs'),{setupDesktopMedia,isYouTube}=require('./desktop-media.cjs');
 steamVoice.registerScheme(protocol);
 // Same data folder as the Control Center, so its users keep settings, keys and memory as they are.
 const root=path.join(process.env.LOCALAPPDATA||app.getPath('appData'),'RoboticTylerHydraCloudV12');fs.mkdirSync(path.join(root,'Data'),{recursive:true});app.setPath('userData',path.join(root,'Data'));
 const OLD_VOICE_DIR=path.join(app.getPath('appData'),'RoboticTylerNativeSteamCompanion');
 const OLD_VOICE_GUID='b0b8de7d-76bb-5d6f-99fa-c8a2fe9a49c6'; // electron-builder key for com.robotictyler.nativesteamcompanion
-let bot,options,voiceWin,listener,tray,voice,updates,vault,windowVoice=true,muteCall=false,steamWindow,media,quitting=false;const removed=[];const activity=[];function eventLog(kind,details=''){activity.unshift({at:Date.now(),kind,details:String(details).slice(0,140)});if(activity.length>120)activity.pop();}
+let bot,options,voiceWin,listener,tray,voice,updates,vault,remote,windowVoice=true,muteCall=false,steamWindow,media,quitting=false;const removed=[];const activity=[];function eventLog(kind,details=''){activity.unshift({at:Date.now(),kind,details:String(details).slice(0,140)});if(activity.length>120)activity.pop();}
 const icon=path.join(__dirname,'..','assets','robotic-tyler.png');
 function helperPath(){const p=app.isPackaged?path.join(process.resourcesPath,'windows-audio-bridge','RoboticTylerAudio.exe'):path.join(__dirname,'..','windows-audio-bridge','publish','RoboticTylerAudio.exe');if(!fs.existsSync(p))throw Error('The Windows audio helper is missing. Reinstall ROBOTIC TYLER (or build it with BUILD-WINDOWS-EXE.cmd).');return p;}
 function helperOut(args,input,timeout=15000){return new Promise((resolve,reject)=>{const c=execFile(helperPath(),args,{windowsHide:true,timeout,maxBuffer:4_000_000},(error,stdout,stderr)=>error?reject(Error(String(stderr||error.message).trim())):resolve(String(stdout).trim()));if(input!==undefined){c.stdin.end(input);}});}
@@ -98,11 +98,21 @@ if(!app.requestSingleInstanceLock()){app.quit();}else{
  }
  try{tray=new Tray(nativeImage.createFromPath(path.join(__dirname,'..','assets','robotic-tyler-tray.png')).resize({width:16,height:16}));tray.on('double-click',()=>bot?.show());buildTray();}catch(err){eventLog('Tray unavailable',err.message);}
 
- ipcMain.handle('tyler:request',(event,message)=>{if(!bot||event.sender.id!==bot.webContents.id||event.senderFrame!==event.sender.mainFrame||!isChat(event.senderFrame.url))throw Error('Only the Steam chat window can use the companion.');if(!message||typeof message!=='object'||JSON.stringify(message).length>2200000)throw Error('Invalid request');eventLog('Steam text request',String(message.type||'unknown'));return new Promise(resolve=>listener(message,{url:event.senderFrame.url,tab:{id:event.sender.id}},resolve));});
+ ipcMain.handle('tyler:request',(event,message)=>{if(!bot||event.sender.id!==bot.webContents.id||event.senderFrame!==event.sender.mainFrame||!isChat(event.senderFrame.url))throw Error('Only the Steam chat window can use the companion.');if(!message||typeof message!=='object'||JSON.stringify(message).length>2200000)throw Error('Invalid request');if(message.type==='remote:result'){remoteAnswer(message);return {ok:true};}eventLog('Steam text request',String(message.type||'unknown'));return new Promise(resolve=>listener(message,{url:event.senderFrame.url,tab:{id:event.sender.id}},resolve));});
+ // Phone remote (v2.25, app/remote.cjs): a paired phone on the home network asks the Steam window
+ // (remote-control.js) for Tyler's status and a fixed list of actions; answers come back here.
+ const remoteJobs=new Map();let remoteSeq=0;
+ function askSteamWindow(action,args){return new Promise((resolve,reject)=>{
+  if(!bot||bot.isDestroyed()||bot.webContents.isDestroyed()||!isChat(bot.webContents.getURL()))return reject(Error('Steam chat isn\u2019t open in Tyler\u2019s desktop app.'));
+  const id='r'+(++remoteSeq),timer=setTimeout(()=>{remoteJobs.delete(id);reject(Error('Tyler\u2019s Steam window didn\u2019t answer. Is Steam chat loaded?'));},8000);
+  remoteJobs.set(id,{resolve,reject,timer});bot.webContents.send('tyler:message',{type:'remote:action',id,action,args});});}
+ function remoteAnswer(m){const job=remoteJobs.get(m?.id);if(!job)return;remoteJobs.delete(m.id);clearTimeout(job.timer);m.ok?job.resolve(m.data&&typeof m.data==='object'?m.data:{}):job.reject(Error(String(m.error||'Tyler couldn\u2019t do that.')));}
+ remote=setupRemote({vault,log:eventLog,ask:askSteamWindow,pageDir:path.join(__dirname,'remote'),uiDir:path.join(__dirname,'companion','ui'),version:app.getVersion(),theme:async()=>(await vault.get('uiTheme')).uiTheme||'steam'});
  // The Music window may only ask for its own music state and report what its player does.
  ipcMain.handle('tyler:youtube',async(event,message)=>{if(!media.isYouTubeFrame(event))throw Error('Only the Music window can use this.');if(!['music:pending','music:event'].includes(message?.type)||JSON.stringify(message).length>4000)throw Error('Invalid request');return new Promise(resolve=>listener(message,{url:event.senderFrame.url,tab:{id:event.sender.id}},resolve));});
  ipcMain.handle('tyler:settings',async(event,request)=>{if(!options||event.sender.id!==options.webContents.id||event.senderFrame!==event.sender.mainFrame||!isLocal(event.senderFrame.url,settingsPath))throw Error('Settings are available only in the local settings window.');
   if(request.action==='activity'){return activity.slice(0,60);}
+  if(request.action==='remote')return remote.handle(String(request.op||''),request);
   if(request.action==='verify'){
    const key=request.key;if(typeof key!=='string'||!key.trim()||key.length>1024)throw Error('Paste the secret from your OpenRouter Keys page.');
    let result;try{result=await fetch('https://openrouter.ai/api/v1/key',{headers:{Authorization:'Bearer '+key},redirect:'error',signal:AbortSignal.timeout(12000)});}catch{throw Error('Could not reach OpenRouter. Check your connection and try Save again.');}
@@ -177,7 +187,7 @@ if(!app.requestSingleInstanceLock()){app.quit();}else{
  void offerOldVoiceRemoval();
  await bot.loadURL('https://steamcommunity.com/chat/');
  }).catch(error=>{dialog.showErrorBox('ROBOTIC TYLER could not start',String(error.message).replace(/sk-or-[\w-]+|AIza[\w-]+/g,'[redacted]'));app.quit();});
- app.on('before-quit',()=>{try{void voice?.stop('ROBOTIC TYLER is closing.');}catch{}});
+ app.on('before-quit',()=>{try{void voice?.stop('ROBOTIC TYLER is closing.');}catch{}try{void remote?.stop();}catch{}});
  app.on('window-all-closed',()=>{if(!voice||voice.mode==='off')app.quit();});
 }
 

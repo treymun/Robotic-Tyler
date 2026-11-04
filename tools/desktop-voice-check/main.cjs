@@ -17,7 +17,10 @@ app.whenReady().then(async()=>{
  const page=fs.readFileSync(path.join(__dirname,'mock-steam.html'));
  ses.protocol.handle('https',req=>new URL(req.url).hostname==='steamcommunity.com'?new Response(page,{headers:{'content-type':'text/html; charset=utf-8','content-security-policy':"default-src 'self'; script-src 'self' 'unsafe-inline'; frame-src 'self'; connect-src 'self'; media-src 'self' blob:"}}):new Response('',{status:404}));
  // The shared background is not part of this check: every request gets a plain refusal.
- ipcMain.handle('tyler:request',()=>({ok:false,error:'not part of this check'}));
+ // except the phone remote's answers (v2.25), which reach the app's remote server as in app/main.cjs.
+ const remoteJobs=new Map();let remoteSeq=0;
+ ipcMain.handle('tyler:request',(_e,m)=>{if(m?.type==='remote:result'){const job=remoteJobs.get(m.id);if(job){remoteJobs.delete(m.id);m.ok?job.resolve(m.data||{}):job.reject(Error(m.error||'failed'));}return {ok:true};}return {ok:false,error:'not part of this check'};});
+ const ask=(action,args)=>new Promise((resolve,reject)=>{const id='r'+(++remoteSeq);setTimeout(()=>{if(remoteJobs.delete(id))reject(Error('no answer'));},8000);remoteJobs.set(id,{resolve,reject});win.webContents.send('tyler:message',{type:'remote:action',id,action,args});});
  win=new BrowserWindow({show:false,width:1380,height:920,webPreferences:{partition:'persist:desktop-voice-check',contextIsolation:true,sandbox:true,nodeIntegration:false,backgroundThrottling:false,autoplayPolicy:'no-user-gesture-required',preload:path.join(ROOT,'app','steam-preload.cjs')}});
  setup.applyPermissions();setup.watch(win.webContents);
  // Music DJ and screen sharing (app/desktop-media.cjs). The picker is answered automatically here
@@ -44,6 +47,15 @@ app.whenReady().then(async()=>{
  shares.muted={...await win.webContents.executeJavaScript('window.__hearMuted()',true),windowMuted:win.webContents.isAudioMuted()};
  win.webContents.setAudioMuted(false);
  shares.keepQuiet=await win.webContents.executeJavaScript('window.__keepQuiet()',true);
+ // Phone remote (v2.25): a phone pairs over HTTP and reads Tyler's status from this window.
+ shares.remote=await (async()=>{const {setupRemote}=require(path.join(ROOT,'app','remote.cjs')),{memoryStorage}=require(path.join(ROOT,'app','vault.cjs')),http=require('node:http');
+  const remote=setupRemote({vault:memoryStorage(),ask,pageDir:path.join(ROOT,'app','remote'),uiDir:path.join(ROOT,'app','companion','ui'),version:'check'});
+  try{const st=await remote.handle('enable'),port=st.port;
+   const req=(method,p,body,cookie)=>new Promise((resolve,reject)=>{const r=http.request({host:'127.0.0.1',port,method,path:p,headers:{'content-type':'application/json','x-tyler-remote':'1',...(cookie?{cookie}:{})}},res=>{const parts=[];res.on('data',c=>parts.push(c));res.on('end',()=>resolve({status:res.statusCode,cookie:String(res.headers['set-cookie']||'').split(';')[0],json:JSON.parse(Buffer.concat(parts).toString()||'{}')}));});r.on('error',reject);if(body)r.write(JSON.stringify(body));r.end();});
+   const paired=await req('POST','/pair',{code:st.code}),state=await req('GET','/state',null,paired.cookie);
+   return {paired:paired.status,state:state.status,ready:state.json.ready===true,tylerState:state.json.state||state.json.error,hasSounds:Array.isArray(state.json.sounds)};
+  }catch(e){return {error:e.message};}finally{await remote.stop();}
+ })();
  // One click (v2.20.1): Start Music DJ opens the Music window in the background and asks for the
  // share in the same click, before the window exists; the app waits for it and shares its sound.
  const old=media.youtubeId();if(old!==null)BrowserWindow.fromWebContents(webContents.fromId(old))?.destroy();

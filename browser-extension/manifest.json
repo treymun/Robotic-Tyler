@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "ROBOTIC TYLER",
-  "version": "2.24.0",
+  "version": "2.25.0",
   "description": "Browser-first Steam AI companion with opt-in screen-aware gaming commentary.",
   "permissions": [
     "storage",
@@ -99,6 +99,7 @@
         "moderation.js",
         "admin.js",
         "keep-alive.js",
+        "remote-control.js",
         "theme-features.js",
         "theme-pack-1.js",
         "theme-pack-2.js",

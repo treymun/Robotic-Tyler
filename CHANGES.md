@@ -1,3 +1,43 @@
+# ROBOTIC TYLER v2.25.0: control Tyler from your phone
+
+## New: Phone remote (desktop app)
+- **Control Tyler from your phone's browser, with nothing to install.** Turn it on in Settings → Overview → Phone remote. Scan the QR code with your phone's camera (or type the address shown, like `http://192.168.1.20:47820`) and enter the 6-digit code.
+- **From the phone you can:**
+  - see what Tyler is doing (Listening, Thinking, On air, Paused…), who's in the voice call, his reply count and spend;
+  - Pause AI, or Connect & start again;
+  - Stop audio;
+  - play any soundboard clip, favourites first;
+  - queue a song, skip it or stop the Music DJ (once the DJ is running on the PC);
+  - type a message that Tyler sends in the chat.
+- The page follows Tyler's theme, works on iPhone and Android, and can be added to your home screen.
+- **Safety:**
+  - It's off until you turn it on.
+  - It answers only devices on your home network, and only at its IP address, so a website can't reach it through a domain name.
+  - A phone has to pair with a code from Settings. The code lasts 10 minutes, works for one phone, and is gone after 8 wrong tries.
+  - Each phone gets its own key, which the PC keeps only as a fingerprint. Settings lists paired phones so you can remove one or all of them.
+  - The phone gets Tyler's status and a fixed list of buttons, never your keys, settings or the chat's messages.
+  - Turning the remote off closes the network port.
+  - It's meant for your own Wi-Fi, not public networks.
+- Windows may ask once whether ROBOTIC TYLER may use the network: allow it on private networks.
+- The Chrome extension can't run a page on your network, so the remote comes with the desktop app. In Chrome, the Settings section says so.
+
+## Tested
+- **Real HTTP on this machine, mocked Steam window (unit test):**
+  - The remote is off until turned on, and its page carries a strict content policy.
+  - Wrong codes and missing headers are refused, and a used code pairs no second phone.
+  - Status and actions need a paired phone, only the action's own fields reach Tyler, and a message is capped at 300 characters.
+  - A removed phone loses access, a code is gone after 8 wrong tries, and a domain name in the address is refused.
+  - Turning it off closes the port.
+- **iPhone-sized Chromium against that server (end-to-end):**
+  - Pairing from the QR link takes the code out of the address bar, and the page uses Tyler's theme without sideways scrolling.
+  - Clips, music, chat messages and Pause reach Tyler; a failed message stays in the box; unpairing works.
+- **The Steam window's side in the panel preview:** status, clips, an unknown clip, music without the DJ, and Pause.
+- **Desktop check in Electron:** with the real Steam-window preload, a phone pairs over HTTP and reads Tyler's status through the app's own channel.
+- The QR code decodes to the right address and code.
+- **Not tested:** a real phone on real Wi-Fi, Windows' firewall prompt, and the real Steam page. 280 unit and integration tests and 24 end-to-end tests.
+
+---
+
 # ROBOTIC TYLER v2.24.0: Tyler stays in quiet calls and keeps his chat connected
 
 ## New: Stay connected (Chat tab)
