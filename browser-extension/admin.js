@@ -16,6 +16,8 @@
  function muteStatus(){$('adminMuteStatus').textContent=[...muted.values()].map(m=>{const remaining=m.until?Math.max(0,Math.ceil((m.until-Date.now())/1000)):null;return '🔇 '+m.name+' · '+(remaining===null?'until unmuted (session only)':Math.floor(remaining/60)+':'+String(remaining%60).padStart(2,'0')+' remaining');}).join('\n')||'No active text mutes.';}
  api.voteMuteReady=groupId=>enabled&&current?.groupId===groupId&&api.isOwner?.()!==false;
  api.registerVotedTextMute=result=>{if(!api.voteMuteReady(result.groupId)||result.muted!==true||!Number.isFinite(result.muteUntil)||result.muteUntil<=Date.now()||result.muteUntil>Date.now()+305000)throw Error('Text mute could not attach to this admin session.');muted.set(result.targetId,{name:result.targetName,at:result.mutedAt,until:result.muteUntil,source:'vote'});renderMutes();watch();status('Five-minute vote text mute started for '+result.targetName+'.');};
+ // v2.33: chat features skip members who are text-muted (automatic replies, no AI request for them).
+ api.isTextMuted=id=>{const m=enabled&&muted.get(String(id||''));return !!m&&(!m.until||m.until>Date.now());};
  api.clearVotedTextMutes=()=>{for(const [id,m]of muted)if(m.source==='vote')muted.delete(id);renderMutes();};
  api.votedTextMuteStatus=()=>{const entries=[...muted.values()].filter(m=>m.source==='vote'&&m.until>Date.now());return entries.length?entries.map(m=>'🔇 '+m.name+' · '+Math.ceil((m.until-Date.now())/1000)+'s remaining').join('\n'):'No active vote text mutes.';};
 

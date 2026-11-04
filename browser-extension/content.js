@@ -35,6 +35,7 @@
  globalThis.TylerStorage?.get(['uiTheme']).then(v=>setTheme(v?.uiTheme)).catch(()=>{});
  globalThis.TylerStorage?.onChanged?.addListener(changes=>{if(changes.uiTheme)setTheme(changes.uiTheme.newValue);});
 
+ const PAGE_ID=Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10);
  let chatHint=null,discovery={},armedAt=0,sampleElement=null,composer=null,region=null,observer=null,armed=false,pending=false,lastResult='',epoch=0;
  let lastNodes=new WeakMap();const echoes=new Set();
  let owner=false,voiceReport=null,incomingReport=null,autoActive=false,voiceWaiters=[],lastChatFocus=null,lastHudActionStart=0;
@@ -163,7 +164,11 @@
    e.preventDefault();showTab(tabs[index].dataset.tab);tabs[index].focus();
   };
  }
- $('quickStop').onclick=()=>{globalThis.TylerCompanion.cancelSetup?.();globalThis.TylerCompanion.stopAutomatic?.('Paused by you');globalThis.TylerCompanion.stopLive?.('Live voice stopped by you.');};
+ const pauseHooks=new Set();
+ $('quickStop').onclick=()=>{globalThis.TylerCompanion.cancelSetup?.();globalThis.TylerCompanion.stopAutomatic?.('Paused by you');globalThis.TylerCompanion.stopLive?.('Live voice stopped by you.');
+  // v2.33: the !tyler watcher too (it kept answering, and billing, while the panel said Paused).
+  if(armed){armed=false;globalThis.TylerCommands?.set('tyler',{enabled:false});epoch++;observer?.disconnect();observer=null;}
+  for(const fn of pauseHooks){try{fn();}catch{}}};
 
  // ── Tab lease: one Steam tab runs the bot ───────────────────────────────
  function setOwner(value){
@@ -171,7 +176,7 @@
   $('footerState').textContent=value?'This tab runs the bot':'Standby · another tab is active';
   if(!value){globalThis.TylerCompanion.stopAutomatic?.('Another tab owns the bot');pause();bridge('stop');setActivity('Standby — another Steam tab is running this bot.');}
  }
- async function claim(takeOver=false){try{const r=await chrome.runtime.sendMessage({type:'lease:claim',takeOver});setOwner(!!r.owner);if(r.owner)setActivity('Ready — use Connect & start.');}catch(e){setActivity('Could not claim this tab: '+e.message);}}
+ async function claim(takeOver=false){try{const r=await chrome.runtime.sendMessage({type:'lease:claim',takeOver,instance:PAGE_ID});setOwner(!!r.owner);if(r.owner)setActivity('Ready — use Connect & start.');}catch(e){setActivity('Could not claim this tab: '+e.message);}}
  async function checkLease(){try{const r=await chrome.runtime.sendMessage({type:'lease:check'});if(r.owner!==owner)setOwner(!!r.owner);}catch{}}
  $('takeover').onclick=()=>claim(true);void claim();
  // The worker pushes 'tyler-lease-lost' on takeover, so this is only a safety
@@ -196,6 +201,19 @@
 
  // ── Sending to Steam ────────────────────────────────────────────────────
  function rememberEcho(text){for(const line of text.split('\n'))echoes.add(line.trim());while(echoes.size>200)echoes.delete(echoes.values().next().value);}
+ const boxText=()=>composer?.isConnected?(composer.matches('textarea,input')?composer.value:composer.textContent).trim():'';
+ const until=(ok,ms)=>new Promise(resolve=>{const t0=Date.now(),step=()=>{if(ok())resolve(true);else if(Date.now()-t0>=ms)resolve(false);else setTimeout(step,100);};step();});
+ async function deliver(text){
+  if(!composer?.isConnected)throw Error('Choose the Steam message box first.');
+  if(boxText()&&!await until(()=>!boxText(),10000))throw Error('There\'s a draft in the bot\'s message box, so the reply waited 10 s and was skipped. Clear the box (or send the draft) and Tyler carries on.');
+  const before=document.activeElement,formatted=TylerChatTag.format(String(text).slice(0,1800));
+  send(text);
+  if(before&&before!==composer&&before!==document.body&&before.isConnected&&!host.contains(before))try{before.focus({preventScroll:true});}catch{}
+  if(await until(()=>!boxText(),2500))return true;
+  // Still in the box: Steam didn't send it. Remove only Tyler's own text, never something the user typed.
+  if(boxText()===formatted.trim()){if(composer.matches('textarea,input')){const proto=composer.tagName==='TEXTAREA'?HTMLTextAreaElement.prototype:HTMLInputElement.prototype;Object.getOwnPropertyDescriptor(proto,'value').set.call(composer,'');composer.dispatchEvent(new Event('input',{bubbles:true}));}else{composer.focus();document.execCommand('selectAll');document.execCommand('delete');}}
+  throw Error('Steam didn\'t send the reply (it stayed in the message box). Check that the chat is connected and you can type there.');
+ }
  function send(text){
   if(!composer?.isConnected)throw Error('Choose the Steam message box first.');
   // One formatting layer (chat-tag.js): any legacy prefix is cleaned off and the owner's name tag added once, or not at all.
@@ -309,7 +327,7 @@
  };
  $('run').onclick=()=>run($('command').value);
  $('send').onclick=()=>{try{if(!lastResult)throw Error('Run a command first.');send(lastResult);}catch(e){status(e.message);}};
- $('reset').onclick=async()=>{pause();try{const r=await ask({type:'reset'});lastResult='';$('result').textContent=r.text;}catch(e){status(e.message);}};
+ $('reset').onclick=async()=>{pause();try{const r=await ask({type:'reset',chatScope:globalThis.TylerSetup?.scope?.(region,document)});lastResult='';$('result').textContent=r.text;}catch(e){status(e.message);}};
  window.addEventListener('message',e=>{if(e.source!==window||e.origin!==location.origin)return;if(e.data?.source==='tyler-listener'&&e.data.type==='state')incomingReport=e.data;});
 
  // ── Systems check ───────────────────────────────────────────────────────
@@ -317,11 +335,11 @@
  // to copy (no keys, no chat text) so a friend can send you exactly what failed.
  let lastReport='';
  $('diagnose').onclick=async()=>{
-  const inputSnapshot=incomingReport;const button=$('diagnose');globalThis.TylerCompanion.stopAutomatic?.('Paused for the full check');
+  const inputSnapshot=incomingReport;const button=$('diagnose');const wasRunning=autoActive&&owner;let inCall=false;globalThis.TylerCompanion.stopAutomatic?.('Paused for the full check');
   button.disabled=true;$('diagnostics').replaceChildren();$('hearingConfirm').hidden=true;$('copyReport').hidden=true;
   // data-result (v2.18) lets a theme mark each line: ok (✓), fail (!) or unknown (?).
   const result=t=>t.startsWith('✓')?'ok':t.startsWith('!')?'fail':'unknown';
-  const lines=[],summary=document.createElement('li');summary.className='check-summary';summary.dataset.result='unknown';
+  const lines=[];checkLines=lines;const summary=document.createElement('li');summary.className='check-summary';summary.dataset.result='unknown';
   const sb=document.createElement('b'),ss=document.createElement('span');sb.textContent='Checking…';ss.textContent='This takes a few seconds and uses one short AI request.';summary.append(sb,ss);$('diagnostics').append(summary);
   const row=(title,detail)=>{const li=document.createElement('li'),b=document.createElement('b'),span=document.createElement('span');li.dataset.result=result(title);b.textContent=title;span.textContent=detail;li.append(b,span);$('diagnostics').append(li);lines.push(title+' — '+detail);};
   const version=globalThis.TylerUI?.version||'';
@@ -337,7 +355,7 @@
     row(v.enabled?'✓ Tyler\'s microphone is on':'! Tyler\'s microphone is off',v.enabled?'Steam gets Tyler\'s own microphone ('+(v.requests||0)+' request'+(v.requests===1?'':'s')+' so far), never your real one.':'Press Connect & start (or Start live voice) before joining the voice channel.');
     // v2.32: the call as Steam itself sees it (voice-call.js): its own call state and, when it is
     // stuck or failed, the last lines of Steam's voice log, so it's clear which step stopped.
-    const call=await globalThis.TylerVoiceCall?.diagnose?.().catch(()=>null);
+    const call=await globalThis.TylerVoiceCall?.diagnose?.().catch(()=>null);inCall=call?.state==='connected'||(!call||call.state==='unavailable')&&v.connectedPeers>0;
     // Steam's own call states (friendsui.js); 10 is Connected (v2.32.4).
     const STEP=n=>n>=10?'connected':n===9?'Steam telling the voice chat the connection is up':n===8?'waiting for Steam to let the bot into the call':n===7?'waiting for the connection to Steam\'s voice server':n>=4?'setting up the connection with Steam\'s voice server':n===3?'microphone only (not in a call)':n>=1?'getting the microphone':'not in a call';
     const STEAM_STATE=['None','ScheduledInitiate','RequestedMicAccess','LocalMicOnly','CreatePeerConnection','InitiatedWebRTCSession','UpdatingWebRTCSession','WaitingOnICEConnected','RequestedPermission','NotifyingVoiceChatOfWebRTCSession','Connected'];
@@ -392,26 +410,30 @@
      if(speech.audio){bridge('preview',{audio:speech.audio});row('✓ Speech works','A short preview plays here. The beep below checks that Steam hears Tyler.');}else row('! Speech failed',speech.warning||'No audio returned');
     }
    }
-   if(owner&&voiceReport?.enabled){bridge('sound',{sound:'beep'});$('hearingConfirm').hidden=false;}
+   if(owner&&voiceReport?.enabled&&inCall){bridge('sound',{sound:'beep'});$('hearingConfirm').hidden=false;}
+   else if(owner&&voiceReport?.enabled&&platform.voice!==false)row('? Beep not tested','The bot isn\'t in a voice call, so nobody could hear it. Join voice and run the check again to test what Steam hears.');
   }catch(e){row('! Check stopped',e.message);}
   finally{
-   button.disabled=false;
+   button.disabled=false;summarize=()=>{
    const bad=[...$('diagnostics').children].filter(li=>li.dataset.result==='fail').length,unsure=[...$('diagnostics').children].filter(li=>li!==summary&&li.dataset.result==='unknown').length;
    summary.dataset.result=bad?'fail':unsure?'unknown':'ok';sb.textContent=bad?bad+' problem'+(bad===1?'':'s')+' found':unsure?'Working, '+unsure+' thing'+(unsure===1?'':'s')+' not verified':'All good';
    ss.textContent=bad?'Each "!" line says what to do. Copy the report and send it to whoever set Tyler up.':unsure?'"?" lines need a voice call or a friend to verify.':'Tyler is ready: chat, AI'+(platform.voice!==false?', speech and his microphone':'')+' all check out.';
    lastReport='ROBOTIC TYLER full check · '+new Date().toLocaleString()+'\n'+sb.textContent+'\n'+lines.join('\n');$('copyReport').hidden=false;
-   emit('check',{problems:bad,unsure});
+   emit('check',{problems:bad,unsure});};summarize();
+   // v2.33: a session that was running carries on (the check only paused it).
+   if(wasRunning&&owner&&!autoActive){row('✓ Tyler carries on','The check paused him while it ran; he is listening again.');summarize();void globalThis.TylerCompanion.startAutomatic?.();}
   }
  };
+ let summarize=()=>{},checkLines=null;
  $('copyReport').onclick=async()=>{const b=$('copyReport');try{await navigator.clipboard.writeText(lastReport);b.textContent='Copied';}catch{const t=document.createElement('textarea');t.value=lastReport;root.append(t);t.select();try{document.execCommand('copy');b.textContent='Copied';}catch{b.textContent='Copy failed';}t.remove();}setTimeout(()=>{b.textContent='Copy report';},1800);};
- const note=text=>{$('hearingConfirm').hidden=true;const li=document.createElement('li');li.dataset.result=text.startsWith('✓')?'ok':'fail';li.textContent=text;$('diagnostics').append(li);};
+ const note=text=>{$('hearingConfirm').hidden=true;const li=document.createElement('li');li.dataset.result=text.startsWith('✓')?'ok':'fail';li.textContent=text;$('diagnostics').append(li);checkLines?.push(text);summarize();};
  $('heardYes').onclick=()=>note('✓ Steam transmission confirmed by you');
  $('heardNo').onclick=()=>note('! Beep not received — enable bridge, rejoin voice, and check Steam mute/output settings.');
 
  // The name-tag settings follow Settings without a reload (they're among the non-secret keys relayed here).
  globalThis.TylerStorage?.onChanged?.addListener((changes,area)=>{if(area==='local'&&(changes.chatTagEnabled||changes.chatTagName)){const c=TylerChatTag.current;TylerChatTag.set({chatTagEnabled:changes.chatTagEnabled?changes.chatTagEnabled.newValue:c.enabled,chatTagName:changes.chatTagName?changes.chatTagName.newValue:c.name});}});
  chrome.runtime.sendMessage({type:'connection'}).then(r=>{if(r?.chatTag)TylerChatTag.set(r.chatTag);}).catch(()=>{});
- globalThis.TylerCompanion={send,pause,bridge,connect,
+ globalThis.TylerCompanion={send,deliver,pause,bridge,connect,onPause:fn=>{pauseHooks.add(fn);return ()=>pauseHooks.delete(fn);},
   getMount:()=>$('automaticMount'),getFeatureMount:()=>$('featureMount'),getSoundboardMount:()=>$('soundboardMount'),getSetupMount:()=>$('automaticSetupMount'),
   getQuickMount:()=>$('quickMount'),getQuickOptions:()=>$('quickOptions'),getStyleSheet:()=>sheet,themeElement,getTheme:()=>uiTheme,
   locateChat,chooseTarget,prepareBridge,getDiscovery:()=>discovery,setChatHint:v=>{chatHint=['text','voice-room'].includes(v)?v:null;},getChatKind:()=>composer?.isConnected?TylerSelection.kind(composer):null,getVoiceState:()=>voiceReport,getChatScope:()=>TylerSetup.scope(region,document),request,showTab,setActivity,

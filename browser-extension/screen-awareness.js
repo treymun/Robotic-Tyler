@@ -29,5 +29,7 @@ async function analyze(auto=false){if(!stream||!video||video.readyState<2)return
  }catch(e){report('Analysis failed: '+e.message);}finally{busy=false;}}
 $('v23Analyze').onclick=()=>analyze(false);
 $('v23Auto').onchange=()=>{clearInterval(interval);if($('v23Auto').checked){interval=setInterval(()=>{if(document.visibilityState==='visible'&&stream)void analyze(true);},45000);report('Automatic analysis enabled while this tab is visible and screen sharing stays active.');}else report('Automatic analysis stopped.');};
+// v2.33: Pause AI also stops automatic analysis (each one is a paid vision request). Sharing stays on.
+globalThis.TylerCompanion?.onPause?.(()=>{if(!$('v23Auto').checked&&!interval)return;clearInterval(interval);interval=null;$('v23Auto').checked=false;report('Automatic analysis paused with Pause AI. Tick it again to resume.');});
 window.addEventListener('pagehide',clean,{once:true});chrome.runtime.onMessage.addListener(m=>{if(m?.type==='v22:stop')clean();});
 })();

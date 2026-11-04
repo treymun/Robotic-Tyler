@@ -10,7 +10,7 @@ async function generate(key,model,body,signal,{full=false}={}){
   if(response.ok){const data=await response.json();return full?data:data.candidates?.[0]?.content?.parts||[];}
   const problem=geminiProblem(response.status,await response.json().catch(()=>null),model);
   if(attempt===0&&problem.retryMs>0){await pause(problem.retryMs+Math.round(Math.random()*400),signal);continue;}
-  const error=Error('Gemini '+response.status+' · '+problem.text);error.status=response.status;throw error;
+  const error=Error('Gemini '+response.status+' · '+problem.text);error.status=response.status;if(problem.retryMs>0)error.retryAfter=problem.retryMs;throw error;
  }
 }
 function textOf(parts){return parts.filter(p=>!p.thought).map(p=>p.text||'').join('').trim();}
@@ -25,9 +25,11 @@ export function geminiTextBody(messages,cap,modelId){
  const model=geminiTextModel(modelId),system=messages.filter(m=>m.role==='system').map(m=>m.content).join('\n');
  return {systemInstruction:{parts:[{text:system}]},contents:geminiContents(messages),generationConfig:{maxOutputTokens:cap+model.headroom,thinkingConfig:{thinkingLevel:model.thinking}}};
 }
-export async function geminiReply(key,messages,cap,signal,modelId){
+export async function geminiReply(key,messages,cap,signal,modelId,onUsage){
  const model=geminiTextModel(modelId);
  const data=await generate(key,model.id,geminiTextBody(messages,cap,model.id),signal,{full:true});
+ // v2.33: Google's own token counts (output includes thinking, which is billed as output).
+ const u=data.usageMetadata;if(u&&typeof onUsage==='function')try{onUsage({prompt:Number(u.promptTokenCount)||0,output:(Number(u.candidatesTokenCount)||0)+(Number(u.thoughtsTokenCount)||0)});}catch{}
  const candidate=data.candidates?.[0],text=textOf(candidate?.content?.parts||[]);
  if(!text)throw Error(candidate?.finishReason==='MAX_TOKENS'?model.label+' used its whole reply budget before answering. Try a longer reply length.':candidate?.finishReason==='SAFETY'||data.promptFeedback?.blockReason?model.label+' declined to answer that one (Google safety filter).':'Gemini returned no reply.');
  return text;

@@ -1,5 +1,21 @@
 import {styleGuide} from './memory.mjs';
 export function temporary(error){const text=String(error?.message||error||'');return /\b(?:429|500|502|503|504)\b|timeout|timed out|failed to fetch|networkerror|speech providers are cooling down/i.test(text);}
+// v2.33: what a failed reply means for automatic mode, so one bad turn no longer ends the session.
+//  fatal     — the key, credits, model, a spending cap, a daily quota or an emergency stop: stop and say why;
+//  busy      — another request from this tab is still running: wait a moment and try the same turn again;
+//  transient — rate limit, provider down, network, timeout: retry this turn (bounded) after a short wait;
+//  turn      — this one turn failed (no text, a refusal, a safety block…): skip it and keep listening.
+export function errorKind(error){
+ const text=String(error?.message||error||''),status=Number(error?.status)||0;
+ if(error?.kind&&['fatal','busy','transient','turn'].includes(error.kind))return error.kind;
+ if(/emergency stop|spending cap|save a key|rejected the key|out of credits|for today|isn.t available (?:on OpenRouter with|to this Google key)|another steam tab owns|disabled\. opt in|key is required/i.test(text)||[401,402,403].includes(status))return 'fatal';
+ if(/still handling the previous command|wait briefly before another command/i.test(text))return 'busy';
+ if(temporary(error)||/try again shortly/i.test(text))return 'transient';
+ return 'turn';
+}
+/** How long to wait before retrying a transient failure: the provider's own Retry-After when it gave
+ * one, 15 s for a rate limit, about 3 s for a provider error, a network blip or a timeout. */
+export function transientDelay(error){const asked=Number(error?.retryAfter)||0;if(asked>0)return Math.min(300000,Math.max(1000,asked));return /\b429\b|rate-limit|rate limit/i.test(String(error?.message||error||''))?15000:3000;}
 export function retryDelay(attempt){return Math.min(60000,15000*Math.pow(2,Math.max(0,attempt)));}
 export function voiceControl(text){const s=String(text).toLowerCase().replace(/[^a-z0-9\s]/g,' ').replace(/\s+/g,' ').trim();return /^(?:(?:robotic )?tyler[, ]+)?(?:stop(?: talking)?|hold on|be quiet|quiet please|pause)(?: please)?$/.test(s)?'stop':null;}
 export function normalizeExtras(settings={}){
