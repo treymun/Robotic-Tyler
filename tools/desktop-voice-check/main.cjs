@@ -18,7 +18,7 @@ app.whenReady().then(async()=>{
  ses.protocol.handle('https',req=>new URL(req.url).hostname==='steamcommunity.com'?new Response(page,{headers:{'content-type':'text/html; charset=utf-8','content-security-policy':"default-src 'self'; script-src 'self' 'unsafe-inline'; frame-src 'self'; connect-src 'self'; media-src 'self' blob:"}}):new Response('',{status:404}));
  // The shared background is not part of this check: every request gets a plain refusal.
  ipcMain.handle('tyler:request',()=>({ok:false,error:'not part of this check'}));
- win=new BrowserWindow({show:false,webPreferences:{partition:'persist:desktop-voice-check',contextIsolation:true,sandbox:true,nodeIntegration:false,backgroundThrottling:false,autoplayPolicy:'no-user-gesture-required',preload:path.join(ROOT,'app','steam-preload.cjs')}});
+ win=new BrowserWindow({show:false,width:1380,height:920,webPreferences:{partition:'persist:desktop-voice-check',contextIsolation:true,sandbox:true,nodeIntegration:false,backgroundThrottling:false,autoplayPolicy:'no-user-gesture-required',preload:path.join(ROOT,'app','steam-preload.cjs')}});
  setup.applyPermissions();setup.watch(win.webContents);
  // Music DJ and screen sharing (app/desktop-media.cjs). The picker is answered automatically here
  // (the first screen); in the app you choose in its picker window.
@@ -31,6 +31,10 @@ app.whenReady().then(async()=>{
  ipcMain.handle('tyler:youtube',()=>({ok:true}));
  await win.loadURL('https://steamcommunity.com/chat/');
  const result=await win.webContents.executeJavaScript('window.__checkDone',true);
+ // v2.23: in the app's window size the panel docks beside the chat: a full-height column on the
+ // right, with the (mock) Steam page narrowed so it isn't covered.
+ await new Promise(r=>setTimeout(r,400));
+ result.dock=await win.webContents.executeJavaScript('(()=>{const h=document.getElementById("tyler-companion-root");return {dock:h?.dataset.dock,body:Math.round(document.body.getBoundingClientRect().width),window:innerWidth,height:innerHeight};})()',true);
  await media.openYouTube('https://www.youtube.com/');await new Promise(r=>setTimeout(r,1500));
  // A click in Tyler's panel starts these in the app; here a simulated user gesture does.
  const shares=await win.webContents.executeJavaScript('window.__shareChecks()',true);

@@ -1,3 +1,26 @@
+# ROBOTIC TYLER v2.23.0: a panel you can resize, docked beside the chat in the desktop app
+
+## New
+- **Desktop app: the panel sits beside Steam's chat instead of on top of it.** It's a full-height column on the right, and Steam's chat moves over to make room, so the panel no longer covers the messages, the message box or the member list. The new button next to Collapse floats it over the chat the old way, and back. If the window is too narrow for both (under about 900 px), the panel floats until there's room again. Collapsing it gives Steam the whole window back.
+- **Resize the panel** by dragging its left edge (the docked column too), its top edge or its top-left corner. With a handle focused, the arrow keys change the size (hold Shift for bigger steps), and double-click or Home puts it back. The size and the dock choice are kept. This works in Chrome and in the desktop app.
+- Chrome starts in the same spot and size as before, and its header is unchanged.
+
+## How it works
+- To make room, Tyler narrows Steam's page itself: its body becomes the box Steam's full-window layout is measured against. The panel lives outside that box, so it isn't affected. This goes through the page's style properties, which a strict page policy allows, and Steam's own values come back when you float or collapse the panel.
+
+## Tested
+- **Mocked, in headless Chromium, on the stand-in Steam page (a new end-to-end test):**
+  - Chrome keeps the old spot and size.
+  - Dragging the edges and the corner resizes the panel, it stops at 340 px wide, the arrow keys resize too, the size survives a reload, and double-click resets it.
+  - The desktop panel docks as a 440 px column, and the stand-in chat's message box isn't covered.
+  - Dragging the docked column resizes it and the chat follows.
+  - Collapse, Float and a narrow window give the chat the whole width back.
+- **Desktop check in Electron with a mock Steam page that has a strict page policy:** the panel docks, and the page is narrowed to make room.
+- All 20 themes' headers fit on one line in the docked column.
+- **Not tested:** the real Steam chat page, whose own layout may react differently to being narrowed. If it looks wrong there, the Float button puts the panel back over the chat as before. Also not tested: Windows. 273 unit and integration tests and 21 end-to-end tests.
+
+---
+
 # ROBOTIC TYLER v2.22.0: every theme gets its own menus, screens and reactions
 
 A polish pass over all 20 themes. Each new control is another way to reach something the panel already does (the full check, the soundboard, Pause, Settings and so on), and the numbers come from Tyler's real session. Theme shortcut keys only work while the pointer is over the panel or focus is in it, and never while you type.

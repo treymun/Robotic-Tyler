@@ -50,3 +50,14 @@ test('long-running theme animations stay off the main thread where the look allo
  // The status wave keeps its height animation: as a transform its 2 px dots came out blurred.
  assert.match(css('panel.css'),/@keyframes rt-wave\{0%,100%\{height:2px\}50%\{height:13px\}\}/);
 });
+test('the panel keeps its own size and dock setting (v2.23), and nothing else of the page\'s',async()=>{
+ const {contentStorage,readable}=await import('../browser-extension/content-storage.mjs');
+ const store={data:{},get:async k=>Object.fromEntries(k.filter(x=>x in store.data).map(x=>[x,store.data[x]])),set:async v=>Object.assign(store.data,v),remove:async k=>{for(const x of k)delete store.data[x];}};
+ assert.ok(readable.has('panelLayout'));
+ await contentStorage(store,{action:'set',values:{panelLayout:{w:480,h:640,dock:'side',dockW:460}}});
+ assert.deepEqual((await contentStorage(store,{action:'get',keys:['panelLayout']})).values.panelLayout,{w:480,h:640,dock:'side',dockW:460});
+ const js=JSON.parse(fs.readFileSync(new URL('../browser-extension/manifest.json',import.meta.url),'utf8')).content_scripts.find(c=>c.js.includes('content.js')).js;
+ assert.ok(js.indexOf('content.js')<js.indexOf('panel-layout.js'),'the layout loads after the panel');
+ const src=fs.readFileSync(new URL('../browser-extension/panel-layout.js',import.meta.url),'utf8');
+ assert.doesNotMatch(src,/createElement\('style'\)/,'Steam\'s page is narrowed through element.style, which a strict page policy allows');
+});

@@ -17,7 +17,7 @@
 /* ── Shell: a Steam popup window ───────────────────────── */
 .panel{
   position:fixed;right:16px;bottom:16px;z-index:2147483647;
-  width:392px;max-width:calc(100vw - 24px);height:min(760px,90vh);
+  width:var(--rt-panel-w,392px);max-width:calc(100vw - 24px);height:var(--rt-panel-h,min(760px,90vh));max-height:calc(100vh - 24px);
   display:flex;flex-direction:column;overflow:hidden;
   background:var(--rt-bg);color:var(--rt-ink);
   border-radius:var(--rt-r-lg);box-shadow:var(--rt-shadow-float);
@@ -133,7 +133,24 @@
 .panel[data-owner=true] .owner-dot{background:var(--rt-state-ready);box-shadow:0 0 6px var(--rt-state-ready)}
 
 /* Collapsed: header, tally and footer only. */
-:host(.mini) .panel{height:auto}
+:host(.mini) .panel{height:auto;width:392px}
+/* v2.23 (panel-layout.js): resize handles on the left edge, top edge and top-left corner, and the
+   panel docked as a full-height column beside Steam's chat. */
+.rt-resize{position:absolute;z-index:40;touch-action:none}
+.rt-resize-w{left:0;top:16px;bottom:16px;width:7px;cursor:ew-resize}
+.rt-resize-h{top:0;left:16px;right:44px;height:6px;cursor:ns-resize}
+.rt-resize-c{left:0;top:0;width:14px;height:14px;cursor:nwse-resize}
+.rt-resize::after{content:"";position:absolute;opacity:0;border-radius:2px;background:var(--rt-active,#67c1f5);transition:opacity .15s}
+.rt-resize-w::after{left:2px;top:50%;width:3px;height:40px;margin-top:-20px}
+.rt-resize-h::after{top:1px;left:50%;width:40px;height:3px;margin-left:-20px}
+.rt-resize-c::after{left:2px;top:2px;width:8px;height:8px;border-radius:1px;background:none;border-left:3px solid var(--rt-active,#67c1f5);border-top:3px solid var(--rt-active,#67c1f5)}
+.rt-resize:hover::after,.rt-resize:focus-visible::after,:host(.resizing) .rt-resize::after{opacity:.85}
+.rt-resize:focus-visible{outline:none}
+:host(.mini) .rt-resize,:host([data-dock=side]) .rt-resize-h,:host([data-dock=side]) .rt-resize-c{display:none}
+:host([data-dock=side]) .rt-resize-w{top:0;bottom:0}
+:host([data-dock=side]) .panel{top:0!important;right:0!important;bottom:0!important;left:auto!important;width:var(--rt-dock-w,440px)!important;max-width:none!important;height:100vh!important;max-height:none!important;border-radius:0!important;box-shadow:-1px 0 0 rgba(0,0,0,.45),-10px 0 28px rgba(0,0,0,.3)!important}
+:host(.resizing) .panel{transition:none!important;animation:none!important}
+:host(.resizing){user-select:none;-webkit-user-select:none}
 :host(.mini) .stats,:host(.mini) .tabs,:host(.mini) .scroll{display:none}
 :host(.mini) .tally{margin-bottom:10px}
 /* Collapsed, a notification is one compact row between the status strip and the footer (the panel

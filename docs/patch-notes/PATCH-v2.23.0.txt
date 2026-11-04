@@ -1,0 +1,11 @@
+ROBOTIC TYLER v2.23.0 — patch notes
+
+New
+- Desktop app: the panel docks beside Steam's chat as a full-height column on the right, and the chat moves over, so nothing is covered. The button next to Collapse floats it over the chat instead (and back). Too narrow a window, or a collapsed panel, gives Steam the whole width.
+- Resize the panel from its left edge, top edge or top-left corner (drag, or arrow keys on a focused handle; double-click or Home resets). Kept between sessions. Chrome and desktop.
+- Chrome: same default spot, size and header as before.
+
+Tested
+- Mocked (stand-in Steam page, headless Chromium): resize by mouse and keyboard, limits, reload, reset; desktop docking, chat not covered, resize docked, collapse/float/narrow fallback.
+- Desktop check in Electron with a strict-policy mock Steam page: docks and narrows the page.
+- Not tested: the real Steam chat page (if it looks wrong, Float restores the old behaviour), Windows. 273 unit and 21 end-to-end tests.
