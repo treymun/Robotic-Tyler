@@ -41,9 +41,18 @@
  function retune(){tuning=tuning.then(async()=>{for(const peer of peers){if(closed(peer))continue;for(const sender of peer.getSenders())if(replaced.has(sender))await tuneSender(sender);}}).catch(()=>{});return tuning;}
  // What Steam's call actually uses (for the full check): codec, its settings, Tyler's send rate.
  let lastCodec=null;
+ // v2.32.1: how far the voice connection got, from the browser's own counters: the connection checks
+ // sent to Steam's voice server and the answers that came back, and which kinds of route were tried.
+ // No addresses. "Sent but never answered" means the traffic is blocked on the way (a firewall, VPN…).
+ let lastIce=null;
+ async function iceReport(){const out={checks:0,answers:0,pairs:0,local:[],remote:[]};let any=false;
+  for(const peer of peers){if(closed(peer))continue;try{const st=await peer.getStats(),cand=new Map();st.forEach(x=>{if(x.type==='local-candidate'||x.type==='remote-candidate')cand.set(x.id,x);});
+   st.forEach(x=>{if(x.type!=='candidate-pair')return;any=true;out.pairs++;out.checks+=Number(x.requestsSent)||0;out.answers+=Number(x.responsesReceived)||0;
+    for(const [k,id] of [['local',x.localCandidateId],['remote',x.remoteCandidateId]]){const c=cand.get(id);if(c){const tag=(c.candidateType||'?')+' '+(c.protocol||'?');if(!out[k].includes(tag)&&out[k].length<4)out[k].push(tag);}}});}catch{}}
+  return any?out:null;}
  async function codecReport(){for(const peer of peers){if(closed(peer)||peer.connectionState!=='connected')continue;try{const st=await peer.getStats();let out=null;st.forEach(x=>{if(x.type==='outbound-rtp'&&x.kind==='audio'&&(!out||x.bytesSent>out.bytesSent))out=x;});if(!out)continue;const c=out.codecId?st.get(out.codecId):null;return {codec:String(c?.mimeType||'').split('/')[1]||'',fmtp:String(c?.sdpFmtpLine||'').slice(0,200),kbps:Math.round((Number(out.targetBitrate)||0)/1000)};}catch{}}return null;}
  let board;let previewNode;let enabled=false,ctx,destination,gain,monitor,meter=null,active=[],queued=[],audioJobs=Promise.resolve(),requests=0,attached=0;const peers=new Set(),replaced=new WeakSet();
- const announce=(text,ok=true)=>window.postMessage({source:'tyler-audio-status',text,ok,voice:{enabled,requests,attached,player:ctx?.state||'not started',peers:peers.size,observing:!!OriginalPeer,connectedPeers:[...peers].filter(p=>p.connectionState==='connected').length,peerStates:[...peers].filter(p=>p.signalingState!=='closed'&&p.connectionState!=='closed').slice(-3).map(p=>p.connectionState+'/'+p.iceConnectionState+'/'+p.signalingState),codec:lastCodec}},location.origin);
+ const announce=(text,ok=true)=>window.postMessage({source:'tyler-audio-status',text,ok,voice:{enabled,requests,attached,player:ctx?.state||'not started',peers:peers.size,observing:!!OriginalPeer,connectedPeers:[...peers].filter(p=>p.connectionState==='connected').length,peerStates:[...peers].filter(p=>p.signalingState!=='closed'&&p.connectionState!=='closed').slice(-3).map(p=>p.connectionState+'/'+p.iceConnectionState+'/'+p.signalingState),codec:lastCodec,ice:lastIce}},location.origin);
  function setup(){if(ctx)return;ctx=new AudioContext();destination=ctx.createMediaStreamDestination();gain=ctx.createGain();gain.gain.value=.35;gain.connect(destination);monitor=ctx.createGain();monitor.gain.value=0;gain.connect(monitor);monitor.connect(ctx.destination);meter=ctx.createAnalyser?.()||null;if(meter){meter.fftSize=2048;gain.connect(meter);}}
  function boardPlayer(){if(!board)board=new TylerBoardAudio(ctx,gain,text=>window.postMessage({source:'tyler-soundboard-status',text},location.origin));return board;}
  async function resumePlayer(){let timer;try{await Promise.race([ctx.resume(),new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('Audio player is suspended. Click Enable again or check this tab is allowed to play sound.')),2500);})]);}finally{clearTimeout(timer);}}
@@ -193,7 +202,7 @@
    }
    if(m.type==='preview'){if(typeof m.audio!=='string'||m.audio.length>6000000)throw Error('Preview too large');setup();await resumePlayer();const bytes=Uint8Array.from(atob(m.audio),c=>c.charCodeAt(0));const buffer=await ctx.decodeAudioData(bytes.buffer);if(buffer.duration>30)throw Error('Preview exceeds 30 seconds');try{previewNode?.stop();}catch{}const preview=ctx.createBufferSource(),pg=ctx.createGain();pg.gain.value=clipLevel(buffer);previewNode=preview;preview.buffer=buffer;preview.connect(pg);pg.connect(ctx.destination);preview.onended=()=>{preview.disconnect();pg.disconnect();};preview.start();announce('Voice preview playing locally only.');return;}
    if(m.type==='enable'){setup();enabled=true;await resumePlayer();for(const peer of peers)await attach(peer);announce(attached?'Synthetic sender attached. Test beep and check Steam meter.':'Sound player ready; no outgoing Steam audio sender attached yet. Leave and rejoin voice.');return;}
-   if(m.type==='status'){lastCodec=await codecReport();announce('Voice connection checked.');return;}
+   if(m.type==='status'){lastCodec=await codecReport();lastIce=await iceReport();announce('Voice connection checked.');return;}
    if(m.type==='stop'){stop();return;}
    if(!enabled)throw Error('Click Enable voice bridge first.');
    if(m.type==='board-stop'){board?.stop();return;}

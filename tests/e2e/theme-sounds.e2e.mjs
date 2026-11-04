@@ -56,7 +56,7 @@ test('all 250 themed clips decode and play through the real player, with headroo
 });
 
 const CALL=`<!doctype html><meta charset="utf-8"><title>Mock Steam call</title><body><script>
-window.__status=[];addEventListener('message',e=>{if(['tyler-soundboard-status','tyler-audio-status'].includes(e.data?.source))__status.push(e.data.text);});
+window.__status=[];addEventListener('message',e=>{if(['tyler-soundboard-status','tyler-audio-status'].includes(e.data?.source))__status.push(e.data.text);if(e.data?.voice)window.__voice=e.data.voice;});
 window.cmd=(type,extra={})=>window.postMessage({source:'tyler-audio-command',type,...extra},location.origin);
 window.call=async()=>{
  cmd('enable');await new Promise(r=>setTimeout(r,200));
@@ -89,6 +89,10 @@ test('a themed clip goes out as Tyler\'s microphone; overlap refused, Stop and c
   await page.evaluate(c=>cmd('board-play',{slot:2,clip:c,volume:.6}),clip);await page.waitForTimeout(150);
   assert.ok((await page.evaluate(()=>__status)).some(t=>/Wait 3 seconds/.test(t)),'the 3-second cooldown');
   const st=await page.evaluate(()=>__status);assert.ok(st.includes('Playing sound 2 · Airhorn'),st.join(' | '));assert.ok(st.includes('Soundboard stopped.'));
+  // v2.32.1: the full check's counters: connection checks sent and answered on a working call (no addresses).
+  await page.evaluate(()=>cmd('status'));await page.waitForFunction(()=>__voice?.ice,null,{timeout:5000});
+  const ice=await page.evaluate(()=>__voice.ice);assert.ok(ice.checks>0&&ice.answers>0,JSON.stringify(ice));assert.ok(ice.local.length&&ice.remote.length);
+  assert.doesNotMatch(JSON.stringify(ice),/\d+\.\d+\.\d+\.\d+/,'no addresses');assert.ok((await page.evaluate(()=>__voice.peerStates)).every(x=>/^(connected|connecting|new)\//.test(x)));
   assert.deepEqual(errors,[]);
  }finally{await browser.close();server.close();}
 });

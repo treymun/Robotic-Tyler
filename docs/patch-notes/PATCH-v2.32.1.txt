@@ -1,0 +1,5 @@
+ROBOTIC TYLER v2.32.1 — patch notes
+
+- Full check, when the call is stuck connecting: the connection checks the bot sent to Steam's voice server and how many it answered, from the browser's own counters, and which kinds of route were tried (no addresses). Sent but never answered shows "Steam's voice server isn't answering".
+- Why: in the desktop app the bot can get stuck connecting (Steam's step 5, the connection checking) while the Chrome extension joins from the same PC. This shows where the voice traffic stops.
+- Tested: the counters on a working stand-in call in Chromium; all unit and e2e tests; desktop check. Not tested: a real Steam call.

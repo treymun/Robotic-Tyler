@@ -342,7 +342,12 @@
       call.state==='joining'||call.state==='failed'&&call.roomId?'Stuck at: '+STEP(call.steamState||0)+(call.room?' ('+call.room+')':'')+'. Leave voice and join again; if it keeps stopping here with nothing changed in Tyler, it is on Steam\'s side.':
       'Press Join voice (Chat tab) or join the voice channel with the bot account, then run the check again.');
      if(call.state!=='connected'&&call.log?.length)row('? Steam\'s voice log',call.log.slice(-4).join(' · '));
-     if(call.state!=='connected'&&(call.state==='joining'||call.roomId))row('? Voice connection','Steam call step '+(call.steamState??'unknown')+' · connections: '+((v.peerStates||[]).join(', ')||'none yet')+'.');
+     if(call.state!=='connected'&&(call.state==='joining'||call.roomId)){
+      // v2.32.1: the browser's own counters say whether Steam's voice server answers at all.
+      const ice=v.ice,blocked=!!ice&&ice.checks>0&&ice.answers===0;
+      row(blocked?'! Steam\'s voice server isn\'t answering':'? Voice connection','Steam call step '+(call.steamState??'unknown')+' · connections: '+((v.peerStates||[]).join(', ')||'none yet')+(ice?' · '+ice.checks+' connection check'+(ice.checks===1?'':'s')+' sent, '+ice.answers+' answered (this PC: '+(ice.local.join(', ')||'none')+'; Steam: '+(ice.remote.join(', ')||'none')+')':'')+'.'+
+       (blocked?' The checks leave but nothing comes back: something between '+(platform.id==='desktop'?'ROBOTIC TYLER':'this browser')+' and Steam\'s voice server is stopping the voice traffic (a firewall, VPN or antivirus rule for this program, or the network).':''));
+     }
     }else row(v.connectedPeers?'✓ In a Steam voice call':'? Not in a voice call',v.connectedPeers?v.connectedPeers+' voice connection'+(v.connectedPeers===1?'':'s')+' active.':'Join the voice channel with the bot account, then run the check again.');
     row(v.attached?'✓ Outgoing audio attached':'! Outgoing audio not attached',v.attached?'A test beep still needs confirmation from your main account.':'Rejoin the voice channel after Connect & start. If it stays like this, reload Steam chat.');
     // Steam's codec settings for Tyler's audio and his send rate (v2.20.2): what the call allows.

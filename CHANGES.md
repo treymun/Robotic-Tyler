@@ -1,3 +1,20 @@
+# ROBOTIC TYLER v2.32.1: the full check shows whether Steam's voice server answers
+
+## Changed
+- **Full check, when the call is stuck connecting:** a new line counts the connection checks the bot sent to Steam's voice server and how many it answered, from the browser's own counters. It also lists which kinds of route were tried, with no addresses.
+  - **Sent but never answered** shows as *"Steam's voice server isn't answering"*, with what to check: a firewall, VPN or antivirus that blocks ROBOTIC TYLER.
+
+## Why
+- In the desktop app, the bot can get stuck "connecting": Steam's step 5, with the voice connection stuck checking. The Chrome extension joins from the same PC, and ROBOTIC TYLER is already allowed in Windows Firewall.
+- These counters show whether the connection checks reach Steam's voice server and come back, which narrows down where the voice traffic stops.
+
+## Tested
+- **Chromium, stand-in call (two connections on this machine):** the counters show checks sent and answered on a working call, and no addresses.
+- All unit and end-to-end tests, and the desktop check (Electron, mock Steam page).
+- **Not tested:** a real Steam call, or a firewall actually blocking the app.
+
+---
+
 # ROBOTIC TYLER v2.32.0: Join Voice and Leave Voice, and Steam's own view of the call
 
 ## New
