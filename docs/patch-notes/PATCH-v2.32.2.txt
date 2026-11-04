@@ -1,0 +1,5 @@
+ROBOTIC TYLER v2.32.2 — patch notes
+
+- Full check, voice connection: the kind of address each side used (IPv4/IPv6, home or public, hidden .local name; never the address), the network type and each pair's state, also on a working call, to compare the Chrome extension's connection with the desktop app's.
+- Why: the desktop app's engine (Electron 45 / Chromium 156) gets no answers from Steam's voice server today (79 sent, 0 answered); last night's version and the Electron voice test do the same, Chrome connects.
+- Tested: stand-in call in Chromium; all tests; desktop check. Not tested: a real Steam call.

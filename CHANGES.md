@@ -1,3 +1,23 @@
+# ROBOTIC TYLER v2.32.2: compare a working voice connection with a stuck one
+
+## Changed
+- **Full check, voice connection:** besides the checks sent and answered, it now shows:
+  - what kind of address each side used (IPv4 or IPv6, home network or public, or a hidden `.local` name), but never the address itself;
+  - the network type;
+  - the state of each connection pair.
+- The line also appears on a **working** call, so the Chrome extension's connection can be compared with the desktop app's.
+
+## Why
+- The desktop app's engine (Electron 45, Chromium 156) gets no answers from Steam's voice server today: the bot sent 79 checks and 0 were answered. Last night's app version and the separate Electron voice test do the same, while Chrome on the same PC connects.
+- So the cause is outside today's code, and specific to the app's browser engine. Comparing what each one sends is the next step.
+
+## Tested
+- **Chromium, stand-in call:** the counters and kinds of address show on a working call, with no addresses.
+- All unit and end-to-end tests, and the desktop check.
+- **Not tested:** a real Steam call.
+
+---
+
 # ROBOTIC TYLER v2.32.1: the full check shows whether Steam's voice server answers
 
 ## Changed

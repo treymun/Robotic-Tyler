@@ -45,10 +45,17 @@
  // sent to Steam's voice server and the answers that came back, and which kinds of route were tried.
  // No addresses. "Sent but never answered" means the traffic is blocked on the way (a firewall, VPN…).
  let lastIce=null;
- async function iceReport(){const out={checks:0,answers:0,pairs:0,local:[],remote:[]};let any=false;
+ // v2.32.2: plus what kind of address each side used (IPv4/IPv6, home network or public, a hidden
+ // .local name), the network type and each pair's state, to compare a working call with a stuck one.
+ const kind=a=>{a=String(a||'').toLowerCase();if(!a)return 'no address';if(a.endsWith('.local'))return 'hidden .local name';
+  if(a.includes(':')){if(/^fe8|^fe9|^fea|^feb/.test(a))return 'IPv6 link-local';if(/^f[cd]/.test(a))return 'IPv6 private';if(a==='::1')return 'IPv6 loopback';return 'IPv6 public';}
+  const n=a.split('.').map(Number);if(n.length!==4||n.some(x=>!(x>=0&&x<=255)))return 'unknown';
+  if(n[0]===10||n[0]===172&&n[1]>=16&&n[1]<=31||n[0]===192&&n[1]===168)return 'IPv4 private';if(n[0]===100&&n[1]>=64&&n[1]<=127)return 'IPv4 shared (CGNAT/VPN)';
+  if(n[0]===169&&n[1]===254)return 'IPv4 link-local';if(n[0]===127)return 'IPv4 loopback';return 'IPv4 public';};
+ async function iceReport(){const out={checks:0,answers:0,pairs:0,local:[],remote:[],states:{}};let any=false;
   for(const peer of peers){if(closed(peer))continue;try{const st=await peer.getStats(),cand=new Map();st.forEach(x=>{if(x.type==='local-candidate'||x.type==='remote-candidate')cand.set(x.id,x);});
-   st.forEach(x=>{if(x.type!=='candidate-pair')return;any=true;out.pairs++;out.checks+=Number(x.requestsSent)||0;out.answers+=Number(x.responsesReceived)||0;
-    for(const [k,id] of [['local',x.localCandidateId],['remote',x.remoteCandidateId]]){const c=cand.get(id);if(c){const tag=(c.candidateType||'?')+' '+(c.protocol||'?');if(!out[k].includes(tag)&&out[k].length<4)out[k].push(tag);}}});}catch{}}
+   st.forEach(x=>{if(x.type!=='candidate-pair')return;any=true;out.pairs++;out.checks+=Number(x.requestsSent)||0;out.answers+=Number(x.responsesReceived)||0;const sk=String(x.state||'?')+(x.nominated?' nominated':'');out.states[sk]=(out.states[sk]||0)+1;
+    for(const [k,id] of [['local',x.localCandidateId],['remote',x.remoteCandidateId]]){const c=cand.get(id);if(c){const tag=(c.candidateType||'?')+' '+(c.protocol||'?')+' '+kind(c.address||c.ip)+(k==='local'&&c.networkType?' '+c.networkType:'');if(!out[k].includes(tag)&&out[k].length<4)out[k].push(tag);}}});}catch{}}
   return any?out:null;}
  async function codecReport(){for(const peer of peers){if(closed(peer)||peer.connectionState!=='connected')continue;try{const st=await peer.getStats();let out=null;st.forEach(x=>{if(x.type==='outbound-rtp'&&x.kind==='audio'&&(!out||x.bytesSent>out.bytesSent))out=x;});if(!out)continue;const c=out.codecId?st.get(out.codecId):null;return {codec:String(c?.mimeType||'').split('/')[1]||'',fmtp:String(c?.sdpFmtpLine||'').slice(0,200),kbps:Math.round((Number(out.targetBitrate)||0)/1000)};}catch{}}return null;}
  let board;let previewNode;let enabled=false,ctx,destination,gain,monitor,meter=null,active=[],queued=[],audioJobs=Promise.resolve(),requests=0,attached=0;const peers=new Set(),replaced=new WeakSet();
