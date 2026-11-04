@@ -102,6 +102,23 @@
  function deliver(type,data){for(const m of mounted){try{m.instance?.update?.(type,data);}catch(error){console.warn('[ROBOTIC TYLER] theme feature '+m.feature.id+':',error?.message||error);}}}
  function emitLocal(type,data={}){deliver(type,data);}
 
+ // ── The status strip, in every theme (v2.20 polish) ───────────────────────
+ // How long Tyler has been listening, thinking or talking; a pulse in the state's colour on every
+ // change; the full status as a tooltip; and --fx-health for themes that show Tyler's health.
+ const tally=$('activityCard'),tallyHead=tally?.querySelector('.tally-head'),tallyLabel=$('activityLabel');
+ const timer=document.createElement('span');timer.className='tally-time';timer.setAttribute('aria-hidden','true');
+ const pulse=document.createElement('span');pulse.className='tally-pulse';pulse.setAttribute('aria-hidden','true');
+ if(tallyLabel&&tallyHead){tallyLabel.after(timer);tally.prepend(pulse);}
+ const TIMED=new Set(['listening','thinking','speaking','waiting']);
+ function strip(changed){
+  const t=now(),active=TIMED.has(S.state)&&!document.hidden;
+  const sec=Math.floor((t-S.since)/1000);timer.textContent=active&&sec>=1?(sec<60?sec+'s':clock(t-S.since)):'';
+  panel.style.setProperty('--fx-health',String(health()));
+  if(changed){tally.title=S.label+(S.text?': '+S.text:'')+' · since '+new Date(S.since).toLocaleTimeString();
+   if(!reduced?.matches){pulse.classList.remove('on');void pulse.offsetWidth;pulse.classList.add('on');}}
+ }
+ setInterval(()=>{if(TIMED.has(S.state)||timer.textContent)strip(false);},1000);
+
  // ── Events from the panel ─────────────────────────────────────────────────
  ui.onUI((type,data)=>{
   const t=now();
@@ -114,6 +131,7 @@
    if(data.state==='error'&&prev!=='error'){S.errors++;S.errorAt.push(t);S.streak=0;log('error',S.text||'Needs attention');}
    if(data.state!==prev&&data.state!=='error')log('state',data.label);
   }
+  if(type==='state')strip(data.state!==data.before);
   if(type==='tab')S.tab=data.tab;
   if(type==='mini')S.mini=!!data.mini;
   if(type==='hud'){S.hud=data;S.spend=parseMoney(data.spend);S.tokens=data.spendMeta||'';}

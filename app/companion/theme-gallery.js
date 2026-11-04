@@ -7,6 +7,8 @@
 // (TylerUI from ui-template.js) inside shadow roots, so each one shows exactly
 // what the panel looks like in that theme, isolated from the page's own theme.
 // Previews use sample text only: nothing is sent, no AI request, no chat connection.
+// What each theme adds to Tyler's panel (theme-pack-1/2/3.js, v2.20), shown under its description.
+const EXTRAS={steam:'an activity graph like the downloads page, and session achievements.',classic:'a server browser of Tyler\'s services, and a VGUI progress dialog while he writes.',tf2:'class-select hotkeys 1–5, an activity killfeed, and a taunt (double-click the logo).',cs2:'a round HUD, a sound buy wheel (B), and round-won banners.',portal:'a tests-passed sign with live status icons, and portal transitions between tabs.',cs16:'a scoreboard and a radio-command menu (V).',hev:'suit-voice status callouts, damage indicators, and a flashlight for extra contrast (F).',l4d:'the survivor team (health of each part of Tyler) and the Director\'s horde warning.',winxp:'a Start menu and system tray in the taskbar, and error dialogs.',doom:'a status face, the screen melt between tabs, and pickup messages.',quake:'a drop-down console with real commands (~) and arena medals.',pipboy:'DATA / MAP / INV / STAT / RADIO categories (Q / E), analog gauges, and a radio for the Music DJ.',combine:'an Overwatch dispatch ticker and biosignal scans.',deadlock:'a souls counter and a spirit thread that follows Tyler\'s state.',minecraft:'hearts, hunger and XP, and block-breaking while Tyler thinks.',payday:'a heist plan, a heist timer, and police-assault banners.',dreamcast:'a working VMU in the header and when collapsed, and the boot swirl.',gmod:'Lua-error problem reports, spawn notices, and properties (right-click the stats).',ricochet:'an arcade score with discs and power-ups, and a flying disc between tabs.',dod:'a field-radio channel dial and an operation briefing.'};
 (()=>{
  'use strict';
  const gallery=document.getElementById('themeGallery'),stage=document.getElementById('themeStage');
@@ -105,6 +107,7 @@
   }
   const [name,desc,light]=T.info[selected];
   $('tgName').textContent=name;$('tgDesc').textContent=desc+(light?' Light theme.':'');
+  const extras=document.getElementById('tgExtras');if(extras)extras.textContent=EXTRAS[selected]?'In the panel: '+EXTRAS[selected]:'';
   const logo=$('tgLogo');if(logo.dataset.theme!==selected){logo.removeAttribute('srcset');logo.src='ui/logos/'+selected+'.png';logo.dataset.theme=selected;}logo.style.imageRendering=PIXEL.has(selected)?'pixelated':'';sharp(logo,selected);
   const same=selected===applied;apply.disabled=same;
   apply.querySelector('.lbl').textContent=same?'In use':'Apply '+name;

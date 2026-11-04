@@ -21,6 +21,25 @@
 @keyframes fx-in{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 @keyframes fx-fade{0%,80%{opacity:1}100%{opacity:0}}
 
+/* ── Status strip polish, every theme: time in state, a pulse on each change ── */
+.tally-head{justify-content:flex-start}
+.tally-head .tally-wave{margin-left:auto}
+.tally-time{margin-left:8px;font:700 10px/1 var(--rt-font-display);letter-spacing:.04em;color:var(--tone,var(--rt-ink-3));opacity:.85;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tally-time:empty{display:none}
+.tally-pulse{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:0;background:linear-gradient(90deg,color-mix(in srgb,var(--tone,#fff) 45%,transparent),transparent 70%)}
+.tally-pulse.on{animation:fx-pulse .6s ease-out}
+@keyframes fx-pulse{0%{opacity:.9;transform:translateX(-30%)}100%{opacity:0;transform:none}}
+:host(.mini) .tally-time{margin-left:6px}
+/* Day of Defeat: the RX needle swings while Tyler talks, trembles while he thinks, drops on a fault */
+[data-rt-theme=dod] .tally[data-state=speaking] .tally-wave i:first-child{animation:dod-swing .42s ease-in-out infinite alternate!important}
+[data-rt-theme=dod] .tally[data-state=thinking] .tally-wave i:first-child{transform:rotate(-40deg);animation:dod-tremble .18s steps(2) infinite!important}
+[data-rt-theme=dod] .tally[data-state=error] .tally-wave i:first-child{transform:rotate(-58deg)}
+[data-rt-theme=dod] .tally:is([data-state=paused],[data-state=standby]) .tally-wave i:first-child{transform:rotate(-60deg);opacity:.6}
+@keyframes dod-swing{from{transform:rotate(-20deg)}to{transform:rotate(38deg)}}
+@keyframes dod-tremble{50%{transform:rotate(-36deg)}}
+/* HEV: when idle, AUX POWER shows Tyler's real health */
+[data-rt-theme=hev] .tally[data-state=ready] .tally-wave::after{clip-path:inset(-5px calc((100 - var(--fx-health,100)) * 1%) -5px -5px);transition:clip-path .6s}
+
 /* ── Steam ─────────────────────────────────────────────── */
 .st-activity{display:block;width:100%;margin:0;padding:7px 10px 8px;border:0;border-radius:var(--rt-r-sm);background:var(--rt-block);text-align:left;color:var(--rt-ink-3);box-shadow:none}
 .st-activity:hover{background:var(--rt-surface-2)}
@@ -309,7 +328,7 @@
 .mc-level{position:absolute;left:50%;top:-12px;transform:translateX(-50%);font:12px "Tyler Minecraft",monospace;color:#80ff20;text-shadow:1px 1px 0 #000,-1px -1px 0 #000,1px -1px 0 #000,-1px 1px 0 #000}
 .mc-levelup{position:absolute;left:50%;top:150px;transform:translateX(-50%);font:16px "Tyler Minecraft",monospace;color:#80ff20;text-shadow:2px 2px 0 #1a3a00;animation:mc-float 1.6s ease-out forwards}
 @keyframes mc-float{from{opacity:0;transform:translate(-50%,10px)}20%{opacity:1}to{opacity:0;transform:translate(-50%,-24px)}}
-.mc-crack{position:absolute;inset:0;z-index:2;pointer-events:none;--crack:0;opacity:calc(var(--crack) / 9);background:repeating-linear-gradient(60deg,transparent 0 9px,rgba(0,0,0,.55) 9px 11px),repeating-linear-gradient(-35deg,transparent 0 13px,rgba(0,0,0,.45) 13px 15px);transition:opacity .2s steps(1)}
+.mc-crack{position:absolute;inset:0;z-index:0;pointer-events:none;--crack:0;opacity:calc(var(--crack) / 9 * .55);background:repeating-linear-gradient(60deg,transparent 0 13px,rgba(0,0,0,.4) 13px 14px),repeating-linear-gradient(-35deg,transparent 0 19px,rgba(0,0,0,.32) 19px 20px);transition:opacity .2s steps(1)}
 .mc-crack[data-stage="1"]{--crack:1}.mc-crack[data-stage="2"]{--crack:2}.mc-crack[data-stage="3"]{--crack:3}.mc-crack[data-stage="4"]{--crack:4}.mc-crack[data-stage="5"]{--crack:5}.mc-crack[data-stage="6"]{--crack:6}.mc-crack[data-stage="7"]{--crack:7}.mc-crack[data-stage="8"]{--crack:8}.mc-crack[data-stage="9"]{--crack:9}
 .mc-pop{position:absolute;left:28px;top:96px;width:14px;height:14px;background:linear-gradient(135deg,#8bd450,#4f8a2a);box-shadow:0 0 0 2px #000;animation:mc-pop .9s cubic-bezier(.3,1.6,.6,1) forwards}
 @keyframes mc-pop{0%{transform:scale(0)}30%{transform:translateY(-18px) scale(1.2) rotate(20deg)}100%{transform:translate(30px,-6px) scale(.6) rotate(90deg);opacity:0}}
@@ -326,7 +345,7 @@
 .pd-step[data-next=true]{border-color:#ffcf3a;box-shadow:inset 0 0 12px rgba(255,207,58,.18);animation:pd-glow 1.6s ease-in-out infinite}
 @keyframes pd-glow{50%{box-shadow:inset 0 0 18px rgba(255,207,58,.35)}}
 .pd-timer{padding:2px 6px;font:600 13px "Tyler PAYDAY",sans-serif;letter-spacing:.06em;color:#fff;background:rgba(0,0,0,.4);border:1px solid rgba(78,161,255,.4);font-variant-numeric:tabular-nums}
-.pd-assault{position:absolute;left:0;right:0;top:112px;height:24px;overflow:hidden;background:repeating-linear-gradient(135deg,#c41e1e 0 14px,#1a1a1a 14px 28px);animation:pd-flash 1s steps(2) infinite}
+.pd-assault{position:absolute;left:0;right:0;top:300px;height:24px;overflow:hidden;background:repeating-linear-gradient(135deg,#c41e1e 0 14px,#1a1a1a 14px 28px);animation:pd-flash 1s steps(2) infinite}
 .pd-assault span{display:block;margin:3px auto;width:max-content;padding:0 10px;background:#c41e1e;font:700 12px "Tyler PAYDAY",sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#fff}
 @keyframes pd-flash{50%{filter:brightness(1.35)}}
 
@@ -348,7 +367,7 @@
 @keyframes dc-spin{from{transform:rotate(-200deg) scale(.6)}to{transform:none}}
 
 /* ── Garry's Mod ──────────────────────────────────────── */
-.gm-lua{position:absolute;left:6px;top:6px;right:6px;display:flex;flex-direction:column;padding:6px 8px;background:rgba(0,0,0,.72);font:11px/1.35 Consolas,"Lucida Console",monospace;color:#8ad6ff;animation:fx-fade 6s linear forwards}
+.gm-lua{position:absolute;left:6px;top:300px;right:6px;display:flex;flex-direction:column;padding:6px 8px;background:rgba(0,0,0,.72);font:11px/1.35 Consolas,"Lucida Console",monospace;color:#8ad6ff;animation:fx-fade 6s linear forwards}
 .gm-lua b{font-weight:400;color:#ffde66}
 .gm-stack{position:absolute;right:8px;bottom:52px;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
 .gm-note{display:flex;align-items:center;gap:6px;padding:4px 10px 4px 6px;border-radius:4px;background:rgba(25,25,25,.9);color:#fff;font:12px "Tyler GMod",Tahoma,sans-serif;box-shadow:0 2px 6px rgba(0,0,0,.5);animation:gm-slide .25s ease-out;transition:opacity .4s,transform .4s}

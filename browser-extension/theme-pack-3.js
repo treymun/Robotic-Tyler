@@ -44,7 +44,7 @@
   }},
   {id:'pd-assault',mount(c){
    let banner=null;
-   const show=()=>{if(banner)return;banner=c.add('layer',c.h('div','fx pd-assault'));banner.setAttribute('role','status');const inner=c.h('span',null,'Police assault in progress');banner.append(inner);};
+   const show=()=>{if(banner)return;banner=c.add('layer',c.h('div','fx pd-assault'));banner.style.top=(c.below('.tabs')+2)+'px';banner.setAttribute('role','status');const inner=c.h('span',null,'Police assault in progress');banner.append(inner);};
    const hide=()=>{banner?.remove();banner=null;};
    return {update(type,d){if(type!=='state')return;if(d.state==='error'||d.state==='waiting')show();else hide();},unmount:hide};
   }},
@@ -74,7 +74,7 @@
   {id:'gm-lua',mount(c){
    let box=null;
    return {update(type,d){if(type!=='state'||d.state!=='error'||d.before==='error')return;box?.remove();
-    box=c.h('div','fx gm-lua');box.setAttribute('role','status');const msg=(d.text||'problem').replace(/\s+/g,' ').slice(0,120);
+    box=c.h('div','fx gm-lua');box.style.top=(c.below('.tabs')+4)+'px';box.setAttribute('role','status');const msg=(d.text||'problem').replace(/\s+/g,' ').slice(0,120);
     box.append(c.h('b',null,'[ROBOTIC TYLER] lua/tyler/reply.lua:'+(40+c.S.errors)+': '+msg),c.h('span',null,'  1. unknown - Checks tab has the details'),c.h('span',null,'   2. Run checks - [C]:-1'));c.flash(box,6000);}};
   }},
   {id:'gm-notices',mount(c){
