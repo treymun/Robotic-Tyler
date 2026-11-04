@@ -34,6 +34,11 @@ app.whenReady().then(async()=>{
  await media.openYouTube('https://www.youtube.com/');await new Promise(r=>setTimeout(r,1500));
  // A click in Tyler's panel starts these in the app; here a simulated user gesture does.
  const shares=await win.webContents.executeJavaScript('window.__shareChecks()',true);
+ // Muted Steam window (v2.20.3): Tyler still hears the call while the window plays nothing.
+ shares.unmuted=await win.webContents.executeJavaScript('window.__hearMuted()',true);
+ win.webContents.setAudioMuted(true);
+ shares.muted={...await win.webContents.executeJavaScript('window.__hearMuted()',true),windowMuted:win.webContents.isAudioMuted()};
+ win.webContents.setAudioMuted(false);
  // One click (v2.20.1): Start Music DJ opens the Music window in the background and asks for the
  // share in the same click, before the window exists; the app waits for it and shares its sound.
  const old=media.youtubeId();if(old!==null)BrowserWindow.fromWebContents(webContents.fromId(old))?.destroy();

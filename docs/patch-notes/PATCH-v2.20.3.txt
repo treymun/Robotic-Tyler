@@ -1,0 +1,10 @@
+ROBOTIC TYLER v2.20.3 — patch notes
+
+New
+- Chat: music quality low / medium / high / auto (and "music quality" to show it). Also in Room → Music DJ → Sound quality; kept between sessions.
+- Auto quality (default): starts at 64 kbps, steps down to 48 and 32 kbps when Steam reports Tyler's audio being lost, back up after a steady minute, never above Medium. High = 128 kbps, Low = Steam's default.
+- Desktop app: Mute the call in this window (Settings → Where Tyler joins voice, or the tray). For when you're in the call on Steam.exe yourself; Tyler still hears everyone.
+
+Tested
+- Mocks: chat command, Auto steps with stand-in Steam stats, saved choice, desktop mute setting.
+- Real Chromium/Electron, no Steam: encoder rate per level; incoming voice still reaches Tyler with the window muted. Auto's reaction to Steam's loss reports not yet tested against Steam. 270 unit and 17 end-to-end tests.

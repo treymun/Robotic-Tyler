@@ -24,7 +24,7 @@ test('music gets independent 200 percent gain and peak compression without chang
   createDynamicsCompressor(){this.limiter={...node('limiter'),...Object.fromEntries(['threshold','knee','ratio','attack','release'].map(k=>[k,{value:0}]))};return this.limiter;}
   async resume(){}
  }
- const box={AudioContext:Audio,MediaStream:class{},setTimeout,clearTimeout,location:{origin:'https://steamcommunity.com'},navigator:{mediaDevices:{getUserMedia:async()=>stream,getDisplayMedia:async()=>stream}},window:{postMessage(){},addEventListener:(_type,fn)=>{receive=fn;}}};
+ const box={AudioContext:Audio,MediaStream:class{},setTimeout,clearTimeout,setInterval:()=>0,clearInterval(){},location:{origin:'https://steamcommunity.com'},navigator:{mediaDevices:{getUserMedia:async()=>stream,getDisplayMedia:async()=>stream}},window:{postMessage(){},addEventListener:(_type,fn)=>{receive=fn;}}};
  vm.runInNewContext(source('audio-bridge.js'),box);
  const command=(type,extra={})=>receive({source:box.window,origin:box.location.origin,data:{source:'tyler-audio-command',type,...extra}});
  await command('music-capture',{volume:3});
@@ -92,6 +92,43 @@ test('Music DJ sound quality: untouched tab sound, a chosen call bitrate, kept b
  assert.match(bridge,/getDisplayMedia\(\{video:\{displaySurface:'browser'\},audio:MUSIC_AUDIO,/);
  assert.match(bridge,/if\(replaced\.has\(sender\)\)await tuneSender\(sender\)/,'only Tyler\'s own senders are tuned');
  assert.match(bridge,/bitrateBefore\.delete\(sender\);if\(before==null\)delete e\.maxBitrate/,'the earlier setting comes back');
- assert.match(music,/<select id="musicQuality"><option value="128000">High · 128 kbps \(recommended\)<\/option><option value="64000">/);
+ assert.match(music,/<select id="musicQuality"><option value="auto">Auto · lowers itself if the call drops audio \(recommended\)<\/option><option value="high">High · 128 kbps<\/option><option value="medium">Medium · 64 kbps<\/option><option value="low">/);
  assert.match(music,/TylerStorage\?\.set\?\.\(\{musicQuality:/);
+});
+test('music quality: chat command, Auto steps down when Steam reports lost audio and back up when steady (v2.20.3)',async()=>{
+ const box0={globalThis:{}};vm.runInNewContext(source('music-core.js'),box0);
+ const M=box0.globalThis.TylerMusic;
+ assert.deepEqual({...M.parse('music quality low')},{action:'quality',level:'low'});
+ assert.deepEqual({...M.parse('!music quality HIGH')},{action:'quality',level:'high'});
+ assert.deepEqual({...M.parse('music quality')},{action:'quality',level:null});
+ assert.equal(M.parse('music quality ultra'),null);assert.equal(M.parse('music quality 128'),null);
+ // The bridge with a stand-in Steam connection: its stats say how many of Tyler's packets got lost.
+ let receive,tick=null;const set=[],stats={sent:0,lost:0};
+ const track={kind:'audio',clone(){return {...track};},addEventListener(){},stop(){},getSettings:()=>({channelCount:2})};
+ const video={kind:'video',getSettings:()=>({displaySurface:'browser'}),addEventListener(){},stop(){}};
+ const shared={getVideoTracks:()=>[video],getAudioTracks:()=>[track],getTracks:()=>[video,track]};
+ const node=()=>({gain:{value:0,setTargetAtTime(){}},connect(){},disconnect(){},threshold:{value:0},knee:{value:0},ratio:{value:0},attack:{value:0},release:{value:0}});
+ class Audio{constructor(){this.state='running';this.currentTime=0;this.destination=node();}createGain(){return node();}createMediaStreamDestination(){return {...node(),stream:{getAudioTracks:()=>[track],clone:()=>shared}};}createMediaStreamSource(){return node();}createDynamicsCompressor(){return node();}async resume(){}}
+ class Peer{constructor(){this.connectionState='connected';this.signalingState='stable';this.senders=[];this.params={encodings:[{active:true}]};}
+  addEventListener(){}getSenders(){return this.senders;}
+  addTrack(t){const peer=this,s={track:t,getParameters:()=>structuredClone(peer.params),setParameters:async p=>{peer.params=p;set.push(p.encodings[0].maxBitrate);},replaceTrack:async x=>{s.track=x;}};this.senders.push(s);return s;}
+  async getStats(){return new Map([['o',{type:'outbound-rtp',kind:'audio',packetsSent:stats.sent}],['r',{type:'remote-inbound-rtp',kind:'audio',packetsLost:stats.lost}]]);}}
+ const box={AudioContext:Audio,MediaStream:class{constructor(t){this.t=t;}},setTimeout,clearTimeout,setInterval:fn=>{tick=fn;return 1;},clearInterval:()=>{tick=null;},location:{origin:'https://steamcommunity.com'},
+  navigator:{mediaDevices:{getUserMedia:async()=>shared,getDisplayMedia:async()=>shared}},window:{postMessage(){},addEventListener:(_t,fn)=>{receive=fn;}},DOMException:Error};
+ box.window.RTCPeerConnection=Peer;box.RTCPeerConnection=Peer;
+ vm.runInNewContext('var window=this.window;'+source('audio-bridge.js'),box);
+ const command=(type,extra={})=>receive({source:box.window,origin:box.location.origin,data:{source:'tyler-audio-command',type,...extra}});
+ await command('enable');const peer=new box.window.RTCPeerConnection();peer.addTrack(track);
+ await command('music-capture',{volume:.35,level:'auto'});await new Promise(r=>setTimeout(r,10));
+ assert.equal(peer.params.encodings[0].maxBitrate,64000,'Auto starts at Medium');assert.ok(tick,'Auto watches the call');
+ const step=async(sent,lost)=>{stats.sent+=sent;stats.lost+=lost;await tick();await new Promise(r=>setTimeout(r,5));};
+ await step(200,0);await step(200,12);assert.equal(peer.params.encodings[0].maxBitrate,48000,'6% lost: one step down');
+ await step(200,12);assert.equal(peer.params.encodings[0].maxBitrate,32000);
+ await step(200,20);assert.equal(peer.params.encodings[0].maxBitrate,32000,'never below Low');
+ for(let i=0;i<15;i++)await step(200,0);assert.equal(peer.params.encodings[0].maxBitrate,48000,'a minute steady: one step up');
+ for(let i=0;i<40;i++)await step(200,0);assert.equal(peer.params.encodings[0].maxBitrate,64000,'Auto never goes above Medium');
+ await command('music-quality',{level:'high'});assert.equal(peer.params.encodings[0].maxBitrate,128000);assert.equal(tick,null,'a fixed level stops Auto');
+ await command('music-quality',{level:'low'});assert.equal('maxBitrate' in peer.params.encodings[0],false,'Low is Steam\'s own default');
+ await command('music-quality',{level:'medium'});await command('music-disconnect');await new Promise(r=>setTimeout(r,5));
+ assert.equal('maxBitrate' in peer.params.encodings[0],false,'the default comes back when the music stops');
 });

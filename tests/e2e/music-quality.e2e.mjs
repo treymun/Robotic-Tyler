@@ -57,7 +57,7 @@ test('Music DJ: untouched tab sound and a higher Opus rate while music plays (re
   assert.deepEqual({ec:asked.audio.echoCancellation,ns:asked.audio.noiseSuppression,agc:asked.audio.autoGainControl},{ec:false,ns:false,agc:false},'no microphone processing on the shared tab');
   assert.equal(asked.systemAudio,'exclude');assert.equal(asked.selfBrowserSurface,'exclude');
   const shared=await page.evaluate(()=>__messages.filter(m=>m.source==='tyler-music-status').at(-1));
-  assert.equal(shared.shared,true);assert.deepEqual(shared.quality,{processed:false,channels:shared.quality.channels,bitrate:128000});
+  assert.equal(shared.shared,true);assert.deepEqual(shared.quality,{processed:false,channels:shared.quality.channels,level:'high',bitrate:128000});
   const high=await page.evaluate(()=>rate());
   assert.equal(high.target,128000);assert.ok(high.sentKbps>=100,'actually sent at a high rate: '+JSON.stringify(high));
 

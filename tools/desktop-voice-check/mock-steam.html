@@ -27,6 +27,20 @@ window.__shareChecks=async()=>{
  }catch(e){out.screen={error:e.name+': '+e.message};}
  return out;
 };
+// Muted window (v2.20.3): a friend's voice arrives in a call while the window's sound is muted; Tyler
+// listens the way voice-listener.js does (Web Audio from the incoming track) and measures its level.
+window.__hearMuted=async()=>{
+ const wait=ms=>new Promise(r=>setTimeout(r,ms));
+ // The friend's side is the frame's own RTCPeerConnection (Tyler's bridge replaces outgoing audio in this page).
+ const a=new (document.getElementById('srv').contentWindow.RTCPeerConnection)(),b=new RTCPeerConnection();a.onicecandidate=e=>e.candidate&&b.addIceCandidate(e.candidate);b.onicecandidate=e=>e.candidate&&a.addIceCandidate(e.candidate);
+ const tone=new AudioContext(),o=tone.createOscillator(),d=tone.createMediaStreamDestination();o.frequency.value=500;o.connect(d);o.start();a.addTrack(d.stream.getAudioTracks()[0],d.stream);
+ const got=new Promise(r=>b.ontrack=e=>r(e.track));
+ await a.setLocalDescription(await a.createOffer());await b.setRemoteDescription(a.localDescription);await b.setLocalDescription(await b.createAnswer());await a.setRemoteDescription(b.localDescription);
+ const track=await got;const el=new Audio();el.srcObject=new MediaStream([track]);el.play().catch(()=>{}); // Steam plays the call like this
+ const ctx=new AudioContext(),src=ctx.createMediaStreamSource(new MediaStream([track])),an=ctx.createAnalyser(),z=ctx.createGain();z.gain.value=0;src.connect(an);an.connect(z);z.connect(ctx.destination);
+ await wait(1200);let peak=0;const buf=new Float32Array(2048);for(let i=0;i<20;i++){await wait(50);an.getFloatTimeDomainData(buf);for(const x of buf)peak=Math.max(peak,Math.abs(x));}
+ a.close();b.close();await ctx.close();await tone.close();return {heardPeak:Math.round(peak*1000)/1000};
+};
 // Start Music DJ in one click: the share is asked for while the YouTube window is still opening.
 window.__oneClick=async()=>{
  const wait=ms=>new Promise(r=>setTimeout(r,ms));

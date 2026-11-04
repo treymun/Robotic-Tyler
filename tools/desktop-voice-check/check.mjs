@@ -5,7 +5,8 @@
 // synthetic microphone with no device and no permission prompt; the local speech detector loads
 // under a strict page CSP; the bot stays in a call through two leaves and a rejoin; Music DJ shares
 // exactly the app's YouTube window (its sound reaches Tyler's audio bridge), also when Start Music
-// DJ asks for the share in the same click that opens the window; and screen awareness
+// DJ asks for the share in the same click that opens the window; Tyler still hears the call when the
+// window's sound is muted (Settings → Mute the call in this window); and screen awareness
 // gets a picture only, of what the picker chose.
 import fs from 'node:fs';import path from 'node:path';import os from 'node:os';import {spawnSync} from 'node:child_process';import {createRequire} from 'node:module';import {fileURLToPath} from 'node:url';
 const HERE=path.dirname(fileURLToPath(import.meta.url)),ROOT=path.resolve(HERE,'..','..');
@@ -24,9 +25,10 @@ if(res.mainLog.some(l=>/blocked-mic|physical microphone/i.test(l)))bad.push('a p
 if(res.neural!=='ready')bad.push('speech detector: '+res.neural);
 if(!/^stayed/.test(res.call))bad.push('call: '+res.call);
 if(res.music?.error||res.music?.audioTracks!==1||res.music?.surface!=='browser'||!(res.music?.peak>0.05))bad.push('music share: '+JSON.stringify(res.music));
-if(res.musicQuality?.processed!==false||res.musicQuality?.bitrate!==128000)bad.push('music sound quality: '+JSON.stringify(res.musicQuality));
+if(res.musicQuality?.processed!==false||res.musicQuality?.level!=='auto'||res.musicQuality?.bitrate!==64000)bad.push('music sound quality: '+JSON.stringify(res.musicQuality));
 if(!res.musicBridge?.some(t=>/YouTube audio is shared/.test(t)))bad.push('the audio bridge did not take the YouTube window\'s sound: '+JSON.stringify(res.musicBridge));
 if(res.oneClick?.error||res.oneClick?.audioTracks!==1||!(res.oneClick?.peak>0.05)||!res.oneClick?.windowOpen||!res.oneClick?.reopened)bad.push('one-click Music DJ: '+JSON.stringify(res.oneClick));
+if(!res.muted?.windowMuted||!(res.muted?.heardPeak>0.05))bad.push('muted window: Tyler must still hear the call: '+JSON.stringify(res.muted));
 if(res.screen?.error||res.screen?.audioTracks!==0)bad.push('screen share: '+JSON.stringify(res.screen));
 if(!res.picked?.length)bad.push('the screen picker was not asked');
 if(bad.length){console.error('FAILED:\n'+bad.join('\n'));process.exit(1);}

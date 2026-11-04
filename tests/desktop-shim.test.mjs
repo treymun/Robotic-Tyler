@@ -21,7 +21,7 @@ function fakeElectron(){
  class BrowserWindow{
   constructor(options){this.options=options;this.destroyed=false;const id=nextId++;const self=this;
    this.webContents={id,url:'',isDestroyed:()=>self.destroyed,getURL(){return this.url;},send:(channel,message)=>sent.push({id,channel,message}),
-    setWindowOpenHandler(){},on(){},once(){},reload(){},setUserAgent(ua){this.userAgent=ua;},mainFrame:{},session:options?.webPreferences?.partition?sessionFor(options.webPreferences.partition):{setPermissionRequestHandler(){},setPermissionCheckHandler(){}}};
+    setWindowOpenHandler(){},on(){},once(){},reload(){},setUserAgent(ua){this.userAgent=ua;},muted:false,setAudioMuted(v){this.muted=v;},isAudioMuted(){return this.muted;},mainFrame:{},session:options?.webPreferences?.partition?sessionFor(options.webPreferences.partition):{setPermissionRequestHandler(){},setPermissionCheckHandler(){}}};
    contents.set(id,this.webContents);windows.push(this);}
   loadURL(url){this.webContents.url=url;return Promise.resolve();}
   loadFile(file){this.webContents.url='file://'+file;return Promise.resolve();}
@@ -63,6 +63,10 @@ test('desktop main process boots the shared background and relays storage change
   await assert.rejects(fake.handlers.get('tyler:settings')({sender:{id:-1}},{action:'get'}),/local settings window/);
   fake.sent.length=0;
   // Use the chrome.storage stand-in directly, as the settings IPC handler does.
+  // v2.20.3: Settings (or the tray) mutes the call in the Steam window; Tyler keeps hearing it (desktop check).
+  assert.equal(bot.webContents.muted,false,'not muted unless asked');
+  await globalThis.chrome.storage.local.set({desktopMuteCall:true});assert.equal(bot.webContents.muted,true,'muted from Settings');
+  await globalThis.chrome.storage.local.set({desktopMuteCall:false});assert.equal(bot.webContents.muted,false);
   await globalThis.chrome.storage.local.set({usage:{requests:3,reportedCostUSD:0.01}});
   for(let i=0;i<50&&!fake.sent.some(s=>s.message?.type==='storage:changed');i++)await new Promise(r=>setTimeout(r,10));
   const relay=fake.sent.find(s=>s.message?.type==='storage:changed');

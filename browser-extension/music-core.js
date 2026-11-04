@@ -6,6 +6,9 @@
   if(request){const query=request[1].trim();if(reserved.test(query))return null;return query.length>=2&&query.length<=160?{action:'play',query}:null;}
   const control=/^(?:!music|music)\s+(skip|pause|resume|stop|clear|reset|queue|now|help)$/i.exec(value);
   if(control)return {action:control[1].toLowerCase()};
+  // v2.20.3: music quality low / medium / high / auto, or on its own to show the current one.
+  const quality=/^(?:!music|music)\s+quality(?:\s+(low|medium|high|auto))?$/i.exec(value);
+  if(quality)return {action:'quality',level:quality[1]?quality[1].toLowerCase():null};
   const volume=/^(?:!music|music)\s+volume\s+(\d{1,3})$/i.exec(value);
   return volume&&Number(volume[1])<=200?{action:'volume',value:Number(volume[1])}:null;
  }

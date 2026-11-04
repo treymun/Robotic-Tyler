@@ -1,3 +1,16 @@
+# ROBOTIC TYLER v2.20.3: music quality from chat, Auto quality, and a quiet Steam window
+
+## New
+- **`music quality low`, `medium`, `high` or `auto` in chat** changes the Music DJ's sound quality on the spot, so anyone in the call can turn it down if it starts to stutter. `music quality` on its own says what it's on now. Tyler confirms in chat. The same levels are in Room → Music DJ → Sound quality, and the choice is kept between sessions.
+- **Auto quality (the new default).** It starts at Medium (64 kbps). If Steam reports that Tyler's audio is getting lost on the way, it steps down to 48 kbps and then 32 kbps, and steps back up after a minute without trouble. It never goes above Medium; pick High (128 kbps) yourself if your connection handles it. Low is Steam's own default rate.
+- **Desktop app: Mute the call in this window** (Settings → Where Tyler joins voice, or the tray menu). Turn it on if you're in the same call on Steam.exe with your own account, so you don't hear yourself and everyone twice through Tyler's window. Tyler still hears everyone and still talks into the call. Sound previews in Tyler's panel go quiet too.
+
+## Tested
+- **Mocks:** the chat command (low, medium, high, auto and on its own); Auto stepping down at 6% lost audio, never below Low, back up after a steady minute and never above Medium, with the default restored when music stops, using stand-in Steam stats; the panel's quality choice surviving a reload; muting from Settings in the desktop app's main process.
+- **Real Chromium and Electron, no Steam:** the encoder rate following High, Medium and the default, measured from the bytes sent; in the desktop app's Electron, a call's incoming voice still reached Tyler at full level while the window was muted (the desktop check, with a mock Steam page). Auto's step-down depends on Steam's server reporting lost packets, which isn't tested against Steam yet; the chat command works either way. 270 unit and integration tests and 17 end-to-end tests.
+
+---
+
 # ROBOTIC TYLER v2.20.2: Music DJ that sounds like music
 
 ## Fixed

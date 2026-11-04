@@ -8,13 +8,30 @@
  // shared, the call's Opus encoder gets more bits on Tyler's own senders (128 kbps by default,
  // Chrome's default is about 32); the earlier setting comes back when the music stops.
  const MUSIC_AUDIO=Object.freeze({echoCancellation:false,noiseSuppression:false,autoGainControl:false,channelCount:{ideal:2},sampleRate:{ideal:48000}});
- let musicBitrate=128000,musicQuality=null,tuning=Promise.resolve();
+ // Quality levels (v2.20.3): High 128 kbps, Medium 64 kbps, Low = Steam's default (about 32 kbps), and
+ // Auto, which starts at Medium and steps down (64 → 48 → 32 kbps) when Steam reports the call is
+ // losing Tyler's audio, then back up once it has been clean for a while. Auto never goes above Medium.
+ const LEVELS={high:128000,medium:64000,low:0},AUTO=[32000,48000,64000];
+ let musicLevel='auto',autoRate=64000,autoClean=0,autoLast=null,autoTimer=0,musicQuality=null,tuning=Promise.resolve();
  const bitrateBefore=new WeakMap();
- const bitrateOf=v=>{const n=Number(v);return n===0?0:Number.isFinite(n)?Math.round(Math.min(256000,Math.max(32000,n))):128000;};
- function musicStatus(text,shared=!!musicStream){window.postMessage({source:'tyler-music-status',text,shared,quality:shared&&musicQuality?{...musicQuality,bitrate:musicBitrate}:null},location.origin);}
- function disconnectMusic(){const stream=musicStream;musicStream=null;musicQuality=null;try{musicSource?.disconnect();musicGain?.disconnect();musicLimiter?.disconnect();}catch{}musicSource=null;for(const track of stream?.getTracks()||[])track.stop();void retune();musicStatus('Music sharing stopped.',false);}
+ const levelOf=v=>{const k=String(v??'').toLowerCase();if(k in LEVELS||k==='auto')return k;const n=Number(v);return v==null||v===''||!Number.isFinite(n)?'auto':n===0?'low':n>=100000?'high':'medium';};
+ const musicRate=()=>musicLevel==='auto'?autoRate:LEVELS[musicLevel];
+ function qualityName(){const kbps=Math.round(musicRate()/1000);return musicLevel==='auto'?'Auto (now '+kbps+' kbps)':musicLevel==='low'?'Low (Steam\'s default, about 32 kbps)':(musicLevel==='high'?'High':'Medium')+' ('+kbps+' kbps)';}
+ function musicStatus(text,shared=!!musicStream){window.postMessage({source:'tyler-music-status',text,shared,quality:shared&&musicQuality?{...musicQuality,level:musicLevel,bitrate:musicRate()}:null},location.origin);}
+ // Auto: every 4 s, the share of Tyler's packets Steam's server reports lost (RTCP receiver reports).
+ async function autoStep(){
+  if(!musicStream||musicLevel!=='auto')return;let sent=0,lost=0,reported=false;
+  for(const peer of peers){if(closed(peer)||peer.connectionState!=='connected')continue;try{const st=await peer.getStats();st.forEach(x=>{if(x.kind!=='audio')return;if(x.type==='outbound-rtp')sent+=Number(x.packetsSent)||0;if(x.type==='remote-inbound-rtp'){reported=true;lost+=Math.max(0,Number(x.packetsLost)||0);}});}catch{}}
+  const prev=autoLast;autoLast={sent,lost};if(!prev||!reported||sent<=prev.sent)return;
+  const loss=Math.max(0,lost-prev.lost)/(sent-prev.sent),i=AUTO.indexOf(autoRate);
+  if(loss>=0.03&&i>0){autoRate=AUTO[i-1];autoClean=0;await retune();musicStatus('The call was dropping music, so quality went down to '+Math.round(autoRate/1000)+' kbps (Auto).');}
+  else if(loss<0.005){autoClean+=4;if(autoClean>=60&&i<AUTO.length-1){autoRate=AUTO[i+1];autoClean=0;await retune();musicStatus('The call is steady again: music quality back up to '+Math.round(autoRate/1000)+' kbps (Auto).');}}
+  else autoClean=0;
+ }
+ function autoWatch(){clearInterval(autoTimer);autoTimer=0;autoLast=null;autoClean=0;if(musicStream&&musicLevel==='auto')autoTimer=setInterval(()=>{void autoStep();},4000);}
+ function disconnectMusic(){const stream=musicStream;musicStream=null;musicQuality=null;clearInterval(autoTimer);autoTimer=0;autoRate=AUTO.at(-1);try{musicSource?.disconnect();musicGain?.disconnect();musicLimiter?.disconnect();}catch{}musicSource=null;for(const track of stream?.getTracks()||[])track.stop();void retune();musicStatus('Music sharing stopped.',false);}
  async function tuneSender(sender){
-  const want=musicStream&&musicBitrate>0?musicBitrate:0;
+  const want=musicStream?musicRate():0;
   try{const p=sender.getParameters(),e=p.encodings?.[0];if(!e)return;
    if(want){if(!bitrateBefore.has(sender))bitrateBefore.set(sender,e.maxBitrate??null);if(e.maxBitrate===want)return;e.maxBitrate=want;}
    else{if(!bitrateBefore.has(sender))return;const before=bitrateBefore.get(sender);bitrateBefore.delete(sender);if(before==null)delete e.maxBitrate;else e.maxBitrate=before;}
@@ -79,11 +96,11 @@
   if(event.source!==window||event.origin!==location.origin||event.data?.source!=='tyler-audio-command')return;
   try{const m=event.data;
    if(m.type==='music-disconnect'){disconnectMusic();return;}
-   if(m.type==='music-quality'){musicBitrate=bitrateOf(m.bitrate);await retune();if(musicStream)musicStatus('Music quality: '+(musicBitrate?Math.round(musicBitrate/1000)+' kbps':'Steam\'s default')+'.');return;}
+   if(m.type==='music-quality'){const before=musicLevel;musicLevel=levelOf(m.level??m.bitrate);if(musicLevel==='auto'&&before!=='auto')autoRate=AUTO.at(-1);await retune();autoWatch();if(musicStream)musicStatus('Music quality: '+qualityName()+'.');return;}
    if(m.type==='music-volume'){if(musicGain){const level=Math.max(0,Math.min(2,Number(m.volume)||0));musicGain.gain.setTargetAtTime(level,ctx.currentTime,.08);}return;}
    if(m.type==='music-capture'){
     disconnectMusic();setup();
-    if(m.bitrate!==undefined)musicBitrate=bitrateOf(m.bitrate);
+    if(m.level!==undefined||m.bitrate!==undefined)musicLevel=levelOf(m.level??m.bitrate);autoRate=AUTO.at(-1);
     const stream=await navigator.mediaDevices.getDisplayMedia({video:{displaySurface:'browser'},audio:MUSIC_AUDIO,preferCurrentTab:false,selfBrowserSurface:'exclude',systemAudio:'exclude',monitorTypeSurfaces:'exclude',surfaceSwitching:'include'});
     const video=stream.getVideoTracks()[0],audio=stream.getAudioTracks();
     if(!audio.length||video?.getSettings?.().displaySurface!=='browser'||/steam/i.test(video?.label||'')){for(const t of stream.getTracks())t.stop();throw Error('Select the YouTube browser tab and enable Share tab audio. Do not select Steam, a window or your screen.');}
@@ -93,7 +110,7 @@
     musicQuality={processed:processed(),channels:Number(audio[0].getSettings?.().channelCount)||1};
     musicStream=stream;musicSource=ctx.createMediaStreamSource(new MediaStream(audio));musicGain=ctx.createGain();musicGain.gain.value=Math.max(0,Math.min(2,(Number.isFinite(Number(m.volume))?Number(m.volume):.35)));musicSource.connect(musicGain);musicLimiter=ctx.createDynamicsCompressor();musicLimiter.threshold.value=-3;musicLimiter.knee.value=6;musicLimiter.ratio.value=20;musicLimiter.attack.value=.003;musicLimiter.release.value=.15;musicGain.connect(musicLimiter);musicLimiter.connect(destination);
     for(const track of stream.getTracks())track.addEventListener('ended',()=>{if(musicStream===stream)disconnectMusic();});
-    enabled=true;await resumePlayer();for(const peer of peers)await attach(peer);await retune();
+    enabled=true;await resumePlayer();for(const peer of peers)await attach(peer);await retune();autoWatch();
     musicStatus('YouTube audio is shared. Join Steam voice with the bot, keep AI in Text mode, then request !play artist song.');return;
    }
    if(m.type==='preview'){if(typeof m.audio!=='string'||m.audio.length>6000000)throw Error('Preview too large');setup();await resumePlayer();const bytes=Uint8Array.from(atob(m.audio),c=>c.charCodeAt(0));const buffer=await ctx.decodeAudioData(bytes.buffer);if(buffer.duration>30)throw Error('Preview exceeds 30 seconds');try{previewNode?.stop();}catch{}const preview=ctx.createBufferSource();previewNode=preview;preview.buffer=buffer;preview.connect(ctx.destination);preview.onended=()=>preview.disconnect();preview.start();announce('Voice preview playing locally only.');return;}
