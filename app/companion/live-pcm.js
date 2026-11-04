@@ -8,17 +8,45 @@
  if(globalThis.TylerLivePcm)return;
  const IN_RATE=16000,OUT_RATE=24000;
 
- /** Float samples at `rate` → Int16 at 16 kHz (box-filter average, which also low-passes). */
+ /**
+  * Band-limited resampler (v2.21): a windowed-sinc filter in a polyphase table. It keeps its place
+  * between calls, so a stream converted piece by piece comes out exactly as if converted in one go:
+  * no click at each join and no samples lost when the rates don't divide evenly. Going down in rate
+  * it removes what the new rate can't hold (an "s" at 11 kHz) instead of folding it back as noise.
+  * process(Float32Array) → Float32Array; flush() returns the last few samples it was holding back.
+  */
+ const tables=new Map();
+ function table(scale,halfTaps,phases){
+  const key=scale+'|'+halfTaps+'|'+phases;if(tables.has(key))return tables.get(key);
+  const W=Math.ceil(halfTaps/scale),T=2*W,fc=0.5*scale*0.92,t=new Float32Array((phases+1)*T);
+  for(let p=0;p<=phases;p++){let sum=0;const frac=p/phases;
+   for(let k=0;k<T;k++){const x=k-(W-1)-frac,s=Math.abs(x)<1e-9?2*fc:Math.sin(2*Math.PI*fc*x)/(Math.PI*x),u=x/W,w=Math.abs(u)>=1?0:0.42+0.5*Math.cos(Math.PI*u)+0.08*Math.cos(2*Math.PI*u);t[p*T+k]=s*w;sum+=s*w;}
+   for(let k=0;k<T;k++)t[p*T+k]/=sum||1;}
+  const out={W,T,t};tables.set(key,out);return out;
+ }
+ function createResampler(inRate,outRate,{halfTaps=12,phases=256}={}){
+  inRate=Number(inRate)||IN_RATE;outRate=Number(outRate)||IN_RATE;
+  const step=inRate/outRate,{W,T,t}=table(Math.min(1,outRate/inRate),halfTaps,phases);
+  let hist,pos;
+  const reset=()=>{hist=new Float32Array(W-1);pos=W-1;};reset();
+  function process(input){
+   if(inRate===outRate)return Float32Array.from(input||[]);
+   const buf=new Float32Array(hist.length+(input?.length||0));buf.set(hist);if(input?.length)buf.set(input,hist.length);
+   const out=new Float32Array(Math.max(0,Math.ceil((buf.length-W-pos)/step)+1));let n=0;
+   while(Math.floor(pos)+W<buf.length){const i0=Math.floor(pos),frac=pos-i0,p=Math.round(frac*phases),base=i0-(W-1),row=p*T;let acc=0;for(let k=0;k<T;k++)acc+=buf[base+k]*t[row+k];out[n++]=acc;pos+=step;}
+   const keep=Math.max(0,Math.floor(pos)-(W-1));hist=buf.slice(keep);pos-=keep;return out.subarray(0,n);
+  }
+  return {process,flush:()=>{const tail=process(new Float32Array(W+1));reset();return tail;},reset,rate:outRate};
+ }
+ const toInt16=f=>{const out=new Int16Array(f.length);for(let i=0;i<f.length;i++){const v=Math.max(-1,Math.min(1,f[i]));out[i]=v<0?v*32768:v*32767;}return out;};
+ /** Float samples at `rate` → Int16 at 16 kHz, all at once (a whole clip). */
  function downsample(input,rate){
   if(!input?.length)return new Int16Array(0);
-  const ratio=rate/IN_RATE,length=Math.floor(input.length/ratio),out=new Int16Array(length);
-  for(let i=0;i<length;i++){
-   const from=Math.floor(i*ratio),to=Math.min(input.length,Math.max(from+1,Math.floor((i+1)*ratio)));
-   let sum=0;for(let j=from;j<to;j++)sum+=input[j];
-   const v=Math.max(-1,Math.min(1,sum/(to-from)));out[i]=v<0?v*32768:v*32767;
-  }
-  return out;
+  const r=createResampler(rate,IN_RATE),a=r.process(input),b=r.flush(),length=Math.floor(input.length*IN_RATE/rate),all=new Float32Array(a.length+b.length);all.set(a);all.set(b,a.length);
+  return toInt16(all.subarray(0,Math.min(length,all.length)));
  }
+ /** The same for a stream in pieces (Gemini Live's microphone frames): keeps its place between frames. */
+ function createDownsampler(rate){const r=createResampler(rate,IN_RATE);return Object.assign(input=>toInt16(r.process(input)),{reset:r.reset});}
  /** Int16 PCM at any rate → Int16 at 16 kHz (for the desktop helper's capture). */
  function resampleInt16(input,rate){
   if(rate===IN_RATE)return input;
@@ -62,5 +90,5 @@
    return out;
   }
  }
- globalThis.TylerLivePcm=Object.freeze({IN_RATE,OUT_RATE,downsample,resampleInt16,rms,toBase64,fromBase64,InputGate});
+ globalThis.TylerLivePcm=Object.freeze({IN_RATE,OUT_RATE,downsample,createDownsampler,createResampler,resampleInt16,rms,toBase64,fromBase64,InputGate});
 })();

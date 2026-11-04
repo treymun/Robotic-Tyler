@@ -2,10 +2,11 @@
  'use strict';let session=0,enabled=false,held=true,controlsOnly=false,waitQuiet=false,context,mix,analyser,highpass,lowpass,timer,recorder,lastCapture=0,lastActivity=0,lastMeter=0;let filter=TylerNoise.configure();const peers=new Set(),sources=new Map();const gate=new TylerNoise.SpeechGate();let lastTick=0;
  // Gemini Live (v2.15): the same filtered mix of the call's incoming tracks, as 16 kHz frames. Tyler's own
  // voice goes out on the sender track (audio-bridge.js), so it never comes back in here.
- let liveOn=false,tap=null,tapSink=null,liveFrames=0;
- function liveTap(){if(tap)return;tap=context.createScriptProcessor(2048,1,1);tapSink=context.createGain();tapSink.gain.value=0;lowpass.connect(tap);tap.connect(tapSink);tapSink.connect(context.destination);
-  tap.onaudioprocess=e=>{if(!liveOn)return;const pcm=TylerLivePcm.downsample(e.inputBuffer.getChannelData(0),context.sampleRate);post('live-audio',{pcm:TylerLivePcm.toBase64(pcm)});if(++liveFrames%4===0)post('live-level',{rms:TylerLivePcm.rms(pcm),tracks:sources.size});};}
- function liveUntap(){try{lowpass?.disconnect(tap);tap?.disconnect();tapSink?.disconnect();}catch{}tap=null;tapSink=null;}
+ // v2.21: one converter for the whole stream, so the 16 kHz frames join without clicks or lost samples.
+ let liveOn=false,tap=null,tapSink=null,liveFrames=0,liveDown=null;
+ function liveTap(){if(tap)return;liveDown=TylerLivePcm.createDownsampler(context.sampleRate);tap=context.createScriptProcessor(2048,1,1);tapSink=context.createGain();tapSink.gain.value=0;lowpass.connect(tap);tap.connect(tapSink);tapSink.connect(context.destination);
+  tap.onaudioprocess=e=>{if(!liveOn)return;const pcm=liveDown(e.inputBuffer.getChannelData(0));post('live-audio',{pcm:TylerLivePcm.toBase64(pcm)});if(++liveFrames%4===0)post('live-level',{rms:TylerLivePcm.rms(pcm),tracks:sources.size});};}
+ function liveUntap(){try{lowpass?.disconnect(tap);tap?.disconnect();tapSink?.disconnect();}catch{}tap=null;tapSink=null;liveDown=null;}
  const post=(type,data={})=>window.postMessage({source:'tyler-listener',type,...data},location.origin);
  function resetCapture(){if(recorder){recorder.discard=true;if(recorder.capture.state==='recording')recorder.capture.stop();}}
  function setup(){if(context)return;context=new AudioContext();mix=context.createMediaStreamDestination();analyser=context.createAnalyser();analyser.fftSize=1024;highpass=context.createBiquadFilter();highpass.type='highpass';lowpass=context.createBiquadFilter();lowpass.type='lowpass';highpass.connect(lowpass);lowpass.connect(mix);lowpass.connect(analyser);configureFilters();}

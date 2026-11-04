@@ -34,9 +34,10 @@ test('queued speech plays back to back as one turn',async()=>{
   assert.deepEqual(errors,[]);
   // First clip + queued remainder: playing stays true from the first start until the remainder ends.
   const f=runs.first.filter(([,t],i,a)=>!(i===0&&a[0][0]===false));
-  assert.deepEqual(f.map(([p])=>p),[true,true,false]);
-  assert.ok(f[1][1]-f[0][1]>=400,'remainder starts when the first clip ends');
-  assert.ok(f[2][1]-f[0][1]>=850,'both clips played in full');
+  assert.deepEqual(f.map(([p])=>p),[true,false],'one turn: playing from the first clip to the end of the remainder');
+  // v2.21: the remainder is scheduled on arrival to start on the exact sample the first clip ends
+  // (voice-quality.e2e.mjs checks the timing), so its playing event no longer waits for the first to end.
+  assert.ok(f[1][1]-f[0][1]>=850,'both clips played in full');
   // A new reply replaces the playing clip and drops its queued remainder.
   const r=runs.replaced.map(([p])=>p);assert.deepEqual(r.slice(-2),[true,false]);assert.equal(r.filter(Boolean).length,2);
   // Stop clears the queue.

@@ -78,7 +78,7 @@ test('history: steered turns are dropped and chat stays wrapped as data',()=>{
 
 test('PCM helpers and the silence gate',()=>{
  const f=new Float32Array(4800).fill(.5),out=Pcm.downsample(f,48000);
- assert.equal(out.length,1600);assert.ok(Math.abs(out[10]-16383)<2);
+ assert.equal(out.length,1600);assert.ok(Math.abs(out[800]-16383)<4,'level kept: '+out[800]);
  assert.deepEqual([...Pcm.fromBase64(Pcm.toBase64(Int16Array.of(1,-2,32767)))],[1,-2,32767]);
  const g=new Pcm.InputGate({threshold:.01,preRollMs:80,hangoverMs:120});
  for(let i=0;i<5;i++)assert.deepEqual(g.push(quiet()).send,[],'silence is held back');
@@ -208,4 +208,23 @@ test('typed test messages and the 2.5 model use the right message types',async()
  assert.deepEqual(ws.sent.at(-1),{realtimeInput:{text:'say hi'}});
  const t2=session({settings:{liveModel:'gemini-2.5-flash-native-audio-preview-12-2025'}});const ws2=await opened(t2);t2.s.sendText('say hi');
  assert.deepEqual(ws2.sent.at(-1),{clientContent:{turns:[{role:'user',parts:[{text:'say hi'}]}],turnComplete:true}});
+});
+
+test('band-limited conversion (v2.21): pieces join cleanly, nothing is lost, high sounds are filtered out',()=>{
+ const tone=(f,rate,sec,a=.5)=>Float32Array.from({length:Math.round(rate*sec)},(_,i)=>a*Math.sin(2*Math.PI*f*i/rate));
+ const rms=x=>Math.sqrt(x.reduce((s,v)=>s+v*v,0)/x.length);
+ for(const rate of [48000,44100]){
+  // The page's 2048-sample frames, streamed: the same as converting all at once.
+  const s=tone(1000,rate,2),down=Pcm.createDownsampler(rate),pieces=[];for(let i=0;i+2048<=s.length;i+=2048)pieces.push(...down(s.subarray(i,i+2048)));
+  const whole=Pcm.createResampler(rate,16000).process(s.subarray(0,pieces.length?Math.floor(s.length/2048)*2048:0));
+  let diff=0;for(let i=0;i<pieces.length;i++)diff=Math.max(diff,Math.abs(pieces[i]/32768-whole[i]));
+  assert.ok(diff<1e-3,rate+': streamed in frames = converted at once ('+diff+')');
+  assert.ok(Math.abs(pieces.length-Math.floor(s.length/2048)*2048*16000/rate)<40,'no samples lost at the joins');
+  // An 11 kHz sound can't exist at 16 kHz: it's removed, not folded back to 5 kHz (the old averaging let it through at about -7 dB).
+  const hi=Pcm.downsample(tone(11000,rate,1),rate);assert.ok(rms(Float32Array.from(hi.slice(200),v=>v/32768))<.5*0.002,'11 kHz removed');
+ }
+ // Gemini Live's 24 kHz voice → 48 kHz in 40 ms pieces: one continuous sine.
+ const up=Pcm.createResampler(24000,48000),src=tone(440,24000,1),out=[];for(let i=0;i<src.length;i+=960)out.push(...up.process(src.subarray(i,i+960)));
+ let err=0;for(let i=100;i<out.length-100;i++)err=Math.max(err,Math.abs(out[i]-.5*Math.sin(2*Math.PI*440*(i)/48000)));
+ assert.ok(err<.002,'no clicks at the joins ('+err+')');
 });

@@ -29,7 +29,7 @@
   else autoClean=0;
  }
  function autoWatch(){clearInterval(autoTimer);autoTimer=0;autoLast=null;autoClean=0;if(musicStream&&musicLevel==='auto')autoTimer=setInterval(()=>{void autoStep();},4000);}
- function disconnectMusic(){const stream=musicStream;musicStream=null;musicQuality=null;clearInterval(autoTimer);autoTimer=0;autoRate=AUTO.at(-1);try{musicSource?.disconnect();musicGain?.disconnect();musicLimiter?.disconnect();}catch{}musicSource=null;for(const track of stream?.getTracks()||[])track.stop();void retune();musicStatus('Music sharing stopped.',false);}
+ function disconnectMusic(){const stream=musicStream;musicStream=null;musicQuality=null;clearInterval(autoTimer);autoTimer=0;autoRate=AUTO.at(-1);try{musicSource?.disconnect();musicGain?.disconnect();musicLimiter?.disconnect();musicDuck?.disconnect();}catch{}musicDuck=null;musicSource=null;for(const track of stream?.getTracks()||[])track.stop();void retune();musicStatus('Music sharing stopped.',false);}
  async function tuneSender(sender){
   const want=musicStream?musicRate():0;
   try{const p=sender.getParameters(),e=p.encodings?.[0];if(!e)return;
@@ -47,18 +47,45 @@
  function setup(){if(ctx)return;ctx=new AudioContext();destination=ctx.createMediaStreamDestination();gain=ctx.createGain();gain.gain.value=.35;gain.connect(destination);monitor=ctx.createGain();monitor.gain.value=0;gain.connect(monitor);monitor.connect(ctx.destination);}
  function boardPlayer(){if(!board)board=new TylerBoardAudio(ctx,gain,text=>window.postMessage({source:'tyler-soundboard-status',text},location.origin));return board;}
  async function resumePlayer(){let timer;try{await Promise.race([ctx.resume(),new Promise((_,reject)=>{timer=setTimeout(()=>reject(Error('Audio player is suspended. Click Enable again or check this tab is allowed to play sound.')),2500);})]);}finally{clearTimeout(timer);}}
- function playing(value){window.postMessage({source:'tyler-playback',playing:value},location.origin);}
+ // v2.21: while Tyler talks, the Music DJ dips about 10 dB and comes back half a second after he stops.
+ let musicDuck=null,duckOn=true;
+ function duck(talking){if(!musicDuck||!ctx)return;const t=ctx.currentTime;musicDuck.gain.cancelScheduledValues(t);musicDuck.gain.setValueAtTime(musicDuck.gain.value,t);if(talking&&duckOn)musicDuck.gain.setTargetAtTime(.32,t,.04);else musicDuck.gain.setTargetAtTime(1,t+(talking?0:.45),.18);}
+ function playing(value){duck(value);window.postMessage({source:'tyler-playback',playing:value},location.origin);}
  // Gemini Live chunks (v2.15): 24 kHz PCM scheduled back to back as they arrive, at most 20 s ahead.
  // A flush stops the response that was interrupted and drops its queued chunks at once.
- let liveNodes=[],liveNext=0,liveFlushed=0;
- function livePlay(b64,gen){if(gen<=liveFlushed)return;const pcm=TylerLivePcm.fromBase64(b64);if(!pcm.length)return;const buf=ctx.createBuffer(1,pcm.length,24000),data=buf.getChannelData(0);for(let i=0;i<pcm.length;i++)data[i]=pcm[i]/32768;
-  const now=ctx.currentTime;if(liveNext<now+.03)liveNext=now+.06;if(liveNext-now>20)return;const src=ctx.createBufferSource();src.buffer=buf;src.connect(gain);src.start(liveNext);liveNext+=buf.duration;const node={src,gen};liveNodes.push(node);playing(true);
+ // v2.21: the 24 kHz chunks go through one band-limited converter per run (live-pcm.js) and are
+ // scheduled frame by frame at the page's own rate. Converting each chunk on its own, as before, left
+ // a small click at every join. A slow level match keeps Live's voice as loud as Tyler's other voice.
+ let liveNodes=[],liveFrame=0,liveFlushed=0,liveUp=null,liveLevel=0,liveGain=null;
+ function livePlay(b64,gen){if(gen<=liveFlushed)return;const pcm=TylerLivePcm.fromBase64(b64);if(!pcm.length)return;
+  const sr=ctx.sampleRate,now=ctx.currentTime;
+  if(!liveUp||liveFrame/sr<now+.03){liveUp=TylerLivePcm.createResampler(TylerLivePcm.OUT_RATE,sr);liveFrame=Math.ceil((now+.06)*sr);}
+  if(liveFrame/sr-now>20)return;
+  const f=new Float32Array(pcm.length);for(let i=0;i<pcm.length;i++)f[i]=pcm[i]/32768;
+  if(!liveGain){liveGain=ctx.createGain();liveGain.connect(gain);}
+  const level=speechLevel(f);if(level){liveLevel=liveLevel?liveLevel*.85+level*.15:level;liveGain.gain.setTargetAtTime(levelGain(liveLevel),now,.8);}
+  const out=liveUp.process(f);if(!out.length)return;const buf=ctx.createBuffer(1,out.length,sr);buf.copyToChannel(out,0);
+  const src=ctx.createBufferSource();src.buffer=buf;src.connect(liveGain);src.start(liveFrame/sr);liveFrame+=out.length;const node={src,gen};liveNodes.push(node);playing(true);
   src.onended=()=>{src.disconnect();liveNodes=liveNodes.filter(n=>n!==node);if(!liveNodes.length&&!active.length)playing(false);};}
- function liveFlush(gen){liveFlushed=Math.max(liveFlushed,gen);const had=liveNodes.length;for(const n of liveNodes)if(n.gen<=gen){try{n.src.onended=null;n.src.stop();n.src.disconnect();}catch{}}liveNodes=liveNodes.filter(n=>n.gen>gen);liveNext=0;if(had&&!liveNodes.length&&!active.length)playing(false);}
- function stop(all=true){if(all)board?.stop();liveFlush(Number.MAX_SAFE_INTEGER-1);liveFlushed=0;try{previewNode?.stop();previewNode?.disconnect();}catch{}previewNode=null;for(const node of active){try{node.stop();node.disconnect();}catch{}}active=[];queued=[];playing(false);}
+ function liveFlush(gen){liveFlushed=Math.max(liveFlushed,gen);const had=liveNodes.length;for(const n of liveNodes)if(n.gen<=gen){try{n.src.onended=null;n.src.stop();n.src.disconnect();}catch{}}liveNodes=liveNodes.filter(n=>n.gen>gen);liveFrame=0;liveUp=null;if(had&&!liveNodes.length&&!active.length)playing(false);}
+ function stop(all=true){if(all)board?.stop();liveFlush(Number.MAX_SAFE_INTEGER-1);liveFlushed=0;try{previewNode?.stop();previewNode?.disconnect();}catch{}previewNode=null;for(const node of active){try{node.stop();node.disconnect();}catch{}}active=[];queued=[];clipEnd=0;playing(false);}
  // Plays one decoded clip; a clip queued with {queue:true} starts the moment this one ends, with no
  // playing(false) gap in between, so the panel keeps treating the reply as one continuous turn.
- function playBuffer(buffer){const source=ctx.createBufferSource();source.buffer=buffer;source.connect(gain);active.push(source);playing(true);source.onended=()=>{source.disconnect();if(!active.includes(source))return;active=active.filter(n=>n!==source);if(active.length)return;const next=queued.shift();if(next)playBuffer(next);else playing(false);};source.start();}
+ // v2.21: a queued clip (the rest of a reply after its first sentence) is scheduled to start on the
+ // exact sample the current one ends, not when the page hears that it ended (a gap of ~10 ms and a
+ // click). Each reply is brought to the same loudness; its parts share one level so they match.
+ let clipEnd=0,replyGain=1;
+ function playBuffer(buffer,{queue=false,level}={}){
+  const source=ctx.createBufferSource(),g=ctx.createGain();source.buffer=buffer;g.gain.value=level??1;source.connect(g);g.connect(gain);
+  const now=ctx.currentTime,at=queue&&active.length&&clipEnd>now?clipEnd:now;clipEnd=at+buffer.duration;
+  const was=active.length;active.push(source);if(!was)playing(true);
+  source.onended=()=>{source.disconnect();g.disconnect();if(!active.includes(source))return;active=active.filter(n=>n!==source);if(!active.length)playing(false);};
+  source.start(at);
+ }
+ // Loudness of speech in a clip: RMS over 20 ms blocks louder than -50 dBFS (so pauses don't count).
+ function speechLevel(data){let sum=0,n=0;const block=480;for(let s=0;s+block<=data.length;s+=block){let e=0;for(let i=s;i<s+block;i++)e+=data[i]*data[i];e/=block;if(e>1e-5){sum+=e;n++;}}return n?Math.sqrt(sum/n):0;}
+ const LEVEL_TARGET=.12;const levelGain=level=>level?Math.max(.3,Math.min(4,LEVEL_TARGET/level)):1;
+ function clipLevel(buffer){const d=buffer.getChannelData(0);let peak=0;for(let i=0;i<d.length;i++)peak=Math.max(peak,Math.abs(d[i]));const g=levelGain(speechLevel(d));return peak?Math.min(g,.98/peak):g;}
  const original=navigator.mediaDevices?.getUserMedia.bind(navigator.mediaDevices);
  if(original)navigator.mediaDevices.getUserMedia=async constraints=>{
   if(!constraints?.audio)return original(constraints);
@@ -97,6 +124,7 @@
   try{const m=event.data;
    if(m.type==='music-disconnect'){disconnectMusic();return;}
    if(m.type==='music-quality'){const before=musicLevel;musicLevel=levelOf(m.level??m.bitrate);if(musicLevel==='auto'&&before!=='auto')autoRate=AUTO.at(-1);await retune();autoWatch();if(musicStream)musicStatus('Music quality: '+qualityName()+'.');return;}
+   if(m.type==='music-duck'){duckOn=m.on!==false;duck(!!(active.length||liveNodes.length));return;}
    if(m.type==='music-volume'){if(musicGain){const level=Math.max(0,Math.min(2,Number(m.volume)||0));musicGain.gain.setTargetAtTime(level,ctx.currentTime,.08);}return;}
    if(m.type==='music-capture'){
     disconnectMusic();setup();
@@ -108,12 +136,12 @@
     const processed=()=>{const x=audio[0].getSettings?.()||{};return !!(x.echoCancellation||x.noiseSuppression||x.autoGainControl);};
     if(processed())await audio[0].applyConstraints?.(MUSIC_AUDIO).catch(()=>{});
     musicQuality={processed:processed(),channels:Number(audio[0].getSettings?.().channelCount)||1};
-    musicStream=stream;musicSource=ctx.createMediaStreamSource(new MediaStream(audio));musicGain=ctx.createGain();musicGain.gain.value=Math.max(0,Math.min(2,(Number.isFinite(Number(m.volume))?Number(m.volume):.35)));musicSource.connect(musicGain);musicLimiter=ctx.createDynamicsCompressor();musicLimiter.threshold.value=-3;musicLimiter.knee.value=6;musicLimiter.ratio.value=20;musicLimiter.attack.value=.003;musicLimiter.release.value=.15;musicGain.connect(musicLimiter);musicLimiter.connect(destination);
+    musicStream=stream;musicSource=ctx.createMediaStreamSource(new MediaStream(audio));musicGain=ctx.createGain();musicGain.gain.value=Math.max(0,Math.min(2,(Number.isFinite(Number(m.volume))?Number(m.volume):.35)));musicSource.connect(musicGain);musicLimiter=ctx.createDynamicsCompressor();musicLimiter.threshold.value=-3;musicLimiter.knee.value=6;musicLimiter.ratio.value=20;musicLimiter.attack.value=.003;musicLimiter.release.value=.15;musicGain.connect(musicLimiter);musicDuck=ctx.createGain();musicDuck.gain.value=active.length||liveNodes.length?.32:1;musicLimiter.connect(musicDuck);musicDuck.connect(destination);
     for(const track of stream.getTracks())track.addEventListener('ended',()=>{if(musicStream===stream)disconnectMusic();});
     enabled=true;await resumePlayer();for(const peer of peers)await attach(peer);await retune();autoWatch();
     musicStatus('YouTube audio is shared. Join Steam voice with the bot, keep AI in Text mode, then request !play artist song.');return;
    }
-   if(m.type==='preview'){if(typeof m.audio!=='string'||m.audio.length>6000000)throw Error('Preview too large');setup();await resumePlayer();const bytes=Uint8Array.from(atob(m.audio),c=>c.charCodeAt(0));const buffer=await ctx.decodeAudioData(bytes.buffer);if(buffer.duration>30)throw Error('Preview exceeds 30 seconds');try{previewNode?.stop();}catch{}const preview=ctx.createBufferSource();previewNode=preview;preview.buffer=buffer;preview.connect(ctx.destination);preview.onended=()=>preview.disconnect();preview.start();announce('Voice preview playing locally only.');return;}
+   if(m.type==='preview'){if(typeof m.audio!=='string'||m.audio.length>6000000)throw Error('Preview too large');setup();await resumePlayer();const bytes=Uint8Array.from(atob(m.audio),c=>c.charCodeAt(0));const buffer=await ctx.decodeAudioData(bytes.buffer);if(buffer.duration>30)throw Error('Preview exceeds 30 seconds');try{previewNode?.stop();}catch{}const preview=ctx.createBufferSource(),pg=ctx.createGain();pg.gain.value=clipLevel(buffer);previewNode=preview;preview.buffer=buffer;preview.connect(pg);pg.connect(ctx.destination);preview.onended=()=>{preview.disconnect();pg.disconnect();};preview.start();announce('Voice preview playing locally only.');return;}
    if(m.type==='enable'){setup();enabled=true;await resumePlayer();for(const peer of peers)await attach(peer);announce(attached?'Synthetic sender attached. Test beep and check Steam meter.':'Sound player ready; no outgoing Steam audio sender attached yet. Leave and rejoin voice.');return;}
    if(m.type==='status'){lastCodec=await codecReport();announce('Voice connection checked.');return;}
    if(m.type==='stop'){stop();return;}
@@ -125,7 +153,7 @@
    if(m.type==='board-play'){if(!attached)for(const peer of peers)await attach(peer);await boardPlayer().play(m);return;}
    if(m.type==='volume'){gain.gain.value=Math.max(0,Math.min(.7,Number(m.volume)||0));monitor.gain.value=m.monitor?1:0;return;}
    if(m.type==='sound'){await ctx.resume();for(const peer of peers)await attach(peer);stop();const t=ctx.currentTime;if(m.sound==='beep')tone(660,t,.8);else if(m.sound==='airhorn'){tone(220,t,.6,'sawtooth');tone(277,t,.6,'sawtooth');}else if(m.sound==='drumroll'){for(let i=0;i<12;i++)tone(100+i*8,t+i*.065,.06,'triangle');}announce(attached?'Sound playing; synthetic sender attached. Check Steam meter.':'Sound playing locally; no outgoing Steam sender attached.');return;}
-   if(m.type==='audio'){if(typeof m.audio!=='string'||m.audio.length>6000000)throw Error('Clip too large (4 MB maximum).');audioJobs=audioJobs.then(async()=>{const binary=atob(m.audio),bytes=Uint8Array.from(binary,c=>c.charCodeAt(0));const buffer=await ctx.decodeAudioData(bytes.buffer);if(buffer.duration>30)throw Error('Clip exceeds 30 seconds.');if(m.queue&&active.length){queued.push(buffer);return;}stop(false);await ctx.resume();playBuffer(buffer);announce('Playing into synthetic Steam microphone.');}).catch(error=>announce(error.message,false));}
+   if(m.type==='audio'){if(typeof m.audio!=='string'||m.audio.length>6000000)throw Error('Clip too large (4 MB maximum).');audioJobs=audioJobs.then(async()=>{const binary=atob(m.audio),bytes=Uint8Array.from(binary,c=>c.charCodeAt(0));const buffer=await ctx.decodeAudioData(bytes.buffer);if(buffer.duration>30)throw Error('Clip exceeds 30 seconds.');if(m.queue&&active.length){playBuffer(buffer,{queue:true,level:replyGain});return;}stop(false);await ctx.resume();replyGain=clipLevel(buffer);playBuffer(buffer,{level:replyGain});announce('Playing into synthetic Steam microphone.');}).catch(error=>announce(error.message,false));}
   }catch(error){if(event.data?.type?.startsWith('music-'))musicStatus(error.message,!!musicStream);announce(error.message,false);}
  });
 })();

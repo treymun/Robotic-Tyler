@@ -31,7 +31,7 @@ test('music gets independent 200 percent gain and peak compression without chang
  assert.equal(context.nodes[0].gain.value,.35);
  assert.equal(context.nodes[2].gain.value,2);
  assert.equal(context.nodes[2].targets[0],context.limiter);
- assert.equal(context.limiter.targets[0],context.out);
+ assert.equal(context.limiter.targets[0].kind,'gain','the limiter feeds the ducking stage (v2.21)');assert.equal(context.limiter.targets[0].targets[0],context.out);
  assert.equal(context.limiter.threshold.value,-3);
  await command('music-volume',{volume:0});assert.equal(context.nodes[2].gain.value,0);
  await command('music-volume',{volume:1.5});assert.equal(context.nodes[2].gain.value,1.5);
@@ -61,7 +61,7 @@ test('music routing is independent from AI stop and controls do not fetch or ext
  const stop=audio.slice(audio.indexOf(' function stop('),audio.indexOf(' const original='));
  assert.doesNotMatch(stop,/disconnectMusic/);
  assert.match(audio,/musicGain.connect\(musicLimiter\)/);
- assert.match(audio,/musicLimiter.connect\(destination\)/);
+ assert.match(audio,/musicLimiter.connect\(musicDuck\);musicDuck.connect\(destination\)/);
  assert.match(audio,/getDisplayMedia/);
  assert.match(source('music.js'),/v22:stop/);
  assert.doesNotMatch(source('youtube-music.js'),/fetch\(|getUserMedia|chrome\.storage|\.currentSrc/);
