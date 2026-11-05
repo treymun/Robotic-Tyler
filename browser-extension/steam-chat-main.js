@@ -142,10 +142,12 @@
   const bin=atob(String(request.data||''));if(!bin.length||bin.length>25*1024*1024)throw Error('That picture is too large for Steam chat.');
   const bytes=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
   const file=new File([bytes],'tyler-'+Date.now()+'.'+ext,{type});
-  await call(m,'SetImageFileToUpload',file,{info:{}});
+  // Steam reads the picture's size by loading it; a picture it can't load never answers, so wait 20 s at most.
+  const within=(p,ms,why)=>Promise.race([p,new Promise((_,no)=>setTimeout(()=>no(Error(why)),ms))]);
+  await within(call(m,'SetImageFileToUpload',file,{info:{}}),20000,'Steam couldn’t read the picture (it may be damaged or an unsupported kind).');
   const props=()=>get(m,'m_fileUploadProps')||{},state=()=>Number(get(props(),'eUploadState')),why=()=>clean(get(props(),'strErrorDescription'),160);
   if([3,4,5].includes(state())){const e=why();call(m,'Reset');throw Error('Steam didn’t accept the picture'+(e?': '+e:'.'));}
-  try{await call(m,'BeginFileUpload',{bSpoiler:request.spoiler===true});}
+  try{await within(call(m,'BeginFileUpload',{bSpoiler:request.spoiler===true}),50000,'Steam’s upload took over 50 s.');}
   catch(e){const w=why();call(m,'Reset');throw Error('Steam’s upload failed'+(w?': '+w:e?.message?': '+clean(e.message,120):'.'));}
   const failed=state()===3,w=why();call(m,'Reset');if(failed)throw Error('Steam’s upload failed'+(w?': '+w:'.'));
   return {uploaded:true,groupId:ctx.id,bytes:bytes.length};

@@ -1,0 +1,5 @@
+ROBOTIC TYLER v2.34.2 — patch notes
+
+- Fixed: chat images could vanish after "Drawing…" with no picture and no message. Steam scrolling the setup message away (or redrawing the chat) cancelled the picture silently; now only switching to another chat cancels, the picture posts through any message of the chat, and every outcome is reported. Limits no longer reset on redraws.
+- Steam's uploader steps are time-limited (reading the picture 20 s, uploading 50 s); the panel says so after 3 minutes.
+- Tested: mocked (the setup message scrolling away mid-picture: fails on 2.34.1, passes now); all tests; desktop check. Not tested: a real Steam upload.

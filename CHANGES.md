@@ -1,3 +1,24 @@
+# ROBOTIC TYLER v2.34.2: chat images don't vanish after "Drawing…"
+
+## Fixed
+- **Chat images:** a picture could be made and then silently dropped after "🎨 Drawing…", with no picture and no message.
+  - The cause: when Steam scrolled the message picked during setup out of its list, or redrew the chat, Tyler treated it as a new chat and cancelled the picture without saying anything.
+  - Now only a change to a different chat cancels a picture (and starts a new session). The picture is posted through any message of the chat, and every outcome is reported, in chat and in the panel.
+  - The counts and limits no longer reset on those redraws either.
+- Steam's own uploader is now time-limited:
+  - reading the picture: 20 s (Steam waits forever if it can't load one);
+  - uploading: 50 s.
+- The panel says so if a picture takes over 3 minutes.
+
+## Tested
+- **Mocked:**
+  - The setup message scrolls away while a picture is being made: the picture still posts, through a newer message. This test fails on 2.34.1 and passes now.
+  - The earlier image tests.
+- All unit and end-to-end tests, and the desktop check.
+- **Not tested:** a real upload into Steam chat.
+
+---
+
 # ROBOTIC TYLER v2.34.1: chat images reach Steam
 
 ## Fixed

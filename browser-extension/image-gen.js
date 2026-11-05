@@ -16,7 +16,7 @@
  <div class="btn-row"><button class="btn sm" id="imgReset" type="button">Reset session counts</button><button class="btn sm" id="imgSettings" type="button">Settings</button></div>`;
  mount.append(panel);
  const $=id=>panel.querySelector('#'+id),status=t=>{$('imgStatus').textContent=t;};
- let cfg=I.config(null),keys={openrouter:false,venice:false},region=null,observer=null,watchEpoch=0,boundAt=0,busy=false;
+ let cfg=I.config(null),keys={openrouter:false,venice:false},region=null,observer=null,watchEpoch=0,chatEpoch=0,boundScope=null,selector=null,boundAt=0,busy=false,jobStarted=0;
  const seen=new WeakMap(),answered=new Set(),queue=[],people=new Map();let sessionCount=0;
  async function refreshConfig(){try{const r=await chrome.runtime.sendMessage({type:'image:config'});if(r?.ok!==false&&r?.config){cfg=I.config(r.config);keys=r.keys||keys;}}catch{}
   globalThis.TylerCommands?.set?.('image',{enabled:cfg.enabled});
@@ -52,20 +52,21 @@
   const who=speakerOf(node),no=allowed(who,req.style);
   if(no){say('🎨 '+who.name+', '+no);status('Refused for '+who.name+': '+no);return;}
   const p=people.get(who.key)||{count:0,last:0};p.count++;p.last=Date.now();people.set(who.key,p);
-  queue.push({...req,who,epoch:watchEpoch});counts();
+  queue.push({...req,who,epoch:chatEpoch});counts();
   if(busy)say('🎨 Queued for '+who.name+' (#'+queue.length+').');
   void next();
  }
  async function next(){
-  if(busy||!queue.length)return;busy=true;const job=queue.shift();
+  if(busy||!queue.length)return;busy=true;jobStarted=Date.now();const job=queue.shift();
   try{
-   if(job.epoch!==watchEpoch)return;
+   if(job.epoch!==chatEpoch)throw Error('Cancelled: the chat changed.');
    const style=I.STYLES[job.style];say('🎨 Drawing “'+job.prompt.slice(0,80)+(job.prompt.length>80?'…':'')+'” for '+job.who.name+' ('+style.label+')…');
    status('Drawing for '+job.who.name+' with '+(cfg.models[job.style]||'?')+'…');
    const r=await chrome.runtime.sendMessage({type:'image:generate',style:job.style,prompt:job.prompt,speaker:job.who.speaker});
    if(!r?.ok)throw Error(r?.error||'The image request failed.');
-   if(job.epoch!==watchEpoch||api.isAiPaused?.())throw Error('Cancelled (the chat changed or AI was paused).');
-   const anchor=api.getSample?.();if(!anchor?.isConnected)throw Error('The chat isn’t connected any more.');
+   if(api.isAiPaused?.())throw Error('Cancelled: AI was paused.');if(job.epoch!==chatEpoch)throw Error('Cancelled: the chat changed.');
+   // Any message of this chat leads to Steam's uploader (the one picked in setup may have scrolled away).
+   const sample=api.getSample?.(),anchor=sample?.isConnected?sample:[...(region?.querySelectorAll?.(selector||'.msgText')||[])].reverse().find(n=>n.isConnected);if(!anchor)throw Error('The chat isn’t connected any more.');
    status('Posting the picture to Steam…');
    await globalThis.TylerSteamChat.request(anchor,'image-upload',{data:r.image,type:r.mediaType,spoiler:r.spoiler===true});
    sessionCount++;counts();
@@ -75,17 +76,18 @@
    const why=String(e.message||e).replace(/^(?:OpenRouter|Venice) \d{3}: /,'').slice(0,160);
    // A request that never produced a picture doesn't count against the person.
    const p=people.get(job.who.key);if(p&&p.count>0)p.count--;counts();
-   if(!/^Cancelled|^Image cancelled/.test(why))say('🎨 Couldn’t draw that for '+job.who.name+': '+why);
+   if(!/AI was paused|^Image cancelled/.test(why))say('🎨 Couldn’t draw that for '+job.who.name+': '+why);
    status('Not posted: '+why);
-  }finally{busy=false;if(queue.length)setTimeout(()=>void next(),300);}
+  }finally{busy=false;jobStarted=0;if(queue.length)setTimeout(()=>void next(),300);}
  }
  function watch(){
-  if(!api.isOwner?.()||!cfg.enabled){if(observer){watchEpoch++;observer.disconnect();observer=null;region=null;}return;}
+  if(!api.isOwner?.()||!cfg.enabled){if(observer||queue.length){watchEpoch++;chatEpoch++;observer?.disconnect();observer=null;region=null;queue.length=0;}return;}
   const next=api.getRegion?.(),sample=api.getSample?.();
-  if(!next?.isConnected||!sample?.isConnected){if(observer){watchEpoch++;observer.disconnect();observer=null;region=null;}return;}
-  if(next===region)return;
-  watchEpoch++;observer?.disconnect();region=next;boundAt=Date.now();queue.length=0;resetSession();
-  const selector=globalThis.TylerSelection?.selector?.(sample);if(!selector)return;
+  if(!next?.isConnected){if(observer){watchEpoch++;observer.disconnect();observer=null;region=null;}return;}
+  if(next===region&&observer)return;
+  const scope=api.getChatScope?.()||'';if(scope!==boundScope){if(boundScope!==null){chatEpoch++;queue.length=0;}boundScope=scope;resetSession();}
+  watchEpoch++;observer?.disconnect();region=next;boundAt=Date.now();
+  selector=(sample?.isConnected&&globalThis.TylerSelection?.selector?.(sample))||selector;if(!selector)return;
   for(const node of region.querySelectorAll(selector))seen.set(node,(globalThis.TylerChatBus?.text(node)??(node.innerText||node.textContent||'').trim()));
   observer=new (globalThis.TylerChatBus?.Observer||MutationObserver)(records=>{
    const nodes=new Set(),collect=raw=>{const n=raw?.nodeType===1?raw:raw?.parentElement;if(!n)return;if(n.matches?.(selector))nodes.add(n);for(const c of n.querySelectorAll?.(selector)||[])nodes.add(c);const parent=n.closest?.(selector);if(parent)nodes.add(parent);};
@@ -101,6 +103,7 @@
   observer.observe(region,{subtree:true,childList:true,characterData:true});
  }
  api.onPause?.(()=>{queue.length=0;if(busy)chrome.runtime.sendMessage({type:'image:cancel'}).catch(()=>{});status('Paused: the image being drawn and the queue were cancelled.');});
+ setInterval(()=>{if(busy&&jobStarted&&Date.now()-jobStarted>200000){status('Still waiting for the picture after 3 minutes…');}},10000);
  void refreshConfig().then(watch);setInterval(watch,1400);setInterval(()=>void refreshConfig(),30000);
  panel.addEventListener('toggle',()=>{if(panel.open)void refreshConfig();});
  globalThis.TylerImageGen=Object.freeze({refresh:refreshConfig,state:()=>({enabled:cfg.enabled,busy,queued:queue.length,session:sessionCount})});

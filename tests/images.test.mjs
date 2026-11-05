@@ -85,7 +85,7 @@ function steamPage({fail=null}={}){
  const group={GetGroupID:()=>'12345',voiceRoomList:[]},text={GetGroup:()=>group,GetVoiceAllowed:()=>false,self:{accountid:2},ChatStore:{VoiceChat:VC}};
  const node={nodeType:1,isConnected:true,closest:()=>null,parentElement:null,__reactProps$x:{msg:{unAccountID:3,rtTimestamp:1700000000,unOrdinal:1},chatView:{chat:text,m_fileUploadManager:manager}}};
  let listener=null;const replies=[];
- const box={document:{querySelectorAll:()=>[],addEventListener:(t,fn)=>{if(t==='tyler-steam-chat-request')listener=fn;}},window:{postMessage:m=>replies.push(JSON.parse(JSON.stringify(m)))},location:{origin:'https://steamcommunity.com'},File,atob,Uint8Array};
+ const box={document:{querySelectorAll:()=>[],addEventListener:(t,fn)=>{if(t==='tyler-steam-chat-request')listener=fn;}},window:{postMessage:m=>replies.push(JSON.parse(JSON.stringify(m)))},location:{origin:'https://steamcommunity.com'},File,atob,Uint8Array,setTimeout,clearTimeout};
  vm.runInNewContext(read('steam-chat-main.js'),box);
  // The real way in: the request rides on an attribute of a chat node, as steam-chat-client.js sends it.
  const viaPage=async ({op,...values})=>{const raw=JSON.stringify({...values,id:'0123456789abcdef',op});node.getAttribute=k=>k==='data-tyler-chat-request'?raw:null;listener({target:node});for(let i=0;i<20;i++)await new Promise(r=>setImmediate(r));return replies.splice(0);};
@@ -114,18 +114,18 @@ function chat({config,generate}){
  const els=new Map(),el=id=>{if(!els.has(id))els.set(id,{id,textContent:'',onclick:null,addEventListener(){}});return els.get(id);};
  const sent=[],requests=[],uploads=[],pauseHooks=[];let observer,clock=1_000_000;
  class FakeDate extends Date{static now(){return clock;}}
- const region={isConnected:true,querySelectorAll:()=>[]},sample={isConnected:true};
+ const later={isConnected:true,name:'a newer message'},region={isConnected:true,querySelectorAll:()=>[later]},sample={isConnected:true,name:'the setup message'};
  const api={getFeatureMount:()=>({append(){}}),isOwner:()=>true,isAiPaused:()=>false,getRegion:()=>region,getSample:()=>sample,send:t=>sent.push(t),emit(){},onPause:fn=>pauseHooks.push(fn)};
- const box={Date:FakeDate,setTimeout:(fn)=>{Promise.resolve().then(fn);return 1;},setInterval:()=>0,clearTimeout(){},console,
+ const intervals=[];const box={Date:FakeDate,setTimeout:(fn)=>{Promise.resolve().then(fn);return 1;},setInterval:fn=>{intervals.push(fn);return intervals.length;},clearTimeout(){},console,
   document:{createElement:()=>({set innerHTML(v){},querySelector:s=>el(s.slice(1)),addEventListener(){}})},
   MutationObserver:class{constructor(fn){observer=fn;}observe(){}disconnect(){}},TylerCompanion:api,TylerSelection:{selector:()=>'.msg'},TylerChatTag:{own:()=>false},
   TylerIdentity:{identify:n=>n.who,meta:n=>n.meta},TylerCommands:{set(){}},
-  TylerSteamChat:{request:async(node,op,v)=>{uploads.push({op,...v});return {uploaded:true};}},
+  TylerSteamChat:{request:async(node,op,v)=>{uploads.push({node:node.name,op,...v});return {uploaded:true};}},
   chrome:{runtime:{sendMessage:async m=>{requests.push(m);if(m.type==='image:config')return {config,keys:{openrouter:true,venice:true}};if(m.type==='image:generate')return generate(m);return {};}}}};
  box.globalThis=box;vm.runInNewContext(read('image-core.js'),box);vm.runInNewContext(read('image-gen.js'),box);
  const settle=async()=>{for(let i=0;i<20;i++)await new Promise(r=>setImmediate(r));};
  const msg=(text,id,name,key)=>({nodeType:1,innerText:text,matches:()=>true,querySelectorAll:()=>[],closest:()=>null,who:{id,name},meta:{key,senderId:id,at:clock}});
- return {status:()=>el('imgStatus').textContent+' | '+el('imgCounts').textContent,sent,requests,uploads,pauseHooks,settle,box,post:async n=>{observer([{addedNodes:[n]}]);await settle();},msg,tick:ms=>{clock+=ms;},generates:()=>requests.filter(r=>r.type==='image:generate')};
+ return {ticks:async()=>{for(const fn of intervals)fn();await settle();},sample,status:()=>el('imgStatus').textContent+' | '+el('imgCounts').textContent,sent,requests,uploads,pauseHooks,settle,box,post:async n=>{observer([{addedNodes:[n]}]);await settle();},msg,tick:ms=>{clock+=ms;},generates:()=>requests.filter(r=>r.type==='image:generate')};
 }
 test('the chat side keeps the owner\'s limits: cooldown per person, per person and per session, then posts through Steam',async()=>{
  const A='76561198000000001',B='76561198000000002',C='76561198000000003';
@@ -149,4 +149,13 @@ test('a failed picture doesn\'t count against the person; Pause cancels the one 
  assert.match(c.sent.at(-1),/Couldn’t draw that for Alex: the model refused that prompt/);assert.equal(c.uploads.length,0);
  await c.post(c.msg('!image a dog','76561198000000001','Alex','a2'));assert.equal(c.generates().length,2,'the refused one didn\'t use up Alex\'s one');
  for(const fn of c.pauseHooks)fn();await c.settle();assert.ok(c.requests.some(r=>r.type==='image:cancel'),'Pause cancels the request in flight');
+});
+test('Steam redrawing the chat or scrolling the setup message away doesn\'t silently drop a picture',async()=>{
+ let release;const c=chat({config:{enabled:true,cooldownSec:0,perPerson:0,perSession:0},generate:async()=>new Promise(r=>{release=r;})});
+ await c.settle();
+ await c.post(c.msg('!image a cat','76561198000000001','Alex','s1'));assert.equal(c.generates().length,1);
+ c.sample.isConnected=false;await c.ticks();await c.ticks(); // the message picked in setup scrolled out of Steam's list; the watcher runs
+ release({ok:true,image:'QUJD',mediaType:'image/png',model:'m',provider:'openrouter',cost:.014,ms:900,spoiler:false});await c.settle();
+ assert.equal(c.uploads.length,1,'still posted');assert.equal(c.uploads[0].node,'a newer message','through another message of the same chat');
+ assert.doesNotMatch(c.sent.join('\n'),/Couldn’t draw/);
 });
