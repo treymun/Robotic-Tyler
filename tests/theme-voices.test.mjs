@@ -393,3 +393,17 @@ test('v2.36 a spoken reply can be called off on its own: a waiting one leaves th
   await assert.rejects(svc.speak({text:'y'.repeat(700)}),/too long/,'typed messages keep their 400-character limit');
  }finally{await svc.shutdown();}
 });
+test('v2.37.1 Stop reaches a voice check that is still loading the model: the engine is closed, nothing is recorded as a failed check, and the next check works',{skip:!python&&'needs python3'},async()=>{
+ const {svc}=fakeInstall();
+ try{
+  const st=svc.installer.state(),slow=Object.keys(st.models||{}).map(k=>path.join(svc.installer.modelDir(k,st),'SLOW_LOAD'));
+  for(const f of slow)fs.writeFileSync(f,'');
+  const before=svc.installer.status().check,a=new AbortController(),t=Date.now();
+  const outcome=svc.check({signal:a.signal}).then(()=>'made',e=>e.code);
+  await new Promise(r=>setTimeout(r,700));a.abort();
+  assert.equal(await outcome,'cancelled');assert.ok(Date.now()-t<5000,'stopped at once, not after the load');
+  assert.deepEqual(svc.installer.status().check,before,'a stopped check isn’t a failed one');assert.equal(svc.lastError,null);
+  for(const f of slow)fs.rmSync(f);
+  const c=await svc.check();assert.equal(c.ok,true);
+ }finally{await svc.shutdown();}
+});

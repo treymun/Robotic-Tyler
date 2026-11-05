@@ -23,6 +23,7 @@ while True:
     r = reqs.get(); rid = r.get("id"); op = r.get("op")
     if op == "quit": send({"id": rid, "ok": True, "event": "bye"}); break
     if op == "hello": send({"id": rid, "ok": True, "torch": "fake", "cuda": False}); continue
+    if op == "load" and os.path.exists(os.path.join(r["model_dir"], "SLOW_LOAD")): time.sleep(8)  # a model that takes a while to load
     if op == "load": loaded["m"] = r["model_dir"]; send({"id": rid, "ok": True, "dtype_used": "fp32", "engine_used": r.get("engine") or "standard", "load_ms": 5}); continue
     if op == "unload": loaded["m"] = None; send({"id": rid, "ok": True}); continue
     if op == "speak":

@@ -1,3 +1,24 @@
+# ROBOTIC TYLER v2.37.1: theme voices start on Windows
+
+## Fixed
+- **On Windows the voice engine froze while starting, so "Making a test voice" never finished** (with either engine). Found on the owner's PC: PyTorch and the graphics card were fine, and the engine answered when it was run by hand, but never under Tyler.
+  - The cause: Tyler keeps a line open to the engine for its requests, and one of the engine's threads waited to read it. On Windows, while one thread waits on such a line, anything else that touches it waits too. As numpy loads, the maths library inside it (OpenBLAS) checks that line, so loading froze until Tyler's next request came.
+  - Now the engine on Windows only reads requests that have already arrived, checking 50 times a second, so nothing ever waits on the line. Programs that libraries start (such as the sox package's check for SoX) get an empty input instead of Tyler's line.
+- **Stop installing now stops the "Making a test voice" step too.** Before, it only stopped downloads. Stopping there closes the engine at once and says that everything is installed, and a stopped check isn't recorded as a failed one.
+- Stopping a theme voice while the engine is still loading (Stop, or someone talking over Tyler) also closes it at once instead of after the load.
+
+## For checking a stall
+- `TYLER_WORKER_TRACE=<seconds>` makes the engine write where each of its threads is to its error output every so often.
+- A new manual GitHub workflow (*Theme voices on Windows*) installs the real engine and model on a Windows machine with Tyler's own installer and makes the voice check's line there.
+
+## Tested
+- **Real, Windows** (GitHub's Windows runner, no graphics card): before the fix, the fast engine installed by Tyler's installer froze loading numpy (the stack showed it waiting in the extension load), and the request timed out after 240 s. With the fix, the engine answered in 19 s, and the voice check passed: the CS 1.6 voice made 3.2 s of speech with Lightweight on the processor in 36 s (2 threads).
+- **Real, Linux:** the changed engine started by Tyler's own code, answering two requests with its line kept open.
+- **Mocked:** Stop during a model load (closed at once, nothing recorded as failed, the next check works), and all earlier unit and end-to-end tests.
+- **Not tested here:** your graphics card. After the update, **Run a voice check** in Settings → Voice → Theme voices is the first real test on it.
+
+---
+
 # ROBOTIC TYLER v2.37.0: each theme's own artwork
 
 Every theme got a review against the owner's new *25-theme visual asset pack*. Twenty-four themes gained one or two touches drawn from the games' and systems' own artwork. It's mostly HUD and status pieces that show what Tyler is really doing, in place of drawings the app made itself. Backgrounds and layouts are unchanged, and each touch falls back to the old drawing if its artwork can't be drawn.
