@@ -164,7 +164,7 @@
   </div>
   <div class="grid two">
     <label>AI provider
-      <select id="aiProvider"><option value="openrouter">OpenRouter</option><option value="gemini">Google Gemini</option></select>
+      <select id="aiProvider"><option value="openrouter">OpenRouter</option><option value="gemini">Google Gemini</option><option value="local" class="only-desktop">This PC (free, no key)</option></select>
     </label>
     <label class="for-openrouter">Text model
       <select id="brain"><option value="fast">Llama 3.3 70B · default</option><option value="budget">Mistral Small 3.2 · budget</option><option value="venice">Venice Uncensored · no filter</option></select>
@@ -173,6 +173,8 @@
       <select id="geminiTextModel"><option value="gemini-3.1-flash-lite">Fast · Gemini 3.1 Flash-Lite</option><option value="gemini-3.5-flash-lite">Balanced · Gemini 3.5 Flash-Lite (recommended)</option><option value="gemini-3.8-flash">Advanced · Gemini 3.8 Flash</option></select>
     </label>
   </div>
+  <p class="hint only-local only-desktop">Text replies come from <b>Text AI on this PC</b>, set up in the next section: no key and no cost per message. Voice calls still need an OpenRouter or Google key below to hear people, and for the cloud voice unless a theme voice speaks.</p>
+  <p class="callout only-local only-chrome">Text AI on this PC is part of the ROBOTIC TYLER desktop app. In Chrome, choose OpenRouter or Google Gemini: with This PC chosen, Tyler can't answer here.</p>
   <div class="model-card" id="modelCard">
     <div class="mc-head"><span class="mc-tier" id="mcTier"></span><b class="mc-name" id="mcName"></b><span class="mc-badge" id="mcBadge"></span><code class="mc-id" id="mcId"></code></div>
     <p class="mc-strengths" id="mcStrengths"></p>
@@ -190,13 +192,71 @@
   </div>
   <div class="toggle-grid">
     <label class="toggle for-openrouter"><input id="smartRouting" type="checkbox"><span><b>Smart model routing</b><small>With Llama 3.3 or Mistral Small selected: casual comments use Mistral Small, longer or complex questions Llama 3.3. Venice and Gemini models are never switched.</small></span></label>
-    <label class="toggle for-openrouter"><input id="streamAI" type="checkbox" checked><span><b>Stream AI text</b><small>Use OpenRouter streaming for a faster first reply.</small></span></label>
+    <label class="toggle for-openrouter for-local"><input id="streamAI" type="checkbox" checked><span><b>Stream AI text</b><small>Use streaming for a faster first reply (OpenRouter, or the AI on this PC).</small></span></label>
     <label class="toggle"><input id="friendMemory" type="checkbox"><span><b>Remember verified friends</b><small>Separate local memory for confirmed Steam accounts, kept for 7 days.</small></span></label>
   </div>
   <label class="narrow">Local text spending cap (USD, 0 = off)
     <input id="spendingCapUSD" type="number" min="0" max="100" step="0.25" value="0">
   </label>
   <p class="hint">This cap uses provider-reported text costs only (OpenRouter). Set a hard limit on your OpenRouter key too; for Gemini, use Google's own billing limits.</p>
+</section>
+
+<!-- ── Text AI on this PC (v2.38, local-ai-settings.js; the desktop app's app/local-ai) ── -->
+<section class="sheet only-desktop" id="localAI" data-ui-zone="ai" data-relevant="false">
+  <div class="sheet-head">
+    <h2>Text AI on this PC</h2>
+    <p>Tyler's text replies written by a model running on this PC (llama.cpp with Qwen3.5): no key, no account and no cost per message, and the chat's messages aren't sent to an AI provider for them. Install a model once, then choose <b>This PC (free, no key)</b> as the AI provider above.</p>
+  </div>
+  <p class="callout" id="laProviderNote" hidden></p>
+  <h3>This PC</h3>
+  <p class="hint" id="laHardware" role="status">Checking this PC…</p>
+  <ul class="tv-notes" id="laAdvice"></ul>
+  <h3>Model</h3>
+  <div class="engine-pick la-models" role="radiogroup" aria-label="Model for Text AI on this PC">
+    <label class="engine-card"><input type="radio" name="laModel" value="4b"><span><b>Qwen3.5 4B <span class="la-tag" data-for="4b"></span></b><small>Quick and light. Fits most graphics cards and runs on the processor too.</small><small class="la-size">2.6 GB download · about 3.6 GB of graphics memory, or 4.5 GB of memory on the processor</small></span></label>
+    <label class="engine-card"><input type="radio" name="laModel" value="9b"><span><b>Qwen3.5 9B <span class="la-tag" data-for="9b"></span></b><small>Smarter, better at jokes and follow-ups. Best with about 8 GB of free graphics memory.</small><small class="la-size">5.3 GB download · about 6.8 GB of graphics memory, or 8 GB of memory on the processor</small></span></label>
+    <label class="engine-card"><input type="radio" name="laModel" value="4b-uncensored"><span><b>Qwen3.5 4B uncensored <span class="la-tag" data-for="4b-uncensored"></span></b><small>Uncensored (refusals removed by the community; a little less accurate).</small><small class="la-size">2.5 GB download · the same memory as the 4B</small></span></label>
+    <label class="engine-card"><input type="radio" name="laModel" value="9b-uncensored"><span><b>Qwen3.5 9B uncensored <span class="la-tag" data-for="9b-uncensored"></span></b><small>Uncensored (refusals removed by the community; a little less accurate).</small><small class="la-size">5.2 GB download · the same memory as the 9B</small></span></label>
+  </div>
+  <p class="hint" id="laModelNote">Tyler suggests a model for this PC. Nothing installs or switches by itself.</p>
+  <details class="tv-explain"><summary>Which model, and what “uncensored” means</summary>
+    <p><b>4B</b> and <b>9B</b> are Alibaba's Qwen3.5 models (Apache-2.0 licence) in a 4-bit file (Q4_K_M) made by Unsloth. The 9B writes better replies and follows the chat better; the 4B is about twice as fast and needs half the memory. Both run with their thinking turned off, so they answer straight away.</p>
+    <p><b>Uncensored</b> versions are huihui-ai's “abliterated” Qwen3.5 (also Apache-2.0), packed by mradermacher: the community removed the model's habit of refusing, so crude banter and hard roasts aren't turned down. That edit makes them a little less accurate. Tyler's own chat rules and the protection against chat takeovers still apply to every model.</p>
+    <p>None of these is as capable as the large cloud models: expect shorter, simpler banter. Your personality settings and reply length are used as with any provider.</p>
+  </details>
+  <div class="grid two">
+    <label>Runs on
+      <select id="laDevice"><option value="auto">Graphics card when possible</option><option value="cpu">Processor only</option></select>
+      <small class="hint" id="laDeviceNote">Any recent NVIDIA, AMD or Intel card (through Vulkan): the whole model goes on the card. If it doesn't fit while you play, Tyler says so instead of moving it.</small>
+    </label>
+    <label>Close the AI after
+      <select id="laIdle"><option value="1">1 minute idle</option><option value="2">2 minutes idle</option><option value="5">5 minutes idle</option><option value="10">10 minutes idle</option><option value="30">30 minutes idle</option><option value="60">1 hour idle</option><option value="0">Never (keep it loaded)</option></select>
+      <small class="hint">Closing it gives all of its memory back to your games; the next reply then waits a few seconds while it loads. It also closes when you pause or stop Tyler, on the emergency stop and when you quit.</small>
+    </label>
+  </div>
+  <h3>Install</h3>
+  <p id="laInstallState" role="status">…</p>
+  <div class="tv-progress" id="laProgressWrap" hidden><span id="laProgress"></span></div>
+  <p class="hint" id="laProgressText"></p>
+  <div class="actions">
+    <button id="laInstall" type="button">Install</button>
+    <button id="laCancel" type="button" class="secondary" hidden>Stop installing</button>
+    <button id="laOffline" type="button" class="secondary">Install from a folder…</button>
+  </div>
+  <div class="callout" id="laOfflineForm" hidden>
+    <label>Folder with the downloaded files<input id="laOfflineDir" placeholder="For example D:\Tyler local AI"><small class="hint">Put the engine archive (llama-b11669-bin-win-vulkan-x64.zip) and the model's .gguf file in one folder. They're checked exactly like downloads; anything missing or different is downloaded instead.</small></label>
+    <div class="actions"><button id="laOfflineGo" type="button">Install from this folder</button><button id="laOfflineCancel" type="button" class="secondary">Cancel</button></div>
+  </div>
+  <p class="hint">Downloaded from the original sources (llama.cpp's own release on GitHub and the model's page on Hugging Face, each at one pinned version), checked against the SHA-256 recorded in this version of Tyler, and kept in their own folder: nothing is installed system-wide and no driver is changed. The AI only listens inside this PC (127.0.0.1) with a new secret key each time it starts. <a href="#" id="laOpenFolder">Open the folder</a>.</p>
+  <h3>Speed check</h3>
+  <p class="hint">Starts the AI if it isn't running and times one short reply: how long until the first word, and how many tokens (word pieces) a second.</p>
+  <div class="actions"><button id="laCheck" type="button" class="secondary">Run a speed check</button><button id="laUnload" type="button" class="secondary">Close the AI now</button></div>
+  <p id="laCheckState" role="status"></p>
+  <h3>Free up space</h3>
+  <p class="hint">Removes the downloaded engine and models. Your settings are kept, and Tyler keeps working with a cloud provider. Installing again means downloading again.</p>
+  <div class="actions"><button id="laRemoveModel" type="button" class="secondary">Remove this model</button><button id="laRemove" type="button" class="secondary">Remove Text AI on this PC</button></div>
+  <h3>Voice calls</h3>
+  <p class="hint">This version writes text replies only. In a voice call Tyler still hears people with a cloud key (your OpenRouter key, or your Google key if that's the one saved) and speaks with the cloud voice of that key, unless you choose <b>Theme voice on this PC</b> under Voice → Standard voice. Gemini Live always uses Google. Hearing on this PC is coming next.</p>
 </section>
 
 <section class="sheet" id="personalitySheet" data-ui-zone="ai">
@@ -248,7 +308,7 @@
 <section class="sheet" id="noticeSheet" data-ui-zone="ai">
   <div class="sheet-head">
     <h2>Telling each chat</h2>
-    <p>Tyler sends the chat's messages (and, in voice, what people say) to your AI provider. Connect &amp; start asks once in each new chat whether you've told everyone.</p>
+    <p>Tyler sends the chat's messages (and, in voice, what people say) to your AI provider. Connect &amp; start asks once in each new chat whether you've told everyone.<span class="only-local only-desktop"> With This PC, text replies are written on this PC, so the chat's messages aren't sent to an AI provider for them; in voice calls, what people say still goes to OpenRouter or Google to be heard.</span></p>
   </div>
   <div class="toggle-grid">
     <label class="toggle"><input id="noticeAsk" type="checkbox" checked><span><b>Ask in each new chat</b><small>Off: Connect &amp; start goes straight through, in every chat. You still need to let people know.</small></span></label>
@@ -661,6 +721,7 @@
 <script src="image-core.js"></script>
 <script src="image-settings.js"></script>
 <script src="theme-voice-settings.js"></script>
+<script src="local-ai-settings.js"></script>
 <script src="settings.js"></script>
 <script src="v22-settings.js"></script>
 <script src="settings-navigation.js"></script>

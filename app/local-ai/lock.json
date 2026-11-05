@@ -1,0 +1,94 @@
+{
+ "format": 1,
+ "created": "2026-11-05",
+ "engine": {
+  "name": "llama.cpp llama-server",
+  "build": "b11669",
+  "commit": "620d2225c",
+  "date": "2026-10-15",
+  "license": "MIT",
+  "page": "https://github.com/ggml-org/llama.cpp/releases/tag/b11669",
+  "runtimes": {
+   "windows-vulkan": {
+    "label": "llama.cpp b11669 for Windows (Vulkan: NVIDIA, AMD or Intel graphics cards, and the processor)",
+    "dev": false,
+    "kind": "zip",
+    "name": "llama-b11669-bin-win-vulkan-x64.zip",
+    "url": "https://github.com/ggml-org/llama.cpp/releases/download/b11669/llama-b11669-bin-win-vulkan-x64.zip",
+    "size": 32182350,
+    "sha256": "2c07574e7bde71321cb785282b20cc821e951132149eeceeea32ddebdbf0598e",
+    "unpacked": 91423005,
+    "strip": "",
+    "exe": "llama-server.exe",
+    "gpuBackend": "ggml-vulkan.dll"
+   },
+   "linux-cpu": {
+    "label": "llama.cpp b11669 for Linux (processor; for development and tests)",
+    "dev": true,
+    "kind": "tar.gz",
+    "name": "llama-b11669-bin-ubuntu-x64.tar.gz",
+    "url": "https://github.com/ggml-org/llama.cpp/releases/download/b11669/llama-b11669-bin-ubuntu-x64.tar.gz",
+    "size": 17851611,
+    "sha256": "cf07c1c112d709bd67e522017471de57ed0ec8bea031d732c5422351c07f65ac",
+    "unpacked": 46118030,
+    "strip": "llama-b11669/",
+    "exe": "llama-server",
+    "gpuBackend": null
+   }
+  }
+ },
+ "models": {
+  "4b": {
+   "label": "Qwen3.5 4B",
+   "repo": "unsloth/Qwen3.5-4B-GGUF",
+   "revision": "e87f176479d0855a907a41277aca2f8ee7a09523",
+   "file": "Qwen3.5-4B-Q4_K_M.gguf",
+   "url": "https://huggingface.co/unsloth/Qwen3.5-4B-GGUF/resolve/e87f176479d0855a907a41277aca2f8ee7a09523/Qwen3.5-4B-Q4_K_M.gguf",
+   "size": 2740937888,
+   "sha256": "00fe7986ff5f6b463e62455821146049db6f9313603938a70800d1fb69ef11a4",
+   "license": "Apache-2.0",
+   "base": "Qwen/Qwen3.5-4B",
+   "quant": "Q4_K_M",
+   "uncensored": false
+  },
+  "9b": {
+   "label": "Qwen3.5 9B",
+   "repo": "unsloth/Qwen3.5-9B-GGUF",
+   "revision": "3885219b6810b007914f3a7950a8d1b469d598a5",
+   "file": "Qwen3.5-9B-Q4_K_M.gguf",
+   "url": "https://huggingface.co/unsloth/Qwen3.5-9B-GGUF/resolve/3885219b6810b007914f3a7950a8d1b469d598a5/Qwen3.5-9B-Q4_K_M.gguf",
+   "size": 5680522464,
+   "sha256": "03b74727a860a56338e042c4420bb3f04b2fec5734175f4cb9fa853daf52b7e8",
+   "license": "Apache-2.0",
+   "base": "Qwen/Qwen3.5-9B",
+   "quant": "Q4_K_M",
+   "uncensored": false
+  },
+  "4b-uncensored": {
+   "label": "Qwen3.5 4B uncensored",
+   "repo": "mradermacher/Huihui-Qwen3.5-4B-abliterated-GGUF",
+   "revision": "9d3aebb998fcf084086a3d1c60c31035fcfbf8e1",
+   "file": "Huihui-Qwen3.5-4B-abliterated.Q4_K_M.gguf",
+   "url": "https://huggingface.co/mradermacher/Huihui-Qwen3.5-4B-abliterated-GGUF/resolve/9d3aebb998fcf084086a3d1c60c31035fcfbf8e1/Huihui-Qwen3.5-4B-abliterated.Q4_K_M.gguf",
+   "size": 2707514688,
+   "sha256": "423f10b6ec2d99c3378143d7cd3b80eb4887b3ed92103103ac59173b404f4f7c",
+   "license": "Apache-2.0",
+   "base": "huihui-ai/Huihui-Qwen3.5-4B-abliterated (from Qwen/Qwen3.5-4B)",
+   "quant": "Q4_K_M",
+   "uncensored": true
+  },
+  "9b-uncensored": {
+   "label": "Qwen3.5 9B uncensored",
+   "repo": "mradermacher/Huihui-Qwen3.5-9B-abliterated-GGUF",
+   "revision": "419ca34f424adbd9276c09e0271cb6b718e8da1d",
+   "file": "Huihui-Qwen3.5-9B-abliterated.Q4_K_M.gguf",
+   "url": "https://huggingface.co/mradermacher/Huihui-Qwen3.5-9B-abliterated-GGUF/resolve/419ca34f424adbd9276c09e0271cb6b718e8da1d/Huihui-Qwen3.5-9B-abliterated.Q4_K_M.gguf",
+   "size": 5627045248,
+   "sha256": "ea1858ef4dc4b648b8dbb44612962a0333e945060dd0545ac0f28d7c4416e4b3",
+   "license": "Apache-2.0",
+   "base": "huihui-ai/Huihui-Qwen3.5-9B-abliterated (from Qwen/Qwen3.5-9B)",
+   "quant": "Q4_K_M",
+   "uncensored": true
+  }
+ }
+}

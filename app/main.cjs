@@ -17,7 +17,7 @@ steamVoice.registerScheme(protocol);
 const root=path.join(process.env.LOCALAPPDATA||app.getPath('appData'),'RoboticTylerHydraCloudV12');fs.mkdirSync(path.join(root,'Data'),{recursive:true});app.setPath('userData',path.join(root,'Data'));
 const OLD_VOICE_DIR=path.join(app.getPath('appData'),'RoboticTylerNativeSteamCompanion');
 const OLD_VOICE_GUID='b0b8de7d-76bb-5d6f-99fa-c8a2fe9a49c6'; // electron-builder key for com.robotictyler.nativesteamcompanion
-let themeVoices=null,pendingVoicesSetup=false;
+let themeVoices=null,localAI=null,pendingVoicesSetup=false;
 let bot,options,voiceWin,listener,tray,voice,updates,vault,remote,windowVoice=true,muteCall=false,steamWindow,media,quitting=false;const removed=[];const activity=[];function eventLog(kind,details=''){activity.unshift({at:Date.now(),kind,details:String(details).slice(0,140)});if(activity.length>120)activity.pop();}
 const icon=path.join(__dirname,'..','assets','robotic-tyler.png');
 function helperPath(){const p=app.isPackaged?path.join(process.resourcesPath,'windows-audio-bridge','RoboticTylerAudio.exe'):path.join(__dirname,'..','windows-audio-bridge','publish','RoboticTylerAudio.exe');if(!fs.existsSync(p))throw Error('The Windows audio helper is missing. Reinstall ROBOTIC TYLER (or build it with BUILD-WINDOWS-EXE.cmd).');return p;}
@@ -76,6 +76,10 @@ if(!app.requestSingleInstanceLock()){app.quit();}else{
  // Loaded inside a try: if anything about it is broken, the rest of Tyler still starts normally.
  try{themeVoices=require('./theme-voices/desktop.cjs').setupThemeVoices({root,dir:__dirname,vault,local,changeListeners,net,shell,log:eventLog,send:e=>{try{if(options&&!options.isDestroyed())options.webContents.send('tyler:voices',e);}catch{}}});}
  catch(error){themeVoices=null;eventLog('Theme voices unavailable',error.message);}
+ // Text AI on this PC (v2.38, app/local-ai): Tyler's text replies from a local model (llama.cpp), no key.
+ // Also loaded inside a try, so a problem with it never stops the rest of Tyler.
+ try{localAI=require('./local-ai/desktop.cjs').setupLocalAI({root,vault,local,changeListeners,net,shell,log:eventLog,send:e=>{try{if(options&&!options.isDestroyed())options.webContents.send('tyler:local-ai',e);}catch{}}});}
+ catch(error){localAI=null;eventLog('Text AI on this PC unavailable',error.message);}
  globalThis.tylerOpenSettings=section=>openSettings(section);
  if(pendingVoicesSetup){pendingVoicesSetup=false;setTimeout(()=>void openSettings('theme-voices-setup'),1500);}
  await import(pathToFileURL(path.join(__dirname,'companion','background.js')).href);
@@ -126,6 +130,7 @@ if(!app.requestSingleInstanceLock()){app.quit();}else{
  ipcMain.handle('tyler:settings',async(event,request)=>{if(!options||event.sender.id!==options.webContents.id||event.senderFrame!==event.sender.mainFrame||!isLocal(event.senderFrame.url,settingsPath))throw Error('Settings are available only in the local settings window.');
   if(request.action==='activity'){return activity.slice(0,60);}
   if(request.action==='remote')return remote.handle(String(request.op||''),request);
+  if(request.action==='local-ai'){if(!localAI)throw Error('Text AI on this PC isn’t available in this copy of Tyler (see Settings → Advanced → activity log).');return localAI.settingsRequest(String(request.op||''),request);}
   if(request.action==='voices'){if(!themeVoices)throw Error('Theme voices aren’t available in this copy of Tyler (see Settings → Advanced → activity log).');return themeVoices.settingsRequest(String(request.op||''),request);}
   if(request.action==='verify'){
    const key=request.key;if(typeof key!=='string'||!key.trim()||key.length>1024)throw Error('Paste the secret from your OpenRouter Keys page.');
@@ -143,12 +148,14 @@ if(!app.requestSingleInstanceLock()){app.quit();}else{
   // Settings → AI (v2.20): Test selected model / Preview a reply, with the saved keys (or a key typed for this one request).
   if(request.action==='ai'){const r=request.request||{},text=v=>typeof v==='string'?v.slice(0,1500):'';
    const keyOf=v=>typeof v==='string'&&v.trim().length<=1024?v.trim():'';
-   return globalThis.tylerSettingsAI({action:r.action==='preview'?'preview':'test',aiProvider:r.aiProvider==='gemini'?'gemini':'openrouter',brain:text(r.brain),smartRouting:r.smartRouting===true,geminiTextModel:text(r.geminiTextModel),kind:r.kind==='roast'?'roast':'normal',prompt:text(r.prompt),
+   return globalThis.tylerSettingsAI({action:r.action==='preview'?'preview':'test',aiProvider:['gemini','local'].includes(r.aiProvider)?r.aiProvider:'openrouter',brain:text(r.brain),smartRouting:r.smartRouting===true,geminiTextModel:text(r.geminiTextModel),kind:r.kind==='roast'?'roast':'normal',prompt:text(r.prompt),
     values:{personality:text(r.values?.personality),roastMode:text(r.values?.roastMode),length:text(r.values?.length),v23Persona:text(r.values?.v23Persona)},openrouterKey:keyOf(r.openrouterKey),geminiKey:keyOf(r.geminiKey)});}
   throw Error('Unknown settings action');});
  // Settings → Voice → Test voice: the key stays here; only the audio goes back to the page.
  async function voiceTest(engine,values){
   const LINE='Hey, it\'s ROBOTIC TYLER. Voice check, one two. Sounding good?',keys=await vault.get(['openrouterKey','geminiKey']);
+  // With Text AI on this PC, the cloud voice uses the key voice calls use (local-ai.mjs voiceKeyFor).
+  const {voiceKeyFor}=await import(pathToFileURL(path.join(__dirname,'companion','local-ai.mjs')).href),speechBy=voiceKeyFor({...keys,aiProvider:values.aiProvider}).provider;
   const live=await import(pathToFileURL(path.join(__dirname,'companion','live-core.mjs')).href);
   if(engine==='live'){
    if(!keys.geminiKey)throw Error('Save a Google AI key first.');
@@ -160,13 +167,14 @@ if(!app.requestSingleInstanceLock()){app.quit();}else{
    return {audio:Buffer.concat([h,pcm]).toString('base64'),note:'Gemini Live answered'+(first!==null?' · first audio after '+first+' ms (measured on this connection)':'')+(said?': “'+said+'”':'.')};
   }
   const started=Date.now();
-  if(values.aiProvider==='gemini'){if(!keys.geminiKey)throw Error('Save a Google AI key first.');const g=await import(pathToFileURL(path.join(__dirname,'companion','gemini.mjs')).href);const r=await g.geminiSpeak(keys.geminiKey,LINE,values.geminiVoice,AbortSignal.timeout(30000),values.geminiTtsModel);return {audio:r.audio,note:'Playing '+r.model+' · ready after '+(Date.now()-started)+' ms.'};}
+  if(values.aiProvider==='local'&&!speechBy)throw Error('Voice calls with Text AI on this PC still need an OpenRouter or Google key for hearing and for the cloud voice. Save one, or choose a theme voice for speaking.');
+  if(speechBy==='gemini'){if(!keys.geminiKey)throw Error('Save a Google AI key first.');const g=await import(pathToFileURL(path.join(__dirname,'companion','gemini.mjs')).href);const r=await g.geminiSpeak(keys.geminiKey,LINE,values.geminiVoice,AbortSignal.timeout(30000),values.geminiTtsModel);return {audio:r.audio,note:'Playing '+r.model+' · ready after '+(Date.now()-started)+' ms.'};}
   if(!keys.openrouterKey)throw Error('Save an OpenRouter key first.');const sp=await import(pathToFileURL(path.join(__dirname,'companion','speech.mjs')).href);const r=await new sp.Speech().generate(LINE,keys.openrouterKey,values.speechVoice,AbortSignal.timeout(30000));return {audio:r.audio,note:'Playing '+r.model+' · ready after '+(Date.now()-started)+' ms.'};
  }
  // The Voice window: start/stop, status, manual listening and typed messages.
  ipcMain.handle('tyler:native',async(event,req)=>{
   if(!voiceWin||event.sender!==voiceWin.webContents||event.senderFrame!==voiceWin.webContents.mainFrame||!isLocal(event.senderFrame.url,voicePath)||!req||typeof req!=='object')throw Error('Unauthorized request');
-  if(req.action==='status'){const s=await vault.get(['voiceEngine','voiceOutputDevice','voiceListenDevice','voiceListenConsent','aiProvider','geminiKey','openrouterKey']);let bridge=true;try{helperPath();}catch{bridge=false;}return {...voice.status(),engine:s.voiceEngine==='live'?'live':'standard',devicesChosen:!!(s.voiceOutputDevice&&s.voiceListenDevice),consent:s.voiceListenConsent===true,keyForEngine:s.voiceEngine==='live'?!!s.geminiKey:s.aiProvider==='gemini'?!!s.geminiKey:!!s.openrouterKey,bridge,steamOpen:!!steamTab(),version:app.getVersion()};}
+  if(req.action==='status'){const s=await vault.get(['voiceEngine','voiceOutputDevice','voiceListenDevice','voiceListenConsent','aiProvider','geminiKey','openrouterKey']);let bridge=true;try{helperPath();}catch{bridge=false;}const {voiceKeyFor}=await import(pathToFileURL(path.join(__dirname,'companion','local-ai.mjs')).href);return {...voice.status(),engine:s.voiceEngine==='live'?'live':'standard',devicesChosen:!!(s.voiceOutputDevice&&s.voiceListenDevice),consent:s.voiceListenConsent===true,keyForEngine:s.voiceEngine==='live'?!!s.geminiKey:!!voiceKeyFor(s).key,bridge,steamOpen:!!steamTab(),version:app.getVersion()};}
   if(req.action==='start'){await startVoice();return voice.status();}
   if(req.action==='stop'){await voice.stop('Voice stopped by you.');return voice.status();}
   if(req.action==='listen')return voice.listenOnce(req.seconds);
@@ -203,7 +211,7 @@ if(!app.requestSingleInstanceLock()){app.quit();}else{
  if(process.argv.includes('--install-theme-voices'))setTimeout(()=>void openSettings('theme-voices-setup'),1500);
  await bot.loadURL('https://steamcommunity.com/chat/');
  }).catch(error=>{dialog.showErrorBox('ROBOTIC TYLER could not start',String(error.message).replace(/sk-or-[\w-]+|AIza[\w-]+/g,'[redacted]'));app.quit();});
- app.on('before-quit',()=>{try{void voice?.stop('ROBOTIC TYLER is closing.');}catch{}try{void remote?.stop();}catch{}try{themeVoices?.kill();}catch{}});
+ app.on('before-quit',()=>{try{void voice?.stop('ROBOTIC TYLER is closing.');}catch{}try{void remote?.stop();}catch{}try{themeVoices?.kill();}catch{}try{localAI?.kill();}catch{}});
  app.on('window-all-closed',()=>{if(!voice||voice.mode==='off')app.quit();});
 }
 

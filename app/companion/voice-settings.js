@@ -6,6 +6,7 @@
 import {LIVE_MODELS,GEMINI_VOICES,liveConfig,liveInstructions,LiveSession,Pcm,geminiVoiceFor} from './live-core.mjs';
 import {GEMINI_TTS_MODELS,geminiSpeak} from './gemini.mjs';
 import {Speech} from './speech.mjs';
+import {voiceKeyFor,LOCAL_HEARING_ERROR} from './local-ai.mjs';
 
 const $=id=>document.getElementById(id);
 const desktop=document.body.dataset.desktop==='true';
@@ -20,11 +21,13 @@ function fill(){
  $('geminiTtsModel').replaceChildren(...GEMINI_TTS_MODELS.map(m=>option(m.id,m.label)));
 }
 function engine(){return $('voiceEngine').value==='live'?'live':'standard';}
+// With Text AI on this PC, voice uses the saved OpenRouter key, else the Google key (local-ai.mjs).
+let localVoice='openrouter';
 function show(){
- const e=engine(),provider=$('aiProvider').value==='gemini'?'gemini':'openrouter';
+ const ai=$('aiProvider').value,e=engine(),provider=ai==='gemini'?'gemini':ai==='local'?localVoice||'openrouter':'openrouter';
  document.body.dataset.voiceEngine=e;document.body.dataset.voiceProvider=provider;
  for(const r of document.querySelectorAll('input[name=voiceEnginePick]'))r.checked=r.value===e;
- $('standardVoiceNote').textContent=provider==='gemini'?'Your text provider is Google Gemini, so speech uses Gemini text-to-speech with one of Google\'s voices.':'Speech uses Grok Voice through OpenRouter, with Voxtral as the fallback if Grok is busy.';
+ $('standardVoiceNote').textContent=ai==='local'?'Text replies are made on this PC. Voice calls still use a cloud key to hear people and for the cloud voice: '+(localVoice==='gemini'?'your Google key (Gemini speech).':localVoice?'your OpenRouter key (Grok Voice, with Voxtral to hear).':'save an OpenRouter or Google key (a theme voice can speak instead of the cloud voice, but hearing still needs the key).'):provider==='gemini'?'Your text provider is Google Gemini, so speech uses Gemini text-to-speech with one of Google\'s voices.':'Speech uses Grok Voice through OpenRouter, with Voxtral as the fallback if Grok is busy.';
  $('liveModelNote').textContent=LIVE_MODELS.find(m=>m.id===$('liveModel').value)?.note||'';
  $('liveSilenceLabel').textContent=(Number($('liveSilenceMs').value)/1000).toFixed(2)+' s';
  // Desktop: the device list is for the VB-CABLE route only.
@@ -34,8 +37,10 @@ function show(){
 async function keyState(){
  try{
   const k=await store.get(['openrouterKey','geminiKey']),e=engine(),provider=$('aiProvider').value;
+  if(provider==='local'){const v=voiceKeyFor({...k,aiProvider:'local'});localVoice=v.provider;show();}
   $('voiceKeyState').textContent=e==='live'
    ?(k.geminiKey?'✓ Google AI key saved. Gemini Live is ready to start.':'Gemini Live needs a Google AI key. Add one under AI & personality → Provider and model.')
+   :provider==='local'?(localVoice==='openrouter'?'✓ OpenRouter key saved: voice calls hear people and speak with it (text replies are made on this PC).':localVoice==='gemini'?'✓ Google AI key saved: voice calls hear people and speak with it (text replies are made on this PC).':LOCAL_HEARING_ERROR)
    :provider==='gemini'?(k.geminiKey?'✓ Google AI key saved for Gemini speech.':'Add a Google AI key for Gemini speech.')
    :(k.openrouterKey?'✓ OpenRouter key saved for Grok speech.':'Add an OpenRouter key for Grok speech.');
  }catch{$('voiceKeyState').textContent='Key status unavailable.';}
@@ -82,7 +87,9 @@ async function test(){
   if(e==='live'){if(!keys.geminiKey)throw Error('Save a Google AI key first.');status(await liveTest(keys.geminiKey,values,status));return;}
   status('Generating speech…');const started=performance.now();
   let spoken;
-  if(values.aiProvider==='gemini'){if(!keys.geminiKey)throw Error('Save a Google AI key first.');spoken=await geminiSpeak(keys.geminiKey,SAMPLE,values.geminiVoice,AbortSignal.timeout(30000),values.geminiTtsModel);}
+  const by=voiceKeyFor({...keys,aiProvider:values.aiProvider}).provider;
+  if(values.aiProvider==='local'&&!by)throw Error('Voice with Text AI on this PC still needs an OpenRouter or Google key. Save one first.');
+  if(by==='gemini'){if(!keys.geminiKey)throw Error('Save a Google AI key first.');spoken=await geminiSpeak(keys.geminiKey,SAMPLE,values.geminiVoice,AbortSignal.timeout(30000),values.geminiTtsModel);}
   else{if(!keys.openrouterKey)throw Error('Save an OpenRouter key first.');spoken=await new Speech().generate(SAMPLE,keys.openrouterKey,values.speechVoice,AbortSignal.timeout(30000));}
   const ms=Math.round(performance.now()-started);await play(spoken.audio);status('Playing '+spoken.model+' · ready after '+ms+' ms.');
  }catch(error){status('Voice test failed: '+String(error?.message||error).replace(/sk-or-[\w-]+|AIza[\w-]+/g,'[hidden]'));}
