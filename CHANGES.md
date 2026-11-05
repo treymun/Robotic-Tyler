@@ -1,3 +1,28 @@
+# ROBOTIC TYLER v2.38.0: Text AI on this PC
+
+## New
+- **Tyler's text replies can be written on your own PC: no key, no account, no cost per message** (desktop app). Settings → AI & personality → AI provider → **This PC (free, no key)**. It runs llama.cpp (b11669) with a Qwen3.5 model, and the chat's messages aren't sent to an AI provider for those replies.
+- **Four models to choose from:** Qwen3.5 4B (2.6 GB) and 9B (5.3 GB), and an **uncensored** version of each (refusals removed by the community; a little less accurate). Tyler suggests one for your PC: the 9B with about 8 GB of free graphics memory, otherwise the 4B; the 4B on the processor. It's only a suggestion: nothing installs or switches by itself. Tyler's chat rules and the takeover protection apply to every model.
+- **Runs on any recent graphics card** (NVIDIA, AMD or Intel, through Vulkan) or on the processor only. One 31 MB download covers both.
+- **The new Settings section *Text AI on this PC*** shows your PC, the download size and disk space before anything downloads, and has Install, Stop installing, Install from a folder, Remove (your settings are kept), a **speed check** (time to the first word and tokens a second) and **Close the AI after** (1 minute to an hour, or never).
+- It starts only when a reply needs it and closes after the idle time, when you pause or stop Tyler, when the Steam window closes, on the emergency stop and when you quit, giving its memory back.
+
+## How it behaves
+- **No silent fallback.** If the AI on this PC can't answer (not installed, the model doesn't fit while a game uses the graphics card, the card isn't found, it stopped mid-reply), the reply fails and says why. Tyler never asks a cloud AI instead and never switches model by himself.
+- **Private by design:** it listens only inside this PC (127.0.0.1), on a new port with a new secret key each start; the key never leaves the app's main process. No web page, no downloads while it runs.
+- **Voice calls still use a cloud key in this version** to hear people (your OpenRouter key, else your Google key), and that key's cloud voice speaks unless you choose *Theme voice on this PC*. With no key, a voice turn says so. Hearing on this PC is coming next.
+- Local replies are counted on their own (not as billed use), and the spending cap no longer blocks them (it still stops cloud hearing and speech).
+- In Chrome, *This PC* isn't offered; if it's chosen anyway, replies say it's a desktop-app feature.
+
+## Tested
+- **Mocked:** the lock (every file pinned with its size, SHA-256 and commit), the installer against a local server (plan first, resumed download, a bad file rejected, an offline folder, remove keeps settings), the engine and service on a fake llama-server (starts only when asked, 127.0.0.1 only, key required, idle close, stop, emergency stop, quit, crash, out of memory, missing model, graphics-card choice), and the real background with a fake local engine (no cloud call for the reply, streaming, clear errors, the voice-call key rule, Chrome). Plus all unit and end-to-end tests and the desktop check.
+- **Real, Linux** (2-core test machine, no graphics card): the real installer downloaded and checked the 4B, the real engine loaded it in about 4 s and answered with thinking off; speed check: first word after 1.5 s, about 4.7 tokens a second on 2 cores. Real Tyler replies through the real reply path took 19–33 s there (first word 4–15 s). The 4B uncensored model was downloaded, checked and answered the same way. The settings page's speed check also ran in Electron.
+- **Real, Windows** (GitHub's Windows runner, 4 cores, no graphics card): the app's installer downloaded and checked the engine and the 4B (2.58 GB in 17 s), and the real engine answered on the processor. The speed check gave the first word after 2.4 s at 4.6 tokens a second, and a streamed Tyler-style reply took 6 s (first text after 2.5 s). Vulkan listed no devices there, as expected.
+  - It found one problem, now fixed: the runner's virtual display adapter (Hyper-V) was suggested as a graphics card. Virtual adapters, and cards Vulkan can't see, now get the processor suggested.
+- **Not tested:** a real graphics card (NVIDIA, AMD or Intel), the two 9B models, and replies in real Steam chat. On your PC, **Run a speed check** after installing is the first real test on a graphics card.
+
+---
+
 # ROBOTIC TYLER v2.37.2: !say picks the voice you name
 
 ## Fixed

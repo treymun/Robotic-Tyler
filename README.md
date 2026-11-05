@@ -15,7 +15,7 @@
 
 <p align="center"><b>Tyler is an AI squadmate for Steam.</b> He sits in your group chat and voice channel, talks like one of the crew, and keeps the night going with trivia, votes, sounds and music.</p>
 
-<p align="center"><a href="CHANGES.md"><img src="assets/readme/whats-new.png" width="100%" alt="What's new since v2.32: Tyler answers in theme voices (v2.36), a fast voice engine for NVIDIA cards (v2.36), each theme's own game artwork (v2.37), theme voices (v2.35), steadier voices and an offline bundle (v2.35.1), chat pictures (v2.34), the chat on your phone (v2.35) and Join and Leave Voice (v2.32, v2.33)."></a></p>
+<p align="center"><a href="CHANGES.md"><img src="assets/readme/whats-new.png" width="100%" alt="What's new since v2.33: text AI on your PC with no key (v2.38), Tyler answers in theme voices (v2.36), a fast voice engine for NVIDIA cards (v2.36), each theme's own game artwork (v2.37), theme voices (v2.35), steadier voices and an offline bundle (v2.35.1), chat pictures (v2.34) and the chat on your phone (v2.35)."></a></p>
 
 ---
 
@@ -59,7 +59,7 @@
 
 1. **[Download Setup](https://github.com/treymun/Robotic-Tyler/releases/latest)** (`ROBOTIC-TYLER-Setup-<version>.exe`) and run it. Tick the **Desktop app** (recommended), the **Chrome extension**, or both.
 2. Open ROBOTIC TYLER and sign in to your bot's Steam account in its Steam chat window.
-3. In **Settings**, add an **OpenRouter** or **Google Gemini** key and pick a personality.
+3. In **Settings**, add an **OpenRouter** or **Google Gemini** key and pick a personality. In the desktop app you can instead choose **This PC (free, no key)**: Tyler's text replies are written by a model on your own PC (see below).
 4. Open your group chat, then **Tyler's panel → Connect & start**, and join the voice channel. That's it: no virtual audio cable, no extra microphone.
 5. *Optional:* **Settings → Overview → Phone remote**, scan the QR code with your phone and type the 6-digit code. Add the page to your home screen and Tyler is one tap away.
 
@@ -84,6 +84,7 @@ Both run the same engine, settings and themes. Prefer the older desktop route th
 
 - **Standard** waits for a pause, writes a reply with your AI provider (OpenRouter or Gemini) and speaks it, with Grok voices through OpenRouter or Google's voices with a Gemini key. Long replies are spoken in full.
 - **Text models:** OpenRouter with Llama 3.3 70B, Mistral Small 3.2 or **Venice Uncensored** (each with its own provider routing, never Parasail), or Google Gemini with **3.1 Flash-Lite, 3.5 Flash-Lite or 3.8 Flash** (all on Google's free tier). **Test selected model** in Settings checks yours.
+- **Text AI on this PC** <sup>new</sup> (desktop app, v2.38): no key, no account, no cost per message. Qwen3.5 4B (2.6 GB) or 9B (5.3 GB), or an **uncensored** version of either, running with llama.cpp on any recent graphics card (NVIDIA, AMD or Intel) or on the processor. It's an optional download with a speed check, it listens only inside your PC, and it never falls back to a cloud AI by itself. Voice calls still use a cloud key for hearing in this version. See [`docs/LOCAL-AI.md`](docs/LOCAL-AI.md).
 - **Gemini Live** is a real-time conversation with Google: Tyler hears the call as people talk, answers in about a second and stops when someone talks over him. It needs a Google AI key, and Google bills the audio while a session runs, so you start and stop every session yourself.
 - **Theme voices** (desktop app, optional) say lines you type in each theme's character voice, cloned on your PC by Qwen3-TTS. Since v2.36 Tyler's Standard voice replies can use them too (Settings → Voice → Speaking voice), with an optional fast engine for NVIDIA cards (faster-qwen3-tts). See [`docs/THEME-VOICES.md`](docs/THEME-VOICES.md).
 - **How he sounds:** Gemini Live replies play without crackle, the second half of a reply starts on the exact sample the first ends, and every reply comes out at the same loudness. Friends' voices reach his speech recognition through a proper filter, so "s" sounds don't turn into noise.

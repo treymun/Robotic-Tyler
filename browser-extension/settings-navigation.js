@@ -15,7 +15,7 @@ const definitions=[
  ['appearance','Appearance','Theme gallery for every Tyler window',icon('appearance')],
  ['advanced','Advanced','Memory, usage, safety tools and experimental options',icon('advanced')],
 ];
-const mapping={appearance:'appearance',quickStart:'overview',phoneRemote:'overview',usagePulse:'overview',top:'overview',studio:'ai',personalitySheet:'ai',chatTagSheet:'ai',playground:'ai',voice:'voice',voiceStandard:'voice',voiceLive:'voice',voiceDevices:'voice',voiceTestSheet:'voice','theme-voices':'voice','theme-voices-setup':'voice',steamActivity:'games',suiteSettings:'squad',approvedFriends:'squad',friendProfiles:'squad',social:'advanced',usageSection:'advanced',v22Tools:'advanced',v23Tools:'advanced'};
+const mapping={appearance:'appearance',quickStart:'overview',phoneRemote:'overview',usagePulse:'overview',top:'overview',studio:'ai',localAI:'ai',personalitySheet:'ai',chatTagSheet:'ai',playground:'ai',voice:'voice',voiceStandard:'voice',voiceLive:'voice',voiceDevices:'voice',voiceTestSheet:'voice','theme-voices':'voice','theme-voices-setup':'voice',steamActivity:'games',suiteSettings:'squad',approvedFriends:'squad',friendProfiles:'squad',social:'advanced',usageSection:'advanced',v22Tools:'advanced',v23Tools:'advanced'};
 document.getElementById('uiPlatform').textContent=isDesktop?'Desktop settings':'Chrome settings';
 globalThis.TylerIcons?.fill(document);
 
@@ -52,7 +52,10 @@ if(status)new MutationObserver(()=>{const t=status.textContent;if(/saved|unchang
 // Key status in the overview step and the sidebar footer.
 const keyState=document.getElementById('uiKeyState'),keyStep=document.getElementById('uiKeyStep'),keySide=document.getElementById('uiKeySide'),keyDot=document.getElementById('uiKeyDot');
 async function updateStatus(){
- try{const s=await store.get(['openrouterKey','geminiKey']);const has=!!(s.openrouterKey||s.geminiKey);
+ try{const s=await store.get(['openrouterKey','geminiKey','aiProvider']);
+  // v2.38: with Text AI on this PC (desktop), text replies need no key.
+  if(isDesktop&&s.aiProvider==='local'){keyState.textContent='Text replies come from the AI on this PC: no key needed. Voice calls still use a cloud key.';keySide.textContent='AI on this PC';keyStep.dataset.done='true';keyDot.dataset.on='true';return;}
+  const has=!!(s.openrouterKey||s.geminiKey);
   keyState.textContent=has?'An AI key is saved. Tyler is ready for Steam.':'Add an OpenRouter or Gemini key to begin.';
   keySide.textContent=has?'AI key saved':'No AI key yet';keyStep.dataset.done=String(has);keyDot.dataset.on=String(has);
  }catch{keyState.textContent='Open AI & personality to confirm your key.';keySide.textContent='Key status unavailable';}

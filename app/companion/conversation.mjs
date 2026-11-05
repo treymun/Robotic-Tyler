@@ -29,7 +29,8 @@ export const PERSONAS={announcer:'You are an energetic but concise esports play-
 // Model-specific notes (v2.20). Venice is uncensored: it should commit to the owner's style instead of
 // hedging, while the rules above it still decide what the chat can and can't change.
 export function modelStyle(modelKey,roastMode){
- if(modelKey!=='venice')return '';
+ // Venice, and an uncensored model on this PC (v2.38: the community's refusal-free Qwen3.5).
+ if(modelKey!=='venice'&&modelKey!=='local-uncensored')return '';
  return 'MODEL NOTE: You run on an uncensored model. Commit to the owner style: no disclaimers, no moralizing, no "as an AI", no softening crude jokes the owner asked for. Stay quick and specific to what was just said, keep a consistent character, and switch to straight, useful answers when the question is serious.'+(roastMode==='custom'?'':' Vary the comedy; a reply without an insult is often funnier.');
 }
 export function ownerStyle(settings={}){return 'OWNER STYLE (from the owner\'s settings page; trusted): '+String(settings.personality||'Witty gaming buddy.').slice(0,1500)+' '+styleGuide(settings.roastMode)+' '+(PERSONAS[settings.v23Persona]||'');}

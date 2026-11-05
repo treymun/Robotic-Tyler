@@ -166,7 +166,7 @@
   };
  }
  const pauseHooks=new Set();let userPaused=false;
- $('quickStop').onclick=()=>{userPaused=true;globalThis.TylerCompanion.cancelSetup?.();globalThis.TylerCompanion.stopAutomatic?.('Paused by you');globalThis.TylerCompanion.stopLive?.('Live voice stopped by you.');
+ $('quickStop').onclick=()=>{userPaused=true;globalThis.TylerCompanion.cancelSetup?.();globalThis.TylerCompanion.stopAutomatic?.('Paused by you');try{Promise.resolve(chrome.runtime.sendMessage({type:'local-ai:release'})).catch(()=>{});}catch{}globalThis.TylerCompanion.stopLive?.('Live voice stopped by you.');
   // v2.33: the !tyler watcher too (it kept answering, and billing, while the panel said Paused).
   if(armed){armed=false;globalThis.TylerCommands?.set('tyler',{enabled:false});epoch++;observer?.disconnect();observer=null;}
   for(const fn of pauseHooks){try{fn();}catch{}}};
@@ -256,7 +256,7 @@
  function pause(){if(autoActive)globalThis.TylerCompanion.stopAutomatic?.('Paused while setup changes');armed=false;globalThis.TylerCommands?.set('tyler',{enabled:false});epoch++;observer?.disconnect();observer=null;status('Commands paused. In-flight results will be ignored.');}
 
  // ── Chat targets ────────────────────────────────────────────────────────
- async function checkAI(){try{const r=await ask({type:'connection'});if(r.chatTag)TylerChatTag.set(r.chatTag);$('aiConnection').textContent=r.keyConfigured?(r.provider||'OpenRouter')+' key saved. Brain: '+r.model+'. Speech: '+(r.speechEngine==='theme'?'theme voice on this PC':r.speechVoice)+'.':'No key saved for the selected provider. Open personality & API settings.';const pick=$('previewVoice');if(Array.isArray(r.voices)&&r.voices.length){pick.replaceChildren(...r.voices.map(v=>{const o=document.createElement('option');o.value=v.value;o.textContent=v.label;return o;}));}pick.value=r.speechVoice||pick.options[0]?.value||'';}catch(e){$('aiConnection').textContent=e.message;}}
+ async function checkAI(){try{const r=await ask({type:'connection'});if(r.chatTag)TylerChatTag.set(r.chatTag);$('aiConnection').textContent=r.local?(r.keyConfigured?'Text replies are made on this PC: '+r.model+'. Speech: '+(r.speechEngine==='theme'?'theme voice on this PC':r.hearing?r.speechVoice:'needs an OpenRouter or Google key')+'.':(r.localProblem||'Text AI on this PC isn’t ready. Open Settings → AI & personality.')):r.keyConfigured?(r.provider||'OpenRouter')+' key saved. Brain: '+r.model+'. Speech: '+(r.speechEngine==='theme'?'theme voice on this PC':r.speechVoice)+'.':'No key saved for the selected provider. Open personality & API settings.';const pick=$('previewVoice');if(Array.isArray(r.voices)&&r.voices.length){pick.replaceChildren(...r.voices.map(v=>{const o=document.createElement('option');o.value=v.value;o.textContent=v.label;return o;}));}pick.value=r.speechVoice||pick.options[0]?.value||'';}catch(e){$('aiConnection').textContent=e.message;}}
  function locateChat(){
   if(TylerSetup.visible(composer)&&TylerSetup.visible(region)&&sampleElement?.isConnected)return true;
   const found=TylerSelection.discover(document,lastChatFocus,chatHint);discovery={ambiguous:!!found.ambiguous,empty:!!found.empty};
@@ -403,7 +403,7 @@
    const music=globalThis.TylerCompanion.musicStatus?.();
    if(music)row(music.sharing?(music.quality?.processed?'! Music DJ shared, but Chrome is processing it':'✓ Music DJ shared'):music.open?'? Music DJ not shared':'? Music DJ off',music.sharing?'The YouTube '+(platform.id==='desktop'?'window':'tab')+'\'s sound goes into the call'+(music.quality?(music.quality.processed?' with Chrome\'s microphone cleanup still on, so music may warble. Update Chrome, then press Share its audio again.':', untouched'+(music.quality.channels>1?' and in stereo':'')+(music.quality.bitrate?(music.quality.level==='auto'?', on Auto quality, now ':', at up to ')+Math.round(music.quality.bitrate/1000)+' kbps.':' at Steam\'s default rate.')+' If it stutters, type music quality low or medium in chat.'):'.'):music.open?'Press Start Music DJ again and share the YouTube '+(platform.id==='desktop'?'window':'tab')+'.':'Optional. Start it from Room → Music DJ.');
    const c=await ask({type:'connection'});
-   row(c.keyConfigured?'✓ '+c.provider+' key saved':'! No API key',c.keyConfigured?'Model: '+c.model+'. Testing it next…':'Add a key in Settings → AI & personality.');
+   row(c.keyConfigured?'✓ '+(c.local?'Text AI on this PC':c.provider+' key saved'):c.local?'! Text AI on this PC isn’t ready':'! No API key',c.keyConfigured?'Model: '+c.model+'. Testing it next…':c.local?(c.localProblem||'Install it in Settings → AI & personality.'):'Add a key in Settings → AI & personality.');
    if(owner&&c.keyConfigured){
     const started=performance.now();
     const text=await ask({type:'command',text:'ask Reply with one short sentence confirming you can respond.'}).catch(e=>({warning:e.message}));

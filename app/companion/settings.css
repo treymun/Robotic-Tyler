@@ -186,6 +186,13 @@ summary:hover,details[open]>summary{color:var(--rt-ink-strong)}
 button:focus-visible,a:focus-visible,summary:focus-visible,input[type=checkbox]:focus-visible,input[type=range]:focus-visible{outline:var(--rt-focus-w,2px) var(--rt-focus-style,solid) var(--rt-focus);outline-offset:var(--rt-focus-offset,2px)}
 /* ── AI provider and model (v2.20): one model card for OpenRouter and Gemini ── */
 body:not([data-ai-provider=gemini]) .for-gemini,body[data-ai-provider=gemini] .for-openrouter{display:none!important}
+/* Text AI on this PC (v2.38): what applies only to it, and the cloud model card it replaces. */
+body:not([data-ai-provider=local]) .only-local,body[data-ai-provider=local] .for-openrouter:not(.for-local),body[data-ai-provider=local] #modelCard{display:none!important}
+#localAI[data-relevant=false]{display:none!important}
+.la-tag{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:var(--rt-r-xs);font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;vertical-align:2px;color:var(--rt-success);background:color-mix(in srgb,var(--rt-success) 18%,transparent)}
+.la-tag:empty{display:none}
+.la-tag[data-kind=installed]{color:var(--rt-link);background:color-mix(in srgb,var(--rt-link) 16%,transparent)}
+.la-models .la-size{font-size:12px;opacity:.85}
 .model-card{--mc-accent:var(--rt-active);margin:14px 0 16px;padding:14px 16px 14px 18px;background:var(--rt-block);border:1px solid var(--rt-line);border-radius:var(--rt-r-md);box-shadow:inset 3px 0 0 var(--mc-accent)}
 .model-card[data-tier=budget],.model-card[data-tier=fast]{--mc-accent:var(--rt-active)}
 .model-card[data-tier=balanced]{--mc-accent:var(--rt-success)}

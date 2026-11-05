@@ -9,7 +9,7 @@ import {runSettingsAI} from './settings-ai.mjs';
 const $=id=>document.getElementById(id);
 const desktop=document.body.dataset.desktop==='true';
 const store=desktop?window.tylerSettings?.storage?.local:globalThis.chrome?.storage?.local;
-const provider=()=>$('aiProvider').value==='gemini'?'gemini':'openrouter';
+const provider=()=>['gemini','local'].includes($('aiProvider').value)?$('aiProvider').value:'openrouter';
 
 function link(href,text){const a=document.createElement('a');a.href=href;a.target='_blank';a.rel='noopener noreferrer';a.textContent=text;return a;}
 function route(model){
@@ -20,8 +20,11 @@ const cap=s=>({deepinfra:'DeepInfra',sambanova:'SambaNova',groq:'Groq',venice:'V
 
 export function render(){
  const google=provider()==='gemini';
- document.body.dataset.aiProvider=google?'gemini':'openrouter';
+ document.body.dataset.aiProvider=provider();
  $('modelTestResult').textContent='';$('modelTestResult').dataset.state='';
+ // Text AI on this PC (v2.38) has its own section (local-ai-settings.js) instead of this card.
+ window.dispatchEvent(new CustomEvent('tyler:ai-provider',{detail:provider()}));
+ if(provider()==='local')return;
  const card=$('modelCard');
  if(google){
   const m=geminiTextModel($('geminiTextModel').value);
