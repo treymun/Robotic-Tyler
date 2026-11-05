@@ -13,7 +13,7 @@ import './soundboard-core.js';
 import './image-core.js';
 import {themeSound} from './theme-sounds.mjs';
 import './trivia-bank.js';
-import {temporary,errorKind,transientDelay,voiceControl,normalizeExtras,conversationGuide,ownerStyle,modelStyle,localCharacter,localCharacterReminder} from './conversation.mjs';
+import {temporary,errorKind,transientDelay,voiceControl,normalizeExtras,conversationGuide,ownerStyle,modelStyle,localCharacter,localCharacterReminder,localReplyTidy} from './conversation.mjs';
 import './identity.js';
 import {Memory,freshReply,styleGuide} from './memory.mjs';
 import {repeatCheck,repeatHint,retryNote} from './repeat-guard.mjs';
@@ -412,6 +412,7 @@ async function handleGameUnlocked(message,sender){
    reply=await generate(request.messages,early?content=>early.feed(content):undefined);
    // The app adds the name tag (chat-tag.js); a tag the model wrote itself is removed so it never appears twice or gets spoken.
    reply=TylerChatTag.strip(reply,TylerChatTag.config(settings)).trim()||reply;
+   if(localAI)reply=localReplyTidy(reply)||reply;
    if(/^\[\[SKIP\]\]$/i.test(reply)&&allowSkip){reply='';ignoreReason='Skipped by '+settings.talkativeness+' mode — select Active for regular replies.';}
    else if(/^\[\[SKIP\]\]$/i.test(reply)){progress('Preparing a fresh reply…');reply=await generate([...request.messages,{role:'system',content:'Reply to the latest chat message with a fresh, brief conversational answer, following the RULES. Do not output a skip marker or repeat an earlier answer. The person is talking to you even if their identity is unknown.'}]);if(/^\[\[SKIP\]\]$/i.test(reply))throw Error('Model refused to produce a conversational reply after one retry. Try another conversation model.');reply=TylerChatTag.strip(reply,TylerChatTag.config(settings)).trim()||reply;}
    else {

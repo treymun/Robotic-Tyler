@@ -8,7 +8,7 @@ import fs from 'node:fs';
 import {OPENROUTER_MODELS,GEMINI_TEXT_MODELS,chooseOpenRouter,openRouterRequest,modelLabel,geminiProblem,openRouterProblem,NEVER_PROVIDERS} from '../browser-extension/models.mjs';
 import {geminiTextBody,geminiContents} from '../browser-extension/gemini.mjs';
 import {styleGuide} from '../browser-extension/memory.mjs';
-import {modelStyle,characterBrief,localCharacterReminder} from '../browser-extension/conversation.mjs';
+import {modelStyle,characterBrief,localCharacterReminder,localReplyTidy} from '../browser-extension/conversation.mjs';
 
 const store={openrouterKey:'sk-or-test',geminiKey:'AIza-test',aiProvider:'openrouter'};
 const calls=[];let geminiQueue=[],orQueue=[];
@@ -143,5 +143,13 @@ test('v2.38.1: the character brief for the models on this PC: the owner\'s perso
  assert.equal(characterBrief({}),'Witty gaming buddy.');
  assert.equal(characterBrief({personality:'  Cocky\n\nCS vet.  ',v23Persona:'dry'}),'Cocky CS vet. Respond with dry, deadpan gaming humor.');
  assert.equal(characterBrief({personality:'x'.repeat(900)}).length,400);
- assert.equal(localCharacterReminder({personality:'y'.repeat(900)}),'(Your character: '+'y'.repeat(240)+')');
+ assert.equal(localCharacterReminder({personality:'y'.repeat(900)}),'(Your character: '+'y'.repeat(240)+' Reply in that voice, in one to three sentences unless they asked for detail, with no offers of help.)');
+ assert.match(localCharacterReminder({length:'short'}),/in one or two sentences, with no offers/);assert.match(localCharacterReminder({length:'detailed'}),/Reply in that voice, with no offers of help\.\)$/);
+});
+test('v2.38.1: a local reply wrapped in quote marks, or with Markdown bold, is posted without them',()=>{
+ assert.equal(localReplyTidy('"Yo, Sam! I’m the captain of this crew."'),'Yo, Sam! I’m the captain of this crew.');
+ assert.equal(localReplyTidy('“Arr, matey.”'),'Arr, matey.');
+ assert.equal(localReplyTidy('Arr, Sam! The **AK-47** is the clear winner.'),'Arr, Sam! The AK-47 is the clear winner.');
+ assert.equal(localReplyTidy('"Yo Tyler." "Sam, no."'),'"Yo Tyler." "Sam, no."','quotes inside are left as they are');
+ assert.equal(localReplyTidy('I’m the *hero* here, 2*3*4 = 24'),'I’m the *hero* here, 2*3*4 = 24');
 });

@@ -39,5 +39,14 @@ export function modelStyle(modelKey,roastMode){
 // before the latest chat message's reminder.
 export function characterBrief(settings={}){return (String(settings.personality||'Witty gaming buddy.').replace(/\s+/g,' ').trim().slice(0,400)+' '+(PERSONAS[settings.v23Persona]||'')).trim();}
 export function localCharacter(settings={}){return 'YOUR CHARACTER (the owner style above; it decides how every reply sounds): '+characterBrief(settings)+' Stay in this character in every reply, in your own words and with its attitude, slang and quirks. Never sound like a generic assistant: no "great question", no "as an AI", no offers of more help, no summaries.';}
-export function localCharacterReminder(settings={}){return '(Your character: '+characterBrief(settings).slice(0,240)+')';}
+export function localCharacterReminder(settings={}){return '(Your character: '+characterBrief(settings).slice(0,240)+' Reply in that voice'+(settings.length==='short'?', in one or two sentences':settings.length==='detailed'?'':', in one to three sentences unless they asked for detail')+', with no offers of help.)';}
+/** v2.38.1: the small models on this PC sometimes wrap the whole reply in quote marks or use Markdown
+ * bold, which Steam chat shows as literal asterisks. Only those are removed; the words stay (a single
+ * *word* is left alone: people type that in chat too). */
+export function localReplyTidy(text){
+ let s=String(text??'').trim();
+ const q=/^(["“])([\s\S]+)(["”])$/.exec(s);
+ if(q&&!/["“”]/.test(q[2]))s=q[2].trim();
+ return s.replace(/\*\*([^*\n]+)\*\*/g,'$1');
+}
 export function ownerStyle(settings={}){return 'OWNER STYLE (from the owner\'s settings page; trusted): '+String(settings.personality||'Witty gaming buddy.').slice(0,1500)+' '+styleGuide(settings.roastMode)+' '+(PERSONAS[settings.v23Persona]||'');}

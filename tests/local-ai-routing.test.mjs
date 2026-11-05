@@ -151,7 +151,10 @@ test('v2.38.1: the owner\'s personality is repeated where the small model looks:
   assert.ok(sys.startsWith(CHAT_RULES),'the rules still come first');assert.ok(last.endsWith(CHAT_REMINDER),'the reminder still ends the message');
   assert.match(sys,/YOUR CHARACTER \(the owner style above; it decides how every reply sounds\): A grumpy pirate captain\. Talks like a pirate \(arr, matey\), calls the squad his crew\. Stay in this character[^]*no summaries\.$/,'the character closes the instructions');
   assert.ok(sys.indexOf('OWNER STYLE')<sys.indexOf('YOUR CHARACTER'));
-  assert.match(last,/<\/chat>\n\(Your character: A grumpy pirate captain\. Talks like a pirate \(arr, matey\), calls the squad his crew\.\)\n\(Reply to the <chat>/,'and again right before the reminder');
+  assert.match(last,/<\/chat>\n\(Your character: A grumpy pirate captain\. Talks like a pirate \(arr, matey\), calls the squad his crew\. Reply in that voice, in one to three sentences unless they asked for detail, with no offers of help\.\)\n\(Reply to the <chat>/,'and again right before the reminder');
   assert.equal(m.filter(x=>x.role==='system').length,1,'one instruction block, first');
+  // A reply the model wrapped in quote marks, with Markdown bold, is posted without them.
+  const old=parts;parts=['"Arr, the ','**tank**, ','matey."'];
+  try{const q=await command('ask who wins?');assert.equal(q.ok,true,q.error);assert.equal(q.text,'Arr, the tank, matey.');}finally{parts=old;}
  }finally{store.personality=before;}
 });
