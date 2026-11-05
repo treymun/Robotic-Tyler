@@ -178,7 +178,10 @@ class Installer{
   const old=this.state(),engine=path.join(this.dir,'engine-'+p.lock);
   const engineReady=!!old&&old.lock===p.lock&&old.runtime===p.runtime&&fs.existsSync(path.join(engine,'ok'));
   const reuse=new Set(),oldEngine=old?this.engineDir(old):null;
-  if(!engineReady&&oldEngine&&fs.existsSync(path.join(oldEngine,'ok'))&&old.runtime===p.runtime)for(const f of p.files.filter(f=>f.group==='runtime')){
+  // Reused from the engine already on this PC, by checksum: also across engines for the same system
+  // (switching to the fast engine keeps PyTorch, which is most of the download).
+  const platform=r=>String(r||'').split('-')[0];
+  if(!engineReady&&oldEngine&&fs.existsSync(path.join(oldEngine,'ok'))&&platform(old.runtime)===platform(p.runtime))for(const f of p.files.filter(f=>f.group==='runtime')){
    if(f.kind==='python'&&old.pythonSha===f.sha256&&fs.existsSync(path.join(oldEngine,'python')))reuse.add(f.sha256);
    if(f.kind==='wheel'&&(old.wheels||[]).some(w=>w.sha256===f.sha256)&&fs.existsSync(path.join(oldEngine,'site',distInfo(f),'RECORD')))reuse.add(f.sha256);
   }

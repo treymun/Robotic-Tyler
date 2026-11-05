@@ -12,7 +12,7 @@ const sapi=require('./sapi.cjs');
 const {Installer,plan,LOCK}=require('./installer.cjs'),{WorkerHost}=require('./worker.cjs'),{Voices,THEMES,STATUS}=require('./voices.cjs'),hardware=require('./hardware.cjs');
 const GB=1024**3;
 const MODES={quality:{model:'quality',label:'Quality',about:'Qwen3-TTS 1.7B: the closest match to each voice.'},light:{model:'light',label:'Lightweight',about:'Qwen3-TTS 0.6B: less graphics memory, a little less like each voice.'}};
-const DEFAULTS={mode:null,device:'auto',idleMinutes:5,followTheme:true,override:'',processed:true,nativeVoices:true,chat:false,chatAccess:'everyone',chatAllowed:'',chatCooldown:20,maxChars:400};
+const DEFAULTS={mode:null,device:'auto',engine:'standard',idleMinutes:5,followTheme:true,override:'',processed:true,nativeVoices:true,chat:false,chatAccess:'everyone',chatAllowed:'',chatCooldown:20,maxChars:400};
 const MAX_QUEUE=4,CACHE_LIMIT=300*1024**2,CHECK_LINE='Voice check. Theme voices are ready.';
 
 class ThemeVoices extends EventEmitter{
@@ -38,6 +38,7 @@ class ThemeVoices extends EventEmitter{
   const s=await this.settings(),next={...s};
   if(changes.mode!==undefined)next.mode=MODES[changes.mode]?changes.mode:null;
   if(changes.device!==undefined)next.device=['auto','cuda','cpu'].includes(changes.device)?changes.device:'auto';
+  if(changes.engine!==undefined)next.engine=changes.engine==='fast'?'fast':'standard';
   if(changes.idleMinutes!==undefined){const n=Number(changes.idleMinutes);next.idleMinutes=[0,1,2,5,10,20,30,60].includes(n)?n:5;}
   for(const k of ['followTheme','processed','chat','nativeVoices'])if(changes[k]!==undefined)next[k]=changes[k]===true;
   if(changes.override!==undefined)next.override=THEMES.includes(changes.override)?changes.override:'';
@@ -47,16 +48,20 @@ class ThemeVoices extends EventEmitter{
   await this.setSettingsRaw(next);this.scheduleIdle(next);this.emitStatus();return next;
  }
  async hardware(refresh=false){if(!this.hw||refresh||Date.now()-this.hw.at>60000)this.hw=await this.detectFn(this.dir);return this.hw;}
- runtimeFor(hw,device){
-  if(process.platform!=='win32')return 'linux-cpu';
+ /** The engine to install. The fast engine (v2.36) is only for an NVIDIA card; a processor-only PC
+  *  always gets the standard one (the fast engine's speed comes from the card). */
+ runtimeFor(hw,device,engine='standard'){
+  const fast=engine==='fast';
+  if(process.platform!=='win32')return fast?'linux-cpu-fast':'linux-cpu';
   if(device==='cpu')return 'windows-cpu';
-  return hardware.usableGpu(hw).gpu?'windows-cuda':'windows-cpu';
+  return hardware.usableGpu(hw).gpu?(fast?'windows-cuda-fast':'windows-cuda'):'windows-cpu';
  }
+ static engineOf(runtime){return String(runtime||'').endsWith('-fast')?'fast':'standard';}
  /** What installing would download for a mode (and optionally the other model too). */
- async planFor({mode,both=false,device}={}){
+ async planFor({mode,both=false,device,engine}={}){
   const hw=await this.hardware(),rec=hardware.recommend(hw),s=await this.settings();
   const m=MODES[mode]?mode:s.mode||rec.mode,models=both?['quality','light']:[MODES[m].model];
-  const p=plan({runtime:this.runtimeFor(hw,device||s.device),models}),need=this.installer.needs(p);
+  const p=plan({runtime:this.runtimeFor(hw,device||s.device,engine||s.engine),models}),need=this.installer.needs(p);
   // What this PC still needs: an engine or model already here (or packages an older engine has) isn't downloaded again.
   return {...p,mode:m,recommendation:rec,hardware:hw,files:undefined,fileCount:need.get.length,download:need.download,reused:need.reused,engineReady:need.engineReady,
    disk:need.engineReady?need.download:p.disk,fullDownload:p.download};
@@ -64,17 +69,20 @@ class ThemeVoices extends EventEmitter{
  async status(){
   const s=await this.settings(),inst=this.installer.status(),hw=this.hw,rec=hw?hardware.recommend(hw):null;
   const mode=s.mode||rec?.mode||'quality',modelOk=!!inst.models?.[MODES[mode].model];
-  return {installed:!!inst.installed,current:!!inst.current,updateAvailable:!!inst.updateAvailable,runtime:inst.runtime||null,models:inst.models||{},check:inst.check||null,
+  // The engine in use is the installed one; choosing the other engine takes effect when it's installed (never silently).
+  const engine=inst.installed?ThemeVoices.engineOf(inst.runtime):null,wanted=s.engine==='fast'?'fast':'standard';
+  const gpu=!!(hw&&hardware.usableGpu(hw).gpu),switchable=!!inst.installed&&!!inst.current&&s.device!=='cpu'&&(gpu||engine==='fast')&&engine!==wanted;
+  return {installed:!!inst.installed,current:!!inst.current,updateAvailable:!!inst.updateAvailable,runtime:inst.runtime||null,engine,engineWanted:wanted,engineSwitch:switchable,models:inst.models||{},check:inst.check||null,
    mode,modeChosen:!!s.mode,modeLabel:MODES[mode].label,recommendation:rec,hardware:hw?{cpu:hw.cpu,ram:hw.ram,gpus:hw.gpus,disk:hw.disk}:null,
    ready:!!inst.installed&&!!inst.current&&modelOk,needs:!inst.installed?'install':!inst.current?'update':!modelOk?'model':null,
-   loaded:this.loaded?{mode:this.loaded.mode,device:this.loaded.device,since:this.loaded.at}:null,
+   loaded:this.loaded?{mode:this.loaded.mode,device:this.loaded.device,engine:this.loaded.engine,since:this.loaded.at}:null,
    busy:!!this.active,queued:this.queue.length,installing:this.installJob?this.installJob.progress:null,installError:this.lastInstallError||null,lastError:this.lastError,settings:s,
    lastClip:this.lastClip?{id:this.lastClip.id,seconds:this.lastClip.seconds,voice:this.lastClip.voiceName,text:this.lastClip.text.slice(0,80)}:null};
  }
  emitStatus(){this.status().then(s=>this.emit('status',s)).catch(()=>{});}
  voiceList(){return this.voices.list();}
  // ── install, repair, remove ──────────────────────────────────────────────
- async install({mode,both=false,offline=[],device,runtime,models}={}){
+ async install({mode,both=false,offline=[],device,engine,runtime,models}={}){
   if(this.installJob)throw Error('Theme voices are already being installed.');
   // Claimed at once, so a second press can't start a second install over the same downloads.
   const ctl=new AbortController();this.installJob={ctl,progress:{phase:'start',label:'Checking this PC'}};this.lastInstallError=null;this.emitStatus();
@@ -82,7 +90,7 @@ class ThemeVoices extends EventEmitter{
    const folders=(offline||[]).map(x=>String(x||'').trim().replace(/^["']+|["']+$/g,'')).filter(Boolean);
    let full,chosen=mode;
    if(runtime&&models)full=plan({runtime,models});
-   else{const p=await this.planFor({mode,both,device});full=plan({runtime:p.runtime,models:p.models});chosen=p.mode;}
+   else{const p=await this.planFor({mode,both,device,engine});full=plan({runtime:p.runtime,models:p.models});chosen=p.mode;}
    this.installJob.progress={phase:'start',label:'Starting',bytes:0,totalBytes:this.installer.needs(full).download};this.emitStatus();
    await this.stop();await this.closeWorker(); // nothing may run from the engine while it's replaced
    await this.installer.install(full,{offline:folders,signal:ctl.signal,python:this.devPython,onProgress:e=>{this.installJob.progress=e;this.emit('install',e);}});
@@ -106,7 +114,7 @@ class ThemeVoices extends EventEmitter{
   const started=Date.now();let result;
   try{result=await this.generate({text:CHECK_LINE,theme,mode,noCache:true,purpose:'check'});}
   catch(e){this.installer.saveCheck({ok:false,error:e.message,code:e.code||null,at:Date.now()});throw e;}
-  const c={ok:true,at:Date.now(),mode,device:result.device||this.loaded?.device,seconds:result.seconds,ms:result.ms,totalMs:Date.now()-started,rtf:+(result.ms/1000/Math.max(.1,result.seconds)).toFixed(2),voice:theme};
+  const c={ok:true,at:Date.now(),mode,device:result.device||this.loaded?.device,engine:this.loaded?.engine||ThemeVoices.engineOf(st.runtime),seconds:result.seconds,ms:result.ms,totalMs:Date.now()-started,rtf:+(result.ms/1000/Math.max(.1,result.seconds)).toFixed(2),voice:theme};
   this.installer.saveCheck(c);return c;
  }
  async verify(onProgress){return this.installer.verify({onProgress});}
@@ -144,7 +152,7 @@ class ThemeVoices extends EventEmitter{
   * Where the model runs. "auto" with the graphics-card engine means the graphics card: if it can't be
   * used, the message fails with the reason instead of quietly moving to the (much slower) processor.
   */
- deviceFor(s){const st=this.installer.state();return s.device==='cpu'||!String(st?.runtime).endsWith('cuda')?'cpu':'cuda';}
+ deviceFor(s){const st=this.installer.state();return s.device==='cpu'||!String(st?.runtime).includes('cuda')?'cpu':'cuda';}
  /** Room for the model? Says so plainly instead of quietly using a smaller one. */
  async roomFor(mode,device){
   const need=hardware.NEEDS[mode];
@@ -156,8 +164,8 @@ class ThemeVoices extends EventEmitter{
   else{const needRam=(mode==='quality'?7.5:3.6)*GB,free=this.freemem();if(free<needRam*0.8)throw Object.assign(Error(MODES[mode].label+' mode on the processor needs about '+(needRam/GB).toFixed(1)+' GB of free memory and '+(free/GB).toFixed(1)+' GB is free. Close some programs'+(mode==='quality'?', or switch to Lightweight mode':'')+'.'),{code:'low_memory'});}
  }
  async ensureLoaded(mode){
-  const s=await this.settings(),device=this.deviceFor(s),st=this.installer.state();
-  if(this.loaded&&this.loaded.mode===mode&&this.loaded.device===device&&this.worker?.alive)return {loaded:this.loaded,worker:this.worker};
+  const s=await this.settings(),device=this.deviceFor(s),st=this.installer.state(),engine=ThemeVoices.engineOf(st?.runtime);
+  if(this.loaded&&this.loaded.mode===mode&&this.loaded.device===device&&this.loaded.engineAsked===engine&&this.worker?.alive)return {loaded:this.loaded,worker:this.worker};
   const dir=this.installer.modelDir(MODES[mode].model,st);
   if(!dir||!fs.existsSync(dir))throw Object.assign(Error(MODES[mode].label+' mode’s model isn’t installed. Install it in Settings → Theme voices.'),{code:'model_missing'});
   // Another model (or the other device) is loaded: close it first, so its memory counts as free.
@@ -167,10 +175,11 @@ class ThemeVoices extends EventEmitter{
   // On the processor, full precision is faster but bigger: measured, Lightweight (0.6B) in fp32 peaked
   // at 6 GB on a long line (and ran out on an 8 GB machine), Quality (1.7B) in bf16 at 5.3 GB.
   const dtype=device==='cuda'?'auto':os.totalmem()>=(mode==='quality'?20:12)*GB?'fp32':'bf16';
-  let r;try{r=await w.request('load',{model_dir:dir,device,dtype,threads:Math.max(1,os.cpus().length-1)},{timeout:300000});}
+  let r;try{r=await w.request('load',{model_dir:dir,device,dtype,engine,threads:Math.max(1,os.cpus().length-1)},{timeout:300000});}
   catch(e){if(e.code==='no_gpu')throw Object.assign(Error('The graphics card can’t be used right now (the voice engine didn’t find it). Check that the NVIDIA driver is installed and up to date, or choose “Processor only” in Settings → Theme voices.'),{code:'no_gpu'});throw e;}
   if(this.worker!==w)throw Object.assign(Error('Stopped.'),{code:'cancelled'});
-  this.loaded={mode,device,dtype:r.dtype_used,at:Date.now(),loadMs:r.load_ms};this.emitStatus();return {loaded:this.loaded,worker:w};
+  // engine: what actually speaks. The fast engine on the processor speaks the standard way (it has no CUDA graphs there).
+  this.loaded={mode,device,dtype:r.dtype_used,engineAsked:engine,engine:r.engine_used==='standard'||!r.engine_used?'standard':'fast',at:Date.now(),loadMs:r.load_ms};this.emitStatus();return {loaded:this.loaded,worker:w};
  }
  scheduleIdle(s){clearTimeout(this.idleTimer);const mins=s?.idleMinutes??5;if(!mins||!this.worker)return;this.idleTimer=setTimeout(()=>{if(!this.active&&!this.queue.length){this.log('Theme voices','idle: closing the voice engine');void this.closeWorker();}},mins*60000);this.idleTimer.unref?.();}
 
@@ -182,15 +191,27 @@ class ThemeVoices extends EventEmitter{
   const t=await this.activeTheme();return THEMES.includes(t)?t:'steam';
  }
  /** Queue a voice message. Resolves with the finished clip ({id,file,seconds,…}). */
- async speak({text,theme,mode,purpose='call',fresh=false}={}){
+ async speak({text,theme,mode,purpose='call',fresh=false,signal}={}){
   const s=await this.settings(),clean=String(text||'').replace(/\s+/g,' ').trim();
-  if(!clean)throw Error('Type something for Tyler to say.');if(clean.length>s.maxChars)throw Error('That’s too long for one voice message ('+clean.length+' characters; '+s.maxChars+' at most).');
+  // Tyler's own spoken replies (v2.36) may be longer than a typed message (up to 800 characters).
+  const limit=purpose==='reply'?800:s.maxChars;
+  if(!clean)throw Error('Type something for Tyler to say.');if(clean.length>limit)throw Error('That’s too long for one voice message ('+clean.length+' characters; '+limit+' at most).');
   const voice=await this.resolveTheme(theme);
-  return this.generate({text:clean,theme:voice,mode:mode||s.mode||(await this.status()).mode,purpose,noCache:fresh,seed:fresh?1+Math.floor(Math.random()*1e6):1});
+  return this.generate({text:clean,theme:voice,mode:mode||s.mode||(await this.status()).mode,purpose,noCache:fresh,seed:fresh?1+Math.floor(Math.random()*1e6):1,signal});
  }
  generate(job){
+  if(job.signal?.aborted)return Promise.reject(Object.assign(Error('Stopped.'),{code:'cancelled'}));
   if(this.queue.length>=MAX_QUEUE)return Promise.reject(Object.assign(Error('Four voice messages are already waiting. Try again in a moment.'),{code:'busy'}));
-  return new Promise((resolve,reject)=>{this.queue.push({...job,id:'v'+(++this.seq),resolve,reject,queuedAt:Date.now()});this.emitStatus();void this.pump();});
+  return new Promise((resolve,reject)=>{
+   const entry={...job,id:'v'+(++this.seq),resolve,reject,queuedAt:Date.now()};
+   // One job can be called off on its own (a voice reply that was interrupted), without stopping the rest.
+   job.signal?.addEventListener('abort',()=>this.cancelJob(entry),{once:true});
+   this.queue.push(entry);this.emitStatus();void this.pump();});
+ }
+ cancelJob(entry){
+  const i=this.queue.indexOf(entry);
+  if(i>=0){this.queue.splice(i,1);entry.reject(Object.assign(Error('Stopped.'),{code:'cancelled'}));this.emitStatus();return;}
+  if(this.active===entry){entry.cancelled=true;if(entry.workerId&&this.worker)this.worker.cancel(entry.workerId);}
  }
  async pump(){
   if(this.active||!this.queue.length)return;

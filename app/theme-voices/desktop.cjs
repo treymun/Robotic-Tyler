@@ -37,8 +37,8 @@ function setupThemeVoices({root,dir,vault,local,changeListeners,net,shell,log,se
  async function settingsRequest(op,r){
   if(op==='status'){await service.hardware().catch(()=>null);return {status:await service.status(),voices:service.voiceList(),modes:MODES,models:Object.fromEntries(Object.entries(LOCK.models).map(([k,m])=>[k,{label:m.label,repo:m.repo,revision:m.revision,license:m.license,bytes:m.files.reduce((n,f)=>n+f.size,0)}])),engine:LOCK.engine,python:LOCK.python.version};}
   if(op==='hardware'){const hw=await service.hardware(true);return {hardware:hw,recommendation:hardware.recommend(hw)};}
-  if(op==='plan'){const p=await service.planFor({mode:r.mode,both:r.both===true,device:r.device});return p;}
-  if(op==='install'){void service.install({mode:r.mode,both:r.both===true,device:r.device,offline:Array.isArray(r.offline)?r.offline.filter(x=>typeof x==='string').slice(0,3):[]}).catch(e=>log('Theme voices install failed',e.message));return {started:true};}
+  if(op==='plan'){const p=await service.planFor({mode:r.mode,both:r.both===true,device:r.device,engine:r.engine==='fast'?'fast':r.engine==='standard'?'standard':undefined});return p;}
+  if(op==='install'){void service.install({mode:r.mode,both:r.both===true,device:r.device,engine:r.engine==='fast'?'fast':r.engine==='standard'?'standard':undefined,offline:Array.isArray(r.offline)?r.offline.filter(x=>typeof x==='string').slice(0,3):[]}).catch(e=>log('Theme voices install failed',e.message));return {started:true};}
   if(op==='cancel'){service.cancelInstall();return {};}
   if(op==='check')return service.check();
   if(op==='verify')return service.verify(e=>send({kind:'verify',...e}));

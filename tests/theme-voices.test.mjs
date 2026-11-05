@@ -320,3 +320,76 @@ test('panel card (mocked): !say works only when the owner turned it on, with a c
  assert.equal(on.box.TylerThemeVoices.parse('!say cs16: Fire in the hole!').theme,'cs16');assert.equal(on.box.TylerThemeVoices.parse('!saything'),null);
  assert.ok(before>=1);
 });
+
+// ── v2.36: the fast engine (faster-qwen3-tts) and theme voices for Tyler's spoken replies (MOCKED) ──
+const REAL_FETCH=globalThis.fetch; // later tests replace globalThis.fetch with stubs
+const NV_PC={os:{platform:'win32'},cpu:{model:'CPU',threads:16},ram:{total:32*GB,free:20*GB},gpus:[{vendor:'NVIDIA',name:'NVIDIA GeForce RTX 5070 Ti Laptop GPU',vramTotal:12*GB,vramFree:11*GB,driver:'581.57',capability:12}],disk:{free:100*GB}};
+test('v2.36 fast engine lock: its own runtime per system, the same PyTorch file as the standard engine, transformers pinned to 5.15.1, the two engine packages without their extra dependencies',()=>{
+ const fast=LOCK.runtimes['windows-cuda-fast'],std=LOCK.runtimes['windows-cuda'],pkg=n=>fast.files.find(x=>x.package===n);
+ assert.equal(fast.engine,'fast');assert.equal(LOCK.runtimes['linux-cpu-fast'].engine,'fast');assert.equal(std.engine,undefined);
+ assert.equal(pkg('transformers').version,'5.15.1','qwen-tts-hf breaks with newer transformers (measured: 5.20.2 and 5.22.1)');
+ assert.ok(pkg('faster-qwen3-tts')?.noDeps&&pkg('qwen-tts-hf')?.noDeps);
+ assert.ok(!pkg('qwen-tts'),'one qwen_tts package only');assert.ok(!pkg('gradio'),'the demo web page isn’t installed');
+ assert.equal(pkg('torch').sha256,std.files.find(x=>x.package==='torch').sha256,'PyTorch is shared');
+ const shared=new Set(std.files.map(x=>x.sha256)),extra=fast.files.filter(x=>!shared.has(x.sha256)).reduce((n,x)=>n+x.size,0);
+ assert.ok(extra>0&&extra<64*1024**2,'switching downloads only the difference ('+(extra/1024**2).toFixed(1)+' MB)');
+ assert.notEqual(lockHash('windows-cuda-fast'),lockHash('windows-cuda'));
+});
+test('v2.36 switching engines reuses what both engines share (PyTorch is most of it), only for the same system; switching back downloads nothing',async()=>{
+ const py=zip([['python313._pth','python313.zip\n.\n'],['python.exe','MZ']]);
+ const whl=(name,ver,body)=>zip([[name+'/__init__.py',body],[name+'-'+ver+'.dist-info/RECORD',name+'/__init__.py,sha256=x,'+body.length+'\n'+name+'-'+ver+'.dist-info/RECORD,,\n']]);
+ const torch=whl('torchish','1.0','T=1\n'),fastpkg=whl('fastish','0.5','F=1\n');
+ const s=await server({'/py.zip':py,'/torchish-1.0-py3-none-any.whl':torch,'/fastish-0.5-py3-none-any.whl':fastpkg});
+ try{
+ const dir=tmp(),workerDir=tmp();fs.writeFileSync(path.join(workerDir,'tyler_voice_worker.py'),'#\n');
+ const inst=new Installer({dir,fetch:(...a)=>REAL_FETCH(...a),workerDir,retryDelay:()=>0});
+ const F={py:{kind:'python',name:'python-3.13-embed-amd64.zip',url:s.url('/py.zip'),size:py.length,sha256:sha(py),group:'runtime'},
+  torch:{kind:'wheel',package:'torchish',version:'1.0',name:'torchish-1.0-py3-none-any.whl',url:s.url('/torchish-1.0-py3-none-any.whl'),size:torch.length,sha256:sha(torch),group:'runtime'},
+  fast:{kind:'wheel',package:'fastish',version:'0.5',name:'fastish-0.5-py3-none-any.whl',url:s.url('/fastish-0.5-py3-none-any.whl'),size:fastpkg.length,sha256:sha(fastpkg),group:'runtime'}};
+ const P=(runtime,lock,files)=>({runtime,models:[],lock,files,download:files.reduce((n,f)=>n+f.size,0),disk:1000});
+ await inst.install(P('windows-cuda','aaaaaaaaaaaa',[F.py,F.torch]));
+ const fast=P('windows-cuda-fast','dddddddddddd',[F.py,F.torch,F.fast]);
+ assert.equal(inst.needs(fast).download,fastpkg.length,'only the fast engine’s own package');
+ assert.equal(inst.needs(P('linux-cpu-fast','eeeeeeeeeeee',[F.py,F.torch,F.fast])).download,py.length+torch.length+fastpkg.length,'another system’s engine isn’t reused');
+ s.log.length=0;const st=await inst.install(fast);
+ assert.deepEqual(s.log.map(l=>l.url),['/fastish-0.5-py3-none-any.whl']);assert.equal(st.runtime,'windows-cuda-fast');
+ assert.equal(inst.needs(P('windows-cuda','aaaaaaaaaaaa',[F.py,F.torch])).download,0,'back to the standard engine: nothing to download');
+ }finally{await s.close();}
+});
+test('v2.36 engine choice: the fast engine only with a usable NVIDIA card and never switched by itself; Processor only keeps the standard engine; the engine is asked for by name',{skip:!python&&'needs python3'},async()=>{
+ const {svc,settings}=fakeInstall();
+ try{
+  const real=Object.getOwnPropertyDescriptor(process,'platform');Object.defineProperty(process,'platform',{value:'win32'});
+  try{
+   assert.equal(svc.runtimeFor(NV_PC,'auto','fast'),'windows-cuda-fast');assert.equal(svc.runtimeFor(NV_PC,'auto'),'windows-cuda');
+   assert.equal(svc.runtimeFor(NV_PC,'cpu','fast'),'windows-cpu');assert.equal(svc.runtimeFor({...NV_PC,gpus:[{vendor:'AMD',name:'Radeon RX 7800 XT'}]},'auto','fast'),'windows-cpu');
+  }finally{Object.defineProperty(process,'platform',real);}
+  assert.equal(ThemeVoices.engineOf('windows-cuda-fast'),'fast');assert.equal(ThemeVoices.engineOf('windows-cuda'),'standard');assert.equal(ThemeVoices.engineOf(null),'standard');
+  assert.match(hardware.recommend(NV_PC).notes.join(' '),/fast engine/);assert.doesNotMatch(hardware.recommend({...NV_PC,gpus:[]}).notes.join(' '),/fast engine/);
+  // Chosen, not installed: the installed engine stays in use until the owner presses Switch.
+  await svc.saveSettings({engine:'fast'});let st=await svc.status();
+  assert.equal(settings().engine,'fast');assert.equal(st.engine,'standard');assert.equal(st.engineWanted,'fast');
+  assert.equal(st.engineSwitch,false,'no NVIDIA card in this test PC: nothing to switch to');
+  svc.hw=NV_PC;st=await svc.status();assert.equal(st.engineSwitch,true,'with the card, Settings offers the switch');
+  await svc.saveSettings({device:'cpu'});assert.equal((await svc.status()).engineSwitch,false,'Processor only: the standard engine');
+  await svc.saveSettings({device:'auto',engine:'turbo'});assert.equal(settings().engine,'standard','an unknown engine is the standard one');
+  const clip=await svc.speak({text:'Engine check.'});assert.ok(fs.existsSync(clip.file));
+  assert.equal(svc.loaded.engineAsked,'standard');assert.equal(svc.loaded.engine,'standard');assert.equal((await svc.status()).loaded.engine,'standard');
+ }finally{await svc.shutdown();}
+});
+test('v2.36 a spoken reply can be called off on its own: a waiting one leaves the queue, the one being made stops, the rest carry on; replies may be up to 800 characters',{skip:!python&&'needs python3'},async()=>{
+ const {svc}=fakeInstall();
+ try{
+  const outcome=p=>p.then(()=>'made',e=>e.code),a=new AbortController(),b=new AbortController();
+  const first=outcome(svc.speak({text:'SLOW reply one',purpose:'reply',signal:a.signal}));
+  const second=outcome(svc.speak({text:'reply two',purpose:'reply',signal:b.signal}));
+  const third=outcome(svc.speak({text:'reply three',purpose:'reply'}));
+  await new Promise(r=>setTimeout(r,300));
+  b.abort();assert.equal(await second,'cancelled','left the queue');assert.equal(svc.queue.length,1);
+  a.abort();assert.equal(await first,'cancelled','stopped while being made');
+  assert.equal(await third,'made','the next one still plays');
+  const late=new AbortController();late.abort();await assert.rejects(svc.speak({text:'too late',purpose:'reply',signal:late.signal}),e=>e.code==='cancelled');
+  assert.ok(fs.existsSync((await svc.speak({text:'y'.repeat(700),purpose:'reply'})).file));
+  await assert.rejects(svc.speak({text:'y'.repeat(700)}),/too long/,'typed messages keep their 400-character limit');
+ }finally{await svc.shutdown();}
+});

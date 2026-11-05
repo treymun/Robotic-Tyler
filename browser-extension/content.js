@@ -247,7 +247,7 @@
   try{
    const r=await ask({type:'command',text:text.replace(/^!tyler\s+/i,'').slice(0,1500),speak:!testOnly&&$('speak').checked});if(current!==epoch)return;
    if(r.text){lastResult=r.text;$('result').textContent=r.text;if(!testOnly&&$('autoSend').checked)send(r.text);}
-   if(r.sound)bridge('sound',{sound:r.sound});if(r.audio&&quiet===hush)bridge('audio',{audio:r.audio});
+   if(r.sound)bridge('sound',{sound:r.sound});if(quiet===hush)[r.firstAudio,r.audio,...(Array.isArray(r.moreAudio)?r.moreAudio:[])].filter(a=>typeof a==='string'&&a).forEach((a,i)=>bridge('audio',{audio:a,queue:i>0}));
    setHud({latency:formatMs(Date.now()-lastHudActionStart),latencyMeta:(r.audio?'Text + speech':'Text only')+(fromChat?' · auto':' · manual')});
    status(r.warning||'Command complete.');
   }catch(e){setHud({latency:'Error',latencyMeta:String(e.message||e).slice(0,60)});status(e.message);}
@@ -256,7 +256,7 @@
  function pause(){if(autoActive)globalThis.TylerCompanion.stopAutomatic?.('Paused while setup changes');armed=false;globalThis.TylerCommands?.set('tyler',{enabled:false});epoch++;observer?.disconnect();observer=null;status('Commands paused. In-flight results will be ignored.');}
 
  // ── Chat targets ────────────────────────────────────────────────────────
- async function checkAI(){try{const r=await ask({type:'connection'});if(r.chatTag)TylerChatTag.set(r.chatTag);$('aiConnection').textContent=r.keyConfigured?(r.provider||'OpenRouter')+' key saved. Brain: '+r.model+'. Speech: '+r.speechVoice+'.':'No key saved for the selected provider. Open personality & API settings.';const pick=$('previewVoice');if(Array.isArray(r.voices)&&r.voices.length){pick.replaceChildren(...r.voices.map(v=>{const o=document.createElement('option');o.value=v.value;o.textContent=v.label;return o;}));}pick.value=r.speechVoice||pick.options[0]?.value||'';}catch(e){$('aiConnection').textContent=e.message;}}
+ async function checkAI(){try{const r=await ask({type:'connection'});if(r.chatTag)TylerChatTag.set(r.chatTag);$('aiConnection').textContent=r.keyConfigured?(r.provider||'OpenRouter')+' key saved. Brain: '+r.model+'. Speech: '+(r.speechEngine==='theme'?'theme voice on this PC':r.speechVoice)+'.':'No key saved for the selected provider. Open personality & API settings.';const pick=$('previewVoice');if(Array.isArray(r.voices)&&r.voices.length){pick.replaceChildren(...r.voices.map(v=>{const o=document.createElement('option');o.value=v.value;o.textContent=v.label;return o;}));}pick.value=r.speechVoice||pick.options[0]?.value||'';}catch(e){$('aiConnection').textContent=e.message;}}
  function locateChat(){
   if(TylerSetup.visible(composer)&&TylerSetup.visible(region)&&sampleElement?.isConnected)return true;
   const found=TylerSelection.discover(document,lastChatFocus,chatHint);discovery={ambiguous:!!found.ambiguous,empty:!!found.empty};

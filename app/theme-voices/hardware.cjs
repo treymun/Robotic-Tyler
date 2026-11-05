@@ -60,6 +60,7 @@ function recommend(hw){
   if(gpu.vramTotal>=8*GB){mode='quality';notes.push(gpu.name+' has '+(gpu.vramTotal/GB).toFixed(0)+' GB of graphics memory: enough for Quality mode.');}
   else if(gpu.vramTotal>=NEEDS.light.vram){mode='light';notes.push(gpu.name+' has '+(gpu.vramTotal/GB).toFixed(1)+' GB of graphics memory: Lightweight mode fits; Quality needs about '+(NEEDS.quality.vram/GB).toFixed(1)+' GB free.');}
   else{device='cpu';mode='light';notes.push(gpu.name+' has too little graphics memory ('+(gpu.vramTotal/GB).toFixed(1)+' GB), so the voices would run on the processor.');}
+  if(device==='cuda')notes.push('The fast engine (Engine, below) makes speech several times quicker on an NVIDIA card: it’s the one to use for Tyler to answer in a theme voice during a call. It’s new, so Tyler doesn’t choose it for you.');
   if(device==='cuda'&&gpu.vramFree&&gpu.vramFree<NEEDS[mode].vram)notes.push('Right now only '+(gpu.vramFree/GB).toFixed(1)+' GB of graphics memory is free (a game may be using it). Voices load when first used and can unload when idle.');
  }else{
   device='cpu';mode='light';notes.push(why);

@@ -1,3 +1,38 @@
+# ROBOTIC TYLER v2.36.0: Tyler can answer in theme voices, and a fast engine for NVIDIA cards
+
+## Tyler's spoken replies in a theme voice (desktop app)
+- **Settings → Voice → Standard voice → Speaking voice:** *Cloud voice* (the default, Grok or Gemini speech as before) or **Theme voice on this PC**. With a theme voice, Tyler's Standard voice replies in a call are made by the local voice engine, in the voice Theme voices would use: the current theme's (G-Man, GLaDOS, the CS 1.6 radio…) or the one you picked there.
+- *Start speaking sooner* works with it: the first sentence is made while the rest of the reply is still being written. A long reply is spoken as a few clips of whole sentences, one after another.
+- **No silent switch to a paid voice:** if the theme voice can't speak (not installed, the model doesn't fit in memory right now, Chrome instead of the desktop app), Tyler types the reply and says why. He never falls back to the cloud voice by himself.
+- **Stop** and someone talking over Tyler call off the voice being made for that reply.
+- No speech charge: these replies are counted separately from billed speech.
+- **Gemini Live is unchanged:** its native-audio models only speak in Google's own voices.
+- **How quick it is depends on the engine:** fast enough for a conversation with the new fast engine on an NVIDIA card (going by its published figures, below); several seconds per second of speech with the standard engine on a graphics card; much slower on the processor.
+
+## The fast engine (NVIDIA only, opt-in)
+- **Settings → Voice → Theme voices → Engine: Fast**, then **Switch to the fast engine**. It's [faster-qwen3-tts](https://github.com/andimarafioti/faster-qwen3-tts) 0.5.4 (MIT): the same Qwen3-TTS models and the same 25 voices, run with CUDA graphs and made in short streamed chunks.
+- **Published speed** (its README, not measured by us): on an RTX 4060 under Windows about 1.8 seconds of speech made per second with Quality and 2.3 with Lightweight, with the first audio in under half a second. The standard engine's figure on the same card is about 0.23.
+- **Switching downloads about 15 MB** (16 files); PyTorch and the rest of the engine are copied from the engine you have. Switching back works the same way. Every file is pinned with its SHA-256 in the same lock.
+- **What's installed:** `faster-qwen3-tts` 0.5.4 and `qwen-tts-hf` 0.1.1.post1 (Apache-2.0, a Transformers 5 build of the same `qwen_tts` package), with Transformers pinned to 5.15.1. qwen-tts-hf failed with 5.20.2 and 5.22.1 in testing.
+- Tyler suggests it on a PC with a usable NVIDIA card but never switches by itself. With *Processor only*, the standard engine is used (the fast engine brings nothing on the processor).
+- If it can't run on your card (out of graphics memory, or the CUDA graphs can't be captured), the voice fails with that reason and points to the standard engine.
+- **Install from a folder…:** the *theme-voices-engine-1* offline bundle doesn't include the fast engine. Installing from it with the fast engine chosen still works: the 16 missing files are downloaded.
+
+## Tested
+- **Real** (Linux, 2 processor cores, no graphics card):
+  - The fast engine installed by the app's installer from the new lock (65 files, every SHA-256 checked).
+  - Its streaming code run through Tyler's voice worker in the mode without CUDA graphs (parity mode): GLaDOS and the CS 1.6 radio said "Let's get it, daddy." and Whisper heard exactly that.
+  - The app's voice service on that engine: a reply was made, and a reply was stopped part-way.
+  - From the installed fast engine, switching back to the standard engine would download 3 files (12.7 MB) and reuse 0.36 GB.
+- **Mocked:**
+  - Replies through a fake local engine: the cloud voice is never called; a failure gives text with the reason; Stop reaches the engine; a long reply is split into clips.
+  - The engine choice, the lock and cross-engine reuse.
+  - All earlier unit and end-to-end tests, and the desktop check.
+- **Not tested** (needs a Windows PC with an NVIDIA card): the fast engine's CUDA graphs, its speed and graphics memory on a real card, and theme-voice replies in a real Steam call. **Run a voice check** after switching is the first real test on your PC.
+- **Not covered by its own test:** queueing three or more reply clips in the Steam page (it uses the same queue as two).
+
+---
+
 # ROBOTIC TYLER v2.35.1: better theme voices for TF2, CS 1.6 and PAYDAY 2, and the offline bundle
 
 ## Theme voices

@@ -13,16 +13,28 @@
   return h.cpu.model+' ('+h.cpu.threads+' threads) · '+gb(h.ram.total)+' memory · '+gpu+(h.disk?.free!=null?' · '+gb(h.disk.free)+' free on the data drive':'')+'.';
  }
  async function planText(){
-  const mode=$('tvMode').value,both=$('tvBoth').checked,device=$('tvDevice').value,key=mode+both+device;
-  try{plans[key]=plans[key]||await tv('plan',{mode,both,device});const p=plans[key];
+  const mode=$('tvMode').value,both=$('tvBoth').checked,device=$('tvDevice').value,engine=$('tvEngine').value,key=mode+both+device+engine;
+  try{plans[key]=plans[key]||await tv('plan',{mode,both,device,engine});const p=plans[key];
    if(!p.download)return 'Everything for this choice is already on this PC: nothing to download.';
-   return 'Downloads '+gb(p.download)+(p.engineReady?' (the model'+(p.models.length>1?'s':'')+'; the voice engine is already installed)':' ('+p.fileCount+' files: the voice engine '+gb(p.runtimeBytes)+(p.runtime==='windows-cuda'?' with graphics-card support':'')+', model'+(p.models.length>1?'s ':' ')+gb(p.modelBytes)+')')+(p.reused?', reusing '+gb(p.reused)+' already on this PC,':'')+' and needs about '+gb(p.disk)+' of disk space.';}
+   const mb=n=>n<GB?Math.max(1,Math.round(n/1024**2))+' MB':gb(n),kind=p.runtime==='windows-cuda-fast'?' with graphics-card support and the fast engine':p.runtime==='windows-cuda'?' with graphics-card support':'';
+   // Switching engines: only what's different is downloaded; say that, not the whole engine's size.
+   if(!p.engineReady&&p.reused)return 'Downloads '+mb(p.download)+' ('+p.fileCount+' file'+(p.fileCount===1?'':'s')+(kind?' for the voice engine'+kind:'')+'; '+gb(p.reused)+' already on this PC is reused) and needs about '+mb(p.disk)+' of disk space while it’s set up.';
+   return 'Downloads '+mb(p.download)+(p.engineReady?' (the model'+(p.models.length>1?'s':'')+'; the voice engine is already installed)':' ('+p.fileCount+' files: the voice engine '+gb(p.runtimeBytes)+kind+', model'+(p.models.length>1?'s ':' ')+gb(p.modelBytes)+')')+(p.reused?', reusing '+gb(p.reused)+' already on this PC,':'')+' and needs about '+mb(p.disk)+' of disk space.';}
   catch(e){return 'Couldn’t work out the download: '+e.message;}
  }
  async function load(){
   let r;try{r=await tv('status');}catch(e){say('tvInstallState','Theme voices aren’t available: '+e.message);return;}
   status=r.status;voices=r.voices;models=r.models;installing=!!status.installing;if(installing)$('tvProgressWrap').hidden=false;if(status.installError&&!status.ready)failed=true;render();
   if(!installing)say('tvInstallState',await stateText());
+ }
+ const engineName=e=>e==='fast'?'fast':'standard';
+ function engineNote(s){
+  const gpu=s.recommendation?.device==='cuda'||s.engine==='fast',cpu=$('tvDevice').value==='cpu';
+  $('tvEngine').options[1].disabled=!gpu||cpu;
+  if(!gpu)return 'The fast engine needs an NVIDIA graphics card that the voice engine can use; this PC uses the standard one.';
+  if(cpu)return 'With “Processor only” Tyler uses the standard engine (the fast one needs the graphics card).';
+  const using=s.installed?' In use: the '+engineName(s.engine)+' engine.':'';
+  return (s.engineSwitch?'Takes effect when you press Switch below.':'The fast engine runs the same models and voices on the graphics card, much faster.')+using;
  }
  async function stateText(){
   const s=status;if(!s)return '…';
@@ -31,8 +43,9 @@
   if(!s.installed)return 'Not installed. '+plan;
   if(!s.current)return 'Installed, but this version of Tyler needs a newer voice engine: press Update. Unchanged parts are reused. '+plan;
   const have=Object.entries(s.models).filter(([,v])=>v).map(([k])=>k==='quality'?'Quality':'Lightweight').join(' and ')||'no model';
-  const chk=s.check?(s.check.ok?' Last voice check: '+s.check.seconds+' s of speech in '+(s.check.ms/1000).toFixed(1)+' s on the '+(s.check.device==='cuda'?'graphics card':'processor')+' ('+new Date(s.check.at).toLocaleString()+').':' Last voice check failed: '+s.check.error):'';
-  return 'Installed: '+have+'.'+(s.needs==='model'?' The '+s.modeLabel+' model isn’t installed yet: press Install to add it. '+plan:'')+chk;
+  const chk=s.check?(s.check.ok?' Last voice check: '+s.check.seconds+' s of speech in '+(s.check.ms/1000).toFixed(1)+' s on the '+(s.check.device==='cuda'?'graphics card':'processor')+(s.check.engine==='fast'?' with the fast engine':'')+' ('+new Date(s.check.at).toLocaleString()+').':' Last voice check failed: '+s.check.error):'';
+  const sw=s.engineSwitch?' You chose the '+engineName(s.engineWanted)+' engine: press Switch to install it. '+plan:'';
+  return 'Installed: '+have+', '+engineName(s.engine)+' engine.'+(s.needs==='model'?' The '+s.modeLabel+' model isn’t installed yet: press Install to add it. '+plan:'')+sw+chk;
  }
  function render(){
   const s=status;if(!s)return;
@@ -41,9 +54,9 @@
   if(rec){const opt=[...$('tvMode').options];for(const o of opt)o.textContent=o.textContent.replace(/ · suggested$/,'')+(o.value===rec.mode?' · suggested':'');}
   if(document.activeElement!==$('tvMode'))$('tvMode').value=s.mode;
   $('tvModeNote').textContent=s.modeChosen?'Your choice. Suggested for this PC: '+(rec?.mode==='light'?'Lightweight':'Quality')+'.':'Not chosen yet: the suggestion for this PC is selected. Tyler never switches mode by itself.';
-  const st=s.settings;$('tvNativeUse').checked=st.nativeVoices!==false;$('tvDevice').value=st.device==='cpu'?'cpu':'auto';$('tvIdle').value=String(st.idleMinutes);$('tvProcessed').checked=st.processed!==false;
+  const st=s.settings;$('tvNativeUse').checked=st.nativeVoices!==false;$('tvDevice').value=st.device==='cpu'?'cpu':'auto';$('tvEngine').value=st.engine==='fast'?'fast':'standard';say('tvEngineNote',engineNote(s));$('tvIdle').value=String(st.idleMinutes);$('tvProcessed').checked=st.processed!==false;
   $('tvChat').checked=!!st.chat;$('tvChatAccess').value=st.chatAccess==='selected'?'selected':'everyone';$('tvChatCooldown').value=String(st.chatCooldown??20);$('tvChatAllowed').value=st.chatAllowed||'';
-  $('tvInstall').textContent=failed?'Retry':!s.installed?'Install theme voices':!s.current||s.updateAvailable?'Update theme voices':s.needs==='model'||$('tvBoth').checked?'Install the model':'Reinstall';
+  $('tvInstall').textContent=failed?'Retry':!s.installed?'Install theme voices':!s.current||s.updateAvailable?'Update theme voices':s.engineSwitch?'Switch to the '+engineName(s.engineWanted)+' engine':s.needs==='model'||$('tvBoth').checked?'Install the model':'Reinstall';
   $('tvRemove').disabled=!s.installed||installing;$('tvRemoveQuality').disabled=!s.models?.quality||installing;$('tvRemoveLight').disabled=!s.models?.light||installing;
   $('tvRemoveQuality').textContent='Remove the Quality model'+(models.quality?' ('+gb(models.quality.bytes)+')':'');$('tvRemoveLight').textContent='Remove the Lightweight model'+(models.light?' ('+gb(models.light.bytes)+')':'');
   for(const id of ['tvCheck','tvRepair','tvUnload'])$(id).disabled=!s.installed||installing;
@@ -80,22 +93,23 @@
  $('tvRefCancel').onclick=()=>{refData=null;$('tvRefForm').hidden=true;};
  $('tvRefSave').onclick=async()=>{if(!refData)return;try{await tv('set-reference',{theme:refData.theme,data:refData.data,fileName:refData.fileName,transcript:$('tvRefText').value});say('tvVoiceState',refData.name+' now uses your recording. Press Test to hear it.');refData=null;$('tvRefForm').hidden=true;await load();}catch(e){say('tvVoiceState',e.message);}};
  async function saveSettings(){
-  const values={mode:$('tvMode').value,device:$('tvDevice').value,idleMinutes:Number($('tvIdle').value),processed:$('tvProcessed').checked,chat:$('tvChat').checked,chatAccess:$('tvChatAccess').value,chatCooldown:Number($('tvChatCooldown').value),chatAllowed:$('tvChatAllowed').value};
+  const values={mode:$('tvMode').value,device:$('tvDevice').value,engine:$('tvEngine').value,idleMinutes:Number($('tvIdle').value),processed:$('tvProcessed').checked,chat:$('tvChat').checked,chatAccess:$('tvChatAccess').value,chatCooldown:Number($('tvChatCooldown').value),chatAllowed:$('tvChatAllowed').value};
   if(values.chatAccess==='selected'&&!/7656119\d{10}/.test(values.chatAllowed))throw Error('Add at least one SteamID64, or let everyone use !say.');
   await tv('settings',{values});say('tvVoiceState','Theme voice settings saved.');await load();
  }
  $('tvSaveSettings').onclick=()=>saveSettings().catch(e=>say('tvVoiceState',e.message));
- for(const id of ['tvMode','tvBoth','tvDevice'])$(id).addEventListener('change',async()=>{if(id!=='tvBoth')await tv('settings',{values:{[id==='tvMode'?'mode':'device']:$(id).value}}).catch(()=>{});say('tvInstallState',await stateText());render();});
+ const settingOf={tvMode:'mode',tvDevice:'device',tvEngine:'engine'};
+ for(const id of ['tvMode','tvBoth','tvDevice','tvEngine'])$(id).addEventListener('change',async()=>{if(settingOf[id]){await tv('settings',{values:{[settingOf[id]]:$(id).value}}).catch(()=>{});await load();return;}say('tvInstallState',await stateText());render();});
  async function install(offline=[]){
   installing=true;render();$('tvProgressWrap').hidden=false;say('tvInstallState','Installing… You can keep using Tyler meanwhile.');
-  try{await tv('install',{mode:$('tvMode').value,both:$('tvBoth').checked,device:$('tvDevice').value,offline});}catch(e){installing=false;say('tvInstallState',e.message);render();}
+  try{await tv('install',{mode:$('tvMode').value,both:$('tvBoth').checked,device:$('tvDevice').value,engine:$('tvEngine').value,offline});}catch(e){installing=false;say('tvInstallState',e.message);render();}
  }
  $('tvInstall').onclick=()=>void install();
  $('tvCancel').onclick=()=>void tv('cancel').catch(()=>{});
  $('tvOffline').onclick=()=>{$('tvOfflineForm').hidden=false;$('tvOfflineDir').focus();};
  $('tvOfflineCancel').onclick=()=>{$('tvOfflineForm').hidden=true;};
  $('tvOfflineGo').onclick=()=>{const dir=$('tvOfflineDir').value.trim().replace(/^["']+|["']+$/g,'');if(!dir)return;$('tvOfflineForm').hidden=true;void install([dir]);};
- $('tvCheck').onclick=async()=>{say('tvInstallState','Making a test voice…');try{const c=await tv('check');say('tvInstallState','Voice check passed: '+c.seconds+' s of speech in '+(c.ms/1000).toFixed(1)+' s on the '+(c.device==='cuda'?'graphics card':'processor')+' ('+c.rtf+' s per second of speech).');}catch(e){say('tvInstallState','Voice check failed: '+e.message);}await load();};
+ $('tvCheck').onclick=async()=>{say('tvInstallState','Making a test voice…');try{const c=await tv('check');say('tvInstallState','Voice check passed: '+c.seconds+' s of speech in '+(c.ms/1000).toFixed(1)+' s on the '+(c.device==='cuda'?'graphics card':'processor')+(c.engine==='fast'?' with the fast engine':'')+' ('+c.rtf+' s per second of speech).');}catch(e){say('tvInstallState','Voice check failed: '+e.message);}await load();};
  $('tvRepair').onclick=async()=>{say('tvInstallState','Checking every file…');try{const r=await tv('repair');say('tvInstallState',r.repaired?'Repaired '+r.problems+' problem(s); voice check passed.':'All files are fine; voice check passed.');}catch(e){say('tvInstallState','Repair failed: '+e.message);}await load();};
  const removeConfirm=async(op,extra,label)=>{say('tvInstallState','Removing…');try{await tv(op,extra);plans={};say('tvInstallState',label);}catch(e){say('tvInstallState',e.message);}await load();};
  let armed=null;const twice=(id,fn,ask)=>{$(id).onclick=()=>{if(armed!==id){armed=id;say('tvInstallState',ask+' Press the button again to confirm.');setTimeout(()=>{if(armed===id)armed=null;},6000);return;}armed=null;void fn();};};

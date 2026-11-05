@@ -7,12 +7,14 @@ const settingsKeys=new Set(['imageGen','veniceKey','quickSetup','personality','l
  // v2.3 options and squad toggles written by the shared settings page (previously dropped on desktop).
  'suiteOptions','v23ScreenConsent','v23AutoRoast','v23RoastEnabled','v23CommandsEnabled','v23ScreenRoast','v23Persona','v23VisionModel','v23Commands','uiTheme',
  // v2.15 voice page: engine choice, Standard and Live voices, devices and listening consent.
- 'fastSpeech','keyboardFilter','voiceControls','voiceEngine','geminiVoice','geminiTtsModel','liveModel','liveVoice','liveInterrupt','liveSilenceMs','liveStartSensitivity','liveEndSensitivity','voiceOutputDevice','voiceListenDevice','voiceListenConsent','voiceImport',
+ 'fastSpeech','keyboardFilter','voiceControls','voiceEngine',
+ // v2.36 speaking voice for Standard voice replies: 'cloud' (default) or 'theme' (the local theme voice).
+ 'speechEngine','geminiVoice','geminiTtsModel','liveModel','liveVoice','liveInterrupt','liveSilenceMs','liveStartSensitivity','liveEndSensitivity','voiceOutputDevice','voiceListenDevice','voiceListenConsent','voiceImport',
  // v2.19 where desktop voice runs: 'window' (the Steam chat window, default) or 'cable' (VB-CABLE helper).
  'desktopVoice','desktopMuteCall',
  // v2.16 name tag in chat messages (plain text, validated by chat-tag.js).
  'chatTagEnabled','chatTagName']);
-function sanitizeSettings(values){if(!values||typeof values!=='object'||Array.isArray(values))throw Error('Invalid settings');const result={};for(const [key,value]of Object.entries(values)){if(!settingsKeys.has(key))continue;if(JSON.stringify(value)?.length>20000)throw Error('Settings value is too large');if(key==='quickSetup'){result[key]=quickSetup(value);continue;}if(key==='imageGen'){result[key]=imageGen(value);continue;}if(key==='veniceKey'){if(typeof value!=='string'||!/^[A-Za-z0-9_\-.]{16,200}$/.test(value))throw Error('Invalid Venice key');result[key]=value;continue;}result[key]=value;}return result;}
+function sanitizeSettings(values){if(!values||typeof values!=='object'||Array.isArray(values))throw Error('Invalid settings');const result={};for(const [key,value]of Object.entries(values)){if(!settingsKeys.has(key))continue;if(JSON.stringify(value)?.length>20000)throw Error('Settings value is too large');if(key==='quickSetup'){result[key]=quickSetup(value);continue;}if(key==='speechEngine'){result[key]=value==='theme'?'theme':'cloud';continue;}if(key==='imageGen'){result[key]=imageGen(value);continue;}if(key==='veniceKey'){if(typeof value!=='string'||!/^[A-Za-z0-9_\-.]{16,200}$/.test(value))throw Error('Invalid Venice key');result[key]=value;continue;}result[key]=value;}return result;}
 // v2.34: chat image settings, through the same checks the extension uses (image-core.js).
 function imageGen(v){let I=globalThis.TylerImages;if(!I){try{require('./companion/image-core.js');}catch{require('../browser-extension/image-core.js');}I=globalThis.TylerImages;}return I.config(v);}
 // v2.33: Connect & start's saved choices, as the settings window may write them (shape checked).

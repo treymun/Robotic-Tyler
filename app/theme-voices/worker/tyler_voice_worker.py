@@ -1,4 +1,4 @@
-# ROBOTIC TYLER theme voices: the local voice worker (v2.35).
+# ROBOTIC TYLER theme voices: the local voice worker (v2.35; the fast engine since v2.36).
 #
 # The desktop app starts this with its own isolated Python (the "engine" it installed and verified) and
 # talks to it only through stdin/stdout, one JSON object per line. There is no network listener and
@@ -8,6 +8,10 @@
 # Requests:  {"id": 7, "op": "hello"|"load"|"unload"|"prompt"|"speak"|"cancel"|"quit", ...}
 # Replies:   {"id": 7, "ok": true, ...} or {"id": 7, "ok": false, "code": "...", "error": "..."}
 # Events:    {"id": 7, "event": "progress", "chunk": 1, "chunks": 3, "step": 40, "steps": 120}
+#
+# Two engines (v2.36): the standard one (qwen-tts), and the fast one for NVIDIA cards (faster-qwen3-tts:
+# the same Qwen3-TTS models with CUDA graphs, made in short streamed chunks). Which one runs is the
+# engine the app installed; the app asks for it by name and this never switches by itself.
 #
 # Voice data that is cached (the reference's speech codes and speaker embedding) is written as
 # safetensors, which holds only tensors and text, never code. Nothing is ever loaded with pickle.
@@ -51,7 +55,7 @@ def reader():
     requests.put({"op": "quit", "id": None})
 threading.Thread(target=reader, daemon=True).start()
 
-torch = None; np = None; sf = None; model = None; model_info = {}; prompts = {}
+torch = None; np = None; sf = None; model = None; fast = None; model_info = {}; prompts = {}
 
 def imports():
     global torch, np, sf
@@ -68,19 +72,23 @@ def hello(req):
     try:
         import qwen_tts, transformers; info.update(qwen_tts=getattr(qwen_tts, "__version__", "0.1.1"), transformers=transformers.__version__)
     except Exception as e: info["import_error"] = str(e)[:300]
+    try:
+        from importlib.metadata import version
+        info["fast_engine"] = version("faster-qwen3-tts")
+    except Exception: info["fast_engine"] = None
     return info
 
 def unload(req=None):
-    global model, model_info
+    global model, model_info, fast
     had = model is not None
-    model = None; model_info = {}; prompts.clear(); gc.collect()
+    model = None; fast = None; model_info = {}; prompts.clear(); gc.collect()
     if torch is not None and torch.cuda.is_available(): torch.cuda.empty_cache()
     return {"unloaded": had}
 
 def load(req):
-    global model, model_info
+    global model, model_info, fast
     imports()
-    want = {"dir": req["model_dir"], "device": req.get("device", "cpu"), "dtype": req.get("dtype", "auto")}
+    want = {"dir": req["model_dir"], "device": req.get("device", "cpu"), "dtype": req.get("dtype", "auto"), "engine": "fast" if req.get("engine") == "fast" else "standard"}
     if model is not None and all(model_info.get(k) == v for k, v in want.items()): return {**model_info, "already": True}
     unload()
     from qwen_tts import Qwen3TTSModel
@@ -90,14 +98,34 @@ def load(req):
     if dtype == "auto": dtype = "bf16" if device == "cuda" and torch.cuda.is_bf16_supported() else ("fp16" if device == "cuda" else "fp32")
     tdtype = {"bf16": torch.bfloat16, "fp16": torch.float16, "fp32": torch.float32}[dtype]
     if device == "cpu": torch.set_num_threads(max(1, int(req.get("threads") or max(1, (os.cpu_count() or 2) - 1))))
-    t0 = time.time()
+    t0 = time.time(); used = "standard"
     try:
-        model = Qwen3TTSModel.from_pretrained(want["dir"], device_map=("cuda:0" if device == "cuda" else "cpu"), dtype=tdtype, attn_implementation="sdpa")
+        if want["engine"] == "fast":
+            try: from faster_qwen3_tts.model import FasterQwen3TTS
+            except Exception as e: raise Failure("no_fast_engine", "This voice engine doesn't include the fast engine (" + type(e).__name__ + "). Install the fast engine in Settings → Theme voices.")
+            if device == "cuda":
+                fast = FasterQwen3TTS.from_pretrained(want["dir"], device="cuda", dtype=tdtype, attn_implementation="sdpa")
+                model = fast.model; used = "fast"
+                # Capture the CUDA graphs now, so the first line doesn't wait for it.
+                try: fast.warmup()
+                except torch.cuda.OutOfMemoryError: raise
+                except Exception as e: raise Failure("fast_failed", "The fast engine couldn't start on this graphics card (" + (type(e).__name__ + ": " + str(e))[:200] + "). Choose the standard engine in Settings → Theme voices.")
+            else:
+                # On the processor the fast engine has no CUDA graphs to speed it up, so it speaks the
+                # standard way. Its own streaming code can still be run without them (the repository's
+                # tests do, with TYLER_FAST_PARITY=1).
+                model = Qwen3TTSModel.from_pretrained(want["dir"], device_map="cpu", dtype=tdtype, attn_implementation="sdpa")
+                if os.environ.get("TYLER_FAST_PARITY") == "1":
+                    if not torch.cuda.is_available(): torch.cuda.synchronize = lambda *a, **k: None
+                    fast = FasterQwen3TTS(model, None, None, device="cpu", dtype=tdtype); fast._warmed_up = True; used = "fast-parity"
+        else:
+            model = Qwen3TTSModel.from_pretrained(want["dir"], device_map=("cuda:0" if device == "cuda" else "cpu"), dtype=tdtype, attn_implementation="sdpa")
+    except Failure: unload(); raise
     except torch.cuda.OutOfMemoryError:
         unload(); raise Failure("out_of_memory", "Not enough free graphics memory to load the voice model.")
     if model.model.tts_model_type != "base": unload(); raise Failure("not_clone_model", "That model can't clone voices (it isn't a Base model).")
     hook_talker()
-    model_info = {**want, "dtype_used": dtype, "load_ms": int((time.time() - t0) * 1000)}
+    model_info = {**want, "dtype_used": dtype, "engine_used": used, "load_ms": int((time.time() - t0) * 1000)}
     if device == "cuda": model_info["vram_used"] = int(torch.cuda.memory_allocated(0))
     return model_info
 
@@ -217,9 +245,14 @@ def speak(req):
                 if job in cancelled: raise Failure("cancelled", "Stopped.")
                 torch.manual_seed(seed + i * 101 + attempt * 7919); step.steps = 0
                 try:
-                    wavs, sr_out = model.generate_voice_clone(text=piece, language=language, voice_clone_prompt=[item], max_new_tokens=step.max)
+                    if fast is not None: wavs, sr_out = fast_take(piece, item, language, step.max, job)
+                    else: wavs, sr_out = model.generate_voice_clone(text=piece, language=language, voice_clone_prompt=[item], max_new_tokens=step.max)
                 except torch.cuda.OutOfMemoryError:
                     raise Failure("out_of_memory", "The graphics card ran out of memory while speaking.")
+                except Failure: raise
+                except Exception as e:
+                    if fast is None or "out of memory" in str(e).lower(): raise
+                    raise Failure("fast_failed", "The fast engine couldn't speak on this PC (" + (type(e).__name__ + ": " + str(e))[:200] + "). Choose the standard engine in Settings → Theme voices.")
                 if job in cancelled: raise Failure("cancelled", "Stopped.")
                 w = trim(np.asarray(wavs[0], dtype=np.float32), sr_out); dur = len(w) / sr_out
                 # A take far longer or shorter than the text needs is usually a stumble: try once more.
@@ -240,6 +273,21 @@ def speak(req):
     if fx and req.get("out_fx"):
         write(req["out_fx"], level(effects(dry, sr_out, fx)), sr_out); result["out_fx"] = req["out_fx"]
     return result
+
+def fast_take(piece, item, language, max_tokens, job):
+    """One take with the fast engine: made in streamed chunks of 12 frames (about a second of speech),
+    so progress is real and Stop works within the take."""
+    parity = model_info.get("engine_used") == "fast-parity"; parts = []; sr = 24000
+    gen = fast.generate_voice_clone_streaming(text=piece, language=language, voice_clone_prompt=[item], ref_text=item.ref_text or "",
+                                              max_new_tokens=max_tokens, chunk_size=12, xvec_only=bool(item.x_vector_only_mode), parity_mode=parity)
+    try:
+        for audio, sr, _timing in gen:
+            parts.append(np.asarray(audio, dtype=np.float32).reshape(-1)); step.steps += 12; now = time.time()
+            if now - step.last > 0.5:
+                step.last = now; send({"id": job, "event": "progress", "chunk": step.chunk, "chunks": step.chunks, "step": step.steps, "steps": step.max})
+            if job in cancelled: raise Failure("cancelled", "Stopped.")
+    finally: gen.close()
+    return [np.concatenate(parts) if parts else np.zeros(1, np.float32)], sr
 
 def level(w, target=-19.0, ceiling=-1.0):
     """Same loudness for every voice (about −19 dBFS RMS), peaks kept under −1 dBFS."""

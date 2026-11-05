@@ -1,9 +1,10 @@
-# Theme voices (v2.35)
+# Theme voices (v2.35; the fast engine and spoken replies since v2.36)
 
 Tyler can say typed messages in each theme's character voice. The voices are **clones made on your PC**
 by a local model (Qwen3-TTS Base). There's no account, key or cost per message. Theme voices are
 **optional**: the normal install doesn't include them, and Tyler's usual voice (Standard voice and
-Gemini Live) works the same with or without them.
+Gemini Live) works the same with or without them. Since v2.36 you can also choose to have Tyler's
+spoken replies made in the theme voice (see *Tyler's spoken replies* below); that's off unless you pick it.
 
 ## Getting them
 
@@ -38,6 +39,7 @@ You can also install them later from **Settings → Voice → Theme voices → I
 |---|---|
 | Voice engine, NVIDIA graphics card (PyTorch 2.11 + CUDA 12.8, Python 3.13) | 2.71 GB |
 | Voice engine, processor only | 0.25 GB |
+| Fast engine, NVIDIA graphics card (v2.36; the same PyTorch, plus faster-qwen3-tts and Transformers 5) | 2.71 GB in all; switching from the standard engine downloads 16 files, about 15 MB, and reuses the rest |
 | Quality model (Qwen3-TTS 1.7B Base) | 4.23 GB |
 | Lightweight model (Qwen3-TTS 0.6B Base) | 2.34 GB (its 0.64 GB speech tokenizer is shared with Quality) |
 | Microsoft Speech SDK 5.1 (optional; the original Microsoft Sam and Mary) | 0.07 GB, from Microsoft |
@@ -56,6 +58,26 @@ You can also install them later from **Settings → Voice → Theme voices → I
 **Speed.** Theme voices are made before they play, not live. Published measurements of this model's standard code path (the faster-qwen3-tts project's README, not measured by us) put an RTX 4060 on Windows at about 4 seconds per second of speech and an RTX 4090 at about 1.2 seconds, for both sizes. On this project's 2-core test machine without a graphics card, with nothing else running, Quality took about 7 seconds per second of speech and Lightweight about 6 (both in bfloat16, as on a PC with less than 12 GB of memory).
 
 Tyler suggests a mode from the hardware it detects (the GPU and its free memory, the driver, system memory). It never switches by itself. If the model doesn't fit right now (for example a game is using the graphics memory), the message fails and says so, rather than quietly using the other model.
+
+## The fast engine (v2.36, NVIDIA only)
+
+- **What it is:** [faster-qwen3-tts](https://github.com/andimarafioti/faster-qwen3-tts) 0.5.4 (MIT licence). It runs the same Qwen3-TTS Base models with the same voices, but captures the model's steps as CUDA graphs and makes speech in short streamed chunks (12 frames, about a second each). It needs a CUDA graphics card; on the processor it brings nothing.
+- **Choosing it:** Settings → Voice → Theme voices → **Engine: Fast**, then **Switch to the fast engine**. It's opt-in: Tyler suggests it on a PC with a usable NVIDIA card but never switches by itself. With **Processor only** the standard engine is used.
+- **What's installed:** its own engine folder from the same lock (`windows-cuda-fast`): the same PyTorch 2.11 + CUDA 12.8 wheel, `qwen-tts-hf` 0.1.1.post1 (Apache-2.0: a Transformers 5 build of the `qwen_tts` package), `faster-qwen3-tts` 0.5.4, and Transformers pinned to **5.15.1** (qwen-tts-hf fails with 5.20.2 and 5.22.1: measured). Both engine packages are installed without their dependency lists (qwen-tts-hf's would add a Gradio demo); the packages they need are in the lock. Every file is checked by SHA-256 like the rest.
+- **Switching** downloads only the files that differ (about 15 MB) and copies the rest from the installed engine. Switching back works the same way. The old engine folder is removed once the new one works.
+- **When it can't run** (out of graphics memory, or the CUDA graphs can't be captured on that card), the message fails and says so, naming the standard engine as the way back. Tyler doesn't switch engines by himself.
+- **Speed (published, not measured by us):** the faster-qwen3-tts README gives, for an RTX 4060 on Windows, about 1.8 seconds of speech made per second with the 1.7B model (first audio after 0.46 s) and 2.3 with the 0.6B (0.41 s), against about 0.23 for the standard code path; an RTX 4090 makes about 4.2. How fast it is on your card is what **Run a voice check** shows.
+- **What's tested here:** no NVIDIA card was available. The fast engine's own streaming code was run on the processor (its CUDA-graph-free parity mode, `TYLER_FAST_PARITY=1`) through Tyler's worker, with the installer-built Linux engine; Whisper heard the right words. The CUDA graphs themselves, the speed and the memory on a real card are untested until you run a voice check.
+
+## Tyler's spoken replies (v2.36, desktop app)
+
+- **Settings → Voice → Standard voice → Speaking voice:** *Cloud voice* (the default: Grok or Gemini speech, as before) or *Theme voice on this PC*.
+- **With a theme voice,** Standard voice replies are made by the local engine in the voice Theme voices would use (the current theme's, or the one you picked there). The first sentence is made while the rest is still being written (*Start speaking sooner*). A long reply is spoken as a few clips of whole sentences, played one after another (one clip plays at most 30 seconds).
+- **Speed:** with the fast engine on an NVIDIA card a reply should take about as long as it lasts, or less (from the published figures above). With the standard engine expect several seconds per second of speech, and on the processor much longer; it works, but it's slow for a conversation.
+- **When it can't speak** (not installed, the model doesn't fit, Chrome instead of the desktop app…), Tyler answers in text and says why. He never switches to the paid cloud voice by himself.
+- **Stop** (or someone talking over Tyler) calls off the voice being made for that reply; other theme-voice messages carry on.
+- **Gemini Live** is unchanged: its native-audio models only speak in Google's own voices.
+- **Usage:** replies in a theme voice are counted separately (`themeSpeechResponses`), not as billed speech.
 
 ## Using them
 
@@ -93,13 +115,14 @@ Tyler suggests a mode from the hardware it detects (the GPU and its free memory,
 
 ## Testing
 
-- **Mocked** (`tests/theme-voices.test.mjs`): no model and no internet. Downloads come from a local server, and the engine is a stand-in that writes a tone.
+- **Mocked** (`tests/theme-voices.test.mjs`, `tests/theme-speech.test.mjs`): no model and no internet. Downloads come from a local server, the engine is a stand-in that writes a tone, and spoken replies use a fake local engine (checking that the cloud voice is never called).
 - **Real:**
   - Qwen3-TTS inference on a Linux processor in the development container: 1.7B and 0.6B, through the production worker and the installer-built engine;
-  - Whisper, ECAPA and WavLM scoring.
+  - Whisper, ECAPA and WavLM scoring;
+  - v2.36: the fast engine installed with the app's installer from the new lock (Linux, processor), its streaming code run in parity mode through the worker, and the service making and stopping a spoken reply on it.
 - **Not tested here:**
   - a Windows install;
-  - NVIDIA GPU speed and memory;
+  - NVIDIA GPU speed and memory, and the fast engine's CUDA graphs;
   - playback in a real Steam call;
   - the native Microsoft Sam and Mary route;
   - Setup's new option on Windows.

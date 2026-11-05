@@ -54,6 +54,30 @@ function apiError(stage,r,d,key){const error=Error((stage+' '+r.status+': '+Stri
 // The voices the selected provider really has (Grok names are never offered for Gemini, or the reverse).
 const voiceChoices=google=>google?GEMINI_VOICES.map(v=>({value:v.name,label:v.name+' · '+v.tone})):VOICES.map(v=>({value:v,label:v}));
 const redact=s=>String(s).replace(/sk-or-[\w-]+/gi,'[redacted]').slice(0,300);
+// v2.36: Tyler's spoken replies can use a theme voice made on this PC (the desktop app's local voice
+// engine, Settings → Voice → Standard voice → Speaking voice). It never falls back to the paid cloud
+// voice: when the theme voice can't speak, the reply stays text and says why.
+function themeSpeechParts(text,size=240){
+ // One clip plays at most 30 s, so a long reply is spoken as a few clips of whole sentences
+ // (240 characters is about 17 s of speech), played one after another.
+ const t=String(text||'').replace(/\s+/g,' ').trim().slice(0,800),parts=[];let cur='';
+ for(const s of t.match(/[^.!?]+(?:[.!?]+|$)\s*/g)||[t]){
+  if(cur&&(cur+s).length>size){parts.push(cur.trim());cur='';}
+  if(s.length>size){for(const w of s.split(' ')){if(cur&&(cur+' '+w).length>size){parts.push(cur.trim());cur='';}cur+=(cur?' ':'')+w;}cur+=' ';}
+  else cur+=s;
+ }
+ if(cur.trim())parts.push(cur.trim());return parts.slice(0,4);
+}
+async function themeSpeakAll(parts,signal){const out=[];for(const p of parts)out.push((await themeSpeak(p,signal)).audio);return out;}
+async function themeSpeak(text,signal){
+ const tv=globalThis.tylerThemeVoices;
+ if(!tv)throw Error('theme voices are made by the desktop app, and this is Chrome. Choose Cloud voice in Settings → Voice → Standard voice, or use the desktop app.');
+ const r=await tv.speak({text,theme:null,purpose:'reply',from:'voice',signal});
+ if(typeof r?.audio!=='string')throw Error('the voice engine returned no audio.');
+ return {audio:r.audio,model:'theme voice ('+(r.clip?.voiceName||r.clip?.theme||'local')+')',seconds:r.clip?.seconds};
+}
+async function countThemeSpeech(chars){const {usage={}}=await chrome.storage.local.get('usage');await chrome.storage.local.set({usage:{...usage,themeSpeechResponses:(usage.themeSpeechResponses||0)+1,themeSpeechCharacters:(usage.themeSpeechCharacters||0)+chars}});}
+const themeWarning=(error,part='')=>'Theme voice failed'+part+': '+redact(String(error?.message||error)).replace(/^Stopped\.$/,'stopped.')+' Tyler answered in text (he doesn’t switch to the paid cloud voice by himself).';
 chrome.action.onClicked.addListener(()=>chrome.runtime.openOptionsPage());
 // The toolbar icon shows the chosen theme's Tyler (ui/logos/<theme>-16/-32.png).
 const LOGO_THEMES=['steam','classic','tf2','cs2','portal','cs16','hev','l4d','winxp','doom','quake','pipboy','combine','deadlock','minecraft','payday','dreamcast','gmod','ricochet','dod','rust','x360','ipod','msn','xmb'];
@@ -255,10 +279,10 @@ async function handleGameUnlocked(message,sender){
  if(message.type==='soundboard:rename'){const label=String(message.name||'').trim().slice(0,50);if(!TylerSoundboard.slug(label)||/^\d+$/.test(label))throw Error('Enter a name with letters or numbers.');const key=TylerSoundboard.slug(label);if(TylerSoundboard.names.some((name,i)=>i+1!==slot&&TylerSoundboard.slug(name)===key)||Object.entries(soundboardLabels).some(([n,name])=>Number(n)!==slot&&TylerSoundboard.slug(name)===key))throw Error('Choose a unique sound name.');soundboardLabels[slot]=label;await write({soundboardLabels});return {};}
  if(message.type==='soundboard:save'){if(!TylerSoundboard.validClip(message.clip))throw Error('Clip must be at most 512 KB and 12 seconds.');const {level,...clip}=message.clip;soundboardSlots[slot]=clip;}else if(message.type==='soundboard:clear'){delete soundboardSlots[slot];delete soundboardLabels[slot];delete soundboardTriggers[slot];}else throw Error('Unknown soundboard action');await write({soundboardSlots,soundboardLabels,soundboardTriggers,boardFavorites:message.type==='soundboard:clear'&&slot>10?favorites.filter(n=>n!==slot):favorites});return {};}
 
- const settings=await chrome.storage.local.get(['openrouterKey','geminiKey','aiProvider','personality','length','brain','noiseLevel','roastMode','speechVoice','voiceThreshold','minVoiced','replyPause','talkativeness','voiceControls','keyboardFilter','callbackGap','nicknameAliases','insideJokes','callbackState','quickSetup','usage','textSpeed','spendingCapUSD','streamAI','friendMemory','voiceBargeIn','voiceBargeDelay','smartRouting','suiteProfiles','suiteOptions','v23Persona','fastSpeech','geminiVoice','geminiTtsModel','voiceEngine','chatTagEnabled','chatTagName','geminiTextModel']);
- const google=settings.aiProvider==='gemini', selectedKey=google?settings.geminiKey:settings.openrouterKey;
+ const settings=await chrome.storage.local.get(['openrouterKey','geminiKey','aiProvider','personality','length','brain','noiseLevel','roastMode','speechVoice','voiceThreshold','minVoiced','replyPause','talkativeness','voiceControls','keyboardFilter','callbackGap','nicknameAliases','insideJokes','callbackState','quickSetup','usage','textSpeed','spendingCapUSD','streamAI','friendMemory','voiceBargeIn','voiceBargeDelay','smartRouting','suiteProfiles','suiteOptions','v23Persona','fastSpeech','geminiVoice','geminiTtsModel','voiceEngine','chatTagEnabled','chatTagName','geminiTextModel','speechEngine']);
+ const google=settings.aiProvider==='gemini', selectedKey=google?settings.geminiKey:settings.openrouterKey, themeSpeech=settings.speechEngine==='theme';
  if(message.automatic===true){const st=await chrome.storage.local.get('v22EmergencyStop');if(st.v22EmergencyStop===true)throw Error('Emergency stop is active. Disable it in settings.');}
- if(message.type==='connection')return {keyConfigured:!!selectedKey,provider:google?'Gemini':'OpenRouter',model:modelLabel(settings),speechModel:google?geminiTtsModel(settings.geminiTtsModel):'x-ai/grok-voice-tts-1.0',brain:settings.brain||'fast',noiseLevel:settings.noiseLevel||'balanced',speechVoice:google?geminiVoiceFor(settings):VOICES.includes(settings.speechVoice)?settings.speechVoice:'rex',chatTag:TylerChatTag.config(settings),voices:voiceChoices(google),voiceEngine:settings.voiceEngine==='live'?'live':'standard',voiceThreshold:settings.voiceThreshold??null,minVoiced:settings.minVoiced??null,replyPause:settings.replyPause??null,talkativeness:settings.talkativeness||'active',voiceControls:settings.voiceControls!==false,keyboardFilter:settings.keyboardFilter!==false,voiceBargeIn:settings.voiceBargeIn===true,voiceBargeDelay:[350,500,750,1000].includes(settings.voiceBargeDelay)?settings.voiceBargeDelay:500,textSpeed:settings.textSpeed||'balanced',quickSetup:settings.quickSetup||{}};
+ if(message.type==='connection')return {keyConfigured:!!selectedKey,provider:google?'Gemini':'OpenRouter',model:modelLabel(settings),speechModel:themeSpeech?'theme voice (this PC)':google?geminiTtsModel(settings.geminiTtsModel):'x-ai/grok-voice-tts-1.0',speechEngine:themeSpeech?'theme':'cloud',brain:settings.brain||'fast',noiseLevel:settings.noiseLevel||'balanced',speechVoice:google?geminiVoiceFor(settings):VOICES.includes(settings.speechVoice)?settings.speechVoice:'rex',chatTag:TylerChatTag.config(settings),voices:voiceChoices(google),voiceEngine:settings.voiceEngine==='live'?'live':'standard',voiceThreshold:settings.voiceThreshold??null,minVoiced:settings.minVoiced??null,replyPause:settings.replyPause??null,talkativeness:settings.talkativeness||'active',voiceControls:settings.voiceControls!==false,keyboardFilter:settings.keyboardFilter!==false,voiceBargeIn:settings.voiceBargeIn===true,voiceBargeDelay:[350,500,750,1000].includes(settings.voiceBargeDelay)?settings.voiceBargeDelay:500,textSpeed:settings.textSpeed||'balanced',quickSetup:settings.quickSetup||{}};
  if(message.type==='setup:save'){const old=settings.quickSetup||{},input=message.values||{},next={...old};if(typeof input.botName==='string')next.botName=input.botName.trim().slice(0,80);if(['auto','text','voice'].includes(input.mode))next.mode=input.mode;if(['text','voice-room'].includes(input.chatKind))next.chatKind=input.chatKind;if(typeof input.noticeScope==='string'&&input.noticeScope.length<=160&&input.noticeScope.startsWith('chat:'))next.notices=[...new Set([...(old.notices||[]),input.noticeScope])].slice(-30);if(typeof input.noticeAlways==='boolean')next.noticeAlways=input.noticeAlways;await chrome.storage.local.set({quickSetup:next});return {};}
  if(message.type==='preferences'){const input=message.values||{},values={};for(const [key,lo,hi]of [['voiceThreshold',.001,.06],['minVoiced',150,1000],['replyPause',400,1800]])if(Number.isFinite(input[key]))values[key]=Math.max(lo,Math.min(hi,input[key]));if(['quiet','occasional','active'].includes(input.talkativeness))values.talkativeness=input.talkativeness;if(VOICES.includes(input.speechVoice))values.speechVoice=input.speechVoice;if(typeof input.voice==='string'){if(google&&GEMINI_VOICES.some(v=>v.name===input.voice))values.geminiVoice=input.voice;else if(!google&&VOICES.includes(input.voice))values.speechVoice=input.voice;else throw Error('That voice isn\'t available for '+(google?'Gemini':'Grok')+' speech.');}if(typeof input.keyboardFilter==='boolean')values.keyboardFilter=input.keyboardFilter;if(typeof input.voiceControls==='boolean')values.voiceControls=input.voiceControls;if(typeof input.voiceBargeIn==='boolean')values.voiceBargeIn=input.voiceBargeIn;if([350,500,750,1000].includes(Number(input.voiceBargeDelay)))values.voiceBargeDelay=Number(input.voiceBargeDelay);await chrome.storage.local.set(values);return {};}
  if(message.type==='reset'){await memory.clear(tab);const scope=acceptableScope(message.chatScope);if(scope)await memory.forget('room:'+scope);hosts.delete(tab);histories.delete(tab);histories.delete(tab+':voice');histories.delete(tab+':text');return {text:scope?'Conversation and poll reset for this chat (other chats and friend memory are kept).':'Conversation and poll reset for this tab.'};}
@@ -346,10 +370,10 @@ async function handleGameUnlocked(message,sender){
      const candidate=freshReply(TylerChatTag.strip(m[1].trim(),TylerChatTag.config(settings)).trim(),history);
      if(!candidate||candidate.length<12||repeatCheck(candidate,history).repeat){this.sentence='';return;}
      this.sentence=candidate;timings.firstSentenceMs=Date.now()-thinkStarted;
-     this.promise=speech.generate(candidate,settings.openrouterKey,settings.speechVoice,controller.signal).then(spoken=>{
+     this.promise=(themeSpeech?themeSpeak(candidate,controller.signal):speech.generate(candidate,settings.openrouterKey,settings.speechVoice,controller.signal)).then(spoken=>{
       if(controller.signal.aborted)return null;timings.firstAudioMs=Date.now()-turnStarted;
       const pending=chrome.tabs?.sendMessage?.(tab,{source:'tyler-early-audio',requestId,audio:spoken.audio});pending?.catch?.(()=>{});return spoken;
-     }).catch(()=>null);
+     }).catch(error=>{this.error=error;return null;});
     }};
    }
    reply=await generate(request.messages,early?content=>early.feed(content):undefined);
@@ -383,6 +407,29 @@ async function handleGameUnlocked(message,sender){
   }
   if(controller.signal.aborted)throw Error('Cancelled');
   if(!reply)return {heard,text:'',ignored:true,reason:ignoreReason||'No reply was generated — try another message.'};
+  if((command==='say'||message.speak)&&themeSpeech){
+   const speechStarted=Date.now();
+   if(early?.sentence){
+    const spokenFirst=await early.promise;
+    if(controller.signal.aborted)throw Error('Cancelled');
+    if(spokenFirst&&reply.startsWith(early.sentence)){
+     const rest=reply.slice(early.sentence.length).trim();let restAudio=null,warning;
+     let restClips=[];
+     if(rest){try{restClips=await themeSpeakAll(themeSpeechParts(rest),controller.signal);}catch(error){if(controller.signal.aborted)throw Error('Cancelled');warning=themeWarning(error,' for the rest of the reply');}}
+     await countThemeSpeech(early.sentence.length+(restClips.length?rest.length:0));
+     return {heard,text:reply,early:true,firstAudio:spokenFirst.audio,audio:restClips[0]||null,moreAudio:restClips.slice(1),warning,timings:{...timings,speechMs:Date.now()-speechStarted}};
+    }
+    const pending=chrome.tabs?.sendMessage?.(tab,{source:'tyler-early-cancel',requestId});pending?.catch?.(()=>{});
+    // The first sentence already failed in the theme voice: the whole reply would fail the same way.
+    if(early.error)return {heard,text:reply,warning:themeWarning(early.error)};
+   }
+   try{
+    progress('Making the theme voice…');const parts=themeSpeechParts(reply),clips=await themeSpeakAll(parts,controller.signal);
+    await countThemeSpeech(parts.join(' ').length);
+    const done={...timings,speechMs:Date.now()-speechStarted};
+    return clips.length>1?{heard,text:reply,early:true,firstAudio:clips[0],audio:clips[1],moreAudio:clips.slice(2),timings:done}:{heard,text:reply,audio:clips[0],timings:done};
+   }catch(error){if(controller.signal.aborted)throw Error('Cancelled');return {heard,text:reply,warning:themeWarning(error)};}
+  }
   if(command==='say'||message.speak){
    if(!selectedKey)return {heard,text:reply,warning:'Save your '+(google?'Gemini':'OpenRouter')+' key in Settings for speech.'};
    if(early?.sentence){

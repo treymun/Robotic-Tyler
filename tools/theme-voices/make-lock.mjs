@@ -1,7 +1,10 @@
 // Builds app/theme-voices/engine-lock.json: every file the theme-voice installer may download, each
 // pinned to its exact address, size and SHA-256 (v2.35). Run by a developer when the engine changes:
 //
-//   node tools/theme-voices/make-lock.mjs [--exclude-newer 2026-10-20]
+//   node tools/theme-voices/make-lock.mjs [--exclude-newer 2026-10-20] [--only windows-cuda-fast,linux-cpu-fast]
+//
+// --only rebuilds just those runtimes and keeps everything else in the existing lock as it is (so the
+// other runtimes' files, and the engines already installed from them, stay exactly the same).
 //
 // Needs uv and python3 (only here, never on users' PCs). Sources: python.org (the embeddable Python),
 // PyPI and download.pytorch.org (the Python packages, resolved by uv for Windows), and Hugging Face
@@ -17,6 +20,13 @@ const QWEN_TTS='0.1.1';
 // qwen-tts 0.1.1's own requirements, minus gradio (only its demo web page uses it). It is installed
 // without its dependency list, from this fully pinned set.
 const REQUIREMENTS=['transformers==4.57.3','accelerate==1.12.0','librosa','soundfile','sox','onnxruntime','einops','numpy','safetensors'];
+// v2.36 fast engine (NVIDIA): faster-qwen3-tts (MIT) adds CUDA graphs and streaming on the same Qwen3-TTS
+// models. It needs qwen-tts-hf, a Transformers 5 build of qwen-tts with the same `qwen_tts` package.
+// Transformers is pinned to 5.15.1: qwen-tts-hf 0.1.1.post1 fails to load the speech tokenizer with
+// 5.20.2 (MimiConfig has no rope_theta) and 5.22.1 (the encoder's upsample property), tested 2026-11-05.
+// Both packages are installed without their dependency lists (qwen-tts-hf's would add gradio).
+const FAST={requirements:['transformers==5.15.1','accelerate==1.12.0','huggingface-hub>=1.5.0,<2','librosa','soundfile','sox','onnxruntime','einops','numpy','safetensors'],
+ noDeps:[['qwen-tts-hf','0.1.1.post1'],['faster-qwen3-tts','0.5.4']]};
 const MODELS={
  quality:{repo:'Qwen/Qwen3-TTS-12Hz-1.7B-Base',label:'Qwen3-TTS 1.7B Base'},
  light:{repo:'Qwen/Qwen3-TTS-12Hz-0.6B-Base',label:'Qwen3-TTS 0.6B Base'}};
@@ -24,7 +34,11 @@ const RUNTIMES={
  'windows-cuda':{platform:'x86_64-pc-windows-msvc',torch:'cu128',tags:['win_amd64'],label:'NVIDIA graphics card (PyTorch '+TORCH+', CUDA 12.8)'},
  'windows-cpu':{platform:'x86_64-pc-windows-msvc',torch:'cpu',tags:['win_amd64'],label:'Processor only (PyTorch '+TORCH+')'},
  // Development and the automatic tests only (this repository's Linux checks), never offered to users.
- 'linux-cpu':{platform:'x86_64-manylinux_2_28',torch:'cpu',tags:['manylinux','linux_x86_64'],label:'Linux processor (tests)',dev:true}};
+ 'linux-cpu':{platform:'x86_64-manylinux_2_28',torch:'cpu',tags:['manylinux','linux_x86_64'],label:'Linux processor (tests)',dev:true},
+ // v2.36: the fast engine. NVIDIA only on users' PCs; the Linux processor build exists for this
+ // repository's tests (it runs faster-qwen3-tts' own code without CUDA graphs).
+ 'windows-cuda-fast':{platform:'x86_64-pc-windows-msvc',torch:'cu128',tags:['win_amd64'],label:'NVIDIA graphics card, fast engine (faster-qwen3-tts, PyTorch '+TORCH+', CUDA 12.8)',fast:true},
+ 'linux-cpu-fast':{platform:'x86_64-manylinux_2_28',torch:'cpu',tags:['manylinux','linux_x86_64'],label:'Linux processor, fast engine (tests)',dev:true,fast:true}};
 
 const get=async(url,type='json')=>{const r=await fetch(url,{redirect:'follow'});if(!r.ok)throw Error(url+' → '+r.status);return type==='json'?r.json():Buffer.from(await r.arrayBuffer());};
 const head=async url=>{const r=await fetch(url,{method:'HEAD',redirect:'follow'});if(!r.ok)throw Error(url+' → '+r.status);return Number(r.headers.get('content-length'));};
@@ -43,7 +57,7 @@ function pick(wheels,rt){
 }
 async function runtime(id,rt){
  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'tyler-lock-'));
- const req=[`torch==${TORCH}+${rt.torch}`,`torchaudio==${TORCH}+${rt.torch}`,...REQUIREMENTS];
+ const req=[`torch==${TORCH}+${rt.torch}`,`torchaudio==${TORCH}+${rt.torch}`,...(rt.fast?FAST.requirements:REQUIREMENTS)];
  if(id.startsWith('windows'))req.push('msvc-runtime'); // the C++ runtime DLLs PyTorch needs, next to python.exe
  fs.writeFileSync(path.join(dir,'req.in'),req.join('\n')+'\n');
  execFileSync('uv',['pip','compile','req.in','--python-platform',rt.platform,'--python-version',PYTHON.version.split('.').slice(0,2).join('.'),
@@ -58,10 +72,13 @@ async function runtime(id,rt){
   if(!w.size)w.size=await head(w.url);
   files.push({kind:'wheel',package:p.name,version:p.version,...w});
  }
- const q=await get(`https://pypi.org/pypi/qwen-tts/${QWEN_TTS}/json`),qw=q.urls.find(u=>u.packagetype==='bdist_wheel');
- files.push({kind:'wheel',package:'qwen-tts',version:QWEN_TTS,name:qw.filename,url:qw.url,size:qw.size,sha256:qw.digests.sha256,noDeps:true});
+ for(const [pkg,ver] of rt.fast?FAST.noDeps:[['qwen-tts',QWEN_TTS]]){
+  const q=await get(`https://pypi.org/pypi/${pkg}/${ver}/json`),qw=q.urls.find(u=>u.packagetype==='bdist_wheel');
+  if(new Date(qw.upload_time_iso_8601)>new Date(EXCLUDE_NEWER))throw Error(pkg+' '+ver+' is newer than --exclude-newer');
+  files.push({kind:'wheel',package:pkg,version:ver,name:qw.filename,url:qw.url,size:qw.size,sha256:qw.digests.sha256,noDeps:true});
+ }
  fs.rmSync(dir,{recursive:true,force:true});
- return {label:rt.label,dev:!!rt.dev,torch:TORCH+'+'+rt.torch,files};
+ return {label:rt.label,dev:!!rt.dev,...(rt.fast?{engine:'fast'}:{}),torch:TORCH+'+'+rt.torch,files};
 }
 async function model(key,m){
  const info=await get(`https://huggingface.co/api/models/${m.repo}`),rev=info.sha;
@@ -74,6 +91,13 @@ async function model(key,m){
  }
  return {...m,revision:rev,license:info.cardData?.license||null,files};
 }
+const out=path.join(root,'app','theme-voices','engine-lock.json');
+const only=arg('--only','')?arg('--only','').split(','):null;
+if(only){
+ const lock=JSON.parse(fs.readFileSync(out,'utf8'));
+ for(const id of only){if(!RUNTIMES[id])throw Error('Unknown runtime '+id);lock.runtimes[id]=await runtime(id,RUNTIMES[id]);console.log(id,lock.runtimes[id].files.length,'files');}
+ fs.writeFileSync(out,JSON.stringify(lock,null,1)+'\n');console.log('Updated',path.relative(root,out));process.exit(0);
+}
 const pyUrl=`https://www.python.org/ftp/python/${PYTHON.version}/python-${PYTHON.version}-embed-amd64.zip`;
 const pyZip=await get(pyUrl,'buffer');
 // Microsoft's own Speech SDK 5.1 (it installs the original SAPI 5 voices Microsoft Sam, Mike and Mary).
@@ -85,7 +109,6 @@ const lock={format:1,engine:'1',created:new Date().toISOString().slice(0,10),exc
  runtimes:{},models:{}};
 for(const [id,rt] of Object.entries(RUNTIMES))lock.runtimes[id]=await runtime(id,rt);
 for(const [k,m] of Object.entries(MODELS))lock.models[k]=await model(k,m);
-const out=path.join(root,'app','theme-voices','engine-lock.json');
 fs.writeFileSync(out,JSON.stringify(lock,null,1)+'\n');
 const total=files=>files.reduce((n,f)=>n+f.size,0),gb=n=>(n/1024**3).toFixed(2)+' GB';
 for(const [id,r] of Object.entries(lock.runtimes))console.log(id.padEnd(13),r.files.length,'files',gb(total(r.files)));
