@@ -38,7 +38,7 @@
   const s=status;if(!s)return;
   say('tvHardware',hardwareLine(s));
   const rec=s.recommendation;$('tvAdvice').replaceChildren(...(rec?.notes||[]).map(t=>{const li=document.createElement('li');li.textContent=t;return li;}));
-  if(rec){const opt=[...$('tvMode').options];for(const o of opt)o.textContent=o.textContent.replace(/ \(suggested for this PC\)$/,'')+(o.value===rec.mode?' (suggested for this PC)':'');}
+  if(rec){const opt=[...$('tvMode').options];for(const o of opt)o.textContent=o.textContent.replace(/ · suggested$/,'')+(o.value===rec.mode?' · suggested':'');}
   if(document.activeElement!==$('tvMode'))$('tvMode').value=s.mode;
   $('tvModeNote').textContent=s.modeChosen?'Your choice. Suggested for this PC: '+(rec?.mode==='light'?'Lightweight':'Quality')+'.':'Not chosen yet: the suggestion for this PC is selected. Tyler never switches mode by itself.';
   const st=s.settings;$('tvNativeUse').checked=st.nativeVoices!==false;$('tvDevice').value=st.device==='cpu'?'cpu':'auto';$('tvIdle').value=String(st.idleMinutes);$('tvProcessed').checked=st.processed!==false;

@@ -11,7 +11,7 @@ const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),cryp
 const sapi=require('./sapi.cjs');
 const {Installer,plan,LOCK}=require('./installer.cjs'),{WorkerHost}=require('./worker.cjs'),{Voices,THEMES,STATUS}=require('./voices.cjs'),hardware=require('./hardware.cjs');
 const GB=1024**3;
-const MODES={quality:{model:'quality',label:'Quality',about:'Qwen3-TTS 1.7B: the closest match to each voice.'},light:{model:'light',label:'Lightweight',about:'Qwen3-TTS 0.6B: less memory and faster, a little less like each voice.'}};
+const MODES={quality:{model:'quality',label:'Quality',about:'Qwen3-TTS 1.7B: the closest match to each voice.'},light:{model:'light',label:'Lightweight',about:'Qwen3-TTS 0.6B: about half the memory, a little less like each voice.'}};
 const DEFAULTS={mode:null,device:'auto',idleMinutes:5,followTheme:true,override:'',processed:true,nativeVoices:true,chat:false,chatAccess:'everyone',chatAllowed:'',chatCooldown:20,maxChars:400};
 const MAX_QUEUE=4,CACHE_LIMIT=300*1024**2,CHECK_LINE='Voice check. Theme voices are ready.';
 

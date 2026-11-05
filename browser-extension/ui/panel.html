@@ -35,9 +35,9 @@
   </div>
 
   <dl class="stats" id="hud">
-    <div class="stat"><dt>Voice</dt><dd id="hudVoice">Idle</dd><small id="hudVoiceMeta">Bridge not checked</small></div>
+    <div class="stat"><dt>Voice</dt><dd id="hudVoice">Idle</dd><small id="hudVoiceMeta">Not checked yet</small></div>
     <div class="stat"><dt>Text spend</dt><dd id="hudSpend">$0.0000</dd><small id="hudSpendMeta">Reported by provider</small></div>
-    <div class="stat"><dt>Last reply</dt><dd id="hudLatency">—</dd><small id="hudLatencyMeta">Waiting for a turn</small></div>
+    <div class="stat"><dt>Last reply</dt><dd id="hudLatency">—</dd><small id="hudLatencyMeta">None yet</small></div>
   </dl>
 
   <div id="fxDeck" class="fx-slot fx-deck"></div>
@@ -104,7 +104,7 @@
             <h3>Choose how Tyler talks</h3>
             <label class="field">Use Tyler for
               <select id="setupMode">
-                <option value="auto">Auto: text when alone, voice when friends join</option>
+                <option value="auto">Auto: text, or voice when friends join</option>
                 <option value="text">Text conversation only</option>
                 <option value="voice">Voice conversation only</option>
               </select>

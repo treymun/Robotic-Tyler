@@ -43,7 +43,7 @@
    <p id="rmCallText" class="hint">Connect Tyler to the group chat first.</p><div id="rmCallRooms" class="btn-row" hidden></div>
    <div class="btn-row rm-call-btns"><button id="rmJoin" class="btn primary" type="button">Join Voice</button><button id="rmLeave" class="btn" type="button">Leave Voice</button></div>
    <small class="hint">Leave Voice takes the bot out of the call. Pause AI and Stop audio keep him in it.</small></div>
-  <label class="field">Use Tyler for<select id="rmMode"><option value="auto">Auto: text when alone, voice when friends join</option><option value="text">Text conversation only</option><option value="voice">Voice conversation only</option></select></label>
+  <label class="field">Use Tyler for<select id="rmMode"><option value="auto">Auto: text, or voice when friends join</option><option value="text">Text conversation only</option><option value="voice">Voice conversation only</option></select></label>
   <small class="hint">A new mode starts the next time you press Connect &amp; start.</small>
   <details class="feature" open><summary><span class="feature-title">Say in chat</span><span class="feature-meta">Tyler types it</span></summary>
     <div class="feature-body"><form id="sayForm" class="btn-row" autocomplete="off"><input id="say" type="text" maxlength="300" placeholder="Tyler types this in the chat" aria-label="Message"><button class="btn primary" type="submit">Send</button></form></div></details>
@@ -73,7 +73,7 @@
   <form id="musicForm" class="btn-row" autocomplete="off"><input id="query" type="search" maxlength="120" placeholder="Artist — song title" aria-label="Song or artist"><button class="btn primary" type="submit">Play</button></form>
   <div class="btn-row"><button id="musicSkip" class="btn" type="button">Skip</button><button id="musicEnd" class="btn danger" type="button">Stop music</button></div>
   <label class="field">Music volume <span class="field-note" id="rmMusicVolumeLabel"></span><input id="rmMusicVolume" type="range" min="0" max="200" step="5"></label>
-  <label class="field">Sound quality<select id="rmMusicQuality"><option value="auto">Auto · lowers itself if the call drops audio</option><option value="high">High · 128 kbps</option><option value="medium">Medium · 64 kbps</option><option value="low">Low · about 32 kbps</option></select></label>
+  <label class="field">Sound quality<select id="rmMusicQuality"><option value="auto">Auto · adjusts to the call</option><option value="high">High · 128 kbps</option><option value="medium">Medium · 64 kbps</option><option value="low">Low · about 32 kbps</option></select></label>
   <label class="check"><input id="rmMusicDuck" type="checkbox"><span>Lower the music while Tyler talks</span></label>
   <p id="rmMusicStatus" class="hint" role="status"></p>
 </section>

@@ -18,7 +18,7 @@
 
 /* Icon + label pairs (tabs, nav, buttons): the label stays, the icon leads */
 .with-ic{display:inline-flex;align-items:center;justify-content:center;gap:6px}
-.tabs button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+.tabs button{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:3px}
 .tabs button .ic{--ic-size:15px;margin:0;opacity:.85}
 .tabs button[aria-selected=true] .ic{opacity:1}
 button .ic{--ic-size:14px;margin-right:6px;vertical-align:-2px}

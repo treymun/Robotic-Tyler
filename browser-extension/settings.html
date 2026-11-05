@@ -111,7 +111,7 @@
 <section class="sheet" id="phoneRemote" data-ui-zone="overview">
   <div class="sheet-head">
     <h2>Phone remote</h2>
-    <p class="only-desktop">Control Tyler from your phone's browser on the same Wi-Fi. The phone shows Tyler's panel in your theme, live, with the theme's extras: start or pause him, play clips, run the Music DJ, type in chat, change the theme and more. Nothing to install. The phone never sees your keys, other settings or chat messages.</p>
+    <p class="only-desktop">Control Tyler from your phone's browser on the same Wi-Fi. The phone shows Tyler's panel in your theme, live, with the theme's extras: start or pause him, play clips, run the Music DJ, type in chat, change the theme and more. Nothing to install. The phone never sees your keys or other settings. A paired phone can read the chat's latest 40 messages for its <b>Chat log</b> card (it asks only while the card is open).</p>
     <p class="only-chrome">The phone remote is part of the desktop app: it runs a small page on your home network, which a Chrome extension can't do.</p>
   </div>
   <div class="only-desktop">
@@ -459,23 +459,23 @@
     <div class="grid two">
       <label>Mode
         <select id="tvMode">
-          <option value="quality">Quality: Qwen3-TTS 1.7B, closest to each voice</option>
-          <option value="light">Lightweight: Qwen3-TTS 0.6B, less memory, faster</option>
+          <option value="quality">Quality (1.7B): closest to each voice</option>
+          <option value="light">Lightweight (0.6B): half the memory</option>
         </select>
         <small class="hint" id="tvModeNote">Tyler suggests a mode for this PC; it never switches by itself.</small>
       </label>
       <label>Runs on
         <select id="tvDevice">
-          <option value="auto">Graphics card when it can be used, otherwise the processor</option>
-          <option value="cpu">Always the processor (keeps the graphics card free for games)</option>
+          <option value="auto">Graphics card when possible, else the processor</option>
+          <option value="cpu">Processor only (keeps the graphics card free)</option>
         </select>
-        <small class="hint">The processor is much slower: a few seconds of speech can take a minute or more.</small>
+        <small class="hint">The processor is much slower: a few seconds of speech can take a minute or more. On a graphics card, expect a few seconds of waiting for each second of speech.</small>
       </label>
     </div>
     <details class="tv-explain"><summary>Quality or Lightweight?</summary>
-      <p><b>Quality</b> uses the larger model (Qwen3-TTS 1.7B). It copies each character's voice more closely and stumbles less (fewer odd pauses or misread words). It needs about 6.5 GB of free graphics memory on an NVIDIA card, or about 8 GB of free memory on the processor, and each message takes longer to make. Download: about 4.2 GB for the model.</p>
-      <p><b>Lightweight</b> uses the smaller model (Qwen3-TTS 0.6B). It needs about 4 GB of graphics memory (or 4 GB of memory) and makes messages faster, but the voices sound a little less like the originals and odd pauses happen more often (Tyler retries a take that comes out the wrong length). Download: about 2.3 GB for the model.</p>
-      <p>Both use the same voice engine (about 2.7 GB with graphics-card support, 0.25 GB for the processor only). You can install both and switch any time.</p>
+      <p><b>Quality</b> uses the larger model (Qwen3-TTS 1.7B). It copies each character's voice more closely and stumbles less (fewer odd pauses or misread words). It needs about 6.5 GB of free graphics memory on an NVIDIA card, or about 8 GB of free memory on the processor. Download: about 4.2 GB for the model.</p>
+      <p><b>Lightweight</b> uses the smaller model (Qwen3-TTS 0.6B). It needs about 4 GB of graphics memory (or 4 GB of memory). On the processor it makes messages about twice as fast; on a graphics card the two take about as long. The voices sound a little less like the originals and odd pauses happen more often (Tyler retries a take that comes out the wrong length). Download: about 2.3 GB for the model.</p>
+      <p>Both use the same voice engine (about 2.7 GB with graphics-card support, 0.25 GB for the processor only). You can install both and switch any time. Theme voices are made ahead of playing, not live: on a mid-range NVIDIA card a short line takes several seconds.</p>
     </details>
     <h3>Install</h3>
     <p id="tvInstallState" role="status">…</p>

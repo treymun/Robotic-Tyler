@@ -9,7 +9,8 @@
 //    tries and it's gone. Each paired phone gets its own random key, kept here only as a hash, in an
 //    HttpOnly cookie; you can remove a phone or all of them. Turning the remote off stops the server.
 //  - The page can only ask for Tyler's status and a fixed list of actions (remote-control.js in the
-//    Steam window carries them out). It never sees keys, settings or chat messages.
+//    Steam window carries them out). It never sees keys or settings. v2.35: a paired phone can read the
+//    chat's latest 40 messages (names, times, text) for its Chat log card, which asks only while open.
 //  - v2.26: the page is a copy of Tyler's panel in his theme, with the theme's live extras: it loads
 //    the panel's own stylesheet and theme code (/lib/, a fixed list) and gets the panel's UI events
 //    as they happen over /events (paired phones only). Two settings can be changed from it: the

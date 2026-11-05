@@ -10,6 +10,7 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {createRequire} from 'node:module';
 const require=createRequire(import.meta.url);
+const {setupRemote}=require('../../app/remote.cjs'),{memoryStorage}=require('../../app/vault.cjs');
 const {chromium}=require('playwright');
 
 const ROOT=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../..');
@@ -29,7 +30,7 @@ const browser=await chromium.launch();
 
 // Runs in the page. `scope` is a CSS selector for the root (or '#shadow' for the panel's shadow root).
 function audit(scope){
- const root=scope==='#shadow'?document.getElementById('tyler-companion-root').shadowRoot:document;
+ const root=scope==='#shadow'?document.getElementById('tyler-companion-root').shadowRoot:scope==='#phone'?document.getElementById('tyler').shadowRoot:document;
  const CONTROL='button,select,input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=hidden]),textarea,a.button,.btn,[role=button]';
  const visible=el=>{const r=el.getBoundingClientRect();if(r.width<2||r.height<2)return false;const s=getComputedStyle(el);if(s.visibility==='hidden'||s.display==='none'||Number(s.opacity)===0)return false;for(let p=el;p;p=p.parentElement||p.getRootNode().host){if(p.hidden||p.closest?.('details:not([open]) > :not(summary)'))return false;}return true;};
  const name=el=>{const id=el.id?'#'+el.id:'';const cls=[...el.classList].slice(0,2).map(c=>'.'+c).join('');const text=(el.textContent||el.value||el.placeholder||'').trim().replace(/\s+/g,' ').slice(0,28);return el.tagName.toLowerCase()+id+cls+(text?' “'+text+'”':'');};
@@ -54,6 +55,11 @@ function audit(scope){
     if(Math.max(...hs)-Math.min(...hs)>1.5)add('uneven-height',same[0].el,same.map(b=>name(b.el).split(' ')[0]+'='+b.r.height.toFixed(1)).join(', '));
     if(Math.max(...cs)-Math.min(...cs)>1.5)add('off-centre',same[0].el,'centres differ by '+(Math.max(...cs)-Math.min(...cs)).toFixed(1)+'px');
    }
+   // Labels inside a row of like buttons (tabs, pads) sit on one line, whatever icon is above them.
+   const textBox=el=>{const w=document.createTreeWalker(el,NodeFilter.SHOW_TEXT);let n,last=null;while((n=w.nextNode()))if(n.textContent.trim()){const r=document.createRange();r.selectNodeContents(n);const b=r.getBoundingClientRect();if(b.height)last=b;}return last;};
+   const btns=line.filter(b=>kind(b.el)==='button'&&b.el.childElementCount>0);
+   if(btns.length>=3&&new Set(btns.map(b=>Math.round(b.r.height))).size===1){const bottoms=btns.map(b=>textBox(b.el)).filter(Boolean).map(t=>t.bottom);
+    if(bottoms.length===btns.length&&Math.max(...bottoms)-Math.min(...bottoms)>1.5)add('labels-uneven',btns[0].el,'label baselines differ by '+(Math.max(...bottoms)-Math.min(...bottoms)).toFixed(1)+'px');}
    const gaps=[];for(let i=1;i<line.length;i++)gaps.push(line[i].r.left-line[i-1].r.right);
    if(gaps.some(g=>g<-.5))add('overlap',line[0].el,'controls overlap by '+(-Math.min(...gaps)).toFixed(1)+'px');
    if(gaps.length>1&&!/space-between|space-around|space-evenly/.test(ps.justifyContent)&&Math.max(...gaps)-Math.min(...gaps)>2)add('uneven-gap',line[0].el,'gaps '+gaps.map(g=>g.toFixed(1)).join('/'));
@@ -92,6 +98,22 @@ function audit(scope){
    if(r.right>right+.5||r.left<left-.5)add('outside-card',el,'by '+Math.max(r.right-right,left-r.left).toFixed(1)+'px');}
   if(el.tagName==='BUTTON'||el.tagName==='SELECT'){const s=getComputedStyle(el);if(el.scrollWidth>el.clientWidth+1&&s.overflow!=='visible')add('clipped',el,el.scrollWidth+' > '+el.clientWidth);}
  }
+ // Labels that break onto a second line, text cut off with "…", select text running under the arrow.
+ const lines=el=>{const w=document.createTreeWalker(el,NodeFilter.SHOW_TEXT);let n;const tops=[];while((n=w.nextNode())){if(!n.textContent.trim())continue;const p=n.parentElement;if(p&&getComputedStyle(p).position==='absolute')continue;const r=document.createRange();r.selectNodeContents(n);for(const x of r.getClientRects())if(x.width>1)tops.push(x.top+x.height/2);}tops.sort((a,b)=>a-b);let count=tops.length?1:0;for(let i=1;i<tops.length;i++)if(tops[i]-tops[i-1]>6)count++;return count;};
+ for(const el of root.querySelectorAll('button,.foot small,.tab-label,.pill,.tag,.chip,.badge')){
+  if(!visible(el)||!el.textContent.trim()||el.closest('.pads,.pad'))continue;
+  if(lines(el)>1&&(el.tagName!=='BUTTON'||el.getBoundingClientRect().width<240))add('wraps',el,lines(el)+' lines');
+ }
+ for(const el of root.querySelectorAll('*')){
+  if(el.children.length||!el.textContent.trim())continue;const s=getComputedStyle(el);
+  if(s.textOverflow==='ellipsis'&&el.scrollWidth>el.clientWidth+1&&visible(el))add('ellipsis',el,'needs '+el.scrollWidth+'px, has '+el.clientWidth+'px');
+ }
+ const ctx=document.createElement('canvas').getContext('2d');
+ for(const el of root.querySelectorAll('select')){
+  if(!visible(el))continue;const s=getComputedStyle(el);ctx.font=s.fontStyle+' '+s.fontWeight+' '+s.fontSize+' '+s.fontFamily;
+  const text=el.selectedOptions[0]?.textContent||'';const need=ctx.measureText(text).width+(parseFloat(s.letterSpacing)||0)*text.length;
+  const room=el.clientWidth-parseFloat(s.paddingLeft)-parseFloat(s.paddingRight);if(need>room+1)add(s.textOverflow==='ellipsis'?'select-ellipsis':'select-clipped',el,'text '+need.toFixed(0)+'px, room '+room.toFixed(0)+'px');
+ }
  // Buttons whose text is not vertically centred (padding mismatch shows as text sitting low or high).
  for(const el of controls.filter(e=>e.tagName==='BUTTON'&&e.childElementCount===0&&e.textContent.trim())){
   const range=document.createRange();range.selectNodeContents(el);const t=range.getBoundingClientRect(),r=el.getBoundingClientRect();if(!t.height)continue;
@@ -99,7 +121,7 @@ function audit(scope){
   const off=(t.top-top)-(bottom-t.bottom);if(Math.abs(off)>3&&t.height<r.height*.8)add('text-off-centre',el,(off>0?'low':'high')+' by '+(Math.abs(off)/2).toFixed(1)+'px');
  }
  // Horizontal page scroll.
- const de=document.documentElement;if(scope!=='#shadow'&&de.scrollWidth>de.clientWidth+1)problems.push({kind:'page-scroll',el:'document',detail:de.scrollWidth+' > '+de.clientWidth});
+ const de=document.documentElement;if(scope==='document'&&de.scrollWidth>de.clientWidth+1)problems.push({kind:'page-scroll',el:'document',detail:de.scrollWidth+' > '+de.clientWidth});
  return problems;
 }
 
@@ -109,18 +131,18 @@ const stub=theme=>{window.chrome={storage:{local:{get:async()=>({uiTheme:theme,u
 for(const theme of THEMES){
  const out=results[theme]={};
  // The panel, every tab, with the feature groups open.
- const page=await browser.newPage({viewport:{width:1280,height:860}});
+ const page=await browser.newPage({viewport:{width:1280,height:860},reducedMotion:'reduce'});
  await page.goto(base+'/tools/preview/panel.html?platform=chrome&theme='+theme);
- await page.waitForFunction(()=>window.__tylerReady===true);await page.waitForTimeout(500);await page.evaluate(()=>document.fonts.ready);
+ await page.waitForFunction(()=>window.__tylerReady===true);await page.waitForTimeout(SHOTS?4000:500);await page.evaluate(()=>document.fonts.ready);
  for(const tab of ['conversation','room','soundboard','setup','checks']){
   await page.evaluate(([t])=>{TylerCompanion.showTab(t);},[tab]);
-  await page.evaluate(shadow(`for(const d of r.querySelectorAll('details'))d.open=true;`));await page.waitForTimeout(200);
+  await page.evaluate(shadow(`for(const d of r.querySelectorAll('details'))d.open=true;`));await page.waitForTimeout(SHOTS?900:200);
   out['panel-'+tab]=await page.evaluate(audit,'#shadow');
   if(SHOTS){const box=await page.evaluate(shadow(`const b=r.querySelector('.panel').getBoundingClientRect();return {x:b.x,y:b.y,width:b.width,height:b.height};`));await page.screenshot({path:path.join(OUT,'audit-'+theme+'-panel-'+tab+'.png'),clip:box});}
  }
  await page.close();
  // Settings, each zone.
- const s=await browser.newPage({viewport:{width:1280,height:900}});
+ const s=await browser.newPage({viewport:{width:1280,height:900},reducedMotion:'reduce'});
  await s.addInitScript(stub,theme);await s.goto(base+'/browser-extension/settings.html');await s.waitForTimeout(500);await s.evaluate(()=>document.fonts.ready);
  for(const zone of ['ai','voice','squad','games','advanced']){
   await s.evaluate(z=>{location.hash=z;},zone);await s.waitForTimeout(250);
@@ -128,6 +150,27 @@ for(const theme of THEMES){
   if(SHOTS)await s.screenshot({path:path.join(OUT,'audit-'+theme+'-settings-'+zone+'.png'),fullPage:true});
  }
  await s.close();
+ // The phone remote on a phone-sized screen (the real remote server and page, the panel preview as the PC).
+ if(process.env.REMOTE!=='0'){
+  const pc=await browser.newPage({viewport:{width:1280,height:900}});let srv=null;
+  await pc.exposeFunction('__remoteEvent',m=>srv?.push(m.events));
+  await pc.goto(base+'/tools/preview/panel.html?platform=desktop-voice&theme='+theme);await pc.waitForFunction(()=>window.__tylerReady===true&&window.TylerRemote);
+  await pc.evaluate(()=>{window.__results=[];handlers['remote:result']=m=>{window.__results.push(m);return {};};handlers['remote:event']=m=>{window.__remoteEvent(m);return {};};});
+  const ask=(action,args={})=>pc.evaluate(async([action,args])=>{const id='a'+Math.random().toString(36).slice(2);for(const fn of listeners)fn({type:'remote:action',id,action,args});for(let i=0;i<250;i++){const r=window.__results.find(x=>x.id===id);if(r){if(!r.ok)throw Error(r.error);return r.data;}await new Promise(x=>setTimeout(x,20));}throw Error('no answer');},[action,args]);
+  srv=setupRemote({vault:memoryStorage(),ask,pageDir:path.join(ROOT,'app','remote'),uiDir:path.join(ROOT,'app','companion','ui'),libDir:path.join(ROOT,'app','companion'),version:'audit',theme:async()=>theme,prefs:{get:async()=>({theme,muteCall:false}),theme:async()=>{},muteCall:async()=>{}}});
+  const st=await srv.handle('enable');
+  const ctx=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,reducedMotion:'reduce'});
+  try{
+   const phone=await ctx.newPage();await phone.goto('http://127.0.0.1:'+st.port+'/?code='+st.code);
+   await phone.waitForFunction(()=>globalThis.__tylerRemote?.state().fx===true,null,{timeout:30000});await phone.evaluate(()=>document.fonts.ready);
+   for(const tab of ['conversation','room','soundboard','setup']){
+    await phone.evaluate(t=>{const r=document.getElementById('tyler').shadowRoot;r.getElementById('tab-'+t)?.click();for(const d of r.querySelectorAll('details'))d.open=true;},tab);await phone.waitForTimeout(400);
+    out['phone-'+tab]=await phone.evaluate(audit,'#phone');
+    const wide=await phone.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth);if(wide>1)out['phone-'+tab].push({kind:'page-scroll',el:'phone page',detail:'scrolls sideways by '+wide+'px'});
+    if(SHOTS)await phone.screenshot({path:path.join(OUT,'audit-'+theme+'-phone-'+tab+'.png'),fullPage:true});
+   }
+  }finally{await ctx.close();await pc.close();await srv.stop();}
+ }
 }
 await browser.close();server.close();
 fs.writeFileSync(path.join(OUT,'layout-audit.json'),JSON.stringify(results,null,1));

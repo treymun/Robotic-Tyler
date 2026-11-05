@@ -15,7 +15,7 @@
 
 <p align="center"><b>Tyler is an AI squadmate for Steam.</b> He sits in your group chat and voice channel, talks like one of the crew, and keeps the night going with trivia, votes, sounds and music.</p>
 
-<p align="center"><a href="CHANGES.md"><img src="assets/readme/whats-new.png" width="100%" alt="What's new since v2.20.1: five new themes, Rust, Xbox 360, iPod classic, MSN Messenger and PlayStation 3 (v2.27), Phone remote (v2.25, v2.26), Stay connected (v2.24), a docked and resizable panel (v2.23), themes with their own menus and screens (v2.22), smoother voice (v2.21), music that sounds right (v2.20.2, v2.20.3), the full check and repeat protection (v2.20.1)."></a></p>
+<p align="center"><a href="CHANGES.md"><img src="assets/readme/whats-new.png" width="100%" alt="What's new since v2.28: theme voices (v2.35), chat pictures (v2.34), the chat on your phone (v2.35), Join and Leave Voice (v2.32, v2.33), a soundboard for every theme (v2.31), the phone remote away from home (v2.30), branded icons (v2.28, v2.29) and steadier replies (v2.33)."></a></p>
 
 ---
 
@@ -35,8 +35,12 @@
 <td valign="top"><img src="assets/readme/icon-themes.png" width="52" align="left" alt="">&nbsp;<b>25 themes</b><br>&nbsp;Steam, TF2, CS2, Portal, DOOM, Rust, Xbox 360, iPod, MSN Messenger, PS3 and more, each with its own Tyler, status strip, menus and screens: a Quake console, a Pip-Boy radio, a click wheel, a Ring of Light, a working Dreamcast VMU…</td>
 </tr>
 <tr>
-<td valign="top"><img src="assets/readme/icon-remote.png" width="52" align="left" alt="">&nbsp;<b>Phone remote</b> <sup>new</sup><br>&nbsp;Tyler's panel on your phone, live and in your theme. Start or pause him, play clips, run the music, type in chat, switch the theme. Nothing to install.</td>
-<td valign="top"><img src="assets/readme/icon-stay.png" width="52" align="left" alt="">&nbsp;<b>Stays in the call</b> <sup>new</sup><br>&nbsp;A soft hum after 45 quiet minutes keeps Steam from dropping him, and he reconnects to the chat by himself. A full check tests every part in one pass.</td>
+<td valign="top"><img src="assets/readme/icon-theme-voices.png" width="52" align="left" alt="">&nbsp;<b>Theme voices</b> <sup>new</sup><br>&nbsp;Type a line and Tyler says it in the theme's character voice: G-Man, GLaDOS, the CS 1.6 radio, Bill and more, cloned on your PC. An optional download in the desktop app; no key, no cost per line.</td>
+<td valign="top"><img src="assets/readme/icon-images.png" width="52" align="left" alt="">&nbsp;<b>Chat pictures</b> <sup>new</sup><br>&nbsp;<code>!image</code> and a description: Tyler draws it and posts it in the chat, with your own OpenRouter or Venice key and within your spending cap.</td>
+</tr>
+<tr>
+<td valign="top"><img src="assets/readme/icon-remote.png" width="52" align="left" alt="">&nbsp;<b>Phone remote</b><br>&nbsp;Tyler's panel on your phone, live and in your theme. Start or pause him, play clips, run the music, read and type in chat, switch the theme. Nothing to install.</td>
+<td valign="top"><img src="assets/readme/icon-stay.png" width="52" align="left" alt="">&nbsp;<b>Stays in the call</b><br>&nbsp;A soft hum after 45 quiet minutes keeps Steam from dropping him, and he reconnects to the chat by himself. A full check tests every part in one pass.</td>
 </tr>
 </table>
 
@@ -81,7 +85,7 @@ Both run the same engine, settings and themes. Prefer the older desktop route th
 - **Standard** waits for a pause, writes a reply with your AI provider (OpenRouter or Gemini) and speaks it, with Grok voices through OpenRouter or Google's voices with a Gemini key. Long replies are spoken in full.
 - **Text models:** OpenRouter with Llama 3.3 70B, Mistral Small 3.2 or **Venice Uncensored** (each with its own provider routing, never Parasail), or Google Gemini with **3.1 Flash-Lite, 3.5 Flash-Lite or 3.8 Flash** (all on Google's free tier). **Test selected model** in Settings checks yours.
 - **Gemini Live** is a real-time conversation with Google: Tyler hears the call as people talk, answers in about a second and stops when someone talks over him. It needs a Google AI key, and Google bills the audio while a session runs, so you start and stop every session yourself.
-
+- **Theme voices** (desktop app, optional) say lines you type in each theme's character voice, cloned on your PC by Qwen3-TTS. They're for typed lines and `!say`, not Tyler's live replies. See [`docs/THEME-VOICES.md`](docs/THEME-VOICES.md).
 - **How he sounds:** Gemini Live replies play without crackle, the second half of a reply starts on the exact sample the first ends, and every reply comes out at the same loudness. Friends' voices reach his speech recognition through a proper filter, so "s" sounds don't turn into noise.
 
 Your personality, reply length and rules always apply, and people in the call can't change them.
@@ -95,7 +99,7 @@ Your personality, reply length and rules always apply, and people in the call ca
 - Tyler only hears the Steam voice call he's in, and only after you confirm everyone knows he's listening. He never uses your physical microphone: his voice is a synthetic microphone that only carries what he says and plays.
 - Your keys stay on your PC (encrypted by Windows in the desktop app) and never reach Steam's pages.
 - Screen commentary only sees the window you pick, as still pictures, and only while you share it.
-- The phone remote is off until you turn it on. It answers only devices on your home network, and only after pairing with a code from Settings. The phone sees what the panel shows, never your keys or the chat's messages. Remove a phone (or all of them) in Settings at any time.
+- The phone remote is off until you turn it on. It answers only devices on your home network, and only after pairing with a code from Settings. The phone sees what the panel shows and the chat's latest messages (for its Chat log card), never your keys. Remove a phone (or all of them) in Settings at any time.
 
 ## Trivia
 
@@ -119,7 +123,7 @@ Type `play trivia` in chat for a 10-question group race: 500 questions across 10
 | `app/`, `voice-app/` | The desktop app: main process, Steam window voice, Voice window (parts are generated from `browser-extension/`). |
 | `windows-audio-bridge/` | The Windows audio helper for the VB-CABLE voice route (C#, NAudio). |
 | `tools/setup/` | The Windows Setup (native Win32, `setup.c`) and its artwork (`art/`, rendered by `render-art.mjs`). |
-| `docs/` | Feature guides (arcade, trivia, music, moderation) and older patch notes. |
+| `docs/` | Feature guides (arcade, trivia, music, moderation, theme voices), patch notes, and `archive/` for notes on old versions. |
 | `CHANGES.md`, `RELEASING.md` | What changed in each release; tests, releases, updates and signing. |
 
 ```

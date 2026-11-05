@@ -83,7 +83,7 @@
  const status=s=>{$('status').textContent=s;if(!autoActive)setActivity(s);};
 
  // ── HUD (voice · spend · latency) ───────────────────────────────────────
- const hudState={voice:'Idle',voiceMeta:'Bridge not checked',spend:'$0.0000',spendMeta:'Reported by provider',latency:'—',latencyMeta:'Waiting for a turn'};
+ const hudState={voice:'Idle',voiceMeta:'Not checked yet',spend:'$0.0000',spendMeta:'Reported by provider',latency:'—',latencyMeta:'None yet'};
  function setHud(partial={}){
   Object.assign(hudState,partial);
   for(const key of ['voice','spend','latency']){

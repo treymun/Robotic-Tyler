@@ -99,7 +99,7 @@ test('Music DJ sound quality: untouched tab sound, a chosen call bitrate, kept b
  assert.match(bridge,/getDisplayMedia\(\{video:\{displaySurface:'browser',frameRate:\{max:1\},width:\{max:320\},height:\{max:180\}\},audio:MUSIC_AUDIO,/);
  assert.match(bridge,/if\(replaced\.has\(sender\)\)await tuneSender\(sender\)/,'only Tyler\'s own senders are tuned');
  assert.match(bridge,/bitrateBefore\.delete\(sender\);if\(before==null\)delete e\.maxBitrate/,'the earlier setting comes back');
- assert.match(music,/<select id="musicQuality"><option value="auto">Auto · lowers itself if the call drops audio \(recommended\)<\/option><option value="high">High · 128 kbps<\/option><option value="medium">Medium · 64 kbps<\/option><option value="low">/);
+ assert.match(music,/<select id="musicQuality"><option value="auto">Auto · adjusts to the call \(recommended\)<\/option><option value="high">High · 128 kbps<\/option><option value="medium">Medium · 64 kbps<\/option><option value="low">/);
  assert.match(music,/TylerStorage\?\.set\?\.\(\{musicQuality:/);
 });
 test('music quality: chat command, Auto steps down when Steam reports lost audio and back up when steady (v2.20.3)',async()=>{

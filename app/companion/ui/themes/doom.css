@@ -229,7 +229,11 @@
 [data-rt-theme=doom] :is(.section-nav button[aria-current=page],nav:not(.tabs) button.active)::before{
   content:"";flex-shrink:0;width:2px;height:2px;margin:0 14px 0 0;border:0;background:transparent;transform:translateY(-6px);filter:drop-shadow(1px 1px 0 #000);
   box-shadow:2px 0px 0 #d9cfb0,4px 0px 0 #d9cfb0,6px 0px 0 #d9cfb0,8px 0px 0 #d9cfb0,10px 0px 0 #d9cfb0,0px 2px 0 #d9cfb0,2px 2px 0 #d9cfb0,4px 2px 0 #d9cfb0,6px 2px 0 #d9cfb0,8px 2px 0 #d9cfb0,10px 2px 0 #d9cfb0,12px 2px 0 #d9cfb0,0px 4px 0 #d9cfb0,2px 4px 0 #2a0000,4px 4px 0 #2a0000,6px 4px 0 #d9cfb0,8px 4px 0 #2a0000,10px 4px 0 #2a0000,12px 4px 0 #d9cfb0,0px 6px 0 #d9cfb0,2px 6px 0 #2a0000,4px 6px 0 #2a0000,6px 6px 0 #d9cfb0,8px 6px 0 #2a0000,10px 6px 0 #2a0000,12px 6px 0 #d9cfb0,0px 8px 0 #d9cfb0,2px 8px 0 #d9cfb0,4px 8px 0 #d9cfb0,8px 8px 0 #d9cfb0,10px 8px 0 #d9cfb0,12px 8px 0 #d9cfb0,2px 10px 0 #d9cfb0,4px 10px 0 #d9cfb0,6px 10px 0 #d9cfb0,8px 10px 0 #d9cfb0,10px 10px 0 #d9cfb0,2px 12px 0 #d9cfb0,6px 12px 0 #d9cfb0,10px 12px 0 #d9cfb0;animation:doom-skull .6s steps(1,end) infinite}
-[data-rt-theme=doom] .foot small{-webkit-line-clamp:3}
+/* v2.35 polish: DOOM's wide pixel type left the footer note three words a line. The note gets the
+   footer's top line and the two buttons share the line under it. */
+[data-rt-theme=doom] .foot{flex-wrap:wrap;row-gap:5px}
+[data-rt-theme=doom] .foot small{flex:1 0 calc(100% - 14px);-webkit-line-clamp:1;white-space:nowrap;text-overflow:ellipsis}
+[data-rt-theme=doom] .foot button{flex:1 1 0}
 
 /* ── v2.17 authenticity: DOOM ──
    The whole screen flashes red for a moment when something goes wrong, like taking damage,
