@@ -10,3 +10,5 @@
 *.woff2 binary
 *.wasm binary
 *.onnx binary
+# Pack 3's source files are kept byte for byte as the pack supplied them (their SHA-256 is checked).
+assets/theme-visual-pack-3/source/** -text
