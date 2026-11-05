@@ -1,4 +1,4 @@
-# ROBOTIC TYLER theme voices: the local voice worker (v2.35; the fast engine since v2.36).
+# ROBOTIC TYLER theme voices: the local voice worker (v2.35; the fast engine since v2.36; Windows start fix v2.37.1).
 #
 # The desktop app starts this with its own isolated Python (the "engine" it installed and verified) and
 # talks to it only through stdin/stdout, one JSON object per line. There is no network listener and
@@ -41,12 +41,36 @@ class Failure(Exception):
 
 # ── requests are read on their own thread, so "cancel" works while a voice is being made ──
 requests = queue.Queue(); cancelled = set(); current = {"id": None}
+# Requests arrive on a private copy of stdin, and the process's own standard input becomes NUL, so no
+# program a library starts can read (or wait on) Tyler's request line (v2.37.1).
+# On Windows a read must never be left waiting on that pipe: while one thread is blocked in ReadFile on a
+# synchronous pipe, every other call on that pipe waits for it, and as numpy loads, the Fortran runtime
+# inside its OpenBLAS calls fstat() on standard input. With the reader waiting for Tyler's next request,
+# "import numpy" froze until a request came (reproduced on GitHub's Windows runner; on the owner's PC the
+# voice check never finished). So on Windows the reader only reads bytes that are already there.
 # Requests are UTF-8 JSON whatever the PC's code page (-I ignores PYTHONIOENCODING; paths hold the
 # Windows user name, and the text can hold any character).
-try: sys.stdin.reconfigure(encoding="utf-8", errors="replace")
-except Exception: pass
+_requests_fd = os.dup(0)
+_nul = os.open(os.devnull, os.O_RDONLY); os.dup2(_nul, 0); os.close(_nul)
+def request_lines():
+    if os.name != "nt":
+        with os.fdopen(_requests_fd, "r", encoding="utf-8", errors="replace") as f:
+            yield from f
+        return
+    import msvcrt, _winapi
+    handle, buf = msvcrt.get_osfhandle(_requests_fd), b""
+    while True:
+        try: waiting = _winapi.PeekNamedPipe(handle, 0)[0]
+        except OSError: break  # the app closed the pipe
+        if not waiting:
+            time.sleep(0.02); continue
+        buf += os.read(_requests_fd, waiting)
+        while b"\n" in buf:
+            line, buf = buf.split(b"\n", 1)
+            yield line.decode("utf-8", "replace")
+    if buf.strip(): yield buf.decode("utf-8", "replace")
 def reader():
-    for line in sys.stdin:
+    for line in request_lines():
         line = line.strip()
         if not line: continue
         try: req = json.loads(line)

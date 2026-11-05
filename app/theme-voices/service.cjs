@@ -97,23 +97,24 @@ class ThemeVoices extends EventEmitter{
    if(!(await this.settings()).mode&&chosen)await this.saveSettings({mode:chosen});
    this.installJob.progress={phase:'check',label:'Making a test voice'};this.emit('install',this.installJob.progress);
    await this.closeWorker(); // the check runs on the engine just installed
-   const check=await this.check();
+   const check=await this.check({signal:ctl.signal}); // Stop installing stops this step too (v2.37.1)
    this.emit('install',{phase:'done',label:'Theme voices are ready',check});return {ok:true,check};
   }catch(e){
-   const out=e.name==='AbortError'?'Installation stopped. What was downloaded is kept, so it carries on from there next time.':e.message;
+   const out=e.name==='AbortError'?'Installation stopped. What was downloaded is kept, so it carries on from there next time.':
+    ctl.signal.aborted&&e.code==='cancelled'?'Stopped before the test voice. Everything is installed: press Run a voice check to try it.':e.message;
    this.lastInstallError={message:out,at:Date.now()};this.emit('install',{phase:'failed',label:out});throw Object.assign(Error(out),{code:e.code});
   }
   finally{this.installJob=null;this.emitStatus();}
  }
  cancelInstall(){this.installJob?.ctl.abort();}
  /** A real voice from the installed engine: the installer's last step, and Settings → Test. */
- async check(){
+ async check({signal}={}){
   const st=this.installer.status(),s=await this.settings(),have=Object.keys(st.models||{}).filter(k=>st.models[k]);
   const mode=s.mode&&st.models?.[MODES[s.mode].model]?s.mode:have[0]||s.mode||'quality';
   const theme=this.voices.get('cs16')?.refPath?'cs16':THEMES.find(t=>this.voices.get(t)?.refPath);
   const started=Date.now();let result;
-  try{result=await this.generate({text:CHECK_LINE,theme,mode,noCache:true,purpose:'check'});}
-  catch(e){this.installer.saveCheck({ok:false,error:e.message,code:e.code||null,at:Date.now()});throw e;}
+  try{result=await this.generate({text:CHECK_LINE,theme,mode,noCache:true,purpose:'check',signal});}
+  catch(e){if(e.code!=='cancelled')this.installer.saveCheck({ok:false,error:e.message,code:e.code||null,at:Date.now()});throw e;}
   const c={ok:true,at:Date.now(),mode,device:result.device||this.loaded?.device,engine:this.loaded?.engine||ThemeVoices.engineOf(st.runtime),seconds:result.seconds,ms:result.ms,totalMs:Date.now()-started,rtf:+(result.ms/1000/Math.max(.1,result.seconds)).toFixed(2),voice:theme};
   this.installer.saveCheck(c);return c;
  }
@@ -211,13 +212,17 @@ class ThemeVoices extends EventEmitter{
  cancelJob(entry){
   const i=this.queue.indexOf(entry);
   if(i>=0){this.queue.splice(i,1);entry.reject(Object.assign(Error('Stopped.'),{code:'cancelled'}));this.emitStatus();return;}
-  if(this.active===entry){entry.cancelled=true;if(entry.workerId&&this.worker)this.worker.cancel(entry.workerId);}
+  if(this.active===entry){entry.cancelled=true;
+   if(entry.workerId&&this.worker)this.worker.cancel(entry.workerId);
+   // Still starting the engine or loading the model: close it, so Stop takes effect now (v2.37.1).
+   else if(this.worker){const w=this.worker;this.worker=null;this.loaded=null;w.kill();this.emitStatus();}}
  }
  async pump(){
   if(this.active||!this.queue.length)return;
   const job=this.queue.shift();this.active=job;this.emitStatus();clearTimeout(this.idleTimer);
   try{job.resolve(await this.run(job));this.lastError=null;}
-  catch(e){this.lastError={message:e.message,code:e.code||null,at:Date.now()};job.reject(e);}
+  catch(e){if(job.cancelled&&e.code!=='cancelled')e=Object.assign(Error('Stopped.'),{code:'cancelled'}); // stopped while the engine was loading
+   if(e.code!=='cancelled')this.lastError={message:e.message,code:e.code||null,at:Date.now()};job.reject(e);}
   finally{this.active=null;this.emitStatus();this.scheduleIdle(await this.settings());if(this.queue.length)setImmediate(()=>void this.pump());}
  }
  async run(job){
