@@ -1,0 +1,48 @@
+{
+ "format": 1,
+ "backend": "qwen3-tts-12hz-base",
+ "profileVersion": 1,
+ "theme": "gmod",
+ "name": "Dr. Kleiner",
+ "voiceTarget": "Dr. Kleiner (Half-Life 2)",
+ "relationship": "Garry's Mod-associated character",
+ "direction": "Nervous, enthusiastic scientist delivery. The source is Half-Life 2; this is not a Garry's Mod UI announcer.",
+ "language": "English",
+ "status": "pending",
+ "statusNote": "",
+ "transcriptSource": "Machine transcript (Whisper small.en), corrected by hand where it clearly misheard; not checked by listening.",
+ "sources": [
+  {
+   "file": "kl_credit.wav",
+   "source": "sourcesounds/hl2 sound/vo/k_lab/kl_credit.wav",
+   "url": "https://raw.githubusercontent.com/sourcesounds/hl2/master/sound/vo/k_lab/kl_credit.wav",
+   "sha256": "891b29b4eba48dcbe9bdc23bbe7dab0036a48994faf33aab12be09032b74b851"
+  },
+  {
+   "file": "kl_debeaked.wav",
+   "source": "sourcesounds/hl2 sound/vo/k_lab/kl_debeaked.wav",
+   "url": "https://raw.githubusercontent.com/sourcesounds/hl2/master/sound/vo/k_lab/kl_debeaked.wav",
+   "sha256": "863ac7a6ca9d7183f40a98a6bf4b16f8b2d6f1f5f5d75118ec739bf24dd410a8"
+  },
+  {
+   "file": "kl_coaxherout.wav",
+   "source": "sourcesounds/hl2 sound/vo/k_lab/kl_coaxherout.wav",
+   "url": "https://raw.githubusercontent.com/sourcesounds/hl2/master/sound/vo/k_lab/kl_coaxherout.wav",
+   "sha256": "7f07e05101e6f00d6fca8768a38d3a09500f604bb0483c981478a46408d942de"
+  }
+ ],
+ "effects": null,
+ "reference": "reference.flac",
+ "transcript": "Well, I can't take all the credit. Dr. Freeman proved an able assistant. Certainly not. Never fear, Gordon. She's de-beaked and completely harmless. Oh, fine. It'll be another week before I can coax her out of there.",
+ "referenceSeconds": 14.65,
+ "sample": {
+  "phrase": "Bon voyage, and best of luck in your future endeavors.",
+  "file": "sample.flac",
+  "source": {
+   "file": "kl_bonvoyage.wav",
+   "source": "sourcesounds/hl2 sound/vo/k_lab/kl_bonvoyage.wav",
+   "url": "https://raw.githubusercontent.com/sourcesounds/hl2/master/sound/vo/k_lab/kl_bonvoyage.wav",
+   "sha256": "7f2c04af6050e4f871f69eea4c5c9b0b34b0af79fdff298cbb5be1b7f3849952"
+  }
+ }
+}

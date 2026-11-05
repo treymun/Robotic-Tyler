@@ -5,3 +5,5 @@ tools/preview/out/
 windows-audio-bridge/publish/
 windows-audio-bridge/bin/
 windows-audio-bridge/obj/
+__pycache__/
+*.pyc

@@ -1,0 +1,78 @@
+{
+ "format": 1,
+ "backend": "qwen3-tts-12hz-base",
+ "profileVersion": 1,
+ "theme": "cs2",
+ "name": "SAS operator",
+ "voiceTarget": "SAS operator",
+ "relationship": "Direct game operator",
+ "direction": "British tactical delivery; preserve the chosen operator, not a mixture of all agents.",
+ "language": "English",
+ "status": "pending",
+ "statusNote": "",
+ "transcriptSource": "Machine transcript (Whisper small.en), corrected by hand where it clearly misheard; not checked by listening.",
+ "sources": [
+  {
+   "file": "bombsiteclear02.wav",
+   "source": "Source2Sounds/cs2 sounds/vo/agents/sas/bombsiteclear02.wav",
+   "url": "https://raw.githubusercontent.com/Source2Sounds/cs2/main/sounds/vo/agents/sas/bombsiteclear02.wav",
+   "sha256": "f653256ec742a461acec31870f753cb6d0abe492d95efacc4dd311165f6439e4"
+  },
+  {
+   "file": "bombtickingdown01.wav",
+   "source": "Source2Sounds/cs2 sounds/vo/agents/sas/bombtickingdown01.wav",
+   "url": "https://raw.githubusercontent.com/Source2Sounds/cs2/main/sounds/vo/agents/sas/bombtickingdown01.wav",
+   "sha256": "5cbce1cf078a0b86f698b7525b033209fc3157d706117cbeaa0f4f61a29d83fb"
+  },
+  {
+   "file": "bombtickingdown02.wav",
+   "source": "Source2Sounds/cs2 sounds/vo/agents/sas/bombtickingdown02.wav",
+   "url": "https://raw.githubusercontent.com/Source2Sounds/cs2/main/sounds/vo/agents/sas/bombtickingdown02.wav",
+   "sha256": "42f50e6d922fe4c57f49298fdca17394c71732b8a24c7d9a2b60f7c54524c20e"
+  },
+  {
+   "file": "coverme03.wav",
+   "source": "Source2Sounds/cs2 sounds/vo/agents/sas/coverme03.wav",
+   "url": "https://raw.githubusercontent.com/Source2Sounds/cs2/main/sounds/vo/agents/sas/coverme03.wav",
+   "sha256": "c3fbba14dd35e45de9aa385d27e84ae8259919600b8b6ae92903211de8d65684"
+  },
+  {
+   "file": "ctmap_cs_source134.wav",
+   "source": "Source2Sounds/cs2 sounds/vo/agents/sas/ctmap_cs_source134.wav",
+   "url": "https://raw.githubusercontent.com/Source2Sounds/cs2/main/sounds/vo/agents/sas/ctmap_cs_source134.wav",
+   "sha256": "95199a4a26e2186ad88c234b0b4ef698a42fe28597fe80ecec9e98eda989f121"
+  },
+  {
+   "file": "ctmap_cs_source140.wav",
+   "source": "Source2Sounds/cs2 sounds/vo/agents/sas/ctmap_cs_source140.wav",
+   "url": "https://raw.githubusercontent.com/Source2Sounds/cs2/main/sounds/vo/agents/sas/ctmap_cs_source140.wav",
+   "sha256": "e2d10c194ab1a7791a0dc56ff60819b2ff25d965f025658bf35f058e1eee46ad"
+  },
+  {
+   "file": "bombtickingdown05.wav",
+   "source": "Source2Sounds/cs2 sounds/vo/agents/sas/bombtickingdown05.wav",
+   "url": "https://raw.githubusercontent.com/Source2Sounds/cs2/main/sounds/vo/agents/sas/bombtickingdown05.wav",
+   "sha256": "6930aa397cb904241cef8ac066e3774f3c0681fdd92c4b581c1361c2eaf1cc40"
+  },
+  {
+   "file": "bombsiteclear03.wav",
+   "source": "Source2Sounds/cs2 sounds/vo/agents/sas/bombsiteclear03.wav",
+   "url": "https://raw.githubusercontent.com/Source2Sounds/cs2/main/sounds/vo/agents/sas/bombsiteclear03.wav",
+   "sha256": "7915768ef128bc4f91fb47f3e96ee95347ea9c955083e85ac6bdbc02b4d57d8c"
+  }
+ ],
+ "effects": null,
+ "reference": "reference.flac",
+ "transcript": "The bombsite is secure, lads. That bomb's still ticking, boys. We need to defuse that bomb. Hold up, son, cover me. Checking the sniper box. Checking the top of mid. That bomb's ticking down. Bombsite under control.",
+ "referenceSeconds": 13.93,
+ "sample": {
+  "phrase": "That bomb's not gonna defuse itself now.",
+  "file": "sample.flac",
+  "source": {
+   "file": "bombtickingdown04.wav",
+   "source": "Source2Sounds/cs2 sounds/vo/agents/sas/bombtickingdown04.wav",
+   "url": "https://raw.githubusercontent.com/Source2Sounds/cs2/main/sounds/vo/agents/sas/bombtickingdown04.wav",
+   "sha256": "6b3f9baa0ab873f8ba5a2e4bfb24ca1cbc622b071c898045245a474dcdc142a5"
+  }
+ }
+}

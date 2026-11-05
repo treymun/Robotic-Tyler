@@ -7,4 +7,7 @@ contextBridge.exposeInMainWorld('tylerSettings',{activity:()=>ipcRenderer.invoke
  remote:(op,extra={})=>ipcRenderer.invoke('tyler:settings',{...extra,action:'remote',op}),
  // v2.26: the theme changed somewhere else (the phone remote), so this window follows it.
  onTheme:fn=>{ipcRenderer.on('tyler:theme',(_event,theme)=>fn(theme));},
+ // Settings → Theme voices (v2.35): install, repair and remove the local voice engine, voices and tests.
+ voices:(op,extra={})=>ipcRenderer.invoke('tyler:settings',{...extra,action:'voices',op}),
+ onVoices:fn=>{ipcRenderer.on('tyler:voices',(_event,e)=>fn(e));},
  voice:{devices:()=>ipcRenderer.invoke('tyler:settings',{action:'voice-devices'}),tone:device=>ipcRenderer.invoke('tyler:settings',{action:'voice-tone',device}),test:({engine,values})=>ipcRenderer.invoke('tyler:settings',{action:'voice-test',engine,values})}});

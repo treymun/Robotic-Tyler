@@ -1,0 +1,66 @@
+{
+ "format": 1,
+ "backend": "qwen3-tts-12hz-base",
+ "profileVersion": 1,
+ "theme": "doom",
+ "name": "VEGA",
+ "voiceTarget": "VEGA (DOOM 2016)",
+ "relationship": "Same-franchise adaptation",
+ "direction": "Controlled, deep digital assistant delivery. Label the DOOM 2016 source; do not call it original DOOM 1993 speech.",
+ "language": "English",
+ "status": "pending",
+ "statusNote": "",
+ "transcriptSource": "Machine transcript (Whisper small.en), corrected by hand where it clearly misheard; not checked by listening.",
+ "sources": [
+  {
+   "file": "146142310.ogg",
+   "source": "Vega/Main/Areas/146142310.ogg",
+   "url": "https://sounds.spriters-resource.com/media/assets/443/446076.zip?updated=1755554204",
+   "sha256": "3aa48ad12bfabd848eb7c62db1f6778c51a704501ecebe3c65e2b23fc8fa2a9b"
+  },
+  {
+   "file": "1014396775.ogg",
+   "source": "Vega/Main/Areas/1014396775.ogg",
+   "url": "https://sounds.spriters-resource.com/media/assets/443/446076.zip?updated=1755554204",
+   "sha256": "732e3810ac70bff99fde3abee2941f9e062095fe8c36a145e40a6e653d917618"
+  },
+  {
+   "file": "1027304741.ogg",
+   "source": "Vega/Main/Areas/1027304741.ogg",
+   "url": "https://sounds.spriters-resource.com/media/assets/443/446076.zip?updated=1755554204",
+   "sha256": "149c41da7ce1ac92728554a0f6dc25b744e778a186db9bcbeb35eacb913630cd"
+  },
+  {
+   "file": "117571590.ogg",
+   "source": "Vega/Main/Areas/117571590.ogg",
+   "url": "https://sounds.spriters-resource.com/media/assets/443/446076.zip?updated=1755554204",
+   "sha256": "894d835704d986f5969bc1ee3132fe0e1ddadeeaeda293915cbc1e93fd93f86f"
+  },
+  {
+   "file": "116125754.ogg",
+   "source": "Vega/Main/Areas/116125754.ogg",
+   "url": "https://sounds.spriters-resource.com/media/assets/443/446076.zip?updated=1755554204",
+   "sha256": "36b996a964e6afe83551862f8f4123cfc1b01daefd7648310213db43732ed535"
+  },
+  {
+   "file": "256360374.ogg",
+   "source": "Vega/Main/Areas/256360374.ogg",
+   "url": "https://sounds.spriters-resource.com/media/assets/443/446076.zip?updated=1755554204",
+   "sha256": "a3e8bef5caba15aac12de9ce73d52e8cc36155278fb04a1f1799e88894935fe0"
+  }
+ ],
+ "effects": null,
+ "reference": "reference.flac",
+ "transcript": "Welcome to Mars City, Union Aerospace's premier research facility. Electromagnetic Chamber. Research Complex. Teleportation Chamber. Facility Operations. Satellite Communications.",
+ "referenceSeconds": 16.03,
+ "sample": {
+  "phrase": "Reactor Core.",
+  "file": "sample.flac",
+  "source": {
+   "file": "1056317482.ogg",
+   "source": "Vega/Main/Areas/1056317482.ogg",
+   "url": "https://sounds.spriters-resource.com/media/assets/443/446076.zip?updated=1755554204",
+   "sha256": "3c505eb47baeb280984ec4de3b75fb7fe530852b0af1a104c76eb8f2dbfbe643"
+  }
+ }
+}

@@ -1,0 +1,48 @@
+{
+ "format": 1,
+ "backend": "qwen3-tts-12hz-base",
+ "profileVersion": 1,
+ "theme": "payday",
+ "name": "Bain",
+ "voiceTarget": "Bain",
+ "relationship": "Direct game character",
+ "direction": "Urgent, practical coordination over comms. Review source lines for consistent radio processing and game era.",
+ "language": "English",
+ "status": "weak",
+ "statusNote": "Only about 4 seconds of different Bain lines were available (most clips are the same line), so this clone is weak. Replace the reference with a longer Bain recording for a closer match.",
+ "transcriptSource": "Machine transcript (Whisper small.en), corrected by hand where it clearly misheard; not checked by listening.",
+ "sources": [
+  {
+   "file": "encryption_agile.wav",
+   "source": "Sideloader/TNHBainAnnouncer.hotmod!/encryption_agile.wav",
+   "url": "https://thunderstore.io/package/download/Buds/Bain_TNH_Announcer/1.0.2/",
+   "sha256": "88928885e831aaeca58a5d03b719d9a459d8931f68ba0c996e7fc7f2f978529d"
+  },
+  {
+   "file": "encryption_unk_1.wav",
+   "source": "Sideloader/TNHBainAnnouncer.hotmod!/encryption_unk_1.wav",
+   "url": "https://thunderstore.io/package/download/Buds/Bain_TNH_Announcer/1.0.2/",
+   "sha256": "54e7f8e3a5450105f16170abf643b0727abe30407a3e305feaa1c08a365205fb"
+  },
+  {
+   "file": "encryption_hardened.wav",
+   "source": "Sideloader/TNHBainAnnouncer.hotmod!/encryption_hardened.wav",
+   "url": "https://thunderstore.io/package/download/Buds/Bain_TNH_Announcer/1.0.2/",
+   "sha256": "f7251b75651c63c86ba86366653a1d55ba5ee20f1cbd18460b4d036e46724f15"
+  }
+ ],
+ "effects": null,
+ "reference": "reference.flac",
+ "transcript": "You know your job! Keep them back! Keep it under control! They're bringing in armored units!",
+ "referenceSeconds": 4.89,
+ "sample": {
+  "phrase": "You're in the clear.",
+  "file": "sample.flac",
+  "source": {
+   "file": "game_endline.wav",
+   "source": "Sideloader/TNHBainAnnouncer.hotmod!/game_endline.wav",
+   "url": "https://thunderstore.io/package/download/Buds/Bain_TNH_Announcer/1.0.2/",
+   "sha256": "f5d60ad7c6458071ee0bc01aaa4ebaad02830f74d4af1ad2e7f71269cd401738"
+  }
+ }
+}

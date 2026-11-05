@@ -1,0 +1,48 @@
+{
+ "format": 1,
+ "backend": "qwen3-tts-12hz-base",
+ "profileVersion": 1,
+ "theme": "xmb",
+ "name": "LittleBigPlanet narrator",
+ "voiceTarget": "LittleBigPlanet narrator",
+ "relationship": "PlayStation 3-era character association",
+ "direction": "Warm British narration with a restrained, polished presentation. Keep actor/version attribution limited to what the source establishes.",
+ "language": "English",
+ "status": "pending",
+ "statusNote": "",
+ "transcriptSource": "Machine transcript (Whisper small.en), corrected by hand where it clearly misheard; not checked by listening.",
+ "sources": [
+  {
+   "file": "sacknarr_vo_intro2.wav",
+   "source": "LittleBigPlanet Narrator (English)/sacknarr_vo_intro2.wav",
+   "url": "https://sounds.spriters-resource.com/media/assets/593/614427.zip?updated=1790974806",
+   "sha256": "199235006f394291dc6d23bccd28d23f390ef9611ceafb49ba76567d710101a9"
+  },
+  {
+   "file": "sacknarr_vo_intro4.wav",
+   "source": "LittleBigPlanet Narrator (English)/sacknarr_vo_intro4.wav",
+   "url": "https://sounds.spriters-resource.com/media/assets/593/614427.zip?updated=1790974806",
+   "sha256": "ac4a3b40c4585d57f9a43b681e6de504514adcfef2acffd3ce3d2a374306841d"
+  },
+  {
+   "file": "sacknarr_vo_victory3.wav",
+   "source": "LittleBigPlanet Narrator (English)/sacknarr_vo_victory3.wav",
+   "url": "https://sounds.spriters-resource.com/media/assets/593/614427.zip?updated=1790974806",
+   "sha256": "045153fde2dcd13a4a0f49f0fae55cd3b82a2c61474703ca88c8d3c956034393"
+  }
+ ],
+ "effects": null,
+ "reference": "reference.flac",
+ "transcript": "Sackboy is no stranger to building brave new worlds. Dab hand at it, that lad. Sackboy and adventure go together like ice cream and wasps. Inseparable. Unpredictable. What you've built here today will be remembered long after this sentence has ended.",
+ "referenceSeconds": 16.59,
+ "sample": {
+  "phrase": "What in the blue blazes has Sackboy blundered into now? Oh my!",
+  "file": "sample.flac",
+  "source": {
+   "file": "sacknarr_vo_intro1.wav",
+   "source": "LittleBigPlanet Narrator (English)/sacknarr_vo_intro1.wav",
+   "url": "https://sounds.spriters-resource.com/media/assets/593/614427.zip?updated=1790974806",
+   "sha256": "7219c48d9c00c52b37808513a4f236f3db069b5041ce654a55b646e1985997d4"
+  }
+ }
+}

@@ -1,0 +1,84 @@
+{
+ "format": 1,
+ "backend": "qwen3-tts-12hz-base",
+ "profileVersion": 1,
+ "theme": "x360",
+ "name": "Halo 3 announcer",
+ "voiceTarget": "Halo 3 multiplayer announcer",
+ "relationship": "Xbox 360-era game association",
+ "direction": "Deep, confident multiplayer announcements. Keep the original concise pacing without extreme pitch effects.",
+ "language": "English",
+ "status": "pending",
+ "statusNote": "",
+ "transcriptSource": "Machine transcript (Whisper small.en), corrected by hand where it clearly misheard; not checked by listening.",
+ "sources": [
+  {
+   "file": "bomb_detonated.wav",
+   "source": "Multiplayer (English)/assault/bomb_detonated.wav",
+   "url": "https://sounds.spriters-resource.com/media/assets/402/405491.zip?updated=1755534535",
+   "sha256": "cf6c2fcfff116f440a1b0a06e292ea231094f428066849c95d56cfee9b5a0d47"
+  },
+  {
+   "file": "flag_taken.wav",
+   "source": "Multiplayer (English)/capture_the_flag/flag_taken.wav",
+   "url": "https://sounds.spriters-resource.com/media/assets/402/405491.zip?updated=1755534535",
+   "sha256": "fb9c42b1aadf329753c105d84f4ae7a601cdecb36561e76e8ea139b4f3ceb231"
+  },
+  {
+   "file": "flag_recovered.wav",
+   "source": "Multiplayer (English)/capture_the_flag/flag_recovered.wav",
+   "url": "https://sounds.spriters-resource.com/media/assets/402/405491.zip?updated=1755534535",
+   "sha256": "1fd229878ef82fedfe7deeae8bac7d0db3e21bd5c57188acd2c8ab71d9febf09"
+  },
+  {
+   "file": "flag_reset.wav",
+   "source": "Multiplayer (English)/capture_the_flag/flag_reset.wav",
+   "url": "https://sounds.spriters-resource.com/media/assets/402/405491.zip?updated=1755534535",
+   "sha256": "0ef9b58dd5e1694019f5b346531abe87d6425254fbb19bc5ac018d507aa6c084"
+  },
+  {
+   "file": "bomb_taken.wav",
+   "source": "Multiplayer (English)/assault/bomb_taken.wav",
+   "url": "https://sounds.spriters-resource.com/media/assets/402/405491.zip?updated=1755534535",
+   "sha256": "4449042a0bdcb0a7da089f04425caff840865c74716957ea121bc3a69836c4b3"
+  },
+  {
+   "file": "flag_captured.wav",
+   "source": "Multiplayer (English)/capture_the_flag/flag_captured.wav",
+   "url": "https://sounds.spriters-resource.com/media/assets/402/405491.zip?updated=1755534535",
+   "sha256": "01fed51429326501c51a76f7b258be1b5526f4206ed2cfcd9904482bc55a6d44"
+  },
+  {
+   "file": "bomb_disarmed.wav",
+   "source": "Multiplayer (English)/assault/bomb_disarmed.wav",
+   "url": "https://sounds.spriters-resource.com/media/assets/402/405491.zip?updated=1755534535",
+   "sha256": "db1377d0a2b26974eefdb4093d77c8cd0cdd8bf969f094276c14a955957e5b97"
+  },
+  {
+   "file": "capture_the_flag.wav",
+   "source": "Multiplayer (English)/capture_the_flag/capture_the_flag.wav",
+   "url": "https://sounds.spriters-resource.com/media/assets/402/405491.zip?updated=1755534535",
+   "sha256": "932f3c33e61a6c0f98e115374e1851890165be6ffe3203231d915cf43ef0f71d"
+  },
+  {
+   "file": "juggernaut_spree.wav",
+   "source": "Multiplayer (English)/flavor/juggernaut_spree.wav",
+   "url": "https://sounds.spriters-resource.com/media/assets/402/405491.zip?updated=1755534535",
+   "sha256": "95644075dbf403669ab6d0732831629e707e22008db22ea1b15c2522706257b5"
+  }
+ ],
+ "effects": null,
+ "reference": "reference.flac",
+ "transcript": "Bomb detonated. Flag taken. Flag recovered. Flag reset. Bomb taken. Flag captured. Bomb disarmed. Capture the flag! Juggernaut spree.",
+ "referenceSeconds": 16.34,
+ "sample": {
+  "phrase": "Double kill!",
+  "file": "sample.flac",
+  "source": {
+   "file": "double_kill.wav",
+   "source": "Multiplayer (English)/flavor/double_kill.wav",
+   "url": "https://sounds.spriters-resource.com/media/assets/402/405491.zip?updated=1755534535",
+   "sha256": "b2b9cd1a8229f1ca51c69eae91589b3b4bb5c0e330481cde8d012ce61c3b3a68"
+  }
+ }
+}

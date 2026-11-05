@@ -1,0 +1,279 @@
+# ROBOTIC TYLER theme voices: the local voice worker (v2.35).
+#
+# The desktop app starts this with its own isolated Python (the "engine" it installed and verified) and
+# talks to it only through stdin/stdout, one JSON object per line. There is no network listener and
+# nothing here downloads anything: the app checks every file first, and this only reads the model
+# folder and the voice references it is told about.
+#
+# Requests:  {"id": 7, "op": "hello"|"load"|"unload"|"prompt"|"speak"|"cancel"|"quit", ...}
+# Replies:   {"id": 7, "ok": true, ...} or {"id": 7, "ok": false, "code": "...", "error": "..."}
+# Events:    {"id": 7, "event": "progress", "chunk": 1, "chunks": 3, "step": 40, "steps": 120}
+#
+# Voice data that is cached (the reference's speech codes and speaker embedding) is written as
+# safetensors, which holds only tensors and text, never code. Nothing is ever loaded with pickle.
+import sys, os, json, threading, queue, time, hashlib, re, gc, traceback, math
+# The app starts Python isolated (-I -S) and names the engine's own package folder here, so no other
+# Python install on this PC can leak in.
+if "--site" in sys.argv:
+    import site; site.addsitedir(sys.argv[sys.argv.index("--site") + 1])
+os.environ.setdefault("HF_HUB_OFFLINE", "1"); os.environ.setdefault("TRANSFORMERS_OFFLINE", "1")
+os.environ.setdefault("HF_HUB_DISABLE_TELEMETRY", "1"); os.environ.setdefault("TOKENIZERS_PARALLELISM", "false")
+
+PROTOCOL = 1
+# The protocol gets its own copy of stdout; anything a library prints (to Python's stdout or straight
+# from C code) goes to stderr instead, so it can never corrupt a reply.
+proto = os.fdopen(os.dup(1), "w", buffering=1, encoding="utf-8", newline="\n")
+os.dup2(2, 1); sys.stdout = sys.stderr
+out_lock = threading.Lock()
+def send(obj):
+    with out_lock:
+        proto.write(json.dumps(obj, ensure_ascii=False) + "\n"); proto.flush()
+
+class Failure(Exception):
+    def __init__(self, code, message): super().__init__(message); self.code = code
+
+# ── requests are read on their own thread, so "cancel" works while a voice is being made ──
+requests = queue.Queue(); cancelled = set(); current = {"id": None}
+def reader():
+    for line in sys.stdin:
+        line = line.strip()
+        if not line: continue
+        try: req = json.loads(line)
+        except Exception: send({"id": None, "ok": False, "code": "bad_request", "error": "Not JSON."}); continue
+        if req.get("op") == "cancel":
+            cancelled.add(req.get("target")); send({"id": req.get("id"), "ok": True}); continue
+        requests.put(req)
+    requests.put({"op": "quit", "id": None})
+threading.Thread(target=reader, daemon=True).start()
+
+torch = None; np = None; sf = None; model = None; model_info = {}; prompts = {}
+
+def imports():
+    global torch, np, sf
+    if torch is None:
+        import torch as t, numpy as n, soundfile as s
+        torch, np, sf = t, n, s
+
+def hello(req):
+    imports()
+    info = {"protocol": PROTOCOL, "python": sys.version.split()[0], "torch": torch.__version__, "cuda": bool(torch.cuda.is_available()), "threads": torch.get_num_threads()}
+    if info["cuda"]:
+        p = torch.cuda.get_device_properties(0); free, total = torch.cuda.mem_get_info(0)
+        info.update(device=p.name, capability=f"{p.major}.{p.minor}", vram_total=total, vram_free=free, bf16=bool(torch.cuda.is_bf16_supported()), cuda_version=torch.version.cuda)
+    try:
+        import qwen_tts, transformers; info.update(qwen_tts=getattr(qwen_tts, "__version__", "0.1.1"), transformers=transformers.__version__)
+    except Exception as e: info["import_error"] = str(e)[:300]
+    return info
+
+def unload(req=None):
+    global model, model_info
+    had = model is not None
+    model = None; model_info = {}; prompts.clear(); gc.collect()
+    if torch is not None and torch.cuda.is_available(): torch.cuda.empty_cache()
+    return {"unloaded": had}
+
+def load(req):
+    global model, model_info
+    imports()
+    want = {"dir": req["model_dir"], "device": req.get("device", "cpu"), "dtype": req.get("dtype", "auto")}
+    if model is not None and all(model_info.get(k) == v for k, v in want.items()): return {**model_info, "already": True}
+    unload()
+    from qwen_tts import Qwen3TTSModel
+    device = want["device"]
+    if device == "cuda" and not torch.cuda.is_available(): raise Failure("no_gpu", "The graphics card isn't available to the voice engine.")
+    dtype = want["dtype"]
+    if dtype == "auto": dtype = "bf16" if device == "cuda" and torch.cuda.is_bf16_supported() else ("fp16" if device == "cuda" else "fp32")
+    tdtype = {"bf16": torch.bfloat16, "fp16": torch.float16, "fp32": torch.float32}[dtype]
+    if device == "cpu": torch.set_num_threads(max(1, int(req.get("threads") or max(1, (os.cpu_count() or 2) - 1))))
+    t0 = time.time()
+    try:
+        model = Qwen3TTSModel.from_pretrained(want["dir"], device_map=("cuda:0" if device == "cuda" else "cpu"), dtype=tdtype, attn_implementation="sdpa")
+    except torch.cuda.OutOfMemoryError:
+        unload(); raise Failure("out_of_memory", "Not enough free graphics memory to load the voice model.")
+    if model.model.tts_model_type != "base": unload(); raise Failure("not_clone_model", "That model can't clone voices (it isn't a Base model).")
+    hook_talker()
+    model_info = {**want, "dtype_used": dtype, "load_ms": int((time.time() - t0) * 1000)}
+    if device == "cuda": model_info["vram_used"] = int(torch.cuda.memory_allocated(0))
+    return model_info
+
+# Cancel and progress: the talker's generate() gets a stopping check that runs once per audio frame
+# (12.5 frames a second of speech), which reports progress and stops at once when cancelled.
+class Progress:
+    job = None; steps = 0; max = 0; chunk = 0; chunks = 0; last = 0
+step = Progress()
+def hook_talker():
+    from transformers import StoppingCriteria, StoppingCriteriaList
+    class Check(StoppingCriteria):
+        def __call__(self, input_ids, scores, **kw):
+            step.steps += 1; now = time.time()
+            if step.job is not None and now - step.last > 0.5:
+                step.last = now; send({"id": step.job, "event": "progress", "chunk": step.chunk, "chunks": step.chunks, "step": step.steps, "steps": step.max})
+            return torch.full((input_ids.shape[0],), step.job in cancelled, dtype=torch.bool, device=input_ids.device)
+    talker = model.model.talker; original = talker.generate
+    def generate(*a, **k):
+        k["stopping_criteria"] = StoppingCriteriaList([Check()]); return original(*a, **k)
+    talker.generate = generate
+
+def sha256(path):
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for b in iter(lambda: f.read(1 << 20), b""): h.update(b)
+    return h.hexdigest()
+
+def read_audio(path):
+    import librosa
+    w, sr = librosa.load(path, sr=24000, mono=True)
+    if len(w) < 24000 * 0.5: raise Failure("short_reference", "The voice's reference recording is shorter than half a second.")
+    return w.astype(np.float32), 24000
+
+def prompt_for(req):
+    """The voice's conditioning (its reference's speech codes and speaker embedding), built once and cached."""
+    if model is None: raise Failure("not_loaded", "The voice model isn't loaded.")
+    ref, text, cache = req["ref_audio"], (req.get("ref_text") or "").strip(), req.get("cache")
+    xvec = bool(req.get("xvector_only")) or not text
+    ref_hash = sha256(ref)
+    key = json.dumps([model_info["dir"], ref_hash, text, xvec])
+    if key in prompts: return prompts[key], True
+    from qwen_tts.inference.qwen3_tts_model import VoiceClonePromptItem
+    meta = {"format": "tyler-voice-prompt-1", "model": os.path.basename(model_info["dir"].rstrip("/\\")), "ref_sha256": ref_hash, "ref_text": text, "xvector_only": str(xvec)}
+    item = None
+    if cache and os.path.exists(cache):
+        try:
+            from safetensors import safe_open
+            with safe_open(cache, framework="pt", device="cpu") as f:
+                m = f.metadata() or {}
+                if all(m.get(k) == v for k, v in meta.items()):
+                    code = f.get_tensor("ref_code") if "ref_code" in f.keys() else None
+                    item = VoiceClonePromptItem(ref_code=None if xvec else code.to(model.device), ref_spk_embedding=f.get_tensor("spk").to(model.device), x_vector_only_mode=xvec, icl_mode=not xvec, ref_text=text or None)
+        except Exception: item = None
+    built = item is None
+    if built:
+        w, sr = read_audio(ref)
+        item = model.create_voice_clone_prompt(ref_audio=(w, sr), ref_text=text or None, x_vector_only_mode=xvec)[0]
+        if cache:
+            from safetensors.torch import save_file
+            tensors = {"spk": item.ref_spk_embedding.detach().float().cpu().contiguous()}
+            if item.ref_code is not None: tensors["ref_code"] = item.ref_code.detach().cpu().contiguous()
+            os.makedirs(os.path.dirname(cache), exist_ok=True); tmp = cache + ".tmp"
+            save_file(tensors, tmp, metadata=meta); os.replace(tmp, cache)
+    if len(prompts) > 8: prompts.pop(next(iter(prompts)))
+    prompts[key] = item
+    return item, not built
+
+def prompt(req):
+    _, cached = prompt_for(req); return {"cached": cached}
+
+# Long text is made one sentence group at a time (so Stop works between them and progress is real);
+# the text itself is spoken as written.
+def chunks(text, limit=220):
+    text = re.sub(r"\s+", " ", text).strip()
+    parts = re.findall(r"[^.!?…]+(?:[.!?…]+[\"')\]]*|$)\s*", text) or [text]
+    out, cur = [], ""
+    for p in parts:
+        while len(p) > limit:
+            cut = max(p.rfind(", ", 0, limit), p.rfind("; ", 0, limit)); cut = cut + 1 if cut > limit // 3 else max(p.rfind(" ", 0, limit), 1)
+            if cur: out.append(cur.strip()); cur = ""
+            out.append(p[:cut].strip()); p = p[cut:]
+        if len(cur) + len(p) > limit and cur: out.append(cur.strip()); cur = ""
+        cur += p
+    if cur.strip(): out.append(cur.strip())
+    return [c for c in out if c]
+
+def trim(w, sr, pad=0.06):
+    if not len(w): return w
+    frame = int(sr * 0.02); n = len(w) // frame
+    if n < 2: return w
+    e = np.sqrt(np.mean(w[: n * frame].reshape(n, frame) ** 2, axis=1) + 1e-12)
+    loud = np.where(20 * np.log10(e) > 20 * np.log10(e.max()) - 40)[0]
+    if not len(loud): return w
+    a = max(0, loud[0] * frame - int(pad * sr)); b = min(len(w), (loud[-1] + 1) * frame + int(pad * sr))
+    return w[a:b]
+
+def expected_seconds(text): return max(0.6, len(text) / 14.5)
+
+def speak(req):
+    if model is None: raise Failure("not_loaded", "The voice model isn't loaded.")
+    job = req["id"]; text = str(req.get("text") or "").strip()
+    if not text: raise Failure("empty", "There's nothing to say.")
+    item, _ = prompt_for(req)
+    language = req.get("language") or "English"; seed = int(req.get("seed") or 1)
+    pieces = chunks(text); sr_out = 24000; audio = []; t0 = time.time(); retries = 0
+    step.job, step.chunks = job, len(pieces)
+    try:
+        for i, piece in enumerate(pieces):
+            step.chunk = i + 1
+            exp = expected_seconds(piece); step.max = int(min(1600, math.ceil((exp * 2.6 + 2) * 12.5)))
+            best = None
+            for attempt in range(2):
+                if job in cancelled: raise Failure("cancelled", "Stopped.")
+                torch.manual_seed(seed + i * 101 + attempt * 7919); step.steps = 0
+                try:
+                    wavs, sr_out = model.generate_voice_clone(text=piece, language=language, voice_clone_prompt=[item], max_new_tokens=step.max)
+                except torch.cuda.OutOfMemoryError:
+                    raise Failure("out_of_memory", "The graphics card ran out of memory while speaking.")
+                if job in cancelled: raise Failure("cancelled", "Stopped.")
+                w = trim(np.asarray(wavs[0], dtype=np.float32), sr_out); dur = len(w) / sr_out
+                # A take far longer or shorter than the text needs is usually a stumble: try once more.
+                score = abs(math.log(max(dur, 0.05) / exp))
+                if best is None or score < best[0]: best = (score, w)
+                if 0.4 * exp <= dur <= 2.2 * exp: break
+                retries += 1
+            audio.append(best[1])
+    finally:
+        step.job = None; cancelled.discard(job)
+    gap = np.zeros(int(sr_out * 0.14), np.float32); joined = []
+    for k, w in enumerate(audio): joined += ([gap] if k else []) + [w]
+    w = np.concatenate(joined) if joined else np.zeros(1, np.float32)
+    dry = level(w); out = req["out"]; os.makedirs(os.path.dirname(out), exist_ok=True)
+    write(out, dry, sr_out)
+    result = {"out": out, "seconds": round(len(dry) / sr_out, 2), "ms": int((time.time() - t0) * 1000), "chunks": len(pieces), "retries": retries}
+    fx = req.get("effects")
+    if fx and req.get("out_fx"):
+        write(req["out_fx"], level(effects(dry, sr_out, fx)), sr_out); result["out_fx"] = req["out_fx"]
+    return result
+
+def level(w, target=-19.0, ceiling=-1.0):
+    """Same loudness for every voice (about −19 dBFS RMS), peaks kept under −1 dBFS."""
+    if not len(w) or not np.any(w): return w
+    rms = np.sqrt(np.mean(w ** 2)); g = 10 ** (target / 20) / max(rms, 1e-6)
+    w = w * g; peak = np.abs(w).max(); lim = 10 ** (ceiling / 20)
+    if peak > lim: w = np.tanh(w / lim * 0.9) / np.tanh(0.9) * lim if peak > lim * 1.6 else w * (lim / peak)
+    return w.astype(np.float32)
+
+def effects(w, sr, fx):
+    """Light processing after the voice is made, only for voices whose recordings have it (radio, mask…)."""
+    from scipy.signal import butter, sosfilt
+    y = w.copy()
+    if fx.get("highpass"): y = sosfilt(butter(4, float(fx["highpass"]), "highpass", fs=sr, output="sos"), y)
+    if fx.get("lowpass"): y = sosfilt(butter(4, min(float(fx["lowpass"]), sr / 2 - 100), "lowpass", fs=sr, output="sos"), y)
+    if fx.get("drive"): d = 1 + 6 * float(fx["drive"]); y = np.tanh(y * d) / np.tanh(d)
+    if fx.get("crush"):
+        bits = max(4, int(fx["crush"])); q = 2 ** (bits - 1); y = np.round(y * q) / q
+    if fx.get("ring"):
+        t = np.arange(len(y)) / sr; y = y * (1 - float(fx.get("ring_mix", .35))) + y * np.sin(2 * np.pi * float(fx["ring"]) * t) * float(fx.get("ring_mix", .35))
+    if fx.get("room"):
+        ir_len = int(sr * float(fx["room"])); decay = np.exp(-np.linspace(0, 6, ir_len)); rng = np.random.default_rng(3)
+        ir = rng.standard_normal(ir_len) * decay * 0.12; ir[0] = 1.0
+        from scipy.signal import fftconvolve
+        y = fftconvolve(y, ir)[: len(y) + ir_len // 2]
+    return y.astype(np.float32)
+
+def write(path, w, sr):
+    tmp = path + ".tmp.wav"; sf.write(tmp, np.clip(w, -1, 1), sr, subtype="PCM_16"); os.replace(tmp, path)
+
+OPS = {"hello": hello, "load": load, "unload": unload, "prompt": prompt, "speak": speak}
+send({"event": "ready", "protocol": PROTOCOL, "pid": os.getpid()})
+while True:
+    req = requests.get(); rid = req.get("id"); op = req.get("op")
+    if op == "quit": unload(); send({"id": rid, "ok": True, "event": "bye"}); break
+    fn = OPS.get(op)
+    if fn is None: send({"id": rid, "ok": False, "code": "unknown_op", "error": "Unknown request."}); continue
+    current["id"] = rid
+    try: send({"id": rid, "ok": True, **(fn(req) or {})})
+    except Failure as f: send({"id": rid, "ok": False, "code": f.code, "error": str(f)})
+    except MemoryError: unload(); send({"id": rid, "ok": False, "code": "out_of_memory", "error": "The computer ran out of memory for the voice model."})
+    except Exception as e:
+        code = "out_of_memory" if "out of memory" in str(e).lower() else "error"
+        if code == "out_of_memory": unload()
+        send({"id": rid, "ok": False, "code": code, "error": (type(e).__name__ + ": " + str(e))[:400], "trace": traceback.format_exc()[-1500:]})
+    finally: current["id"] = None

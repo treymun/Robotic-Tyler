@@ -1,0 +1,96 @@
+{
+ "format": 1,
+ "backend": "qwen3-tts-12hz-base",
+ "profileVersion": 1,
+ "theme": "combine",
+ "name": "Combine soldier",
+ "voiceTarget": "Combine soldier",
+ "relationship": "Direct game faction voice",
+ "direction": "Clipped tactical speech and the original mask/radio timbre. Keep Overwatch and Civil Protection as separate optional voices.",
+ "language": "English",
+ "status": "pending",
+ "statusNote": "",
+ "transcriptSource": "Transcripts are machine transcripts checked against the original file names (the radio filter makes them hard to hear).",
+ "sources": [
+  {
+   "file": "callcontactparasitics.wav",
+   "source": "sourcesounds/hl2 sound/npc/combine_soldier/vo/callcontactparasitics.wav",
+   "url": "https://raw.githubusercontent.com/sourcesounds/hl2/master/sound/npc/combine_soldier/vo/callcontactparasitics.wav",
+   "sha256": "414993fec64542ead05ce72a9db285820df24f121c1d2ffe17c5be864216b33c"
+  },
+  {
+   "file": "contactconfim.wav",
+   "source": "sourcesounds/hl2 sound/npc/combine_soldier/vo/contactconfim.wav",
+   "url": "https://raw.githubusercontent.com/sourcesounds/hl2/master/sound/npc/combine_soldier/vo/contactconfim.wav",
+   "sha256": "446a84bf9684c756a86c4ce8b3338faf774c35d9b01a7eacb4b64a034c3807f9"
+  },
+  {
+   "file": "extractorislive.wav",
+   "source": "sourcesounds/hl2 sound/npc/combine_soldier/vo/extractorislive.wav",
+   "url": "https://raw.githubusercontent.com/sourcesounds/hl2/master/sound/npc/combine_soldier/vo/extractorislive.wav",
+   "sha256": "23c296c128154830b26d22a2284845a7d0f2c496e390138dc0f6d6491eec30c0"
+  },
+  {
+   "file": "hasnegativemovement.wav",
+   "source": "sourcesounds/hl2 sound/npc/combine_soldier/vo/hasnegativemovement.wav",
+   "url": "https://raw.githubusercontent.com/sourcesounds/hl2/master/sound/npc/combine_soldier/vo/hasnegativemovement.wav",
+   "sha256": "d8e0a4a4776ee67295ff29bd68c0c2b7a1904367d531afaa553870b18a3fe9bb"
+  },
+  {
+   "file": "fixsightlinesmovein.wav",
+   "source": "sourcesounds/hl2 sound/npc/combine_soldier/vo/fixsightlinesmovein.wav",
+   "url": "https://raw.githubusercontent.com/sourcesounds/hl2/master/sound/npc/combine_soldier/vo/fixsightlinesmovein.wav",
+   "sha256": "be9bd0c184a5b736f72f4de564dd8b07550b256c9eeaed31a07dda8b63705421"
+  },
+  {
+   "file": "gosharpgosharp.wav",
+   "source": "sourcesounds/hl2 sound/npc/combine_soldier/vo/gosharpgosharp.wav",
+   "url": "https://raw.githubusercontent.com/sourcesounds/hl2/master/sound/npc/combine_soldier/vo/gosharpgosharp.wav",
+   "sha256": "4a83f7d07f21313cc76b6aae1a8d1589a8d868cd0dcd54c6fa087f4688c22f07"
+  },
+  {
+   "file": "hardenthatposition.wav",
+   "source": "sourcesounds/hl2 sound/npc/combine_soldier/vo/hardenthatposition.wav",
+   "url": "https://raw.githubusercontent.com/sourcesounds/hl2/master/sound/npc/combine_soldier/vo/hardenthatposition.wav",
+   "sha256": "a72e876e7804712f32f4271b73c027e92b525a9f3cd6d024b77f1c5a3001399b"
+  },
+  {
+   "file": "containmentproceeding.wav",
+   "source": "sourcesounds/hl2 sound/npc/combine_soldier/vo/containmentproceeding.wav",
+   "url": "https://raw.githubusercontent.com/sourcesounds/hl2/master/sound/npc/combine_soldier/vo/containmentproceeding.wav",
+   "sha256": "eb8eaee64ad51b9d0a132fee9a4f9a69881f6526b61f45f9028e799af3671fa7"
+  },
+  {
+   "file": "executingfullresponse.wav",
+   "source": "sourcesounds/hl2 sound/npc/combine_soldier/vo/executingfullresponse.wav",
+   "url": "https://raw.githubusercontent.com/sourcesounds/hl2/master/sound/npc/combine_soldier/vo/executingfullresponse.wav",
+   "sha256": "60549c3becad5e4087da24bdb550c305828b2ff068ced30b30b8619f3ac4aedb"
+  },
+  {
+   "file": "goactiveintercept.wav",
+   "source": "sourcesounds/hl2 sound/npc/combine_soldier/vo/goactiveintercept.wav",
+   "url": "https://raw.githubusercontent.com/sourcesounds/hl2/master/sound/npc/combine_soldier/vo/goactiveintercept.wav",
+   "sha256": "8b5a84e55941e04bf574350050ab1297cdcf15aca89f659a758ddcf98c6b01c9"
+  },
+  {
+   "file": "isatcode.wav",
+   "source": "sourcesounds/hl2 sound/npc/combine_soldier/vo/isatcode.wav",
+   "url": "https://raw.githubusercontent.com/sourcesounds/hl2/master/sound/npc/combine_soldier/vo/isatcode.wav",
+   "sha256": "5af3e42d15248df2de198c2357ac46ed801459ce3b935704b526abfa54a500e0"
+  }
+ ],
+ "effects": null,
+ "reference": "reference.flac",
+ "transcript": "Call contact parasitics. Contact confirmed. Extractor is live. Has negative movement. Fix sightlines, move in. Go sharp, go sharp. Harden that position. Containment proceeding. Executing full response. Go active intercept. Is at code.",
+ "referenceSeconds": 12.83,
+ "sample": {
+  "phrase": "Confirm sector not sterile.",
+  "file": "sample.flac",
+  "source": {
+   "file": "confirmsectornotsterile.wav",
+   "source": "sourcesounds/hl2 sound/npc/combine_soldier/vo/confirmsectornotsterile.wav",
+   "url": "https://raw.githubusercontent.com/sourcesounds/hl2/master/sound/npc/combine_soldier/vo/confirmsectornotsterile.wav",
+   "sha256": "cb0bebc01c95e1c411405f46aac26273925112e76ec68369504fb6463c9eef8a"
+  }
+ }
+}

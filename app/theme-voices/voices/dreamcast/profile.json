@@ -1,0 +1,48 @@
+{
+ "format": 1,
+ "backend": "qwen3-tts-12hz-base",
+ "profileVersion": 1,
+ "theme": "dreamcast",
+ "name": "Crazy Taxi DJ",
+ "voiceTarget": "Crazy Taxi DJ / announcer",
+ "relationship": "Dreamcast-era game association",
+ "direction": "Energetic arcade DJ delivery. Preserve the chosen announcer and avoid mixing customers or drivers.",
+ "language": "English",
+ "status": "pending",
+ "statusNote": "",
+ "transcriptSource": "Machine transcript (Whisper small.en), corrected by hand where it clearly misheard; not checked by listening.",
+ "sources": [
+  {
+   "file": "DJ24_04.wav",
+   "source": "DJ-Arcade/DJ24_04.wav",
+   "url": "https://sounds.spriters-resource.com/media/assets/405/407777.zip?updated=1755535689",
+   "sha256": "2ff51b0dd32ed6ebf061ed9f67da1e794a302e0a2586ee610ec33ef1f5fed2dd"
+  },
+  {
+   "file": "DJ30.wav",
+   "source": "DJ-Arcade/DJ30.wav",
+   "url": "https://sounds.spriters-resource.com/media/assets/405/407777.zip?updated=1755535689",
+   "sha256": "fb58ac792d71405e3b9e52d7c6d74fe060b15cad7236e980c2a06fb3ec4d1537"
+  },
+  {
+   "file": "DJ32_05.wav",
+   "source": "DJ-Arcade/DJ32_05.wav",
+   "url": "https://sounds.spriters-resource.com/media/assets/405/407777.zip?updated=1755535689",
+   "sha256": "8436d57d53d31b140eed1e17068aab36768296f0b784dc65656441f79df187a4"
+  }
+ ],
+ "effects": null,
+ "reference": "reference.flac",
+ "transcript": "All right, it's time to check out how you did today. Now let's take a look. Whoa, no license! All you have to do is drive the passengers around. Think you better try again. Come on, enter your name into the Hall of Fame!",
+ "referenceSeconds": 13.09,
+ "sample": {
+  "phrase": "Hey, hey, hey! It's time to make some crazy money! Are ya ready? Here we go!",
+  "file": "sample.flac",
+  "source": {
+   "file": "DJ10.wav",
+   "source": "DJ-Arcade/DJ10.wav",
+   "url": "https://sounds.spriters-resource.com/media/assets/405/407777.zip?updated=1755535689",
+   "sha256": "b9ed7b331fae478c0ff5d2ab9dc78465a5fe61171be8312824f0cd8129623575"
+  }
+ }
+}

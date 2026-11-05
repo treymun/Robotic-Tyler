@@ -1,0 +1,38 @@
+{
+ "format": 1,
+ "backend": "qwen3-tts-12hz-base",
+ "profileVersion": 1,
+ "theme": "dod",
+ "name": "US field radio",
+ "voiceTarget": "US field-radio voice (Day of Defeat: Source)",
+ "relationship": "Direct game faction voice",
+ "direction": "Brisk battlefield callouts. Individual recordings need speaker consistency review before creating a single clone.",
+ "language": "English",
+ "status": "pending",
+ "statusNote": "",
+ "transcriptSource": "Machine transcript (Whisper small.en), corrected by hand where it clearly misheard; not checked by listening.",
+ "sources": [
+  {
+   "file": "us_c4teamplanted.wav",
+   "source": "sourcesounds/dods sound/player/american/us_c4teamplanted.wav",
+   "url": "https://raw.githubusercontent.com/sourcesounds/dods/master/sound/player/american/us_c4teamplanted.wav",
+   "sha256": "da14571a959eb9bf5c07640ee9d3aaf0434353d58900e92d3ac4910717425b3d"
+  },
+  {
+   "file": "us_c4teamplanted2.wav",
+   "source": "sourcesounds/dods sound/player/american/us_c4teamplanted2.wav",
+   "url": "https://raw.githubusercontent.com/sourcesounds/dods/master/sound/player/american/us_c4teamplanted2.wav",
+   "sha256": "f338b3d0747d0cbf5cfeeb2d928f2e7a3764245d6448502f800f5f9032fe8090"
+  },
+  {
+   "file": "us_c4teamplanted3.wav",
+   "source": "sourcesounds/dods sound/player/american/us_c4teamplanted3.wav",
+   "url": "https://raw.githubusercontent.com/sourcesounds/dods/master/sound/player/american/us_c4teamplanted3.wav",
+   "sha256": "bee382e9006634021c3bcf23f7124e539d580cacab1d03aec0211d4930bf75b6"
+  }
+ ],
+ "effects": null,
+ "reference": "reference.flac",
+ "transcript": "Easy Red, charge is planted on enemy equipment. Over. Easy Red, be advised, charges have been planted. Over. Easy Red, we have planted the charge. Over.",
+ "referenceSeconds": 12.51
+}

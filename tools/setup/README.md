@@ -65,6 +65,12 @@ was built against.
 
    It then checks that Windows lists the new version. Failures give a reason and a **Retry** button.
 5. **Opens** the installed apps on Finish, if you leave their boxes ticked.
+6. **Theme voices (optional, v2.35):** *Also add local theme voices* is unticked by default (the standard
+   install). Ticked, Setup opens the desktop app on Finish with `--install-theme-voices`, which shows a
+   guided step in Settings → Voice → Theme voices: this PC's compatibility, the download size and disk
+   space, and Quality vs Lightweight. Nothing is downloaded until **Install now**; **Not now** skips it
+   for good (it can be installed later from the same place). Setup itself never downloads the voice
+   engine or models, so the normal setup and desktop installer stay small.
 
 The setup never reads or writes the apps' data folders, registry entries or install folders itself.
 Settings, keys and themes survive updates, repairs and uninstalls.
@@ -78,6 +84,7 @@ Logs go to `%TEMP%\ROBOTIC TYLER Setup <version>\setup.log`.
 | Option | Effect |
 |---|---|
 | `/components=chrome,desktop` | Preselect parts (`control` or `voice` also mean the desktop app). |
+| `/components=desktop,voices` | Also tick *Also add local theme voices*. |
 | `/auto` | Start installing right away and close when done. Exit codes: 0 all installed, 1 something failed, 2 cancelled. |
 | `/nodesktop` | Untick desktop shortcuts. |
 | `/source=<url or folder>` | Download from a mirror or a local folder instead of the release. Files are still verified. |

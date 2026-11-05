@@ -1,0 +1,16 @@
+{
+ "format": 1,
+ "backend": "qwen3-tts-12hz-base",
+ "profileVersion": 1,
+ "theme": "rust",
+ "name": "Scientist (radio)",
+ "voiceTarget": "Scientist radio voice",
+ "relationship": "Direct game NPC target; acquisition incomplete",
+ "direction": "Import original Scientist speech from a local Rust installation or a working public archive. Distorted chatter may be insufficient for intelligible cloning; test and report honestly.",
+ "language": "English",
+ "status": "missing",
+ "statusNote": "No usable Scientist recordings could be obtained (the public archive refused the download). Add one from your Rust install with Replace.",
+ "transcriptSource": "Machine transcript (Whisper small.en), corrected by hand where it clearly misheard; not checked by listening.",
+ "sources": [],
+ "effects": null
+}

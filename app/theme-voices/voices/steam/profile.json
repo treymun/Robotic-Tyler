@@ -1,0 +1,42 @@
+{
+ "format": 1,
+ "backend": "qwen3-tts-12hz-base",
+ "profileVersion": 1,
+ "theme": "steam",
+ "name": "G-Man",
+ "voiceTarget": "G-Man (Half-Life 2)",
+ "relationship": "Valve-associated character",
+ "direction": "Low, deliberate delivery and distinctive pauses; keep processing minimal.",
+ "language": "English",
+ "status": "pending",
+ "statusNote": "",
+ "transcriptSource": "Machine transcript (Whisper small.en), corrected by hand where it clearly misheard; not checked by listening.",
+ "sources": [
+  {
+   "file": "gman_03.wav",
+   "source": "sourcesounds/hl2 sound/vo/gman_misc/gman_03.wav",
+   "url": "https://raw.githubusercontent.com/sourcesounds/hl2/master/sound/vo/gman_misc/gman_03.wav",
+   "sha256": "3ede34967d00b781cd381745d47e7078c2f556e823791bb2a07f725aa67e7f68"
+  },
+  {
+   "file": "gman_04.wav",
+   "source": "sourcesounds/hl2 sound/vo/gman_misc/gman_04.wav",
+   "url": "https://raw.githubusercontent.com/sourcesounds/hl2/master/sound/vo/gman_misc/gman_04.wav",
+   "sha256": "3ed8b2fda6f31327c913400d71d2f1b3b64b04b466f85312e8c752192821a467"
+  }
+ ],
+ "effects": null,
+ "reference": "reference.flac",
+ "transcript": "The right man in the wrong place can make all the difference in the world. So, wake up, Mr. Freeman. Wake up and smell the ashes.",
+ "referenceSeconds": 13.8,
+ "sample": {
+  "phrase": "Rise and shine, Mr. Freeman. Rise and shine.",
+  "file": "sample.flac",
+  "source": {
+   "file": "gman_riseshine.wav",
+   "source": "sourcesounds/hl2 sound/vo/gman_misc/gman_riseshine.wav",
+   "url": "https://raw.githubusercontent.com/sourcesounds/hl2/master/sound/vo/gman_misc/gman_riseshine.wav",
+   "sha256": "1064554b0a1eb09a11b89b4ee8b630d69a0acf39167f47a88c60846a63925581"
+  }
+ }
+}

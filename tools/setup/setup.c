@@ -99,7 +99,7 @@
 /* ── Controls ────────────────────────────────────────────────────────────── */
 #define NCOMP 2
 enum { K_CHROME, K_DESKTOP };
-enum { IDC_CARD0=1001, IDC_DESKTOP=1010, IDC_RETRY0=1011, IDC_LAUNCH0=1021 };
+enum { IDC_CARD0=1001, IDC_DESKTOP=1010, IDC_RETRY0=1011, IDC_LAUNCH0=1021, IDC_VOICES=1031 };
 #define INRANGE(id,base) ((id)>=(base)&&(id)<(base)+NCOMP)
 enum { WM_APP_PROGRESS=WM_APP+1, WM_APP_ROW, WM_APP_DONE };
 enum { TIMER_ANIM=1, TIMER_AUTOCLOSE=2 };
@@ -126,7 +126,10 @@ static Comp g_comp[NCOMP]={
   .file=DESKTOP_FILE,.guid=DESKTOP_GUID,.display=DESKTOP_DISPLAY,.exe=DESKTOP_EXE,.sha=DESKTOP_SHA256,.size=DESKTOP_SIZE},
 };
 
-static HINSTANCE g_inst; static HWND g_wnd,g_ok,g_cancelBtn,g_desktop;
+static HINSTANCE g_inst; static HWND g_wnd,g_ok,g_cancelBtn,g_desktop,g_voices;
+/* v2.35: "Install theme voices" hands over to the desktop app's guided install (it checks this PC, shows
+   the download size and asks before downloading the voice engine and model). */
+static BOOL g_wantVoices=FALSE;
 static int g_dpi=96,g_page=P_CHOOSE,g_anim=0,g_exitCode=2;
 static HFONT f_title,f_sub,f_h1,f_body,f_body14,f_label,f_bold,f_small,f_btn,f_tag;
 static CRITICAL_SECTION g_lock; static volatile LONG g_cancel=0,g_busy=0;
@@ -663,7 +666,7 @@ static void makeFonts(void){
  f_body=font(13,FW_NORMAL,L"Arial");f_body14=font(14,FW_NORMAL,L"Arial");f_label=font(14,FW_NORMAL,L"Arial");f_bold=font(15,FW_BOLD,L"Arial");
  f_small=font(12,FW_NORMAL,L"Arial");f_btn=font(14,FW_NORMAL,L"Arial");f_tag=font(10,FW_BOLD,L"Arial");
  for(int i=0;i<NCOMP;i++){HWND k[3]={g_comp[i].card,g_comp[i].retry,g_comp[i].launch};for(int j=0;j<3;j++)if(k[j])SendMessageW(k[j],WM_SETFONT,(WPARAM)f_body,FALSE);}
- HWND kids[]={g_desktop,g_ok,g_cancelBtn};for(int i=0;i<3;i++)if(kids[i])SendMessageW(kids[i],WM_SETFONT,(WPARAM)f_body,FALSE);
+ HWND kids[]={g_desktop,g_ok,g_cancelBtn,g_voices};for(int i=0;i<4;i++)if(kids[i])SendMessageW(kids[i],WM_SETFONT,(WPARAM)f_body,FALSE);
 }
 static void place(HWND h,int x,int y,int w,int hgt,BOOL show){SetWindowPos(h,NULL,S(x),S(y),S(w),S(hgt),SWP_NOZORDER|SWP_NOACTIVATE);ShowWindow(h,show?SW_SHOWNA:SW_HIDE);}
 static void cardName(Comp *c){wchar_t s[700],st[300];COLORREF col;cardStatus(c,st,300,&col);swprintf(s,700,L"%ls (%ls). %ls %ls",c->title,c->tag,c->desc,st);SetWindowTextW(c->card,s);}
@@ -671,6 +674,9 @@ static void layout(void){
  BOOL choose=g_page==P_CHOOSE,done=!g_busy;
  for(int i=0;i<NCOMP;i++){place(g_comp[i].card,32+i*356,184,340,236,choose);cardName(&g_comp[i]);}
  place(g_desktop,32,436,360,24,choose);
+ /* Theme voices need the desktop app (installed now or already). */
+ {BOOL can=Button_GetCheck(g_comp[K_DESKTOP].card)==BST_CHECKED||g_comp[K_DESKTOP].installed;EnableWindow(g_voices,can);if(!can)Button_SetCheck(g_voices,BST_UNCHECKED);}
+ place(g_voices,32,462,696,24,choose);
  int slot=0;
  for(int i=0;i<NCOMP;i++){Comp *c=&g_comp[i];BOOL row=!choose&&c->inRun;int y=rowTop(row?slot:0);if(row)slot++;
   BOOL failed=row&&done&&c->state==S_FAILED;
@@ -713,9 +719,9 @@ static void startRun(int only){
 static void onInstall(void){
  BOOL any=FALSE;for(int i=0;i<NCOMP;i++){g_comp[i].selected=Button_GetCheck(g_comp[i].card)==BST_CHECKED&&IsWindowEnabled(g_comp[i].card);any|=g_comp[i].selected;}
  if(!any)return;
- g_runDesktop=Button_GetCheck(g_desktop)==BST_CHECKED;
+ g_runDesktop=Button_GetCheck(g_desktop)==BST_CHECKED;g_wantVoices=Button_GetCheck(g_voices)==BST_CHECKED&&IsWindowEnabled(g_voices);
  if(!confirmRunning())return;
- logLine(L"install: chrome=%d desktop-app=%d shortcuts=%d",g_comp[K_CHROME].selected,g_comp[K_DESKTOP].selected,g_runDesktop);
+ logLine(L"install: chrome=%d desktop-app=%d shortcuts=%d theme-voices=%d",g_comp[K_CHROME].selected,g_comp[K_DESKTOP].selected,g_runDesktop,g_wantVoices);
  startRun(-1);
 }
 static void copyText(const wchar_t *t){
@@ -745,9 +751,10 @@ static void openChrome(Comp *c){
 static void finish(void){
  for(int i=0;i<NCOMP;i++){Comp *c=&g_comp[i];
   if(c->chrome){if(c->inRun&&c->state==S_DONE&&Button_GetCheck(c->launch)==BST_CHECKED)openChrome(c);continue;}
-  if(c->inRun&&c->state==S_DONE&&Button_GetCheck(c->launch)==BST_CHECKED&&c->instDir[0]){
+  BOOL voices=g_wantVoices&&c==&g_comp[K_DESKTOP]&&(c->inRun?c->state==S_DONE:c->installed);
+  if(((c->inRun&&c->state==S_DONE&&Button_GetCheck(c->launch)==BST_CHECKED)||voices)&&c->instDir[0]){
    wchar_t exe[MAX_PATH];swprintf(exe,MAX_PATH,L"%ls\\%ls",c->instDir,c->exe);
-   HINSTANCE r=ShellExecuteW(NULL,L"open",exe,NULL,c->instDir,SW_SHOWNORMAL);logLine(L"%ls: open %ls -> %d",c->key,exe,(int)(INT_PTR)r);}}
+   HINSTANCE r=ShellExecuteW(NULL,L"open",exe,voices?L"--install-theme-voices":NULL,c->instDir,SW_SHOWNORMAL);logLine(L"%ls: open %ls%ls -> %d",c->key,exe,voices?L" --install-theme-voices":L"",(int)(INT_PTR)r);}}
  DestroyWindow(g_wnd);
 }
 static BOOL askStop(void){
@@ -779,6 +786,7 @@ static LRESULT CALLBACK wndProc(HWND h,UINT m,WPARAM w,LPARAM l){
   for(int i=0;i<NCOMP;i++){Comp *c=&g_comp[i];
    c->card=mk(WC_BUTTONW,c->title,BS_AUTOCHECKBOX|BS_MULTILINE,IDC_CARD0+i);}
   g_desktop=mk(WC_BUTTONW,L"Add a desktop shortcut",BS_AUTOCHECKBOX,IDC_DESKTOP);
+  g_voices=mk(WC_BUTTONW,L"Also add local theme voices (optional; the app checks this PC and shows the download first)",BS_AUTOCHECKBOX,IDC_VOICES);
   for(int i=0;i<NCOMP;i++){Comp *c=&g_comp[i];c->retry=mk(WC_BUTTONW,L"Retry",BS_PUSHBUTTON,IDC_RETRY0+i);c->launch=mk(WC_BUTTONW,L"Open",BS_AUTOCHECKBOX,IDC_LAUNCH0+i);Button_SetCheck(c->launch,BST_CHECKED);}
   g_cancelBtn=mk(WC_BUTTONW,L"Cancel",BS_PUSHBUTTON,IDCANCEL);
   g_ok=mk(WC_BUTTONW,L"Install",BS_DEFPUSHBUTTON,IDOK);
@@ -791,13 +799,14 @@ static LRESULT CALLBACK wndProc(HWND h,UINT m,WPARAM w,LPARAM l){
    else on=any?!outdated:TRUE;
    Button_SetCheck(c->card,on&&IsWindowEnabled(c->card)?BST_CHECKED:BST_UNCHECKED);}
   Button_SetCheck(g_desktop,g_noDesktop?BST_UNCHECKED:BST_CHECKED);
+  Button_SetCheck(g_voices,g_preselect[0]&&wcsstr(g_preselect,L"voices")?BST_CHECKED:BST_UNCHECKED);
   layout();return 0;}
  case WM_NOTIFY:{
   NMHDR *n=(NMHDR*)l;
   if(n->code==NM_CUSTOMDRAW){NMCUSTOMDRAW *cd=(NMCUSTOMDRAW*)l;
    if(cd->dwDrawStage==CDDS_PREPAINT){int id=(int)n->idFrom;
     if(INRANGE(id,IDC_CARD0))drawCard(cd->hdc,n->hwndFrom,cd->rc,cd->uItemState);
-    else if(id==IDC_DESKTOP)drawCheck(cd->hdc,n->hwndFrom,cd->rc,cd->uItemState,C_BODY);
+    else if(id==IDC_DESKTOP||id==IDC_VOICES)drawCheck(cd->hdc,n->hwndFrom,cd->rc,cd->uItemState,C_BODY);
     else if(INRANGE(id,IDC_LAUNCH0))drawCheck(cd->hdc,n->hwndFrom,cd->rc,cd->uItemState,C_CARD);
     else drawButton(cd->hdc,n->hwndFrom,cd->rc,cd->uItemState);
     return CDRF_SKIPDEFAULT;}}
@@ -805,7 +814,7 @@ static LRESULT CALLBACK wndProc(HWND h,UINT m,WPARAM w,LPARAM l){
  case WM_COMMAND:{
   int id=LOWORD(w);
   if(INRANGE(id,IDC_CARD0)){layout();InvalidateRect((HWND)l,NULL,TRUE);InvalidateRect(h,NULL,FALSE);}
-  else if(id==IDC_DESKTOP||INRANGE(id,IDC_LAUNCH0))InvalidateRect((HWND)l,NULL,TRUE);
+  else if(id==IDC_DESKTOP||id==IDC_VOICES||INRANGE(id,IDC_LAUNCH0))InvalidateRect((HWND)l,NULL,TRUE);
   else if(INRANGE(id,IDC_RETRY0)){int i=id-IDC_RETRY0;logLine(L"%ls: retry",g_comp[i].key);startRun(i);}
   else if(id==IDOK){if(g_page==P_CHOOSE){if(IsWindowEnabled(g_ok))onInstall();}else if(!g_busy)finish();}
   else if(id==IDCANCEL){if(g_page==P_CHOOSE)DestroyWindow(h);else if(g_busy)askStop();else finish();}

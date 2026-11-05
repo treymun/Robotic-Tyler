@@ -1,0 +1,29 @@
+{
+ "format": 1,
+ "backend": "qwen3-tts-12hz-base",
+ "profileVersion": 1,
+ "theme": "msn",
+ "name": "Microsoft Mary",
+ "voiceTarget": "Microsoft Mary (SAPI 5)",
+ "relationship": "Contemporary Windows voice association",
+ "direction": "Bright, classic synthetic female delivery; no hall or stadium effects by default.",
+ "language": "English",
+ "status": "pending",
+ "statusNote": "",
+ "transcriptSource": "Machine transcript (Whisper small.en), corrected by hand where it clearly misheard; not checked by listening.",
+ "sources": [
+  {
+   "file": "mary-sapi5-reference-render.wav",
+   "source": "https://download.microsoft.com/download/B/4/3/B4314928-7B71-4336-9DE7-6FA4CF00B7B3/SpeechSDK51.exe",
+   "url": "https://download.microsoft.com/download/B/4/3/B4314928-7B71-4336-9DE7-6FA4CF00B7B3/SpeechSDK51.exe",
+   "sha256": "b4fb3853d0dc6bdfde17e5009bfd15d994e35d8d9f9dac360e3485203a5fcf8d"
+  }
+ ],
+ "effects": null,
+ "native": {
+  "sapi": "Microsoft Mary"
+ },
+ "reference": "reference.flac",
+ "transcript": "Robotic Tyler is ready. Your friends are waiting in the group chat. Choose a voice, enter your message, and listen to the preview. We can change themes while keeping the same conversation. The next round starts in ten seconds. Please check your microphone and join the call when you are ready.",
+ "referenceSeconds": 16.72
+}

@@ -1,0 +1,66 @@
+{
+ "format": 1,
+ "backend": "qwen3-tts-12hz-base",
+ "profileVersion": 1,
+ "theme": "cs16",
+ "name": "CS 1.6 radio operator",
+ "voiceTarget": "Original CS 1.6 radio operator",
+ "relationship": "Direct game operator",
+ "direction": "Short, emphatic radio delivery. Separate match announcer lines from operator lines.",
+ "language": "English",
+ "status": "pending",
+ "statusNote": "",
+ "transcriptSource": "Machine transcript (Whisper small.en), corrected by hand where it clearly misheard; not checked by listening.",
+ "sources": [
+  {
+   "file": "com_reportin.wav",
+   "source": "com_reportin.wav",
+   "url": "https://sounds.spriters-resource.com/media/assets/406/409513.zip?updated=1755536591",
+   "sha256": "c7df925563c58c07f1ac319e24ce435c9d20707064be12e85cbfcddd15069967"
+  },
+  {
+   "file": "ct_enemys.wav",
+   "source": "ct_enemys.wav",
+   "url": "https://sounds.spriters-resource.com/media/assets/406/409513.zip?updated=1755536591",
+   "sha256": "e67956fd3b4eb16eb0e890d6edc78a92a86c1bfa6b3a036af1031e6fe18fc363"
+  },
+  {
+   "file": "fireassis.wav",
+   "source": "fireassis.wav",
+   "url": "https://sounds.spriters-resource.com/media/assets/406/409513.zip?updated=1755536591",
+   "sha256": "2d51c3c7d3b3cf43d55cbbcd7ec2443226a567411e29a41e62e5e909e22fdffb"
+  },
+  {
+   "file": "ct_backup.wav",
+   "source": "ct_backup.wav",
+   "url": "https://sounds.spriters-resource.com/media/assets/406/409513.zip?updated=1755536591",
+   "sha256": "074168870b89128729b71eece8faa02f01fc7def67f90ccba5e214e9b628e35a"
+  },
+  {
+   "file": "fallback.wav",
+   "source": "fallback.wav",
+   "url": "https://sounds.spriters-resource.com/media/assets/406/409513.zip?updated=1755536591",
+   "sha256": "0007234376ea98d7d5d10ea67158677ae42f5557e3d3e397e3db8bd6836396b0"
+  },
+  {
+   "file": "ct_inpos.wav",
+   "source": "ct_inpos.wav",
+   "url": "https://sounds.spriters-resource.com/media/assets/406/409513.zip?updated=1755536591",
+   "sha256": "4a932b80e009eb9d1f34319006c78e6eb84632ddff78a0c7dd9987db9ebccef0"
+  }
+ ],
+ "effects": null,
+ "reference": "reference.flac",
+ "transcript": "Report in, team. Enemy spotted. Taking fire, need assistance. Need backup. Team, fall back! I'm in position.",
+ "referenceSeconds": 10.62,
+ "sample": {
+  "phrase": "Fire in the hole!",
+  "file": "sample.flac",
+  "source": {
+   "file": "ct_fireinhole.wav",
+   "source": "ct_fireinhole.wav",
+   "url": "https://sounds.spriters-resource.com/media/assets/406/409513.zip?updated=1755536591",
+   "sha256": "a2672154c93403e0bc16f64eb4e30173ce7d3ace841bb1821da29b68a02bdfa4"
+  }
+ }
+}

@@ -20,7 +20,8 @@
     "!assets/theme-sounds/**/*",
     "!**/*.map",
     "!**/node_modules/.cache/**/*",
-    "!app/desktop-overrides/**/*"
+    "!app/desktop-overrides/**/*",
+    "!app/theme-voices/**/__pycache__/**/*"
   ],
   "win": {
     "icon": "assets/robotic-tyler.ico",
@@ -75,5 +76,9 @@
         "**/*"
       ]
     }
+  ],
+  "asarUnpack": [
+    "app/theme-voices/worker/**/*",
+    "app/theme-voices/voices/**/*"
   ]
 }

@@ -1,0 +1,40 @@
+{
+ "format": 1,
+ "backend": "qwen3-tts-12hz-base",
+ "profileVersion": 1,
+ "theme": "minecraft",
+ "name": "Dungeons narrator",
+ "voiceTarget": "Minecraft Dungeons story narrator",
+ "relationship": "Official franchise spin-off",
+ "direction": "Warm, deliberate British female storytelling. Label it as Dungeons narration, not vanilla villager speech.",
+ "language": "English",
+ "status": "pending",
+ "statusNote": "",
+ "transcriptSource": "Machine transcript (Whisper small.en), corrected by hand where it clearly misheard; not checked by listening.",
+ "sources": [
+  {
+   "file": "Vo_cin_sqcoIntro-001.ogg",
+   "source": "https://minecraft.wiki/images/Vo_cin_sqcoIntro-001.ogg?c67cf",
+   "url": "https://minecraft.wiki/images/Vo_cin_sqcoIntro-001.ogg?c67cf",
+   "sha256": "dc4165e402e32e49c7f32fcc4e16827dc9971592c3c520cdf4f51820056fda61",
+   "seconds": [
+    0,
+    12.9
+   ]
+  }
+ ],
+ "effects": null,
+ "reference": "reference.flac",
+ "transcript": "The village is burning. No doubt this is the work of the evil Arch-Illager and his minions. They sweep across the land like a ravenous scourge, subjugating or destroying all in their path.",
+ "referenceSeconds": 12.9,
+ "sample": {
+  "phrase": "This is a time for heroes like yourself. Make haste.",
+  "file": "sample.flac",
+  "source": {
+   "file": "Vo_cin_sqcoIntro-001.ogg",
+   "source": "https://minecraft.wiki/images/Vo_cin_sqcoIntro-001.ogg?c67cf",
+   "url": "https://minecraft.wiki/images/Vo_cin_sqcoIntro-001.ogg?c67cf",
+   "sha256": "dc4165e402e32e49c7f32fcc4e16827dc9971592c3c520cdf4f51820056fda61"
+  }
+ }
+}

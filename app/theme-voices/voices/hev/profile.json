@@ -1,0 +1,54 @@
+{
+ "format": 1,
+ "backend": "qwen3-tts-12hz-base",
+ "profileVersion": 1,
+ "theme": "hev",
+ "name": "HEV suit",
+ "voiceTarget": "HEV suit (Half-Life)",
+ "relationship": "Direct suit voice",
+ "direction": "Calm female synthesized safety announcements, steady rhythm, minimal extra reverb.",
+ "language": "English",
+ "status": "pending",
+ "statusNote": "",
+ "transcriptSource": "Machine transcript (Whisper small.en), corrected by hand where it clearly misheard; not checked by listening.",
+ "sources": [
+  {
+   "file": "blood_toxins.wav",
+   "source": "sourcesounds/hl1 sound/fvox/blood_toxins.wav",
+   "url": "https://raw.githubusercontent.com/sourcesounds/hl1/master/sound/fvox/blood_toxins.wav",
+   "sha256": "007ec44923e09745ab3ae5c20216de3fbda33470171cc1b4ffdc753487c3f62f"
+  },
+  {
+   "file": "automedic_on.wav",
+   "source": "sourcesounds/hl1 sound/fvox/automedic_on.wav",
+   "url": "https://raw.githubusercontent.com/sourcesounds/hl1/master/sound/fvox/automedic_on.wav",
+   "sha256": "66c4d3a92b42fe51e2bd8f64af75d8583a99c283dfe160e8750c2690fd9361d9"
+  },
+  {
+   "file": "atmospherics_on.wav",
+   "source": "sourcesounds/hl1 sound/fvox/atmospherics_on.wav",
+   "url": "https://raw.githubusercontent.com/sourcesounds/hl1/master/sound/fvox/atmospherics_on.wav",
+   "sha256": "152d112979b94e7bb2f130bb01d90c81593848d9c43414e391357595676a782a"
+  },
+  {
+   "file": "administering_medical.wav",
+   "source": "sourcesounds/hl1 sound/fvox/administering_medical.wav",
+   "url": "https://raw.githubusercontent.com/sourcesounds/hl1/master/sound/fvox/administering_medical.wav",
+   "sha256": "50faf2366ba4b76c16ff5d78338eba8d9d10f0415108085d67716a5fcc39ff55"
+  }
+ ],
+ "effects": null,
+ "reference": "reference.flac",
+ "transcript": "Warning: blood toxin levels detected. Automatic medical systems engaged. Atmospheric contaminant sensors activated. Administering medical attention.",
+ "referenceSeconds": 15.49,
+ "sample": {
+  "phrase": "Warning: hazardous chemical detected.",
+  "file": "sample.flac",
+  "source": {
+   "file": "chemical_detected.wav",
+   "source": "sourcesounds/hl1 sound/fvox/chemical_detected.wav",
+   "url": "https://raw.githubusercontent.com/sourcesounds/hl1/master/sound/fvox/chemical_detected.wav",
+   "sha256": "5039d7f535453664c38059118e031966bd72d6087a269138b2fca2eec57d2f3d"
+  }
+ }
+}

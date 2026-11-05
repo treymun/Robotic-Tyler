@@ -1,0 +1,78 @@
+{
+ "format": 1,
+ "backend": "qwen3-tts-12hz-base",
+ "profileVersion": 1,
+ "theme": "quake",
+ "name": "Quake III announcer",
+ "voiceTarget": "Quake III Arena announcer",
+ "relationship": "Same-franchise adaptation",
+ "direction": "Deep, emphatic arena announcements with controlled resonance; preserve intelligibility on longer messages.",
+ "language": "English",
+ "status": "pending",
+ "statusNote": "",
+ "transcriptSource": "Machine transcript (Whisper small.en), corrected by hand where it clearly misheard; not checked by listening.",
+ "sources": [
+  {
+   "file": "enemy_flag.wav",
+   "source": "announcer/enemy_flag.wav",
+   "url": "https://sounds.spriters-resource.com/media/assets/406/408976.zip?updated=1755536294",
+   "sha256": "19ecef82bbb74aa28d801d2a36b994ed43dc7a881f82809c2cb7d1ceca611d07"
+  },
+  {
+   "file": "base_attack.wav",
+   "source": "announcer/base_attack.wav",
+   "url": "https://sounds.spriters-resource.com/media/assets/406/408976.zip?updated=1755536294",
+   "sha256": "5596c1655691d2a5f7e587bf9d7144ac6b10b1256ef87f648b4beeb97036c6f0"
+  },
+  {
+   "file": "enemy_1flag.wav",
+   "source": "announcer/enemy_1flag.wav",
+   "url": "https://sounds.spriters-resource.com/media/assets/406/408976.zip?updated=1755536294",
+   "sha256": "25515363ae2476519db483b60d108de75456d369b63237be3449f0c51deeebdf"
+  },
+  {
+   "file": "3_frags.wav",
+   "source": "announcer/3_frags.wav",
+   "url": "https://sounds.spriters-resource.com/media/assets/406/408976.zip?updated=1755536294",
+   "sha256": "e389cf9004d5d05d70ed01866488c02162e5fec74e7871b0c5c5e0d333441b98"
+  },
+  {
+   "file": "2_frags.wav",
+   "source": "announcer/2_frags.wav",
+   "url": "https://sounds.spriters-resource.com/media/assets/406/408976.zip?updated=1755536294",
+   "sha256": "90af9baee58fd107600b38e90a3e028c3a4791ab697a25dd971e83ea880cd464"
+  },
+  {
+   "file": "5_minute.wav",
+   "source": "announcer/5_minute.wav",
+   "url": "https://sounds.spriters-resource.com/media/assets/406/408976.zip?updated=1755536294",
+   "sha256": "6a1d63fade706b7e06f40920fdc437efae4c0055b09d25c14cdaa31fdcd6815a"
+  },
+  {
+   "file": "denied.wav",
+   "source": "announcer/denied.wav",
+   "url": "https://sounds.spriters-resource.com/media/assets/406/408976.zip?updated=1755536294",
+   "sha256": "3ff0873211268ba29ab04b67342abdafc14338f18c1b9c2739bb19c3db09a30f"
+  },
+  {
+   "file": "1_frag.wav",
+   "source": "announcer/1_frag.wav",
+   "url": "https://sounds.spriters-resource.com/media/assets/406/408976.zip?updated=1755536294",
+   "sha256": "ce8557e260103d392774408669fd7b4867f092766b7e83f2215bbffff1896c91"
+  }
+ ],
+ "effects": null,
+ "reference": "reference.flac",
+ "transcript": "The enemy has your flag. Your base is under attack! The enemy has the flag. Three frags left. Two frags left. Five minute warning! Denied! One frag left.",
+ "referenceSeconds": 16.17,
+ "sample": {
+  "phrase": "Excellent!",
+  "file": "sample.flac",
+  "source": {
+   "file": "excellent_a.wav",
+   "source": "announcer/excellent_a.wav",
+   "url": "https://sounds.spriters-resource.com/media/assets/406/408976.zip?updated=1755536294",
+   "sha256": "7d72e3d087239c6e5c202e8afc77ca8bc37b9b1b2f3f10fbeb56cf1ec72c3b9b"
+  }
+ }
+}

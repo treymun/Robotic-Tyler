@@ -62,9 +62,11 @@
    music:{title:clean(S.music,120),by:clean(S.musicBy,60),sharing:!!music.sharing,open:!!music.open},
    sounds:[...(board.slots||[])].sort((a,b)=>fav.has(b.slot)-fav.has(a.slot)).slice(0,40).map(s=>({slot:s.slot,name:clean(s.name,40),fav:fav.has(s.slot)})),
    favorites:[...fav].slice(0,40),
-   controls:controls(),fx:fx()};
+   controls:controls(),fx:fx(),themeVoices:themeVoices()};
  }
 
+ function themeVoices(){const tv=globalThis.TylerThemeVoices;if(!tv)return {available:false};const st=tv.state();if(st.available===false)return {available:false};
+  return {available:true,ready:!!st.ready,busy:!!st.busy,voices:(st.voices||[]).slice(0,30).map(v=>({theme:clean(v.theme,12),name:clean(v.name,40)}))};}
  // ── Live events while a phone watches ─────────────────────────────────────
  // Only these events, with only these fields (all of them are already on the panel).
  const FIELDS={state:['state','label','text','before'],hud:['voice','voiceMeta','spend','spendMeta','latency','latencyMeta'],reply:['chars'],chat:['recent','flood'],
@@ -118,6 +120,10 @@
   heard:({yes})=>{click(yes?'heardYes':'heardNo');return {};},
   beep:()=>{const v=api.getVoiceState?.()||{},inCall=globalThis.TylerVoiceCall?.state?.().state==='connected'||Number(v.connectedPeers)>0;if(!v.enabled)throw Error('Tyler’s microphone is off. Press Connect & start first.');if(!inCall)throw Error('The bot isn’t in a voice call, so nobody would hear the beep. Join voice first.');click('beep');return {};},
   'voice-check':()=>{click('voiceCheck');return {};},
+  // v2.35: theme voices. The phone sends only the text (and a voice name); the voice is made on this PC.
+  'theme-say':({text:t,theme})=>{const tv=globalThis.TylerThemeVoices,s=clean(t,400);if(!tv?.state().ready)throw Error('Theme voices aren’t installed on the PC.');if(!s)throw Error('Type a message first.');if(tv.state().busy)throw Error('Tyler is still making the last one.');
+   tv.say(s,/^[a-z0-9]{2,12}$/.test(String(theme||''))?theme:undefined).catch(()=>{});return {started:true};},
+  'theme-stop':()=>{const b=$('tvStop');if(b)b.click();return {};},
   say:({text:t})=>{const s=clean(t,300);if(!s)throw Error('Type a message first.');api.send(s);return {};},
  };
  const ANYONE=new Set(['state','watch']);

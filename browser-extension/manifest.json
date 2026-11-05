@@ -97,6 +97,7 @@
         "voice-call.js",
         "squad-suite.js",
         "image-gen.js",
+        "theme-voices.js",
         "screen-awareness.js",
         "activity-watch.js",
         "music-core.js",

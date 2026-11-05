@@ -1,0 +1,36 @@
+{
+ "format": 1,
+ "backend": "qwen3-tts-12hz-base",
+ "profileVersion": 1,
+ "theme": "classic",
+ "name": "Black Mesa VOX",
+ "voiceTarget": "Black Mesa VOX (Half-Life)",
+ "relationship": "GoldSrc-era association",
+ "direction": "Clipped computerized male announcements; preserve original cadence rather than smoothing it into a modern assistant.",
+ "language": "English",
+ "status": "pending",
+ "statusNote": "",
+ "transcriptSource": "Machine transcript (Whisper small.en), corrected by hand where it clearly misheard; not checked by listening.",
+ "sources": [
+  {
+   "file": "vox_login.wav",
+   "source": "sourcesounds/hl1 sound/vox/vox_login.wav",
+   "url": "https://raw.githubusercontent.com/sourcesounds/hl1/master/sound/vox/vox_login.wav",
+   "sha256": "5ae53a7892710cfeffbe901e6f460d328ace5fea356b97b6e64e176b588cf695"
+  }
+ ],
+ "effects": null,
+ "reference": "reference.flac",
+ "transcript": "Hello. The Automatic Diagnostic and Announcement System welcomes you to the Black Mesa Research Facility. Remember, have a secure day.",
+ "referenceSeconds": 10.29,
+ "sample": {
+  "phrase": "Sterilization.",
+  "file": "sample.flac",
+  "source": {
+   "file": "sterilization.wav",
+   "source": "sourcesounds/hl1 sound/vox/sterilization.wav",
+   "url": "https://raw.githubusercontent.com/sourcesounds/hl1/master/sound/vox/sterilization.wav",
+   "sha256": "8144a41f87bacb0528da6221c66faddc7ea66e41b5805a183496885df3003b8c"
+  }
+ }
+}

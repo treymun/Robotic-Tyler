@@ -1,0 +1,16 @@
+{
+ "format": 1,
+ "backend": "qwen3-tts-12hz-base",
+ "profileVersion": 1,
+ "theme": "ricochet",
+ "name": "Ricochet countdown voice",
+ "voiceTarget": "Original Ricochet countdown voice",
+ "relationship": "Direct game recordings; very limited corpus",
+ "direction": "Find a longer verified recording of the same voice before claiming a faithful arbitrary-speech clone. Do not pad by repeating the countdown.",
+ "language": "English",
+ "status": "insufficient",
+ "statusNote": "The game's four countdown words total under one second, which isn't enough to clone a voice. Add a longer recording of the same voice with Replace.",
+ "transcriptSource": "Machine transcript (Whisper small.en), corrected by hand where it clearly misheard; not checked by listening.",
+ "sources": [],
+ "effects": null
+}

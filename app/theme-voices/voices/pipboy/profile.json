@@ -1,0 +1,36 @@
+{
+ "format": 1,
+ "backend": "qwen3-tts-12hz-base",
+ "profileVersion": 1,
+ "theme": "pipboy",
+ "name": "Codsworth",
+ "voiceTarget": "Codsworth / Mister Handy (Fallout 4)",
+ "relationship": "Same-franchise character",
+ "direction": "Polite British robot delivery with a lightly metallic character; avoid importing other Fallout companions into the profile.",
+ "language": "English",
+ "status": "pending",
+ "statusNote": "",
+ "transcriptSource": "Machine transcript (Whisper small.en), corrected by hand where it clearly misheard; not checked by listening.",
+ "sources": [
+  {
+   "file": "Codsworth_001A0E3F_1.ogg",
+   "source": "https://static.wikia.nocookie.net/fallout/images/c/c6/Codsworth_001A0E3F_1.ogg/revision/latest",
+   "url": "https://static.wikia.nocookie.net/fallout/images/c/c6/Codsworth_001A0E3F_1.ogg/revision/latest",
+   "sha256": "46ffca09ec092d9d642ed780c4a2d3d4f1af319c0ea3d975c400a13393c9a2f4"
+  }
+ ],
+ "effects": null,
+ "reference": "reference.flac",
+ "transcript": "So it ends as it began. Fitting, I suppose. If only the Institute was interested in helping improve the Commonwealth. Why none of these powerful groups want to help the actual people of the world we live in is beyond me.",
+ "referenceSeconds": 14.14,
+ "sample": {
+  "phrase": "This is all much more exciting than domestic life, I assure you!",
+  "file": "sample.flac",
+  "source": {
+   "file": "Codsworth_DomesticLife.ogg",
+   "source": "https://static.wikia.nocookie.net/fallout/images/3/35/Codsworth_DomesticLife.ogg/revision/latest",
+   "url": "https://static.wikia.nocookie.net/fallout/images/3/35/Codsworth_DomesticLife.ogg/revision/latest",
+   "sha256": "1ec828a71b213a0d293513336381ce10a8b68adfa2a794c16ef78589642b704d"
+  }
+ }
+}

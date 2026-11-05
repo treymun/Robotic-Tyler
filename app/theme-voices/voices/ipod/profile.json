@@ -1,0 +1,26 @@
+{
+ "format": 1,
+ "backend": "qwen3-tts-12hz-base",
+ "profileVersion": 1,
+ "theme": "ipod",
+ "name": "Apple Alex",
+ "voiceTarget": "Apple Alex",
+ "relationship": "Apple/iPod VoiceOver-era association",
+ "direction": "Clean, restrained U.S. English system narration, without cinematic radio effects. Preserve original-system cadence.",
+ "language": "English",
+ "status": "pending",
+ "statusNote": "",
+ "transcriptSource": "Machine transcript (Whisper small.en), corrected by hand where it clearly misheard; not checked by listening.",
+ "sources": [
+  {
+   "file": "alex-original-mac-demo.aiff",
+   "source": "https://infoheap.com/data/audio/mac-text-to-speech-tts-demo-alex.aiff",
+   "url": "https://infoheap.com/data/audio/mac-text-to-speech-tts-demo-alex.aiff",
+   "sha256": "5671c82bca43601b2df2c3b2412544405375ccb1f0b45c62e2608959ca6364d1"
+  }
+ ],
+ "effects": null,
+ "reference": "reference.flac",
+ "transcript": "Using Text-to-Speech, TTS, you can have Alex and other Mac voices speak selected text so you can hear a word as you see it on screen.",
+ "referenceSeconds": 8.95
+}

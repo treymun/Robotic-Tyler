@@ -1,0 +1,54 @@
+{
+ "format": 1,
+ "backend": "qwen3-tts-12hz-base",
+ "profileVersion": 1,
+ "theme": "deadlock",
+ "name": "Bebop",
+ "voiceTarget": "Bebop",
+ "relationship": "Direct game character",
+ "direction": "Heavy mechanical character with clear delivery. Avoid turning all lines into combat grunts.",
+ "language": "English",
+ "status": "pending",
+ "statusNote": "",
+ "transcriptSource": "Machine transcript (Whisper small.en), corrected by hand where it clearly misheard; not checked by listening.",
+ "sources": [
+  {
+   "file": "bebop_kill_high_networth.mp3",
+   "source": "Source2Sounds/deadlock sounds/vo/bebop/bebop_kill_high_networth.mp3",
+   "url": "https://raw.githubusercontent.com/Source2Sounds/deadlock/main/sounds/vo/bebop/bebop_kill_high_networth.mp3",
+   "sha256": "a19710ac38612940d0a320eb9b7de29ecb25fe65399ef5e68e2cb901dded5bf7"
+  },
+  {
+   "file": "bebop_happy_04.mp3",
+   "source": "Source2Sounds/deadlock sounds/vo/bebop/bebop_happy_04.mp3",
+   "url": "https://raw.githubusercontent.com/Source2Sounds/deadlock/main/sounds/vo/bebop/bebop_happy_04.mp3",
+   "sha256": "2bcad3a00680f72f0efc22152f97c6ee899795954a358ba723046da2df06d7be"
+  },
+  {
+   "file": "bebop_kill_nano_03.mp3",
+   "source": "Source2Sounds/deadlock sounds/vo/bebop/bebop_kill_nano_03.mp3",
+   "url": "https://raw.githubusercontent.com/Source2Sounds/deadlock/main/sounds/vo/bebop/bebop_kill_nano_03.mp3",
+   "sha256": "b5419d8372bc791cf0a538acfe165887394c4662a49f01179b853adfae4df509"
+  },
+  {
+   "file": "bebop_desperation_power3_05.mp3",
+   "source": "Source2Sounds/deadlock sounds/vo/bebop/bebop_desperation_power3_05.mp3",
+   "url": "https://raw.githubusercontent.com/Source2Sounds/deadlock/main/sounds/vo/bebop/bebop_desperation_power3_05.mp3",
+   "sha256": "02e3cef91938337599dbd776d001e186d6c7a530c089bf576dc492ed2fb5536a"
+  }
+ ],
+ "effects": null,
+ "reference": "reference.flac",
+ "transcript": "It don't matter how big you are, I'll take anyone to task! It's nice to fight with people who aren't incompetent! I'm not something organic that's easy to kill. Let's see which one of us dies first.",
+ "referenceSeconds": 12.62,
+ "sample": {
+  "phrase": "You see that? I killed Lash. I killed Lash.",
+  "file": "sample.flac",
+  "source": {
+   "file": "bebop_kill_lash_02.mp3",
+   "source": "Source2Sounds/deadlock sounds/vo/bebop/bebop_kill_lash_02.mp3",
+   "url": "https://raw.githubusercontent.com/Source2Sounds/deadlock/main/sounds/vo/bebop/bebop_kill_lash_02.mp3",
+   "sha256": "2b6ee833ab49aa4953c3770eb398622dac3feafa0d74335bec024900b9589142"
+  }
+ }
+}

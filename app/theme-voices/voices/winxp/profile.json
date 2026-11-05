@@ -1,0 +1,29 @@
+{
+ "format": 1,
+ "backend": "qwen3-tts-12hz-base",
+ "profileVersion": 1,
+ "theme": "winxp",
+ "name": "Microsoft Sam",
+ "voiceTarget": "Microsoft Sam (SAPI 5)",
+ "relationship": "Original operating-system voice",
+ "direction": "Keep the original robotic prosody. Prefer native synthesis if available; cloning is an optional portability route.",
+ "language": "English",
+ "status": "pending",
+ "statusNote": "",
+ "transcriptSource": "Machine transcript (Whisper small.en), corrected by hand where it clearly misheard; not checked by listening.",
+ "sources": [
+  {
+   "file": "sam-sapi5-reference-render.wav",
+   "source": "https://download.microsoft.com/download/B/4/3/B4314928-7B71-4336-9DE7-6FA4CF00B7B3/SpeechSDK51.exe",
+   "url": "https://download.microsoft.com/download/B/4/3/B4314928-7B71-4336-9DE7-6FA4CF00B7B3/SpeechSDK51.exe",
+   "sha256": "970a0089e7b59be4a30e88689037681e37dc835306f1695319095431bac5fe5e"
+  }
+ ],
+ "effects": null,
+ "native": {
+  "sapi": "Microsoft Sam"
+ },
+ "reference": "reference.flac",
+ "transcript": "Robotic Tyler is ready. Your friends are waiting in the group chat. Choose a voice, enter your message, and listen to the preview. We can change themes while keeping the same conversation. The next round starts in ten seconds. Please check your microphone and join the call when you are ready.",
+ "referenceSeconds": 18.78
+}

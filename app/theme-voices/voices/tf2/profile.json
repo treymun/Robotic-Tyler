@@ -1,0 +1,60 @@
+{
+ "format": 1,
+ "backend": "qwen3-tts-12hz-base",
+ "profileVersion": 1,
+ "theme": "tf2",
+ "name": "The Administrator",
+ "voiceTarget": "Administrator",
+ "relationship": "Direct game character",
+ "direction": "Stern, commanding female delivery. Do not mix with Scout, Soldier, Merasmus, or alternate announcers.",
+ "language": "English",
+ "status": "pending",
+ "statusNote": "",
+ "transcriptSource": "Machine transcript (Whisper small.en), corrected by hand where it clearly misheard; not checked by listening.",
+ "sources": [
+  {
+   "file": "announcer_captureflag_enemyreturned_01.mp3",
+   "source": "sourcesounds/tf sound/vo/announcer_captureflag_enemyreturned_01.mp3",
+   "url": "https://raw.githubusercontent.com/sourcesounds/tf/master/sound/vo/announcer_captureflag_enemyreturned_01.mp3",
+   "sha256": "2e488220d32a49a52cdb6a456b1d2cb3733c7348f8483bc88ce30ac63e5361b9"
+  },
+  {
+   "file": "announcer_captureflag_miscspace_13.mp3",
+   "source": "sourcesounds/tf sound/vo/announcer_captureflag_miscspace_13.mp3",
+   "url": "https://raw.githubusercontent.com/sourcesounds/tf/master/sound/vo/announcer_captureflag_miscspace_13.mp3",
+   "sha256": "b5ba60b1812b1d3848a9b1983fae390e0d147c5615205830a2a0c134d3ac844b"
+  },
+  {
+   "file": "announcer_captureflag_enemycaptured_01.mp3",
+   "source": "sourcesounds/tf sound/vo/announcer_captureflag_enemycaptured_01.mp3",
+   "url": "https://raw.githubusercontent.com/sourcesounds/tf/master/sound/vo/announcer_captureflag_enemycaptured_01.mp3",
+   "sha256": "4d9dd0406e78603bae892e7b173e1c123be95ef2e5bd6688a3b735c23adb5418"
+  },
+  {
+   "file": "announcer_capture_controlpoints.mp3",
+   "source": "sourcesounds/tf sound/vo/announcer_capture_controlpoints.mp3",
+   "url": "https://raw.githubusercontent.com/sourcesounds/tf/master/sound/vo/announcer_capture_controlpoints.mp3",
+   "sha256": "c1008ea77deef397f112a6cc5daedcea372458558c713a50d05dd498904a8b18"
+  },
+  {
+   "file": "announcer_captureflag_miscspace_07.mp3",
+   "source": "sourcesounds/tf sound/vo/announcer_captureflag_miscspace_07.mp3",
+   "url": "https://raw.githubusercontent.com/sourcesounds/tf/master/sound/vo/announcer_captureflag_miscspace_07.mp3",
+   "sha256": "64b10b497d3a2026e065bafcd422f0486b05e95ad2a77c803693b69dcaa89e05"
+  }
+ ],
+ "effects": null,
+ "reference": "reference.flac",
+ "transcript": "Our reactor core has returned to our vault! We need to stop their ship from launching! The enemy has captured our reactor core! Prepare to capture all control points. Now, steal the reactor core!",
+ "referenceSeconds": 19.25,
+ "sample": {
+  "phrase": "Alert! The center control point is being captured!",
+  "file": "sample.flac",
+  "source": {
+   "file": "announcer_alert_center_control_being_captured.mp3",
+   "source": "sourcesounds/tf sound/vo/announcer_alert_center_control_being_captured.mp3",
+   "url": "https://raw.githubusercontent.com/sourcesounds/tf/master/sound/vo/announcer_alert_center_control_being_captured.mp3",
+   "sha256": "7612ddab83e2004bc2723e7098e7228631569e7d98449e1aea91a02a24476865"
+  }
+ }
+}

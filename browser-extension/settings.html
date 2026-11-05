@@ -437,6 +437,107 @@
   <p class="hint" id="voiceTestState" role="status">Nothing is sent until you press Test voice.</p>
 </section>
 
+<section class="sheet" id="theme-voices" data-ui-zone="voice">
+  <div class="sheet-head">
+    <h2>Theme voices</h2>
+    <p>Tyler can say typed messages in each theme's character voice: G-Man for Steam, GLaDOS for Portal, the radio operator for Counter-Strike 1.6, and so on. The voices are clones made on this PC by a local engine (Qwen3-TTS), so they need no key, account or payment per message. Use them from the <b>Theme voices</b> card in Tyler's Steam chat panel, the phone remote, or <code>!say</code> in chat if you allow it below.</p>
+  </div>
+  <p class="callout only-chrome">Theme voices are part of the desktop app: its installer sets up the voice engine on your PC. In Chrome, open Steam chat in the ROBOTIC TYLER desktop app to use them.</p>
+  <div class="only-desktop">
+    <div class="callout" id="tvGuide" hidden>
+      <h3>Add local theme voices</h3>
+      <p>You chose theme voices in Setup. Tyler works normally without them; this adds the voice engine and a model, all downloaded and checked automatically. Nothing is downloaded until you press <b>Install now</b>.</p>
+      <p class="hint" id="tvGuidePc"></p>
+      <p id="tvGuidePlan"></p>
+      <div class="actions"><button id="tvGuideGo" type="button">Install now</button><button id="tvGuideSkip" type="button" class="secondary">Not now</button></div>
+      <small class="hint">Not now: Tyler won't ask again. You can install them any time here, in Settings → Voice → Theme voices.</small>
+    </div>
+    <p class="hint">Optional. Theme voices don't change Tyler's normal voice (Standard voice and Gemini Live work the same with or without them).</p>
+    <h3>This PC</h3>
+    <p class="hint" id="tvHardware" role="status">Checking this PC…</p>
+    <ul class="tv-notes" id="tvAdvice"></ul>
+    <div class="grid two">
+      <label>Mode
+        <select id="tvMode">
+          <option value="quality">Quality: Qwen3-TTS 1.7B, closest to each voice</option>
+          <option value="light">Lightweight: Qwen3-TTS 0.6B, less memory, faster</option>
+        </select>
+        <small class="hint" id="tvModeNote">Tyler suggests a mode for this PC; it never switches by itself.</small>
+      </label>
+      <label>Runs on
+        <select id="tvDevice">
+          <option value="auto">Graphics card when it can be used, otherwise the processor</option>
+          <option value="cpu">Always the processor (keeps the graphics card free for games)</option>
+        </select>
+        <small class="hint">The processor is much slower: a few seconds of speech can take a minute or more.</small>
+      </label>
+    </div>
+    <details class="tv-explain"><summary>Quality or Lightweight?</summary>
+      <p><b>Quality</b> uses the larger model (Qwen3-TTS 1.7B). It copies each character's voice more closely and stumbles less (fewer odd pauses or misread words). It needs about 6.5 GB of free graphics memory on an NVIDIA card, or about 8 GB of free memory on the processor, and each message takes longer to make. Download: about 4.2 GB for the model.</p>
+      <p><b>Lightweight</b> uses the smaller model (Qwen3-TTS 0.6B). It needs about 4 GB of graphics memory (or 4 GB of memory) and makes messages faster, but the voices sound a little less like the originals and odd pauses happen more often (Tyler retries a take that comes out the wrong length). Download: about 2.3 GB for the model.</p>
+      <p>Both use the same voice engine (about 2.7 GB with graphics-card support, 0.25 GB for the processor only). You can install both and switch any time.</p>
+    </details>
+    <h3>Install</h3>
+    <p id="tvInstallState" role="status">…</p>
+    <div class="tv-progress" id="tvProgressWrap" hidden><span id="tvProgress"></span></div>
+    <p class="hint" id="tvProgressText"></p>
+    <label class="toggle"><input id="tvBoth" type="checkbox"><span><b>Also install the other mode's model</b><small>So you can switch between Quality and Lightweight without another download.</small></span></label>
+    <div class="actions">
+      <button id="tvInstall" type="button">Install theme voices</button>
+      <button id="tvCancel" type="button" class="secondary" hidden>Stop installing</button>
+      <button id="tvCheck" type="button" class="secondary">Run a voice check</button>
+      <button id="tvRepair" type="button" class="secondary">Check and repair files</button>
+      <button id="tvOffline" type="button" class="secondary">Install from a folder…</button>
+    </div>
+    <div class="callout" id="tvOfflineForm" hidden>
+      <label>Folder with the offline bundle's files<input id="tvOfflineDir" placeholder="For example D:\Tyler theme voices"><small class="hint">Download every part of the offline bundle (from the <a href="https://github.com/treymun/Robotic-Tyler/releases/tag/theme-voices-engine-1" target="_blank" rel="noopener">theme-voices-engine-1 release</a>) into one folder first. Its files are checked exactly like downloads; anything missing or damaged is downloaded instead.</small></label>
+      <div class="actions"><button id="tvOfflineGo" type="button">Install from this folder</button><button id="tvOfflineCancel" type="button" class="secondary">Cancel</button></div>
+    </div>
+    <p class="hint">Everything is downloaded from its original source (python.org, PyPI, PyTorch and Hugging Face), checked against the SHA-256 recorded in this version of Tyler, and kept in its own folder: nothing is installed system-wide and other Python installs aren't touched. Interrupted downloads carry on where they stopped. <a href="#" id="tvOpenFolder">Open the folder</a>.</p>
+    <h3>While you play</h3>
+    <div class="grid two">
+      <label>Close the voice engine after
+        <select id="tvIdle">
+          <option value="1">1 minute idle</option><option value="2">2 minutes idle</option><option value="5">5 minutes idle</option><option value="10">10 minutes idle</option><option value="30">30 minutes idle</option><option value="0">Never (keep it loaded)</option>
+        </select>
+        <small class="hint">Closing it gives all of its memory back. The next message then takes a few seconds longer to start.</small>
+      </label>
+      <label class="toggle"><input id="tvProcessed" type="checkbox"><span><b>Add the voice's radio or mask sound</b><small>Only for voices whose original recordings have it (for example the Combine mask). Off plays the clone dry.</small></span></label>
+    </div>
+    <div class="actions"><button id="tvUnload" type="button" class="secondary">Close the engine now</button><button id="tvClearCache" type="button" class="secondary">Clear the cache of made clips</button></div>
+    <h3>Free up space</h3>
+    <p class="hint">Removes the downloaded engine and models. Your settings, your own reference recordings and clips you saved are kept, and Tyler keeps working without theme voices. You can install them again later (a remove means downloading again).</p>
+    <div class="actions"><button id="tvRemoveQuality" type="button" class="secondary">Remove the Quality model</button><button id="tvRemoveLight" type="button" class="secondary">Remove the Lightweight model</button><button id="tvRemove" type="button" class="secondary">Remove theme voices</button></div>
+    <h3><code>!say</code> in chat</h3>
+    <div class="grid two">
+      <label class="toggle"><input id="tvChat" type="checkbox"><span><b>Let the chat use !say</b><small><code>!say TEXT</code> or <code>!say portal: TEXT</code> plays into the voice call. Off by default.</small></span></label>
+      <label>Who can use it
+        <select id="tvChatAccess"><option value="everyone">Everyone in the chat</option><option value="selected">Only these Steam accounts</option></select>
+      </label>
+      <label>Wait between one person's messages
+        <select id="tvChatCooldown"><option value="0">No wait</option><option value="10">10 seconds</option><option value="20">20 seconds</option><option value="30">30 seconds</option><option value="60">1 minute</option><option value="120">2 minutes</option><option value="300">5 minutes</option></select>
+      </label>
+      <label>Allowed Steam accounts (SteamID64, one per line)<textarea id="tvChatAllowed" rows="2" placeholder="7656119…"></textarea></label>
+    </div>
+    <div class="actions"><button id="tvSaveSettings" type="button">Save theme voice settings</button></div>
+    <h3>Microsoft Sam and Mary</h3>
+    <p class="hint">The Windows XP and MSN Messenger voices can be the real thing: Microsoft's own SAPI 5 voices, when this PC has them. Windows 10 and 11 don't include them; Microsoft's Speech SDK 5.1 adds them. Without them, Tyler uses a clone of a reference recording of each voice (an approximation).</p>
+    <p class="hint" id="tvNative" role="status">Checking for Microsoft Sam and Mary…</p>
+    <div class="actions"><button id="tvNativeGet" type="button" class="secondary">Get them from Microsoft (Speech SDK 5.1, 68 MB)</button><button id="tvNativeCheck" type="button" class="secondary">Check again</button></div>
+    <label class="toggle"><input id="tvNativeUse" type="checkbox" checked><span><b>Use the original Windows voices when this PC has them</b><small>Off uses the clones instead.</small></span></label>
+    <h3>The 25 voices</h3>
+    <p class="hint">Each theme's voice can be replaced with your own recording (5–20 seconds of one person speaking clearly, plus exactly what they say). Your replacements are kept through updates. <b>Reference</b> plays the original recording the clone learns from; <b>Test</b> makes new speech with the clone.</p>
+    <label>Test sentence<input id="tvTestText" maxlength="200" value="Good evening. This is a test of my brand new voice."></label>
+    <div class="tv-voices" id="tvVoices"></div>
+    <p class="hint" id="tvVoiceState" role="status"></p>
+    <input id="tvRefFile" type="file" accept=".wav,.flac,.mp3,.ogg,audio/*" hidden>
+    <div class="callout" id="tvRefForm" hidden>
+      <label><span id="tvRefTitle">What is said in the recording</span><textarea id="tvRefText" rows="2" maxlength="600" placeholder="Type exactly what the person says. Leave it empty if you don't know (the clone then uses only the sound of the voice)."></textarea></label>
+      <div class="actions"><button id="tvRefSave" type="button">Use this recording</button><button id="tvRefCancel" type="button" class="secondary">Cancel</button></div>
+    </div>
+  </div>
+</section>
+
 <!-- ── Squad & friends ─────────────────────────────────────── -->
 <section class="sheet" id="suiteSettings" data-ui-zone="squad">
   <div class="sheet-head">
@@ -543,6 +644,7 @@
 <script src="notice-settings.js"></script>
 <script src="image-core.js"></script>
 <script src="image-settings.js"></script>
+<script src="theme-voice-settings.js"></script>
 <script src="settings.js"></script>
 <script src="v22-settings.js"></script>
 <script src="settings-navigation.js"></script>

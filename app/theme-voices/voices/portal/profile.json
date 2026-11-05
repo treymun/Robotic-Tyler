@@ -1,0 +1,48 @@
+{
+ "format": 1,
+ "backend": "qwen3-tts-12hz-base",
+ "profileVersion": 1,
+ "theme": "portal",
+ "name": "GLaDOS",
+ "voiceTarget": "GLaDOS (Portal 1)",
+ "relationship": "Direct game character",
+ "direction": "Cool, precisely articulated speech with the character's synthetic tone. Do not stack heavy effects over an already processed clone.",
+ "language": "English",
+ "status": "pending",
+ "statusNote": "",
+ "transcriptSource": "Machine transcript (Whisper small.en), corrected by hand where it clearly misheard; not checked by listening.",
+ "sources": [
+  {
+   "file": "00_part1_entry-2.wav",
+   "source": "sourcesounds/portal sound/vo/aperture_ai/00_part1_entry-2.wav",
+   "url": "https://raw.githubusercontent.com/sourcesounds/portal/master/sound/vo/aperture_ai/00_part1_entry-2.wav",
+   "sha256": "f42b7ef13ad0e54bca7918c3d0cb6feaa4c7db2b2e3b8ecf9173a388788a3a77"
+  },
+  {
+   "file": "00_part1_entry-3.wav",
+   "source": "sourcesounds/portal sound/vo/aperture_ai/00_part1_entry-3.wav",
+   "url": "https://raw.githubusercontent.com/sourcesounds/portal/master/sound/vo/aperture_ai/00_part1_entry-3.wav",
+   "sha256": "53906a6a87ce49e9ef8167ba7f98392e0bf01e58ac560486db71a086ed16db92"
+  },
+  {
+   "file": "01_part1_get_portal_gun-1.wav",
+   "source": "sourcesounds/portal sound/vo/aperture_ai/01_part1_get_portal_gun-1.wav",
+   "url": "https://raw.githubusercontent.com/sourcesounds/portal/master/sound/vo/aperture_ai/01_part1_get_portal_gun-1.wav",
+   "sha256": "264f90185d3d1e79b7452560fe5933840ed88583e3177fa2113c7a701b41f0a7"
+  }
+ ],
+ "effects": null,
+ "reference": "reference.flac",
+ "transcript": "We hope your brief detention in the relaxation vault has been a pleasant one. Your specimen has been processed and we are now ready to begin the test proper. Very good. You are now in possession of the Aperture Science Handheld Portal Device.",
+ "referenceSeconds": 16.35,
+ "sample": {
+  "phrase": "Hello, and, again, welcome to the Aperture Science Computer Aided Enrichment Center.",
+  "file": "sample.flac",
+  "source": {
+   "file": "00_part1_entry-1.wav",
+   "source": "sourcesounds/portal sound/vo/aperture_ai/00_part1_entry-1.wav",
+   "url": "https://raw.githubusercontent.com/sourcesounds/portal/master/sound/vo/aperture_ai/00_part1_entry-1.wav",
+   "sha256": "620705f535f4b95021c28b4753eb907adb589265c6a90edb6642cc1e7d33102a"
+  }
+ }
+}

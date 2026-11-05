@@ -47,6 +47,12 @@
   <small class="hint">A new mode starts the next time you press Connect &amp; start.</small>
   <details class="feature" open><summary><span class="feature-title">Say in chat</span><span class="feature-meta">Tyler types it</span></summary>
     <div class="feature-body"><form id="sayForm" class="btn-row" autocomplete="off"><input id="say" type="text" maxlength="300" placeholder="Tyler types this in the chat" aria-label="Message"><button class="btn primary" type="submit">Send</button></form></div></details>
+  <details class="feature" id="rmTvCard"><summary><span class="feature-title">Theme voice</span><span class="feature-meta" id="rmTvMeta">On the PC</span></summary>
+    <div class="feature-body"><p class="hint">Tyler says it in the call in a theme’s character voice. The voice is made on your PC; this phone only sends the text.</p>
+      <form id="rmTvForm" autocomplete="off"><label class="field">Voice<select id="rmTvVoice"><option value="">Follow the theme</option></select></label>
+      <label class="field">What Tyler says<input id="rmTvText" type="text" maxlength="400" placeholder="Type a message for the call" aria-label="Voice message"></label>
+      <div class="btn-row"><button class="btn primary" type="submit">Say in call</button><button id="rmTvStop" class="btn" type="button">Stop</button></div></form>
+      <p id="rmTvState" class="hint" role="status"></p></div></details>
   <details class="feature"><summary><span class="feature-title">Stay connected</span><span class="feature-meta">Quiet calls</span></summary>
     <div class="feature-body">
       <label class="check"><input id="rmKeepCall" type="checkbox"><span>Keep Tyler in quiet calls</span></label>
@@ -163,6 +169,12 @@
   if(choose)list.replaceChildren(...rooms.map(r=>{const b=document.createElement('button');b.type='button';b.className='btn';b.textContent=r.name+(r.count?' · '+r.count:'');b.onclick=()=>void callAct('voice-join',{roomId:r.id});return b;}));
  }
  async function callAct(action,extra={}){if(callBusy)return;callBusy=true;renderCall(live.call||{});try{await act(action,extra);}finally{callBusy=false;renderCall(live.call||{});pollSoon(300);}}
+ function renderThemeVoice(t){
+  const card=$('rmTvCard');if(!card)return;card.hidden=!t?.available;if(!t?.available)return;
+  $('rmTvMeta').textContent=t.ready?(t.busy?'Speaking…':'Ready'):'Not installed';
+  const sel=$('rmTvVoice'),keep=sel.value;if(sel.options.length<=1&&t.voices?.length){for(const v of t.voices){const o=document.createElement('option');o.value=v.theme;o.textContent=v.name;sel.append(o);}sel.value=keep;}
+  $('rmTvState').textContent=t.ready?(t.busy?'Tyler is making or saying a voice message.':''):'Install theme voices on the PC first: Settings → Voice → Theme voices.';
+ }
  function renderControls(s){
   const c=s.controls||{};
   live.paused=!!s.paused;$('connect').hidden=!live.paused;$('rmPause').hidden=live.paused;
@@ -175,6 +187,7 @@
   setValue('rmMode',c.mode);
   if(c.keep){setCheck('rmKeepCall',c.keep.call);setCheck('rmKeepChat',c.keep.chat);setValue('rmKeepMinutes',c.keep.minutes);$('rmKeepMinutes').disabled=!c.keep.call;$('rmKeepStatus').textContent=c.keep.status||'';}
   // Music
+  renderThemeVoice(s.themeVoices);
   const m=s.music||{};live.music=m;nowPlaying();
   $('rmMusicStart').hidden=!!m.sharing;$('rmMusicStartHint').hidden=!!m.sharing;$('musicSkip').disabled=$('musicEnd').disabled=!m.sharing;
   $('query').disabled=!m.sharing;$('musicForm').querySelector('button').disabled=!m.sharing;$('query').placeholder=m.sharing?'Artist — song title':'Start the Music DJ first';
@@ -277,6 +290,8 @@
   $('rmNoticeAlways').onclick=()=>void act('notice',{always:true},'Continuing. Tyler won’t ask again.');
   $('settings').onclick=()=>showTab('setup');
   $('rmMode').onchange=()=>void act('mode',{mode:$('rmMode').value},'Mode saved for the next Connect & start');
+  $('rmTvForm').addEventListener('submit',async e=>{e.preventDefault();const t=$('rmTvText').value.trim();if(!t)return;if(await act('theme-say',{text:t,theme:$('rmTvVoice').value},'Making the voice on the PC…'))$('rmTvText').value='';});
+  $('rmTvStop').addEventListener('click',()=>void act('theme-stop',{},'Stopped'));
   $('sayForm').addEventListener('submit',async e=>{e.preventDefault();const t=$('say').value.trim();if(!t)return;if(await act('say',{text:t},'Sent'))$('say').value='';});
   $('rmKeepCall').onchange=()=>void act('keepalive',{call:$('rmKeepCall').checked});
   $('rmKeepChat').onchange=()=>void act('keepalive',{chat:$('rmKeepChat').checked});

@@ -1,0 +1,54 @@
+{
+ "format": 1,
+ "backend": "qwen3-tts-12hz-base",
+ "profileVersion": 1,
+ "theme": "l4d",
+ "name": "Bill",
+ "voiceTarget": "Bill",
+ "relationship": "Direct game character",
+ "direction": "Older, gravelly and practical. Keep conversational speech separate from pain and combat exertion.",
+ "language": "English",
+ "status": "pending",
+ "statusNote": "",
+ "transcriptSource": "Machine transcript (Whisper small.en), corrected by hand where it clearly misheard; not checked by listening.",
+ "sources": [
+  {
+   "file": "c6dlc3intro07.wav",
+   "source": "sourcesounds/left4dead sound/player/survivor/voice/namvet/c6dlc3intro07.wav",
+   "url": "https://raw.githubusercontent.com/sourcesounds/left4dead/master/sound/player/survivor/voice/namvet/c6dlc3intro07.wav",
+   "sha256": "bedce9a5d610a74ce266237fb8dcde30da21dacd0269dc115e7c2dc1ee75c213"
+  },
+  {
+   "file": "c6dlc3intro06.wav",
+   "source": "sourcesounds/left4dead sound/player/survivor/voice/namvet/c6dlc3intro06.wav",
+   "url": "https://raw.githubusercontent.com/sourcesounds/left4dead/master/sound/player/survivor/voice/namvet/c6dlc3intro06.wav",
+   "sha256": "2abe92401aa6cdad2e76b167cb8521fd6c8caeacd61c768f2e76150cac66e330"
+  },
+  {
+   "file": "c6dlc3intro09.wav",
+   "source": "sourcesounds/left4dead sound/player/survivor/voice/namvet/c6dlc3intro09.wav",
+   "url": "https://raw.githubusercontent.com/sourcesounds/left4dead/master/sound/player/survivor/voice/namvet/c6dlc3intro09.wav",
+   "sha256": "6a88767683ea25883264435203038a98d49e2b23fe66f27b70636ece42a273bf"
+  },
+  {
+   "file": "c6dlc3intro03.wav",
+   "source": "sourcesounds/left4dead sound/player/survivor/voice/namvet/c6dlc3intro03.wav",
+   "url": "https://raw.githubusercontent.com/sourcesounds/left4dead/master/sound/player/survivor/voice/namvet/c6dlc3intro03.wav",
+   "sha256": "a8c11cdc4f982fd97645783f23badc167680057143b2306cfa0302e78cbfcd3e"
+  }
+ ],
+ "effects": null,
+ "reference": "reference.flac",
+ "transcript": "All right, everybody. Remember, we're looking for a sailboat. I ain't stopping a boat every fifteen minutes to go look for gas! You know who runs around filling up things with gas? Idiots. Alright, let's move, no stragglers.",
+ "referenceSeconds": 14.99,
+ "sample": {
+  "phrase": "Shut up, Francis!",
+  "file": "sample.flac",
+  "source": {
+   "file": "c6dlc3intro02.wav",
+   "source": "sourcesounds/left4dead sound/player/survivor/voice/namvet/c6dlc3intro02.wav",
+   "url": "https://raw.githubusercontent.com/sourcesounds/left4dead/master/sound/player/survivor/voice/namvet/c6dlc3intro02.wav",
+   "sha256": "799267ed533410009539e31d8b7ccdda8961cb86853b365fabdb0d8e4a1c3cb4"
+  }
+ }
+}

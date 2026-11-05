@@ -27,6 +27,23 @@ VOICE ON THE DESKTOP (v2.19):
   into = CABLE Input, Tyler listens to = your headset, and Steam's microphone =
   CABLE Output, and start voice from the Voice window (Ctrl+Shift+V).
 
+THEME VOICES (optional, v2.35, desktop app):
+  Tyler can say typed messages in each theme's character voice (GLaDOS, G-Man,
+  the CS 1.6 radio operator…). The voices are clones made on your own PC, so
+  there's no key and no cost per message. They're optional: the normal install
+  doesn't include them, and Tyler's usual voice works the same without them.
+  1. Add them in Setup (tick "Also add local theme voices"), or later in the
+     app: Settings → Voice → Theme voices → Install theme voices. Tyler checks
+     your PC first and shows the download (about 7 GB with an NVIDIA card in
+     Quality mode) before anything starts. Everything is automatic: no Python,
+     no terminal. Interrupted downloads carry on where they stopped.
+  2. In Steam chat, open Tyler's panel → Theme voices: type a message, then
+     Preview (only you hear it) or Play into call. "Follow the theme" uses the
+     current theme's voice; untick it to pick any voice.
+  3. Optional: !say in chat (off by default), and the phone remote's Theme
+     voice card. Remove them any time in the same Settings section; your
+     settings, own recordings and saved clips are kept.
+
 UPDATING CHROME FROM THIS FOLDER:
   Copy browser-extension/ over the same folder you loaded before, then click
   Reload on Tyler's card in chrome://extensions (keeps settings and keys).

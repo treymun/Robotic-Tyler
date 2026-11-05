@@ -1,0 +1,41 @@
+# The theme voices' offline bundle (v2.35): every file Tyler's theme-voice installer would download
+# (the isolated Python, the pinned packages for graphics-card and processor PCs, and both Qwen3-TTS
+# models), checked against app/theme-voices/engine-lock.json and packed into a .tar split into parts
+# under GitHub's 2 GiB per-file limit. It goes on its own release (theme-voices-engine-<n>), which only
+# changes when the voice engine does, not with every Tyler version.
+#
+# Run it by hand: Actions → Theme voices offline bundle → Run workflow.
+name: Theme voices offline bundle
+on:
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: Upload the bundle to the theme-voices-engine release
+        type: boolean
+        default: true
+permissions:
+  contents: write
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Make room (the bundle is about 10 GB)
+        run: |
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL /usr/local/share/boost || true
+          df -h /
+      - name: Build the bundle
+        run: node tools/theme-voices/make-offline-bundle.mjs --out dist/theme-voices-offline --runtimes windows-cuda,windows-cpu --models quality,light
+      - name: Upload to the theme-voices-engine release
+        if: inputs.publish
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          ENGINE=$(node -p "require('./app/theme-voices/engine-lock.json').engine")
+          TAG="theme-voices-engine-$ENGINE"
+          gh release view "$TAG" >/dev/null 2>&1 || gh release create "$TAG" --title "ROBOTIC TYLER theme voices: offline bundle (engine $ENGINE)" --notes-file dist/theme-voices-offline/README-theme-voices-offline.txt --latest=false
+          gh release upload "$TAG" dist/theme-voices-offline/*.tar.* dist/theme-voices-offline/SHA256SUMS-theme-voices.txt dist/theme-voices-offline/README-theme-voices-offline.txt --clobber

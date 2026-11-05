@@ -110,6 +110,9 @@ async function handleGameUnlocked(message,sender){
  if(message.type==='image:config'){const {imageGen,veniceKey,openrouterKey}=await chrome.storage.local.get(['imageGen','veniceKey','openrouterKey']);return {config:TylerImages.config(imageGen),keys:{openrouter:!!openrouterKey,venice:!!veniceKey}};}
  if(message.type==='image:cancel'){imageJobs.get(tab)?.abort();return {};}
  if(message.type==='image:generate')return makeImage(message,tab);
+ // v2.35: theme voices (voice clones made on this PC). The engine lives in the desktop app
+ // (app/theme-voices); Chrome has none, so there these only say where the feature is.
+ if(typeof message.type==='string'&&message.type.startsWith('voices:'))return themeVoices(message,tab);
  if(message.type==='v23:roast'){
   const st=await chrome.storage.local.get(['v23RoastEnabled','v23RoastState','v22EmergencyStop']);
   if(st.v22EmergencyStop===true||st.v23RoastEnabled!==true)throw Error('Roast battles disabled.');
@@ -141,7 +144,7 @@ async function handleGameUnlocked(message,sender){
   if(!/^![a-z][a-z0-9_-]{1,24}$/.test(entry.name)||typeof entry.reply!=='string'||entry.reply.length>250)throw Error('Invalid custom command.');
   return {message:entry.reply};
  }
- if(message.type==='settings'){await chrome.runtime.openOptionsPage();return {};}
+ if(message.type==='settings'){if(typeof message.section==='string'&&/^[a-z-]{2,30}$/.test(message.section)&&globalThis.tylerOpenSettings)await globalThis.tylerOpenSettings(message.section);else await chrome.runtime.openOptionsPage();return {};}
  if(message.type?.startsWith('suite:')&&!await lease.check(tab))throw Error('Another Steam tab owns the bot.');
  if(message.type==='suite:status'){
   const s=await chrome.storage.local.get(['openrouterKey','geminiKey','usage','suiteVotes','suiteProfiles','suiteXp','suiteEvents','suiteOptions','suiteParty']);
@@ -410,6 +413,21 @@ function imageProblem(provider,status,m){
  if(status===404)return 'that model isn’t available right now. Pick another one in Settings → Images.';
  if(status===429||status===503)return 'the image model is busy. Try again in a moment.';
  return m||'the request failed.';
+}
+async function themeVoices(message,tab){
+ const tv=globalThis.tylerThemeVoices;
+ if(!tv)return {available:false,reason:'Theme voices are part of the ROBOTIC TYLER desktop app: they are made by a voice engine it installs on your PC. Open Steam chat in the desktop app to use them.'};
+ const op=message.type.slice(7);
+ if(op==='status')return {available:true,...await tv.status()};
+ if(op==='stop')return tv.stop();
+ if(op==='settings')return tv.settings(message.values||{});
+ if(op==='save')return tv.save(String(message.id||''));
+ if(op==='speak'){
+  if(!await lease.check(tab))throw Error('Another Steam tab owns Tyler.');
+  const flags=await chrome.storage.local.get('v22EmergencyStop');if(flags.v22EmergencyStop===true)throw Error('Emergency stop is on.');
+  return tv.speak({text:String(message.text||'').slice(0,800),theme:typeof message.theme==='string'?message.theme:null,fresh:message.fresh===true,purpose:message.purpose==='call'?'call':'preview',from:message.from==='chat'?'chat':'panel'});
+ }
+ throw Error('Unknown theme-voice request.');
 }
 async function makeImage(message,tab){
  const s=await chrome.storage.local.get(['imageGen','openrouterKey','veniceKey','usage','spendingCapUSD','v22EmergencyStop']),cfg=TylerImages.config(s.imageGen);
