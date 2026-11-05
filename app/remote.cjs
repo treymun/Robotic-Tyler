@@ -20,7 +20,7 @@ const DEFAULT_PORT=47820,CODE_MS=600000,MAX_TRIES=8,MAX_DEVICES=8,COOKIE='rt_rem
 const THEMES=new Set(['steam','classic','tf2','cs2','portal','cs16','hev','l4d','winxp','doom','quake','pipboy','combine','deadlock','minecraft','payday','dreamcast','gmod','ricochet','dod','rust','x360','ipod','msn','xmb']);
 // Each action and the only fields it passes on (anything else a request carries is dropped).
 const num=(v,min,max)=>{const n=Number(v);return Number.isFinite(n)?Math.min(max,Math.max(min,n)):min;};
-const ACTIONS={pause:()=>({}),start:()=>({}),notice:b=>({always:b.always===true}),'voice-join':b=>({roomId:/^\d{1,20}$/.test(String(b.roomId||''))?String(b.roomId):''}),'voice-leave':()=>({}),'stop-audio':()=>({}),sound:b=>({slot:Number(b.slot)}),'clips-stop':()=>({}),'theme-say':b=>({text:String(b.text||'').replace(/\s+/g,' ').trim().slice(0,400),theme:/^[a-z0-9]{2,12}$/.test(String(b.theme||''))?String(b.theme):''}),'theme-stop':()=>({}),'clip-volume':b=>({value:num(b.value,0,1)}),
+const ACTIONS={pause:()=>({}),start:()=>({}),notice:b=>({always:b.always===true}),'voice-join':b=>({roomId:/^\d{1,20}$/.test(String(b.roomId||''))?String(b.roomId):''}),'voice-leave':()=>({}),'stop-audio':()=>({}),sound:b=>({slot:Number(b.slot)}),'clips-stop':()=>({}),'theme-say':b=>({text:String(b.text||'').replace(/\s+/g,' ').trim().slice(0,400),theme:/^[a-z0-9]{2,12}$/.test(String(b.theme||''))?String(b.theme):''}),'theme-stop':()=>({}),'chat-log':()=>({}),clear:()=>({}),'clip-volume':b=>({value:num(b.value,0,1)}),
  'music-start':()=>({}),'music-play':b=>({query:String(b.query||'').slice(0,120)}),'music-skip':()=>({}),'music-stop':()=>({}),'music-volume':b=>({value:num(b.value,0,200)}),
  'music-quality':b=>({level:String(b.level||'')}),'music-duck':b=>({on:b.on===true}),'voice-volume':b=>({value:num(b.value,0,.7)}),mode:b=>({mode:String(b.mode||'')}),
  keepalive:b=>{const o={};if(typeof b.call==='boolean')o.call=b.call;if(typeof b.chat==='boolean')o.chat=b.chat;if(b.minutes!==undefined)o.minutes=String(Math.round(num(b.minutes,1,120)));return o;},
@@ -96,6 +96,8 @@ function setupRemote({vault,log=()=>{},ask,pageDir,uiDir,libDir=path.dirname(uiD
  function body(req){return new Promise((resolve,reject)=>{let size=0;const parts=[];req.on('data',c=>{size+=c.length;if(size>4096){reject(Error('Too large'));req.destroy();}else parts.push(c);});req.on('end',()=>{try{resolve(JSON.parse(Buffer.concat(parts).toString('utf8')||'{}'));}catch{reject(Error('Invalid request'));}});req.on('error',reject);});}
  // Actions from one phone at most 5 a second.
  const recent=[];const limited=()=>{const t=Date.now();while(recent.length&&t-recent[0]>1000)recent.shift();if(recent.length>=5)return true;recent.push(t);return false;};
+ // v2.35: reading the chat log has its own small allowance, so it never uses up the buttons' one.
+ const reads=[];const readLimited=()=>{const t=Date.now();while(reads.length&&t-reads[0]>1000)reads.shift();if(reads.length>=3)return true;reads.push(t);return false;};
 
  async function run(action,args){
   if(action==='theme'){if(!THEMES.has(args.theme))throw Error('Unknown theme.');if(!prefs)throw Error('Not available.');await prefs.theme(args.theme);return {theme:args.theme};}
@@ -164,9 +166,9 @@ function setupRemote({vault,log=()=>{},ask,pageDir,uiDir,libDir=path.dirname(uiD
    if(p==='/action'){
     let b;try{b=await body(req);}catch(e){return send(res,400,{error:e.message});}
     const action=String(b.action||'');if(!Object.hasOwn(ACTIONS,action))return send(res,400,{error:'Unknown action.'});
-    if(limited())return send(res,429,{error:'Slow down a little.'});
+    if(action==='chat-log'?readLimited():limited())return send(res,429,{error:'Slow down a little.'});
     const args=ACTIONS[action](b);
-    try{const r=await run(action,args);log('Phone remote',action);return send(res,200,{ok:true,...r});}catch(e){return send(res,409,{error:String(e.message||e).slice(0,200)});}
+    try{const r=await run(action,args);if(action!=='chat-log')log('Phone remote',action);return send(res,200,{ok:true,...r});}catch(e){return send(res,409,{error:String(e.message||e).slice(0,200)});}
    }
   }
   if(req.method==='GET'&&p==='/state'){

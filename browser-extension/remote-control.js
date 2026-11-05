@@ -124,9 +124,20 @@
   'theme-say':({text:t,theme})=>{const tv=globalThis.TylerThemeVoices,s=clean(t,400);if(!tv?.state().ready)throw Error('Theme voices aren’t installed on the PC.');if(!s)throw Error('Type a message first.');if(tv.state().busy)throw Error('Tyler is still making the last one.');
    tv.say(s,/^[a-z0-9]{2,12}$/.test(String(theme||''))?theme:undefined).catch(()=>{});return {started:true};},
   'theme-stop':()=>{const tv=globalThis.TylerThemeVoices;if(!tv)throw Error('Theme voices aren’t available in this window.');void tv.stop();return {};},
+  // v2.35: the chat log on the phone: the latest messages in the open Steam chat, as Steam shows them.
+  'chat-log':()=>{
+   const region=api.getRegion?.(),sample=api.getSample?.();if(!region?.isConnected)return {connected:false,messages:[]};
+   const sel=(sample?.isConnected&&globalThis.TylerSelection?.selector?.(sample))||'.msgText',I=globalThis.TylerIdentity;
+   const nodes=[...region.querySelectorAll(sel)].filter(n=>n.isConnected).slice(-40);
+   const messages=nodes.map(n=>{const m=I?.meta?.(n)||null,who=I?.identify?.(n,region)||null,line=globalThis.TylerChatBus?.text(n)??(n.innerText||n.textContent||'');
+    return {name:clean(m?.self?'Tyler':(who?.name||'Someone'),40),self:!!m?.self,at:Number(m?.at)||null,text:clean(line,400)};}).filter(x=>x.text);
+   return {connected:true,messages};
+  },
+  // v2.35: Clear conversation & poll, as on the PC (Tyler forgets this chat's conversation; like the PC's button, it pauses him).
+  clear:()=>{click('reset');return {};},
   say:({text:t})=>{const s=clean(t,300);if(!s)throw Error('Type a message first.');api.send(s);return {};},
  };
- const ANYONE=new Set(['state','watch']);
+ const ANYONE=new Set(['state','watch','chat-log']);
  chrome.runtime.onMessage.addListener(m=>{
   if(m?.type!=='remote:action'||typeof m.id!=='string')return;
   const fn=Object.hasOwn(ACTIONS,m.action)?ACTIONS[m.action]:null;if(!fn){reply(m.id,false,null,'Unknown action.');return;}

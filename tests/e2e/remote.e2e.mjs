@@ -85,6 +85,16 @@ test('phone remote: pair, a copy of the panel in Tyler\'s theme, live status, bu
   await inPhone(phone,r=>{r.getElementById('say').value='hello squad';r.getElementById('sayForm').requestSubmit();});
   await pc.waitForFunction(()=>window.__sent.includes('hello squad'));
   await phone.waitForFunction(()=>document.getElementById('tyler').shadowRoot.getElementById('say').value==='');
+  // v2.35: the chat log card shows what's in the chat on the PC; Clear conversation needs a second tap.
+  await pc.evaluate(()=>{const region=document.querySelector('.ChatHistory');TylerCompanion.getRegion=()=>region;TylerCompanion.getSample=()=>region.querySelector('.msgText');});
+  await inPhone(phone,r=>{r.getElementById('rmLogCard').open=true;r.getElementById('rmLogCard').dispatchEvent(new Event('toggle'));});
+  await phone.waitForFunction(()=>document.getElementById('tyler').shadowRoot.querySelectorAll('#rmLog .rm-log-line').length===3,null,{timeout:15000});
+  assert.match(await inPhone(phone,r=>r.getElementById('rmLog').textContent),/Alex.*tyler who is throwing this match.*Sam.*!play daft punk/s);
+  await pc.evaluate(()=>{window.__resets=0;handlers.reset=()=>{window.__resets++;return {text:'Conversation cleared.'};};});
+  await tap(phone,'rmClear');assert.equal(await inPhone(phone,r=>r.getElementById('rmClear').textContent),'Tap again to clear','the first tap only asks');
+  await phone.waitForTimeout(300);assert.equal(await pc.evaluate(()=>window.__resets),0,'one tap clears nothing');
+  await tap(phone,'rmClear');await phone.waitForFunction(()=>document.getElementById('tyler').shadowRoot.getElementById('rmClear').textContent==='Clear conversation');
+  await pc.waitForFunction(()=>window.__resets===1,null,{timeout:5000});
   await inPhone(phone,r=>{const m=r.getElementById('rmMode');m.value='voice';m.dispatchEvent(new Event('change'));});
   await pc.waitForFunction(()=>document.getElementById('tyler-companion-root').shadowRoot.getElementById('setupMode').value==='voice');
   await tap(phone,'tab-setup');await inPhone(phone,r=>r.getElementById('rmMuteCall').click());
@@ -241,6 +251,14 @@ test('Steam window side: status, actions through the panel\'s controls, events o
   assert.match((await ask('music-quality',{level:'ultra'})).error,/isn.t available/);
   assert.match((await ask('mode',{mode:'party'})).error,/auto, text or voice/);
   assert.equal((await ask('pause')).ok,true);
+  // v2.35: the chat log (what's in the open chat) and Clear conversation, from the phone.
+  assert.deepEqual((await ask('chat-log')).data,{connected:false,messages:[]},'no chat connected yet: an empty log, not an error');
+  // The mock Steam page's chat, as the panel sees it once a chat is connected.
+  await pc.evaluate(()=>{const region=document.querySelector('.ChatHistory');TylerCompanion.getRegion=()=>region;TylerCompanion.getSample=()=>region.querySelector('.msgText');});
+  const log=await ask('chat-log');assert.equal(log.ok,true);assert.equal(log.data.connected,true);
+  assert.deepEqual(log.data.messages.map(m=>m.name+': '+m.text),['Alex: tyler who is throwing this match','ROBOTIC TYLER: [ROBOTIC TYLER] Statistically? The guy asking.','Sam: !play daft punk one more time']);
+  for(const m of log.data.messages)assert.deepEqual(Object.keys(m).sort(),['at','name','self','text']);
+  assert.equal((await ask('clear')).ok,true);
   assert.match((await ask('notice',{always:true})).error,/Nothing is waiting/,'v2.30: no chat check waiting');assert.equal(st.data.notice,false);
   assert.match((await ask('nope')).error,/Unknown action/);assert.match((await ask('__proto__')).error,/Unknown action/);
   // Events go to the main process only while a phone watches.

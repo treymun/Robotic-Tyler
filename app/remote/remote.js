@@ -47,6 +47,11 @@
   <small class="hint">A new mode starts the next time you press Connect &amp; start.</small>
   <details class="feature" open><summary><span class="feature-title">Say in chat</span><span class="feature-meta">Tyler types it</span></summary>
     <div class="feature-body"><form id="sayForm" class="btn-row" autocomplete="off"><input id="say" type="text" maxlength="300" placeholder="Tyler types this in the chat" aria-label="Message"><button class="btn primary" type="submit">Send</button></form></div></details>
+  <details class="feature" id="rmLogCard"><summary><span class="feature-title">Chat log</span><span class="feature-meta" id="rmLogMeta">What's happening</span></summary>
+    <div class="feature-body"><p class="hint">The latest messages in the chat open on your PC, refreshed every few seconds while this is open.</p>
+      <ol id="rmLog" class="rm-log" aria-live="polite"></ol>
+      <div class="btn-row"><button id="rmLogRefresh" class="btn" type="button">Refresh</button><button id="rmClear" class="btn danger" type="button">Clear conversation</button></div>
+      <p id="rmClearHint" class="hint">Clear conversation makes Tyler forget this chat's conversation and poll (friend memory stays). Like the button on the PC, it pauses him: press Connect &amp; start to carry on.</p></div></details>
   <details class="feature" id="rmTvCard"><summary><span class="feature-title">Theme voice</span><span class="feature-meta" id="rmTvMeta">On the PC</span></summary>
     <div class="feature-body"><p class="hint">Tyler says it in the call in a theme’s character voice. The voice is made on your PC; this phone only sends the text.</p>
       <form id="rmTvForm" autocomplete="off"><label class="field">Voice<select id="rmTvVoice"><option value="">Follow the theme</option></select></label>
@@ -270,6 +275,27 @@
   catch(e){toast('error','Tyler couldn’t do that',e.name==='TimeoutError'?'Your PC didn’t answer in time.':e.message);return false;}
   finally{sending.delete(key);}
  }
+ // v2.35: the chat log, read from the Steam window on the PC (only while its card is open).
+ let logBusy=false,logTimer=0;
+ async function chatLog(now=false){
+  clearTimeout(logTimer);if(!$('rmLogCard')?.open||document.hidden){return;}
+  if(logBusy)return;logBusy=true;
+  try{
+   const r=await fetch('/action',{method:'POST',headers:H,body:JSON.stringify({action:'chat-log'}),signal:AbortSignal.timeout(8000)}),j=await r.json().catch(()=>({}));
+   if(r.status===401){showPaired(false);return;}
+   if(!r.ok)throw Error(j.error||'Couldn’t read the chat.');
+   const list=$('rmLog');
+   if(!j.connected){list.replaceChildren();$('rmLogMeta').textContent='Not connected';const li=document.createElement('li');li.className='hint';li.textContent='Open the group chat in Tyler’s Steam window on your PC.';list.append(li);return;}
+   const near=list.scrollHeight-list.scrollTop-list.clientHeight<40;
+   list.replaceChildren(...j.messages.map(m=>{const li=document.createElement('li');li.className='rm-log-line'+(m.self?' self':'');
+    const head=document.createElement('span');head.className='rm-log-who';head.textContent=m.name+(m.at?' · '+new Date(m.at*(m.at<1e12?1000:1)).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'}):'');
+    const body=document.createElement('span');body.className='rm-log-text';body.textContent=m.text;li.append(head,body);return li;}));
+   $('rmLogMeta').textContent=j.messages.length?j.messages.length+' recent':'No messages yet';
+   if(near||now)list.scrollTop=list.scrollHeight;
+  }catch(e){$('rmLogMeta').textContent='Couldn’t read the chat';}
+  finally{logBusy=false;if($('rmLogCard')?.open)logTimer=setTimeout(()=>void chatLog(),5000);}
+ }
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden)void chatLog();});
  // A slider sends its value when you let go; the label follows while you drag.
  function slider(id,label,format,send){
   const el=$(id);
@@ -290,6 +316,11 @@
   $('rmNoticeAlways').onclick=()=>void act('notice',{always:true},'Continuing. Tyler won’t ask again.');
   $('settings').onclick=()=>showTab('setup');
   $('rmMode').onchange=()=>void act('mode',{mode:$('rmMode').value},'Mode saved for the next Connect & start');
+  $('rmLogRefresh').onclick=()=>void chatLog(true);
+  $('rmLogCard').addEventListener('toggle',()=>{if($('rmLogCard').open)void chatLog(true);});
+  let clearArmed=0;
+  $('rmClear').onclick=async()=>{if(Date.now()-clearArmed>5000){clearArmed=Date.now();$('rmClear').textContent='Tap again to clear';setTimeout(()=>{if(Date.now()-clearArmed>=5000)$('rmClear').textContent='Clear conversation';},5200);return;}
+   clearArmed=0;$('rmClear').textContent='Clear conversation';if(await act('clear',{},'Conversation cleared. Tyler is paused.'))void chatLog(true);};
   $('rmTvForm').addEventListener('submit',async e=>{e.preventDefault();const t=$('rmTvText').value.trim();if(!t)return;if(await act('theme-say',{text:t,theme:$('rmTvVoice').value},'Making the voice on the PC…'))$('rmTvText').value='';});
   $('rmTvStop').addEventListener('click',()=>void act('theme-stop',{},'Stopped'));
   $('sayForm').addEventListener('submit',async e=>{e.preventDefault();const t=$('say').value.trim();if(!t)return;if(await act('say',{text:t},'Sent'))$('say').value='';});

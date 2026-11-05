@@ -49,6 +49,9 @@ test('phone remote: pair with the code, then status and actions; nothing without
   assert.equal(act.status,200);assert.deepEqual(asked.at(-1),['sound',{slot:2}],'only the action\'s own fields reach Tyler');
   assert.equal((await request(port,{method:'POST',path:'/action',headers:{...H,cookie},body:{action:'delete-everything'}})).status,400);
   assert.equal((await request(port,{method:'POST',path:'/action',headers:{...H,cookie},body:{action:'say',text:'x'.repeat(900)}})).status,200);assert.equal(asked.at(-1)[1].text.length,300);
+  // v2.35: the chat log and Clear conversation are fixed actions with no arguments.
+  assert.equal((await request(port,{method:'POST',path:'/action',headers:{...H,cookie},body:{action:'chat-log',limit:9999}})).status,200);assert.deepEqual(asked.at(-1),['chat-log',{}]);
+  assert.equal((await request(port,{method:'POST',path:'/action',headers:{...H,cookie},body:{action:'clear',everything:true}})).status,200);assert.deepEqual(asked.at(-1),['clear',{}]);
   // Settings lists the phone; removing it ends its access.
   s=await remote.handle('status');assert.equal(s.devices.length,1);assert.equal(s.devices[0].name,'iPhone');
   await remote.handle('forget',{id:s.devices[0].id});assert.equal((await request(port,{path:'/state',headers:{cookie}})).status,401);
