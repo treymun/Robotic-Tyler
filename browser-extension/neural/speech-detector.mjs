@@ -22,6 +22,9 @@ export class SpeechDetector {
     if(!Number.isFinite(probability))throw Error('Invalid speech model output');
     peak=Math.max(peak,probability);
     if(probability>=.5){speechFrames++;run++;longest=Math.max(longest,run);}else run=0;
+    // v2.33: the answer can't change once it's settled, so stop there (it scanned every frame of a
+    // 12 s clip, about 180 ms, after the person had already stopped talking).
+    if(speechFrames>=3&&longest>=2&&peak>=.65)return {speech:true,speechMs:speechFrames*32,peak,early:true};
    }
    return {speech:speechFrames>=3&&longest>=2&&peak>=.65,speechMs:speechFrames*32,peak};
   }finally{state?.dispose();sr.dispose();}

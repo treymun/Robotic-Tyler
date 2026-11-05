@@ -4,7 +4,7 @@ export function createMusicRouter(chrome){
  async function route(m,s){
   if(!s.tab||!/^https:\/\/(?:www\.)?youtube\.com\//.test(s.url||''))throw Error('Music controller requires the selected YouTube tab.');
   const {tylerMusicTab:state}=await store.get('tylerMusicTab');
-  if(!state||state.youtubeTab!==s.tab.id)return {};
+  if(!state||state.youtubeTab!==s.tab.id)return {notMusic:true};
   if(m.type==='music:pending')return {command:state};
   if(m.type==='music:event'&&m.token===state.token){
    if(!['playing','ended','blocked','error','paused','missing'].includes(m.event))return {};

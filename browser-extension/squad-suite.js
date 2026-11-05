@@ -70,7 +70,7 @@
   const trivia=parsed?.kind==='trivia'?(parsed.action==='answer'?{action:'answer',choice:parsed.choice}:{action:'start'}):null;
   if(line.length>140)return;
   if(!match&&!trivia&&!party&&!help&&!roast&&!custom){
-   if(featureFlags.directorEnabled===true&&Date.now()-lastCue>90000&&/\b(gg|we won|victory|clutch|we lost|defeat|wiped)\b/i.test(line)&&globalThis.TylerIdentity?.speaker(node,bound)?.id){lastCue=Date.now();api.bridge('board-play',{slot:/\b(we lost|defeat|wiped)\b/i.test(line)?5:4,volume:.35});}return;
+   if(featureFlags.directorEnabled===true&&Date.now()-lastCue>90000&&/\b(gg|we won|victory|clutch|we lost|defeat|wiped)\b/i.test(line)&&globalThis.TylerIdentity?.speaker(node,bound)?.id){lastCue=Date.now();const slot=/\b(we lost|defeat|wiped)\b/i.test(line)?5:4;if(api.playChatSound)void api.playChatSound(slot,globalThis.TylerIdentity.speaker(node,bound));}return;
   }
   let speaker=globalThis.TylerIdentity?.speaker(node,bound);
   for(let retry=0;!speaker&&retry<4;retry++){await new Promise(resolve=>setTimeout(resolve,100));if(!active())return;speaker=globalThis.TylerIdentity?.speaker(node,bound);}

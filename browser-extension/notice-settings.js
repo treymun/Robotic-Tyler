@@ -8,7 +8,7 @@
  const status=document.getElementById('noticeStatus');
  const show=q=>{box.checked=q?.noticeAlways!==true;status.textContent=box.checked?'Connect & start asks once in each new chat.':'Connect & start doesn’t ask. Remember to tell new chats that Tyler is listening.';};
  const load=()=>Promise.resolve(store.get(['quickSetup'])).then(v=>show(v?.quickSetup||{})).catch(()=>{});
- box.onchange=async()=>{try{const v=await store.get(['quickSetup']),q={...(v?.quickSetup||{}),noticeAlways:!box.checked};await store.set({quickSetup:q});show(q);globalThis.TylerKit?.page()?.toast({kind:'success',title:'Saved',text:status.textContent});}catch(e){status.textContent=String(e.message||e);}};
+ box.onchange=async()=>{try{const v=await store.get(['quickSetup']),q={...(v?.quickSetup||{}),noticeAlways:!box.checked};await store.set({quickSetup:q});const back=(await store.get(['quickSetup']))?.quickSetup||{};if((back.noticeAlways===true)!==q.noticeAlways)throw Error('The setting didn’t save. Try again.');show(back);globalThis.TylerKit?.page()?.toast({kind:'success',title:'Saved',text:status.textContent});}catch(e){status.textContent=String(e.message||e);}};
  globalThis.chrome?.storage?.onChanged?.addListener?.((changes,area)=>{if(area==='local'&&changes.quickSetup)show(changes.quickSetup.newValue||{});});
  void load();
 })();

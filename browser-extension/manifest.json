@@ -1,11 +1,12 @@
 {
   "manifest_version": 3,
   "name": "ROBOTIC TYLER",
-  "version": "2.32.4",
+  "version": "2.33.0",
   "description": "Browser-first Steam AI companion with opt-in screen-aware gaming commentary.",
   "permissions": [
     "storage",
-    "tabs"
+    "tabs",
+    "unlimitedStorage"
   ],
   "host_permissions": [
     "https://openrouter.ai/*",

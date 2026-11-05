@@ -19,8 +19,9 @@
    for(const a of list){if(a.closest(SKIP)||!a.getClientRects().length)continue;const id=videoId(a);if(id)return {a,id};}
   return null;
  }
+ let misses=0;
  async function tick(){
-  const r=await send({type:'music:pending'}),state=r?.command;if(!state)return;
+  const r=await send({type:'music:pending'}),state=r?.command;misses=r?.notMusic?misses+1:0;if(!state)return;
   const video=document.querySelector('video');
   if(['pause','stop'].includes(state.action)){video?.pause();lastAction=state.action+'|'+state.token;return;}
   if(state.action==='resume'){
@@ -48,5 +49,5 @@
   if(video.error){await event(state,'error');return;}
   if(!document.querySelector('.ad-showing')&&!video.paused&&video.readyState>=2){const title=document.querySelector('h1.ytd-watch-metadata')?.textContent||document.title.replace(/ - YouTube$/,'');await event(state,'playing',title);}
  }
- setInterval(()=>void tick(),1200);void tick();
+ const loop=async()=>{try{await tick();}finally{setTimeout(loop,misses>=5?20000:1200);}};void loop();
 })();

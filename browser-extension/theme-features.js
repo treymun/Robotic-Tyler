@@ -108,13 +108,13 @@
    later(fn,delay){const t=setTimeout(()=>{timers.delete(t);fn();},delay);timers.add(t);return t;},
    cancel(t){clearTimeout(t);timers.delete(t);},
    every(fn){tick=fn;start();},
-   key(fn){const k=e=>{if(keyActive(e))fn(e);};document.addEventListener('keydown',k,true);offs.push(()=>document.removeEventListener('keydown',k,true));},
+   key(fn,opts={}){const k=e=>{if(keyActive(e)&&(!opts.focus||e.target===ui.host||e.composedPath().includes(panel)))fn(e);};document.addEventListener('keydown',k,true);offs.push(()=>document.removeEventListener('keydown',k,true));},
    on(target,type,fn,opts){target.addEventListener(type,fn,opts);offs.push(()=>target.removeEventListener(type,fn,opts));},
    /** A short-lived element in the overlay layer (notifications, transitions). */
    flash(el,life=1800){slots.layer.append(el);own.add(el);ctx.later(()=>{el.remove();own.delete(el);},life);return el;},
    /** One of the current theme's branded icons (v2.28, ui-brand.js), or null if it has none. */
    brand(id,cls='fx-bi'){const g=globalThis.TylerBrand;return g?.el?.(S.theme,id,cls)||null;},
-   destroy(){for(const t of timers)clearTimeout(t);timers.clear();for(const el of own)el.remove();own.clear();for(const off of offs)off();tick=null;},
+   destroy(){try{this?._menu?.close?.(false);this?._overlay?.close?.();}catch{}for(const t of timers)clearTimeout(t);timers.clear();for(const el of own)el.remove();own.clear();for(const off of offs)off();tick=null;},
    get tick(){return tick;},
    /** Pixels from the panel's top to the bottom of an element (to place overlays under the tabs, say). */
    below(selector){const el=root.querySelector(selector),p=panel.getBoundingClientRect();return el?Math.round(el.getBoundingClientRect().bottom-p.top):0;},
@@ -161,7 +161,7 @@
   };
   return ctx;
  }
- function start(){if(ticker)return;ticker=setInterval(()=>{if(document.hidden||S.mini&&S.theme!=='dreamcast')return;for(const m of mounted){try{m.ctx.tick?.();}catch(e){console.warn('[ROBOTIC TYLER] theme feature tick:',e?.message);}}},1000);}
+ function start(){if(ticker)return;ticker=setInterval(()=>{if(document.hidden||api.isOffscreen?.()||S.mini&&S.theme!=='dreamcast')return;for(const m of mounted){try{m.ctx.tick?.();}catch(e){console.warn('[ROBOTIC TYLER] theme feature tick:',e?.message);}}},1000);}
  function stopTicker(){if(ticker&&!mounted.some(m=>m.ctx.tick)){clearInterval(ticker);ticker=0;}}
  function unmount(){for(const m of mounted){try{m.instance?.unmount?.();}catch{}m.ctx.destroy();}mounted=[];panel.removeAttribute('data-fx');stopTicker();}
  // v2.28: the original themes' branded icons (ui-brand.js): the panel's own icons (tabs, buttons,
@@ -191,7 +191,7 @@
  if(tallyLabel&&tallyHead){tallyLabel.after(timer);tally.prepend(pulse);}
  const TIMED=new Set(['listening','thinking','speaking','waiting']);
  function strip(changed){
-  const t=now(),active=TIMED.has(S.state)&&!document.hidden;
+  const t=now(),active=TIMED.has(S.state)&&!document.hidden&&!api.isOffscreen?.();
   const sec=Math.floor((t-S.since)/1000);timer.textContent=active&&sec>=1?(sec<60?sec+'s':clock(t-S.since)):'';
   panel.style.setProperty('--fx-health',String(health()));
   if(changed){tally.title=S.label+(S.text?': '+S.text:'')+' · since '+new Date(S.since).toLocaleTimeString();
@@ -216,6 +216,7 @@
   if(type==='tab')S.tab=data.tab;
   if(type==='mini')S.mini=!!data.mini;
   if(type==='hud'){S.hud=data;S.spend=parseMoney(data.spend);S.tokens=data.spendMeta||'';}
+  if(type==='reply'&&data?.kind==='game')return;
   if(type==='reply'){S.replies++;bump('replies');turnDone(t);log('reply','Replied in chat ('+data.chars+' characters)');}
   if(type==='chat'){S.heard++;bump('heard');S.chatBurst=data.recent||0;S.flood=!!data.flood;}
   if(type==='sound'){S.sounds++;bump('sounds');S.lastSound=data.name||'';log('sound','Played '+S.lastSound);}

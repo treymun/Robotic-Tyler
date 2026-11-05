@@ -116,7 +116,7 @@
   keepalive:({call,chat,minutes})=>{if(call===true)setControl('kaCall',true,['change']);if(minutes!==undefined&&!$('kaMinutes')?.disabled)setControl('kaMinutes',minutes,['change']);if(chat!==undefined)setControl('kaChat',chat,['change']);if(call===false)setControl('kaCall',false,['change']);return {};},
   'full-check':()=>{api.showTab?.('checks');click('diagnose');return {};},
   heard:({yes})=>{click(yes?'heardYes':'heardNo');return {};},
-  beep:()=>{click('beep');return {};},
+  beep:()=>{const v=api.getVoiceState?.()||{},inCall=globalThis.TylerVoiceCall?.state?.().state==='connected'||Number(v.connectedPeers)>0;if(!v.enabled)throw Error('Tyler’s microphone is off. Press Connect & start first.');if(!inCall)throw Error('The bot isn’t in a voice call, so nobody would hear the beep. Join voice first.');click('beep');return {};},
   'voice-check':()=>{click('voiceCheck');return {};},
   say:({text:t})=>{const s=clean(t,300);if(!s)throw Error('Type a message first.');api.send(s);return {};},
  };

@@ -189,7 +189,7 @@
   $('device').textContent=s.device?'This '+s.device+' is paired with Tyler on your PC.':'';$('rmVersion').textContent=s.version?'v'+s.version:'';
   // Checks
   if(c.check){
-   $('diagnose').disabled=!!c.check.running;$('hearingConfirm').hidden=!c.check.hearing;
+   checkRunning=!!c.check.running;$('diagnose').disabled=!!c.check.running;$('hearingConfirm').hidden=!c.check.hearing;
    const k=JSON.stringify(c.check.items);if(k!==checksKey&&c.check.items?.length){checksKey=k;const list=$('diagnostics');list.replaceChildren();
     for(const it of c.check.items){const li=document.createElement('li');if(it.result)li.dataset.result=it.result;if(it.summary)li.className='check-summary';if(it.title){const b=document.createElement('b'),sp=document.createElement('span');b.textContent=it.title;sp.textContent=it.text||'';li.append(b,sp);}else li.textContent=it.text||'';list.append(li);}}
   }
@@ -245,12 +245,17 @@
 
  // ── Actions ──────────────────────────────────────────────────────────────
  const toast=(kind,title,text='')=>kit?.toast({kind,title,text});
+ const sending=new Set();let notReady='';
  async function act(action,extra={},done=''){
-  try{const r=await fetch('/action',{method:'POST',headers:H,body:JSON.stringify({action,...extra})}),j=await r.json().catch(()=>({}));
+  const key=action+JSON.stringify(extra);if(sending.has(key))return false;
+  if(notReady&&!['start','pause'].includes(action)){toast('error','Tyler isn’t ready on your PC',notReady);return false;}
+  sending.add(key);
+  try{const r=await fetch('/action',{method:'POST',headers:H,body:JSON.stringify({action,...extra}),signal:AbortSignal.timeout(15000)}),j=await r.json().catch(()=>({}));
    if(r.status===401){showPaired(false);return false;}
    if(!r.ok)throw Error(j.error||'Tyler couldn’t do that.');
    if(done)toast('success',done);pollSoon(400);return true;}
-  catch(e){toast('error','Tyler couldn’t do that',e.message);return false;}
+  catch(e){toast('error','Tyler couldn’t do that',e.name==='TimeoutError'?'Your PC didn’t answer in time.':e.message);return false;}
+  finally{sending.delete(key);}
  }
  // A slider sends its value when you let go; the label follows while you drag.
  function slider(id,label,format,send){
@@ -277,7 +282,7 @@
   $('rmKeepChat').onchange=()=>void act('keepalive',{chat:$('rmKeepChat').checked});
   $('rmKeepMinutes').onchange=()=>void act('keepalive',{minutes:Number($('rmKeepMinutes').value)});
   $('rmMusicStart').onclick=()=>void act('music-start',{},'Starting the Music DJ on your PC…');
-  $('musicForm').addEventListener('submit',async e=>{e.preventDefault();const q=$('query').value.trim();if(q.length<2)return;if(await act('music-play',{query:q},'Queued: '+q))$('query').value='';});
+  $('musicForm').addEventListener('submit',async e=>{e.preventDefault();const q=$('query').value.trim();if(q.length<2)return;if(await act('music-play',{query:q},'Sent to the Music DJ: '+q+' (it searches YouTube next)'))$('query').value='';});
   $('musicSkip').onclick=()=>void act('music-skip',{},'Skipped');
   $('musicEnd').onclick=()=>void act('music-stop',{},'Music stopped');
   slider('rmMusicVolume','rmMusicVolumeLabel',v=>Math.round(v)+'%',v=>act('music-volume',{value:v}));
@@ -340,7 +345,8 @@
   if(!s||typeof s!=='object')return;
   showPaired(true);
   if(Number.isFinite(s.now))offset=Date.now()-s.now;
-  if(!s.ready){setLink('pc');$('footerState').textContent='Open Steam chat in Tyler’s desktop app';if(live.state!=='error'||live.text!==s.error)setActivity('error','Not ready',s.error||'Open Steam chat in Tyler’s desktop app.');return;}
+  notReady=s.ready?'':(s.error||'Open Steam chat in Tyler’s desktop app.');
+  if(!s.ready){setLink('pc');if(live.call)renderCall({state:'unavailable',reason:notReady});$('footerState').textContent='Open Steam chat in Tyler’s desktop app';if(live.state!=='error'||live.text!==s.error)setActivity('error','Not ready',s.error||'Open Steam chat in Tyler’s desktop app.');return;}
   if(linkState==='pc'||linkState==='pair'||linkState==='connecting'||linkState==='lost')setLink(events?.readyState===1?'live':'polling');
   live.voice={...live.voice,...(s.voice||{})};live.chat=!!s.chat;live.owner=s.owner!==false;if(s.fx)live.fx=s.fx;
   if(THEMES.includes(s.theme)&&s.theme!==theme)setTheme(s.theme);
@@ -381,8 +387,10 @@
  }
  function closeEvents(){if(events){events.close();events=null;}}
  let lastOk=0;
- async function poll(){
-  try{const r=await fetch('/state',{cache:'no-store'});
+ let polling=null;
+ function poll(){if(!polling)polling=pollOnce().finally(()=>{polling=null;});return polling;}
+ async function pollOnce(){
+  try{const r=await fetch('/state',{cache:'no-store',signal:AbortSignal.timeout(6000)});
    if(r.status===401){closeEvents();showPaired(false);const code=new URLSearchParams(location.search).get('code');if(code&&!poll.tried){poll.tried=true;$('code').value=code;void pair(code);}return;}
    const s=await r.json();lastOk=Date.now();
    if(!fxLoaded&&!booting&&s.ready){apply(s);booting=startExtras(s);await booting;}
@@ -392,9 +400,10 @@
  }
  const pollSoon=ms=>{clearTimeout(soonTimer);soonTimer=setTimeout(()=>void poll(),ms);};
  // While a full check runs, its lines arrive every second.
- function checkWatch(){clearInterval(checkTimer);let n=0;checkTimer=setInterval(()=>{if(++n>40)clearInterval(checkTimer);void poll();},1000);}
+ function checkWatch(){clearInterval(checkTimer);let n=0;checkTimer=setInterval(()=>{if(++n>40||n>4&&!checkRunning){clearInterval(checkTimer);return;}void poll();},1000);}
+ let checkRunning=false;
  // Live events carry the status; the poll fills in the rest (the controls' settings, the check's lines).
- function startPolling(){clearInterval(pollTimer);pollTimer=setInterval(()=>{if(document.visibilityState!=='visible')return;if(events?.readyState===1&&Date.now()-lastOk<7500)return;void poll();},4000);}
+ function startPolling(){clearInterval(pollTimer);pollTimer=setInterval(()=>{if(document.visibilityState!=='visible')return;if(events?.readyState===1&&Date.now()-lastOk<20000)return;void poll();},4000);}
  document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){void poll();}else closeEvents();});
 
  async function pair(code){

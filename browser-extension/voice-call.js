@@ -24,7 +24,7 @@
   const pub=state();for(const fn of listeners){try{fn(pub);}catch{}}api.emit?.('voice-call',pub);render();
  }
  /** What the panel, the phone and the full check show. */
- function state(){return {state:S.state,room:S.room,roomId:S.roomId,groupId:S.groupId,people:S.people,elsewhere:!!last?.elsewhere,error:S.error,reason:S.reason,since:S.since,pending:!!pending,rooms:S.rooms.map(r=>({id:r.id,name:r.name,count:r.count})),steamState:S.steam};}
+ function state(){return {state:starting&&S.state!=='connected'?'joining':S.state,room:S.room,roomId:S.roomId,groupId:S.groupId,people:S.people,elsewhere:!!last?.elsewhere,error:S.error,reason:S.reason,since:S.since,pending:!!pending||starting,rooms:S.rooms.map(r=>({id:r.id,name:r.name,count:r.count})),steamState:S.steam};}
  // One look at Steam: the group's voice channels, which one Steam's call is in, and its state.
  async function observe(logs=false){
   const node=anchor();
@@ -58,8 +58,13 @@
  function finish(){clearTimeout(pending?.timeout);pending=null;schedule();}
  function schedule(){clearTimeout(timer);timer=setTimeout(tick,pending?FAST:SLOW);}
  async function tick(){if(polling){schedule();return;}polling=true;try{await observe();}finally{polling=false;schedule();}}
+ let starting=false;
  async function join(roomId){
+  if(starting)throw Error('Tyler is already joining the call.');
   if(pending)throw Error(pending.kind==='join'?'Tyler is already joining the call.':'Tyler is leaving the call. Wait for it to finish.');
+  starting=true;render();try{return await joinNow(roomId);}finally{starting=false;render();}
+ }
+ async function joinNow(roomId){
   const node=anchor();if(!node)throw Error('Connect Tyler to the group chat first (Connect & start or Soundboard only).');
   if(api.isOwner?.()===false)throw Error('Another tab runs the bot. Use this tab instead first.');
   const v=await observe();if(!v)throw Error(S.reason||'Steam chat controls did not answer.');
@@ -104,7 +109,7 @@
   box.dataset.state=st;$('vcState').textContent=LABEL[st]||st;
   $('vcText').textContent=st==='connected'?(S.room||'Voice')+(S.people?' · '+S.people+' other'+(S.people===1?'':'s')+' in the call':' · nobody else yet'):
    st==='joining'?'Steam is connecting'+(S.room?' to '+S.room:'')+'.':st==='leaving'?'Steam is leaving the call.':st==='failed'?S.error:st==='unavailable'?S.reason:'Tyler joins this group’s voice channel with his own microphone.';
-  $('vcJoin').disabled=!!pending||st==='connected'||st==='unavailable';$('vcLeave').disabled=pending?.kind==='leave'||!(st==='connected'||st==='joining'||st==='failed'&&!!S.roomId);
+  $('vcJoin').disabled=!!pending||starting||st==='connected'||st==='unavailable';$('vcLeave').disabled=pending?.kind==='leave'||!(st==='connected'||st==='joining'||st==='failed'&&!!S.roomId);
   const choices=$('vcChoices'),need=st==='failed'&&S.rooms.length>1&&/Choose one/.test(S.error);choices.hidden=!need;
   if(need)choices.replaceChildren(...S.rooms.map(r=>{const b=document.createElement('button');b.type='button';b.className='btn sm';b.textContent=r.name+(r.count?' · '+r.count:'');b.onclick=()=>void join(r.id).catch(e=>api.notify?.({kind:'error',title:'Couldn’t join the call',text:e.message}));return b;}));
  }

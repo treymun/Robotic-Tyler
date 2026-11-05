@@ -38,8 +38,11 @@
   listen('live-off');audio('pcm-flush',{gen:Number.MAX_SAFE_INTEGER-1});
   show(text);buttons();void refresh();
  }
+ let starting=false;
  async function start(){
-  if(port)return;
+  if(port||starting)return;starting=true;try{await begin();}finally{starting=false;}
+ }
+ async function begin(){
   if(!$('liveConsent').checked){show('Tick the consent box first: everyone in the call should know Tyler is listening.');return;}
   if(api.isOwner?.()===false){show('This tab is on standby. Take over in Setup first.');return;}
   await refresh();if(engine!=='live'){show('Settings → Voice is set to Standard. Choose Gemini Live there first.');return;}
@@ -51,7 +54,7 @@
   port=chrome.runtime.connect({name:'tyler-live'});state='connecting';buttons();show('Connecting to Gemini Live…');
   port.onMessage.addListener(onMessage);
   port.onDisconnect.addListener(()=>{if(port)end('Live voice ended because the extension restarted. Press Start to begin a new session.');});
-  ping=setInterval(()=>{try{port?.postMessage({type:'ping'});}catch{}},20000);
+  clearInterval(ping);ping=setInterval(()=>{try{port?.postMessage({type:'ping'});}catch{}},20000);
   port.postMessage({type:'start',chatScope:api.getChatScope?.()});
  }
  function onMessage(m){

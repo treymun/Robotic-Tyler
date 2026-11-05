@@ -1,3 +1,108 @@
+# ROBOTIC TYLER v2.33.0: a feature-quality pass, and voice occupancy read from Steam
+
+## New
+- **Voice occupancy is read from Steam.** In Auto and voice mode, Tyler reads who's in the call from Steam's own call data, so you don't have to click the bot's name. The voice list is only a fallback, for when Steam can't say.
+
+## Replies (text and voice)
+- **One failed reply no longer switches Tyler off.**
+  - When a reply fails (no text, a refusal, a safety block, a draft in the message box), Tyler skips that one, says why, and keeps listening.
+  - Account problems stop him and say why under "Needs attention" (it used to say only "Paused"). These are a bad key, no credits, a model that's gone, the spending cap, a daily Gemini limit or the emergency stop.
+  - Three failed replies in a row also stop him.
+- **Retries are faster and say why.** A provider hiccup retries after about 3 s, with the reason shown. A rate limit waits 15 s, or as long as the provider asks.
+- **No dropped message.** A message that arrived right after a direct one used to be skipped. It's answered now.
+- **Pause cancels a reply in progress.** That reply used to finish in the background, get billed, and be saved to memory as something Tyler said. Reloading the Steam tab also cancels the old page's request, so it can't block the new one.
+- **Quiet mode costs less.** Only messages for Tyler go to the AI: his name, a question, or a follow-up from the person he just answered. The rest are kept as context, with no AI request.
+- **Text-muted members are ignored**, and a Steam message is answered only once, even if its text changes.
+- **Text replies are checked.**
+  - A reply waits for your draft in the bot's message box instead of failing.
+  - Tyler checks that Steam actually sent it; if it didn't, he takes his text back out and says so.
+- **"Keep the chat connected" really reconnects** when Steam redraws the chat. Before, Tyler stopped a second before the reconnect could run.
+- **Clear conversation** clears this chat only. It used to wipe every room's memory.
+
+## Voice
+- **Interrupting Tyler no longer leaves him deaf**, and what the interrupter said is answered.
+- **Stop audio stops the whole spoken reply**, including the part still being made. A spoken "stop" works while the rest is being made, too.
+- **A friend who starts answering as Tyler finishes is heard.** Their speech used to be thrown away.
+- **End of turn follows the room.**
+  - The end of someone's turn, barge-in and the quiet gap before a reply now use the room's background level.
+  - The Sensitivity slider works again with AI speech detection on.
+  - A fan or game sound in someone's mic no longer keeps a turn open for 12 s.
+- **Faster local speech check:** about 10 ms after someone stops talking, down from up to about 180 ms.
+- **If speech fails,** Tyler types the reply into the chat and keeps listening. Before, he went deaf for 60 s and the reply was lost.
+- **Gemini Live**
+  - A double click on Start, or a stop while connecting, can no longer leave a paid Google connection open.
+  - Live keeps its own sensitivity; moving a Standard voice slider no longer changes it or restarts Live.
+  - Long answers are no longer cut off.
+
+## Music and audio
+- **No more clipping.** A safety stage on the final mix stops loud music and speech from crackling in the call. It's exactly linear below about −2 dBFS, so normal audio is untouched. The music limiter's hidden +0.76 dB boost was removed.
+- **Ducking:** music dips about 14 dB while Tyler talks (it was 10), and soundboard clips dip it too.
+- **Music share**
+  - Starting the share twice can no longer leave a share playing that nothing could stop.
+  - Re-sharing doesn't pause the song.
+  - Cancelling the picker keeps the share that was already on.
+  - Switching the shared tab is no longer offered.
+- **The video is no longer captured at full quality.** The share's unused video is captured at one small frame a second.
+- **The call's audio runs at 48 kHz**, Opus's own rate.
+- **"Stereo" is accurate.** The music status says when Steam's call is mono, even with a stereo share.
+- **Volume and the local monitor are kept.** Master volume and "Hear bot audio on this PC too" are saved, and they work before Connect & start.
+- **The keep-alive hum plays again.** A settings refresh every 30 seconds kept resetting its timer, so it almost never played.
+- **Stop audio also drops a clip that was still loading.**
+- **YouTube tabs that aren't Tyler's music tab** check every 20 s instead of every 1.2 s.
+
+## Soundboard and games
+- **Game results always post.** A game result is posted even when its sound isn't allowed or can't play right now (restricted sound access used to block the games silently).
+- **Sounds only count when they play.** A sound that was refused is no longer reported as played. The panel stays out of "On air", and stats and themes count only sounds that played.
+- **Less chat spam from games.** Repeated no-op game replies are held back, and posts are capped at 6 per 10 seconds; round starts, results and reveals always post.
+- **Game commentary**
+  - It's limited to once per 45 s.
+  - Dice and coin results get none.
+  - Pause AI turns it off.
+- **"Chat sound commands and chat games"** is saved. It also says that it covers the games.
+- **The soundboard director**
+  - It now follows the soundboard's access, volume and theme sounds.
+  - It's no longer labelled AI.
+- **Rust belt:** number keys need the panel's focus and don't repeat when held. The belt updates when the sounds change.
+- **Game posts no longer count as Tyler's replies** in theme stats.
+- **The trivia label** now says 500 questions in ten categories.
+- **Storage:** the extension can store more, so 32 clips in three banks can't fill Chrome's 10 MB limit.
+
+## Screen awareness and costs
+- Screen awareness is never routed to Parasail.
+- It counts toward spend and the spending cap.
+- Pause AI stops its automatic analysis.
+- Gemini text replies now show their token counts.
+
+## Desktop app, phone remote and the full check
+- **The full check** puts a running Tyler back when it's done. The beep is only tested in a call, and the answer updates the summary and the report.
+- **Pause AI** also stops the !tyler watcher. The tray's item is now "Pause AI replies", and it no longer ends the Music DJ.
+- **The desktop app**
+  - Hidden to the tray or minimized, the panel's animations and theme timers pause. Nothing changes on screen while it's visible.
+  - "Telling each chat" in Settings now saves.
+- **Phone remote**
+  - A double tap no longer sends twice.
+  - One status request at a time, with a timeout.
+  - The full-check watch ends with the check.
+  - Actions say so when the PC's window isn't ready.
+  - The beep is refused when nobody in a call could hear it.
+  - Turning the remote off while it's starting now closes the port.
+- **Join voice** ignores a second click. The remembered voice channel is now kept across reloads.
+
+## Tested
+- **Mocked, in Node:**
+  - automatic mode: skipped turns, account stops, busy and blip retries, no dropped message, Pause aborts, Quiet mode, mutes, one answer per message;
+  - the background: error kinds, this-chat reset, local context, screen awareness never Parasail and counted, a reload cancelling the old request;
+  - Live start/stop races;
+  - occupancy from Steam.
+- **Headless Chromium, stand-ins:**
+  - the real audio bridge, with a faked YouTube share: no samples at full scale with music at 200% and full master volume (hundreds before); Stop drops a decoding clip; a double share leaves nothing after Stop;
+  - the speech detector's time;
+  - the keep-alive timer.
+- All unit and end-to-end tests, and the desktop check.
+- **Not tested:** real Steam calls, real YouTube, Windows audio and Gemini Live.
+
+---
+
 # ROBOTIC TYLER v2.32.4: "In the call" shows when the bot really is in the call
 
 ## Fixed

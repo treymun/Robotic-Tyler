@@ -41,11 +41,11 @@ export function liveConfig(s={}){
  const model=LIVE_MODELS.find(m=>m.id===s.liveModel)||LIVE_MODELS[0];
  return {model:model.id,voice:geminiVoiceFor(s,'liveVoice'),interrupt:s.liveInterrupt!==false,
   startSensitivity:s.liveStartSensitivity==='high'?'high':'low',endSensitivity:s.liveEndSensitivity==='low'?'low':'high',
-  silenceMs:Math.round(clamp(s.liveSilenceMs,300,2000,700)),prefixMs:300,threshold:clamp(s.voiceThreshold,.001,.06,.01),
+  silenceMs:Math.round(clamp(s.liveSilenceMs,300,2000,700)),prefixMs:300,threshold:clamp(s.liveVoiceThreshold,.001,.06,.01),
   proactive:['quiet','occasional'].includes(s.talkativeness),length:['short','detailed'].includes(s.length)?s.length:'normal'};
 }
 /** Settings whose change only applies to the next live session. */
-export const LIVE_RESTART_KEYS=Object.freeze(['liveModel','liveVoice','liveInterrupt','liveStartSensitivity','liveEndSensitivity','liveSilenceMs','voiceThreshold','talkativeness','length','personality','roastMode','v23Persona']);
+export const LIVE_RESTART_KEYS=Object.freeze(['liveModel','liveVoice','liveInterrupt','liveStartSensitivity','liveEndSensitivity','liveSilenceMs','liveVoiceThreshold','talkativeness','length','personality','roastMode','v23Persona']);
 
 const LENGTH={short:'Keep each reply to one short sentence.',normal:'Keep replies short, usually one or two sentences; say a little more only when someone asks a real question.',detailed:'Answer real questions fully but conversationally, in a few sentences at most.'};
 /** The system instruction: the voice rules first, then reply length, then the owner's own style. */

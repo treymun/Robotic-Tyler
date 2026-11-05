@@ -257,10 +257,11 @@ async function handleGameUnlocked(message,sender){
  // v2.33 Quiet mode: messages not for Tyler are kept as context, with no AI request. Takeover lines never are.
  if(message.type==='remember'){const text=String(message.text||'').slice(0,1400).trim(),scope=acceptableScope(message.chatScope);if(!text||!scope||injectionAttempt(text))return {};const id='room:'+scope;await memory.write(id,[...cleanHistory(await memory.read(id)),{role:'user',content:text}]);return {remembered:true};}
  if(message.type==='voice'){if(typeof message.audio!=='string'||message.audio.length>2000000||message.format!=='wav')throw Error('Invalid speech recording');}else if(message.type!=='command'||typeof message.text!=='string'||message.text.length>1500)throw Error('Invalid command');
- if(busy.has(tab))throw Error('Still handling the previous command.');
+ const stopCheck=message.type==='voice'&&message.controlOnly===true;
+ if(busy.has(tab)&&!stopCheck)throw Error('Still handling the previous command.');
  if(Date.now()-(last.get(tab)||0)<(message.automatic?0:900))throw Error('Wait briefly before another command.');
- busy.add(tab);last.set(tab,Date.now());
- const controller=new AbortController();jobs.set(tab,{id:message.requestId,controller});
+ if(!stopCheck){busy.add(tab);last.set(tab,Date.now());}
+ const controller=new AbortController();if(!stopCheck)jobs.set(tab,{id:message.requestId,controller});
  const requestId=message.requestId,turnStarted=Date.now();
  const timings={};
  const progress=stage=>{const pending=chrome.tabs?.sendMessage?.(tab,{source:'tyler-progress',stage});pending?.catch?.(()=>{});};
@@ -393,7 +394,7 @@ async function handleGameUnlocked(message,sender){
    }catch(error){return {heard,text:reply,retryable:temporary(error),retryAfter:60000,warning:'Speech failed: '+redact(String(error.message).split(selectedKey).join('[redacted]'))};}
   }
   return {heard,text:reply,timings};
- }catch(error){if(heard&&message.modality==='voice'&&message.type==='command')error.retryMessage=message;throw error;}finally{busy.delete(tab);jobs.delete(tab);}
+ }catch(error){if(heard&&message.modality==='voice'&&message.type==='command')error.retryMessage=message;throw error;}finally{if(!stopCheck){busy.delete(tab);jobs.delete(tab);}}
 }
 const failure=error=>{const kind=errorKind(error),retry=kind==='transient';return {ok:false,error:redact(error.message),kind,retryable:retry,retryAfter:retry?transientDelay(error):kind==='busy'?1200:0,retryMessage:retry?error.retryMessage:undefined};};
 chrome.runtime.onMessage.addListener((m,s,reply)=>{handle(m,s).then(result=>reply({ok:true,...result})).catch(error=>reply(failure(error)));return true;});

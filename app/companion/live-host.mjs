@@ -5,7 +5,7 @@
 // needs a new session, or hits the emergency stop. The key never goes to the sink.
 import {LiveSession,liveConfig,liveInstructions,LIVE_RESTART_KEYS} from './live-core.mjs';
 
-const KEYS=['geminiKey','voiceEngine','liveModel','liveVoice','liveInterrupt','liveStartSensitivity','liveEndSensitivity','liveSilenceMs','voiceThreshold','talkativeness','length','personality','roastMode','v23Persona','speechVoice','v22EmergencyStop'];
+const KEYS=['geminiKey','voiceEngine','liveModel','liveVoice','liveInterrupt','liveStartSensitivity','liveEndSensitivity','liveSilenceMs','liveVoiceThreshold','talkativeness','length','personality','roastMode','v23Persona','speechVoice','v22EmergencyStop'];
 const cut=(s,n)=>String(s||'').replace(/\s+/g,' ').trim().slice(0,n);
 
 export class LiveHost{
@@ -16,13 +16,17 @@ export class LiveHost{
 
  /** Starts a session for `owner` (one at a time: any running session is stopped first). Resolves once Google accepted it. */
  async start({sink,historyId,owner}){
-  await this.stop('Another live session started');
-  const s=await this.storage.get(KEYS);
+  // v2.33: each start has a number; a stop (or a newer start) moves the number on, and every step
+  // after an await checks it, so a double click or a stop during "connecting…" can't leave a Google
+  // connection open that Stop can't reach.
+  const seq=this.seq=(this.seq||0)+1;this.starting=owner;const gone=()=>seq!==this.seq;
+  await this._stopCurrent('Another live session started');if(gone())throw Error('Live voice start was cancelled.');
+  const s=await this.storage.get(KEYS);if(gone())throw Error('Live voice start was cancelled.');
   if(s.v22EmergencyStop===true)throw Error('Emergency stop is on. Unlock it in Settings before starting live voice.');
   if(s.voiceEngine!=='live')throw Error('Choose Gemini Live in Settings → Voice first.');
   if(!s.geminiKey)throw Error('Save a Google AI key in Settings → AI & personality to use Gemini Live.');
   const config=liveConfig(s),memory=this.memory,read=()=>memory?memory.read(historyId).catch(()=>[]):[];
-  const history=await read();
+  const history=await read();if(gone())throw Error('Live voice start was cancelled.');
   let session;
   const mine=()=>this.session===session;
   session=new LiveSession({key:s.geminiKey,config,instructions:liveInstructions(s,config),history,getHistory:read,WebSocketImpl:this.WS,timers:this.timers,now:this.now,handlers:{
@@ -34,9 +38,11 @@ export class LiveHost{
    onTakeover:()=>sink.note?.('Someone tried to change Tyler\'s rules. Tyler was reminded to ignore it.'),
    onTurn:turn=>this._remember(historyId,turn),
   }});
+  if(this.session&&this.session!==session){try{this.session.stop('Another live session started');}catch{}this._ended();}
   this.session=session;this.sink=sink;this.owner=owner;this.config=config;this.startedAt=Date.now();
   try{await session.start();}
   catch(error){if(mine())this._ended();throw error;}
+  if(gone()){if(mine()){session.stop('Stopped while connecting');this._ended();}throw Error('Live voice start was cancelled.');}
   return {model:config.model,voice:config.voice};
  }
  /** A 16 kHz Int16 frame from the voice chat. */
@@ -44,6 +50,10 @@ export class LiveHost{
  text(text){return this.session?.sendText(text)??false;}
  /** Stops the running session (only `owner`'s, when given). */
  async stop(reason='Stopped',owner){
+  if(!owner||owner===this.starting||owner===this.owner)this.seq=(this.seq||0)+1; // cancels a start still in progress
+  return this._stopCurrent(reason,owner);
+ }
+ async _stopCurrent(reason,owner){
   const session=this.session;if(!session||(owner&&owner!==this.owner))return false;
   session.stop(reason);this._ended();await this.writes;return true;
  }

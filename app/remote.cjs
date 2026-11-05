@@ -194,13 +194,16 @@ function setupRemote({vault,log=()=>{},ask,pageDir,uiDir,libDir=path.dirname(uiD
   starting=(async()=>{const cfg=await readConfig();let lastError;
    for(let p=cfg.port;p<cfg.port+10;p++){try{server=await listen(p);port=p;break;}catch(e){lastError=e;if(e.code!=='EADDRINUSE')break;}}
    if(!server)throw Error('The phone remote couldn\'t start: '+(lastError?.code||lastError?.message||'no free port'));
-   if(port!==cfg.port)await vault.set({remoteControl:{on:true,away:cfg.away,port}});log('Phone remote','on, port '+port);
+   if(port!==cfg.port){const now=await readConfig();await vault.set({remoteControl:{on:now.on,away:now.away,port}});}
+   // Turned off while the port was opening: close it again now.
+   if(!(await readConfig()).on){const s=server;server=null;await new Promise(r=>s.close(()=>r()));log('Phone remote','off (turned off while starting)');return;}
+   log('Phone remote','on, port '+port);
   })().finally(()=>{starting=null;});
   return starting;
  }
  // Closing waits for open connections, and a phone's live stream reconnects at once, so every
 // connection is closed straight away rather than after close() (which then never finished).
-async function stop(){if(!server)return;dropStreams();const s=server;server=null;code=null;const closed=new Promise(r=>s.close(()=>r()));s.closeAllConnections?.();await closed;log('Phone remote','off');}
+async function stop(){if(starting)await starting.catch(()=>{});if(!server)return;dropStreams();const s=server;server=null;code=null;const closed=new Promise(r=>s.close(()=>r()));s.closeAllConnections?.();await closed;log('Phone remote','off');}
  async function status(){
   const cfg=await readConfig(),addresses=lanAddresses(),tailnet=tailnetAddresses();if(cfg.on&&!server)await start().catch(()=>{});
   const live=code&&Date.now()<codeUntil,qrFor=a=>live&&a?matrix('http://'+a+':'+port+'/?code='+code):null;

@@ -33,7 +33,9 @@ test('all Chrome text modules use the shared account or label reader; worker per
  assert.match(source('automatic.js'),/TylerIdentity\.identify\?\.\(t\.node/);
  assert.match(source('soundboard.js'),/TylerIdentity\?\.valid\(triviaSpeaker\)/);
  const manifest=JSON.parse(source('manifest.json'));assert.ok(manifest.content_scripts.find(g=>g.world==='MAIN').js.includes('sender-main.js'));
- assert.deepEqual(manifest.permissions,['storage','tabs']);
+ // v2.33: unlimitedStorage (no install warning) so 32 soundboard clips in three banks can't fill Chrome's
+ // 10 MB storage and make every other setting fail to save.
+ assert.deepEqual(manifest.permissions,['storage','tabs','unlimitedStorage']);
 });
 
 test('Squad Suite character updates send votes, parties, roasts and custom commands with the same sender',async()=>{

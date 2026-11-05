@@ -93,7 +93,7 @@ if(!app.requestSingleInstanceLock()){app.quit();}else{
    on?{label:'Stop voice',click:()=>void voice.stop('Voice stopped from the tray.')}:{label:'Start voice',click:()=>startVoice().catch(e=>{tray.displayBalloon?.({title:'Voice didn\'t start',content:e.message});void openVoice();})}];
   tray.setContextMenu(Menu.buildFromTemplate([{label:'Open Steam chat',click:()=>{bot?.show();bot?.focus();}},...voiceItems,
    ...(windowVoice?[{label:'Mute the call in this window (Tyler still hears it)',type:'checkbox',checked:muteCall,click:item=>void local.set({desktopMuteCall:item.checked})}]:[]),
-   {label:'Settings',click:()=>void openSettings()},{label:'Pause text replies',click:()=>{eventLog('Pause requested');bot?.webContents.send('tyler:message',{type:'v22:stop'});}},{type:'separator'},
+   {label:'Settings',click:()=>void openSettings()},{label:'Pause AI replies',click:()=>{eventLog('Pause requested');bot?.webContents.send('tyler:message',{type:'tyler:pause-ai'});}},{type:'separator'},
    {label:'Check for updates…',click:()=>updates.check(bot)},{label:'Quit ROBOTIC TYLER',click:()=>{quitting=true;app.quit();}}]));
  }
  try{tray=new Tray(nativeImage.createFromPath(path.join(__dirname,'..','assets','robotic-tyler-tray.png')).resize({width:16,height:16}));tray.on('double-click',()=>bot?.show());buildTray();}catch(err){eventLog('Tray unavailable',err.message);}
@@ -186,6 +186,7 @@ if(!app.requestSingleInstanceLock()){app.quit();}else{
  // configure() set the generic window rules; the Steam window's session keeps steam-voice.cjs's handlers.
  steamWindow.applyPermissions();steamWindow.watch(bot.webContents);
  // While voice runs, closing the chat window keeps Tyler in the tray instead of quitting.
+ for(const [ev,visible] of [['hide',false],['minimize',false],['show',true],['restore',true]])bot.on(ev,()=>{try{bot.webContents.send('tyler:message',{type:'tyler:window-visible',visible});}catch{}});
  bot.on('close',event=>{if(!quitting&&voice.mode!=='off'){event.preventDefault();bot.hide();tray?.displayBalloon?.({title:'ROBOTIC TYLER is still in voice chat',content:'Stop voice or quit from the tray icon.'});}});
  bot.on('closed',()=>{quitting=true;app.quit();});const botId=bot.webContents.id;bot.webContents.on('destroyed',()=>{for(const fn of removed)fn(botId);});
  Menu.setApplicationMenu(Menu.buildFromTemplate([{label:'ROBOTIC TYLER',submenu:[{label:'Steam chat',click:()=>bot.loadURL('https://steamcommunity.com/chat/')},{label:'Voice',accelerator:'Ctrl+Shift+V',click:()=>void openVoice()},{label:'Settings',click:()=>void openSettings()},{label:'Reload companion',click:()=>bot.webContents.reload()},{label:'Check for updates…',click:()=>updates.check(bot)},{type:'separator'},{label:'Open Steam desktop friends',click:()=>shell.openExternal('steam://open/friends')},{label:'Open chat in your browser',click:()=>shell.openExternal('https://steamcommunity.com/chat/')},{type:'separator'},{label:'Quit',click:()=>{quitting=true;app.quit();}}]},{label:'View',submenu:[{label:'Pin Tyler above other windows',type:'checkbox',accelerator:'Ctrl+Shift+Y',click:item=>bot.setAlwaysOnTop(item.checked)},{type:'separator'},{role:'zoomIn'},{role:'zoomOut'},{role:'resetZoom'},{role:'togglefullscreen'}]},{label:'Edit',submenu:[{role:'undo'},{role:'redo'},{type:'separator'},{role:'cut'},{role:'copy'},{role:'paste'},{role:'selectAll'}]}]));

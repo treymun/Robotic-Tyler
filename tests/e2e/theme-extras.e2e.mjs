@@ -126,7 +126,8 @@ test('themed menus and screens: open, fit, keyboard, Escape, real actions',{time
   await page.keyboard.press('Escape');assert.equal(await count('.rs-craft-menu'),0);
   await click('.rs-chip');await page.evaluate(R+'.querySelector(".rs-bp button").click()');assert.match(await tab(),/checks/i,'Craft · Full check runs the full check');assert.equal(await count('.rs-job'),1);
   await click('.rs-tc');assert.equal(await count('.rs-tc-menu'),1);await fits('.rs-tc-menu');await page.keyboard.press('Escape');
-  await over();const before=(await page.evaluate(()=>window.__played)).length;await page.keyboard.press('1');assert.equal((await page.evaluate(()=>window.__played)).length,before+1,'belt slot 1 plays a clip');
+  await over();const before=(await page.evaluate(()=>window.__played)).length;await page.keyboard.press('1');assert.equal((await page.evaluate(()=>window.__played)).length,before,'v2.33: hovering alone doesn\'t send a sound to the call');
+  await page.evaluate(R+'.querySelector(".rs-tc").focus()');await page.keyboard.press('1');assert.equal((await page.evaluate(()=>window.__played)).length,before+1,'belt slot 1 plays a clip once the panel has focus');
   await page.evaluate(()=>TylerCompanion.setActivity('NEEDS ATTENTION — Gemini 429 failed · quota reached'));await page.waitForTimeout(100);assert.equal(await count('.rs-wound'),1);
   await page.evaluate(()=>TylerCompanion.setActivity('LISTENING — speak normally, then pause'));await page.waitForTimeout(100);assert.equal(await count('.rs-wound'),0);
 

@@ -1,7 +1,7 @@
-ROBOTIC TYLER — v2.32.4
+ROBOTIC TYLER — v2.33.0
 
 JUST WANT TO USE IT?
-  Download ROBOTIC-TYLER-Setup-2.32.4.exe from
+  Download ROBOTIC-TYLER-Setup-2.33.0.exe from
   github.com/treymun/Robotic-Tyler/releases/latest and run it. Two parts:
     Desktop app        → Steam chat and Steam voice on Windows, no Chrome needed
                          (voice: Standard or Gemini Live, right in its Steam window)
@@ -10,15 +10,18 @@ JUST WANT TO USE IT?
   Run Setup again later to add or update a part. Settings and keys are kept.
   The desktop app replaces the old Control Center (upgraded in place) and Voice
   Studio (its settings are imported on first start; it then offers to remove it).
-  Pick a look in Settings → Appearance: 20 themes, from Steam, Team Fortress 2,
-  Counter-Strike 2 and Portal to DOOM, Deadlock, PAYDAY 2 and Day of Defeat.
+  Pick a look in Settings → Appearance: 25 themes, from Steam, Team Fortress 2,
+  Counter-Strike 2 and Portal to DOOM, Deadlock, PAYDAY 2, Xbox 360 and MSN.
 
 VOICE ON THE DESKTOP (v2.19):
   1. Sign in to the bot's Steam account in the app's Steam chat window.
   2. Settings: add your AI key; Settings → Voice: pick Standard or Gemini Live.
   3. In Steam chat, open the group, then Tyler's panel → Connect & start (or
-     Start live voice), and join the voice channel. No VB-CABLE needed: Tyler
-     talks through his own synthetic microphone.
+     Start live voice), then press Join voice in the Chat tab (or join the
+     voice channel yourself). No VB-CABLE needed: Tyler talks through his own
+     synthetic microphone.
+  4. Optional: Settings → Phone remote lets you run Tyler from your phone,
+     including Join voice and Leave voice.
   Prefer the older route through VB-CABLE and the Steam desktop app? Settings →
   Voice → Where Tyler joins voice → "Through VB-CABLE", then set Tyler speaks
   into = CABLE Input, Tyler listens to = your headset, and Steam's microphone =

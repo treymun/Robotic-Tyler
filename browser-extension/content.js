@@ -35,6 +35,7 @@
  globalThis.TylerStorage?.get(['uiTheme']).then(v=>setTheme(v?.uiTheme)).catch(()=>{});
  globalThis.TylerStorage?.onChanged?.addListener(changes=>{if(changes.uiTheme)setTheme(changes.uiTheme.newValue);});
 
+ let hush=0;
  const PAGE_ID=Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,10);
  let chatHint=null,discovery={},armedAt=0,sampleElement=null,composer=null,region=null,observer=null,armed=false,pending=false,lastResult='',epoch=0;
  let lastNodes=new WeakMap();const echoes=new Set();
@@ -164,8 +165,8 @@
    e.preventDefault();showTab(tabs[index].dataset.tab);tabs[index].focus();
   };
  }
- const pauseHooks=new Set();
- $('quickStop').onclick=()=>{globalThis.TylerCompanion.cancelSetup?.();globalThis.TylerCompanion.stopAutomatic?.('Paused by you');globalThis.TylerCompanion.stopLive?.('Live voice stopped by you.');
+ const pauseHooks=new Set();let userPaused=false;
+ $('quickStop').onclick=()=>{userPaused=true;globalThis.TylerCompanion.cancelSetup?.();globalThis.TylerCompanion.stopAutomatic?.('Paused by you');globalThis.TylerCompanion.stopLive?.('Live voice stopped by you.');
   // v2.33: the !tyler watcher too (it kept answering, and billing, while the panel said Paused).
   if(armed){armed=false;globalThis.TylerCommands?.set('tyler',{enabled:false});epoch++;observer?.disconnect();observer=null;}
   for(const fn of pauseHooks){try{fn();}catch{}}};
@@ -214,7 +215,7 @@
   if(boxText()===formatted.trim()){if(composer.matches('textarea,input')){const proto=composer.tagName==='TEXTAREA'?HTMLTextAreaElement.prototype:HTMLInputElement.prototype;Object.getOwnPropertyDescriptor(proto,'value').set.call(composer,'');composer.dispatchEvent(new Event('input',{bubbles:true}));}else{composer.focus();document.execCommand('selectAll');document.execCommand('delete');}}
   throw Error('Steam didn\'t send the reply (it stayed in the message box). Check that the chat is connected and you can type there.');
  }
- function send(text){
+ function send(text,opts={}){
   if(!composer?.isConnected)throw Error('Choose the Steam message box first.');
   // One formatting layer (chat-tag.js): any legacy prefix is cleaned off and the owner's name tag added once, or not at all.
   const formatted=TylerChatTag.format(String(text).slice(0,1800));if(!formatted)throw Error('Nothing to send.');composer.focus();
@@ -226,7 +227,7 @@
    if(composer.textContent.trim())throw Error('The selected message box contains a draft. Clear it first.');
    document.execCommand('insertText',false,formatted);composer.dispatchEvent(new InputEvent('input',{bubbles:true,inputType:'insertText',data:formatted}));
   }
-  rememberEcho(formatted);TylerChatTag.remember(formatted);emit('reply',{chars:formatted.length});
+  rememberEcho(formatted);TylerChatTag.remember(formatted);emit('reply',{chars:formatted.length,kind:opts?.kind==='game'?'game':'reply'});
   composer.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',code:'Enter',keyCode:13,which:13,bubbles:true}));
   composer.dispatchEvent(new KeyboardEvent('keyup',{key:'Enter',code:'Enter',keyCode:13,which:13,bubbles:true}));
   status('Submitted to the chosen message box. Confirm it appears in Steam; if it stays as a draft, press Enter manually.');
@@ -241,12 +242,12 @@
  }
  async function run(text,fromChat=false,testOnly=false){
   if(pending){status('Busy. Command skipped; try again after the current one finishes.');return;}
-  pending=true;lastHudActionStart=Date.now();setHud({latency:'Working…',latencyMeta:'Processing command'});const current=epoch;
+  pending=true;lastHudActionStart=Date.now();setHud({latency:'Working…',latencyMeta:'Processing command'});const current=epoch,quiet=hush;
   status('Handling command (AI may take up to 25 seconds, speech up to 20 more)…');
   try{
    const r=await ask({type:'command',text:text.replace(/^!tyler\s+/i,'').slice(0,1500),speak:!testOnly&&$('speak').checked});if(current!==epoch)return;
    if(r.text){lastResult=r.text;$('result').textContent=r.text;if(!testOnly&&$('autoSend').checked)send(r.text);}
-   if(r.sound)bridge('sound',{sound:r.sound});if(r.audio)bridge('audio',{audio:r.audio});
+   if(r.sound)bridge('sound',{sound:r.sound});if(r.audio&&quiet===hush)bridge('audio',{audio:r.audio});
    setHud({latency:formatMs(Date.now()-lastHudActionStart),latencyMeta:(r.audio?'Text + speech':'Text only')+(fromChat?' · auto':' · manual')});
    status(r.warning||'Command complete.');
   }catch(e){setHud({latency:'Error',latencyMeta:String(e.message||e).slice(0,60)});status(e.message);}
@@ -302,8 +303,11 @@
  $('testText').onclick=()=>run('ask Reply with a short hello.',false,true);checkAI();window.addEventListener('focus',checkAI);
  $('settings').onclick=()=>chrome.runtime.sendMessage({type:'settings'});
  $('voiceCheck').onclick=()=>bridge('status');
- $('beep').onclick=()=>bridge('sound',{sound:'beep'});$('stop').onclick=()=>{globalThis.TylerCompanion.stopLive?.('Live voice stopped by you.');bridge('stop');};
- function volume(){bridge('volume',{volume:Number($('volume').value),monitor:$('monitor').checked});}$('volume').oninput=volume;$('monitor').onchange=volume;
+ $('beep').onclick=()=>bridge('sound',{sound:'beep'});$('stop').onclick=()=>{hush++;globalThis.TylerCompanion.stopLive?.('Live voice stopped by you.');globalThis.TylerCompanion.cancelVoiceTurn?.();bridge('stop');};
+ // v2.33: the master volume and "Hear bot audio on this PC too" are kept (they were lost on reload) and sent
+ // to the bridge straight away, which holds them until it starts (they used to be dropped before Enable).
+ function volume(save=true){const v={volume:Number($('volume').value),monitor:$('monitor').checked};bridge('volume',v);if(save===true)void globalThis.TylerStorage?.set?.({voiceMix:v}).catch(()=>{});}$('volume').oninput=volume;$('monitor').onchange=volume;
+ globalThis.TylerStorage?.get?.(['voiceMix']).then(r=>{const v=r?.voiceMix;if(v&&typeof v==='object'){if(Number.isFinite(v.volume))$('volume').value=String(Math.max(0,Math.min(.7,v.volume)));$('monitor').checked=v.monitor===true;}}).catch(()=>{}).finally(()=>volume(false));
  $('clip').onchange=async()=>{const file=$('clip').files[0];if(!file)return;if(file.size>4000000){status('Choose a clip smaller than 4 MB.');return;}const reader=new FileReader();reader.onload=()=>bridge('audio',{audio:String(reader.result).split(',')[1]});reader.readAsDataURL(file);};
 
  // ── Manual commands ─────────────────────────────────────────────────────
@@ -433,19 +437,19 @@
  // The name-tag settings follow Settings without a reload (they're among the non-secret keys relayed here).
  globalThis.TylerStorage?.onChanged?.addListener((changes,area)=>{if(area==='local'&&(changes.chatTagEnabled||changes.chatTagName)){const c=TylerChatTag.current;TylerChatTag.set({chatTagEnabled:changes.chatTagEnabled?changes.chatTagEnabled.newValue:c.enabled,chatTagName:changes.chatTagName?changes.chatTagName.newValue:c.name});}});
  chrome.runtime.sendMessage({type:'connection'}).then(r=>{if(r?.chatTag)TylerChatTag.set(r.chatTag);}).catch(()=>{});
- globalThis.TylerCompanion={send,deliver,pause,bridge,connect,onPause:fn=>{pauseHooks.add(fn);return ()=>pauseHooks.delete(fn);},
+ globalThis.TylerCompanion={send,deliver,pause,bridge,connect,setOffscreen:off=>{if(off)host.dataset.offscreen='1';else delete host.dataset.offscreen;emit('offscreen',{off:!!off});},isOffscreen:()=>!!host.dataset.offscreen,pauseAI:()=>$('quickStop').click(),onPause:fn=>{pauseHooks.add(fn);return ()=>pauseHooks.delete(fn);},
   getMount:()=>$('automaticMount'),getFeatureMount:()=>$('featureMount'),getSoundboardMount:()=>$('soundboardMount'),getSetupMount:()=>$('automaticSetupMount'),
   getQuickMount:()=>$('quickMount'),getQuickOptions:()=>$('quickOptions'),getStyleSheet:()=>sheet,themeElement,getTheme:()=>uiTheme,
   locateChat,chooseTarget,prepareBridge,getDiscovery:()=>discovery,setChatHint:v=>{chatHint=['text','voice-room'].includes(v)?v:null;},getChatKind:()=>composer?.isConnected?TylerSelection.kind(composer):null,getVoiceState:()=>voiceReport,getChatScope:()=>TylerSetup.scope(region,document),request,showTab,setActivity,
   notify,confirm:confirmBox,emit,
   // Theme features (theme-features.js): the panel, live state and a subscription. Isolated world only.
   ui:{root,panel,host,onUI:fn=>{uiListeners.add(fn);return ()=>uiListeners.delete(fn);},state:()=>({state:$('activityCard').dataset.state,label:$('activityLabel').textContent,text:$('activity').textContent,tab:currentTab,hud:{...hudState},mini:host.classList.contains('mini'),theme:uiTheme,owner})},
-  isOwner:()=>owner,setAutomaticActive:value=>autoActive=value,isAutomaticActive:()=>autoActive,reportTurn,getIncoming:()=>incomingReport,getComposer:()=>composer,getRegion:()=>region,getSample:()=>sampleElement,getEpoch:()=>epoch,
+  isOwner:()=>owner,setAutomaticActive:value=>{autoActive=value;if(value)userPaused=false;},isAiPaused:()=>userPaused,isAutomaticActive:()=>autoActive,reportTurn,getIncoming:()=>incomingReport,getComposer:()=>composer,getRegion:()=>region,getSample:()=>sampleElement,getEpoch:()=>epoch,
   platform};
 })();
 
 /* v2.2 emergency stop is local to the Chrome tab. */
-chrome.runtime.onMessage.addListener(message=>{if(message?.type==='v22:stop'){try{globalThis.TylerCompanion?.stopAutomatic?.('Emergency stop');globalThis.TylerCompanion?.bridge?.('stop');globalThis.TylerCompanion?.pause?.();}catch(e){console.warn('Emergency stop:',e.message);}}});
+chrome.runtime.onMessage.addListener(message=>{if(message?.type==='tyler:window-visible'){globalThis.TylerCompanion?.setOffscreen?.(message.visible===false);return;}if(message?.type==='tyler:pause-ai'){try{globalThis.TylerCompanion?.pauseAI?.();}catch(e){console.warn('Pause:',e.message);}return;}if(message?.type==='v22:stop'){try{globalThis.TylerCompanion?.stopAutomatic?.('Emergency stop');globalThis.TylerCompanion?.bridge?.('stop');globalThis.TylerCompanion?.pause?.();}catch(e){console.warn('Emergency stop:',e.message);}}});
 
 /* v2.2 local command guide (Ctrl+Shift+H); does not post unsolicited chat. */
 window.addEventListener('keydown',e=>{

@@ -174,7 +174,7 @@
   // v2.22: press E to call for a MEDIC: Tyler shouts it and the Checks tab (the medic) opens.
   {id:'tf-medic',mount(c){
    let last=0;
-   function call(){if(Date.now()-last<1500)return;last=Date.now();const b=c.h('div','fx tf-medic');const mc=c.brand('medic-cross','tf-medic-bi');if(mc)b.append(mc);b.append(c.h('b',null,'MEDIC!'),c.h('small',null,'Checks tab: run the full check to patch Tyler up'));c.flash(b,1800);c.root.querySelector('.mark')?.classList.add('tf-medic-call');c.later(()=>c.root.querySelector('.mark')?.classList.remove('tf-medic-call'),900);c.actions.tab('checks');}
+   function call(){if(Date.now()-last<1500)return;last=Date.now();const b=c.h('div','fx tf-medic');const mc=c.brand('medic-cross','tf-medic-bi');if(mc)b.append(mc);b.append(c.h('b',null,'MEDIC!'),c.h('small',null,'Checks tab: run the full check to patch Tyler up'));c.flash(b,1800);const mark=c.root.querySelector('.mark');mark?.classList.add('tf-medic-call');mark?.addEventListener('animationend',()=>mark.classList.remove('tf-medic-call'),{once:true});c.later(()=>mark?.classList.remove('tf-medic-call'),900);c.actions.tab('checks');}
    c.key(e=>{if((e.key==='e'||e.key==='E')&&!e.repeat){e.preventDefault();call();}});
    const hint=c.root.querySelector('#tab-checks');hint?.setAttribute('title','Checks (5) · E calls for a medic');
    return {update(type,d){if(type==='state'&&d.state==='error'&&d.before!=='error'){const b=c.h('div','fx tf-medic tf-medic-hint');b.append(c.h('b',null,'Tyler is hurt'),c.h('small',null,'Press E for a medic'));c.flash(b,2600);}},unmount(){hint?.removeAttribute('title');}};

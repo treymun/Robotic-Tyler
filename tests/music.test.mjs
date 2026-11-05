@@ -21,6 +21,7 @@ test('music gets independent 200 percent gain and peak compression without chang
   createGain(){const n=node('gain');this.nodes.push(n);return n;}
   createMediaStreamDestination(){this.out={...node('steam'),stream};return this.out;}
   createMediaStreamSource(){this.source=node('source');return this.source;}
+  createWaveShaper(){this.shaper={...node('shaper'),curve:null,oversample:'none'};return this.shaper;}
   createDynamicsCompressor(){this.limiter={...node('limiter'),...Object.fromEntries(['threshold','knee','ratio','attack','release'].map(k=>[k,{value:0}]))};return this.limiter;}
   async resume(){}
  }
@@ -28,13 +29,19 @@ test('music gets independent 200 percent gain and peak compression without chang
  vm.runInNewContext(source('audio-bridge.js'),box);
  const command=(type,extra={})=>receive({source:box.window,origin:box.location.origin,data:{source:'tyler-audio-command',type,...extra}});
  await command('music-capture',{volume:3});
- assert.equal(context.nodes[0].gain.value,.35);
- assert.equal(context.nodes[2].gain.value,2);
- assert.equal(context.nodes[2].targets[0],context.limiter);
- assert.equal(context.limiter.targets[0].kind,'gain','the limiter feeds the ducking stage (v2.21)');assert.equal(context.limiter.targets[0].targets[0],context.out);
+ // v2.33: setup makes the call bus (0), Tyler's master (1) and the monitor (2); the share adds its gain (3),
+ // the limiter's makeup trim (4) and the duck (5). Everything meets on the bus, then the safety clipper.
+ const [bus,master,,music,trim,duckNode]=context.nodes;
+ assert.equal(master.gain.value,.35);assert.equal(bus.gain.value,.5);assert.equal(master.targets[0],bus);
+ assert.equal(music.gain.value,2);
+ assert.equal(music.targets[0],context.limiter);
+ assert.equal(context.limiter.targets[0],trim,'the limiter\'s makeup gain is taken back out');assert.ok(Math.abs(trim.gain.value-10**(-.76/20))<1e-9);
+ assert.equal(trim.targets[0],duckNode,'then the ducking stage (v2.21)');assert.equal(duckNode.targets[0],bus);
+ assert.equal(bus.targets[0],context.shaper);assert.equal(context.shaper.targets[0],context.out,'the safety clipper feeds the call');
+ assert.equal(context.shaper.oversample,'2x');const c=context.shaper.curve;assert.equal(c[2048],0);assert.ok(Math.abs(c[2048+512]-.5)<1e-6,'linear below the knee');assert.ok(c[4096]<=.98&&c[4096]>.95,'peaks rounded under full scale');
  assert.equal(context.limiter.threshold.value,-3);
- await command('music-volume',{volume:0});assert.equal(context.nodes[2].gain.value,0);
- await command('music-volume',{volume:1.5});assert.equal(context.nodes[2].gain.value,1.5);
+ await command('music-volume',{volume:0});assert.equal(music.gain.value,0);
+ await command('music-volume',{volume:1.5});assert.equal(music.gain.value,1.5);
  await command('stop');assert.equal(tracks.some(t=>t.stopped),false);
  await command('music-disconnect');assert.equal(tracks.every(t=>t.stopped),true);
 });
@@ -61,7 +68,7 @@ test('music routing is independent from AI stop and controls do not fetch or ext
  const stop=audio.slice(audio.indexOf(' function stop('),audio.indexOf(' const original='));
  assert.doesNotMatch(stop,/disconnectMusic/);
  assert.match(audio,/musicGain.connect\(musicLimiter\)/);
- assert.match(audio,/musicLimiter.connect\(musicDuck\);musicDuck.connect\(destination\)/);
+ assert.match(audio,/musicLimiter.connect\(musicTrim\);musicTrim.connect\(musicDuck\);musicDuck.connect\(bus\)/);
  assert.match(audio,/getDisplayMedia/);
  assert.match(source('music.js'),/v22:stop/);
  assert.doesNotMatch(source('youtube-music.js'),/fetch\(|getUserMedia|chrome\.storage|\.currentSrc/);
@@ -89,7 +96,7 @@ test('one-click Start Music DJ opens YouTube behind Steam and asks for the share
 test('Music DJ sound quality: untouched tab sound, a chosen call bitrate, kept between sessions (v2.20.2)',()=>{
  const bridge=source('audio-bridge.js'),music=source('music.js');
  assert.match(bridge,/MUSIC_AUDIO=Object\.freeze\(\{echoCancellation:false,noiseSuppression:false,autoGainControl:false/);
- assert.match(bridge,/getDisplayMedia\(\{video:\{displaySurface:'browser'\},audio:MUSIC_AUDIO,/);
+ assert.match(bridge,/getDisplayMedia\(\{video:\{displaySurface:'browser',frameRate:\{max:1\},width:\{max:320\},height:\{max:180\}\},audio:MUSIC_AUDIO,/);
  assert.match(bridge,/if\(replaced\.has\(sender\)\)await tuneSender\(sender\)/,'only Tyler\'s own senders are tuned');
  assert.match(bridge,/bitrateBefore\.delete\(sender\);if\(before==null\)delete e\.maxBitrate/,'the earlier setting comes back');
  assert.match(music,/<select id="musicQuality"><option value="auto">Auto · lowers itself if the call drops audio \(recommended\)<\/option><option value="high">High · 128 kbps<\/option><option value="medium">Medium · 64 kbps<\/option><option value="low">/);

@@ -467,3 +467,7 @@ button:focus-visible,summary:focus-visible,a:focus-visible,input[type=checkbox]:
 .panel[data-rt-theme=steam]:has(.tally:is([data-state=standby],[data-state=paused])) .mark[data-logo]{border-color:#6a6a6a}
 [data-rt-theme=steam] .wordmark{color:#6dcff6}
 [data-rt-theme=steam] .ident-sub{color:#7fb6cf}
+
+/* v2.33: the desktop window hidden to the tray or minimized. Animations pause where they are and carry on
+ * when it's shown again; nothing changes while it's visible. */
+:host([data-offscreen]) *,:host([data-offscreen]) *::before,:host([data-offscreen]) *::after{animation-play-state:paused!important}

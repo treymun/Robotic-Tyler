@@ -22,7 +22,7 @@ test('the Music window preload starts the YouTube controller on YouTube, and onl
   const calls=[];
   const ctx={require:name=>{assert.equal(name,'electron');return {ipcRenderer:{invoke:(channel,message)=>{calls.push([channel,message]);return Promise.resolve({ok:true});}}};},
    process:{isMainFrame:true},location:{href,pathname:new URL(href).pathname},
-   document:{readyState:'complete',querySelector:()=>null,querySelectorAll:()=>[],addEventListener(){}},setInterval:()=>0,URL};
+   document:{readyState:'complete',querySelector:()=>null,querySelectorAll:()=>[],addEventListener(){}},setInterval:()=>0,setTimeout:()=>0,URL};
   ctx.globalThis=ctx;vm.runInNewContext(src,ctx);return calls;
  };
  const yt=run('https://www.youtube.com/results?search_query=daft+punk');await new Promise(r=>setTimeout(r,0));

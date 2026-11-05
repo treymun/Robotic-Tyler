@@ -57,9 +57,9 @@
      if(it){b.append(c.h('b',null,it.name));b.title='Play '+it.name+' (key '+(i+1)+')';b.onclick=()=>{held=it.slot;mark();c.actions.playSound(it.slot);};if(fav.has(it.slot))b.dataset.fav='true';}else b.disabled=true;
      b.dataset.slot=it?String(it.slot):'';belt.append(b);}mark();}
    const mark=()=>{for(const b of belt.children)b.setAttribute('aria-pressed',String(!!held&&b.dataset.slot===String(held)));};
-   c.key(e=>{if(/^[1-6]$/.test(e.key)){const it=slots[Number(e.key)-1];if(it){e.preventDefault();held=it.slot;mark();c.actions.playSound(it.slot);}}});
+   c.key(e=>{if(!e.repeat&&/^[1-6]$/.test(e.key)){const it=slots[Number(e.key)-1];if(it){e.preventDefault();held=it.slot;mark();c.actions.playSound(it.slot);}}},{focus:true});
    fill();c.later(fill,1500);
-   return {update(type,d){if(type==='sound'){held=Number(d.slot)||held;mark();const b=[...belt.children].find(x=>x.dataset.slot===String(d.slot));if(b){c.cancel(lit);b.classList.add('rs-use');lit=c.later(()=>b.classList.remove('rs-use'),900);}}if(type==='life'||type==='theme')fill();}};
+   return {update(type,d){if(type==='sounds'){fill();return;}if(type==='sound'){held=Number(d.slot)||held;mark();const b=[...belt.children].find(x=>x.dataset.slot===String(d.slot));if(b){c.cancel(lit);b.classList.add('rs-use');lit=c.later(()=>b.classList.remove('rs-use'),900);}}if(type==='life'||type==='theme')fill();}};
   }},
   {id:'rs-craft',mount(c){
    // Crafting (Q): Tyler's actions as blueprints. Craft runs the real action; the queue at the
