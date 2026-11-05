@@ -1,3 +1,28 @@
+# ROBOTIC TYLER v2.35.1: better theme voices for TF2, CS 1.6 and PAYDAY 2, and the offline bundle
+
+## Theme voices
+- **Team Fortress 2 (the Administrator) is now rated Ready.** She clones from a different set of four announcer lines. With the old set, one test take in six came out in a different voice; with the new one, all six matched. On average the new takes are a little less like her (the old set's good takes were closer), so it's a steadier voice rather than a closer one.
+- **Counter-Strike 1.6 (the radio operator)** clones from 11 radio lines instead of 6. On an independent speaker check this measured slightly closer and steadier. It's still rated a weak clone.
+- **PAYDAY 2 (Bain)** clones from his voice character alone, without a transcript. The recordings hold only about 4 seconds of different Bain lines, and the old way left one test take hard to understand; now every take was clear. It's still a weak clone: a longer Bain recording through **Replace…** would help.
+- **Lightweight measured for every voice:** on the same checks it scored close to Quality (an average speaker match of 69% against 71% over 19 voices, and slightly fewer words heard: 97% against 99%). Its test takes were shorter (no long message), so it's not a strict comparison. Quality stays the suggestion when the graphics card has room for it.
+- A clip you made before with one of these three voices is made again the next time (the cache knows the voice changed). Your own replacement recordings are untouched.
+- **Ratings now:** 18 Ready, 2 weak clones (Counter-Strike 1.6, PAYDAY 2), 3 approximations (the Combine radio and the Microsoft Sam and Mary clones), Ricochet with too little original speech, and Rust with no recordings yet.
+
+## The offline bundle is out
+- **Settings → Voice → Theme voices → Install from a folder…** now has its download: the *theme-voices-engine-1* release on GitHub, 9.4 GB in five parts plus their SHA-256 sums. It holds both engines (NVIDIA card and processor-only) and both models.
+- Download every part into one folder and choose that folder; Tyler checks every file against the same SHA-256 list as a normal install and downloads nothing it has.
+- It's a separate release that only changes when the voice engine does, so it doesn't count as the latest version of Tyler.
+
+## Corrected: how long a voice takes on the processor
+v2.35.0's notes said Quality took about 17 seconds per second of speech on the test machine. That run shared the machine with other work. Measured again on its own: **about 7 seconds per second of speech** (5.5 to 10.4) for Quality in bfloat16 on 2 processor cores. Lightweight in bfloat16 (what a PC with less than 12 GB of memory uses) took **about 6 seconds per second** (4.2 to 11.9), so on the processor it's only a little faster than Quality, not the two-thirds of the time v2.35.0's Settings said; Settings now says *a little faster*. On a graphics card the published figures are the same for both sizes.
+
+## Tested
+- **Real (no graphics card, Linux, 2 cores):** the three voices' old and new references, six takes each in Quality mode, scored by tools that aren't part of the voice engine (Whisper for the words; ECAPA for the speaker, against all of that voice's original recordings, so old and new are measured the same way). Lightweight takes for all 23 voices that have recordings (65 takes, bfloat16), scored the same way.
+- **The offline bundle:** its index lists exactly the 70 files the installer's lock asks for (none missing, none extra), and every part is published with its SHA-256. Not tested: downloading all 9.4 GB and installing from it on a Windows PC.
+- All unit and end-to-end tests, and the desktop check.
+- **Not tested** (needs a Windows PC with an NVIDIA card): as in v2.35.0.
+---
+
 # ROBOTIC TYLER v2.35.0: theme voices (optional local voice cloning)
 
 ## New: theme voices (desktop app, optional)

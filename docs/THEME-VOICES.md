@@ -50,10 +50,10 @@ You can also install them later from **Settings → Voice → Theme voices → I
   - on the processor, about half the speed of Lightweight.
 - **Lightweight (0.6B):**
   - needs about 4 GB of graphics memory, a little over half of Quality's; on the processor it needs about as much memory as Quality (measured: up to 6 GB on a long message);
-  - on the processor it takes about two-thirds of the time Quality does; on a graphics card the two take about as long (the published figures below are the same for both sizes);
+  - on the processor a little faster than Quality (measured: about 5.7 against 6.7 seconds per second of speech); on a graphics card the two take about as long (the published figures below are the same for both sizes);
   - the voices are a little less like the originals, and odd pauses happen more often. Tyler retries a take whose length is far off what the text needs.
 
-**Speed.** Theme voices are made before they play, not live. Published measurements of this model's standard code path (the faster-qwen3-tts project's README, not measured by us) put an RTX 4060 on Windows at about 4 seconds per second of speech and an RTX 4090 at about 1.2 seconds, for both sizes. On this project's 2-core test machine without a graphics card it was about 17 seconds per second of speech in Quality and about 9 in Lightweight (on the same lines, Quality took about 13).
+**Speed.** Theme voices are made before they play, not live. Published measurements of this model's standard code path (the faster-qwen3-tts project's README, not measured by us) put an RTX 4060 on Windows at about 4 seconds per second of speech and an RTX 4090 at about 1.2 seconds, for both sizes. On this project's 2-core test machine without a graphics card, with nothing else running, Quality took about 7 seconds per second of speech and Lightweight about 6 (both in bfloat16, as on a PC with less than 12 GB of memory).
 
 Tyler suggests a mode from the hardware it detects (the GPU and its free memory, the driver, system memory). It never switches by itself. If the model doesn't fit right now (for example a game is using the graphics memory), the message fails and says so, rather than quietly using the other model.
 

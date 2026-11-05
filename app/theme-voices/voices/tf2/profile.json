@@ -8,45 +8,39 @@
  "relationship": "Direct game character",
  "direction": "Stern, commanding female delivery. Do not mix with Scout, Soldier, Merasmus, or alternate announcers.",
  "language": "English",
- "status": "weak",
- "statusNote": "Usually close to the Administrator (three of four test takes), but one take came out in a different voice. Press Generate again if a take sounds wrong.",
+ "status": "ready",
+ "statusNote": "v2.35.1 uses a different set of four announcer lines: with the old set, one test take in six came out in a different voice; with this one all six matched, a little less close on average but steadier.",
  "transcriptSource": "Machine transcript (Whisper small.en), corrected by hand where it clearly misheard; not checked by listening.",
  "sources": [
   {
-   "file": "announcer_captureflag_enemyreturned_01.mp3",
-   "source": "sourcesounds/tf sound/vo/announcer_captureflag_enemyreturned_01.mp3",
-   "url": "https://raw.githubusercontent.com/sourcesounds/tf/master/sound/vo/announcer_captureflag_enemyreturned_01.mp3",
-   "sha256": "2e488220d32a49a52cdb6a456b1d2cb3733c7348f8483bc88ce30ac63e5361b9"
+   "file": "announcer_attack_controlpoints.mp3",
+   "source": "sourcesounds/tf sound/vo/announcer_attack_controlpoints.mp3",
+   "url": "https://raw.githubusercontent.com/sourcesounds/tf/master/sound/vo/announcer_attack_controlpoints.mp3",
+   "sha256": "678f9099bf07616fc54d7df806fcd6a3da19c896f441b18a41300c950a863f93"
   },
   {
-   "file": "announcer_captureflag_miscspace_13.mp3",
-   "source": "sourcesounds/tf sound/vo/announcer_captureflag_miscspace_13.mp3",
-   "url": "https://raw.githubusercontent.com/sourcesounds/tf/master/sound/vo/announcer_captureflag_miscspace_13.mp3",
-   "sha256": "b5ba60b1812b1d3848a9b1983fae390e0d147c5615205830a2a0c134d3ac844b"
+   "file": "announcer_captureflag_enemydropped_01.mp3",
+   "source": "sourcesounds/tf sound/vo/announcer_captureflag_enemydropped_01.mp3",
+   "url": "https://raw.githubusercontent.com/sourcesounds/tf/master/sound/vo/announcer_captureflag_enemydropped_01.mp3",
+   "sha256": "de61337b1d9404145c7875c974704bdbaa0c725ce6888b84d1ad2f53fdfd45c7"
   },
   {
-   "file": "announcer_captureflag_enemycaptured_01.mp3",
-   "source": "sourcesounds/tf sound/vo/announcer_captureflag_enemycaptured_01.mp3",
-   "url": "https://raw.githubusercontent.com/sourcesounds/tf/master/sound/vo/announcer_captureflag_enemycaptured_01.mp3",
-   "sha256": "4d9dd0406e78603bae892e7b173e1c123be95ef2e5bd6688a3b735c23adb5418"
+   "file": "announcer_captureflag_miscspace_11.mp3",
+   "source": "sourcesounds/tf sound/vo/announcer_captureflag_miscspace_11.mp3",
+   "url": "https://raw.githubusercontent.com/sourcesounds/tf/master/sound/vo/announcer_captureflag_miscspace_11.mp3",
+   "sha256": "d2fd047213803df9219d0fb42fb70f938e198573f454e46fd669f3c6779db415"
   },
   {
-   "file": "announcer_capture_controlpoints.mp3",
-   "source": "sourcesounds/tf sound/vo/announcer_capture_controlpoints.mp3",
-   "url": "https://raw.githubusercontent.com/sourcesounds/tf/master/sound/vo/announcer_capture_controlpoints.mp3",
-   "sha256": "c1008ea77deef397f112a6cc5daedcea372458558c713a50d05dd498904a8b18"
-  },
-  {
-   "file": "announcer_captureflag_miscspace_07.mp3",
-   "source": "sourcesounds/tf sound/vo/announcer_captureflag_miscspace_07.mp3",
-   "url": "https://raw.githubusercontent.com/sourcesounds/tf/master/sound/vo/announcer_captureflag_miscspace_07.mp3",
-   "sha256": "64b10b497d3a2026e065bafcd422f0486b05e95ad2a77c803693b69dcaa89e05"
+   "file": "announcer_captureflag_enemyreturned_03.mp3",
+   "source": "sourcesounds/tf sound/vo/announcer_captureflag_enemyreturned_03.mp3",
+   "url": "https://raw.githubusercontent.com/sourcesounds/tf/master/sound/vo/announcer_captureflag_enemyreturned_03.mp3",
+   "sha256": "337c207c233f32fe2396a5d1259e0ee6e7779ca700545581b9f3a7752a2d75e9"
   }
  ],
  "effects": null,
  "reference": "reference.flac",
- "transcript": "Our reactor core has returned to our vault! We need to stop their ship from launching! The enemy has captured our reactor core! Prepare to capture all control points. Now, steal the reactor core!",
- "referenceSeconds": 19.25,
+ "transcript": "Prepare to attack the enemy's control points. The enemy has dropped our reactor core. We must launch that transport ship! The reactor core is back in our vault!",
+ "referenceSeconds": 13.7,
  "sample": {
   "phrase": "Alert! The center control point is being captured!",
   "file": "sample.flac",

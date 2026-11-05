@@ -9,7 +9,7 @@
  "direction": "Urgent, practical coordination over comms. Review source lines for consistent radio processing and game era.",
  "language": "English",
  "status": "weak",
- "statusNote": "Only about 4 seconds of different Bain lines were available (most clips are the same line), so this clone is weak. Replace the reference with a longer Bain recording for a closer match.",
+ "statusNote": "Only about 4 seconds of different Bain lines exist in the recordings (most clips repeat one line). v2.35.1 clones from his voice character alone (no transcript), which made every test take clear and steadier; it's still a weak clone. A longer Bain recording via Replace would help.",
  "transcriptSource": "Machine transcript (Whisper small.en), corrected by hand where it clearly misheard; not checked by listening.",
  "sources": [
   {
@@ -32,6 +32,7 @@
   }
  ],
  "effects": null,
+ "xvectorOnly": true,
  "reference": "reference.flac",
  "transcript": "You know your job! Keep them back! Keep it under control! They're bringing in armored units!",
  "referenceSeconds": 4.89,

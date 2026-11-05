@@ -9,7 +9,7 @@
  "direction": "Short, emphatic radio delivery. Separate match announcer lines from operator lines.",
  "language": "English",
  "status": "weak",
- "statusNote": "Recognisably the radio operator's delivery, but the clone comes out lower and only about halfway between a different voice and his own other lines on an independent speaker check. A cleaner, longer recording would help.",
+ "statusNote": "Recognisably the radio operator's delivery, but less like him than most voices are like their originals (about halfway, on an independent speaker check). v2.35.1 uses a longer reference (11 radio lines instead of 6), which measured slightly closer and steadier; it's still a weak clone.",
  "transcriptSource": "Machine transcript (Whisper small.en), corrected by hand where it clearly misheard; not checked by listening.",
  "sources": [
   {
@@ -47,12 +47,42 @@
    "source": "ct_inpos.wav",
    "url": "https://sounds.spriters-resource.com/media/assets/406/409513.zip?updated=1755536591",
    "sha256": "4a932b80e009eb9d1f34319006c78e6eb84632ddff78a0c7dd9987db9ebccef0"
+  },
+  {
+   "file": "com_followcom.wav",
+   "source": "com_followcom.wav",
+   "url": "https://sounds.spriters-resource.com/media/assets/406/409513.zip?updated=1755536591",
+   "sha256": "c55814e42c59324d598de1d365073ae320c2945869f5b7537674fceee5064b63"
+  },
+  {
+   "file": "ct_point.wav",
+   "source": "ct_point.wav",
+   "url": "https://sounds.spriters-resource.com/media/assets/406/409513.zip?updated=1755536591",
+   "sha256": "c119f0244b8139002118944388ccfecf9abc1865bab8bab8a189a7cc0f44a0b2"
+  },
+  {
+   "file": "getout.wav",
+   "source": "getout.wav",
+   "url": "https://sounds.spriters-resource.com/media/assets/406/409513.zip?updated=1755536591",
+   "sha256": "fcb785a1bb681d9b6e7261ab74539384155a21d833e2c97049449acf9a8c9423"
+  },
+  {
+   "file": "locknload.wav",
+   "source": "locknload.wav",
+   "url": "https://sounds.spriters-resource.com/media/assets/406/409513.zip?updated=1755536591",
+   "sha256": "5bf9e47d8049cbb01f07ef4103f1412b7657dd743d6f21213cf258a08024c480"
+  },
+  {
+   "file": "enemydown.wav",
+   "source": "enemydown.wav",
+   "url": "https://sounds.spriters-resource.com/media/assets/406/409513.zip?updated=1755536591",
+   "sha256": "b67764832723ad8fcfa5ebbe15141f550e66f814d3e1e9194ce46605b4f0c9ea"
   }
  ],
  "effects": null,
  "reference": "reference.flac",
- "transcript": "Report in, team. Enemy spotted. Taking fire, need assistance. Need backup. Team, fall back! I'm in position.",
- "referenceSeconds": 10.62,
+ "transcript": "Report in, team. Enemy spotted. Taking fire, need assistance. Need backup. Team, fall back! I'm in position. Okay team, follow my command. I'll take the point. Okay, let's get out of here. Lock and load. Enemy down.",
+ "referenceSeconds": 19.83,
  "sample": {
   "phrase": "Fire in the hole!",
   "file": "sample.flac",
