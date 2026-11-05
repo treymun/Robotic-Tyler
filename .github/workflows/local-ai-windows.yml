@@ -1,0 +1,35 @@
+# REAL test of Text AI on this PC on Windows (no graphics card): installs llama.cpp b11669 (the Vulkan
+# build, which also carries the processor backends) and a Qwen3.5 model from their real sources with
+# the app's own installer, asks Vulkan for graphics cards the way the app does, starts the real
+# llama-server on the processor, checks it listens only on 127.0.0.1 and refuses requests without
+# its key, then times the speed check and one streamed reply. Run by hand: Actions → Text AI on
+# this PC on Windows → Run workflow. Downloads about 2.6 GB (4B) or 5.3 GB (9B) from GitHub and
+# Hugging Face.
+name: Text AI on this PC on Windows
+
+on:
+  workflow_dispatch:
+    inputs:
+      model:
+        description: Model to install (4b, 9b, 4b-uncensored or 9b-uncensored)
+        type: choice
+        options: [4b, 9b, 4b-uncensored, 9b-uncensored]
+        default: 4b
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install, start and reply (real engine and model, processor)
+        env:
+          MODEL: ${{ inputs.model }}
+          DEVICE: cpu
+        run: node tools/local-ai/windows-smoke.cjs "$env:RUNNER_TEMP\TylerLocalAI"
