@@ -311,3 +311,9 @@ body .rt-fixed .rt-toasts{bottom:84px}
 .remote-code{font:700 22px/1 var(--rt-font-mono,monospace);letter-spacing:.12em;color:var(--rt-ink-strong)}
 .remote-devices{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
 .remote-devices li{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 10px;border-radius:var(--rt-r-sm,4px);background:var(--rt-block)}
+
+/* v2.34: Settings → Chat images, one row per style (its switch, model and price). */
+.image-styles{display:grid;gap:2px;margin:6px 0 10px}
+.image-style{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:4px 12px;align-items:center;padding:8px 0;border-top:1px solid color-mix(in srgb,currentColor 12%,transparent)}
+.image-style .hint{grid-column:1/-1;margin:0}
+@media (max-width:640px){.image-style{grid-template-columns:1fr}}

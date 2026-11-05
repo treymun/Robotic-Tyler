@@ -15,7 +15,7 @@
  const one=s=>String(s||'').trim();
 
  // Squad commands (handled by squad-suite.js). Returns what the line asks for, or null.
- const SQUAD_RESERVED=['!help','!trivia','!vote','!game','!party','!roast','!answer','!tyler','!votekick','!kick','!votemute','!mute','!modhelp','!play'];
+ const SQUAD_RESERVED=['!image','!img','!draw','!help','!trivia','!vote','!game','!party','!roast','!answer','!tyler','!votekick','!kick','!votemute','!mute','!modhelp','!play'];
  function squad(line){
   const t=one(line);if(!t||t.length>140)return null;
   if(/^!help(?:\s+tyler)?$/i.test(t))return {kind:'help'};
@@ -33,6 +33,7 @@
  const COMMANDS=[
   {id:'tyler',label:'Ask Tyler',enabled:false,usage:['!tyler ask QUESTION'],match:t=>/^!tyler\s+\S/i.test(t)},
   {id:'moderation',label:'Moderation',enabled:false,usage:['!votekick NAME','!votemute NAME','!modhelp'],match:t=>!!globalThis.TylerModeration?.parse?.(t)},
+  {id:'image',label:'Chat images',enabled:false,usage:['!image PROMPT','!image best PROMPT','!image help'],match:t=>!!globalThis.TylerImages?.parse?.(t)},
   {id:'music',label:'Music',enabled:false,usage:['!play ARTIST SONG','music skip','music queue'],match:t=>!!globalThis.TylerMusic?.parse?.(t)},
   {id:'squad-vote',label:'Game votes',enabled:false,usage:['!vote GAME'],match:t=>squad(t)?.kind==='vote'},
   {id:'squad-party',label:'Party host',enabled:false,usage:['!party join','!party teams'],match:t=>squad(t)?.kind==='party'},

@@ -1,0 +1,6 @@
+ROBOTIC TYLER v2.34.0 — patch notes
+
+- New: chat images. "!image PROMPT" (or !image fast/standard/best/venice/vstandard/vbest PROMPT); Tyler draws it and posts it through Steam's own chat uploader.
+- Six styles with selectable models: OpenRouter Fast (FLUX.2 klein ~$0.014), Standard (Nano Banana 2.1 ~$0.034), Best (Riverflow 2.5 pro ~$0.06-0.13); Venice, uncensored as far as Venice allows (safe mode off): Fast (Lustify v8 $0.01), Standard (Krea 2 Turbo $0.04), Best (Hunyuan Image 3.0 $0.09).
+- Venice key slot with links. Limits: cooldown per person, per person per session, per session total, who can ask. Venice pictures as Steam spoilers by default. Counted in spend and the spending cap. Pause AI cancels. Off by default.
+- Tested: mocked unit tests (core, background, Steam uploader stand-in, chat-side limits); all tests; desktop check. Not tested: real OpenRouter/Venice pictures and a real Steam upload.

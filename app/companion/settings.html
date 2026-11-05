@@ -270,6 +270,40 @@
   <p class="chat-tag-preview" aria-live="polite"><span class="hint">Preview:</span> <span id="chatTagPreview">(ROBOTIC TYLER) Anyone up for another round?</span></p>
 </section>
 
+<section class="sheet" id="imageSheet" data-ui-zone="ai">
+  <div class="sheet-head">
+    <h2>Chat images</h2>
+    <p>Friends type <code>!image</code> and a description (for example <code>!image a cat in a smoke grenade</code>, or <code>!image best …</code>, <code>!image venice …</code>); Tyler draws it and posts it in the chat as a normal Steam image. Every picture is a paid request to the style's provider, counted in your spending and stopped by the spending cap.</p>
+  </div>
+  <div class="toggle-grid">
+    <label class="toggle"><input id="imgEnabled" type="checkbox"><span><b>Let the chat request images</b><small>Off by default. Pause AI also stops images.</small></span></label>
+  </div>
+  <h3>Styles</h3>
+  <p class="hint">Three styles use your OpenRouter key; three use a Venice key and are uncensored as far as Venice allows (its own servers, safe mode off; illegal content is always blocked). Pick the model for each style; the default style is what a plain <code>!image</code> uses.</p>
+  <div class="image-styles" id="imgStyles"></div>
+  <label class="narrow">Default style<select id="imgDefault"></select></label>
+  <div class="toggle-grid">
+    <label class="toggle"><input id="imgSpoiler" type="checkbox" checked><span><b>Post Venice pictures as spoilers</b><small>Steam blurs them until someone clicks.</small></span></label>
+  </div>
+  <h3>Limits</h3>
+  <div class="grid two">
+    <label>Time between requests, per person<select id="imgCooldown"></select></label>
+    <label>Images per person, per session<select id="imgPerPerson"></select></label>
+    <label>Images in total, per session<select id="imgPerSession"></select></label>
+    <label>Who can ask<select id="imgAccess"><option value="everyone">Everyone in the chat</option><option value="selected">Only the Steam accounts below</option></select></label>
+  </div>
+  <label>Allowed Steam accounts (64-bit IDs, one per line)<textarea id="imgAllowed" rows="3" spellcheck="false" placeholder="7656119…"></textarea></label>
+  <p class="hint">A session starts when Tyler connects to a chat. The panel's Chat images card shows the counts and can reset them.</p>
+  <h3>Venice key</h3>
+  <label class="narrow">Venice API key<input id="veniceKey" type="password" autocomplete="off" spellcheck="false" placeholder="Paste a Venice API key"></label>
+  <div class="link-row">
+    <a target="_blank" rel="noopener noreferrer" href="https://venice.ai/settings/api">Create a Venice API key</a>
+    <a target="_blank" rel="noopener noreferrer" href="https://docs.venice.ai/models/image">Venice image models and prices</a>
+    <a target="_blank" rel="noopener noreferrer" href="https://openrouter.ai/collections/image-models">OpenRouter image models</a>
+  </div>
+  <div class="btn-row"><button id="imgSave" class="btn primary" type="button">Save image settings</button><button id="imgForgetVenice" class="btn" type="button">Remove the Venice key</button></div>
+  <p class="hint" id="imgStatus" role="status"></p>
+</section>
 <section class="sheet" id="playground" data-ui-zone="ai">
   <div class="sheet-head">
     <h2>Preview a reply</h2>
@@ -507,6 +541,8 @@
 <script src="ui-template.js"></script>
 <script src="chat-tag.js"></script>
 <script src="notice-settings.js"></script>
+<script src="image-core.js"></script>
+<script src="image-settings.js"></script>
 <script src="settings.js"></script>
 <script src="v22-settings.js"></script>
 <script src="settings-navigation.js"></script>

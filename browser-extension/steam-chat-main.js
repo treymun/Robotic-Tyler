@@ -130,7 +130,28 @@
    return lines.filter((l,i)=>i===lastTry||!/Still trying/i.test(l)).slice(-14).map(line=>clean(line.replace(/\b\d{1,3}(?:\.\d{1,3}){3}(?::\d+)?\b/g,'[address]').replace(/\b[0-9a-f]{0,4}(?::[0-9a-f]{0,4}){2,7}\b/gi,'[address]').replace(/\b\d{9,}\b/g,'[id]').replace(/(ufrag|pwd|fingerprint|candidate)\S*/gi,'$1 [hidden]'),200));}
   catch{return [];}
  }
+ // v2.34: chat images go through Steam's own chat uploader (what dropping a picture into the chat
+ // uses: the chat view's upload manager, then its upload), so friends see a normal Steam image.
+ function uploader(node){
+  for(const p of propsAt(node))for(const x of [get(p,'chatView'),own(p,'chatView'),p]){const m=get(x,'m_fileUploadManager');if(m&&typeof get(m,'SetImageFileToUpload')==='function'&&typeof get(m,'BeginFileUpload')==='function')return m;}
+  return null;
+ }
+ async function uploadImage(node,request){
+  const ctx=context(node),m=uploader(node);if(!m)throw Error('Steam’s image upload isn’t available in this chat. Reload Steam chat and try again.');
+  const type=/^image\/(png|jpeg|webp|gif)$/.test(request.type)?request.type:'image/png',ext={'image/png':'png','image/jpeg':'jpg','image/webp':'webp','image/gif':'gif'}[type];
+  const bin=atob(String(request.data||''));if(!bin.length||bin.length>25*1024*1024)throw Error('That picture is too large for Steam chat.');
+  const bytes=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
+  const file=new File([bytes],'tyler-'+Date.now()+'.'+ext,{type});
+  await call(m,'SetImageFileToUpload',file,{info:{}});
+  const props=()=>get(m,'m_fileUploadProps')||{},state=()=>Number(get(props(),'eUploadState')),why=()=>clean(get(props(),'strErrorDescription'),160);
+  if([3,4,5].includes(state())){const e=why();call(m,'Reset');throw Error('Steam didn’t accept the picture'+(e?': '+e:'.'));}
+  try{await call(m,'BeginFileUpload',{bSpoiler:request.spoiler===true});}
+  catch(e){const w=why();call(m,'Reset');throw Error('Steam’s upload failed'+(w?': '+w:e?.message?': '+clean(e.message,120):'.'));}
+  const failed=state()===3,w=why();call(m,'Reset');if(failed)throw Error('Steam’s upload failed'+(w?': '+w:'.'));
+  return {uploaded:true,groupId:ctx.id,bytes:bytes.length};
+ }
  async function handle(node,request){
+  if(request.op==='image-upload')return uploadImage(node,request);
   if(request.op==='disarm'){armed.clear();muteArmed.clear();adminArmed.clear();mutes.clear();return {};}
   if(request.op==='disarm-moderation'){armed.clear();return {};}
   if(request.op==='disarm-vote-mute'){muteArmed.clear();clearVotedMutes();return {};}

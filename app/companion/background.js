@@ -10,6 +10,7 @@ import {GEMINI_VOICES,geminiVoiceFor,Pcm} from './live-core.mjs';
 import {LiveHost} from './live-host.mjs';
 import {TabLease} from './lease.mjs';
 import './soundboard-core.js';
+import './image-core.js';
 import {themeSound} from './theme-sounds.mjs';
 import './trivia-bank.js';
 import {temporary,errorKind,transientDelay,voiceControl,normalizeExtras,conversationGuide,ownerStyle,modelStyle} from './conversation.mjs';
@@ -41,7 +42,7 @@ async function themedClip(theme,slot,name){const p=themeSound(theme,slot);if(!p)
 
 const hosts=new Map(),busy=new Set(),last=new Map(),histories=new Map();
 const memory=new Memory(chrome.storage.local);
-const jobs=new Map(),pages=new Map(); // pages: the content page that claimed each tab (v2.33: a reload cancels the old page's request)
+const jobs=new Map(),pages=new Map(),imageJobs=new Map(); // imageJobs: a picture being made for each tab (v2.34) // pages: the content page that claimed each tab (v2.33: a reload cancels the old page's request)
 const lease=new TabLease(chrome.storage.session||chrome.storage.local,async id=>{if(!chrome.tabs?.get)return true;try{await chrome.tabs.get(id);return true;}catch{return false;}});
 const musicRouter=createMusicRouter(chrome);
 // Gemini Live (v2.15). One session at a time; the desktop app reaches it through globalThis.tylerLive.
@@ -105,6 +106,10 @@ async function handleGameUnlocked(message,sender){
   {const {usage={}}=await chrome.storage.local.get('usage');const u=data.usage||{};await chrome.storage.local.set({usage:{...usage,requests:(usage.requests||0)+1,visionRequests:(usage.visionRequests||0)+1,promptTokens:(usage.promptTokens||0)+(u.prompt_tokens||0),completionTokens:(usage.completionTokens||0)+(u.completion_tokens||0),reportedCostUSD:(usage.reportedCostUSD||0)+(Number(u.cost)||0),unpriced:(usage.unpriced||0)+(typeof u.cost==='number'?0:1)}});}
   const result=parseScene(data.choices?.[0]?.message?.content||'');return {scene:result};
  }
+ // v2.34: chat images (image-core.js). The keys stay here; the chat side keeps the per-person limits.
+ if(message.type==='image:config'){const {imageGen,veniceKey,openrouterKey}=await chrome.storage.local.get(['imageGen','veniceKey','openrouterKey']);return {config:TylerImages.config(imageGen),keys:{openrouter:!!openrouterKey,venice:!!veniceKey}};}
+ if(message.type==='image:cancel'){imageJobs.get(tab)?.abort();return {};}
+ if(message.type==='image:generate')return makeImage(message,tab);
  if(message.type==='v23:roast'){
   const st=await chrome.storage.local.get(['v23RoastEnabled','v23RoastState','v22EmergencyStop']);
   if(st.v22EmergencyStop===true||st.v23RoastEnabled!==true)throw Error('Roast battles disabled.');
@@ -218,7 +223,7 @@ async function handleGameUnlocked(message,sender){
  if(message.type==='lease:claim'){const r=await lease.claim(tab,message.takeOver===true);if(r.owner&&typeof message.instance==='string'){const before=pages.get(tab);pages.set(tab,message.instance.slice(0,40));if(before&&before!==message.instance){jobs.get(tab)?.controller.abort();jobs.delete(tab);busy.delete(tab);}}if(r.owner&&r.previous!==undefined&&r.previous!==tab){const old=jobs.get(r.previous);old?.controller.abort();void live.stop('Another Steam tab took over Tyler','tab:'+r.previous);chrome.tabs?.sendMessage?.(r.previous,{source:'tyler-lease-lost'})?.catch?.(()=>{});}return r;}
  if(message.type==='lease:check')return {owner:await lease.check(tab)};
  if(message.type==='abort'){const job=jobs.get(tab);if(job&&job.id===message.requestId)job.controller.abort();return {};}
- if((['command','voice'].includes(message.type)||message.type==='soundboard:play')&&!sender.native&&!await lease.check(tab))throw Error('Another Steam tab owns this bot. Use Take over in Setup.');
+ if((['command','voice','image:generate'].includes(message.type)||message.type==='soundboard:play')&&!sender.native&&!await lease.check(tab))throw Error('Another Steam tab owns this bot. Use Take over in Setup.');
 
  if(message.type?.startsWith('soundboard:')){const store=chrome.storage.local;
  const {boardBank='Arcade',uiTheme='steam'}=await store.get(['boardBank','uiTheme']);
@@ -396,9 +401,43 @@ async function handleGameUnlocked(message,sender){
   return {heard,text:reply,timings};
  }catch(error){if(heard&&message.modality==='voice'&&message.type==='command')error.retryMessage=message;throw error;}finally{if(!stopCheck){busy.delete(tab);jobs.delete(tab);}}
 }
+// v2.34: one picture for a chat request, from the style's provider and model. Nothing is switched to
+// another model or provider; the spending cap counts it (Venice at its list price, as it reports none).
+function imageProblem(provider,status,m){
+ if(status===401)return (provider==='venice'?'Venice':'OpenRouter')+' rejected the key'+(provider==='venice'?' (or this model needs Venice Pro)':'')+'.';
+ if(status===402)return provider==='venice'?'the Venice balance is empty. Add credit at venice.ai.':'the OpenRouter key is out of credits.';
+ if(status===422||/moderat|safety|content polic|violat|refus|blocked/i.test(m))return 'the model refused that prompt'+(provider==='openrouter'?' (its content rules). An uncensored Venice style may be allowed in Settings → Images.':' (content policy).');
+ if(status===404)return 'that model isn’t available right now. Pick another one in Settings → Images.';
+ if(status===429||status===503)return 'the image model is busy. Try again in a moment.';
+ return m||'the request failed.';
+}
+async function makeImage(message,tab){
+ const s=await chrome.storage.local.get(['imageGen','openrouterKey','veniceKey','usage','spendingCapUSD','v22EmergencyStop']),cfg=TylerImages.config(s.imageGen);
+ if(s.v22EmergencyStop===true)throw Error('Emergency stop is on. Unlock it in Settings first.');
+ if(!cfg.enabled)throw Error('Chat images are off. Turn them on in Settings → Images.');
+ const style=TylerImages.STYLES[message.style]?message.style:cfg.defaultStyle;if(!cfg.styles[style])throw Error('That image style is switched off in Settings → Images.');
+ if(cfg.access==='selected'){const who=TylerIdentity.valid(message.speaker);if(!who||!cfg.allowedIDs.split('\n').includes(who.id))throw Error('This sender isn’t on the image allow list.');}
+ if(localBudgetReached(s.usage,s.spendingCapUSD))throw Error('The local spending cap is reached, so no more images. Raise it in Settings.');
+ const req=TylerImages.request(cfg,style,message.prompt,NEVER_PROVIDERS),key=req.provider==='venice'?s.veniceKey:s.openrouterKey;
+ if(!key)throw Error(req.provider==='venice'?'Save a Venice API key in Settings → Images first.':'Save an OpenRouter key in Settings first.');
+ if(imageJobs.has(tab))throw Error('Tyler is already drawing one. Try again once it’s posted.');
+ const controller=new AbortController();imageJobs.set(tab,controller);const started=Date.now();
+ try{
+  const r=await fetch(req.url,{method:'POST',redirect:'error',signal:AbortSignal.any([AbortSignal.timeout(150000),controller.signal]),headers:{'Content-Type':'application/json',Authorization:'Bearer '+key,...(req.provider==='openrouter'?{'X-Title':'ROBOTIC TYLER Images'}:{})},body:JSON.stringify(req.body)});
+  const d=await r.json().catch(()=>({}));
+  if(!r.ok){const m=String(d?.error?.message||d?.error||d?.message||'').split(key).join('[redacted]').slice(0,200);const e=Error((req.provider==='venice'?'Venice ':'OpenRouter ')+r.status+': '+imageProblem(req.provider,r.status,m));e.status=r.status;throw e;}
+  if(controller.signal.aborted)throw Error('Cancelled');
+  const out=TylerImages.result(req.provider,d);if(out.data.length>27000000)throw Error('The picture is too large for Steam chat.');
+  const listed=Number((/\$([\d.]+)/.exec(TylerImages.price(style,req.model))||[])[1])||0,cost=out.cost??(req.provider==='venice'?listed:0);
+  const {usage={}}=await chrome.storage.local.get('usage');
+  await chrome.storage.local.set({usage:{...usage,imageRequests:(usage.imageRequests||0)+1,imageCostUSD:(usage.imageCostUSD||0)+cost,reportedCostUSD:(usage.reportedCostUSD||0)+cost,unpriced:(usage.unpriced||0)+(out.cost===null&&req.provider!=='venice'?1:0)}});
+  return {image:out.data,mediaType:out.type,style,model:req.model,provider:req.provider,cost,estimated:out.cost===null,ms:Date.now()-started,spoiler:req.provider==='venice'&&cfg.spoilerVenice};
+ }catch(e){if(controller.signal.aborted)throw Error('Image cancelled.');throw Error(redact(String(e.message||e).split(key).join('[redacted]')));}
+ finally{imageJobs.delete(tab);}
+}
 const failure=error=>{const kind=errorKind(error),retry=kind==='transient';return {ok:false,error:redact(error.message),kind,retryable:retry,retryAfter:retry?transientDelay(error):kind==='busy'?1200:0,retryMessage:retry?error.retryMessage:undefined};};
 chrome.runtime.onMessage.addListener((m,s,reply)=>{handle(m,s).then(result=>reply({ok:true,...result})).catch(error=>reply(failure(error)));return true;});
-chrome.tabs?.onRemoved?.addListener(id=>{void live.stop('The Steam tab closed','tab:'+id);lease.release(id).catch(()=>{});jobs.get(id)?.controller.abort();memory.clear(id).catch(()=>{});pages.delete(id);hosts.delete(id);histories.delete(id);last.delete(id);busy.delete(id);});
+chrome.tabs?.onRemoved?.addListener(id=>{imageJobs.get(id)?.abort();void live.stop('The Steam tab closed','tab:'+id);lease.release(id).catch(()=>{});jobs.get(id)?.controller.abort();memory.clear(id).catch(()=>{});pages.delete(id);hosts.delete(id);histories.delete(id);last.delete(id);busy.delete(id);});
 
 
 

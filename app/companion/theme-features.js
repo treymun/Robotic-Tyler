@@ -216,7 +216,7 @@
   if(type==='tab')S.tab=data.tab;
   if(type==='mini')S.mini=!!data.mini;
   if(type==='hud'){S.hud=data;S.spend=parseMoney(data.spend);S.tokens=data.spendMeta||'';}
-  if(type==='reply'&&data?.kind==='game')return;
+  if(type==='reply'&&(data?.kind==='game'||data?.kind==='image'))return;
   if(type==='reply'){S.replies++;bump('replies');turnDone(t);log('reply','Replied in chat ('+data.chars+' characters)');}
   if(type==='chat'){S.heard++;bump('heard');S.chatBurst=data.recent||0;S.flood=!!data.flood;}
   if(type==='sound'){S.sounds++;bump('sounds');S.lastSound=data.name||'';log('sound','Played '+S.lastSound);}

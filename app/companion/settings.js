@@ -109,7 +109,7 @@ for(const button of document.querySelectorAll('.preset'))button.onclick=()=>{
   saveDraft();
 };
 $('forgePrompt').onclick=()=>{composePersonality();saveDraft();$('status').textContent='Personality rebuilt from the sliders. Save if you want to keep it.';};
-$('clear').onclick=async()=>{await storage().remove(['openrouterKey','geminiKey','speechKey']);await load();};
+$('clear').onclick=async()=>{await storage().remove(['openrouterKey','geminiKey','speechKey','veniceKey']);await load();};
 $('steam').onclick=()=>openSteam();
 // Preview a reply and Test selected model: ai-settings.js (v2.20), with the real model and routing.
 $('save').onclick=async()=>{

@@ -227,7 +227,7 @@
    if(composer.textContent.trim())throw Error('The selected message box contains a draft. Clear it first.');
    document.execCommand('insertText',false,formatted);composer.dispatchEvent(new InputEvent('input',{bubbles:true,inputType:'insertText',data:formatted}));
   }
-  rememberEcho(formatted);TylerChatTag.remember(formatted);emit('reply',{chars:formatted.length,kind:opts?.kind==='game'?'game':'reply'});
+  rememberEcho(formatted);TylerChatTag.remember(formatted);emit('reply',{chars:formatted.length,kind:['game','image'].includes(opts?.kind)?opts.kind:'reply'});
   composer.dispatchEvent(new KeyboardEvent('keydown',{key:'Enter',code:'Enter',keyCode:13,which:13,bubbles:true}));
   composer.dispatchEvent(new KeyboardEvent('keyup',{key:'Enter',code:'Enter',keyCode:13,which:13,bubbles:true}));
   status('Submitted to the chosen message box. Confirm it appears in Steam; if it stays as a draft, press Enter manually.');

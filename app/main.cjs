@@ -125,7 +125,7 @@ if(!app.requestSingleInstanceLock()){app.quit();}else{
    if([401,403].includes(result.status))throw Error('OpenRouter rejected the key. Paste the full secret from your OpenRouter Keys page.');
    if(!result.ok)throw Error('OpenRouter key check returned HTTP '+result.status+'. Try again shortly.');return true;
   }
-  if(request.action==='get'){const names=(Array.isArray(request.keys)?request.keys:[request.keys]).filter(k=>settingsKeys.has(k));const data=await vault.get(names);if(data.geminiKey)data.geminiKey=true;if(data.openrouterKey)data.openrouterKey=true;delete data.speechKey;return data;}
+  if(request.action==='get'){const names=(Array.isArray(request.keys)?request.keys:[request.keys]).filter(k=>settingsKeys.has(k));const data=await vault.get(names);if(data.geminiKey)data.geminiKey=true;if(data.openrouterKey)data.openrouterKey=true;if(data.veniceKey)data.veniceKey=true;delete data.speechKey;return data;}
   if(request.action==='set'){await local.set(sanitizeSettings(request.values));return {};}
   if(request.action==='remove'){await local.remove((Array.isArray(request.keys)?request.keys:[request.keys]).filter(k=>settingsKeys.has(k)));return {};}
   if(request.action==='chat'){bot.loadURL('https://steamcommunity.com/chat/');bot.show();bot.focus();return {};}

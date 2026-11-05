@@ -1,3 +1,49 @@
+# ROBOTIC TYLER v2.34.0: chat images
+
+## New
+- **Chat images.** A friend types `!image` and a description, and Tyler draws it and posts it in the chat as a normal Steam picture. He uses Steam's own chat uploader, the same one dropping a picture into the chat uses.
+  - **Commands:**
+    - `!image PROMPT` uses the default style.
+    - `!image fast|standard|best PROMPT` uses an OpenRouter style.
+    - `!image venice|vstandard|vbest PROMPT` uses a Venice style.
+    - `!image help` lists the styles that are on.
+- **Six styles, each with a model you can change in Settings → AI → Chat images:**
+  - **OpenRouter key:**
+    - Fast: FLUX.2 klein, about $0.014 per picture.
+    - Standard: Nano Banana 2.1, about $0.034.
+    - Best: Riverflow 2.5 pro, about $0.06–0.13.
+  - **Venice key:** uncensored as far as Venice allows. Safe mode is off, the models run on Venice's own servers, and Venice still blocks illegal content.
+    - Venice fast: Lustify v8, $0.01.
+    - Venice standard: Krea 2 Turbo, $0.04.
+    - Venice best: Hunyuan Image 3.0, $0.09.
+  - Other models on each list: GPT Image 2, Qwen Image 3, FLUX.2 pro, Nano Banana Pro, Z-Image Turbo, Chroma and an anime model.
+- **Venice key slot**, with links to create a key and to Venice's model list and prices. The key stays in the extension or app, like the other keys.
+- **Limits you choose:**
+  - time between requests per person: none, 15 s, 30 s, or 1, 2, 5, 10, 30 or 60 min;
+  - pictures per person per session: 1, 2, 3, 5, 10, 20, 50 or no limit;
+  - pictures per session in total: 3, 5, 10, 20, 50, 100, 200 or no limit;
+  - who can ask: everyone, or only Steam accounts you list.
+  - A session starts when Tyler connects to a chat. The panel's Chat images card shows the counts and can reset them.
+- **Venice pictures are posted as Steam spoilers by default**, blurred until someone clicks. You can turn this off.
+- **Costs:**
+  - Every picture counts toward your spending and is stopped by the spending cap: OpenRouter's reported cost, or Venice at its list price.
+  - A picture that failed doesn't count against the person who asked.
+  - OpenRouter never routes a picture to Parasail.
+- **One picture at a time**, with up to three waiting. Pause AI cancels the one being drawn and clears the queue.
+- **Off by default.** The Venice styles also start off.
+
+## Tested
+- **Mocked:**
+  - the styles, settings and commands;
+  - the request each provider gets (OpenRouter never Parasail; Venice with safe mode off);
+  - the background: keys, style switches, the allow list, the spending cap, cost counted, refusals explained, keys never in errors;
+  - Steam's uploader, against a stand-in shaped like Steam's chat view: spoilers, and Steam's refusals reported;
+  - the chat side: cooldown, per-person and per-session limits, one answer per message, a failed picture not counted, Pause cancelling.
+- All unit and end-to-end tests, and the desktop check.
+- **Not tested:** real OpenRouter or Venice pictures, and a real upload into Steam chat. The upload uses Steam's own uploader as Steam's chat code shows it, and needs a first try in your chat.
+
+---
+
 # ROBOTIC TYLER v2.33.0: a feature-quality pass, and voice occupancy read from Steam
 
 ## New
