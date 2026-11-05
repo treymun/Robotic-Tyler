@@ -14,7 +14,8 @@ class WorkerHost extends EventEmitter{
   const keep=['SystemRoot','SYSTEMROOT','WINDIR','TEMP','TMP','LOCALAPPDATA','APPDATA','USERPROFILE','HOME','PATH','NUMBER_OF_PROCESSORS','PROCESSOR_ARCHITECTURE','CUDA_VISIBLE_DEVICES'];
   const env={};for(const k of keep)if(process.env[k]!==undefined)env[k]=process.env[k];
   Object.assign(env,{PYTHONIOENCODING:'utf-8',PYTHONDONTWRITEBYTECODE:'1',PYTHONNOUSERSITE:'1',HF_HUB_OFFLINE:'1',TRANSFORMERS_OFFLINE:'1',HF_HUB_DISABLE_TELEMETRY:'1'},this.extraEnv);
-  const proc=spawn(this.python,['-I','-S','-u',this.script,'--site',this.site],{cwd:this.cwd,env,windowsHide:true,stdio:['pipe','pipe','pipe']});
+  // -X utf8: the pipes are UTF-8 whatever the PC's code page (-I makes Python ignore PYTHONIOENCODING).
+  const proc=spawn(this.python,['-I','-S','-X','utf8','-u',this.script,'--site',this.site],{cwd:this.cwd,env,windowsHide:true,stdio:['pipe','pipe','pipe']});
   this.proc=proc;
   this.ready=new Promise((resolve,reject)=>{
    const timer=setTimeout(()=>{reject(Object.assign(Error('The voice engine didn’t start within 90 seconds.'),{code:'start_timeout'}));this.kill();},90000);
@@ -46,7 +47,14 @@ class WorkerHost extends EventEmitter{
  /** The id the next request will get (so a caller can cancel the one it is about to send). */
  nextId(){return this.seq+1;}
  cancel(id){try{if(this.alive)this.proc.stdin.write(JSON.stringify({id:'c'+id,op:'cancel',target:id})+'\n');}catch{}}
- async quit(){if(!this.alive)return;try{await Promise.race([this.request('quit',{},{timeout:5000}),new Promise(r=>setTimeout(r,5000))]);}catch{}this.kill();}
+ /** Asks the engine to close, waits for the process to end (so its files are no longer in use), then makes sure. */
+ async quit(){
+  const p=this.proc;if(!p||p.exitCode!==null)return;
+  const ended=new Promise(r=>p.once('exit',r));
+  try{p.stdin.write(JSON.stringify({id:'quit',op:'quit'})+'\n');}catch{}
+  if(await Promise.race([ended.then(()=>true),new Promise(r=>setTimeout(()=>r(false),5000))]))return;
+  this.kill();await Promise.race([ended,new Promise(r=>setTimeout(r,3000))]);
+ }
  kill(){if(this.proc){this.killing=true;try{this.proc.kill();}catch{}}}
 }
 module.exports={WorkerHost};

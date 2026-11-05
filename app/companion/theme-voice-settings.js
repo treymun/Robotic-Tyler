@@ -21,7 +21,7 @@
  }
  async function load(){
   let r;try{r=await tv('status');}catch(e){say('tvInstallState','Theme voices aren’t available: '+e.message);return;}
-  status=r.status;voices=r.voices;models=r.models;render();
+  status=r.status;voices=r.voices;models=r.models;installing=!!status.installing;if(installing)$('tvProgressWrap').hidden=false;if(status.installError&&!status.ready)failed=true;render();
   if(!installing)say('tvInstallState',await stateText());
  }
  async function stateText(){
@@ -56,9 +56,10 @@
    const row=document.createElement('div');row.className='tv-voice';row.dataset.theme=v.theme;
    const a=document.createElement('div'),b=document.createElement('div'),c=document.createElement('div');c.className='tv-buttons';
    a.innerHTML='<b></b><small></small>';a.querySelector('b').textContent=v.name+' · '+v.theme;a.querySelector('small').textContent=(v.relationship?v.relationship+'. ':'')+(v.statusNote||'');
-   b.innerHTML='<span class="tv-tag"></span>';const tag=b.querySelector('.tv-tag');tag.dataset.status=v.status;tag.textContent=v.custom?'Your recording':v.status==='ready'?'Ready':v.status==='weak'?'Weak clone':v.status==='approximation'?'Approximation':v.status==='insufficient'?'Too little audio':'Missing';
+   b.innerHTML='<span class="tv-tag"></span>';const tag=b.querySelector('.tv-tag');tag.dataset.status=v.status;tag.textContent=v.custom?'Your recording':v.status==='ready'?'Ready':v.status==='weak'?'Weak clone':v.status==='approximation'?'Approximation':v.status==='insufficient'?'Too little audio':v.status==='missing'?'No recordings':'Not rated yet';
    const btn=(label,fn,disabled=false)=>{const x=document.createElement('button');x.type='button';x.className='secondary';x.textContent=label;x.disabled=disabled;x.onclick=()=>fn(x).catch(e=>say('tvVoiceState',v.name+': '+e.message));c.append(x);};
    btn('Reference',async()=>{const r=await tv('sample',{theme:v.theme});play(r.audio,r.type);say('tvVoiceState','Playing '+v.name+'’s original reference recording (sample playback, not the clone).');},!v.hasReference);
+   if(v.sample&&!v.custom)btn('Original line',async()=>{const r=await tv('sample',{theme:v.theme,kind:'line'});play(r.audio,r.type);say('tvVoiceState','Playing the original “'+v.sample+'” (sample playback: the game’s own recording, not the clone). Press Test to hear the clone.');});
    btn('Test',async x=>{x.disabled=true;say('tvVoiceState','Making '+v.name+'’s voice… (the first one loads the model)');try{const r=await tv('test',{theme:v.theme,text:$('tvTestText').value,fresh:true});play(r.audio);say('tvVoiceState',v.name+': '+r.clip.seconds.toFixed(1)+' s of new speech made in '+(r.clip.ms/1000).toFixed(1)+' s on the '+(r.clip.device==='cuda'?'graphics card':'processor')+(r.clip.processed?' (with its radio/mask sound; dry version next)':'')+'.');if(r.dry)setTimeout(()=>play(r.dry),Math.ceil(r.clip.seconds*1000)+600);}finally{x.disabled=false;}},!v.hasReference||!status?.ready);
    btn('Replace…',async()=>{pick(v);});
    if(v.custom)btn('Restore original',async()=>{await tv('restore-reference',{theme:v.theme});say('tvVoiceState',v.name+' uses its built-in reference again.');await load();});
@@ -93,7 +94,7 @@
  $('tvCancel').onclick=()=>void tv('cancel').catch(()=>{});
  $('tvOffline').onclick=()=>{$('tvOfflineForm').hidden=false;$('tvOfflineDir').focus();};
  $('tvOfflineCancel').onclick=()=>{$('tvOfflineForm').hidden=true;};
- $('tvOfflineGo').onclick=()=>{const dir=$('tvOfflineDir').value.trim();if(!dir)return;$('tvOfflineForm').hidden=true;void install([dir]);};
+ $('tvOfflineGo').onclick=()=>{const dir=$('tvOfflineDir').value.trim().replace(/^["']+|["']+$/g,'');if(!dir)return;$('tvOfflineForm').hidden=true;void install([dir]);};
  $('tvCheck').onclick=async()=>{say('tvInstallState','Making a test voice…');try{const c=await tv('check');say('tvInstallState','Voice check passed: '+c.seconds+' s of speech in '+(c.ms/1000).toFixed(1)+' s on the '+(c.device==='cuda'?'graphics card':'processor')+' ('+c.rtf+' s per second of speech).');}catch(e){say('tvInstallState','Voice check failed: '+e.message);}await load();};
  $('tvRepair').onclick=async()=>{say('tvInstallState','Checking every file…');try{const r=await tv('repair');say('tvInstallState',r.repaired?'Repaired '+r.problems+' problem(s); voice check passed.':'All files are fine; voice check passed.');}catch(e){say('tvInstallState','Repair failed: '+e.message);}await load();};
  const removeConfirm=async(op,extra,label)=>{say('tvInstallState','Removing…');try{await tv(op,extra);plans={};say('tvInstallState',label);}catch(e){say('tvInstallState',e.message);}await load();};
@@ -131,4 +132,5 @@
  $('tvGuideSkip').onclick=()=>{$('tvGuide').hidden=true;history.replaceState(null,'','#theme-voices');say('tvInstallState','Skipped. Install theme voices here whenever you like.');};
  if(location.hash==='#theme-voices-setup')void guide();
  else if(location.hash==='#theme-voices')setTimeout(()=>root.scrollIntoView({block:'start'}),300);
+ window.addEventListener('hashchange',()=>{if(location.hash==='#theme-voices-setup')void guide();});
 })();

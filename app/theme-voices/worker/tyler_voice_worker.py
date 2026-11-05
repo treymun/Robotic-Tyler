@@ -34,12 +34,17 @@ class Failure(Exception):
 
 # ── requests are read on their own thread, so "cancel" works while a voice is being made ──
 requests = queue.Queue(); cancelled = set(); current = {"id": None}
+# Requests are UTF-8 JSON whatever the PC's code page (-I ignores PYTHONIOENCODING; paths hold the
+# Windows user name, and the text can hold any character).
+try: sys.stdin.reconfigure(encoding="utf-8", errors="replace")
+except Exception: pass
 def reader():
     for line in sys.stdin:
         line = line.strip()
         if not line: continue
         try: req = json.loads(line)
-        except Exception: send({"id": None, "ok": False, "code": "bad_request", "error": "Not JSON."}); continue
+        except Exception:
+            m = re.search(r'"id"\s*:\s*(\d+)', line); send({"id": int(m.group(1)) if m else None, "ok": False, "code": "bad_request", "error": "Not JSON."}); continue
         if req.get("op") == "cancel":
             cancelled.add(req.get("target")); send({"id": req.get("id"), "ok": True}); continue
         requests.put(req)
@@ -167,11 +172,15 @@ def prompt(req):
 # the text itself is spoken as written.
 def chunks(text, limit=220):
     text = re.sub(r"\s+", " ", text).strip()
-    parts = re.findall(r"[^.!?…]+(?:[.!?…]+[\"')\]]*|$)\s*", text) or [text]
+    parts = re.findall(r"[^.!?…。！？]+(?:[.!?…。！？]+[\"')\]」』]*|$)\s*", text) or [text]
     out, cur = [], ""
     for p in parts:
         while len(p) > limit:
-            cut = max(p.rfind(", ", 0, limit), p.rfind("; ", 0, limit)); cut = cut + 1 if cut > limit // 3 else max(p.rfind(" ", 0, limit), 1)
+            # Break at a comma, then a space; text with neither (a long URL, CJK) is cut at the limit.
+            cut = max(p.rfind(", ", 0, limit), p.rfind("; ", 0, limit), p.rfind("，", 0, limit), p.rfind("、", 0, limit))
+            if cut > limit // 3: cut += 1
+            else:
+                sp = p.rfind(" ", 0, limit); cut = sp if sp > limit // 3 else limit
             if cur: out.append(cur.strip()); cur = ""
             out.append(p[:cut].strip()); p = p[cut:]
         if len(cur) + len(p) > limit and cur: out.append(cur.strip()); cur = ""
@@ -202,7 +211,7 @@ def speak(req):
     try:
         for i, piece in enumerate(pieces):
             step.chunk = i + 1
-            exp = expected_seconds(piece); step.max = int(min(1600, math.ceil((exp * 2.6 + 2) * 12.5)))
+            exp = expected_seconds(piece); step.max = int(min(1600, math.ceil((exp * 2.3 + 1.5) * 12.5)))
             best = None
             for attempt in range(2):
                 if job in cancelled: raise Failure("cancelled", "Stopped.")

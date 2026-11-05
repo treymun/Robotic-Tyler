@@ -11,21 +11,20 @@
 const {app,BrowserWindow,ipcMain,Menu,shell,safeStorage,webContents,Tray,nativeImage,dialog,session,protocol,desktopCapturer,net}=require('electron');
 const path=require('node:path'),fs=require('node:fs'),{pathToFileURL}=require('node:url'),{execFile,spawn}=require('node:child_process');
 const {setupUpdates}=require('./updates.cjs'),{Vault,memoryStorage}=require('./vault.cjs'),{isChat,isSteam,isLocal,settingsKeys,sanitizeSettings}=require('./guards.cjs');
-const {setupThemeVoices}=require('./theme-voices/desktop.cjs');
 const {setupRemote}=require('./remote.cjs'),{NativeVoice}=require('./native-voice.cjs'),{importVoiceStudio}=require('./migrate.cjs'),steamVoice=require('./steam-voice.cjs'),{setupDesktopMedia,isYouTube}=require('./desktop-media.cjs');
 steamVoice.registerScheme(protocol);
 // Same data folder as the Control Center, so its users keep settings, keys and memory as they are.
 const root=path.join(process.env.LOCALAPPDATA||app.getPath('appData'),'RoboticTylerHydraCloudV12');fs.mkdirSync(path.join(root,'Data'),{recursive:true});app.setPath('userData',path.join(root,'Data'));
 const OLD_VOICE_DIR=path.join(app.getPath('appData'),'RoboticTylerNativeSteamCompanion');
 const OLD_VOICE_GUID='b0b8de7d-76bb-5d6f-99fa-c8a2fe9a49c6'; // electron-builder key for com.robotictyler.nativesteamcompanion
-let themeVoices=null;
+let themeVoices=null,pendingVoicesSetup=false;
 let bot,options,voiceWin,listener,tray,voice,updates,vault,remote,windowVoice=true,muteCall=false,steamWindow,media,quitting=false;const removed=[];const activity=[];function eventLog(kind,details=''){activity.unshift({at:Date.now(),kind,details:String(details).slice(0,140)});if(activity.length>120)activity.pop();}
 const icon=path.join(__dirname,'..','assets','robotic-tyler.png');
 function helperPath(){const p=app.isPackaged?path.join(process.resourcesPath,'windows-audio-bridge','RoboticTylerAudio.exe'):path.join(__dirname,'..','windows-audio-bridge','publish','RoboticTylerAudio.exe');if(!fs.existsSync(p))throw Error('The Windows audio helper is missing. Reinstall ROBOTIC TYLER (or build it with BUILD-WINDOWS-EXE.cmd).');return p;}
 function helperOut(args,input,timeout=15000){return new Promise((resolve,reject)=>{const c=execFile(helperPath(),args,{windowsHide:true,timeout,maxBuffer:4_000_000},(error,stdout,stderr)=>error?reject(Error(String(stderr||error.message).trim())):resolve(String(stdout).trim()));if(input!==undefined){c.stdin.end(input);}});}
 
 if(!app.requestSingleInstanceLock()){app.quit();}else{
- app.on('second-instance',(_e,argv=[])=>{if(argv.includes('--install-theme-voices')&&app.isReady()){void (async()=>{try{await globalThis.tylerOpenSettings?.('theme-voices-setup');}catch{}})();return;}const w=voiceWin&&!voiceWin.isDestroyed()&&voiceWin.isVisible()?voiceWin:bot;if(w){if(w.isMinimized())w.restore();w.show();w.focus();}});
+ app.on('second-instance',(_e,argv=[])=>{if(argv.includes('--install-theme-voices')){if(globalThis.tylerOpenSettings)void globalThis.tylerOpenSettings('theme-voices-setup').catch(()=>{});else pendingVoicesSetup=true;return;}const w=voiceWin&&!voiceWin.isDestroyed()&&voiceWin.isVisible()?voiceWin:bot;if(w){if(w.isMinimized())w.restore();w.show();w.focus();}});
  app.whenReady().then(async()=>{
  updates=setupUpdates({app,dialog,channel:'control',log:eventLog,onReady:version=>{try{tray?.displayBalloon?.({title:'ROBOTIC TYLER update ready',content:'Version '+version+' installs when you quit.'});}catch{}}});
  vault=new Vault(path.join(root,'Data','Companion'),safeStorage);const sessionStore=memoryStorage();
@@ -74,8 +73,11 @@ if(!app.requestSingleInstanceLock()){app.quit();}else{
    update:async(id,props={})=>{media.update(id,props);return {id};},
    onRemoved:{addListener(fn){removed.push(fn);}}}};
  // Theme voices (v2.35, app/theme-voices): voice clones made by a local engine in its own process.
- themeVoices=setupThemeVoices({root,dir:__dirname,vault,local,changeListeners,net,shell,log:eventLog,send:e=>{try{if(options&&!options.isDestroyed())options.webContents.send('tyler:voices',e);}catch{}}});
+ // Loaded inside a try: if anything about it is broken, the rest of Tyler still starts normally.
+ try{themeVoices=require('./theme-voices/desktop.cjs').setupThemeVoices({root,dir:__dirname,vault,local,changeListeners,net,shell,log:eventLog,send:e=>{try{if(options&&!options.isDestroyed())options.webContents.send('tyler:voices',e);}catch{}}});}
+ catch(error){themeVoices=null;eventLog('Theme voices unavailable',error.message);}
  globalThis.tylerOpenSettings=section=>openSettings(section);
+ if(pendingVoicesSetup){pendingVoicesSetup=false;setTimeout(()=>void openSettings('theme-voices-setup'),1500);}
  await import(pathToFileURL(path.join(__dirname,'companion','background.js')).href);
 
  // ── Voice ──────────────────────────────────────────────────────────────
@@ -124,7 +126,7 @@ if(!app.requestSingleInstanceLock()){app.quit();}else{
  ipcMain.handle('tyler:settings',async(event,request)=>{if(!options||event.sender.id!==options.webContents.id||event.senderFrame!==event.sender.mainFrame||!isLocal(event.senderFrame.url,settingsPath))throw Error('Settings are available only in the local settings window.');
   if(request.action==='activity'){return activity.slice(0,60);}
   if(request.action==='remote')return remote.handle(String(request.op||''),request);
-  if(request.action==='voices')return themeVoices.settingsRequest(String(request.op||''),request);
+  if(request.action==='voices'){if(!themeVoices)throw Error('Theme voices aren’t available in this copy of Tyler (see Settings → Advanced → activity log).');return themeVoices.settingsRequest(String(request.op||''),request);}
   if(request.action==='verify'){
    const key=request.key;if(typeof key!=='string'||!key.trim()||key.length>1024)throw Error('Paste the secret from your OpenRouter Keys page.');
    let result;try{result=await fetch('https://openrouter.ai/api/v1/key',{headers:{Authorization:'Bearer '+key},redirect:'error',signal:AbortSignal.timeout(12000)});}catch{throw Error('Could not reach OpenRouter. Check your connection and try Save again.');}
@@ -201,7 +203,7 @@ if(!app.requestSingleInstanceLock()){app.quit();}else{
  if(process.argv.includes('--install-theme-voices'))setTimeout(()=>void openSettings('theme-voices-setup'),1500);
  await bot.loadURL('https://steamcommunity.com/chat/');
  }).catch(error=>{dialog.showErrorBox('ROBOTIC TYLER could not start',String(error.message).replace(/sk-or-[\w-]+|AIza[\w-]+/g,'[redacted]'));app.quit();});
- app.on('before-quit',()=>{try{void voice?.stop('ROBOTIC TYLER is closing.');}catch{}try{void remote?.stop();}catch{}try{void themeVoices?.shutdown();}catch{}});
+ app.on('before-quit',()=>{try{void voice?.stop('ROBOTIC TYLER is closing.');}catch{}try{void remote?.stop();}catch{}try{themeVoices?.kill();}catch{}});
  app.on('window-all-closed',()=>{if(!voice||voice.mode==='off')app.quit();});
 }
 

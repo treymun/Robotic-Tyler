@@ -123,7 +123,7 @@
   // v2.35: theme voices. The phone sends only the text (and a voice name); the voice is made on this PC.
   'theme-say':({text:t,theme})=>{const tv=globalThis.TylerThemeVoices,s=clean(t,400);if(!tv?.state().ready)throw Error('Theme voices aren’t installed on the PC.');if(!s)throw Error('Type a message first.');if(tv.state().busy)throw Error('Tyler is still making the last one.');
    tv.say(s,/^[a-z0-9]{2,12}$/.test(String(theme||''))?theme:undefined).catch(()=>{});return {started:true};},
-  'theme-stop':()=>{const b=$('tvStop');if(b)b.click();return {};},
+  'theme-stop':()=>{const tv=globalThis.TylerThemeVoices;if(!tv)throw Error('Theme voices aren’t available in this window.');void tv.stop();return {};},
   say:({text:t})=>{const s=clean(t,300);if(!s)throw Error('Type a message first.');api.send(s);return {};},
  };
  const ANYONE=new Set(['state','watch']);

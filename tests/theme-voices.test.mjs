@@ -53,6 +53,9 @@ test('the lock pins every file: python.org, PyPI/PyTorch and one Hugging Face co
  assert.ok(names('windows-cuda').includes('torch')&&LOCK.runtimes['windows-cuda'].files.find(f=>f.package==='torch').version.endsWith('+cu128'));
  assert.ok(LOCK.runtimes['windows-cpu'].files.find(f=>f.package==='torch').version.endsWith('+cpu'));
  assert.ok(!names('windows-cuda').includes('gradio'),'the demo web page isn’t installed');
+ // Packages that ship a native library in their platform wheel must use that wheel (the pure one lacks it).
+ for(const rt of ['windows-cuda','windows-cpu'])for(const pkg of ['soundfile','numpy','torch','onnxruntime','scipy'])assert.match(LOCK.runtimes[rt].files.find(f=>f.package===pkg).name,/win_amd64\.whl$/,rt+' '+pkg);
+ assert.match(LOCK.runtimes['windows-cuda'].files.find(f=>f.package==='msvc-runtime')?.name||'',/win_amd64\.whl$/,'the C++ runtime PyTorch needs');
  assert.ok(names('windows-cuda').includes('qwen-tts')&&LOCK.runtimes['windows-cuda'].files.find(f=>f.package==='qwen-tts').noDeps);
  for(const [k,m] of Object.entries(LOCK.models)){assert.match(m.revision,/^[0-9a-f]{40}$/);assert.match(m.repo,k==='quality'?/1\.7B-Base$/:/0\.6B-Base$/,'only Base (voice-cloning) models');
   for(const f of m.files){assert.match(f.sha256,/^[0-9a-f]{64}$/);assert.ok(f.url.includes('/resolve/'+m.revision+'/'),'pinned to the commit');}}

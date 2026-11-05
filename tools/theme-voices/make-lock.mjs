@@ -35,7 +35,8 @@ const toml=file=>JSON.parse(execFileSync('python3',['-I','-c','import tomllib,js
 function pick(wheels,rt){
  const name=w=>decodeURIComponent(w.url.split('/').pop());
  const score=w=>{const n=name(w),plat=rt.tags.some(t=>n.includes(t)),any=/-none-any\.whl$/.test(n);
-  if(plat&&n.includes('-'+PYTHON.tag+'-'+PYTHON.tag+'-'))return 4;if(plat&&/-abi3-/.test(n))return 3;if(plat&&n.includes('-'+PYTHON.tag+'-'))return 2;if(any)return 1;return 0;};
+  // A platform wheel always beats a pure one: soundfile's none-any wheel, for one, lacks libsndfile.
+  if(plat&&n.includes('-'+PYTHON.tag+'-'+PYTHON.tag+'-'))return 5;if(plat&&/-abi3-/.test(n))return 4;if(plat&&n.includes('-'+PYTHON.tag+'-'))return 3;if(plat&&/-none-/.test(n))return 2;if(any)return 1;return 0;};
  const best=[...wheels].sort((a,b)=>score(b)-score(a))[0];if(!best||!score(best))throw Error('No usable wheel among '+wheels.map(name).join(', '));
  if(rt.tags[0]==='manylinux'&&!/(manylinux|none-any)/.test(name(best)))throw Error('Not a Linux wheel: '+name(best));
  return {name:name(best),url:best.url,size:best.size,sha256:best.hashes?.sha256};

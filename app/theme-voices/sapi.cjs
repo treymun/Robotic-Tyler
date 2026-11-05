@@ -11,12 +11,13 @@ const sys=process.env.SystemRoot||'C:\\Windows';
 const SHELLS=[path.join(sys,'SysWOW64','WindowsPowerShell','v1.0','powershell.exe'),path.join(sys,'System32','WindowsPowerShell','v1.0','powershell.exe')];
 const LIST='$ErrorActionPreference="Stop";$v=New-Object -ComObject SAPI.SpVoice;foreach($t in $v.GetVoices()){$t.GetDescription()}';
 // Format 22 = 22 kHz 16-bit mono (SAPI's SAFT22kHz16BitMono); mode 3 = create the file.
-const SPEAK='$ErrorActionPreference="Stop";$text=[Console]::In.ReadToEnd();$want=$env:TYLER_SAPI_VOICE;$out=$env:TYLER_SAPI_OUT;'+
+// The text arrives as UTF-8; flag 16 (SVSFIsNotXML) speaks it as plain text, so markup in a chat message is just read out.
+const SPEAK='$ErrorActionPreference="Stop";[Console]::InputEncoding=[System.Text.Encoding]::UTF8;$text=[Console]::In.ReadToEnd();$want=$env:TYLER_SAPI_VOICE;$out=$env:TYLER_SAPI_OUT;'+
  '$v=New-Object -ComObject SAPI.SpVoice;$pick=$null;foreach($t in $v.GetVoices()){if($t.GetDescription() -eq $want){$pick=$t}};if(-not $pick){throw "voice not found"};$v.Voice=$pick;'+
- '$f=New-Object -ComObject SAPI.SpAudioFormat;$f.Type=22;$s=New-Object -ComObject SAPI.SpFileStream;$s.Format=$f;$s.Open($out,3,$false);$v.AudioOutputStream=$s;[void]$v.Speak($text,0);$s.Close()';
+ '$f=New-Object -ComObject SAPI.SpAudioFormat;$f.Type=22;$s=New-Object -ComObject SAPI.SpFileStream;$s.Format=$f;$s.Open($out,3,$false);$v.AudioOutputStream=$s;[void]$v.Speak($text,16);$s.Close()';
 const run=(shell,script,{input='',env={},timeout=30000}={})=>new Promise((resolve,reject)=>{
  const c=execFile(shell,['-NoProfile','-NonInteractive','-ExecutionPolicy','Bypass','-Command',script],{windowsHide:true,timeout,env:{...process.env,...env},maxBuffer:1_000_000},(e,out,err)=>e?reject(Error(String(err||e.message).trim().split(/\r?\n/).pop())):resolve(String(out)));
- c.stdin.end(input);
+ c.stdin.end(Buffer.from(String(input),'utf8'));
 });
 let cache=null;
 /** {name → the PowerShell that has it} for every SAPI voice on this PC (Windows only). */

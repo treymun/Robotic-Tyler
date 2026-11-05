@@ -8,8 +8,8 @@
  "relationship": "Direct game faction voice",
  "direction": "Clipped tactical speech and the original mask/radio timbre. Keep Overwatch and Civil Protection as separate optional voices.",
  "language": "English",
- "status": "pending",
- "statusNote": "",
+ "status": "approximation",
+ "statusNote": "The Combine radio-mask sound doesn't clone: full cloning turned every test into unintelligible radio noise, so this uses only the soldier's voice character plus a radio/mask effect after speaking (turn the effect off in Settings for the dry voice). Recognisably radio-like, not the original voice.",
  "transcriptSource": "Transcripts are machine transcripts checked against the original file names (the radio filter makes them hard to hear).",
  "sources": [
   {
@@ -79,7 +79,13 @@
    "sha256": "5af3e42d15248df2de198c2357ac46ed801459ce3b935704b526abfa54a500e0"
   }
  ],
- "effects": null,
+ "effects": {
+  "highpass": 400,
+  "lowpass": 3000,
+  "drive": 0.7,
+  "crush": 6
+ },
+ "xvectorOnly": true,
  "reference": "reference.flac",
  "transcript": "Call contact parasitics. Contact confirmed. Extractor is live. Has negative movement. Fix sightlines, move in. Go sharp, go sharp. Harden that position. Containment proceeding. Executing full response. Go active intercept. Is at code.",
  "referenceSeconds": 12.83,

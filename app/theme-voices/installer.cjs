@@ -18,6 +18,17 @@ const lockHash=(runtimeId)=>crypto.createHash('sha256').update(JSON.stringify([L
 const modelDirName=key=>key+'-'+LOCK.models[key].revision.slice(0,12);
 const abortError=()=>Object.assign(Error('Cancelled.'),{name:'AbortError'});
 
+/** Writes to a file and fails cleanly on any write error (for example a full disk), never crashing. */
+function writer(file,flags='w'){
+ const out=fs.createWriteStream(file,{flags});let failed=null;out.on('error',e=>{failed=e;});
+ const check=()=>{if(failed)throw Object.assign(Error(failed.code==='ENOSPC'?'The disk is full.':'Couldn’t write '+path.basename(file)+': '+failed.message),{code:failed.code==='ENOSPC'?'DISK':'WRITE'});};
+ return {
+  async write(chunk){check();if(!out.write(chunk))await new Promise(r=>{const done=()=>{out.off('drain',done);out.off('error',done);r();};out.on('drain',done);out.on('error',done);});check();},
+  async close(){await new Promise(r=>{if(out.destroyed||out.writableFinished)return r();out.end(r);out.once('error',()=>r());});check();},
+  destroy(){try{out.destroy();}catch{}}};
+}
+const rmr=(p,o={})=>fs.promises.rm(p,{recursive:true,force:true,maxRetries:10,retryDelay:300,...o});
+const writeJson=(file,data)=>{fs.writeFileSync(file+'.tmp',JSON.stringify(data,null,1));fs.renameSync(file+'.tmp',file);};
 async function sha256File(file,signal){
  const h=crypto.createHash('sha256');
  for await(const chunk of fs.createReadStream(file,{highWaterMark:1<<20})){if(signal?.aborted)throw abortError();h.update(chunk);}
@@ -76,9 +87,9 @@ class Installer{
    }
    // A file too big for one download link is shipped in parts: NAME.001, NAME.002, …
    const first=whole+'.001';if(fs.existsSync(first)){
-    const out=fs.createWriteStream(final+'.partial');let n=1;
-    for(;;n++){const part=whole+'.'+String(n).padStart(3,'0');if(!fs.existsSync(part))break;await new Promise((res,rej)=>{const r=fs.createReadStream(part);r.on('error',rej);r.on('end',res);r.pipe(out,{end:false});});}
-    await new Promise(r=>out.end(r));
+    const out=writer(final+'.partial');
+    try{for(let n=1;;n++){const part=whole+'.'+String(n).padStart(3,'0');if(!fs.existsSync(part))break;for await(const c of fs.createReadStream(part,{highWaterMark:1<<20})){if(signal?.aborted)throw abortError();await out.write(c);}}await out.close();}
+    catch(e){out.destroy();await rmr(final+'.partial');throw e;}
     if(fs.statSync(final+'.partial').size===f.size&&await sha256File(final+'.partial',signal)===f.sha256){await fs.promises.rename(final+'.partial',final);onBytes?.(f.size);return final;}
     await fs.promises.rm(final+'.partial',{force:true});
    }
@@ -87,7 +98,7 @@ class Installer{
   for(let attempt=1;attempt<=5;attempt++){
    if(signal?.aborted)throw abortError();
    try{return await this.download(f,final,{signal,onBytes});}
-   catch(e){if(e.name==='AbortError')throw e;lastError=e;this.log('Theme voices download retry',f.name+': '+e.message);
+   catch(e){if(e.name==='AbortError'||e.code==='DISK')throw e;lastError=e;this.log('Theme voices download retry',f.name+': '+e.message);
     if(e.code==='CHECKSUM')continue;await new Promise(r=>setTimeout(r,this.retryDelay(attempt)));}
   }
   throw Error('Couldn’t download '+path.basename(f.name)+': '+(lastError?.message||'unknown error'));
@@ -95,19 +106,25 @@ class Installer{
  async download(f,final,{signal,onBytes}){
   const part=final+'.partial';let have=fs.existsSync(part)?fs.statSync(part).size:0;if(have>f.size){fs.rmSync(part);have=0;}
   const headers=have?{Range:'bytes='+have+'-'}:{};
-  const r=await this.fetch(f.url,{headers,signal,redirect:'follow'});
+  // A connection that goes quiet for 60 s is dropped and the download resumes on the next try.
+  const stall=new AbortController(),onAbort=()=>stall.abort();signal?.addEventListener('abort',onAbort);
+  let quiet=setTimeout(()=>stall.abort(),60000);const alive=()=>{clearTimeout(quiet);quiet=setTimeout(()=>stall.abort(),60000);};
+  try{
+  const r=await this.fetch(f.url,{headers,signal:stall.signal,redirect:'follow'});alive();
   if(r.status===416&&have===f.size){/* already complete */}
   else if(!(r.status===200||r.status===206))throw Error('the server answered '+r.status);
   if(r.status===200&&have){have=0;fs.rmSync(part,{force:true});} // the server ignored the resume: start over
   if(have)onBytes?.(have);
   if(r.status!==416){
-   const out=fs.createWriteStream(part,{flags:have?'a':'w'});
+   const out=writer(part,have?'a':'w');
    try{
     const reader=r.body.getReader();
-    for(;;){const {done,value}=await reader.read();if(done)break;if(signal?.aborted)throw abortError();
-     if(!out.write(Buffer.from(value)))await new Promise(res=>out.once('drain',res));onBytes?.(value.byteLength);}
-   }finally{await new Promise(res=>out.end(res));}
+    for(;;){const {done,value}=await reader.read();if(done)break;alive();if(signal?.aborted)throw abortError();
+     await out.write(Buffer.from(value));onBytes?.(value.byteLength);}
+    await out.close();
+   }catch(e){out.destroy();if(signal?.aborted)throw abortError();if(stall.signal.aborted&&e.code!=='DISK')throw Error('the connection stalled');throw e;}
   }
+  }finally{clearTimeout(quiet);signal?.removeEventListener('abort',onAbort);}
   const size=fs.statSync(part).size;if(size!==f.size){if(size>f.size)fs.rmSync(part,{force:true});throw Error('the download stopped early ('+size+' of '+f.size+' bytes)');}
   const got=await sha256File(part,signal);
   if(got!==f.sha256){fs.rmSync(part,{force:true});throw Object.assign(Error('the file didn’t match its checksum, so it was deleted'),{code:'CHECKSUM'});}
@@ -122,6 +139,8 @@ class Installer{
  async unbundle(folder,files,{signal,onBytes}={}){
   if(!fs.existsSync(folder))throw Error('The folder '+folder+' doesn’t exist.');
   const names=fs.readdirSync(folder),base=names.find(n=>/\.tar\.001$/i.test(n))?.replace(/\.001$/i,'')||names.find(n=>/\.tar$/i.test(n));if(!base)return 0;
+  if(names.some(n=>/\.tar\.\d{3}$/i.test(n))){const nums=names.filter(n=>n.startsWith(base+'.')).map(n=>Number(n.slice(base.length+1))).filter(Number.isFinite).sort((a,b)=>a-b);
+   const gap=nums.findIndex((x,i)=>x!==i+1);if(gap>=0)throw Error('Part '+String(gap+1).padStart(3,'0')+' of the offline bundle is missing from '+folder+'.');}
   const parts=fs.existsSync(path.join(folder,base))?[path.join(folder,base)]:[];for(let n=1;;n++){const p=path.join(folder,base+'.'+String(n).padStart(3,'0'));if(!fs.existsSync(p))break;parts.push(p);}
   const want=new Map(files.map(f=>[f.sha256.slice(0,16)+'-'+path.basename(f.name),f]));let found=0;
   await fs.promises.mkdir(this.downloads,{recursive:true});
@@ -134,11 +153,14 @@ class Installer{
    const str=(a,b)=>h.toString('utf8',a,b).replace(/\0.*$/s,'');const name=(str(345,500)?str(345,500)+'/':'')+str(0,100),size=parseInt(str(124,136).trim()||'0',8),type=String.fromCharCode(h[156]||48);
    const f=type==='0'&&want.get(path.basename(name)),final=f&&path.join(this.downloads,path.basename(name));
    const skip=f&&fs.existsSync(final)&&fs.statSync(final).size===f.size;
-   const out=f&&!skip?fs.createWriteStream(final+'.partial'):null,hash=crypto.createHash('sha256');let left=size;
-   while(left>0){if(!buf.length&&!await need(1))throw Error('The offline bundle is incomplete (a part is missing or cut short).');const n=Math.min(left,buf.length),chunk=buf.subarray(0,n);buf=buf.subarray(n);left-=n;
-    if(out){hash.update(chunk);if(!out.write(chunk))await new Promise(r=>out.once('drain',r));onBytes?.(n);}}
+   const out=f&&!skip?writer(final+'.partial'):null,hash=crypto.createHash('sha256');let left=size;
+   try{
+    while(left>0){if(signal?.aborted)throw abortError();if(!buf.length&&!await need(1))throw Error('The offline bundle is incomplete (a part is missing or cut short).');const n=Math.min(left,buf.length),chunk=buf.subarray(0,n);buf=buf.subarray(n);left-=n;
+     if(out){hash.update(chunk);await out.write(chunk);onBytes?.(n);}}
+    if(out)await out.close();
+   }catch(e){out?.destroy();if(out)await rmr(final+'.partial');throw e;}
    const pad=(512-size%512)%512;if(pad){await need(pad);buf=buf.subarray(Math.min(pad,buf.length));}
-   if(out){await new Promise(r=>out.end(r));if(hash.digest('hex')===f.sha256){await fs.promises.rename(final+'.partial',final);found++;}else{await fs.promises.rm(final+'.partial',{force:true});this.log('Theme voices: damaged file in the offline bundle',name);}}
+   if(out){if(hash.digest('hex')===f.sha256){await fs.promises.rename(final+'.partial',final);found++;}else{await rmr(final+'.partial');this.log('Theme voices: damaged file in the offline bundle',name);}}
   }
   this.log('Theme voices: offline bundle','used '+found+' file(s) from '+base);return found;
  }
@@ -174,12 +196,18 @@ class Installer{
  async install(p,{offline=[],signal,onProgress=()=>{},python}={}){
   const free=await fs.promises.statfs(this.dir).then(s=>s.bavail*s.bsize).catch(()=>null);
   const old=this.state(),oldEngine=old?this.engineDir(old):null,need=this.needs(p);
-  const diskNeed=need.engineReady?need.download:p.disk;
-  if(free!==null&&free<diskNeed*0.6)throw Object.assign(Error('Not enough free disk space: theme voices need about '+(diskNeed/GB).toFixed(1)+' GB and '+(free/GB).toFixed(1)+' GB is free on that drive.'),{code:'DISK'});
+  // The real peak: what's downloaded, plus (for a new engine) the unpacked packages while the old engine is still on disk.
+  const runtimeGet=need.get.filter(f=>f.group==='runtime').reduce((n,f)=>n+f.size,0),runtimeAll=p.files.filter(f=>f.group==='runtime').reduce((n,f)=>n+f.size,0);
+  const diskNeed=need.download+(need.engineReady?0:runtimeAll*1.9)+(runtimeGet?0:0)+256*1024**2;
+  if(free!==null&&free<diskNeed)throw Object.assign(Error('Not enough free disk space: theme voices need about '+(diskNeed/GB).toFixed(1)+' GB and '+(free/GB).toFixed(1)+' GB is free on that drive.'),{code:'DISK'});
   const toGet=need.get;let got=0;const totalBytes=need.download;
   const tick=(phase,label,extra={})=>onProgress({phase,label,bytes:got,totalBytes,...extra});
   // 1. Every file, verified. An offline bundle (a .tar in parts) is unpacked into the downloads first.
-  for(const folder of offline)await this.unbundle(folder,toGet,{signal,onBytes:n=>{got+=n;tick('download','Reading the offline bundle',{done:0,total:toGet.length});}}).catch(e=>this.log('Theme voices: offline bundle',e.message));
+  for(const folder of offline){
+   if(!fs.existsSync(folder)||!fs.statSync(folder).isDirectory())throw Object.assign(Error('The folder “'+folder+'” wasn’t found. Check the path (without quotes) and try again.'),{code:'OFFLINE'});
+   try{await this.unbundle(folder,toGet,{signal,onBytes:n=>{got+=n;tick('download','Reading the offline bundle',{done:0,total:toGet.length});}});}
+   catch(e){if(e.name==='AbortError'||e.code==='DISK')throw e;throw Object.assign(Error('The offline bundle in '+folder+' can’t be used: '+e.message),{code:'OFFLINE'});}
+  }
   const local=new Map();let i=0;
   for(const f of toGet){
    i++;tick('download','Downloading '+path.basename(f.name),{done:i-1,total:toGet.length});
@@ -190,7 +218,7 @@ class Installer{
   // 2. The engine (Python and packages), in a fresh folder named after the lock.
   const engineName='engine-'+p.lock,engine=path.join(this.dir,engineName);
   if(!need.engineReady){
-   await fs.promises.rm(engine,{recursive:true,force:true});await fs.promises.mkdir(engine,{recursive:true});
+   await rmr(engine);await fs.promises.mkdir(engine,{recursive:true});
    const site=path.join(engine,'site'),prefix=path.join(engine,'python');
    const runtimeFiles=p.files.filter(f=>f.group==='runtime');let n=0;
    for(const f of runtimeFiles){
@@ -216,11 +244,13 @@ class Installer{
     if(fs.existsSync(target)&&fs.statSync(target).size===f.size)continue;
     await fs.promises.mkdir(path.dirname(target),{recursive:true});
     const sib=local.has(f.sha256)?null:this.sibling({...f,model:key});
-    if(sib){await fs.promises.copyFile(sib,target);continue;}
+    // Copies land under a temporary name first, so a half-copied file is never mistaken for a placed one.
+    if(sib){await fs.promises.copyFile(sib,target+'.tmp');await fs.promises.rename(target+'.tmp',target);continue;}
     const src=local.get(f.sha256);if(!src)throw Error('Missing download for '+f.path);
     // The speech tokenizer is shared by both models: copy it rather than moving it.
     const shared=p.files.filter(x=>x.sha256===f.sha256).length>1;
-    if(shared)await fs.promises.copyFile(src,target);else await fs.promises.rename(src,target).catch(()=>fs.promises.copyFile(src,target));
+    if(shared){await fs.promises.copyFile(src,target+'.tmp');await fs.promises.rename(target+'.tmp',target);}
+    else await fs.promises.rename(src,target).catch(async()=>{await fs.promises.copyFile(src,target+'.tmp');await fs.promises.rename(target+'.tmp',target);});
    }
    models[key]={dir:modelDirName(key),revision:m.revision,repo:m.repo};
   }
@@ -229,10 +259,10 @@ class Installer{
   const rt=p.files.filter(f=>f.group==='runtime');
   const state={format:1,engineGen:LOCK.engine,engine:engineName,runtime:p.runtime,lock:p.lock,models,at:Date.now(),python:python||null,check:old?.lock===p.lock?old?.check:null,
    pythonSha:rt.find(f=>f.kind==='python')?.sha256||null,wheels:rt.filter(f=>f.kind==='wheel').map(f=>({package:f.package,version:f.version,name:f.name,sha256:f.sha256}))};
-  await fs.promises.writeFile(this.statePath()+'.tmp',JSON.stringify(state,null,1));await fs.promises.rename(this.statePath()+'.tmp',this.statePath());
-  // 4. Tidy: older engines and finished downloads of unpacked packages.
-  for(const name of fs.readdirSync(this.dir))if(/^engine-[0-9a-f]{12}$/.test(name)&&name!==engineName)await fs.promises.rm(path.join(this.dir,name),{recursive:true,force:true}).catch(()=>{});
-  for(const f of p.files.filter(f=>f.group==='runtime'))await fs.promises.rm(local.get(f.sha256)||'',{force:true}).catch(()=>{});
+  writeJson(this.statePath(),state);
+  // 4. Tidy: older engines, and downloads that are now unpacked or copied into place.
+  for(const name of fs.readdirSync(this.dir))if(/^engine-[0-9a-f]{12}$/.test(name)&&name!==engineName)await rmr(path.join(this.dir,name)).catch(e=>this.log('Theme voices: old engine not removed yet',e.message));
+  for(const f of p.files){const d=local.get(f.sha256);if(d&&fs.existsSync(d))await rmr(d).catch(()=>{});}
   tick('done','Installed',{done:1,total:1});
   return state;
  }
@@ -244,38 +274,44 @@ class Installer{
  /** Checks every installed file against the lock and the packages' own RECORD lists. */
  async verify({signal,onProgress=()=>{}}={}){
   const s=this.state();if(!s)return {ok:false,problems:['Theme voices aren’t installed.']};
-  const problems=[],engine=this.engineDir(s);
-  if(!fs.existsSync(path.join(engine,'ok')))problems.push('The voice engine folder is incomplete.');
+  const problems=[],engineProblems=[],damagedModels=[],engine=this.engineDir(s);
+  if(!fs.existsSync(path.join(engine,'ok')))engineProblems.push('The voice engine folder is incomplete.');
   const site=path.join(engine,'site');
   const records=fs.existsSync(site)?fs.readdirSync(site).filter(d=>d.endsWith('.dist-info')):[];
   let n=0;
   for(const d of records){
    n++;onProgress({phase:'verify',label:'Checking '+d.replace(/\.dist-info$/,''),done:n,total:records.length});
-   const rec=path.join(site,d,'RECORD');if(!fs.existsSync(rec)){problems.push(d+' has no file list.');continue;}
-   for(const line of fs.readFileSync(rec,'utf8').split(/\r?\n/)){
+   const rec=path.join(site,d,'RECORD');if(!fs.existsSync(rec)){engineProblems.push(d+' has no file list.');continue;}
+   let k=0;
+   for(const line of (await fs.promises.readFile(rec,'utf8')).split(/\r?\n/)){
     const m=/^(.*),sha256=([A-Za-z0-9_-]+),(\d+)$/.exec(line.trim());if(!m)continue;
     const target=safeJoin(site,m[1]);if(!target)continue;
-    if(!fs.existsSync(target)){if(!m[1].includes('.data/'))problems.push('Missing '+m[1]);continue;}
-    if(fs.statSync(target).size!==Number(m[3]))problems.push('Changed '+m[1]);
+    // Checked without blocking the app: a pause every few hundred files.
+    if(++k%300===0)await new Promise(r=>setImmediate(r));
+    const st=await fs.promises.stat(target).catch(()=>null);
+    if(!st){if(!m[1].includes('.data/'))engineProblems.push('Missing '+m[1]);continue;}
+    if(st.size!==Number(m[3]))engineProblems.push('Changed '+m[1]);
    }
    if(signal?.aborted)throw abortError();
   }
   for(const [key,v] of Object.entries(s.models||{})){
    const m=LOCK.models[key];if(!m)continue;
    for(const f of m.files){const t=path.join(this.dir,'models',v.dir,f.path);onProgress({phase:'verify',label:'Checking '+m.label+' '+f.path});
-    if(!fs.existsSync(t)){problems.push('Missing model file '+f.path);continue;}
-    if(fs.statSync(t).size!==f.size||await sha256File(t,signal)!==f.sha256)problems.push('Damaged model file '+key+'/'+f.path);}
+    if(!fs.existsSync(t)){damagedModels.push({model:key,path:f.path,file:t,missing:true});continue;}
+    if(fs.statSync(t).size!==f.size||await sha256File(t,signal)!==f.sha256)damagedModels.push({model:key,path:f.path,file:t});}
   }
-  return {ok:!problems.length,problems:problems.slice(0,40),count:problems.length};
+  problems.push(...engineProblems,...damagedModels.map(d=>(d.missing?'Missing model file ':'Damaged model file ')+d.model+'/'+d.path));
+  return {ok:!problems.length,problems:problems.slice(0,40),count:problems.length,engineOk:!engineProblems.length,damagedModels};
  }
  /** Removes the engine and models. Custom voices, saved clips and settings stay unless asked. */
  async remove({everything=false}={}){
   for(const name of fs.existsSync(this.dir)?fs.readdirSync(this.dir):[]){
    if(!everything&&['custom-voices','saved'].includes(name))continue;
-   await fs.promises.rm(path.join(this.dir,name),{recursive:true,force:true});
+   await rmr(path.join(this.dir,name));
   }
  }
- async removeModel(key){const s=this.state();if(!s?.models?.[key])return;await fs.promises.rm(path.join(this.dir,'models',s.models[key].dir),{recursive:true,force:true});delete s.models[key];fs.writeFileSync(this.statePath(),JSON.stringify(s,null,1));}
+ async removeModel(key){const s=this.state();if(!s?.models?.[key])return;await rmr(path.join(this.dir,'models',s.models[key].dir));delete s.models[key];writeJson(this.statePath(),s);}
+ saveCheck(c){const s=this.state();if(!s)return;s.check=c;writeJson(this.statePath(),s);}
 }
 // Where each file of a wheel goes (the wheel format: NAME.data/purelib|platlib go with the packages,
 // NAME.data/data goes to Python's own folder, scripts and headers aren't needed).

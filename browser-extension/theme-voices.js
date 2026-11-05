@@ -22,7 +22,7 @@
  mount.append(panel);
  let noteAt=0;const $=id=>panel.querySelector('#'+id),status=t=>{$('tvStatus').textContent=t;noteAt=Date.now();},quiet=t=>{if(Date.now()-noteAt>8000)$('tvStatus').textContent=t;};
  const send=m=>chrome.runtime.sendMessage(m).then(r=>{if(r?.ok===false)throw Error(r.error||'Theme voices didn’t answer.');return r;});
- let info={available:null},voices=[],last=null,lastRoute=null,busy=false,chatCfg={chat:false};
+ let info={available:null},voices=[],last=null,lastRoute=null,busy=false,chatCfg={chat:false},gen=0;
  const label=t=>voices.find(v=>v.theme===t)?.name||t;
  function chosen(){return $('tvFollow').checked?(api.getTheme?.()||'steam'):$('tvVoice').value;}
  function describe(){
@@ -41,6 +41,7 @@
   $('tvStop').disabled=!busy&&!s.busy;
   if(!busy){
    if(s.installing)quiet('Installing theme voices: '+(s.installing.label||'')+(s.installing.totalBytes?' ('+Math.round(100*(s.installing.bytes||0)/s.installing.totalBytes)+'%)':''));
+   else if(s.installError&&!s.ready)quiet('Theme voices didn’t install: '+s.installError.message+' Retry in Settings → Theme voices.');
    else if(!s.installed)quiet('Optional: theme voices aren’t installed. Tyler’s normal voice works without them. “Set up theme voices” shows what this PC would download first.');
    else if(!s.current)quiet('Theme voices need a quick update for this version. Open Settings → Theme voices.');
    else if(s.needs==='model')quiet(s.modeLabel+' mode’s model isn’t installed. Open Settings → Theme voices.');
@@ -81,12 +82,13 @@
   for(const part of wavParts(audio))api.bridge('audio',{audio:part,queue:true});
  }
  /** Make (or reuse) the clip for the box's text with the voice chosen right now, then play it. */
- async function make(route,{text=$('tvText').value,theme=chosen(),fresh=false,from='panel'}={}){
+ async function make(route,{text=$('tvText').value,theme=chosen(),fresh=false,from='panel',speakerId=null}={}){
   text=String(text||'').replace(/\s+/g,' ').trim();if(!text){status('Type something for Tyler to say.');return null;}
   if(busy){status('Still making the last one. Press Stop to cancel it.');return null;}
-  busy=true;render();const started=Date.now();status('Making '+label(theme)+'’s voice…');
+  busy=true;render();const started=Date.now(),mine=++gen;status('Making '+label(theme)+'’s voice…');
   try{
-   const r=await send({type:'voices:speak',text,theme,fresh,purpose:route==='call'?'call':'preview',from});
+   const r=await send({type:'voices:speak',text,theme,fresh,purpose:route==='call'?'call':'preview',from,speakerId});
+   if(mine!==gen)return null; // Stop was pressed meanwhile: a late result is never played
    last={...r.clip,audio:r.audio};lastRoute=route;
    const c=r.clip,where=c.device==='cuda'?'graphics card':c.device==='windows'?'Windows speech':'processor';
    $('tvClip').textContent=c.voiceName+' · '+c.seconds.toFixed(1)+' s'+(c.cached?' · from the cache':' · made in '+(c.ms/1000).toFixed(1)+' s on the '+where)+' · '+(c.mode==='native'?'the original Windows voice':c.mode==='light'?'Lightweight':'Quality')+(c.processed?' · with the voice’s radio/mask sound':'')+(c.status&&!['ready','custom'].includes(c.status)?' · '+c.status:'');
@@ -94,13 +96,14 @@
    status(route==='call'?'Playing into the call: “'+text.slice(0,60)+'”':route==='preview'?'Previewing here only (not in the call).':'Ready. Preview it or play it into the call.');
    return last;
   }catch(e){status(/Stopped/.test(e.message)?'Stopped.':'Couldn’t make that voice: '+e.message);throw e;}
-  finally{busy=false;render();if(Date.now()-started>1500)void refresh();}
+  finally{if(mine===gen){busy=false;render();}if(Date.now()-started>1500)void refresh();}
  }
  const click=(id,fn)=>{$(id).onclick=()=>{fn().catch(()=>{});};};
  click('tvGenerate',()=>make(null));
  click('tvPreview',async()=>{const t=$('tvText').value.trim();if(last&&last.text===t.replace(/\s+/g,' ')&&last.theme===chosen()){play('preview',last.audio);lastRoute='preview';status('Previewing here only (not in the call).');return;}await make('preview');});
  click('tvCall',async()=>{const t=$('tvText').value.trim();if(last&&last.text===t.replace(/\s+/g,' ')&&last.theme===chosen()){play('call',last.audio);lastRoute='call';status('Playing into the call.');return;}await make('call');});
- click('tvStop',async()=>{await send({type:'voices:stop'}).catch(()=>{});api.bridge('stop');busy=false;status('Stopped.');render();});
+ async function stopAll(){gen++;busy=false;await send({type:'voices:stop'}).catch(()=>{});api.bridge('stop');status('Stopped.');render();}
+ click('tvStop',stopAll);
  click('tvReplay',async()=>{if(!last)return;try{play(lastRoute||'preview',last.audio);status('Replaying '+(lastRoute==='call'?'into the call.':'here.'));}catch(e){status(e.message);}});
  click('tvSave',async()=>{if(!last)return;try{const r=await send({type:'voices:save',id:last.id});status('Saved: '+r.file);}catch(e){status('Couldn’t save: '+e.message);}});
  // ── !say in chat (off unless the owner turns it on) ──────────────────────
@@ -116,7 +119,8 @@
   if(Date.now()-prev<wait){status('!say from '+name+' skipped: cooldown.');return;}
   if(req.theme&&!voices.some(v=>v.theme===req.theme)){api.send('🔊 '+name+', there’s no “'+req.theme+'” voice. Voices: '+voices.filter(v=>v.hasReference).map(v=>v.theme).join(', ')+'.',{kind:'game'});return;}
   lastBy.set(key,Date.now());
-  try{await make('call',{text:req.text,theme:req.theme||chosen(),from:'chat'});}
+  if(busy){api.send('🔊 '+name+', Tyler is still on the last one. Try again in a moment.',{kind:'game'});return;}
+  try{await make('call',{text:req.text,theme:req.theme||chosen(),from:'chat',speakerId:id});}
   catch(e){if(!/Stopped/.test(e.message))api.send('🔊 Couldn’t say that for '+name+': '+String(e.message).slice(0,140),{kind:'game'});}
  }
  function watch(){
@@ -136,6 +140,6 @@
  api.onPause?.(()=>{if(busy)void send({type:'voices:stop'}).catch(()=>{});});
  panel.addEventListener('toggle',()=>{if(panel.open)void refresh();});
  api.ui?.onUI?.(()=>describe());
- void refresh();setInterval(()=>{if(panel.open||busy||chatCfg.chat)void refresh();},busy?2000:15000);setInterval(watch,1500);
- globalThis.TylerThemeVoices=Object.freeze({refresh,parse,say:(text,theme)=>make('call',{text,theme}),state:()=>({busy,available:info.available,ready:!!info.status?.ready,voices:voices.filter(v=>v.hasReference).map(v=>({theme:v.theme,name:v.name}))})});
+ let lastPoll=0;void refresh();setInterval(()=>{const every=busy?2000:15000;if((panel.open||busy||chatCfg.chat)&&Date.now()-lastPoll>=every){lastPoll=Date.now();void refresh();}},2000);setInterval(watch,1500);
+ globalThis.TylerThemeVoices=Object.freeze({refresh,parse,stop:stopAll,say:(text,theme)=>make('call',{text,theme}),state:()=>({busy,available:info.available,ready:!!info.status?.ready,voices:voices.filter(v=>v.hasReference).map(v=>({theme:v.theme,name:v.name}))})});
 })();

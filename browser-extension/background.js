@@ -425,7 +425,7 @@ async function themeVoices(message,tab){
  if(op==='speak'){
   if(!await lease.check(tab))throw Error('Another Steam tab owns Tyler.');
   const flags=await chrome.storage.local.get('v22EmergencyStop');if(flags.v22EmergencyStop===true)throw Error('Emergency stop is on.');
-  return tv.speak({text:String(message.text||'').slice(0,800),theme:typeof message.theme==='string'?message.theme:null,fresh:message.fresh===true,purpose:message.purpose==='call'?'call':'preview',from:message.from==='chat'?'chat':'panel'});
+  return tv.speak({text:String(message.text||'').slice(0,800),theme:typeof message.theme==='string'?message.theme:null,fresh:message.fresh===true,purpose:message.purpose==='call'?'call':'preview',from:message.from==='chat'?'chat':'panel',speakerId:/^7656119\d{10}$/.test(String(message.speakerId||''))?String(message.speakerId):null});
  }
  throw Error('Unknown theme-voice request.');
 }

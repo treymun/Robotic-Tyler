@@ -68,47 +68,62 @@ class ThemeVoices extends EventEmitter{
    mode,modeChosen:!!s.mode,modeLabel:MODES[mode].label,recommendation:rec,hardware:hw?{cpu:hw.cpu,ram:hw.ram,gpus:hw.gpus,disk:hw.disk}:null,
    ready:!!inst.installed&&!!inst.current&&modelOk,needs:!inst.installed?'install':!inst.current?'update':!modelOk?'model':null,
    loaded:this.loaded?{mode:this.loaded.mode,device:this.loaded.device,since:this.loaded.at}:null,
-   busy:!!this.active,queued:this.queue.length,installing:this.installJob?this.installJob.progress:null,lastError:this.lastError,settings:s,
+   busy:!!this.active,queued:this.queue.length,installing:this.installJob?this.installJob.progress:null,installError:this.lastInstallError||null,lastError:this.lastError,settings:s,
    lastClip:this.lastClip?{id:this.lastClip.id,seconds:this.lastClip.seconds,voice:this.lastClip.voiceName,text:this.lastClip.text.slice(0,80)}:null};
  }
  emitStatus(){this.status().then(s=>this.emit('status',s)).catch(()=>{});}
  voiceList(){return this.voices.list();}
  // ── install, repair, remove ──────────────────────────────────────────────
- async install({mode,both=false,offline=[],device}={}){
+ async install({mode,both=false,offline=[],device,runtime,models}={}){
   if(this.installJob)throw Error('Theme voices are already being installed.');
-  const p=await this.planFor({mode,both,device}),full=plan({runtime:p.runtime,models:p.models});
-  const ctl=new AbortController();this.installJob={ctl,progress:{phase:'start',label:'Starting',bytes:0,totalBytes:p.download}};this.emitStatus();
+  // Claimed at once, so a second press can't start a second install over the same downloads.
+  const ctl=new AbortController();this.installJob={ctl,progress:{phase:'start',label:'Checking this PC'}};this.lastInstallError=null;this.emitStatus();
   try{
-   await this.closeWorker();
-   await this.installer.install(full,{offline,signal:ctl.signal,python:this.devPython,onProgress:e=>{this.installJob.progress=e;this.emit('install',e);}});
-   if(!(await this.settings()).mode)await this.saveSettings({mode:p.mode});
+   const folders=(offline||[]).map(x=>String(x||'').trim().replace(/^["']+|["']+$/g,'')).filter(Boolean);
+   let full,chosen=mode;
+   if(runtime&&models)full=plan({runtime,models});
+   else{const p=await this.planFor({mode,both,device});full=plan({runtime:p.runtime,models:p.models});chosen=p.mode;}
+   this.installJob.progress={phase:'start',label:'Starting',bytes:0,totalBytes:this.installer.needs(full).download};this.emitStatus();
+   await this.stop();await this.closeWorker(); // nothing may run from the engine while it's replaced
+   await this.installer.install(full,{offline:folders,signal:ctl.signal,python:this.devPython,onProgress:e=>{this.installJob.progress=e;this.emit('install',e);}});
+   if(!(await this.settings()).mode&&chosen)await this.saveSettings({mode:chosen});
    this.installJob.progress={phase:'check',label:'Making a test voice'};this.emit('install',this.installJob.progress);
+   await this.closeWorker(); // the check runs on the engine just installed
    const check=await this.check();
    this.emit('install',{phase:'done',label:'Theme voices are ready',check});return {ok:true,check};
-  }catch(e){const out=e.name==='AbortError'?'Installation stopped. What was downloaded is kept, so it carries on from there next time.':e.message;this.emit('install',{phase:'failed',label:out});throw Error(out);}
+  }catch(e){
+   const out=e.name==='AbortError'?'Installation stopped. What was downloaded is kept, so it carries on from there next time.':e.message;
+   this.lastInstallError={message:out,at:Date.now()};this.emit('install',{phase:'failed',label:out});throw Object.assign(Error(out),{code:e.code});
+  }
   finally{this.installJob=null;this.emitStatus();}
  }
  cancelInstall(){this.installJob?.ctl.abort();}
  /** A real voice from the installed engine: the installer's last step, and Settings → Test. */
  async check(){
-  const s=await this.settings(),mode=s.mode||Object.keys(this.installer.status().models||{}).find(k=>this.installer.status().models[k])||'quality';
+  const st=this.installer.status(),s=await this.settings(),have=Object.keys(st.models||{}).filter(k=>st.models[k]);
+  const mode=s.mode&&st.models?.[MODES[s.mode].model]?s.mode:have[0]||s.mode||'quality';
   const theme=this.voices.get('cs16')?.refPath?'cs16':THEMES.find(t=>this.voices.get(t)?.refPath);
   const started=Date.now();let result;
   try{result=await this.generate({text:CHECK_LINE,theme,mode,noCache:true,purpose:'check'});}
-  catch(e){const c={ok:false,error:e.message,code:e.code||null,at:Date.now()};this.saveCheck(c);throw e;}
-  const c={ok:true,at:Date.now(),mode,device:this.loaded?.device,seconds:result.seconds,ms:result.ms,totalMs:Date.now()-started,rtf:+(result.ms/1000/Math.max(.1,result.seconds)).toFixed(2),voice:theme};
-  this.saveCheck(c);return c;
+  catch(e){this.installer.saveCheck({ok:false,error:e.message,code:e.code||null,at:Date.now()});throw e;}
+  const c={ok:true,at:Date.now(),mode,device:result.device||this.loaded?.device,seconds:result.seconds,ms:result.ms,totalMs:Date.now()-started,rtf:+(result.ms/1000/Math.max(.1,result.seconds)).toFixed(2),voice:theme};
+  this.installer.saveCheck(c);return c;
  }
- saveCheck(c){const st=this.installer.state();if(!st)return;st.check=c;fs.writeFileSync(this.installer.statePath(),JSON.stringify(st,null,1));}
  async verify(onProgress){return this.installer.verify({onProgress});}
- async repair(){const v=await this.installer.verify();if(v.ok)return {ok:true,repaired:false,check:await this.check()};const st=this.installer.state();
-  const mode=(await this.settings()).mode||'quality';const models=Object.keys(st?.models||{}).length?Object.keys(st.models):[MODES[mode].model];
-  await this.closeWorker();await fs.promises.rm(path.join(this.dir,st?.engine||'none','ok'),{force:true});
-  const p=plan({runtime:st?.runtime||this.runtimeFor(await this.hardware(),'auto'),models});
-  for(const key of models)for(const f of LOCK.models[key].files){const t=path.join(this.dir,'models',st?.models?.[key]?.dir||'x',f.path);if(fs.existsSync(t)&&v.problems.some(x=>x.includes(f.path)))fs.rmSync(t,{force:true});}
-  await this.installer.install(p,{python:this.devPython});return {ok:true,repaired:true,problems:v.count,check:await this.check()};}
- async remove({everything=false}={}){await this.stop();await this.closeWorker();await this.installer.remove({everything});this.lastClip=null;this.emitStatus();}
- async removeModel(key){await this.closeWorker();await this.installer.removeModel(key);this.emitStatus();}
+ /** Checks every file; re-fetches only what's damaged (the engine only when the engine itself is). */
+ async repair(){
+  if(this.installJob)throw Error('Theme voices are being installed right now.');
+  const v=await this.installer.verify();if(v.ok)return {ok:true,repaired:false,check:await this.check()};
+  const st=this.installer.state();if(!st)throw Error('Theme voices aren’t installed.');
+  await this.stop();await this.closeWorker();
+  if(!v.engineOk)await fs.promises.rm(path.join(this.dir,st.engine,'ok'),{force:true});
+  for(const d of v.damagedModels)await fs.promises.rm(d.file,{force:true,maxRetries:10});
+  const models=Object.keys(st.models||{});
+  const r=await this.install({runtime:st.runtime,models:models.length?models:[MODES[(await this.settings()).mode||'quality'].model]});
+  return {ok:true,repaired:true,problems:v.count,check:r.check};
+ }
+ async remove({everything=false}={}){if(this.installJob)throw Error('Stop the installation first.');await this.stop();await this.closeWorker();await this.installer.remove({everything});this.lastClip=null;this.emitStatus();}
+ async removeModel(key){if(this.installJob)throw Error('Stop the installation first.');await this.stop();await this.closeWorker();await this.installer.removeModel(key);this.emitStatus();}
 
  // ── the worker ───────────────────────────────────────────────────────────
  async workerFor(){
@@ -117,34 +132,43 @@ class ThemeVoices extends EventEmitter{
   if(this.worker?.alive)return this.worker;
   const engine=this.installer.engineDir(st);
   const script=await this.installer.copyWorker(engine);
-  this.worker=new WorkerHost({python:this.installer.python(st),script,site:path.join(engine,'site'),cwd:engine,log:this.log});
-  this.worker.on('exit',()=>{this.loaded=null;this.emitStatus();});
-  await this.worker.start();return this.worker;
+  const w=new WorkerHost({python:this.installer.python(st),script,site:path.join(engine,'site'),cwd:engine,log:this.log});
+  this.worker=w;
+  w.on('exit',()=>{if(this.worker===w){this.worker=null;this.loaded=null;}this.emitStatus();});
+  await w.start();return w;
  }
  async closeWorker(){clearTimeout(this.idleTimer);const w=this.worker;this.worker=null;this.loaded=null;if(w)await w.quit();this.emitStatus();}
- async device(mode,s){
-  const st=this.installer.state(),hw=await this.hardware(true);
-  if(s.device==='cpu'||!String(st?.runtime).endsWith('cuda'))return 'cpu';
-  const {gpu,why}=hardware.usableGpu(hw);
-  if(!gpu){if(s.device==='cuda')throw Object.assign(Error('The graphics card can’t be used right now: '+why),{code:'no_gpu'});return 'cpu';}
-  return 'cuda';
- }
+ /** Ends the engine at once (the app is quitting): no python.exe is left behind holding files. */
+ killNow(){try{this.worker?.kill();}catch{}}
+ /**
+  * Where the model runs. "auto" with the graphics-card engine means the graphics card: if it can't be
+  * used, the message fails with the reason instead of quietly moving to the (much slower) processor.
+  */
+ deviceFor(s){const st=this.installer.state();return s.device==='cpu'||!String(st?.runtime).endsWith('cuda')?'cpu':'cuda';}
  /** Room for the model? Says so plainly instead of quietly using a smaller one. */
  async roomFor(mode,device){
-  const hw=await this.hardware(true),need=hardware.NEEDS[mode];
-  if(device==='cuda'){const g=hardware.usableGpu(hw).gpu;if(g&&g.vramFree&&g.vramFree<need.vram*0.85)throw Object.assign(Error(MODES[mode].label+' mode needs about '+(need.vram/GB).toFixed(1)+' GB of free graphics memory and '+(g.vramFree/GB).toFixed(1)+' GB is free right now (a game may be using it). Close it, or switch to '+(mode==='quality'?'Lightweight mode':'the processor')+' in Settings → Theme voices.'),{code:'low_vram'});}
+  const need=hardware.NEEDS[mode];
+  if(device==='cuda'){
+   const hw=await this.hardware(true).catch(()=>null),g=hw&&hardware.usableGpu(hw).gpu;
+   // A probe that finds nothing (nvidia-smi busy or slow during a game) isn't treated as "no card": the engine itself decides when it loads.
+   if(g&&g.vramFree&&g.vramFree<need.vram*0.85)throw Object.assign(Error(MODES[mode].label+' mode needs about '+(need.vram/GB).toFixed(1)+' GB of free graphics memory and '+(g.vramFree/GB).toFixed(1)+' GB is free right now (a game may be using it). Close it, or switch to '+(mode==='quality'?'Lightweight mode':'the processor')+' in Settings → Theme voices.'),{code:'low_vram'});
+  }
   else{const needRam=(mode==='quality'?7.5:3.6)*GB,free=this.freemem();if(free<needRam*0.8)throw Object.assign(Error(MODES[mode].label+' mode on the processor needs about '+(needRam/GB).toFixed(1)+' GB of free memory and '+(free/GB).toFixed(1)+' GB is free. Close some programs'+(mode==='quality'?', or switch to Lightweight mode':'')+'.'),{code:'low_memory'});}
  }
  async ensureLoaded(mode){
-  const s=await this.settings(),device=await this.device(mode,s),st=this.installer.state();
+  const s=await this.settings(),device=this.deviceFor(s),st=this.installer.state();
+  if(this.loaded&&this.loaded.mode===mode&&this.loaded.device===device&&this.worker?.alive)return {loaded:this.loaded,worker:this.worker};
   const dir=this.installer.modelDir(MODES[mode].model,st);
   if(!dir||!fs.existsSync(dir))throw Object.assign(Error(MODES[mode].label+' mode’s model isn’t installed. Install it in Settings → Theme voices.'),{code:'model_missing'});
-  if(this.loaded&&this.loaded.mode===mode&&this.loaded.device===device&&this.worker?.alive)return this.loaded;
-  if(!this.loaded||this.loaded.device!==device||this.loaded.mode!==mode)await this.roomFor(mode,device);
+  // Another model (or the other device) is loaded: close it first, so its memory counts as free.
+  if(this.loaded)await this.closeWorker();
+  await this.roomFor(mode,device);
   const w=await this.workerFor();
   const dtype=device==='cuda'?'auto':os.totalmem()>=(mode==='quality'?14:7)*GB?'fp32':'bf16';
-  const r=await w.request('load',{model_dir:dir,device,dtype,threads:Math.max(1,os.cpus().length-1)},{timeout:300000});
-  this.loaded={mode,device,dtype:r.dtype_used,at:Date.now(),loadMs:r.load_ms};this.emitStatus();return this.loaded;
+  let r;try{r=await w.request('load',{model_dir:dir,device,dtype,threads:Math.max(1,os.cpus().length-1)},{timeout:300000});}
+  catch(e){if(e.code==='no_gpu')throw Object.assign(Error('The graphics card can’t be used right now (the voice engine didn’t find it). Check that the NVIDIA driver is installed and up to date, or choose “Always the processor” in Settings → Theme voices.'),{code:'no_gpu'});throw e;}
+  if(this.worker!==w)throw Object.assign(Error('Stopped.'),{code:'cancelled'});
+  this.loaded={mode,device,dtype:r.dtype_used,at:Date.now(),loadMs:r.load_ms};this.emitStatus();return {loaded:this.loaded,worker:w};
  }
  scheduleIdle(s){clearTimeout(this.idleTimer);const mins=s?.idleMinutes??5;if(!mins||!this.worker)return;this.idleTimer=setTimeout(()=>{if(!this.active&&!this.queue.length){this.log('Theme voices','idle: closing the voice engine');void this.closeWorker();}},mins*60000);this.idleTimer.unref?.();}
 
@@ -182,21 +206,23 @@ class ThemeVoices extends EventEmitter{
   const out=path.join(this.cacheDir,key+'.wav');
   if(!job.noCache&&fs.existsSync(out)){const now=new Date();fs.utimesSync(out,now,now);return this.finish(job,v,{file:out,cached:true,ms:0,seconds:wavSeconds(out),mode,processed:!!fx});}
   if(job.cancelled)throw Object.assign(Error('Stopped.'),{code:'cancelled'});
+  if(this.installJob&&job.purpose!=='check')throw Object.assign(Error('Theme voices are being installed. Try again when it’s done.'),{code:'installing'});
   // Microsoft Sam and Mary: the real Windows voice when this PC has it (closer than a clone, and instant).
   if(v.native?.sapi&&s.nativeVoices!==false&&!v.custom){
    const n=await sapi.find(v.native.sapi).catch(()=>null);
    if(n){const t0=Date.now(),file=path.join(this.cacheDir,key+'-sapi.wav');if(!job.noCache&&fs.existsSync(file))return this.finish(job,v,{file,cached:true,ms:0,seconds:wavSeconds(file),mode:'native',device:'windows',native:n.name});
-    await sapi.speak(n.name,job.text,file);return this.finish(job,v,{file,cached:false,ms:Date.now()-t0,seconds:wavSeconds(file),mode:'native',device:'windows',native:n.name});}
+    await sapi.speak(n.name,job.text,file);if(job.cancelled)throw Object.assign(Error('Stopped.'),{code:'cancelled'});return this.finish(job,v,{file,cached:false,ms:Date.now()-t0,seconds:wavSeconds(file),mode:'native',device:'windows',native:n.name});}
   }
-  const loaded=await this.ensureLoaded(mode);
+  const {loaded,worker:w}=await this.ensureLoaded(mode);
   if(job.cancelled)throw Object.assign(Error('Stopped.'),{code:'cancelled'});
-  const w=this.worker;job.workerId=w.nextId();
+  job.workerId=w.nextId();
   const expected=Math.max(1,job.text.length/14.5),rtf=loaded.device==='cuda'?1.5:mode==='quality'?30:15;
   const dry=out.replace(/\.wav$/,fx?'-dry.wav':'.wav');
   this.emit('progress',{id:job.id,phase:'speaking',text:job.text.slice(0,60),voice:v.name});
   const r=await w.request('speak',{text:job.text,ref_audio:v.refPath,ref_text:v.xvectorOnly?'':(v.transcript||''),xvector_only:!!v.xvectorOnly||!v.transcript,cache:path.join(this.promptDir,vkey+'-'+mode+'.safetensors'),
    out:dry,out_fx:fx?out:null,effects:fx,seed:job.seed||1,language:v.language||'English'},
    {timeout:Math.min(20*60000,60000+expected*rtf*3000),onProgress:p=>this.emit('progress',{id:job.id,phase:'speaking',chunk:p.chunk,chunks:p.chunks,step:p.step,steps:p.steps,voice:v.name})});
+  if(job.cancelled)throw Object.assign(Error('Stopped.'),{code:'cancelled'});
   this.pruneCache();
   return this.finish(job,v,{file:fx?r.out_fx:r.out,dry:fx?r.out:null,cached:false,ms:r.ms,seconds:r.seconds,mode,device:loaded.device,retries:r.retries,processed:!!fx});
  }
@@ -220,7 +246,7 @@ class ThemeVoices extends EventEmitter{
  /** Copies a clip to the Saved folder under a readable name. */
  save(clip){
   const dir=path.join(this.dir,'saved');fs.mkdirSync(dir,{recursive:true});
-  const name=(clip.voiceName+' - '+clip.text).replace(/[^\w .,'!?-]+/g,' ').replace(/[.!?]+$/,'').slice(0,70).trim()||'Tyler';
+  const name=(clip.voiceName+' - '+clip.text).replace(/[^\w .,'!-]+/g,' ').replace(/[.!?]+$/,'').slice(0,70).trim()||'Tyler';
   let file=path.join(dir,name+'.wav'),n=2;while(fs.existsSync(file))file=path.join(dir,name+' ('+(n++)+').wav');
   fs.copyFileSync(clip.file,file);return file;
  }

@@ -25,7 +25,11 @@ function setupThemeVoices({root,dir,vault,local,changeListeners,net,shell,log,se
  changeListeners.push(changes=>{if(changes.v22EmergencyStop?.newValue===true)void service.stop();});
  globalThis.tylerThemeVoices={
   status:async()=>({status:await service.status(),voices:service.voiceList()}),
-  speak:async o=>{const clip=await service.speak(o);clips.set(clip.id,clip);if(clips.size>30)clips.delete(clips.keys().next().value);return {clip:pub(clip),audio:service.audio(clip)};},
+  speak:async o=>{
+   // !say from chat is checked here too (not only in the Steam page): on, and who may use it.
+   if(o.from==='chat'){const st=await service.settings();if(!st.chat)throw Error('!say is switched off.');
+    if(st.chatAccess==='selected'&&!(/^7656119\d{10}$/.test(String(o.speakerId||''))&&String(st.chatAllowed||'').split(/\s+/).includes(String(o.speakerId))))throw Error('Only the owner’s chosen accounts can use !say.');}
+   const clip=await service.speak(o);clips.set(clip.id,clip);if(clips.size>30)clips.delete(clips.keys().next().value);return {clip:pub(clip),audio:service.audio(clip)};},
   stop:()=>service.stop(),
   settings:async v=>{const allowed={};if(typeof v.followTheme==='boolean')allowed.followTheme=v.followTheme;if(typeof v.override==='string')allowed.override=v.override;await service.saveSettings(allowed);return {};},
   save:async id=>{const c=clips.get(id);if(!c)throw Error('That clip isn’t available any more. Make it again.');const file=service.save(c);try{shell.showItemInFolder(file);}catch{}return {file};}
@@ -48,12 +52,16 @@ function setupThemeVoices({root,dir,vault,local,changeListeners,net,shell,log,se
   if(op==='stop')return service.stop();
   if(op==='set-reference'){const v=service.voices.setCustom(String(r.theme||''),{data:r.data,fileName:r.fileName,transcript:r.transcript,name:r.name});return {voice:{theme:v.theme,name:v.name,status:v.status}};}
   if(op==='restore-reference'){service.voices.removeCustom(String(r.theme||''));return {};}
-  if(op==='sample'){const v=service.voices.get(String(r.theme||''));if(!v?.samplePath&&!v?.refPath)throw Error('No sample for that voice.');const f=v.sampleFile?path.join(appDir,'voices',v.theme,v.sampleFile):v.refPath;return {audio:fs.readFileSync(f).toString('base64'),kind:v.sampleFile?'sample':'reference',type:f.endsWith('.flac')?'audio/flac':'audio/wav'};}
+  // The original recordings, for comparing by ear: the reference the clone learns from, or the
+  // familiar line's original (sample playback: the game's own recording, not the clone).
+  if(op==='sample'){const v=service.voices.get(String(r.theme||''));if(!v)throw Error('Unknown voice.');
+   const line=r.kind==='line'&&v.sample?.file&&!v.custom?path.join(appDir,'voices',v.theme,v.sample.file):null,f=line||v.refPath;if(!f||!fs.existsSync(f))throw Error('No recording for that voice.');
+   const ext=path.extname(f).toLowerCase();return {audio:fs.readFileSync(f).toString('base64'),kind:line?'line':'reference',type:{'.flac':'audio/flac','.mp3':'audio/mpeg','.ogg':'audio/ogg'}[ext]||'audio/wav'};}
   if(op==='native-status')return service.nativeStatus();
   if(op==='native-install'){const file=await service.nativeInstaller();const err=await shell.openPath(file);if(err)throw Error('Windows couldn’t start Microsoft’s installer: '+err);return {started:true};}
   if(op==='open-folder'){const which=r.which==='saved'?path.join(service.dir,'saved'):service.dir;fs.mkdirSync(which,{recursive:true});await shell.openPath(which);return {};}
   throw Error('Unknown theme-voice setting.');
  }
- return {service,settingsRequest,shutdown:()=>service.shutdown()};
+ return {service,settingsRequest,shutdown:()=>service.shutdown(),kill:()=>service.killNow()};
 }
 module.exports={setupThemeVoices};
