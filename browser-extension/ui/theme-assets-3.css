@@ -1,0 +1,87 @@
+/* v2.37 Pack 3 additions for the themes in theme-pack-3.js (minecraft payday dreamcast gmod ricochet dod): the 25-theme visual asset pack's
+   artwork (assets/theme-visual-pack-3). Loaded after theme-features.css. */
+
+/* Minecraft: the HUD's own hearts and hunger shanks (gui/icons.png, 9 px) at twice their size and 8 source
+   pixels apart, as the game draws them: the container, then the full or half fill on top. A hit flashes the
+   heart containers white, the game's own flash sprite (four blinks, not with reduced motion). */
+.mc-row.mc-p3{gap:0}
+/* Hearts and hunger are 160 px each: in a narrow panel the hunger row goes under the hearts,
+   right-aligned, and the XP level gets its own line above the bar. */
+.mc-status:has(.mc-p3){container-type:inline-size}
+.mc-top:has(>.mc-p3){flex-wrap:wrap;row-gap:2px}.mc-top>.mc-food.mc-p3{margin-left:auto}
+@container (width < 324px){.mc-top:has(>.mc-p3){margin-bottom:12px}}
+.mc-row.mc-p3 i[data-v]{position:relative;flex:0 0 18px;width:18px;height:18px;background:none;filter:none;-webkit-mask:none;mask:none;animation:none}
+.mc-hearts.mc-p3 i[data-v]+i[data-v]{margin-left:-2px}
+.mc-food.mc-p3 i[data-v]+i[data-v]{margin-right:-2px}
+.mc-bi{position:absolute;left:0;top:0;display:block;width:18px;height:18px}
+.mc-p3 .mc-full,.mc-p3 .mc-half{display:none}
+.mc-p3 i[data-v=full] .mc-full,.mc-p3 i[data-v=half] .mc-half{display:block}
+.mc-p3 .mc-f{opacity:0}
+.mc-hurt.mc-p3 .mc-f{animation:mc-p3-flash .25s steps(1) 4}
+@keyframes mc-p3-flash{0%{opacity:1}50%{opacity:0}}
+/* The inventory's music discs: 16 px items at the GUI's 2x, in its 36 px slots (smaller only in a narrow panel). */
+.mc-disc.mc-disc-p3{width:32px;height:32px;max-width:calc(100% - 4px);max-height:calc(100% - 4px)}
+
+/* PAYDAY 2: the brush-stroke tick box beside each heist-plan step's number (ticked, white, once it's done),
+   and the Drill Sawgeant skill glyph (a drill and its timer) on the drill timer, in the timer's colour. */
+.pd-step.pd-p3 small{display:inline-flex;align-items:center;gap:4px}
+.pd-step.pd-p3[data-done=true] small::after{content:none}
+.pd-tick{position:relative;display:inline-block;flex-shrink:0;width:12px;height:12px}
+/* (Pack drawings get color:initial from .panel svg[data-bi][data-bi], so colours here name svg[data-bi] too.) */
+.pd-tick-bi{position:absolute;left:0;top:0;width:12px;height:12px}
+.panel svg[data-bi].pd-tick-bi.pd-tick-off{color:rgba(223,232,242,.45)}
+.panel svg[data-bi].pd-tick-bi.pd-tick-on{color:#fff}
+.pd-tick .pd-tick-on,.pd-step[data-done=true] .pd-tick .pd-tick-off{display:none}.pd-step[data-done=true] .pd-tick .pd-tick-on{display:block}
+.pd-drill-bi.pd-drill-p3{width:18px;height:18px;margin:-3px 5px -3px 0;vertical-align:-5px}
+.panel .pd-drill svg[data-bi].pd-drill-p3{color:inherit}
+
+/* Dreamcast: the BIOS's VMU LCD icons at their own 32 px, in the LCD's ink. The memory card's save files sit
+   on a VMU screen each, the file's colour kept as the line under it. */
+.dc-icon.dc-icon-p3{width:32px;height:32px}
+.dc-icon-p3 path,.dc-file-p3 path{fill:#24301e}
+.dc-file-icon.dc-file-p3{width:32px;height:32px;padding:0;border-radius:2px;background:#a9c59a;box-shadow:inset 0 0 0 1px #6f8463,0 2px 0 var(--file,#ff6a00)}
+/* The 32 px screens are 8 px taller than the old 24 px tiles: the file tiles' padding gives that back, so the card
+   stays the height it was and still opens under the tabs. */
+.panel .dc-file:has(>.dc-file-p3){padding:2px 4px 1px;gap:1px}
+.dc-file:has(>.dc-file-p3) small{margin-top:2px}
+
+/* Garry's Mod: the script-error notice from lua/menu/errors.lua (light Derma box, dark drop shadow, grey bold
+   text, the Silk error icon pulsing) above the console lines, which keep their own dark box. A repeat of the
+   same error flashes it yellow, as the game does. */
+.gm-lua.gm-lua-p3{gap:6px;padding:0;background:none;align-items:flex-start}
+.gm-lua.gm-lua-p3.fx-interactive:hover{background:none}
+.gm-con{display:flex;flex-direction:column;align-self:stretch;padding:6px 8px;background:rgba(0,0,0,.72)}
+.gm-lua-p3:hover .gm-con{background:rgba(0,0,0,.85)}
+.gm-err{position:relative;isolation:isolate;display:flex;align-items:center;gap:12px;max-width:100%;padding:6px 14px 6px 6px;border-radius:2px;background:#f0f0f0;box-shadow:2px 2px 0 #282828;font:700 12px/16px "Tyler GMod",Tahoma,sans-serif;color:#5a5a5a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gm-err-bi{flex:0 0 16px;width:16px;height:16px}
+.gm-err.gm-again::after{content:"";position:absolute;inset:0;z-index:-1;border-radius:2px;background:#ffc800;opacity:0;animation:gm-again .5s ease-out}
+@keyframes gm-again{from{opacity:1}}
+@media (prefers-reduced-motion:no-preference){.gm-err-bi{animation:gm-err-pulse .5s ease-in-out 12 alternate}}
+@keyframes gm-err-pulse{to{opacity:.35}}
+/* The spawn menu's sounds show the Silk sound icon (16 px) at twice its size. */
+.gm-icon-bi{position:absolute;left:50%;top:6px;width:32px;height:32px;margin-left:-16px}
+
+/* Ricochet: the HUD's discs at their own 48 x 20, side by side as the game shows them (the column widens to
+   fit them); blue while Tyler has the disc, grey once a problem cost it. The thrown disc between tabs is the
+   same blue disc, flying flat; Game over carries the falling death notice, white as the sprite is. */
+.rc-score.rc-p3{container-type:inline-size;grid-template-columns:minmax(max-content,1.2fr) auto minmax(0,1fr)}
+.rc-discs.rc-p3{gap:0;margin-top:5px}
+.rc-discs.rc-p3 .rc-disc-p3,.rc-discs.rc-p3 .rc-disc-p3.on{position:relative;flex:0 0 48px;width:48px;height:20px;border:0;border-radius:0;background:none;box-shadow:none}
+.rc-discs.rc-p3 .rc-disc-p3+.rc-disc-p3{margin-left:-12px}
+/* A narrow panel fans them closer, so the score and the power-up keep their room. */
+@container (max-width:340px){.rc-discs.rc-p3 .rc-disc-p3+.rc-disc-p3{margin-left:-24px}}
+.rc-disc-bi{position:absolute;left:0;top:0;display:block;width:48px;height:20px}
+.rc-disc-p3 .rc-disc-on,.rc-disc-p3.on .rc-disc-off{display:none}
+.rc-disc-p3.on .rc-disc-on{display:block}
+.rc-flying.rc-flying-p3{width:48px;height:20px;border-radius:0;filter:drop-shadow(0 0 6px rgba(90,200,255,.65));animation:rc-fly-p3 .5s cubic-bezier(.3,.1,.3,1) forwards}
+.rc-flying-p3 .rc-flying-bi{width:48px;height:20px}
+@keyframes rc-fly-p3{from{transform:translateX(var(--from))}to{transform:translateX(var(--to))}}
+.rc-over.rc-over-p3{display:flex;flex-direction:column;align-items:center;gap:6px}
+.rc-over-bi{width:32px;height:32px;filter:drop-shadow(0 0 6px #ff3030)}
+.panel svg[data-bi].rc-over-bi,svg[data-bi][data-bi][data-bi].rc-over-bi{color:#fff}
+
+/* Day of Defeat: Source: the round timer's stopwatch (16 px) in front of the status strip's running time, only
+   while that time shows. */
+.dod-timer-bi{display:none;flex-shrink:0;width:16px;height:16px;margin-left:8px}
+.dod-timer-bi:has(+ .tally-time:not(:empty)){display:block}
+.dod-timer-bi+.tally-time{margin-left:-3px}

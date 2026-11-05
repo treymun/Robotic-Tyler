@@ -1,0 +1,4 @@
+{"picks": {
+  "p3-stunstick": {"file": "themes/combine/icons/hl2-native-hud-glyph-u006e.svg", "mode": "vector", "mono": true, "name": "Half-Life 2 HUD weapon icon: stunstick (halflife2.ttf n)"},
+  "p3-citizen": {"file": "themes/combine/icons/hl2-native-hud-glyph-u0043.svg", "mode": "vector", "mono": true, "name": "Half-Life 2 HUD squad figure (halflife2.ttf C)"}
+}}

@@ -1,0 +1,9 @@
+{
+ "picks": {
+  "p3-silk-error": {
+   "file": "themes/gmod/icons/icons-error.png.png",
+   "mode": "pixels",
+   "name": "Silk icon16/error.png (Garry's Mod Lua error notice)"
+  }
+ }
+}

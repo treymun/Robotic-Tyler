@@ -1,0 +1,158 @@
+{
+ "icons": {},
+ "picks": {
+  "p3-door-locked": {
+   "file": "themes/portal/animations/signage-signage_doorstate.vtf.png",
+   "mode": "trace",
+   "name": "signage doorstate, locked X (first frame)",
+   "sha256": "76fe51cc846270478708531792789a1985c0d3a45f866b16f071576f10cf9be7",
+   "size": [
+    128,
+    128
+   ],
+   "source": {
+    "commit": "ca4c1781e88a6185c4d8813190909885597410ea",
+    "downloadUrl": "https://raw.githubusercontent.com/Valla-Chan/portal-elc-content/ca4c1781e88a6185c4d8813190909885597410ea/materials/signage/signage_doorstate.vtf",
+    "kind": "archived-original-portal-material",
+    "path": "materials/signage/signage_doorstate.vtf",
+    "repo": "Valla-Chan/portal-elc-content"
+   },
+   "tier": "Archived source artwork",
+   "tinted": true
+  },
+  "p3-door-open": {
+   "file": "themes/portal/animations/signage-signage_doorstate.vtf.png",
+   "mode": "trace",
+   "name": "signage doorstate, open check (second frame)",
+   "sha256": "76fe51cc846270478708531792789a1985c0d3a45f866b16f071576f10cf9be7",
+   "size": [
+    128,
+    128
+   ],
+   "source": {
+    "commit": "ca4c1781e88a6185c4d8813190909885597410ea",
+    "downloadUrl": "https://raw.githubusercontent.com/Valla-Chan/portal-elc-content/ca4c1781e88a6185c4d8813190909885597410ea/materials/signage/signage_doorstate.vtf",
+    "kind": "archived-original-portal-material",
+    "path": "materials/signage/signage_doorstate.vtf",
+    "repo": "Valla-Chan/portal-elc-content"
+   },
+   "tier": "Archived source artwork",
+   "tinted": true
+  },
+  "p3-sign-cake": {
+   "file": "themes/portal/ui/signage-signage_overlay_cake.vtf.png",
+   "mode": "trace",
+   "name": "signage signage overlay cake",
+   "sha256": "cbb68fe71a87537dcb346b4cc9851f3652b1fb1e17a139e6fe4cff51c7a1f537",
+   "size": [
+    256,
+    256
+   ],
+   "source": {
+    "commit": "ca4c1781e88a6185c4d8813190909885597410ea",
+    "downloadUrl": "https://raw.githubusercontent.com/Valla-Chan/portal-elc-content/ca4c1781e88a6185c4d8813190909885597410ea/materials/signage/signage_overlay_cake.vtf",
+    "kind": "archived-original-portal-material",
+    "path": "materials/signage/signage_overlay_cake.vtf",
+    "repo": "Valla-Chan/portal-elc-content"
+   },
+   "tier": "Archived source artwork",
+   "tinted": true
+  },
+  "p3-sign-catcher": {
+   "file": "themes/portal/ui/signage-signage_overlay_catcher.vtf.png",
+   "mode": "trace",
+   "name": "signage signage overlay catcher",
+   "sha256": "8d35b38770de2314c6a2850c1cd968f97c10a983bc7f6a9abe5458093d91ca84",
+   "size": [
+    256,
+    256
+   ],
+   "source": {
+    "commit": "ca4c1781e88a6185c4d8813190909885597410ea",
+    "downloadUrl": "https://raw.githubusercontent.com/Valla-Chan/portal-elc-content/ca4c1781e88a6185c4d8813190909885597410ea/materials/signage/signage_overlay_catcher.vtf",
+    "kind": "archived-original-portal-material",
+    "path": "materials/signage/signage_overlay_catcher.vtf",
+    "repo": "Valla-Chan/portal-elc-content"
+   },
+   "tier": "Archived source artwork",
+   "tinted": true
+  },
+  "p3-sign-cube": {
+   "file": "themes/portal/ui/signage-signage_overlay_companioncube.vtf.png",
+   "mode": "trace",
+   "name": "signage signage overlay companioncube",
+   "sha256": "a0b7541c27506be8927e38c47d51d9669a479e952a7632b9155a586d4b2bf778",
+   "size": [
+    256,
+    256
+   ],
+   "source": {
+    "commit": "ca4c1781e88a6185c4d8813190909885597410ea",
+    "downloadUrl": "https://raw.githubusercontent.com/Valla-Chan/portal-elc-content/ca4c1781e88a6185c4d8813190909885597410ea/materials/signage/signage_overlay_companioncube.vtf",
+    "kind": "archived-original-portal-material",
+    "path": "materials/signage/signage_overlay_companioncube.vtf",
+    "repo": "Valla-Chan/portal-elc-content"
+   },
+   "tier": "Archived source artwork",
+   "tinted": true
+  },
+  "p3-sign-dispenser": {
+   "file": "themes/portal/ui/signage-signage_overlay_boxdispenser.vtf.png",
+   "mode": "trace",
+   "name": "signage signage overlay boxdispenser",
+   "sha256": "bae5d0a5b8722757667255d1ee2623cd4150d2c87ebd1ac72b67cebc98458c7a",
+   "size": [
+    256,
+    256
+   ],
+   "source": {
+    "commit": "ca4c1781e88a6185c4d8813190909885597410ea",
+    "downloadUrl": "https://raw.githubusercontent.com/Valla-Chan/portal-elc-content/ca4c1781e88a6185c4d8813190909885597410ea/materials/signage/signage_overlay_boxdispenser.vtf",
+    "kind": "archived-original-portal-material",
+    "path": "materials/signage/signage_overlay_boxdispenser.vtf",
+    "repo": "Valla-Chan/portal-elc-content"
+   },
+   "tier": "Archived source artwork",
+   "tinted": true
+  },
+  "p3-sign-energyball": {
+   "file": "themes/portal/ui/signage-signage_overlay_energyball.vtf.png",
+   "mode": "trace",
+   "name": "signage signage overlay energyball",
+   "sha256": "2d6d4b929eda75adf26fc667ee9226b434e9486df748a3b633c10fb989aadcb3",
+   "size": [
+    256,
+    256
+   ],
+   "source": {
+    "commit": "ca4c1781e88a6185c4d8813190909885597410ea",
+    "downloadUrl": "https://raw.githubusercontent.com/Valla-Chan/portal-elc-content/ca4c1781e88a6185c4d8813190909885597410ea/materials/signage/signage_overlay_energyball.vtf",
+    "kind": "archived-original-portal-material",
+    "path": "materials/signage/signage_overlay_energyball.vtf",
+    "repo": "Valla-Chan/portal-elc-content"
+   },
+   "tier": "Archived source artwork",
+   "tinted": true
+  },
+  "p3-sign-turret": {
+   "file": "themes/portal/ui/signage-signage_overlay_turret.vtf.png",
+   "mode": "trace",
+   "name": "signage signage overlay turret",
+   "sha256": "c3e36c9cbe188e046a2804174ff933ac6a0905de35c94e5dd0c40293a7c54f4a",
+   "size": [
+    256,
+    256
+   ],
+   "source": {
+    "commit": "ca4c1781e88a6185c4d8813190909885597410ea",
+    "downloadUrl": "https://raw.githubusercontent.com/Valla-Chan/portal-elc-content/ca4c1781e88a6185c4d8813190909885597410ea/materials/signage/signage_overlay_turret.vtf",
+    "kind": "archived-original-portal-material",
+    "path": "materials/signage/signage_overlay_turret.vtf",
+    "repo": "Valla-Chan/portal-elc-content"
+   },
+   "tier": "Archived source artwork",
+   "tinted": true
+  }
+ },
+ "states": {}
+}

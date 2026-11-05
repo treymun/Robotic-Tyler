@@ -1,0 +1,4 @@
+{"picks": {
+  "p3-time-wall": {"file": "themes/deadlock/icons/data-heroes-paradox-assets-ability_time_wall.png.png", "mode": "trace", "name": "Deadlock ability: Time Wall (Paradox)"},
+  "p3-max-health": {"file": "themes/deadlock/icons/data-stat-icons-max-health-icon.png.png", "mode": "trace", "name": "Deadlock stat symbol: max health"}
+}}

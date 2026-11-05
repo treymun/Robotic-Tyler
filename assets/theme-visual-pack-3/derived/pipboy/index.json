@@ -1,0 +1,44 @@
+{
+ "icons": {
+  "warning": "p3-radiation"
+ },
+ "picks": {
+  "p3-radiation": {
+   "file": "themes/pipboy/icons/mapmarkerloctype_41_d.svg",
+   "mode": "vector",
+   "name": "Fallout 4 map marker: radioactive area",
+   "sha256": "6ab3d99db07f8e8462d3ae9e7b03942ac00140ec730f7c0a9ce4a980670f8e6d",
+   "size": [
+    64.0,
+    63.0
+   ],
+   "source": {
+    "downloadUrl": "https://github.com/matzman666/PyPipboyApp/releases/download/v0.8.4-alpha/PyPipboyApp-v0.8.4a-scriptsOnly.7z",
+    "kind": "archived-native-fallout4-companion-vectors",
+    "repo": "matzman666/PyPipboyApp"
+   },
+   "tier": "Archived source artwork",
+   "tinted": true
+  },
+  "p3-radio-tower": {
+   "file": "themes/pipboy/icons/mapmarkerloctype_42_d.svg",
+   "mode": "vector",
+   "name": "Fallout 4 map marker: radio tower",
+   "sha256": "2eb592eaf97a85143dce94426341325b02f6c6e04003e4a09fc5980e37af8631",
+   "size": [
+    64.0,
+    98.0
+   ],
+   "source": {
+    "downloadUrl": "https://github.com/matzman666/PyPipboyApp/releases/download/v0.8.4-alpha/PyPipboyApp-v0.8.4a-scriptsOnly.7z",
+    "kind": "archived-native-fallout4-companion-vectors",
+    "repo": "matzman666/PyPipboyApp"
+   },
+   "tier": "Archived source artwork",
+   "tinted": true
+  }
+ },
+ "states": {
+  "error": "p3-radiation"
+ }
+}

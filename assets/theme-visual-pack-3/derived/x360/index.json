@@ -1,0 +1,50 @@
+{
+ "icons": {},
+ "picks": {
+  "p3-music": {
+   "file": "themes/x360/ui/assets-blades-providedicons-media-music.png.png",
+   "mode": "pixels",
+   "name": "Blades Music",
+   "native": [
+    32,
+    32
+   ],
+   "sha256": "e6ebe673ea349daa54bdf3c6623d5addc06b0ec8f8e628b22eeab0cda42d3251",
+   "size": [
+    32,
+    32
+   ],
+   "source": {
+    "commit": "7d92705cf2131e6159120cfa5ae10736ddfabf68",
+    "downloadUrl": "https://raw.githubusercontent.com/ZivvoZ/dashx360/7d92705cf2131e6159120cfa5ae10736ddfabf68/Assets/Blades/ProvidedIcons/media/music.png",
+    "kind": "blades-recreation-source-assets",
+    "path": "Assets/Blades/ProvidedIcons/media/music.png",
+    "repo": "ZivvoZ/dashx360"
+   },
+   "tier": "Community / period source"
+  },
+  "p3-network-settings": {
+   "file": "themes/x360/ui/assets-blades-providedicons-system-network-settings.png.png",
+   "mode": "pixels",
+   "name": "Blades Network Settings",
+   "native": [
+    32,
+    32
+   ],
+   "sha256": "fdc0b273b481c53fa8b92f69a19262f165c90e46d8bef6a056304a48477ac23b",
+   "size": [
+    32,
+    32
+   ],
+   "source": {
+    "commit": "7d92705cf2131e6159120cfa5ae10736ddfabf68",
+    "downloadUrl": "https://raw.githubusercontent.com/ZivvoZ/dashx360/7d92705cf2131e6159120cfa5ae10736ddfabf68/Assets/Blades/ProvidedIcons/system/network%20settings.png",
+    "kind": "blades-recreation-source-assets",
+    "path": "Assets/Blades/ProvidedIcons/system/network settings.png",
+    "repo": "ZivvoZ/dashx360"
+   },
+   "tier": "Community / period source"
+  }
+ },
+ "states": {}
+}

@@ -1,0 +1,8 @@
+{"picks": {
+  "p3-quad": {"file": "themes/quake/ui/sb_quad.png", "mode": "pixels", "name": "Quake status bar Quad Damage (SB_QUAD)"},
+  "p3-sigil": {"file": "themes/quake/ui/sb_sigil1.png", "mode": "pixels", "name": "Quake status bar rune (SB_SIGIL1)"},
+  "p3-invuln": {"file": "themes/quake/ui/sb_invuln.png", "mode": "pixels", "name": "Quake status bar Pentagram of Protection (SB_INVULN)"},
+  "p3-net": {"file": "themes/quake/ui/net.png", "mode": "pixels", "name": "Quake connection-interrupted icon (NET)"}
+ },
+ "states": {"waiting": "p3-net"}
+}

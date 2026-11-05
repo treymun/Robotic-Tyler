@@ -1,0 +1,59 @@
+{
+ "picks": {
+  "p3-vmu-hourglass-1": {
+   "file": "themes/dreamcast/icons/vmu-hourglass_one.png",
+   "mode": "pixels",
+   "name": "Dreamcast BIOS VMU hourglass, frame 1"
+  },
+  "p3-vmu-hourglass-2": {
+   "file": "themes/dreamcast/icons/vmu-hourglass_two.png",
+   "mode": "pixels",
+   "name": "Dreamcast BIOS VMU hourglass, frame 2"
+  },
+  "p3-vmu-hourglass-3": {
+   "file": "themes/dreamcast/icons/vmu-hourglass_three.png",
+   "mode": "pixels",
+   "name": "Dreamcast BIOS VMU hourglass, frame 3"
+  },
+  "p3-vmu-hourglass-4": {
+   "file": "themes/dreamcast/icons/vmu-hourglass_four.png",
+   "mode": "pixels",
+   "name": "Dreamcast BIOS VMU hourglass, frame 4"
+  },
+  "p3-vmu-invalid": {
+   "file": "themes/dreamcast/icons/vmu-invalid_vmu.png",
+   "mode": "pixels",
+   "name": "Dreamcast BIOS Invalid VMU"
+  },
+  "p3-vmu-pencil": {
+   "file": "themes/dreamcast/icons/vmu-pencil.png",
+   "mode": "pixels",
+   "name": "Dreamcast BIOS VMU icon: pencil"
+  },
+  "p3-vmu-telephone": {
+   "file": "themes/dreamcast/icons/vmu-telephone.png",
+   "mode": "pixels",
+   "name": "Dreamcast BIOS VMU icon: telephone"
+  },
+  "p3-vmu-bell": {
+   "file": "themes/dreamcast/icons/vmu-bell.png",
+   "mode": "pixels",
+   "name": "Dreamcast BIOS VMU icon: bell"
+  },
+  "p3-vmu-note": {
+   "file": "themes/dreamcast/icons/vmu-eighth_note.png",
+   "mode": "pixels",
+   "name": "Dreamcast BIOS VMU icon: eighth note"
+  },
+  "p3-vmu-vmu": {
+   "file": "themes/dreamcast/icons/vmu-vmuicon.png",
+   "mode": "pixels",
+   "name": "Dreamcast BIOS VMU icon: VMU"
+  },
+  "p3-vmu-clock": {
+   "file": "themes/dreamcast/icons/vmu-clock.png",
+   "mode": "pixels",
+   "name": "Dreamcast BIOS VMU icon: clock"
+  }
+ }
+}

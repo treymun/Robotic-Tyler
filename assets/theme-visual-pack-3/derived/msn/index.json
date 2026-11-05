@@ -1,0 +1,128 @@
+{
+ "icons": {},
+ "picks": {
+  "p3-badge-away": {
+   "crop": [
+    10,
+    0,
+    10,
+    10
+   ],
+   "file": "themes/msn/icons/public-msn-assets-msn75-resources-msnmsgr-png-msnmsgr_png_2059_9.png.png",
+   "mode": "pixels",
+   "name": "Messenger 7.5 status badge (away)",
+   "native": [
+    10,
+    10
+   ],
+   "sha256": "0df6a250d56d7e61beb2c7a06bfb23c92dbbc56f1cc4e39729ceffe339d90cb8",
+   "size": [
+    10,
+    10
+   ],
+   "source": {
+    "commit": "fe8cd7b67bd1f8a65b148aa3f0d7ebd67a4a6ef6",
+    "downloadUrl": "https://raw.githubusercontent.com/anisayari/codex-messenger/fe8cd7b67bd1f8a65b148aa3f0d7ebd67a4a6ef6/public/msn-assets/msn75/resources/msnmsgr/PNG/msnmsgr_PNG_2059_9.png",
+    "kind": "msn-7.5-archived-installer-resource",
+    "path": "public/msn-assets/msn75/resources/msnmsgr/PNG/msnmsgr_PNG_2059_9.png",
+    "repo": "anisayari/codex-messenger"
+   },
+   "tier": "Archived source artwork"
+  },
+  "p3-badge-busy": {
+   "crop": [
+    0,
+    0,
+    10,
+    10
+   ],
+   "file": "themes/msn/icons/public-msn-assets-msn75-resources-msnmsgr-png-msnmsgr_png_2059_9.png.png",
+   "mode": "pixels",
+   "name": "Messenger 7.5 status badge (busy)",
+   "native": [
+    10,
+    10
+   ],
+   "sha256": "0df6a250d56d7e61beb2c7a06bfb23c92dbbc56f1cc4e39729ceffe339d90cb8",
+   "size": [
+    10,
+    10
+   ],
+   "source": {
+    "commit": "fe8cd7b67bd1f8a65b148aa3f0d7ebd67a4a6ef6",
+    "downloadUrl": "https://raw.githubusercontent.com/anisayari/codex-messenger/fe8cd7b67bd1f8a65b148aa3f0d7ebd67a4a6ef6/public/msn-assets/msn75/resources/msnmsgr/PNG/msnmsgr_PNG_2059_9.png",
+    "kind": "msn-7.5-archived-installer-resource",
+    "path": "public/msn-assets/msn75/resources/msnmsgr/PNG/msnmsgr_PNG_2059_9.png",
+    "repo": "anisayari/codex-messenger"
+   },
+   "tier": "Archived source artwork"
+  },
+  "p3-buddy-offline": {
+   "file": "themes/msn/icons/public-msn-assets-msn75-resources-msnmsgr-png-msnmsgr_png_2030_9.png.png",
+   "mode": "pixels",
+   "name": "Messenger 7.5 contact (offline)",
+   "native": [
+    16,
+    16
+   ],
+   "sha256": "c915bfa0cccf3116419db9c405aff5faef28c1374edd0c8acfe58cfed836967f",
+   "size": [
+    16,
+    16
+   ],
+   "source": {
+    "commit": "fe8cd7b67bd1f8a65b148aa3f0d7ebd67a4a6ef6",
+    "downloadUrl": "https://raw.githubusercontent.com/anisayari/codex-messenger/fe8cd7b67bd1f8a65b148aa3f0d7ebd67a4a6ef6/public/msn-assets/msn75/resources/msnmsgr/PNG/msnmsgr_PNG_2030_9.png",
+    "kind": "msn-7.5-archived-installer-resource",
+    "path": "public/msn-assets/msn75/resources/msnmsgr/PNG/msnmsgr_PNG_2030_9.png",
+    "repo": "anisayari/codex-messenger"
+   },
+   "tier": "Archived source artwork"
+  },
+  "p3-buddy-online": {
+   "file": "themes/msn/icons/public-msn-assets-msn75-resources-msnmsgr-png-msnmsgr_png_2028_9.png.png",
+   "mode": "pixels",
+   "name": "Messenger 7.5 contact (online)",
+   "native": [
+    16,
+    16
+   ],
+   "sha256": "548fb3589cedd5a8c931bf5435541e0329616278cf4c2073dae928a498acb18b",
+   "size": [
+    16,
+    16
+   ],
+   "source": {
+    "commit": "fe8cd7b67bd1f8a65b148aa3f0d7ebd67a4a6ef6",
+    "downloadUrl": "https://raw.githubusercontent.com/anisayari/codex-messenger/fe8cd7b67bd1f8a65b148aa3f0d7ebd67a4a6ef6/public/msn-assets/msn75/resources/msnmsgr/PNG/msnmsgr_PNG_2028_9.png",
+    "kind": "msn-7.5-archived-installer-resource",
+    "path": "public/msn-assets/msn75/resources/msnmsgr/PNG/msnmsgr_PNG_2028_9.png",
+    "repo": "anisayari/codex-messenger"
+   },
+   "tier": "Archived source artwork"
+  },
+  "p3-nudge": {
+   "file": "themes/msn/icons/public-msn-assets-msn75-resources-msnmsgr-png-msnmsgr_png_911_9.png.png",
+   "mode": "pixels",
+   "name": "Messenger 7.5 Nudge",
+   "native": [
+    24,
+    16
+   ],
+   "sha256": "485c1b72946139a70b5c41c4f6090cab4dbac6267557fb01519f5611291a9061",
+   "size": [
+    24,
+    16
+   ],
+   "source": {
+    "commit": "fe8cd7b67bd1f8a65b148aa3f0d7ebd67a4a6ef6",
+    "downloadUrl": "https://raw.githubusercontent.com/anisayari/codex-messenger/fe8cd7b67bd1f8a65b148aa3f0d7ebd67a4a6ef6/public/msn-assets/msn75/resources/msnmsgr/PNG/msnmsgr_PNG_911_9.png",
+    "kind": "msn-7.5-archived-installer-resource",
+    "path": "public/msn-assets/msn75/resources/msnmsgr/PNG/msnmsgr_PNG_911_9.png",
+    "repo": "anisayari/codex-messenger"
+   },
+   "tier": "Archived source artwork"
+  }
+ },
+ "states": {}
+}

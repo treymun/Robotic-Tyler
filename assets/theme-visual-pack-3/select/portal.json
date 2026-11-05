@@ -1,0 +1,53 @@
+{
+ "picks": {
+  "p3-door-locked": {
+   "file": "themes/portal/animations/signage-signage_doorstate.vtf.png",
+   "mode": "trace",
+   "name": "signage doorstate, locked X (first frame)",
+   "invert": true
+  },
+  "p3-door-open": {
+   "file": "themes/portal/animations/signage-signage_doorstate.vtf.png",
+   "mode": "trace",
+   "seek": 1,
+   "name": "signage doorstate, open check (second frame)",
+   "invert": true
+  },
+  "p3-sign-dispenser": {
+   "file": "themes/portal/ui/signage-signage_overlay_boxdispenser.vtf.png",
+   "mode": "trace",
+   "invert": true,
+   "threshold": 0.2
+  },
+  "p3-sign-catcher": {
+   "file": "themes/portal/ui/signage-signage_overlay_catcher.vtf.png",
+   "mode": "trace",
+   "invert": true,
+   "threshold": 0.2
+  },
+  "p3-sign-turret": {
+   "file": "themes/portal/ui/signage-signage_overlay_turret.vtf.png",
+   "mode": "trace",
+   "invert": true,
+   "threshold": 0.2
+  },
+  "p3-sign-cube": {
+   "file": "themes/portal/ui/signage-signage_overlay_companioncube.vtf.png",
+   "mode": "trace",
+   "invert": true,
+   "threshold": 0.2
+  },
+  "p3-sign-cake": {
+   "file": "themes/portal/ui/signage-signage_overlay_cake.vtf.png",
+   "mode": "trace",
+   "invert": true,
+   "threshold": 0.2
+  },
+  "p3-sign-energyball": {
+   "file": "themes/portal/ui/signage-signage_overlay_energyball.vtf.png",
+   "mode": "trace",
+   "invert": true,
+   "threshold": 0.2
+  }
+ }
+}

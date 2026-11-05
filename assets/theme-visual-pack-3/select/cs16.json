@@ -1,0 +1,5 @@
+{"picks":{
+ "p3-hp-cross":{"file":"themes/cs16/icons/hud-hud-cross.png","mode":"lum"},
+ "p3-c4":{"file":"themes/cs16/icons/hud-hud-c4.png","mode":"lum","crop":[0,8,32,16]}
+},
+ "states":{"thinking":"p3-c4"}}

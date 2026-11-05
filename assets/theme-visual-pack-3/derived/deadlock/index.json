@@ -1,0 +1,44 @@
+{
+ "icons": {},
+ "picks": {
+  "p3-max-health": {
+   "file": "themes/deadlock/icons/data-stat-icons-max-health-icon.png.png",
+   "mode": "trace",
+   "name": "Deadlock stat symbol: max health",
+   "sha256": "494e45305eb4f3f92701cd33ad09a21b73b5e5eb6f40a03c05c04d6fd7e1e417",
+   "size": [
+    40,
+    40
+   ],
+   "source": {
+    "commit": "38c6be2ca47eedc31883cf83c4ef5a2ac6480ebc",
+    "downloadUrl": "https://raw.githubusercontent.com/simon-lund/deadlock-data/38c6be2ca47eedc31883cf83c4ef5a2ac6480ebc/data/stat-icons/max-health-icon.png",
+    "kind": "extracted-game-art",
+    "path": "data/stat-icons/max-health-icon.png",
+    "repo": "simon-lund/deadlock-data"
+   },
+   "tier": "Archived source artwork",
+   "tinted": true
+  },
+  "p3-time-wall": {
+   "file": "themes/deadlock/icons/data-heroes-paradox-assets-ability_time_wall.png.png",
+   "mode": "trace",
+   "name": "Deadlock ability: Time Wall (Paradox)",
+   "sha256": "b9212ff5df948ac211e30b894fe34d08a85eaf82c890902d0534f364ca9a3a47",
+   "size": [
+    96,
+    96
+   ],
+   "source": {
+    "commit": "38c6be2ca47eedc31883cf83c4ef5a2ac6480ebc",
+    "downloadUrl": "https://raw.githubusercontent.com/simon-lund/deadlock-data/38c6be2ca47eedc31883cf83c4ef5a2ac6480ebc/data/heroes/paradox/assets/ability_time_wall.png",
+    "kind": "extracted-game-art",
+    "path": "data/heroes/paradox/assets/ability_time_wall.png",
+    "repo": "simon-lund/deadlock-data"
+   },
+   "tier": "Archived source artwork",
+   "tinted": true
+  }
+ },
+ "states": {}
+}

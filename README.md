@@ -15,7 +15,7 @@
 
 <p align="center"><b>Tyler is an AI squadmate for Steam.</b> He sits in your group chat and voice channel, talks like one of the crew, and keeps the night going with trivia, votes, sounds and music.</p>
 
-<p align="center"><a href="CHANGES.md"><img src="assets/readme/whats-new.png" width="100%" alt="What's new since v2.28: theme voices (v2.35), chat pictures (v2.34), the chat on your phone (v2.35), Join and Leave Voice (v2.32, v2.33), a soundboard for every theme (v2.31), the phone remote away from home (v2.30), branded icons (v2.28, v2.29) and steadier replies (v2.33)."></a></p>
+<p align="center"><a href="CHANGES.md"><img src="assets/readme/whats-new.png" width="100%" alt="What's new since v2.32: Tyler answers in theme voices (v2.36), a fast voice engine for NVIDIA cards (v2.36), each theme's own game artwork (v2.37), theme voices (v2.35), steadier voices and an offline bundle (v2.35.1), chat pictures (v2.34), the chat on your phone (v2.35) and Join and Leave Voice (v2.32, v2.33)."></a></p>
 
 ---
 
@@ -23,7 +23,7 @@
 
 <table>
 <tr>
-<td width="50%" valign="top"><img src="assets/readme/icon-voice.png" width="52" align="left" alt="">&nbsp;<b>Talks in voice</b><br>&nbsp;Joins your Steam voice channel and answers out loud. <b>Standard</b> voice waits for a pause; <b>Gemini Live</b> answers in about a second and stops when someone talks over him.</td>
+<td width="50%" valign="top"><img src="assets/readme/icon-voice.png" width="52" align="left" alt="">&nbsp;<b>Talks in voice</b><br>&nbsp;Joins your Steam voice channel and answers out loud. <b>Standard</b> voice waits for a pause (and can answer in the theme's character voice); <b>Gemini Live</b> answers in about a second and stops when someone talks over him.</td>
 <td width="50%" valign="top"><img src="assets/readme/icon-chat.png" width="52" align="left" alt="">&nbsp;<b>Replies in text</b><br>&nbsp;Reads the room, remembers friends and inside jokes, and picks his moments. You set the personality, length and how talkative he is.</td>
 </tr>
 <tr>
@@ -32,10 +32,10 @@
 </tr>
 <tr>
 <td valign="top"><img src="assets/readme/icon-games.png" width="52" align="left" alt="">&nbsp;<b>Trivia, votes and games</b><br>&nbsp;500-question trivia races, an arcade (<code>play vault</code>, <code>play hangman</code>, <code>play riddle</code> …), squad votes and optional mute or kick votes.</td>
-<td valign="top"><img src="assets/readme/icon-themes.png" width="52" align="left" alt="">&nbsp;<b>25 themes</b><br>&nbsp;Steam, TF2, CS2, Portal, DOOM, Rust, Xbox 360, iPod, MSN Messenger, PS3 and more, each with its own Tyler, status strip, menus and screens: a Quake console, a Pip-Boy radio, a click wheel, a Ring of Light, a working Dreamcast VMU…</td>
+<td valign="top"><img src="assets/readme/icon-themes.png" width="52" align="left" alt="">&nbsp;<b>25 themes</b><br>&nbsp;Steam, TF2, CS2, Portal, DOOM, Rust, Xbox 360, iPod, MSN Messenger, PS3 and more, each with its own Tyler, status strip, menus and screens (a Quake console, a Pip-Boy radio, a click wheel, a Ring of Light, a working Dreamcast VMU…) and touches drawn from the game's own artwork.</td>
 </tr>
 <tr>
-<td valign="top"><img src="assets/readme/icon-theme-voices.png" width="52" align="left" alt="">&nbsp;<b>Theme voices</b> <sup>new</sup><br>&nbsp;Type a line and Tyler says it in the theme's character voice: G-Man, GLaDOS, the CS 1.6 radio, Bill and more, cloned on your PC. An optional download in the desktop app; no key, no cost per line.</td>
+<td valign="top"><img src="assets/readme/icon-theme-voices.png" width="52" align="left" alt="">&nbsp;<b>Theme voices</b> <sup>new</sup><br>&nbsp;Tyler speaks in the theme's character voice: G-Man, GLaDOS, the CS 1.6 radio, Bill and more, cloned on your PC. Type a line, or let him answer the call in it. An optional download in the desktop app, with a fast engine for NVIDIA cards; no key, no cost per line.</td>
 <td valign="top"><img src="assets/readme/icon-images.png" width="52" align="left" alt="">&nbsp;<b>Chat pictures</b> <sup>new</sup><br>&nbsp;<code>!image</code> and a description: Tyler draws it and posts it in the chat, with your own OpenRouter or Venice key and within your spending cap.</td>
 </tr>
 <tr>
@@ -137,4 +137,4 @@ npm run package:release       # dist/release/: Chrome zip, setup, install guide,
 
 ---
 
-<sub>ROBOTIC TYLER is a free, unofficial fan project. It isn't affiliated with or endorsed by Valve, id Software, Bethesda, Mojang, Microsoft, Overkill Software, Starbreeze, Sega, Facepunch Studios or any other publisher; game names only describe each theme's style. Steam is a trademark of Valve Corporation. The HEV, Windows XP and Portal logos show those games' and Windows' own symbols (and the Dreamcast logo an orange swirl); see `tools/logos/README.md`.</sub>
+<sub>ROBOTIC TYLER is a free, unofficial fan project. It isn't affiliated with or endorsed by Valve, id Software, Bethesda, Mojang, Microsoft, Overkill Software, Starbreeze, Sega, Facepunch Studios or any other publisher; game names only describe each theme's style. Steam is a trademark of Valve Corporation. The HEV, Windows XP and Portal logos show those games' and Windows' own symbols (and the Dreamcast logo an orange swirl); see `tools/logos/README.md`. Each theme's extras use artwork from the games and systems themselves, from the owner's asset packs; sources and credits are in `browser-extension/ui/brand/` (Pack 2 and Pack 3).</sub>

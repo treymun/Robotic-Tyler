@@ -1,0 +1,31 @@
+{
+ "icons": {},
+ "picks": {
+  "p3-deceased": {
+   "crop": [
+    48,
+    36,
+    32,
+    34
+   ],
+   "file": "themes/l4d/ui/vgui-a_panel_dead.vtf.png",
+   "mode": "trace",
+   "name": "Left 4 Dead teammate panel: Deceased (its skull)",
+   "sha256": "87315cca1388c1295708e9bb56823d420388876a048c5f7474a9bdd9de006450",
+   "size": [
+    32,
+    34
+   ],
+   "source": {
+    "commit": "1eb87a1df4c6a7d4bf95c32b64fd8f48e9822ab9",
+    "downloadUrl": "https://raw.githubusercontent.com/l4d/hud/1eb87a1df4c6a7d4bf95c32b64fd8f48e9822ab9/materials/vgui/a_panel_dead.vtf",
+    "kind": "community-archive-l4d1-character-art",
+    "path": "materials/vgui/a_panel_dead.vtf",
+    "repo": "l4d/hud"
+   },
+   "tier": "Community / period source",
+   "tinted": true
+  }
+ },
+ "states": {}
+}

@@ -1,0 +1,9 @@
+{
+ "picks": {
+  "p3-buddy-online": {"file": "themes/msn/icons/public-msn-assets-msn75-resources-msnmsgr-png-msnmsgr_png_2028_9.png.png", "mode": "pixels", "name": "Messenger 7.5 contact (online)"},
+  "p3-buddy-offline": {"file": "themes/msn/icons/public-msn-assets-msn75-resources-msnmsgr-png-msnmsgr_png_2030_9.png.png", "mode": "pixels", "name": "Messenger 7.5 contact (offline)"},
+  "p3-badge-busy": {"file": "themes/msn/icons/public-msn-assets-msn75-resources-msnmsgr-png-msnmsgr_png_2059_9.png.png", "mode": "pixels", "crop": [0, 0, 10, 10], "name": "Messenger 7.5 status badge (busy)"},
+  "p3-badge-away": {"file": "themes/msn/icons/public-msn-assets-msn75-resources-msnmsgr-png-msnmsgr_png_2059_9.png.png", "mode": "pixels", "crop": [10, 0, 10, 10], "name": "Messenger 7.5 status badge (away)"},
+  "p3-nudge": {"file": "themes/msn/icons/public-msn-assets-msn75-resources-msnmsgr-png-msnmsgr_png_911_9.png.png", "mode": "pixels", "name": "Messenger 7.5 Nudge"}
+ }
+}

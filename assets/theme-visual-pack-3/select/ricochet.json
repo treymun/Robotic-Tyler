@@ -1,0 +1,31 @@
+{
+ "picks": {
+  "p3-disc-blue": {
+   "file": "themes/ricochet/icons/ricochet-gfx-vgui-640_discblue.tga.png",
+   "mode": "pixels",
+   "crop": [
+    9,
+    6,
+    48,
+    20
+   ],
+   "name": "Ricochet HUD disc, blue (gfx/vgui/640_discblue.tga)"
+  },
+  "p3-disc-grey": {
+   "file": "themes/ricochet/icons/ricochet-gfx-vgui-640_discgrey.tga.png",
+   "mode": "pixels",
+   "crop": [
+    9,
+    6,
+    48,
+    20
+   ],
+   "name": "Ricochet HUD disc, spent (gfx/vgui/640_discgrey.tga)"
+  },
+  "p3-falling": {
+   "file": "themes/ricochet/icons/ricochet-sprites-640_falling.spr.png",
+   "mode": "lum",
+   "name": "Ricochet death notice: falling (sprites/640_falling.spr)"
+  }
+ }
+}

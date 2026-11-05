@@ -1,0 +1,52 @@
+{
+ "icons": {},
+ "picks": {
+  "p3-away": {
+   "file": "themes/classic/icons/og-steam-resource-icon_away.tga.png",
+   "mode": "pixels",
+   "name": "og steam resource icon away",
+   "native": [
+    16,
+    16
+   ],
+   "sha256": "10dc1aa87fc3fe36e10ad03572ac37e1aa0760a3f78bb747582c9223aa06c18c",
+   "size": [
+    16,
+    16
+   ],
+   "source": {
+    "commit": "411aa955e76759bf24cee9dc38fa459cb9040823",
+    "downloadUrl": "https://raw.githubusercontent.com/ungstein/OG-Steam/411aa955e76759bf24cee9dc38fa459cb9040823/OG-Steam/resource/icon_away.tga",
+    "kind": "community-2004-skin-assets",
+    "path": "OG-Steam/resource/icon_away.tga",
+    "repo": "ungstein/OG-Steam"
+   },
+   "tier": "Community / period source"
+  },
+  "p3-message": {
+   "file": "themes/classic/icons/og-steam-resource-icon_message.tga.png",
+   "mode": "pixels",
+   "name": "og steam resource icon message",
+   "native": [
+    16,
+    16
+   ],
+   "sha256": "d444ef87562cef3970fea16be755fc4b1471c3e9c0830fdde98dfd2d0d4355bb",
+   "size": [
+    16,
+    16
+   ],
+   "source": {
+    "commit": "411aa955e76759bf24cee9dc38fa459cb9040823",
+    "downloadUrl": "https://raw.githubusercontent.com/ungstein/OG-Steam/411aa955e76759bf24cee9dc38fa459cb9040823/OG-Steam/resource/icon_message.tga",
+    "kind": "community-2004-skin-assets",
+    "path": "OG-Steam/resource/icon_message.tga",
+    "repo": "ungstein/OG-Steam"
+   },
+   "tier": "Community / period source"
+  }
+ },
+ "states": {
+  "paused": "p3-away"
+ }
+}

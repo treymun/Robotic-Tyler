@@ -1,0 +1,51 @@
+==> LICENSE (from r-paydaybuilds/pd2builder) <==
+MIT License
+
+Copyright (c) 2019 r/paydaybuilds
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+==> README.md (from r-paydaybuilds/pd2builder) <==
+[![GitHub License](https://img.shields.io/github/license/r-paydaybuilds/pd2builder.svg)](https://raw.githubusercontent.com/r-paydaybuilds/pd2builder/master/LICENSE)
+[![Discord](https://img.shields.io/badge/Chat-Discord-7289da.svg)](https://discord.gg/3ndGBWC)
+[![Travis CI](https://api.travis-ci.org/r-paydaybuilds/pd2builder.svg)](https://travis-ci.org/r-paydaybuilds/pd2builder)
+[![Crowdin](https://badges.crowdin.net/pd2builder/localized.svg)](https://crowdin.com/project/pd2builder)
+# pd2builder, a loadout simulator of Payday 2 that works
+
+#### You can currently find demos on [netlify](https://pd2builder.netlify.app/) and [github pages](https://r-paydaybuilds.github.io/pd2builder/)
+#### Kind of a to-do list can be found in the [wiki](https://github.com/r-paydaybuilds/pd2builder/wiki/To-Do-list)
+
+## Running locally
+1. Get node.js (LTS or more)
+2. Clone the repo
+3. `npm install`
+4. `node pd2builder.js`
+5. Go to http://localhost:9999
+
+## Contributing
+1. Fork the repo
+2. Merge `develop` branch to your fork
+2. Do your thing
+3. Optional: add yourself on contributors.md
+4. Pull Request
+5. Profit?!
+
+## What we use
+[![BrowserStack](https://i.imgur.com/wT7FyNd.png)](https://www.browserstack.com/)
+We are using BrowserStack for testing the app easily with different machines including mobile!

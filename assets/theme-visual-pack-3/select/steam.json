@@ -1,0 +1,13 @@
+{"picks":{
+ "p3-away":{"file":"themes/steam/icons/native-steam-away.svg","mode":"vector","mono":true},
+ "p3-snooze":{"file":"themes/steam/icons/native-steam-sleep.svg","mode":"vector","mono":true},
+ "p3-chat":{"file":"themes/steam/icons/native-steam-chat.svg","mode":"vector","mono":true},
+ "p3-mic":{"file":"themes/steam/icons/native-steam-microphone.svg","mode":"vector","mono":true},
+ "p3-volume":{"file":"themes/steam/icons/native-steam-volume.svg","mode":"vector","mono":true},
+ "p3-music":{"file":"themes/steam/icons/native-steam-music.svg","mode":"vector","mono":true},
+ "p3-lightning":{"file":"themes/steam/icons/native-steam-lightning.svg","mode":"vector","mono":true},
+ "p3-fire":{"file":"themes/steam/icons/native-steam-fire.svg","mode":"vector","mono":true},
+ "p3-home":{"file":"themes/steam/icons/native-steam-home.svg","mode":"vector","mono":true},
+ "p3-clock":{"file":"themes/steam/icons/native-steam-clock.svg","mode":"vector","mono":true},
+ "p3-refresh":{"file":"themes/steam/icons/native-steam-refresh.svg","mode":"vector","mono":true}
+}}

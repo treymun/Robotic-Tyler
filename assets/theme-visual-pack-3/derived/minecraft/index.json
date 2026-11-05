@@ -1,0 +1,400 @@
+{
+ "icons": {},
+ "picks": {
+  "p3-food-empty": {
+   "crop": [
+    16,
+    27,
+    9,
+    9
+   ],
+   "file": "themes/minecraft/ui/gui-icons.png.png",
+   "mode": "pixels",
+   "name": "Minecraft HUD: Hunger container (gui/icons.png)",
+   "native": [
+    9,
+    9
+   ],
+   "sha256": "3f5c3d10c6ac1931d097354c8c5c0ce0d38f9b4944b2a5772ef5d0ff915e16dd",
+   "size": [
+    9,
+    9
+   ],
+   "source": {
+    "commit": "6c571b0825ee27b81f01127c2bd0d4ba2c89abb9",
+    "downloadUrl": "https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/6c571b0825ee27b81f01127c2bd0d4ba2c89abb9/data/1.8.8/gui/icons.png",
+    "kind": "vanilla-1.8.8-texture",
+    "path": "data/1.8.8/gui/icons.png",
+    "repo": "PrismarineJS/minecraft-assets"
+   },
+   "tier": "Native / official source"
+  },
+  "p3-food-full": {
+   "crop": [
+    52,
+    27,
+    9,
+    9
+   ],
+   "file": "themes/minecraft/ui/gui-icons.png.png",
+   "mode": "pixels",
+   "name": "Minecraft HUD: Hunger shank (gui/icons.png)",
+   "native": [
+    9,
+    9
+   ],
+   "sha256": "3f5c3d10c6ac1931d097354c8c5c0ce0d38f9b4944b2a5772ef5d0ff915e16dd",
+   "size": [
+    9,
+    9
+   ],
+   "source": {
+    "commit": "6c571b0825ee27b81f01127c2bd0d4ba2c89abb9",
+    "downloadUrl": "https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/6c571b0825ee27b81f01127c2bd0d4ba2c89abb9/data/1.8.8/gui/icons.png",
+    "kind": "vanilla-1.8.8-texture",
+    "path": "data/1.8.8/gui/icons.png",
+    "repo": "PrismarineJS/minecraft-assets"
+   },
+   "tier": "Native / official source"
+  },
+  "p3-food-half": {
+   "crop": [
+    61,
+    27,
+    9,
+    9
+   ],
+   "file": "themes/minecraft/ui/gui-icons.png.png",
+   "mode": "pixels",
+   "name": "Minecraft HUD: Half hunger shank (gui/icons.png)",
+   "native": [
+    9,
+    9
+   ],
+   "sha256": "3f5c3d10c6ac1931d097354c8c5c0ce0d38f9b4944b2a5772ef5d0ff915e16dd",
+   "size": [
+    9,
+    9
+   ],
+   "source": {
+    "commit": "6c571b0825ee27b81f01127c2bd0d4ba2c89abb9",
+    "downloadUrl": "https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/6c571b0825ee27b81f01127c2bd0d4ba2c89abb9/data/1.8.8/gui/icons.png",
+    "kind": "vanilla-1.8.8-texture",
+    "path": "data/1.8.8/gui/icons.png",
+    "repo": "PrismarineJS/minecraft-assets"
+   },
+   "tier": "Native / official source"
+  },
+  "p3-heart-empty": {
+   "crop": [
+    16,
+    0,
+    9,
+    9
+   ],
+   "file": "themes/minecraft/ui/gui-icons.png.png",
+   "mode": "pixels",
+   "name": "Minecraft HUD: Heart container (gui/icons.png)",
+   "native": [
+    9,
+    9
+   ],
+   "sha256": "3f5c3d10c6ac1931d097354c8c5c0ce0d38f9b4944b2a5772ef5d0ff915e16dd",
+   "size": [
+    9,
+    9
+   ],
+   "source": {
+    "commit": "6c571b0825ee27b81f01127c2bd0d4ba2c89abb9",
+    "downloadUrl": "https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/6c571b0825ee27b81f01127c2bd0d4ba2c89abb9/data/1.8.8/gui/icons.png",
+    "kind": "vanilla-1.8.8-texture",
+    "path": "data/1.8.8/gui/icons.png",
+    "repo": "PrismarineJS/minecraft-assets"
+   },
+   "tier": "Native / official source"
+  },
+  "p3-heart-flash": {
+   "crop": [
+    25,
+    0,
+    9,
+    9
+   ],
+   "file": "themes/minecraft/ui/gui-icons.png.png",
+   "mode": "pixels",
+   "name": "Minecraft HUD: Heart container, hurt flash (gui/icons.png)",
+   "native": [
+    9,
+    9
+   ],
+   "sha256": "3f5c3d10c6ac1931d097354c8c5c0ce0d38f9b4944b2a5772ef5d0ff915e16dd",
+   "size": [
+    9,
+    9
+   ],
+   "source": {
+    "commit": "6c571b0825ee27b81f01127c2bd0d4ba2c89abb9",
+    "downloadUrl": "https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/6c571b0825ee27b81f01127c2bd0d4ba2c89abb9/data/1.8.8/gui/icons.png",
+    "kind": "vanilla-1.8.8-texture",
+    "path": "data/1.8.8/gui/icons.png",
+    "repo": "PrismarineJS/minecraft-assets"
+   },
+   "tier": "Native / official source"
+  },
+  "p3-heart-full": {
+   "crop": [
+    52,
+    0,
+    9,
+    9
+   ],
+   "file": "themes/minecraft/ui/gui-icons.png.png",
+   "mode": "pixels",
+   "name": "Minecraft HUD: Heart (gui/icons.png)",
+   "native": [
+    9,
+    9
+   ],
+   "sha256": "3f5c3d10c6ac1931d097354c8c5c0ce0d38f9b4944b2a5772ef5d0ff915e16dd",
+   "size": [
+    9,
+    9
+   ],
+   "source": {
+    "commit": "6c571b0825ee27b81f01127c2bd0d4ba2c89abb9",
+    "downloadUrl": "https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/6c571b0825ee27b81f01127c2bd0d4ba2c89abb9/data/1.8.8/gui/icons.png",
+    "kind": "vanilla-1.8.8-texture",
+    "path": "data/1.8.8/gui/icons.png",
+    "repo": "PrismarineJS/minecraft-assets"
+   },
+   "tier": "Native / official source"
+  },
+  "p3-heart-half": {
+   "crop": [
+    61,
+    0,
+    9,
+    9
+   ],
+   "file": "themes/minecraft/ui/gui-icons.png.png",
+   "mode": "pixels",
+   "name": "Minecraft HUD: Half heart (gui/icons.png)",
+   "native": [
+    9,
+    9
+   ],
+   "sha256": "3f5c3d10c6ac1931d097354c8c5c0ce0d38f9b4944b2a5772ef5d0ff915e16dd",
+   "size": [
+    9,
+    9
+   ],
+   "source": {
+    "commit": "6c571b0825ee27b81f01127c2bd0d4ba2c89abb9",
+    "downloadUrl": "https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/6c571b0825ee27b81f01127c2bd0d4ba2c89abb9/data/1.8.8/gui/icons.png",
+    "kind": "vanilla-1.8.8-texture",
+    "path": "data/1.8.8/gui/icons.png",
+    "repo": "PrismarineJS/minecraft-assets"
+   },
+   "tier": "Native / official source"
+  },
+  "p3-record-13": {
+   "file": "themes/minecraft/icons/items-record_13.png.png",
+   "mode": "pixels",
+   "name": "Music Disc 13 (items/record_13.png)",
+   "native": [
+    16,
+    16
+   ],
+   "sha256": "0af64ba7015112695ccfbc0cf1000a6893bcd67e5a7f6fbc1a9e483a5f9890c9",
+   "size": [
+    16,
+    16
+   ],
+   "source": {
+    "commit": "6c571b0825ee27b81f01127c2bd0d4ba2c89abb9",
+    "downloadUrl": "https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/6c571b0825ee27b81f01127c2bd0d4ba2c89abb9/data/1.8.8/items/record_13.png",
+    "kind": "vanilla-1.8.8-texture",
+    "path": "data/1.8.8/items/record_13.png",
+    "repo": "PrismarineJS/minecraft-assets"
+   },
+   "tier": "Native / official source"
+  },
+  "p3-record-cat": {
+   "file": "themes/minecraft/icons/items-record_cat.png.png",
+   "mode": "pixels",
+   "name": "Music Disc Cat (items/record_cat.png)",
+   "native": [
+    16,
+    16
+   ],
+   "sha256": "f95b6849639929d68145fca425e1e9c0d0d5377b20d664095e119b66c4cdf533",
+   "size": [
+    16,
+    16
+   ],
+   "source": {
+    "commit": "6c571b0825ee27b81f01127c2bd0d4ba2c89abb9",
+    "downloadUrl": "https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/6c571b0825ee27b81f01127c2bd0d4ba2c89abb9/data/1.8.8/items/record_cat.png",
+    "kind": "vanilla-1.8.8-texture",
+    "path": "data/1.8.8/items/record_cat.png",
+    "repo": "PrismarineJS/minecraft-assets"
+   },
+   "tier": "Native / official source"
+  },
+  "p3-record-chirp": {
+   "file": "themes/minecraft/icons/items-record_chirp.png.png",
+   "mode": "pixels",
+   "name": "Music Disc Chirp (items/record_chirp.png)",
+   "native": [
+    16,
+    16
+   ],
+   "sha256": "691a944c439ae7f86671e8b072fec65f53f72b39e22d4ffebf3c907424171cbd",
+   "size": [
+    16,
+    16
+   ],
+   "source": {
+    "commit": "6c571b0825ee27b81f01127c2bd0d4ba2c89abb9",
+    "downloadUrl": "https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/6c571b0825ee27b81f01127c2bd0d4ba2c89abb9/data/1.8.8/items/record_chirp.png",
+    "kind": "vanilla-1.8.8-texture",
+    "path": "data/1.8.8/items/record_chirp.png",
+    "repo": "PrismarineJS/minecraft-assets"
+   },
+   "tier": "Native / official source"
+  },
+  "p3-record-far": {
+   "file": "themes/minecraft/icons/items-record_far.png.png",
+   "mode": "pixels",
+   "name": "Music Disc Far (items/record_far.png)",
+   "native": [
+    16,
+    16
+   ],
+   "sha256": "a6fbc56a87c57e1fe3cffdf661c114e499bbe68d1736e68d27ce9ea32f7f3680",
+   "size": [
+    16,
+    16
+   ],
+   "source": {
+    "commit": "6c571b0825ee27b81f01127c2bd0d4ba2c89abb9",
+    "downloadUrl": "https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/6c571b0825ee27b81f01127c2bd0d4ba2c89abb9/data/1.8.8/items/record_far.png",
+    "kind": "vanilla-1.8.8-texture",
+    "path": "data/1.8.8/items/record_far.png",
+    "repo": "PrismarineJS/minecraft-assets"
+   },
+   "tier": "Native / official source"
+  },
+  "p3-record-mall": {
+   "file": "themes/minecraft/icons/items-record_mall.png.png",
+   "mode": "pixels",
+   "name": "Music Disc Mall (items/record_mall.png)",
+   "native": [
+    16,
+    16
+   ],
+   "sha256": "84699943bdded70eab3b958972604b4a751e28b87ab6cb6598c3573de99f23f2",
+   "size": [
+    16,
+    16
+   ],
+   "source": {
+    "commit": "6c571b0825ee27b81f01127c2bd0d4ba2c89abb9",
+    "downloadUrl": "https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/6c571b0825ee27b81f01127c2bd0d4ba2c89abb9/data/1.8.8/items/record_mall.png",
+    "kind": "vanilla-1.8.8-texture",
+    "path": "data/1.8.8/items/record_mall.png",
+    "repo": "PrismarineJS/minecraft-assets"
+   },
+   "tier": "Native / official source"
+  },
+  "p3-record-stal": {
+   "file": "themes/minecraft/icons/items-record_stal.png.png",
+   "mode": "pixels",
+   "name": "Music Disc Stal (items/record_stal.png)",
+   "native": [
+    16,
+    16
+   ],
+   "sha256": "889d84a2d0b8a6d643e5ddab68be6d57516f3a8912e5ebba5d520f41effc7c6c",
+   "size": [
+    16,
+    16
+   ],
+   "source": {
+    "commit": "6c571b0825ee27b81f01127c2bd0d4ba2c89abb9",
+    "downloadUrl": "https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/6c571b0825ee27b81f01127c2bd0d4ba2c89abb9/data/1.8.8/items/record_stal.png",
+    "kind": "vanilla-1.8.8-texture",
+    "path": "data/1.8.8/items/record_stal.png",
+    "repo": "PrismarineJS/minecraft-assets"
+   },
+   "tier": "Native / official source"
+  },
+  "p3-record-strad": {
+   "file": "themes/minecraft/icons/items-record_strad.png.png",
+   "mode": "pixels",
+   "name": "Music Disc Strad (items/record_strad.png)",
+   "native": [
+    16,
+    16
+   ],
+   "sha256": "4f7460b86423661e6c98dbc393cb6338c89f196b99d7ec6fea9945d084936991",
+   "size": [
+    16,
+    16
+   ],
+   "source": {
+    "commit": "6c571b0825ee27b81f01127c2bd0d4ba2c89abb9",
+    "downloadUrl": "https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/6c571b0825ee27b81f01127c2bd0d4ba2c89abb9/data/1.8.8/items/record_strad.png",
+    "kind": "vanilla-1.8.8-texture",
+    "path": "data/1.8.8/items/record_strad.png",
+    "repo": "PrismarineJS/minecraft-assets"
+   },
+   "tier": "Native / official source"
+  },
+  "p3-record-wait": {
+   "file": "themes/minecraft/icons/items-record_wait.png.png",
+   "mode": "pixels",
+   "name": "Music Disc Wait (items/record_wait.png)",
+   "native": [
+    16,
+    16
+   ],
+   "sha256": "a52a5c40793d7aef3d38ca78007f68be093675ce4b49f262bffa138a245d294c",
+   "size": [
+    16,
+    16
+   ],
+   "source": {
+    "commit": "6c571b0825ee27b81f01127c2bd0d4ba2c89abb9",
+    "downloadUrl": "https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/6c571b0825ee27b81f01127c2bd0d4ba2c89abb9/data/1.8.8/items/record_wait.png",
+    "kind": "vanilla-1.8.8-texture",
+    "path": "data/1.8.8/items/record_wait.png",
+    "repo": "PrismarineJS/minecraft-assets"
+   },
+   "tier": "Native / official source"
+  },
+  "p3-record-ward": {
+   "file": "themes/minecraft/icons/items-record_ward.png.png",
+   "mode": "pixels",
+   "name": "Music Disc Ward (items/record_ward.png)",
+   "native": [
+    16,
+    16
+   ],
+   "sha256": "58d54bb7374649fc3eb4a2e02ac4674e6ab7aa51e96f00839243d70ab29de1e7",
+   "size": [
+    16,
+    16
+   ],
+   "source": {
+    "commit": "6c571b0825ee27b81f01127c2bd0d4ba2c89abb9",
+    "downloadUrl": "https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/6c571b0825ee27b81f01127c2bd0d4ba2c89abb9/data/1.8.8/items/record_ward.png",
+    "kind": "vanilla-1.8.8-texture",
+    "path": "data/1.8.8/items/record_ward.png",
+    "repo": "PrismarineJS/minecraft-assets"
+   },
+   "tier": "Native / official source"
+  }
+ },
+ "states": {}
+}

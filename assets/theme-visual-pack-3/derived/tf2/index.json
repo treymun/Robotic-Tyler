@@ -1,0 +1,27 @@
+{
+ "icons": {},
+ "picks": {
+  "p3-spy": {
+   "file": "themes/tf2/icons/img-icons-class-spy-white.svg.svg",
+   "mode": "vector",
+   "name": "img icons class spy white.svg",
+   "sha256": "79e02e06e667f443701c8e87ec0affc43dd412267e32752fc02f3665a7cd5046",
+   "size": [
+    50.0,
+    50.0
+   ],
+   "source": {
+    "commit": "67fd6f894a1e20713125441df42ad4d724654288",
+    "downloadUrl": "https://raw.githubusercontent.com/TF2Stadium/Assets/67fd6f894a1e20713125441df42ad4d724654288/img/icons/class/spy-white.svg",
+    "kind": "community-vectors-and-game-screenshots",
+    "path": "img/icons/class/spy-white.svg",
+    "repo": "TF2Stadium/Assets"
+   },
+   "tier": "Community / period source",
+   "tinted": true
+  }
+ },
+ "states": {
+  "paused": "p3-spy"
+ }
+}

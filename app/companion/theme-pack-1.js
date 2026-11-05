@@ -29,13 +29,16 @@
   {id:'st-persona',mount(c){
    const chip=c.add('bar',c.h('button','fx st-persona'));chip.type='button';chip.setAttribute('aria-haspopup','menu');chip.setAttribute('aria-expanded','false');
    const dot=c.h('i','st-p-dot'),name=c.h('span','st-p-name');chip.append(dot,name);
+   // v2.37: Away and Snooze show the Steam client's own away (moon) and sleep (Zz) icons (Pack 3) in place of the dot.
+   const moon=c.brand('p3-away','st-p-bi'),zz=c.brand('p3-snooze','st-p-bi');for(const b of [moon,zz])if(b){b.style.display='none';dot.after(b);}
    const persona=()=>{const s=c.S.state;return s==='speaking'?['ingame','In voice']:s==='paused'?['away','Away']:s==='standby'?['away','Snooze']:s==='error'?['offline','Offline']:['online','Online'];};
-   function render(){const [kind,label]=persona();chip.dataset.persona=kind;name.textContent=label;chip.title='Tyler is '+label.toLowerCase()+(c.S.text?': '+c.S.text:'')+'. Click for the status menu.';}
+   function render(){const [kind,label]=persona();chip.dataset.persona=kind;name.textContent=label;chip.title='Tyler is '+label.toLowerCase()+(c.S.text?': '+c.S.text:'')+'. Click for the status menu.';
+    const icon=label==='Away'?moon:label==='Snooze'?zz:null;for(const b of [moon,zz])if(b)b.style.display=b===icon?'':'none';dot.style.display=icon?'none':'';}
    chip.onclick=()=>{if(chip.getAttribute('aria-expanded')==='true'){c._menu?.close();return;}
     const [kind,label]=persona(),paused=c.actions.paused(),L=c.life,got=(L?.ach||[...c._session]).filter(a=>String(a).startsWith('st:')).length;
     c.menu(chip,[{heading:'Robotic Tyler · '+label+(c.S.label&&c.S.label!==label?' · '+c.S.label:'')},
      paused?{mark:'●',label:'Online',hint:'Connect & start',run:c.actions.connect}:{mark:'●',label:'Online',current:kind!=='offline',hint:kind==='ingame'?'In voice':'',run:()=>{}},
-     {mark:'●',label:'Away',hint:'Pause AI',current:paused,disabled:paused,run:c.actions.pause},
+     {mark:'●',icon:'p3-away',label:'Away',hint:'Pause AI',current:paused,disabled:paused,run:c.actions.pause},
      'sep',
      {mark:'★',icon:'achievement',label:'Achievements',hint:got+' of 12',run:()=>c.panel.dispatchEvent(new CustomEvent('tyler-fx',{detail:'st-achievements'}))},
      {mark:'✓',label:'Run full check',run:c.actions.fullCheck},
@@ -65,6 +68,9 @@
    const PROGRESS={ten:[()=>total('replies')+total('spoken'),10],hundred:[()=>total('replies')+total('spoken'),100],thousand:[()=>total('replies')+total('spoken'),1000],
     streak:[()=>Math.max(c.life?.bestStreak||0,c.S.best),15],regular:[()=>c.life?.sessions||0,10],marathon:[()=>(c.life?.timeMs||0)/36e5,10]};
    const has=key=>(c.life?.ach||[...c._session]).includes('st:'+key);
+   // v2.37: the Steam client's own icons (Pack 3) on the badges that have a matching one; the counts keep their number.
+   const ICON={ice:'p3-chat',voice:'p3-mic',sound:'p3-volume',dj:'p3-music',fast:'p3-lightning',streak:'p3-fire',regular:'p3-home',marathon:'p3-clock',back:'p3-refresh'};
+   const badge=(key,glyph)=>{const el=c.h('span','st-ach-icon'),bi=ICON[key]&&c.brand(ICON[key],'st-ach-bi');if(bi)el.append(bi);else el.textContent=glyph;return el;};
    function page(){
     const o=c.overlay('st-ach-page','Achievements');const got=LIST.filter(([k])=>has(k)).length;
     const head=c.h('div','st-ap-head'),bar=c.h('span','st-ap-bar'),fill=c.h('i');fill.style.width=Math.round(got/LIST.length*100)+'%';bar.append(fill);
@@ -73,14 +79,14 @@
     for(const [key,name,desc,glyph] of [...LIST].sort((a,b)=>has(b[0])-has(a[0]))){
      const row=c.h('div','st-ap-row'+(has(key)?' got':''));const t=c.h('span','st-ap-text');t.append(c.h('b',null,name),c.h('span',null,desc));
      const pr=PROGRESS[key];if(pr&&!has(key)){const [now,max]=[pr[0](),pr[1]],pb=c.h('span','st-ap-prog'),pf=c.h('i');pf.style.width=Math.min(100,now/max*100)+'%';pb.append(pf);t.append(pb,c.h('small',null,(key==='marathon'?now.toFixed(1):Math.floor(now))+' / '+max));}
-     row.append(c.h('span','st-ach-icon',glyph),t,c.h('small','st-ap-state',has(key)?'Unlocked':'Locked'));list.append(row);}
+     row.append(badge(key,glyph),t,c.h('small','st-ap-state',has(key)?'Unlocked':'Locked'));list.append(row);}
     const x=c.h('button','st-ap-close','Close');x.type='button';x.onclick=o.close;o.el.append(list,x);
     if(!c.life)o.el.append(c.h('p','st-ap-note','Lifetime stats are off (Settings → Appearance): achievements last this session only.'));x.focus();
    }
    c.on(c.panel,'tyler-fx',e=>{if(e.detail==='st-achievements')page();});
-   function toast(name,desc,glyph){
+   function toast(key,name,desc,glyph){
     queue=queue.then(()=>new Promise(done=>{
-     const el=c.h('div','fx st-ach fx-interactive'),icon=c.h('span','st-ach-icon',glyph),text=c.h('span','st-ach-text');
+     const el=c.h('div','fx st-ach fx-interactive'),icon=badge(key,glyph),text=c.h('span','st-ach-text');
      text.append(c.h('small',null,'Achievement unlocked'),c.h('b',null,name),c.h('span',null,desc));el.append(icon,text);
      el.setAttribute('role','status');el.title='Open achievements';el.onclick=()=>{el.remove();page();};c.flash(el,5200);c.later(done,1400);
     }));
@@ -88,7 +94,7 @@
    function check(type,d){
     for(const [key,name,desc,glyph,test] of LIST){
      const met=key==='back'?type==='state'&&d?.before==='error'&&['ready','listening'].includes(d?.state):test(type,d);
-     if(met&&c.unlock('st:'+key))toast(name,desc,glyph);
+     if(met&&c.unlock('st:'+key))toast(key,name,desc,glyph);
     }
    }
    c.later(()=>check('life'),1500);
@@ -98,12 +104,14 @@
  ]);
 
  // ── Classic Steam: the server browser and a VGUI progress dialog ──────────
+ // v2.37 (Pack 3): the Chat row shows the 2004 client's own message envelope, and the status strip its
+ // Away clock while Tyler is paused (assets/theme-visual-pack-3/select/classic.json), both at native size.
  F.define('classic',[
   {id:'cl-servers',mount(c){
    const box=c.add('deck',c.h('div','fx cl-servers'));box.setAttribute('role','listbox');box.setAttribute('aria-label','Tyler services. Enter opens the matching tab.');
    const head=c.h('div','cl-head');head.append(c.h('span',null,'Service'),c.h('span',null,'Status'),c.h('span',null,'Ping'));box.append(head);
    const rows=new Map();let selected='ai';
-   for(const s of c.systems()){const row=c.h('div','cl-row');row.setAttribute('role','option');row.tabIndex=s.id==='ai'?0:-1;const lamp=c.h('i','cl-lamp');const name=c.h('span','cl-name',s.name),status=c.h('span','cl-status'),ping=c.h('span','cl-ping');const bi=c.brand(({ai:'server',chat:'vgui-window',voice:'friends',music:'music'})[s.id],'cl-bi');if(bi)name.prepend(bi);name.prepend(lamp);row.append(name,status,ping);box.append(row);rows.set(s.id,{row,status,ping,tab:s.tab});
+   for(const s of c.systems()){const row=c.h('div','cl-row');row.setAttribute('role','option');row.tabIndex=s.id==='ai'?0:-1;const lamp=c.h('i','cl-lamp');const name=c.h('span','cl-name',s.name),status=c.h('span','cl-status'),ping=c.h('span','cl-ping');const bi=(s.id==='chat'&&c.brand('p3-message','cl-bi'))||c.brand(({ai:'server',chat:'vgui-window',voice:'friends',music:'music'})[s.id],'cl-bi');if(bi)name.prepend(bi);name.prepend(lamp);row.append(name,status,ping);box.append(row);rows.set(s.id,{row,status,ping,tab:s.tab});
     row.onclick=()=>select(s.id);row.ondblclick=()=>c.actions.tab(s.tab);}
    let select=function(id){selected=id;for(const [k,r] of rows){r.row.setAttribute('aria-selected',String(k===id));r.row.tabIndex=k===id?0:-1;}};
    box.addEventListener('keydown',e=>{const ids=[...rows.keys()];let i=ids.indexOf(selected);if(e.key==='ArrowDown')i=Math.min(ids.length-1,i+1);else if(e.key==='ArrowUp')i=Math.max(0,i-1);else if(e.key==='Enter'){c.actions.tab(rows.get(selected).tab);return;}else return;e.preventDefault();select(ids[i]);rows.get(ids[i]).row.focus();});
@@ -144,6 +152,7 @@
  // ── Team Fortress 2: class-select navigation, a killfeed and a taunt ──────
  // v2.30: each tab's class emblem (Pack 2): the talker is the Scout.
  const TF_CLASS={conversation:'source-class-scout',room:'source-class-engineer',soundboard:'source-class-soldier',setup:'source-class-medic',checks:'source-class-sniper'};
+ // v2.37 (Pack 3): while Tyler is paused (or on standby) the status strip shows the Spy's emblem: cloaked.
  const ROLES={conversation:['Chat','The talker. Keeps the banter going.'],room:['Room','The engineer. Builds the party.'],soundboard:['Sounds','The soldier. Loudest one here.'],setup:['Setup','The medic. Keeps Tyler alive.'],checks:['Checks','The sniper. Finds the problem.']};
  F.define('tf2',[
   {id:'tf-class',mount(c){
@@ -198,14 +207,17 @@
    // v2.22: a sound that plays shows as a purchase in the middle, like the buy feed; a reply under a
    // second earns the round MVP star beside Tyler's score.
    let bought=null,boughtAt=0;const mvp=c.h('i','cs-mvp','★');mvp.title='MVP: a reply in under a second';ct.prepend(mvp);
+   // v2.37: the HUD's own buy-zone cart (Pack 3) beside BOUGHT.
+   const cart=c.brand('p3-buyzone','cs-cart-bi');
    function render(){ctScore.textContent=String(c.S.replies+c.S.spoken);tScore.textContent=String(c.S.heard);
-    if(bought&&Date.now()-boughtAt<1800){time.textContent='BOUGHT';round.textContent=bought;box.dataset.bought='true';}else{bought=null;box.removeAttribute('data-bought');time.textContent=c.clock(Date.now()-c.S.started);round.textContent='ROUND '+(c.S.turns.length+1);}
+    if(bought&&Date.now()-boughtAt<1800){time.replaceChildren(...(cart?[cart]:[]),'BOUGHT');round.textContent=bought;box.dataset.bought='true';}else{bought=null;box.removeAttribute('data-bought');time.textContent=c.clock(Date.now()-c.S.started);round.textContent='ROUND '+(c.S.turns.length+1);}
     mvp.hidden=!(c.S.turns.length&&Math.min(...c.S.turns.slice(-5))<1000);
     const v=c.voice(),n=Math.min(5,v.peers);alive.replaceChildren(...Array.from({length:5},(_,i)=>{const d=c.h('i');if(i<n)d.className='on';return d;}));box.dataset.state=c.S.state;}
    render();c.every(render);return {update(type,d){if(type==='sound'&&d?.name){bought=String(d.name).slice(0,24);boughtAt=Date.now();c.later(render,1850);}render();}};
   }},
   {id:'cs-wheel',mount(c){
    const chip=c.add('bar',c.h('button','fx fx-chip cs-buy','B'));chip.type='button';chip.title='Sound wheel (B)';chip.setAttribute('aria-label','Open the sound wheel');
+   {const cart=c.brand('p3-buyzone','cs-buy-bi');if(cart)chip.prepend(cart);} // v2.37: B is the buy menu: the HUD's buy-zone cart (Pack 3).
    let wheel=null;
    function close(){wheel?.remove();wheel=null;chip.setAttribute('aria-expanded','false');}
    function open(){
@@ -235,27 +247,44 @@
    function show(kind,title,sub){if(Date.now()-last<2500)return;last=Date.now();const el=c.h('div','fx cs-banner '+kind);const ic=kind==='win'?c.brand('source-ct-logo','cs-banner-bi cs-banner-ct')||c.brand('round-win','cs-banner-bi'):c.brand('source-equipment-c4','cs-banner-bi')||c.brand('c4-timer','cs-banner-bi');if(ic)el.append(ic);el.append(c.h('b',null,title),c.h('span',null,sub));c.flash(el,1900);}
    return {update(type,d){if(type==='turn')show('win','Round won',(d.ms<1500?'MVP · ':'')+'Tyler answered in '+c.ms(d.ms));if(type==='state'&&d.state==='error'&&d.before!=='error')show('loss','Round lost','Tyler needs attention');}};
   }},
+  // v2.37: while Tyler reconnects (the strip's waiting state) its badge is CS2's "connecting to the network"
+  // globe (Pack 3, select/cs2.json); this adds the indicator's outer ring around it, as the main menu draws them.
+  {id:'cs-net',mount(c){
+   const brand=c.root.querySelector('#activityCard .tally-brand'),ring=brand&&c.brand('p3-gc-ring','tally-bi cs-gc-ring');
+   if(!ring)return {};ring.dataset.for='waiting';brand.append(ring);
+   return {unmount(){ring.remove();}};
+  }},
  ]);
 
  // ── Portal: the chamber sign and portal transitions between tabs ──────────
  const PO_ICONS={ai:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="7"/><path d="M12 5v14M5 12h14"/></svg>',chat:'<svg viewBox="0 0 24 24"><path d="M4 6h16v9H10l-5 4v-4H4z"/></svg>',voice:'<svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0 0 12 0M12 17v4"/></svg>',
   people:'<svg viewBox="0 0 24 24"><circle cx="8" cy="8" r="3"/><circle cx="16" cy="8" r="3"/><path d="M3 20c0-4 2.5-6 5-6s5 2 5 6M11 20c0-4 2.5-6 5-6s5 2 5 6"/></svg>',music:'<svg viewBox="0 0 24 24"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg>',sound:'<svg viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 9a4 4 0 0 1 0 6M19 6a8 8 0 0 1 0 12"/></svg>'};
+ // v2.37: the real chamber-sign pictograms (Pack 3: Portal's signage_overlay_* cut-outs, traced) on the sign's
+ // tiles, in place of the drawn icons: the cube dispenser for the AI, the pellet catcher for chat, the turret for
+ // voice, the Companion Cube for people in the call, the cake for music and the energy pellet for the soundboard.
+ const PO_SIGN={ai:'p3-sign-dispenser',chat:'p3-sign-catcher',voice:'p3-sign-turret',people:'p3-sign-cube',music:'p3-sign-cake',sound:'p3-sign-energyball'};
  F.define('portal',[
   {id:'po-sign',mount(c){
    const box=c.add('deck',c.h('div','fx po-sign'));
    const num=c.h('b','po-num'),of=c.h('span','po-of'),bar=c.h('span','po-progress'),icons=c.h('span','po-icons');
    const left=c.h('div','po-left');left.append(num,of);const right=c.h('div','po-right');right.append(c.h('small',null,'Tests passed · subject health'),bar,icons);box.append(left,right);
    for(let i=0;i<10;i++)bar.append(c.h('i'));
-   const lit=new Map();for(const [k,label] of [['ai','AI key saved'],['chat','Chat linked'],['voice','Voice armed'],['people','People in the call'],['music','Music playing'],['sound','Soundboard used']]){const i=c.svg(PO_ICONS[k],'po-icon');const w=c.h('span','po-tile');w.title=label;w.setAttribute('aria-label',label);w.append(i);icons.append(w);lit.set(k,w);}
+   // v2.37: the chamber's own exit-door sign in the sign's corner (Pack 3: Portal's signage_doorstate, both
+   // frames): the orange tick while Tyler is running, the blue X while he's paused, on standby or needs attention.
+   const locked=()=>['error','paused','standby'].includes(c.S.state);
+   const doorOpen=c.brand('p3-door-open','po-door-bi'),doorShut=c.brand('p3-door-locked','po-door-bi'),door=doorOpen&&doorShut&&c.h('span','po-door');
+   if(door){door.append(doorOpen,doorShut);door.setAttribute('aria-hidden','true');box.append(door);}
+   const lit=new Map();for(const [k,label] of [['ai','AI key saved'],['chat','Chat linked'],['voice','Voice armed'],['people','People in the call'],['music','Music playing'],['sound','Soundboard used']]){const art=c.brand(PO_SIGN[k],'po-p3'),i=art||c.svg(PO_ICONS[k],'po-icon');const w=c.h('span','po-tile'+(art?' po-tile-p3':''));w.title=label;w.setAttribute('aria-label',label);w.append(i);icons.append(w);lit.set(k,w);}
    function render(){const S=c.S,v=c.voice(),sys=c.systems();const passed=S.replies+S.spoken;num.textContent=c.pad(passed);of.textContent=S.errors?'/'+c.pad(passed+S.errors):'';left.title=passed+' replies'+(S.errors?', '+S.errors+' problems':'');
     const h=c.health();[...bar.children].forEach((x,i)=>x.classList.toggle('on',i<Math.round(h/10)));
     const on={ai:S.keyOk===true,chat:sys[1].level===3,voice:v.armed,people:v.peers>0,music:!!S.music,sound:S.sounds>0};
-    for(const [k,w] of lit){w.classList.toggle('on',!!on[k]);w.setAttribute('aria-label',w.title+(on[k]?': yes':': no'));}box.dataset.state=S.state;}
+    for(const [k,w] of lit){w.classList.toggle('on',!!on[k]);w.setAttribute('aria-label',w.title+(on[k]?': yes':': no'));}box.dataset.state=S.state;
+    if(door){const shut=locked();door.dataset.door=shut?'locked':'open';door.title=shut?'Exit door locked: Tyler is paused or needs attention':'Exit door open: Tyler is running';}}
    // v2.22: the sign opens the chamber report (Enter or click): what each tile means and the numbers.
    box.tabIndex=0;box.setAttribute('role','button');box.title='Test chamber report';
    function report(){const S=c.S,v=c.voice(),L=c.life,o=c.overlay('po-report','Test chamber report');
     const head=c.h('div','po-r-head');const ap=c.brand('aperture-iris','po-r-bi');if(ap)head.append(ap);head.append(c.h('b',null,c.pad(S.replies+S.spoken)),c.h('span',null,'Test chamber report · subject: Robotic Tyler'));
-    const rows=[['Tests passed',S.replies+S.spoken],['Tests failed',S.errors],['Fastest test',S.turns.length?c.ms(Math.min(...S.turns)):'—'],['Average test',S.turns.length?c.ms(c.avgTurn()):'—'],['Subject health',c.health()+'%'],['Observers in the call',v.peers],['Lifetime tests',L?(L.replies+L.spoken).toLocaleString():'—']];
+    const rows=[['Tests passed',S.replies+S.spoken],['Tests failed',S.errors],['Fastest test',S.turns.length?c.ms(Math.min(...S.turns)):'—'],['Average test',S.turns.length?c.ms(c.avgTurn()):'—'],['Subject health',c.health()+'%'],['Exit door',locked()?'Locked':'Open'],['Observers in the call',v.peers],['Lifetime tests',L?(L.replies+L.spoken).toLocaleString():'—']];
     const t=c.h('div','po-r-rows');for(const [k,val] of rows){const r=c.h('div');r.append(c.h('span',null,k),c.h('b',null,String(val)));t.append(r);}
     const legend=c.h('div','po-r-legend');for(const w of icons.children){const r=c.h('div');r.append(w.cloneNode(true),c.h('span',null,w.title+(w.classList.contains('on')?': yes':': not yet')));legend.append(r);}
     const x=c.h('button','po-r-close','Continue testing');x.type='button';x.onclick=o.close;o.el.append(head,t,legend,x);x.focus({preventScroll:true});}
@@ -313,10 +342,23 @@
    c.key(e=>{if((e.key==='v'||e.key==='V')&&!e.repeat){e.preventDefault();open();}else if(menu&&/^[0-7]$/.test(e.key)){e.preventDefault();e.key==='0'?close():choose(Number(e.key)-1);}else if(menu&&e.key==='Escape'){e.preventDefault();close();}});
    return {unmount:close};
   }},
+  // v2.37: the HUD's own health cross (Pack 3: GoldSrc 640hud sprite, additive, tinted like the HUD) in place of
+  // the drawn one on the first stat. Like the game's, it turns red when Tyler's health is 25 or less.
+  // The thinking badge is the HUD's C4 icon, green like the game's status icons (select/cs16.json).
+  {id:'c16-hud',mount(c){
+   const stat=c.root.querySelector('#hud .stat'),cross=stat&&c.brand('p3-hp-cross','c16-hp');
+   if(!cross)return {};stat.prepend(cross);
+   let shown=-1;
+   const render=()=>{const h=c.health();if(h===shown)return;shown=h;cross.classList.toggle('low',h<=25);stat.title='Tyler\'s health: '+h+'%';};
+   render();c.every(render);
+   return {update(type){if(type==='state')render();},unmount(){cross.remove();stat.removeAttribute('title');}};
+  }},
  ]);
 
  // ── HEV suit: suit voice captions, damage indicators and a flashlight ─────
  const HEV={ready:'Communications link established',listening:'Voice signal detected',thinking:'Processing. Please wait',speaking:'Broadcasting on voice channel',waiting:'Automatic recovery engaged',error:'Warning: system fault detected',paused:'Automatic systems offline',standby:'Standby. Secondary unit active'};
+ // v2.37 (Pack 3): errors and warnings (the status strip, notifications, dialogs) show the HUD's own radiation
+ // damage icon, traced from Half-Life's 640hud sprite, in place of the drawn one (select/hev.json).
  F.define('hev',[
   {id:'hev-voice',mount(c){
    let line=null;
@@ -337,10 +379,19 @@
   }},
   {id:'hev-light',mount(c){
    const b=c.add('bar',c.h('button','fx fx-chip hev-lamp'));b.type='button';b.setAttribute('aria-pressed','false');b.title='Flashlight: brighter, higher-contrast panel (F)';b.setAttribute('aria-label','Flashlight');
-   b.append(c.brand('flashlight','hev-bi')||c.svg('<svg viewBox="0 0 24 24"><path d="M3 9h7l3-3h4v12h-4l-3-3H3z"/><path d="M19 8l3-2M19 16l3 2M19 12h3"/></svg>'));
+   // v2.37: the HUD's own flashlight (Pack 3: Half-Life's flash_empty, flash_full and flash_beam sprites), drawn
+   // the way the game does: the casing, its charge filled from the right, and the beam while it's on. The charge
+   // is Tyler's health.
+   const parts=['p3-flash-empty','p3-flash-full','p3-flash-beam'].map(id=>c.brand(id,'hev-fl '+id.slice(3)));
+   let fill=null;
+   if(parts.every(Boolean)){const lamp=c.h('span','hev-flash');lamp.setAttribute('aria-hidden','true');const casing=c.h('span','hev-fl-casing');casing.append(parts[0],parts[1]);lamp.append(casing,parts[2]);b.append(lamp);b.classList.add('hev-lamp-hud');fill=parts[1];}
+   else b.append(c.brand('flashlight','hev-bi')||c.svg('<svg viewBox="0 0 24 24"><path d="M3 9h7l3-3h4v12h-4l-3-3H3z"/><path d="M19 8l3-2M19 16l3 2M19 12h3"/></svg>'));
+   let charge=-1;
+   const render=()=>{if(!fill)return;const h=c.health();if(h===charge)return;charge=h;fill.style.clipPath='inset(0 0 0 '+(100-h)+'%)';b.title='Flashlight: brighter, higher-contrast panel (F). Charge: Tyler\'s health, '+h+'%';};
    const toggle=()=>{const on=!c.panel.hasAttribute('data-hev-light');c.panel.toggleAttribute('data-hev-light',on);b.setAttribute('aria-pressed',String(on));};
    b.onclick=toggle;c.key(e=>{if((e.key==='f'||e.key==='F')&&!e.repeat){e.preventDefault();toggle();}});
-   return {unmount(){c.panel.removeAttribute('data-hev-light');}};
+   render();if(fill)c.every(render);
+   return {update(type){if(type==='state')render();},unmount(){c.panel.removeAttribute('data-hev-light');}};
   }},
  ]);
 })();

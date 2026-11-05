@@ -1,0 +1,28 @@
+{
+ "icons": {},
+ "picks": {
+  "p3-round-timer": {
+   "file": "themes/dod/icons/vgui-timer.vtf.png",
+   "mode": "pixels",
+   "name": "Day of Defeat: Source HUD round timer (vgui/timer)",
+   "native": [
+    16,
+    16
+   ],
+   "sha256": "3f0c2b67fbaa1e30abae4145012efb984277bc62b6bca6b9004a74438d384140",
+   "size": [
+    16,
+    16
+   ],
+   "source": {
+    "commit": "d860b5cf055adedce621ef281fff41e28d7b79bd",
+    "downloadUrl": "https://raw.githubusercontent.com/bouletmarc/DOD_content/d860b5cf055adedce621ef281fff41e28d7b79bd/materials/vgui/timer.vtf",
+    "kind": "archived-source-art",
+    "path": "materials/vgui/timer.vtf",
+    "repo": "bouletmarc/DOD_content"
+   },
+   "tier": "Archived source artwork"
+  }
+ },
+ "states": {}
+}

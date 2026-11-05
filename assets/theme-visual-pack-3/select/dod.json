@@ -1,0 +1,9 @@
+{
+ "picks": {
+  "p3-round-timer": {
+   "file": "themes/dod/icons/vgui-timer.vtf.png",
+   "mode": "pixels",
+   "name": "Day of Defeat: Source HUD round timer (vgui/timer)"
+  }
+ }
+}

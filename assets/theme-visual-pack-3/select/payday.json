@@ -1,0 +1,20 @@
+{
+ "picks": {
+  "p3-tickbox": {
+   "file": "themes/payday/icons/checkbox.png.png",
+   "mode": "trace",
+   "name": "PAYDAY 2 tick box"
+  },
+  "p3-tickbox-ticked": {
+   "file": "themes/payday/logos/checkbox_marked.png.png",
+   "mode": "trace",
+   "name": "PAYDAY 2 tick box, ticked"
+  },
+  "p3-skill-drill-sawgeant": {
+   "file": "themes/payday/icons/skill-drill_sawgeant.png",
+   "mode": "trace",
+   "light": true,
+   "name": "PAYDAY 2 skill icon: Drill Sawgeant"
+  }
+ }
+}

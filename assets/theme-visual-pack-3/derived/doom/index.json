@@ -1,0 +1,115 @@
+{
+ "icons": {},
+ "picks": {
+  "p3-ammo-box": {
+   "file": "themes/doom/icons/ammoa0.png",
+   "mode": "pixels",
+   "name": "DOOM box of bullets (AMMOA0)",
+   "native": [
+    28,
+    16
+   ],
+   "sha256": "cef1072f0094c2fae3c529e16993ad3fcfb19ed5c10d0219118df2ce16095cf1",
+   "size": [
+    28,
+    16
+   ],
+   "source": {
+    "downloadUrl": "https://raw.githubusercontent.com/samrude005/doom1.wad/HEAD/doom1.wad",
+    "kind": "original-doom-shareware-art",
+    "path": "doom1.wad",
+    "repo": "samrude005/doom1.wad"
+   },
+   "tier": "Native / official source"
+  },
+  "p3-key-blue": {
+   "file": "themes/doom/ui/stkeys0.png",
+   "mode": "pixels",
+   "name": "DOOM status bar blue key card (STKEYS0)",
+   "native": [
+    7,
+    5
+   ],
+   "sha256": "529ef0b9a339141776ac26c63f09e7426d1aea2439c45c795db9a45e68f88f22",
+   "size": [
+    7,
+    5
+   ],
+   "source": {
+    "downloadUrl": "https://raw.githubusercontent.com/samrude005/doom1.wad/HEAD/doom1.wad",
+    "kind": "original-doom-shareware-art",
+    "path": "doom1.wad",
+    "repo": "samrude005/doom1.wad"
+   },
+   "tier": "Native / official source"
+  },
+  "p3-key-red": {
+   "file": "themes/doom/ui/stkeys2.png",
+   "mode": "pixels",
+   "name": "DOOM status bar red key card (STKEYS2)",
+   "native": [
+    7,
+    5
+   ],
+   "sha256": "2c3b6eb7d451614ee30327112560a04994474f9a6fd1d7725b18837746620d11",
+   "size": [
+    7,
+    5
+   ],
+   "source": {
+    "downloadUrl": "https://raw.githubusercontent.com/samrude005/doom1.wad/HEAD/doom1.wad",
+    "kind": "original-doom-shareware-art",
+    "path": "doom1.wad",
+    "repo": "samrude005/doom1.wad"
+   },
+   "tier": "Native / official source"
+  },
+  "p3-key-yellow": {
+   "file": "themes/doom/ui/stkeys1.png",
+   "mode": "pixels",
+   "name": "DOOM status bar yellow key card (STKEYS1)",
+   "native": [
+    7,
+    5
+   ],
+   "sha256": "5d8313bb111c372dd4719a4358d02e00ea2c01403dc39bc918ba8801f7651094",
+   "size": [
+    7,
+    5
+   ],
+   "source": {
+    "downloadUrl": "https://raw.githubusercontent.com/samrude005/doom1.wad/HEAD/doom1.wad",
+    "kind": "original-doom-shareware-art",
+    "path": "doom1.wad",
+    "repo": "samrude005/doom1.wad"
+   },
+   "tier": "Native / official source"
+  },
+  "p3-medikit": {
+   "file": "themes/doom/icons/media0.png",
+   "mode": "pixels",
+   "name": "DOOM medikit (MEDIA0)",
+   "native": [
+    28,
+    19
+   ],
+   "sha256": "32d952ed3375a7f3780584dbcd9d2be68fb486186dbc9a13f3090d770030fed6",
+   "size": [
+    28,
+    19
+   ],
+   "source": {
+    "downloadUrl": "https://raw.githubusercontent.com/samrude005/doom1.wad/HEAD/doom1.wad",
+    "kind": "original-doom-shareware-art",
+    "path": "doom1.wad",
+    "repo": "samrude005/doom1.wad"
+   },
+   "tier": "Native / official source"
+  }
+ },
+ "states": {
+  "error": "p3-key-red",
+  "listening": "p3-key-blue",
+  "thinking": "p3-key-yellow"
+ }
+}

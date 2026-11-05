@@ -1,0 +1,4 @@
+{"picks": {
+  "p3-deceased": {"file": "themes/l4d/ui/vgui-a_panel_dead.vtf.png", "mode": "trace", "crop": [48, 36, 32, 34], "upscale": 4,
+                  "name": "Left 4 Dead teammate panel: Deceased (its skull)"}
+}}

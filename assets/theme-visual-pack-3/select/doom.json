@@ -1,0 +1,9 @@
+{"picks": {
+  "p3-key-blue": {"file": "themes/doom/ui/stkeys0.png", "mode": "pixels", "name": "DOOM status bar blue key card (STKEYS0)"},
+  "p3-key-yellow": {"file": "themes/doom/ui/stkeys1.png", "mode": "pixels", "name": "DOOM status bar yellow key card (STKEYS1)"},
+  "p3-key-red": {"file": "themes/doom/ui/stkeys2.png", "mode": "pixels", "name": "DOOM status bar red key card (STKEYS2)"},
+  "p3-ammo-box": {"file": "themes/doom/icons/ammoa0.png", "mode": "pixels", "name": "DOOM box of bullets (AMMOA0)"},
+  "p3-medikit": {"file": "themes/doom/icons/media0.png", "mode": "pixels", "name": "DOOM medikit (MEDIA0)"}
+ },
+ "states": {"listening": "p3-key-blue", "thinking": "p3-key-yellow", "error": "p3-key-red"}
+}

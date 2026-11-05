@@ -1,0 +1,117 @@
+{
+ "icons": {
+  "error": "p3-dmg-rad",
+  "warning": "p3-dmg-rad"
+ },
+ "picks": {
+  "p3-dmg-rad": {
+   "file": "themes/hev/icons/hud-hud-dmg_rad.png",
+   "mode": "trace",
+   "name": "hud hud dmg rad",
+   "sha256": "81d2a704ca8defa1065bffca3cc9cb9ed983b180eeaa5a9a6067cf90ea6a5bf1",
+   "size": [
+    64,
+    64
+   ],
+   "source": {
+    "commit": "6ad155c7a610a85cfd443fcace2c97f2afcb2866",
+    "downloadUrl": "https://raw.githubusercontent.com/u3games/CS-Server/6ad155c7a610a85cfd443fcace2c97f2afcb2866/server/valve/sprites/640hud9.spr",
+    "kind": "archived-source-art",
+    "path": "server/valve/sprites/640hud9.spr",
+    "repo": "u3games/CS-Server"
+   },
+   "tier": "Archived source artwork",
+   "tinted": true
+  },
+  "p3-flash-beam": {
+   "crop": [
+    0,
+    5,
+    12,
+    22
+   ],
+   "file": "themes/hev/icons/hud-hud-flash_beam.png",
+   "mode": "lum",
+   "name": "hud hud flash beam",
+   "native": [
+    12,
+    22
+   ],
+   "sha256": "ebeb912c0643e88595bca226b83838f72cfcef31286fe96440462603ed67f1ac",
+   "size": [
+    12,
+    22
+   ],
+   "source": {
+    "commit": "6ad155c7a610a85cfd443fcace2c97f2afcb2866",
+    "downloadUrl": "https://raw.githubusercontent.com/u3games/CS-Server/6ad155c7a610a85cfd443fcace2c97f2afcb2866/server/valve/sprites/640hud7.spr",
+    "kind": "archived-source-art",
+    "path": "server/valve/sprites/640hud7.spr",
+    "repo": "u3games/CS-Server"
+   },
+   "tier": "Archived source artwork",
+   "tinted": true
+  },
+  "p3-flash-empty": {
+   "crop": [
+    0,
+    5,
+    32,
+    22
+   ],
+   "file": "themes/hev/icons/hud-hud-flash_empty.png",
+   "mode": "lum",
+   "name": "hud hud flash empty",
+   "native": [
+    32,
+    22
+   ],
+   "sha256": "99a4974005ecd4c6c3d91c8dde5a41de560104e084e5e95553e4fc3746105b31",
+   "size": [
+    32,
+    22
+   ],
+   "source": {
+    "commit": "6ad155c7a610a85cfd443fcace2c97f2afcb2866",
+    "downloadUrl": "https://raw.githubusercontent.com/u3games/CS-Server/6ad155c7a610a85cfd443fcace2c97f2afcb2866/server/valve/sprites/640hud7.spr",
+    "kind": "archived-source-art",
+    "path": "server/valve/sprites/640hud7.spr",
+    "repo": "u3games/CS-Server"
+   },
+   "tier": "Archived source artwork",
+   "tinted": true
+  },
+  "p3-flash-full": {
+   "crop": [
+    0,
+    5,
+    32,
+    22
+   ],
+   "file": "themes/hev/icons/hud-hud-flash_full.png",
+   "mode": "lum",
+   "name": "hud hud flash full",
+   "native": [
+    32,
+    22
+   ],
+   "sha256": "d4fc542391794056605d1f3673ef186ff75da2d8443aa614570c02f63a6ad0f9",
+   "size": [
+    32,
+    22
+   ],
+   "source": {
+    "commit": "6ad155c7a610a85cfd443fcace2c97f2afcb2866",
+    "downloadUrl": "https://raw.githubusercontent.com/u3games/CS-Server/6ad155c7a610a85cfd443fcace2c97f2afcb2866/server/valve/sprites/640hud7.spr",
+    "kind": "archived-source-art",
+    "path": "server/valve/sprites/640hud7.spr",
+    "repo": "u3games/CS-Server"
+   },
+   "tier": "Archived source artwork",
+   "tinted": true
+  }
+ },
+ "states": {
+  "error": "p3-dmg-rad"
+ }
+}

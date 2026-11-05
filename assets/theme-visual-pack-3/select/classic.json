@@ -1,0 +1,5 @@
+{"picks":{
+ "p3-away":{"file":"themes/classic/icons/og-steam-resource-icon_away.tga.png","mode":"pixels"},
+ "p3-message":{"file":"themes/classic/icons/og-steam-resource-icon_message.tga.png","mode":"pixels"}
+},
+ "states":{"paused":"p3-away"}}

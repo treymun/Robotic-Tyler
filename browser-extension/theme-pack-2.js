@@ -2,6 +2,8 @@
 (() => {
  'use strict';
  const F=globalThis.TylerThemeFeatures;if(!F)return;
+ // v2.37: the first of these drawings the theme has (Pack 3's game artwork first, then the older packs').
+ const firstArt=(c,ids,cls)=>{for(const id of ids){const e=c.brand(id,cls);if(e)return e;}return null;};
 
  // ── Left 4 Dead: the survivor team and the Director's horde warning ───────
  F.define('l4d',[
@@ -13,8 +15,10 @@
     k.b.dataset.hp=hp>=70?'good':hp>=40?'hurt':hp>0?'critical':'down';
     // v2.28: the item each survivor carries, as on the team HUD: a first aid kit while healthy, pills
     // when hurt, adrenaline when critical, and down (incapacitated) when the part isn't working.
-    const kit=({good:'medkit',hurt:'pills',critical:'adrenaline',down:'incapacitated'})[k.b.dataset.hp];
-    if(k.kit!==kit){k.kit=kit;k.item.replaceChildren(...[c.brand(kit,'l4d-bi')].filter(Boolean));k.item.title=({medkit:'First aid kit',pills:'Pain pills',adrenaline:'Adrenaline',incapacitated:'Incapacitated'})[kit];}k.fill.style.width=hp+'%';k.note.textContent=s.level===0?'Down':s.detail;k.b.title=s.name+': '+s.detail+'. Opens '+c.TAB_NAMES[s.tab]+'.';}
+    // v2.37: a part that isn't working at all gets the skull from L4D's own dead-teammate HUD panel
+    // ("Deceased"), where the game shows it, instead of the drawn incapacitated survivor.
+    const kit=({good:'medkit',hurt:'pills',critical:'adrenaline',down:'deceased'})[k.b.dataset.hp];
+    if(k.kit!==kit){k.kit=kit;k.item.replaceChildren(...[kit==='deceased'?firstArt(c,['p3-deceased'],'l4d-bi l4d-dead')||c.brand('incapacitated','l4d-bi'):c.brand(kit,'l4d-bi')].filter(Boolean));k.item.title=({medkit:'First aid kit',pills:'Pain pills',adrenaline:'Adrenaline',deceased:'Deceased'})[kit];}k.fill.style.width=hp+'%';k.note.textContent=s.level===0?'Down':s.detail;k.b.title=s.name+': '+s.detail+'. Opens '+c.TAB_NAMES[s.tab]+'.';}
     box.dataset.incap=String(c.S.state==='error');}
    render();c.every(render);return {update:render};
   }},
@@ -40,6 +44,8 @@
    const icons={owner:c.h('span','xp-ti owner'),voice:c.h('span','xp-ti voice'),net:c.h('span','xp-ti net'),music:c.h('span','xp-ti music')};
    // v2.28: the tray's volume and network icons are XP's own (the branded pack); the others stay drawn.
    for(const [k,id] of [['voice','speaker'],['net','network']]){const bi=c.brand(id,'xp-ti-bi');if(bi){icons[k].classList.add('xp-ti-b');icons[k].append(bi);}}
+   // v2.37: the music icon is XP's own 16 x 16 Play icon (shell32 #246, its native frame), lit while a song plays.
+   {const bi=c.brand('p3-play','xp-ti-bi xp-ti-px');if(bi){icons.music.classList.add('xp-ti-b');icons.music.append(bi);}}
    for(const i of Object.values(icons))tray.append(i);tray.append(clock);foot.prepend(start);foot.append(tray);
    let menu=null;
    function close(){menu?.remove();menu=null;start.setAttribute('aria-expanded','false');}
@@ -54,7 +60,8 @@
     // My Computer, My Network Places, Help and Support, Turn Off. The others keep Pack 1's drawings.
     const XI={conversation:'information',room:'source-shell32-4',soundboard:'speaker',setup:'source-shell32-16',checks:'source-shell32-18'};
     for(const t of c.TABS)item(list,'xp-mi',c.TAB_NAMES[t],SUB[t],()=>c.actions.tab(t),XI[t]);
-    list.append(c.h('i','xp-menu-sep'));item(list,'xp-mi xp-all','All Programs','',()=>c.actions.settings());
+    // v2.37: All Programs ends in XP's green arrow (shell32's 16 x 16 Go icon) instead of a drawn triangle.
+    list.append(c.h('i','xp-menu-sep'));{const all=item(list,'xp-mi xp-all','All Programs','',()=>c.actions.settings()),go=c.brand('p3-go','xp-all-go');if(go){all.classList.add('xp-all-b');all.append(go);}}
     item(places,'xp-pl',"Tyler's Settings",'',c.actions.settings,'source-shell32-16');item(places,'xp-pl','Run full check','',c.actions.fullCheck,'source-shell32-18');item(places,'xp-pl','Stop audio','',c.actions.stopAudio,'speaker');places.append(c.h('i','xp-menu-sep'));item(places,'xp-pl','Help and Support','',()=>c.actions.tab('checks'),'source-shell32-24');
     cols.append(list,places);
     const off=c.h('div','xp-menu-foot'),logoff=c.h('button','xp-off xp-logoff','Log Off'),hide=c.h('button','xp-off','Turn Off');logoff.type=hide.type='button';logoff.title='Pause AI';hide.title='Collapse the panel';{const ti=c.brand('source-shell32-28','xp-off-bi');if(ti){hide.classList.add('xp-has-bi');hide.prepend(ti);}}
@@ -66,7 +73,8 @@
    // v2.22: balloon tips from the tray when something real happens: the call, the music, a problem fixed.
    let balloon=null,was={peers:0,music:''};
    function tip(icon,title,text){balloon?.remove();balloon=c.h('div','fx xp-balloon fx-interactive');balloon.setAttribute('role','status');const x=c.h('button','xp-bx','✕');x.type='button';x.setAttribute('aria-label','Close');x.onclick=()=>balloon?.remove();
-    const head=c.h('div','xp-bhead');head.append(c.brand(icon==='voice'?'speaker':'information','xp-bicon-bi')||c.h('span','xp-bicon '+icon),c.h('b',null,title),x);balloon.append(head,c.h('p',null,text));balloon.style.bottom=(c.panel.getBoundingClientRect().bottom-foot.getBoundingClientRect().top+6)+'px';c.flash(balloon,6000);}
+    // (XP SP2 balloons can carry the notifying tray icon: the music one shows the tray's Play icon.)
+    const head=c.h('div','xp-bhead');head.append(firstArt(c,icon==='music'?['p3-play','information']:[icon==='voice'?'speaker':'information'],'xp-bicon-bi')||c.h('span','xp-bicon '+icon),c.h('b',null,title),x);balloon.append(head,c.h('p',null,text));balloon.style.bottom=(c.panel.getBoundingClientRect().bottom-foot.getBoundingClientRect().top+6)+'px';c.flash(balloon,6000);}
    const balloons=(type,d)=>{const v=c.voice();
     if(v.peers>0&&!was.peers)tip('voice','Joined the voice call',v.peers+' '+(v.peers===1?'person':'people')+' in the call can hear Tyler now.');was.peers=v.peers;
     if(type==='music'&&d?.title&&d.title!==was.music)tip('music','Now playing',d.title.slice(0,80));if(type==='music')was.music=d?.title||'';
@@ -138,9 +146,12 @@
    let hits=0,flashes=0;
    const ouch=()=>{if(Date.now()<ouchUntil)return;ouchUntil=Date.now()+900;face.dataset.hits=String(++hits);if(c.reduced)return;face.dataset.flashes=String(flashes+=2);flash=true;void redraw();c.later(()=>{flash=false;void redraw();},140);c.later(()=>{flash=true;void redraw();},280);c.later(()=>{flash=false;void redraw();},420);};
    // v2.22: the key cards, like the status bar's: blue = AI key saved, yellow = chat linked, red = voice armed.
-   const keys=c.h('div','doom-keys');const cards={blue:c.h('i','doom-key blue'),yellow:c.h('i','doom-key yellow'),red:c.h('i','doom-key red')};for(const [k,el] of Object.entries(cards)){const bi=c.brand(k+'-keycard','doom-key-bi');if(bi){el.classList.add('doom-key-b');el.append(bi);}keys.append(el);}
-   // v2.28: the status bar's own pickups beside the numbers: the ammo for replies, the medikit for health.
-   for(const [cell,id] of [[ammo,'ammo'],[hp,'health']]){const bi=c.brand(id,'doom-cell-bi');if(bi)cell.prepend(bi);}
+   // v2.37: the key cards are the status bar's own STKEYS patches (7 x 5, drawn at twice their size).
+   const keys=c.h('div','doom-keys');const cards={blue:c.h('i','doom-key blue'),yellow:c.h('i','doom-key yellow'),red:c.h('i','doom-key red')};const KEY={blue:'p3-key-blue',yellow:'p3-key-yellow',red:'p3-key-red'};
+   for(const [k,el] of Object.entries(cards)){const px=c.brand(KEY[k],'doom-key-bi doom-key-px'),bi=px||c.brand(k+'-keycard','doom-key-bi');if(bi){el.classList.add('doom-key-b');if(px)el.classList.add('doom-key-pxb');el.append(bi);}keys.append(el);}
+   // v2.28: pickups beside the numbers: ammo for replies, a medikit for health. v2.37: DOOM's own
+   // pickup sprites (a box of bullets, the medikit) at their native size, beside the number.
+   for(const [cell,ids] of [[ammo,['p3-ammo-box','ammo']],[hp,['p3-medikit','health']]]){const bi=firstArt(c,ids,'doom-cell-bi');if(bi){if(bi.dataset.bi?.includes('/p3-')){bi.classList.add('doom-cell-px');cell.classList.add('doom-cell-row');}cell.prepend(bi);}}
    box.append(ammo,face,hp,keys);face.title='Tyler\'s status';
    function render(){ammoN.textContent=String(c.S.replies+c.S.spoken);const h=c.health(),t=Date.now();hpN.textContent=h+'%';
     if(h<lastH-4)ouch();lastH=h;
@@ -212,7 +223,10 @@
   }},
   {id:'qk-medals',mount(c){
    const counts={};let lastTurn=0;
-   function award(key,name){counts[key]=c.best('quake:'+key,(Number(c.life?.best?.['quake:'+key])||counts[key]||0)+1);const el=c.h('div','fx qk-medal '+key);el.append(c.brand(({impressive:'quad-damage',excellent:'quake-rune',perfect:'armor'})[key],'qk-medal-bi')||c.h('span','qk-medal-icon'),c.h('b',null,name),c.h('small',null,'×'+counts[key]));el.setAttribute('role','status');c.flash(el,1700);}
+   // v2.37: each medal carries one of Quake's own status bar icons (gfx.wad, 16 px, drawn at twice that):
+   // the Quad Damage, a rune and the Pentagram of Protection.
+   const ICON={impressive:['p3-quad','quad-damage'],excellent:['p3-sigil','quake-rune'],perfect:['p3-invuln','armor']};
+   function award(key,name){counts[key]=c.best('quake:'+key,(Number(c.life?.best?.['quake:'+key])||counts[key]||0)+1);const el=c.h('div','fx qk-medal '+key);const bi=firstArt(c,ICON[key],'qk-medal-bi');if(bi?.dataset.bi?.includes('/p3-'))bi.classList.add('qk-medal-px');el.append(bi||c.h('span','qk-medal-icon'),c.h('b',null,name),c.h('small',null,'×'+counts[key]));el.setAttribute('role','status');c.flash(el,1700);}
    return {update(type,d){if(type!=='turn')return;const t=Date.now();
     if(d.ms<1200)award('impressive','Impressive');else if(lastTurn&&t-lastTurn<10000)award('excellent','Excellent');
     if(c.S.streak&&c.S.streak%5===0)award('perfect','Perfect');lastTurn=t;}};
@@ -232,8 +246,9 @@
   }},
   {id:'pb-gauges',mount(c){
    const box=c.add('deck',c.h('div','fx pb-gauges'));
-   const gauge=(label,title,icon)=>{const g=c.h('div','pb-gauge');g.title=title;const dial=c.svg('<svg viewBox="0 0 100 60"><path class="pb-arc" d="M10 55 A40 40 0 0 1 90 55"/><path class="pb-ticks" d="M10 55 A40 40 0 0 1 90 55"/><line class="pb-needle" x1="50" y1="55" x2="50" y2="20"/><circle cx="50" cy="55" r="4"/></svg>');const v=c.h('b'),l=c.h('small',null,label);const bi=c.brand(icon,'pb-gauge-bi');if(bi)l.prepend(bi);g.append(dial,l,v);box.append(g);return {g,v,needle:dial.querySelector('.pb-needle')};};
-   const resp=gauge('RESP','Last reply time (0 to 5 s)','atomic'),rad=gauge('RADS','Text spend this session (reported by provider)','radiation');
+   const gauge=(label,title,icons)=>{const g=c.h('div','pb-gauge');g.title=title;const dial=c.svg('<svg viewBox="0 0 100 60"><path class="pb-arc" d="M10 55 A40 40 0 0 1 90 55"/><path class="pb-ticks" d="M10 55 A40 40 0 0 1 90 55"/><line class="pb-needle" x1="50" y1="55" x2="50" y2="20"/><circle cx="50" cy="55" r="4"/></svg>');const v=c.h('b'),l=c.h('small',null,label);const bi=firstArt(c,icons,'pb-gauge-bi');if(bi)l.prepend(bi);g.append(dial,l,v);box.append(g);return {g,v,needle:dial.querySelector('.pb-needle')};};
+   // v2.37: RADS carries Fallout 4's own radiation symbol (its map marker for a radioactive area).
+   const resp=gauge('RESP','Last reply time (0 to 5 s)',['atomic']),rad=gauge('RADS','Text spend this session (reported by provider)',['p3-radiation','radiation']);
    const cnd=c.h('div','pb-cnd');cnd.title='Condition: Tyler\'s health';const fill=c.h('i'),track=c.h('span');track.append(fill);cnd.append(c.h('small',null,'CND'),track);box.append(cnd);
    // v2.22: CND opens the condition screen: each part of Tyler with its own bar, like the limbs.
    cnd.tabIndex=0;cnd.setAttribute('role','button');cnd.title='Condition: Tyler\'s health. Click for each part.';
@@ -248,7 +263,8 @@
   {id:'pb-radio',mount(c){
    const box=c.add('deck',c.h('div','fx pb-radio'));box.hidden=true;
    const wave=c.svg('<svg viewBox="0 0 120 24" preserveAspectRatio="none"><path d="M0 12 Q7.5 0 15 12 T30 12 T45 12 T60 12 T75 12 T90 12 T105 12 T120 12"/></svg>','pb-wave');
-   const title=c.h('span','pb-song');{const fm=c.h('b',null,'Tyler FM');const ri=c.brand('radio','pb-radio-bi');if(ri)fm.prepend(ri);box.append(fm,wave,title);}
+   // v2.37: the station's mark is Fallout 4's own radio tower (its map marker for one).
+   const title=c.h('span','pb-song');{const fm=c.h('b',null,'Tyler FM');const ri=firstArt(c,['p3-radio-tower','radio'],'pb-radio-bi');if(ri)fm.prepend(ri);box.append(fm,wave,title);}
    // v2.22: the radio's own buttons: skip the song or switch the station off (the Music DJ's controls).
    const ctl=c.h('span','pb-ctl'),skip=c.h('button',null,'SKIP'),off=c.h('button',null,'OFF');skip.type=off.type='button';skip.title='Skip this song (Music DJ: Skip now)';off.title='Stop the music and the sharing';
    skip.onclick=()=>c.root.getElementById('musicSkip')?.click();off.onclick=()=>c.root.getElementById('musicEnd')?.click();ctl.append(skip,off);box.append(ctl);
@@ -259,6 +275,9 @@
 
  // ── Combine: the Overwatch dispatch ticker and biosignal scans ────────────
  const DISPATCH={ready:'Overwatch acknowledges. Unit ROBOTIC TYLER on standby for dispatch',listening:'Biosignal audio detected. Unit monitoring',thinking:'Unit composing response. Stand by',speaking:'Unit transmitting on voice band',waiting:'Unit recalibrating. Hold position',error:'Anticitizen data anomaly. Unit requires inspection',paused:'Unit suspended by sector control',standby:'Secondary unit holds jurisdiction'};
+ // v2.37: one figure from HL2's HUD font (the squad status figure, halflife2.ttf "C") per person in the
+ // voice call, after the count (at most 8; the count stays the text). Null when there's no one, or no drawing.
+ function subjects(c,n){n=Math.min(8,Math.max(0,Number(n)||0));if(!n||!c.brand('p3-citizen'))return null;const row=c.h('span','cb-subjects');row.setAttribute('aria-hidden','true');for(let i=0;i<n;i++)row.append(c.brand('p3-citizen','cb-subject-bi'));return row;}
  const CB_CODE={ready:'10-8',listening:'10-8',thinking:'10-6',speaking:'11-6',waiting:'10-20',error:'10-108',paused:'10-7',standby:'10-7'};
  F.define('combine',[
   {id:'cb-dispatch',mount(c){
@@ -287,7 +306,7 @@
     const head=c.h('div','cb-term-head');{const ins=c.brand('combine-insignia','cb-term-bi');if(ins)head.append(ins);}head.append(c.h('b',null,'UNIT ROBOTIC TYLER'),c.h('span',null,'SECTOR STATUS: '+(S.state==='error'?'NON-COMPLIANT':'COMPLIANT')));
     const gauge=c.h('div','cb-socio');gauge.dataset.level=hp>=80?'stable':hp>=50?'marginal':'critical';const meter=c.h('span','cb-socio-bar');for(let i=0;i<20;i++){const seg=c.h('i');if(i<Math.round(hp/5))seg.className='on';meter.append(seg);}
     gauge.append(c.h('small',null,'SOCIOSTABILITY'),meter,c.h('b',null,(hp>=80?'STABLE':hp>=50?'MARGINAL':'CRITICAL')+' · '+hp+'%'));
-    const facts=c.h('div','cb-term-facts');for(const [k,val] of [['RESPONSES',L?L.replies+L.spoken:S.replies+S.spoken],['CITIZENS HEARD',L?L.heard:S.heard],['VIOLATIONS',L?L.errors:S.errors],['SUBJECTS ON BAND',v.peers],['AVG RESPONSE',c.ms(c.avgTurn())],['DEPLOYMENTS',L?L.sessions:1]]){const f=c.h('div');f.append(c.h('small',null,k),c.h('b',null,String(val)));facts.append(f);}
+    const facts=c.h('div','cb-term-facts');for(const [k,val] of [['RESPONSES',L?L.replies+L.spoken:S.replies+S.spoken],['CITIZENS HEARD',L?L.heard:S.heard],['VIOLATIONS',L?L.errors:S.errors],['SUBJECTS ON BAND',v.peers],['AVG RESPONSE',c.ms(c.avgTurn())],['DEPLOYMENTS',L?L.sessions:1]]){const f=c.h('div');f.append(c.h('small',null,k),c.h('b',null,String(val)));if(k==='SUBJECTS ON BAND'){const fig=subjects(c,v.peers);if(fig)f.querySelector('b').append(fig);}facts.append(f);}
     const log=c.h('div','cb-term-log');log.setAttribute('role','log');for(const e of S.log.slice(-10).reverse()){const r=c.h('div');if(e.kind==='error')r.className='bad';r.append(c.h('span',null,new Date(e.at).toLocaleTimeString([],{hour12:false})),c.h('i',null,code(e.kind)),c.h('span',null,e.text.toUpperCase()));log.append(r);}
     if(!S.log.length)log.append(c.h('div',null,'NO DISPATCHES THIS SHIFT'));
     const row=c.h('div','cb-term-row'),ins=c.h('button','cb-term-close','Inspect sector'),x=c.h('button','cb-term-close','Close terminal');ins.type=x.type='button';ins.title='Run the full check';ins.onclick=()=>{close();c.actions.fullCheck();};x.onclick=close;row.append(ins,x);
@@ -309,7 +328,8 @@
      paused?{mark:'▶',label:'Deploy unit',hint:'Connect & start',run:c.actions.connect}:{mark:'❚❚',label:'Suspend unit',hint:'Pause AI',run:c.actions.pause},
      {mark:'◎',icon:'checkpoint',label:'Inspect sector',hint:'Full check',run:c.actions.fullCheck},
      {mark:'≋',icon:'radio',label:'Re-scan voice band',hint:'Voice check',run:c.actions.refreshVoice},
-     {mark:'■',icon:'stun-baton',label:'Silence audio',hint:'Stop audio',run:c.actions.stopAudio},
+     // v2.37: HL2's own HUD icon for the Civil Protection stunstick (halflife2.ttf), where it has one.
+     {mark:'■',icon:c.brand('p3-stunstick')?'p3-stunstick':'stun-baton',label:'Silence audio',hint:'Stop audio',run:c.actions.stopAudio},
      'sep',{mark:'▤',label:'Unit record',hint:'T',run:()=>c.panel.dispatchEvent(new CustomEvent('tyler-fx',{detail:'cb-terminal'}))},
      {mark:'⚙',icon:'civil-protection-mask',label:'Overwatch config',hint:'Settings',run:c.actions.settings}],{cls:'cb-menu',label:'Overwatch directives',align:'right'});};
    render();return {update(type){if(type==='state')render();if(type==='chat')snap();}};
@@ -317,7 +337,7 @@
   {id:'cb-scan',mount(c){
    let last=0;
    return {update(type,d){if(type!=='state'||d.state===d.before)return;
-    if(d.state==='listening'&&Date.now()-last>15000&&!c.reduced){last=Date.now();const v=c.voice(),scan=c.h('div','fx cb-scan');scan.style.setProperty('--cb-top',(c.below('#activityCard')-12)+'px');scan.append(c.h('i'),...[c.brand('scanner','cb-scan-bi')].filter(Boolean),c.h('b',null,'Biosignal scan: '+(v.peers||'no')+' subject'+(v.peers===1?'':'s')+' in call'));c.flash(scan,2000);}
+    if(d.state==='listening'&&Date.now()-last>15000&&!c.reduced){last=Date.now();const v=c.voice(),scan=c.h('div','fx cb-scan');scan.style.setProperty('--cb-top',(c.below('#activityCard')-12)+'px');const line=c.h('b',null,'Biosignal scan: '+(v.peers||'no')+' subject'+(v.peers===1?'':'s')+' in call');{const fig=subjects(c,v.peers);if(fig)line.append(fig);}scan.append(c.h('i'),...[c.brand('scanner','cb-scan-bi')].filter(Boolean),line);c.flash(scan,2000);}
     if(d.state==='error'){const a=c.h('div','fx cb-alert'),band=c.h('div','cb-alert-band');band.style.top=(c.below('.tabs')+4)+'px';band.append(...[c.brand('alert','cb-alert-bi')].filter(Boolean),c.h('b',null,'Anomaly'),c.h('i',null,'10-108'),c.h('span',null,(d.text||'Unit requires inspection').slice(0,90)));a.append(band);c.flash(a,3200);}}};
   }},
  ]);
@@ -359,9 +379,10 @@
    left.tabIndex=0;left.setAttribute('role','button');left.setAttribute('aria-haspopup','dialog');left.title='Souls: tokens Tyler has used (1 soul per 10 tokens). Click for the shop (B).';
    const CATS=[['weapon','Weapon'],['vitality','Vitality'],['spirit','Spirit']];let cat='weapon',o=null;
    function items(k){const S=c.S,v=c.voice(),snd=c.actions.sounds(),paused=c.actions.paused(),fav=snd.favorites.map(n=>snd.slots.find(x=>x.slot===n)).find(Boolean);
+    // v2.37: Deadlock's max health symbol on Checks, and Paradox's Time Wall (it stops time) on Pause AI.
     if(k==='weapon')return [['Soundboard',snd.slots.length+' clips · '+S.sounds+' played',c.brand('source-ammo-icon')?'bi:source-ammo-icon':'◆',()=>c.actions.tab('soundboard')],fav?['Quick cast',fav.name,'bi:spirit-flame',()=>c.actions.playSound(fav.slot)]:['Quick cast','Star a clip in Sounds first','bi:spirit-flame',null],['Silence','Stops clips, music and voice','■',c.actions.stopAudio]];
-    if(k==='vitality')return [['Full check','Health '+c.health()+'%',c.brand('source-health-regen-icon')?'bi:source-health-regen-icon':'✚',c.actions.fullCheck],['Voice check',v.armed?(v.peers?v.peers+' in the call':'Armed, call empty'):'Microphone off','bi:spectral-radio',c.actions.refreshVoice],['Checks','Problems and fixes','☰',()=>c.actions.tab('checks')]];
-    return [[paused?'Connect & start':'Pause AI',S.label||'Ready','❚',paused?c.actions.connect:c.actions.pause],['Setup',S.model||(S.keyOk===false?'No AI key saved':'Chat and AI'),'bi:patron-totem',()=>c.actions.tab('setup')],['Settings','Voice, theme and keys','✧',c.actions.settings]];}
+    if(k==='vitality')return [['Full check','Health '+c.health()+'%',c.brand('source-health-regen-icon')?'bi:source-health-regen-icon':'✚',c.actions.fullCheck],['Voice check',v.armed?(v.peers?v.peers+' in the call':'Armed, call empty'):'Microphone off','bi:spectral-radio',c.actions.refreshVoice],['Checks','Problems and fixes',c.brand('p3-max-health')?'bi:p3-max-health':'☰',()=>c.actions.tab('checks')]];
+    return [[paused?'Connect & start':'Pause AI',S.label||'Ready',!paused&&c.brand('p3-time-wall')?'bi:p3-time-wall':'❚',paused?c.actions.connect:c.actions.pause],['Setup',S.model||(S.keyOk===false?'No AI key saved':'Chat and AI'),'bi:patron-totem',()=>c.actions.tab('setup')],['Settings','Voice, theme and keys','✧',c.actions.settings]];}
    function render(focusTab){if(!o)return;const el=o.el;el.replaceChildren();el.dataset.cat=cat;
     const head=c.h('div','dl-shop-head');const bank=c.h('span','dl-shop-bank');bank.append(c.brand('soul-currency','dl-orb-bi')||c.h('i','dl-orb'),c.h('b',null,(c.root.querySelector('.dl-souls')?.textContent||'0')));head.append(c.h('b',null,'Shop'),bank);
     const tabs=c.h('div','dl-shop-tabs');tabs.setAttribute('role','tablist');

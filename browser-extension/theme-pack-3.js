@@ -6,12 +6,21 @@
  // v2.22: a music disc for the inventory (a 14×14 pixel circle) and the label colours it takes.
  const MC_DISC=(()=>{let d='';for(let y=0;y<14;y++){const r=Math.sqrt(Math.max(0,49-(y-6.5)**2)),a=Math.round(7-r),b=Math.round(7+r);if(b>a)d+='M'+a+' '+y+'h'+(b-a)+'v1h-'+(b-a)+'z';}return d;})();
  const MC_LABELS=['#e0b42c','#d9483b','#4cb84c','#3a8fd6','#b45ad6','#e07b2c','#3fc8c8','#e85ca0','#9acd32'];
+ // v2.37 (Pack 3): the game's own sprites. The HUD's hearts and hunger shanks from gui/icons.png (container,
+ // the container's hurt flash, full and half), and the 1.8.8 music discs (items/record_*.png) for the
+ // inventory, one per sound as the label colours were. Each falls back to the drawing above without them.
+ const MC_HUD={hearts:['p3-heart-empty','p3-heart-flash','p3-heart-full','p3-heart-half'],food:['p3-food-empty','','p3-food-full','p3-food-half']};
+ const MC_RECORDS=['p3-record-13','p3-record-cat','p3-record-chirp','p3-record-far','p3-record-mall','p3-record-stal','p3-record-strad','p3-record-wait','p3-record-ward'];
+ // Each <i> keeps its container, the flash (hearts only) and both fills; CSS shows the one its data-v asks for.
+ function mcSprites(c,row,[empty,flash,full,half]){if(!c.brand(empty))return;row.classList.add('mc-p3');
+  for(const i of row.children)for(const [id,k] of [[empty,'mc-c'],[flash,'mc-f'],[full,'mc-full'],[half,'mc-half']])if(id){const e=c.brand(id,'mc-bi '+k);if(e)i.append(e);}}
  // ── Minecraft: hearts, hunger and XP, and block-breaking while thinking ───
  F.define('minecraft',[
   {id:'mc-status',mount(c){
    const box=c.add('deck',c.h('div','fx mc-status'));
    const hearts=c.h('span','mc-row mc-hearts'),food=c.h('span','mc-row mc-food'),xp=c.h('div','mc-xp'),fill=c.h('i'),lvl=c.h('b','mc-level');
    for(let i=0;i<10;i++){hearts.append(c.h('i'));food.append(c.h('i'));}
+   mcSprites(c,hearts,MC_HUD.hearts);mcSprites(c,food,MC_HUD.food);
    xp.append(fill,lvl);const top=c.h('div','mc-top');top.append(hearts,food);box.append(top,xp);
    hearts.title='Health: Tyler\'s connection health';food.title='Hunger: what\'s left of your spending cap (full when no cap is set)';xp.title='Experience: replies';
    let cap=0,level=-1;
@@ -36,10 +45,10 @@
    let o=null,tipEl=null,bar=[];
    const chest=c.add('bar',c.h('button','fx mc-chest'));chest.type='button';chest.title='Inventory: Tyler\'s sounds as music discs (E)';chest.setAttribute('aria-label','Open the inventory');chest.setAttribute('aria-haspopup','dialog');
    chest.append(c.svg('<svg viewBox="0 0 12 11" shape-rendering="crispEdges"><path fill="#2a1a0a" d="M0 0h12v11H0z"/><path fill="#9c6a2f" d="M1 1h10v3H1zM1 5h10v5H1z"/><path fill="#c48a44" d="M1 1h10v1H1zM1 5h10v1H1z"/><path fill="#d8d8d8" d="M5 3h2v4H5z"/><path fill="#2a1a0a" d="M5 4h2v1H5z"/></svg>'));
-   const label=n=>{let x=0;for(const ch of String(n))x=(x*31+ch.charCodeAt(0))>>>0;return MC_LABELS[x%MC_LABELS.length];};
+   const hash=n=>{let x=0;for(const ch of String(n))x=(x*31+ch.charCodeAt(0))>>>0;return x;},label=n=>MC_LABELS[hash(n)%MC_LABELS.length];
    const tip=t=>{if(tipEl)tipEl.textContent=t;};
    function slot(s,i,hot,favs){const b=c.h('button','mc-slot');b.type='button';if(!s){b.disabled=true;b.setAttribute('aria-label','Empty slot');return b;}
-    b.append(c.svg('<svg viewBox="0 0 14 14" shape-rendering="crispEdges"><path fill="#1b1b1b" d="'+MC_DISC+'"/><path fill="#333" d="M2 6h1v2H2zM11 6h1v2h-1zM6 2h2v1H6zM6 11h2v1H6z"/><path fill="'+label(s.name)+'" d="M5 5h4v4H5z"/><path fill="#1b1b1b" d="M6 6h2v2H6z"/><path fill="#7a7a7a" d="M3 3h1v1H3zM4 2h2v1H4z"/></svg>','mc-disc'));
+    b.append(c.brand(MC_RECORDS[hash(s.name)%MC_RECORDS.length],'mc-disc mc-disc-p3')||c.svg('<svg viewBox="0 0 14 14" shape-rendering="crispEdges"><path fill="#1b1b1b" d="'+MC_DISC+'"/><path fill="#333" d="M2 6h1v2H2zM11 6h1v2h-1zM6 2h2v1H6zM6 11h2v1H6z"/><path fill="'+label(s.name)+'" d="M5 5h4v4H5z"/><path fill="#1b1b1b" d="M6 6h2v2H6z"/><path fill="#7a7a7a" d="M3 3h1v1H3zM4 2h2v1H4z"/></svg>','mc-disc'));
     if(hot)b.append(c.h('small',null,String(i+1)));const fav=favs.includes(s.slot);
     b.setAttribute('aria-label','Play '+s.name+(hot?', hotbar '+(i+1):''));b.title=s.name+(fav?' ★':'');
     b.onmouseenter=b.onfocus=()=>tip(s.name+(fav?' ★ favourite':'')+(hot?' · '+(i+1):''));
@@ -83,10 +92,14 @@
    const title=c.h('div','pd-title');const status=c.h('b');title.append(c.h('small',null,'Heist plan'),status);box.append(title);
    // v2.22: the drill. While Tyler writes, a drill timer runs to his usual reply time; past twice that,
    // "The drill's jammed!"; then "Drill done".
-   const drill=c.h('div','pd-drill'),bar=c.h('span','pd-drill-bar'),fill=c.h('i'),dt=c.h('small');bar.append(fill);{const dl=c.h('b',null,'Drill'),di=c.brand('drill','pd-drill-bi');if(di)dl.prepend(di);drill.append(dl,bar,dt);}box.append(drill);
+   // v2.37 (Pack 3): the drill's label carries PAYDAY 2's own drill-and-timer glyph (the Drill Sawgeant
+   // skill icon from the game's skill atlas) in place of the drawn drill.
+   const drill=c.h('div','pd-drill'),bar=c.h('span','pd-drill-bar'),fill=c.h('i'),dt=c.h('small');bar.append(fill);{const dl=c.h('b',null,'Drill'),di=c.brand('p3-skill-drill-sawgeant','pd-drill-bi pd-drill-p3')||c.brand('drill','pd-drill-bi');if(di)dl.prepend(di);drill.append(dl,bar,dt);}box.append(drill);
    const row=c.h('div','pd-steps');box.append(row);
    const PD_GEAR=['loot-bag','stealth-ghost','drill','dallas-mask'];
-   defs.forEach(([name,detail,tab],i)=>{const b=c.h('button','pd-step');b.type='button';const n=c.h('small',null,String(i+1)),gear=c.brand(PD_GEAR[i],'pd-step-bi');b.append(n);if(gear)b.append(gear);b.append(c.h('b',null,name),c.h('span',null,detail));b.onclick=()=>c.actions.tab(tab);row.append(b);steps.push(b);});
+   // v2.37 (Pack 3): each step's number has PAYDAY 2's brush-stroke tick box, ticked when the step is really done.
+   const tick=()=>{const a=c.brand('p3-tickbox','pd-tick-bi pd-tick-off'),b=c.brand('p3-tickbox-ticked','pd-tick-bi pd-tick-on');if(!a||!b)return null;const t=c.h('span','pd-tick');t.append(a,b);return t;};
+   defs.forEach(([name,detail,tab],i)=>{const b=c.h('button','pd-step');b.type='button';const n=c.h('small',null,String(i+1)),gear=c.brand(PD_GEAR[i],'pd-step-bi'),tb=tick();if(tb){n.append(tb);b.classList.add('pd-p3');}b.append(n);if(gear)b.append(gear);b.append(c.h('b',null,name),c.h('span',null,detail));b.onclick=()=>c.actions.tab(tab);row.append(b);steps.push(b);});
    let jam=0,done=0;
    function render(){let first=-1;defs.forEach((d,i)=>{const ok=d[3]();steps[i].dataset.done=String(ok);if(!ok&&first<0)first=i;steps[i].dataset.next=String(i===first);});status.textContent=first<0?'Ready. Go loud.':'Next: '+defs[first][0];box.dataset.ready=String(first<0);}
    function drillState(st){c.cancel(jam);
@@ -136,11 +149,19 @@
  const VMU_ICON={ready:'M2 6h12v6H2zM4 4h8v2H4zM6 8h1v1H6zM9 8h1v1H9z',listening:'M7 2h2v7H7zM5 7h1v2H5zM10 7h1v2h-1zM6 10h4v1H6zM7.5 11h1v2h-1z',thinking:'M2 7h2v2H2zM7 7h2v2H7zM12 7h2v2h-2z',speaking:'M3 6h3v4H3zM6 5h1v6H6zM7 4h1v8H7zM10 6h1v4h-1zM12 4h1v8h-1z',error:'M3 3h2v2H3zM5 5h2v2H5zM7 7h2v2H7zM9 9h2v2H9zM11 11h2v2h-2zM11 3h2v2h-2zM9 5h2v2H9zM5 9h2v2H5zM3 11h2v2H3z',waiting:'M5 2h6v2H5zM6 4h4v2H6zM7 6h2v4H7zM6 10h4v2H6zM5 12h6v2H5z',paused:'M4 3h3v10H4zM9 3h3v10H9z',standby:'M4 4h8v1H4zM9 5h2v1H9zM8 6h2v1H8zM7 7h2v1H7zM6 8h2v1H6zM5 9h2v1H5zM4 10h8v1H4z'};
  const DC_BIOS={play:'M4 2h2v1h2v1h2v1h2v1h2v4h-2v1h-2v1H8v1H6v1H4z',file:'M3 1h7l3 3v11H3zM5 6h6v1H5zM5 8h6v1H5zM5 10h6v1H5zM5 12h4v1H5z',music:'M6 1h8v10h-1v2h-3v-3h2V4H8v8H7v2H3v-3h3z',settings:'M7 1h2v2h2v1h1v2h2v2h-2v2h-1v1H9v2H7v-2H5v-1H4V8H2V6h2V4h1V3h2zM7 6v3h2V6z'};
  const DC_FILE={reply:'M2 3h12v8H8l-3 3v-3H2zM4 6h8v1H4zM4 8h5v1H4z',heard:'M2 4h12v9H2zM3 5v1h1v1h1v1h1v1h4V8h1V7h1V6h1V5zM3 12h10V8h-1v1h-1v1H5V9H4V8H3z',sound:'M2 6h3l3-3h1v10H8l-3-3H2zM11 5h1v6h-1zM13 3h1v10h-1z',song:'M6 2h8v9h-1v2h-3v-3h2V5H8v7H7v2H3v-3h3z',session:'M3 5h10v1h1v5h-1v1h-3v-1H6v1H3v-1H2V6h1zM4 7v1H3v1h1v1h1V9h1V8H5V7zM10 7h1v1h-1zM12 8h1v1h-1zM10 9h1v1h-1z',hours:'M5 1h6v1h2v2h1v8h-1v2h-2v1H5v-1H3v-2H2V4h1V2h2zM7 4v5h4V8H8V4z'};
+ // v2.37 (Pack 3): the Dreamcast BIOS's own 32 × 32 VMU LCD icons. The hourglass it shows while it works
+ // (four frames) and the invalid-VMU sign on the big VMU screen while Tyler thinks or has a problem, and
+ // a BIOS VMU icon for each save file on the memory card.
+ const DC_HOUR=['p3-vmu-hourglass-1','p3-vmu-hourglass-2','p3-vmu-hourglass-3','p3-vmu-hourglass-4'];
+ const DC_FILE_P3={reply:'p3-vmu-pencil',heard:'p3-vmu-telephone',sound:'p3-vmu-bell',song:'p3-vmu-note',session:'p3-vmu-vmu',hours:'p3-vmu-clock'};
  F.define('dreamcast',[
   {id:'dc-vmu',mount(c){
    const tally=c.root.getElementById('activityCard');
    const lcd=c.h('div','fx dc-lcd');lcd.setAttribute('aria-hidden','true');
-   const icon=c.svg('<svg viewBox="0 0 16 16" shape-rendering="crispEdges"><path/></svg>','dc-icon');const right=c.h('div','dc-lcd-right'),clock=c.h('b'),count=c.h('small');right.append(clock,count);lcd.append(icon,right);tally.append(lcd);
+   const icon=c.svg('<svg viewBox="0 0 16 16" shape-rendering="crispEdges"><path/></svg>','dc-icon');const right=c.h('div','dc-lcd-right'),clock=c.h('b'),count=c.h('small');right.append(clock,count);lcd.append(icon);
+   const hour=DC_HOUR.map(id=>c.brand(id,'dc-icon dc-icon-p3')).filter(Boolean),invalid=c.brand('p3-vmu-invalid','dc-icon dc-icon-p3');
+   const art=[...(hour.length===4?hour:[]),...(invalid?[invalid]:[])];for(const e of art){e.style.display='none';lcd.append(e);}
+   lcd.append(right);tally.append(lcd);let frame=0;
    // The VMU in the controller: a small one in the header, the big screen when the panel is collapsed.
    const vmu=c.add('bar',c.h('button','fx dc-vmu'));vmu.type='button';vmu.title='VMU: Tyler\'s status. Click to collapse into the VMU.';vmu.setAttribute('aria-label','Collapse into the VMU');
    const small=c.svg('<svg viewBox="0 0 16 16" shape-rendering="crispEdges"><path/></svg>','dc-vmu-icon');const screen=c.h('span','dc-vmu-lcd');screen.append(small);vmu.append(screen,c.h('i','dc-vmu-a'),c.h('i','dc-vmu-b'));vmu.title='VMU: Tyler\'s status. Click for his memory card.';vmu.setAttribute('aria-label','Open Tyler\'s memory card');
@@ -156,7 +177,7 @@
     const info=c.h('div','dc-info');const show=(name,value,blocks)=>{info.replaceChildren(c.h('b',null,name.toUpperCase()),c.h('span',null,String(value)),c.h('small',null,blocks+' BLOCK'+(blocks===1?'':'S')));};
     const files=[['Replies',L?L.replies+L.spoken:S.replies+S.spoken,'#ff6a00','reply'],['Heard',L?L.heard:S.heard,'#1e88e5','heard'],['Sounds',L?L.sounds:S.sounds,'#43a047','sound'],['Songs',L?L.songs:(S.music?1:0),'#8e24aa','song'],['Sessions',L?L.sessions:1,'#fdd835','session'],['Hours',L?(L.timeMs/36e5).toFixed(1):'—','#00acc1','hours']];
     files.forEach(([name,value,color,k],n)=>{const f=c.h('button','dc-file');f.type='button';f.style.setProperty('--file',color);const blocks=Math.max(1,Math.ceil(String(value).length/2));
-     f.append(c.svg('<svg viewBox="0 0 16 16" shape-rendering="crispEdges"><path fill-rule="evenodd" d="'+DC_FILE[k]+'"/></svg>','dc-file-icon'),c.h('small',null,name),c.h('b',null,String(value)));f.onmouseenter=f.onfocus=()=>show(name,value,blocks);
+     f.append(c.brand(DC_FILE_P3[k],'dc-file-icon dc-file-p3')||c.svg('<svg viewBox="0 0 16 16" shape-rendering="crispEdges"><path fill-rule="evenodd" d="'+DC_FILE[k]+'"/></svg>','dc-file-icon'),c.h('small',null,name),c.h('b',null,String(value)));f.onmouseenter=f.onfocus=()=>show(name,value,blocks);
      f.onkeydown=e=>{const d={ArrowRight:1,ArrowLeft:-1,ArrowDown:3,ArrowUp:-3}[e.key];if(d){e.preventDefault();grid.children[(n+d+files.length)%files.length].focus();}};grid.append(f);});
     show(files[0][0],files[0][1],1);
     const blocks=L?Math.max(0,200-Math.min(200,Math.ceil(JSON.stringify(L).length/128))):200;
@@ -168,9 +189,14 @@
    // v2.22: the VMU screens redraw with a quick LCD refresh when Tyler's state changes, and the clock's
    // colon blinks like the VMU's own.
    let lastState=c.S.state,tick=0;
-   function render(){const d=VMU_ICON[c.S.state]||VMU_ICON.ready;icon.querySelector('path').setAttribute('d',d);small.querySelector('path').setAttribute('d',d);const t=new Date();tick++;clock.textContent=String(t.getHours()).padStart(2,'0')+(tick%2?':':' ')+String(t.getMinutes()).padStart(2,'0');count.textContent='RPL '+c.pad(c.S.replies+c.S.spoken,3);vmu.dataset.state=c.S.state;
+   // The big screen's BIOS art: the hourglass while Tyler works (a frame a second, the first one only
+   // with reduced motion), the invalid-VMU sign on a problem; the drawn icons for every other state.
+   function lcdArt(step){const st=c.S.state,busy=hour.length===4&&(st==='thinking'||st==='waiting'),bad=!!invalid&&st==='error';
+    frame=busy&&step&&!c.reduced?(frame+1)%4:busy?frame:0;if(c.reduced)frame=0;
+    const on=busy?hour[frame]:bad?invalid:null;for(const e of art)e.style.display=e===on?'':'none';icon.style.display=on?'none':'';}
+   function render(step){const d=VMU_ICON[c.S.state]||VMU_ICON.ready;icon.querySelector('path').setAttribute('d',d);small.querySelector('path').setAttribute('d',d);lcdArt(step===true);const t=new Date();tick++;clock.textContent=String(t.getHours()).padStart(2,'0')+(tick%2?':':' ')+String(t.getMinutes()).padStart(2,'0');count.textContent='RPL '+c.pad(c.S.replies+c.S.spoken,3);vmu.dataset.state=c.S.state;
     if(c.S.state!==lastState){lastState=c.S.state;if(!c.reduced)for(const el of [screen,lcd]){el.classList.remove('dc-refresh');void el.offsetWidth;el.classList.add('dc-refresh');}}}
-   render();c.every(render);return {update:render,unmount(){lcd.remove();close();}};
+   render();c.every(()=>render(true));return {update:()=>render(),unmount(){lcd.remove();close();}};
   }},
   {id:'dc-swirl',mount(c){
    const play=()=>{if(c.reduced)return;const s=c.h('div','fx dc-swirl');s.append(c.brand('dreamcast-swirl','dc-swirl-bi')||c.svg('<svg viewBox="0 0 100 100"><path d="M50 50 m0 -6 a6 6 0 1 1 -6 6 a12 12 0 0 1 12 -12 a18 18 0 1 1 -18 18 a24 24 0 0 1 24 -24 a30 30 0 1 1 -30 30"/></svg>'));c.flash(s,1300);};
@@ -189,7 +215,12 @@
    return {update(type,d){if(type!=='state'||d.state!=='error'||d.before==='error')return;box?.remove();
     const msg=(d.text||'problem').replace(/\s+/g,' ').slice(0,120),t=Date.now();repeat=msg===lastMsg&&t-lastAt<60000?repeat+1:1;lastMsg=msg;lastAt=t;
     box=c.h('div','fx gm-lua fx-interactive');box.style.top=(c.below('.tabs')+4)+'px';box.setAttribute('role','status');box.title='Click for the Checks tab';
-    box.append(c.h('b',null,'[ROBOTIC TYLER] lua/tyler/reply.lua:'+(40+c.S.errors)+': '+msg+(repeat>1?' (x'+repeat+')':'')),c.h('span',null,'  1. unknown - Checks tab has the details'),c.h('span',null,'   2. Run checks - [C]:-1'));
+    const lines=[c.h('b',null,'[ROBOTIC TYLER] lua/tyler/reply.lua:'+(40+c.S.errors)+': '+msg+(repeat>1?' (x'+repeat+')':'')),c.h('span',null,'  1. unknown - Checks tab has the details'),c.h('span',null,'   2. Run checks - [C]:-1')];
+    // v2.37 (Pack 3): above the console lines, Garry's Mod's own script-error notice (lua/menu/errors.lua):
+    // a light Derma box with the Silk icon16/error.png, which flashes yellow when the error comes back.
+    const silk=c.brand('p3-silk-error','gm-err-bi');
+    if(silk){box.classList.add('gm-lua-p3');const note=c.h('div','gm-err'),con=c.h('div','gm-con');if(repeat>1&&!c.reduced)note.classList.add('gm-again');note.append(silk,c.h('span',null,'Something is creating script errors'));con.append(...lines);box.append(note,con);}
+    else box.append(...lines);
     box.onclick=()=>{box?.remove();box=null;c.actions.tab('checks');};c.flash(box,6000);}};
   }},
   // v2.22: the spawn menu (Q over the panel): the soundboard as spawn icons with a search box, and the
@@ -203,7 +234,8 @@
     const grid=c.h('div','gm-sp-grid');
     const list=[...favorites.map(n=>slots.find(x=>x.slot===n)).filter(Boolean),...slots.filter(x=>!favorites.includes(x.slot))];
     for(const snd of list){const b=c.h('button','gm-icon');b.type='button';b.title='Spawn '+snd.name;b.dataset.name=snd.name.toLowerCase();if(favorites.includes(snd.slot))b.dataset.fav='true';
-     b.append(c.h('i'),c.h('span',null,snd.name));b.onclick=()=>{c.actions.playSound(snd.slot);b.classList.remove('spawned');void b.offsetWidth;b.classList.add('spawned');};grid.append(b);}
+     // v2.37: the Silk sound icon (icon16/sound.png, already the Voice check tool's) at twice its size.
+     b.append(c.brand('source-silk-sound','gm-icon-bi')||c.h('i'),c.h('span',null,snd.name));b.onclick=()=>{c.actions.playSound(snd.slot);b.classList.remove('spawned');void b.offsetWidth;b.classList.add('spawned');};grid.append(b);}
     if(!list.length)grid.append(c.h('p','gm-sp-empty','No sounds yet. The Sounds tab sets up the soundboard.'));
     search.oninput=()=>{const q=search.value.trim().toLowerCase();for(const b of grid.querySelectorAll('.gm-icon'))b.hidden=!!q&&!b.dataset.name.includes(q);};
     left.append(search,grid);
@@ -235,16 +267,24 @@
   }},
  ]);
 
+ // v2.37 (Pack 3): Ricochet's own HUD discs (gfx/vgui/640_disc*.tga, 48 × 20 at their size): a blue disc
+ // for each one Tyler still has, the grey one for each a problem cost him; the same disc is the one he
+ // throws between tabs, and the falling death notice (sprites/640_falling.spr, additive) is on Game over.
+ const rcDisc=(c,id,cls)=>{const e=c.brand(id,cls);if(e)e.setAttribute('viewBox','0 18.67 64 26.67');return e;};
  // ── Ricochet: the arcade scoreboard and the disc that carries you between tabs ─
  F.define('ricochet',[
   {id:'rc-score',mount(c){
    const box=c.add('deck',c.h('div','fx rc-score'));
    const score=c.h('b','rc-points'),discs=c.h('span','rc-discs'),power=c.h('span','rc-power');
+   // Three disc holders made once, each with both drawings; render() only says which shows.
+   const held=[0,1,2].map(()=>{const blue=rcDisc(c,'p3-disc-blue','rc-disc-bi rc-disc-on'),grey=rcDisc(c,'p3-disc-grey','rc-disc-bi rc-disc-off');if(!blue||!grey)return null;const i=c.h('i','rc-disc-p3');i.append(grey,blue);return i;});
+   const native=held.every(Boolean);if(native){discs.classList.add('rc-p3');box.classList.add('rc-p3');discs.append(...held);}
    const left=c.h('div');left.append(c.h('small',null,'Score'),score);const mid=c.h('div');mid.append(c.h('small',null,'Discs'),discs);const right=c.h('div');right.append(c.h('small',null,'Power-up'),power);box.append(left,mid,right);
    let points=0,lives=3,clean=0;
    // v2.22: Press start (Connect & start) while Tyler is paused, like an arcade cabinet in attract mode.
    const start=c.h('button','rc-start','Press start');start.type='button';start.title='Connect & start';start.onclick=e=>{e.stopPropagation();c.actions.connect();};start.onkeydown=e=>e.stopPropagation();right.append(start);
-   function render(){score.textContent=String(points).padStart(6,'0');discs.replaceChildren(...Array.from({length:3},(_,i)=>{const d=c.h('i');if(i<lives)d.className='on';return d;}));
+   function render(){score.textContent=String(points).padStart(6,'0');if(native)held.forEach((d,i)=>d.classList.toggle('on',i<lives));else discs.replaceChildren(...Array.from({length:3},(_,i)=>{const d=c.h('i');if(i<lives)d.className='on';return d;}));
+    discs.title=lives+' of 3 discs';
     const last=c.S.turns.at(-1);power.textContent=c.S.streak>=3?'Triple shot ×'+c.S.streak:last&&last<1200?'Fast shot':'—';power.dataset.on=String(power.textContent!=='—');box.dataset.attract=String(c.actions.paused());}
    const hi=c.h('small','rc-hi');left.append(hi);
    const showHi=()=>{const best=c.best('ricochet',points);hi.textContent='HI '+String(best).padStart(6,'0');};
@@ -261,13 +301,15 @@
    const pop=n=>{if(c.reduced)return;const p=c.h('span','rc-plus','+'+n);left.append(p);c.later(()=>p.remove(),1100);};
    return {unmount:close,update(type,d){if(type==='life')showHi();if(type==='state')render();if(type==='turn'){c.later(showHi,0);const gain=100+Math.max(0,Math.round((3000-d.ms)/30))+c.S.streak*25;points+=gain;pop(gain);
      if(!hiAnnounced&&before>0&&points>before){hiAnnounced=true;const o=c.h('div','fx rc-over rc-newhi','New high score!');c.flash(o,2200);}if(++clean>=3&&lives<3){lives++;clean=0;}render();box.classList.remove('hit');void box.offsetWidth;box.classList.add('hit');}
-    if(type==='state'&&d.state==='error'&&d.before!=='error'){lives=Math.max(0,lives-1);clean=0;render();if(!lives){const o=c.h('div','fx rc-over','Game over. Insert coin');c.flash(o,2200);lives=3;c.later(render,2200);}}}};
+    if(type==='state'&&d.state==='error'&&d.before!=='error'){lives=Math.max(0,lives-1);clean=0;render();if(!lives){const o=c.h('div','fx rc-over','Game over. Insert coin'),fell=c.brand('p3-falling','rc-over-bi');if(fell){o.classList.add('rc-over-p3');o.prepend(fell);}c.flash(o,2200);lives=3;c.later(render,2200);}}}};
   }},
   {id:'rc-disc',mount(c){
    const tabs=c.root.querySelector('.tabs');let prev=c.S.tab;
    return {update(type,d){if(type!=='tab'||d.tab===prev||c.reduced)return;const from=c.TABS.indexOf(prev),to=c.TABS.indexOf(d.tab);prev=d.tab;
     const p=c.panel.getBoundingClientRect(),r=tabs.getBoundingClientRect(),w=r.width/c.TABS.length;
-    const disc=c.h('span','fx rc-flying');{const em=c.brand('ricochet-emblem','rc-flying-bi');if(em){disc.classList.add('rc-flying-b');disc.append(em);}}disc.style.top=(r.top-p.top+r.height/2-9)+'px';disc.style.setProperty('--from',(r.left-p.left+w*(from+.5)-9)+'px');disc.style.setProperty('--to',(r.left-p.left+w*(to+.5)-9)+'px');c.flash(disc,520);}};
+    const disc=c.h('span','fx rc-flying'),own=rcDisc(c,'p3-disc-blue','rc-flying-bi');let hw=9,hh=9;
+    if(own){disc.classList.add('rc-flying-b','rc-flying-p3');disc.append(own);hw=24;hh=10;}else{const em=c.brand('ricochet-emblem','rc-flying-bi');if(em){disc.classList.add('rc-flying-b');disc.append(em);}}
+    disc.style.top=Math.round(r.top-p.top+r.height/2-hh)+'px';disc.style.setProperty('--from',Math.round(r.left-p.left+w*(from+.5)-hw)+'px');disc.style.setProperty('--to',Math.round(r.left-p.left+w*(to+.5)-hw)+'px');c.flash(disc,520);}};
   }},
  ]);
 
@@ -303,7 +345,10 @@
     [...scale.children].forEach((m,j)=>m.setAttribute('aria-current',String(j===i)));
     const h=c.health(),bars=c.S.state==='error'?1:Math.round(h/20);[...signal.children].forEach((x,j)=>x.classList.toggle('on',j<bars));lamp.dataset.state=c.S.state;signal.title='Link strength '+h+'%';}
    const crackle=()=>{if(c.reduced)return;scale.classList.remove('dod-static');void scale.offsetWidth;scale.classList.add('dod-static');};
-   render();c.every(render);return {update(type,d){if(type==='tab'&&d.tab!==lastTab){lastTab=d.tab;crackle();}render();}};
+   // v2.37 (Pack 3): the stopwatch from DoD:S's round timer (vgui/timer, 16 px) in front of the status strip's
+   // running time (how long Tyler has been listening, thinking or talking); CSS shows it only with that time.
+   const time=c.root.getElementById('activityCard')?.querySelector('.tally-time'),watch=time&&c.brand('p3-round-timer','dod-timer-bi');if(watch)time.before(watch);
+   render();c.every(render);return {update(type,d){if(type==='tab'&&d.tab!==lastTab){lastTab=d.tab;crackle();}render();},unmount(){watch?.remove();}};
   }},
   {id:'dod-brief',mount(c){
    const chip=c.add('bar',c.h('button','fx fx-chip dod-chip','Orders'));{const oi=c.brand('orders','dod-chip-bi');if(oi)chip.prepend(oi);}chip.type='button';chip.title='Operation briefing';

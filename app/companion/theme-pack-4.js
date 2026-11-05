@@ -11,9 +11,15 @@
  const capOf=c=>{let cap=0;globalThis.TylerStorage?.get?.(['spendingCapUSD']).then(v=>{cap=Number(v?.spendingCapUSD)||0;}).catch(()=>{});return ()=>cap;};
 
  // ── Rust: vitals and status effects, the belt, crafting, the Tool Cupboard, wounded ─────────────
- // Small white pictograms on the coloured squares, drawn here (not Rust's own icons).
+ // Small white pictograms on the coloured squares, drawn here (not Rust's own icons): now only the
+ // fallback, as Rust's own symbols below replace each of them (the tool cupboard's lock: Pack 1's).
  // v2.30: Rust's own HUD symbols (Pack 2) for health, calories, hydration and Bleeding.
  const RS_HUD={health:'source-ui-health',food:'source-ui-food-cooked',water:'source-ui-cup-water',bleed:'source-ui-bleeding'};
+ // v2.37: Rust's own UI glyphs (Pack 3, gui/ui) for the status effects and pickups that were still
+ // drawn here: home (building privilege), clan (friends in the call), tools (crafting), broadcast
+ // (radio) and warning (raid alarm). The drawings stay as the fallback.
+ const RS_P3={priv:'p3-ui-home',comfort:'p3-ui-clan',craft:'p3-ui-tools',radio:'p3-ui-broadcast',raid:'p3-ui-warning'};
+ const rsIcon=(c,key)=>(RS_HUD[key]&&c.brand(RS_HUD[key],'rs-ic rs-ic-b'))||(RS_P3[key]&&c.brand(RS_P3[key],'rs-ic rs-ic-b'))||c.svg(RS[key],'rs-ic');
  const RS={
   health:'<svg viewBox="0 0 16 16"><path d="M6 2.5h4v3.5h3.5v4H10v3.5H6V10H2.5V6H6z"/></svg>',
   food:'<svg viewBox="0 0 16 16"><path d="M4.5 2v4.5a1.5 1.5 0 0 0 3 0V2M6 2v12M11.5 2c-2 1.5-2 5 0 6v6"/></svg>',
@@ -38,7 +44,7 @@
    // Status effects stack above the vitals, as in Rust: each shows only while it applies.
    const EFFECTS=[['priv','Building privilege','Tyler is watching this chat',()=>c.systems()[1].level===3],['comfort','Comfort','Friends are in the voice call with Tyler',()=>c.voice().peers>0],
     ['craft','Crafting','Tyler is writing a reply',()=>c.S.state==='thinking'],['radio','Radio','The Music DJ is playing',()=>!!c.S.music],['raid','Raid alarm','The chat is busy: Tyler paces his replies',()=>!!c.S.flood],['bleed','Bleeding','Something needs attention: open the Checks tab',()=>c.S.state==='error']];
-   const chips=EFFECTS.map(([key,label,title])=>{const e=c.h('button','rs-effect rs-'+key);e.type='button';e.title=title;e.append((RS_HUD[key]&&c.brand(RS_HUD[key],'rs-ic rs-ic-b'))||c.svg(RS[key],'rs-ic'),c.h('span',null,label));e.hidden=true;e.onclick=()=>c.actions.tab(key==='radio'?'room':key==='bleed'||key==='comfort'?'checks':'conversation');effects.append(e);return e;});
+   const chips=EFFECTS.map(([key,label,title])=>{const e=c.h('button','rs-effect rs-'+key);e.type='button';e.title=title;e.append(rsIcon(c,key),c.h('span',null,label));e.hidden=true;e.onclick=()=>c.actions.tab(key==='radio'?'room':key==='bleed'||key==='comfort'?'checks':'conversation');effects.append(e);return e;});
    function render(){
     const h=c.health();hp.fill.style.transform='scaleX('+(h/100).toFixed(3)+')';hp.val.textContent=String(Math.round(h));
     const k=cap(),left=k>0?clamp(1-c.S.spend/k):1;food.fill.style.transform='scaleX('+left.toFixed(3)+')';food.val.textContent=String(Math.round(left*500));
@@ -131,7 +137,7 @@
   {id:'rs-pickup-part',mount(c){
    // Pickup notices at the bottom right: scrap for each reply, the clip's name, the song.
    const stack=c.add('layer',c.h('div','fx rs-picks'));
-   function pick(icon,text,n){const p=c.h('div','rs-pick');p.append((icon==='scrap'&&c.brand('scrap','rs-pick-bi'))||c.svg(RS[icon],'rs-ic'),c.h('span',null,text));if(n)p.append(c.h('b',null,'+'+n));stack.append(p);while(stack.children.length>4)stack.firstElementChild.remove();c.later(()=>p.remove(),2800);
+   function pick(icon,text,n){const p=c.h('div','rs-pick');p.append((icon==='scrap'&&c.brand('scrap','rs-pick-bi'))||rsIcon(c,icon),c.h('span',null,text));if(n)p.append(c.h('b',null,'+'+n));stack.append(p);while(stack.children.length>4)stack.firstElementChild.remove();c.later(()=>p.remove(),2800);
     stack.style.bottom=(c.panel.querySelector('.foot')?.offsetHeight||40)+(c.root.querySelector('.rs-belt:not([hidden])')?.offsetHeight||0)+6+'px';}
    // The logo, double-clicked: what every fresh spawn says.
    const mark=c.root.querySelector('.mark');if(mark)c.on(mark,'dblclick',()=>{const b=c.h('div','fx rs-hello','Hello? I’m friendly!');c.flash(b,2400);});
@@ -163,7 +169,8 @@
  const X_PEOPLE='<svg viewBox="0 0 16 16"><path d="M5.5 7.5a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4zM1.8 13c.4-2.3 1.8-3.6 3.7-3.6S8.8 10.7 9.2 13M11 7.3a1.9 1.9 0 1 0 0-3.8M11.4 9.4c1.5.2 2.5 1.4 2.8 3.6"/></svg>';
  const X_POWER='<svg viewBox="0 0 16 16"><path d="M5.2 4.3a5 5 0 1 0 5.6 0M8 2v5.5"/></svg>';
  // The console's pop-up: a dark pill rising from the bottom centre, with a round icon.
- function xPop(c,icon,small,text){const el=c.h('div','fx x-pop');const ic=c.h('span','x-pop-ic');const bi=c.brand(({[X_TROPHY]:'source-achievements',[X_PEOPLE]:'source-friends'})[icon],'x-pop-bi x-blades')||c.brand(({[X_TROPHY]:'achievement',[X_PEOPLE]:'player',[X_POWER]:'ring-of-light'})[icon],'x-pop-bi');if(bi){ic.classList.add('x-pop-ic-b');ic.append(bi);}else ic.append(c.svg(icon));const t=c.h('div');t.append(c.h('small',null,small),c.h('b',null,text));el.append(ic,t);
+ // `icon` is one of the drawings above, or (v2.37) a Pack 3 Blades icon's id.
+ function xPop(c,icon,small,text){const el=c.h('div','fx x-pop');const ic=c.h('span','x-pop-ic'),p3=icon.startsWith('p3-');const bi=(p3?c.brand(icon,'x-pop-bi x-blades'):c.brand(({[X_TROPHY]:'source-achievements',[X_PEOPLE]:'source-friends'})[icon],'x-pop-bi x-blades'))||c.brand(({[X_TROPHY]:'achievement',[X_PEOPLE]:'player',[X_POWER]:'ring-of-light'})[icon],'x-pop-bi');if(bi){ic.classList.add('x-pop-ic-b');ic.append(bi);}else ic.append(c.svg(p3?X_POWER:icon));const t=c.h('div');t.append(c.h('small',null,small),c.h('b',null,text));el.append(ic,t);
   el.style.bottom=(c.panel.querySelector('.foot')?.offsetHeight||40)+12+'px';c.flash(el,4200);return el;}
  F.define('x360',[
   {id:'x-ring',mount(c){
@@ -179,9 +186,12 @@
    const card=c.add('deck',c.h('button','fx x-card'));card.type='button';card.setAttribute('aria-haspopup','dialog');card.title='Gamer card: achievements';
    const pic=c.h('canvas','x-pic');pic.width=pic.height=96;const info=c.h('div','x-info'),tag=c.h('b','x-tag','ROBOTIC TYLER'),score=c.h('span','x-score'),stars=c.h('span','x-stars'),zone=c.h('small','x-zone'),motto=c.h('small','x-motto');
    const row=c.h('div','x-row'),gs=c.brand('source-gscore','x-gs-bi');if(gs){score.classList.add('x-score-b');row.append(gs);}row.append(score,stars,zone);info.append(tag,row,motto);card.append(pic,info);
+   // v2.37: while the Music DJ plays, the motto shows the song after the Blades Media blade's own Music icon (Pack 3).
+   const note=c.brand('p3-music','x-motto-bi'),said=c.h('span');motto.append(said);
    requestAnimationFrame(()=>globalThis.TylerLogos?.paint(pic,'x360'));
    function render(){score.textContent=xScore(c).toLocaleString();score.title='Gamerscore: '+xScore(c)+' of '+XG;const h=c.health(),n=Math.max(1,Math.round(h/20));stars.textContent='★'.repeat(n)+'☆'.repeat(5-n);stars.title='Reputation: Tyler’s health ('+Math.round(h)+'%)';
-    zone.textContent=c.voice().peers?'Party · '+(c.voice().peers+1):'Pro';motto.textContent=c.S.music?'♫ '+c.S.music:c.S.label+(c.S.text?' · '+c.S.text:'');}
+    zone.textContent=c.voice().peers?'Party · '+(c.voice().peers+1):'Pro';const song=c.S.music;said.textContent=song?(note?'':'♫ ')+song:c.S.label+(c.S.text?' · '+c.S.text:'');
+    if(note&&!!song!==note.isConnected){if(song)motto.prepend(note);else note.remove();}motto.title=song?'Music DJ: '+song:'';}
    function open(){const o=c.overlay('x-ach','Achievements');const got=XA.filter(a=>xHas(c,a[0])).length;
     const head=c.h('div','x-ach-head');head.append(c.h('b',null,'Achievements'),c.h('span',null,got+' of '+XA.length+' unlocked · '+xScore(c)+' of '+XG+' G'));o.el.append(head);
     for(const [key,g,name,desc] of XA){const on=xHas(c,key),it=c.h('div','x-ach-item');it.dataset.on=String(on);const ic=c.h('span','x-ach-ic');const ab=on&&(c.brand('source-achievements','x-ach-bi x-blades')||c.brand('achievement','x-ach-bi'));if(ab){ic.classList.add('x-ach-ic-b');ic.append(ab);}else ic.append(c.svg(X_TROPHY));
@@ -191,8 +201,13 @@
    // Unlocks, checked on every change and once a second.
    function check(){for(const [key,g,name,desc,met] of XA)if(met&&met(c)&&c.unlock('x360:'+key)){xPop(c,X_TROPHY,'Achievement unlocked',g+'G – '+name);render();}}
    render();c.every(()=>{render();check();});
+   // v2.37: a full check's verdict pops up like the System blade's connection test, with its Network
+   // Settings icon (Pack 3). The first clean one unlocks Clean Bill of Health instead. One pop per check.
+   let tested=0;
    return {update(type,d){
-    if(type==='check'&&!d?.problems&&!d?.unsure&&c.unlock('x360:clean-bill'))xPop(c,X_TROPHY,'Achievement unlocked','15G – Clean Bill of Health');
+    if(type==='check'&&Date.now()-tested>5000){tested=Date.now();const bad=Number(d?.problems)||0,unsure=Number(d?.unsure)||0;
+     if(!bad&&!unsure&&c.unlock('x360:clean-bill'))xPop(c,X_TROPHY,'Achievement unlocked','15G – Clean Bill of Health');
+     else xPop(c,'p3-network-settings','Connection test',bad?bad+' problem'+(bad===1?'':'s')+' found: see Checks':unsure?'Working, '+unsure+' not verified':'All good: Tyler is ready');}
     if(type==='state'&&d.before==='error'&&['ready','listening'].includes(d.state)&&c.unlock('x360:comeback'))xPop(c,X_TROPHY,'Achievement unlocked','15G – Comeback');
     if(type==='turn'&&d.ms<1000&&c.unlock('x360:quick-draw'))xPop(c,X_TROPHY,'Achievement unlocked','10G – Quick Draw');
     check();render();}};
@@ -306,6 +321,11 @@
  // v2.30: Messenger's original emoticons (Pack 2) with their shortcuts; the text ones stay as the fallback.
  const MSN_EMO=[':)',';)','(Y)','(N)','*-)','8-|','(I)','(8)','(*)','(T)','(S)','(brb)'];
  const MSN_EMO_IC=['smile','winking-smile-static','thumbs-up','thumbs-down','thinking-smile-static','nerd-smile','light-bulb','note','star','telephone-receiver','sleeping-half-moon','be-right-back'].map(n=>'source-'+n);
+ // v2.37: Messenger 7.5's own 16 px contact icon (Pack 3, its installer resources): the green buddy, with
+ // its 10 px badge for Busy or Away on the corner, as the contact list drew them, or the red buddy
+ // when offline. Levels as in systems(): 3 online, 2 away, 1 busy, 0 offline. Null without the art.
+ function msnBuddy(c,level){const base=c.brand(level>0?'p3-buddy-online':'p3-buddy-offline','msn-buddy-bi');if(!base)return null;
+  const w=c.h('span','msn-buddy');w.append(base);const badge=level===1?'p3-badge-busy':level===2?'p3-badge-away':'';const b=badge&&c.brand(badge,'msn-badge-bi');if(b)w.append(b);return w;}
  function msnPop(c,title,text){const el=c.h('div','fx msn-pop');const head=c.h('div','msn-pop-head');head.append(...[c.brand('msn-butterfly','msn-pop-bf')].filter(Boolean),c.h('b',null,'MSN Messenger'));const body=c.h('div','msn-pop-body'),pic=c.h('canvas','msn-pop-pic');pic.width=pic.height=72;
   const t=c.h('div');t.append(c.h('b',null,title),c.h('span',null,text));body.append(pic,t);el.append(head,body);requestAnimationFrame(()=>globalThis.TylerLogos?.paint(pic,'msn'));
   el.style.bottom=(c.panel.querySelector('.foot')?.offsetHeight||40)+10+'px';c.flash(el,5200);}
@@ -324,9 +344,11 @@
    // Click the display picture: the status menu.
    const mark=c.root.querySelector('.mark');if(!mark)return {};mark.classList.add('fx-interactive','msn-dp');mark.setAttribute('role','button');mark.tabIndex=0;mark.title='Change your status';
    const open=()=>{const paused=c.actions.paused(),[word]=MSN_PRES[c.S.state]||MSN_PRES.ready;
-    c.menu(mark,[{heading:'My status: '+word},{label:'Online',mark:'●',icon:'online',hint:paused?'Connect & start':'',current:!paused,run:()=>{if(c.actions.paused())c.actions.connect();}},
+    const m=c.menu(mark,[{heading:'My status: '+word},{label:'Online',mark:'●',icon:'online',hint:paused?'Connect & start':'',current:!paused,run:()=>{if(c.actions.paused())c.actions.connect();}},
      {label:'Away',mark:'●',icon:'away',hint:'Pause AI',current:paused,run:()=>c.actions.pause()},{label:'Appear Offline',mark:'●',icon:'offline',hint:'Collapse the window',run:()=>c.actions.collapse()},'sep',
-     {label:'Send a Nudge',icon:'nudge',hint:'Test beep in voice',run:()=>c.actions.beep()},{label:'Change Display Picture…',hint:'Settings → Appearance',run:()=>c.actions.settings()}],{cls:'msn-menu',label:'Status'});};
+     {label:'Send a Nudge',icon:'nudge',hint:'Test beep in voice',run:()=>c.actions.beep()},{label:'Change Display Picture…',hint:'Settings → Appearance',run:()=>c.actions.settings()}],{cls:'msn-menu',label:'Status'});
+    // v2.37: Online, Away and Appear Offline show the contact icons the contact list uses (Pack 3).
+    const items=m?.el?.querySelectorAll('.fx-menu-item')||[];[3,2,0].forEach((lv,i)=>{const mk=items[i]?.querySelector('.fx-menu-mark'),b=mk&&msnBuddy(c,lv);if(b){mk.classList.add('fx-menu-mark-bi');mk.replaceChildren(b);}});};
    c.on(mark,'click',open);c.on(mark,'keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();open();}});
    return {unmount(){mark.classList.remove('fx-interactive','msn-dp');mark.removeAttribute('role');mark.removeAttribute('tabindex');mark.removeAttribute('title');}};
   }},
@@ -337,14 +359,18 @@
    for(const k of ['on','off']){heads[k].type='button';heads[k].onclick=()=>{open[k]=!open[k];render();};box.append(heads[k],groups[k]);}
    // The conversation toolbar: Nudge and emoticons (each one plays a clip).
    const bar=c.h('div','msn-tools'),nudge=c.h('button','msn-tool',null),emo=c.h('button','msn-tool');nudge.type=emo.type='button';
-   nudge.append(c.brand('nudge','msn-tool-bi')||c.h('i','msn-nudge-ic'),c.h('span',null,'Nudge'));nudge.title='Send a Nudge: a test beep in Steam voice';nudge.onclick=()=>{c.actions.beep();c.panel.classList.remove('msn-shake');void c.panel.offsetWidth;if(!c.reduced)c.panel.classList.add('msn-shake');};
+   // v2.37: Messenger 7.5's own Nudge icon (Pack 3), at its 24 × 16 size.
+   nudge.append(c.brand('p3-nudge','msn-nudge-bi')||c.brand('nudge','msn-tool-bi')||c.h('i','msn-nudge-ic'),c.h('span',null,'Nudge'));nudge.title='Send a Nudge: a test beep in Steam voice';nudge.onclick=()=>{c.actions.beep();c.panel.classList.remove('msn-shake');void c.panel.offsetWidth;if(!c.reduced)c.panel.classList.add('msn-shake');};
    emo.append(c.brand('source-smile','msn-emo-bi')||c.h('i','msn-emo-ic',':)'),c.h('span',null,'Emoticons'));emo.title='Emoticons: each one plays a soundboard clip';emo.setAttribute('aria-haspopup','menu');
    emo.onclick=()=>{const s=c.actions.sounds(),list=(s.slots||[]).slice(0,12);if(!list.length){c.actions.tab('soundboard');return;}
     c.menu(emo,list.map((it,i)=>({label:it.name,icon:MSN_EMO_IC[i%MSN_EMO_IC.length],mark:MSN_EMO[i%MSN_EMO.length],run:()=>c.actions.playSound(it.slot)})),{cls:'msn-menu msn-emo',label:'Emoticons',align:'right'});}; // from the button's right edge: it is at the panel's right
    bar.append(nudge,emo);box.append(bar);
+   // Rebuilt only when a contact's presence or detail changes (not every second), so focus stays put.
+   let drawn='';
    function render(){const sys=c.systems(),on=sys.filter(x=>x.level===3),off=sys.filter(x=>x.level!==3);
+    const key=JSON.stringify([open,sys.map(x=>[x.level,x.detail])]);if(key===drawn)return;drawn=key;
     for(const [k,list,label] of [['on',on,'Online'],['off',off,'Not online']]){heads[k].textContent=(open[k]?'▾ ':'▸ ')+label+' ('+list.length+')';heads[k].hidden=!list.length;groups[k].hidden=!open[k]||!list.length;groups[k].replaceChildren();
-     for(const x of list){const r=c.h('button','msn-contact');r.type='button';r.dataset.level=String(x.level);r.append(c.brand(['offline','busy','away','online'][x.level]||'offline','msn-dot-bi')||c.h('i','msn-dot'),c.h('b',null,x.name),c.h('small',null,x.detail));r.title='Open '+x.name;r.onclick=()=>c.actions.tab(x.tab);groups[k].append(r);}}}
+     for(const x of list){const r=c.h('button','msn-contact');r.type='button';r.dataset.level=String(x.level);r.append(msnBuddy(c,x.level)||c.brand(['offline','busy','away','online'][x.level]||'offline','msn-dot-bi')||c.h('i','msn-dot'),c.h('b',null,x.name),c.h('small',null,x.detail));r.title='Open '+x.name;r.onclick=()=>c.actions.tab(x.tab);groups[k].append(r);}}}
    render();c.every(render);return {update(){render();},unmount(){c.panel.classList.remove('msn-shake');}};
   }},
   {id:'msn-notices',mount(c){
@@ -375,7 +401,9 @@
  const xtLevel=c=>{const pts=XT.reduce((n,t)=>n+(xtHas(c,t[0])?XT_PTS[t[1]]:0),0);return {pts,level:1+Math.floor(pts/60),pct:Math.round((pts%60)/60*100)};};
  const XB_TROPHY='<svg viewBox="0 0 16 16"><path d="M5 2.5h6v3.2a3 3 0 0 1-6 0zM5 3.5H2.8v1a2.3 2.3 0 0 0 2.4 2.3M11 3.5h2.2v1a2.3 2.3 0 0 1-2.4 2.3M8 8.7v2.6M5.5 13.5h5M6.3 11.3h3.4"/></svg>';
  const XB_INFO='<svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6"/><path d="M8 7.2v4M8 4.8v.2"/></svg>';
- function xbNotice(c,icon,line,sub,tier){const el=c.h('div','fx xb-note');if(tier)el.dataset.tier=tier;const ic=c.h('span','xb-note-ic');ic.append(icon==='ps'?(c.brand('playstation-mark','xb-ps')||c.h('i')):c.svg(icon));if(icon==='ps')el.dataset.tier='psn';const t=c.h('div');t.append(c.h('b',null,line),c.h('small',null,sub));el.append(ic,t);
+ // v2.37: the XMB's own Trophy Collection glyph (Pack 3) on the trophy notice and list; the drawing is the fallback.
+ const xbTrophy=c=>c.brand('p3-trophy','xb-tr-bi')||c.svg(XB_TROPHY);
+ function xbNotice(c,icon,line,sub,tier){const el=c.h('div','fx xb-note');if(tier)el.dataset.tier=tier;const ic=c.h('span','xb-note-ic');ic.append(icon==='ps'?(c.brand('playstation-mark','xb-ps')||c.h('i')):icon===XB_TROPHY?xbTrophy(c):c.svg(icon));if(icon==='ps')el.dataset.tier='psn';const t=c.h('div');t.append(c.h('b',null,line),c.h('small',null,sub));el.append(ic,t);
   el.style.top=(c.below('.bar')+6)+'px';c.flash(el,5000);}
  F.define('xmb',[
   {id:'xb-clock',mount(c){
@@ -407,8 +435,8 @@
    function earn(t){xbNotice(c,XB_TROPHY,'You have earned a trophy.','['+t[1][0].toUpperCase()+t[1].slice(1)+'] '+t[2],t[1]);}
    function check(){for(const t of XT)if(t[4]&&t[4](c)&&c.unlock('xmb:'+t[0]))earn(t);}
    function list(){const o=c.overlay('xb-screen','Trophies'),L=xtLevel(c),got=XT.filter(t=>xtHas(c,t[0])).length;
-    const head=c.h('div','xb-screen-head xb-info-head');head.append(c.h('b',null,'Trophies'),...[c.brand('trophy','xb-info-ps')].filter(Boolean),c.h('span',null,'Level '+L.level+' · '+got+' of '+XT.length+' earned'));const bar=c.h('span','xb-level'),f=c.h('i');f.style.transform='scaleX('+(L.pct/100)+')';bar.append(f);head.append(bar);o.el.append(head);
-    for(const t of XT){const on=xtHas(c,t[0]),r=c.h('div','xb-trophy');r.dataset.tier=t[1];r.dataset.on=String(on);const ic=c.h('span','xb-trophy-ic');ic.append(c.svg(XB_TROPHY));const tx=c.h('div');tx.append(c.h('b',null,on?t[2]:'Hidden trophy'),c.h('small',null,t[3]));r.append(ic,tx);o.el.append(r);}
+    const head=c.h('div','xb-screen-head xb-info-head');head.append(c.h('b',null,'Trophies'),...[c.brand('p3-trophy','xb-info-ps xb-tr-head')||c.brand('trophy','xb-info-ps')].filter(Boolean),c.h('span',null,'Level '+L.level+' · '+got+' of '+XT.length+' earned'));const bar=c.h('span','xb-level'),f=c.h('i');f.style.transform='scaleX('+(L.pct/100)+')';bar.append(f);head.append(bar);o.el.append(head);
+    for(const t of XT){const on=xtHas(c,t[0]),r=c.h('div','xb-trophy');r.dataset.tier=t[1];r.dataset.on=String(on);const ic=c.h('span','xb-trophy-ic');ic.append(xbTrophy(c));const tx=c.h('div');tx.append(c.h('b',null,on?t[2]:'Hidden trophy'),c.h('small',null,t[3]));r.append(ic,tx);o.el.append(r);}
     const x=c.h('button','xb-back','Back');x.type='button';x.onclick=o.close;o.el.append(x);x.focus({preventScroll:true});}
    c.on(c.panel,'tyler-fx',e=>{if(e.detail?.open==='xb-trophies')list();});
    check();c.every(check);

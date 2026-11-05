@@ -1,0 +1,25 @@
+{
+ "icons": {},
+ "picks": {
+  "p3-trophy": {
+   "file": "themes/xmb/icons/icons-xmb_icon_039.png.png",
+   "mode": "trace",
+   "name": "PS3 XMB Trophy Collection",
+   "sha256": "9e6640c7447aed13126629974837eea05aa406b7288f30e4533a575a1f09ffba",
+   "size": [
+    512,
+    512
+   ],
+   "source": {
+    "commit": "e718990670745077bbf73a92bdb2d3d8003f6f48",
+    "downloadUrl": "https://raw.githubusercontent.com/TheGammaSqueeze/xmb-web/e718990670745077bbf73a92bdb2d3d8003f6f48/icons/xmb_icon_039.png",
+    "kind": "firmware-derived-xmb-archive",
+    "path": "icons/xmb_icon_039.png",
+    "repo": "TheGammaSqueeze/xmb-web"
+   },
+   "tier": "Archived source artwork",
+   "tinted": true
+  }
+ },
+ "states": {}
+}

@@ -1,0 +1,65 @@
+{
+ "icons": {},
+ "picks": {
+  "p3-buyzone": {
+   "file": "themes/cs2/icons/cs2-panorama-images-icons-ui-buyzone.svg.svg",
+   "mode": "vector",
+   "name": "cs2 panorama images icons ui buyzone.svg",
+   "sha256": "d95681455f21e6186193244b31278dad0f9a339c4049c3f1d558205437c8de2d",
+   "size": [
+    32.0,
+    32.0
+   ],
+   "source": {
+    "commit": "edbfa7613cda0bee919a9e8ebbacee7059e37f23",
+    "downloadUrl": "https://raw.githubusercontent.com/Juknum/counter-strike-icons/edbfa7613cda0bee919a9e8ebbacee7059e37f23/cs2/panorama/images/icons/ui/buyzone.svg",
+    "kind": "extracted-game-art",
+    "path": "cs2/panorama/images/icons/ui/buyzone.svg",
+    "repo": "Juknum/counter-strike-icons"
+   },
+   "tier": "Archived source artwork",
+   "tinted": true
+  },
+  "p3-gc-globe": {
+   "file": "themes/cs2/icons/cs2-panorama-images-icons-ui-gc_connecting_inner.svg.svg",
+   "mode": "vector",
+   "name": "cs2 panorama images icons ui gc connecting inner.svg",
+   "sha256": "05b8fe3335dd55417a49f2340da8b5da59e7bc6c19aa0e6391f320f30ef318b3",
+   "size": [
+    33.0,
+    32.0
+   ],
+   "source": {
+    "commit": "edbfa7613cda0bee919a9e8ebbacee7059e37f23",
+    "downloadUrl": "https://raw.githubusercontent.com/Juknum/counter-strike-icons/edbfa7613cda0bee919a9e8ebbacee7059e37f23/cs2/panorama/images/icons/ui/gc_connecting_inner.svg",
+    "kind": "extracted-game-art",
+    "path": "cs2/panorama/images/icons/ui/gc_connecting_inner.svg",
+    "repo": "Juknum/counter-strike-icons"
+   },
+   "tier": "Archived source artwork",
+   "tinted": true
+  },
+  "p3-gc-ring": {
+   "file": "themes/cs2/icons/cs2-panorama-images-icons-ui-gc_connecting_outer.svg.svg",
+   "mode": "vector",
+   "name": "cs2 panorama images icons ui gc connecting outer.svg",
+   "sha256": "781f1033490ba279e2149600521240c22a709713f375a6bac60f3564d1870163",
+   "size": [
+    32.0,
+    32.0
+   ],
+   "source": {
+    "commit": "edbfa7613cda0bee919a9e8ebbacee7059e37f23",
+    "downloadUrl": "https://raw.githubusercontent.com/Juknum/counter-strike-icons/edbfa7613cda0bee919a9e8ebbacee7059e37f23/cs2/panorama/images/icons/ui/gc_connecting_outer.svg",
+    "kind": "extracted-game-art",
+    "path": "cs2/panorama/images/icons/ui/gc_connecting_outer.svg",
+    "repo": "Juknum/counter-strike-icons"
+   },
+   "tier": "Archived source artwork",
+   "tinted": true
+  }
+ },
+ "states": {
+  "waiting": "p3-gc-globe"
+ }
+}

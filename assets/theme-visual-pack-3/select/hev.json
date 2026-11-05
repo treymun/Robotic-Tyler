@@ -1,0 +1,8 @@
+{"picks":{
+ "p3-flash-empty":{"file":"themes/hev/icons/hud-hud-flash_empty.png","mode":"lum","crop":[0,5,32,22]},
+ "p3-flash-full":{"file":"themes/hev/icons/hud-hud-flash_full.png","mode":"lum","crop":[0,5,32,22]},
+ "p3-flash-beam":{"file":"themes/hev/icons/hud-hud-flash_beam.png","mode":"lum","crop":[0,5,12,22]},
+ "p3-dmg-rad":{"file":"themes/hev/icons/hud-hud-dmg_rad.png","mode":"trace","light":true,"upscale":4}
+},
+ "icons":{"error":"p3-dmg-rad","warning":"p3-dmg-rad"},
+ "states":{"error":"p3-dmg-rad"}}

@@ -1,0 +1,60 @@
+{
+ "icons": {},
+ "picks": {
+  "p3-c4": {
+   "crop": [
+    0,
+    8,
+    32,
+    16
+   ],
+   "file": "themes/cs16/icons/hud-hud-c4.png",
+   "mode": "lum",
+   "name": "hud hud c4",
+   "native": [
+    32,
+    16
+   ],
+   "sha256": "496f85e102d1ff231f423227fcb714c2411d75bd16f378090c8f46dab013be65",
+   "size": [
+    32,
+    16
+   ],
+   "source": {
+    "commit": "6ad155c7a610a85cfd443fcace2c97f2afcb2866",
+    "downloadUrl": "https://raw.githubusercontent.com/u3games/CS-Server/6ad155c7a610a85cfd443fcace2c97f2afcb2866/server/cstrike/sprites/640hud7.spr",
+    "kind": "archived-source-art",
+    "path": "server/cstrike/sprites/640hud7.spr",
+    "repo": "u3games/CS-Server"
+   },
+   "tier": "Archived source artwork",
+   "tinted": true
+  },
+  "p3-hp-cross": {
+   "file": "themes/cs16/icons/hud-hud-cross.png",
+   "mode": "lum",
+   "name": "hud hud cross",
+   "native": [
+    24,
+    24
+   ],
+   "sha256": "fa1252387a77ade7ba90954f05db6ef435d1b25a07493114414962c42b15fcf6",
+   "size": [
+    24,
+    24
+   ],
+   "source": {
+    "commit": "6ad155c7a610a85cfd443fcace2c97f2afcb2866",
+    "downloadUrl": "https://raw.githubusercontent.com/u3games/CS-Server/6ad155c7a610a85cfd443fcace2c97f2afcb2866/server/cstrike/sprites/640hud7.spr",
+    "kind": "archived-source-art",
+    "path": "server/cstrike/sprites/640hud7.spr",
+    "repo": "u3games/CS-Server"
+   },
+   "tier": "Archived source artwork",
+   "tinted": true
+  }
+ },
+ "states": {
+  "thinking": "p3-c4"
+ }
+}

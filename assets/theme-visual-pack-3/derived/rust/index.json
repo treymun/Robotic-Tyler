@@ -1,0 +1,101 @@
+{
+ "icons": {},
+ "picks": {
+  "p3-ui-broadcast": {
+   "file": "themes/rust/icons/gui-ui-broadcast.png.png",
+   "mode": "trace",
+   "name": "Rust UI broadcast",
+   "sha256": "9dba0d72d2668eda9fb1c124988bacc195aca8b082ef5133d0fd13bbcc54669e",
+   "size": [
+    256,
+    256
+   ],
+   "source": {
+    "commit": "dc357ff3b6748ccc12231135c6466a379a18adbf",
+    "downloadUrl": "https://raw.githubusercontent.com/LehaSex/rust-game-icons/dc357ff3b6748ccc12231135c6466a379a18adbf/gui/ui/broadcast.png",
+    "kind": "extracted-game-art",
+    "path": "gui/ui/broadcast.png",
+    "repo": "LehaSex/rust-game-icons"
+   },
+   "tier": "Archived source artwork",
+   "tinted": true
+  },
+  "p3-ui-clan": {
+   "file": "themes/rust/icons/gui-ui-clan.png.png",
+   "mode": "trace",
+   "name": "Rust UI clan",
+   "sha256": "f4a8cf2c657ca5fef20a1a97bb3da422672bc5c3b1bb9eb284371ffc0a737916",
+   "size": [
+    128,
+    128
+   ],
+   "source": {
+    "commit": "dc357ff3b6748ccc12231135c6466a379a18adbf",
+    "downloadUrl": "https://raw.githubusercontent.com/LehaSex/rust-game-icons/dc357ff3b6748ccc12231135c6466a379a18adbf/gui/ui/clan.png",
+    "kind": "extracted-game-art",
+    "path": "gui/ui/clan.png",
+    "repo": "LehaSex/rust-game-icons"
+   },
+   "tier": "Archived source artwork",
+   "tinted": true
+  },
+  "p3-ui-home": {
+   "file": "themes/rust/icons/gui-ui-home.png.png",
+   "mode": "trace",
+   "name": "Rust UI home",
+   "sha256": "9721ffd6e85c49d043cb75a43ddcf4c7fbfacaeca26e28e30ed93ff5647f44d8",
+   "size": [
+    256,
+    256
+   ],
+   "source": {
+    "commit": "dc357ff3b6748ccc12231135c6466a379a18adbf",
+    "downloadUrl": "https://raw.githubusercontent.com/LehaSex/rust-game-icons/dc357ff3b6748ccc12231135c6466a379a18adbf/gui/ui/home.png",
+    "kind": "extracted-game-art",
+    "path": "gui/ui/home.png",
+    "repo": "LehaSex/rust-game-icons"
+   },
+   "tier": "Archived source artwork",
+   "tinted": true
+  },
+  "p3-ui-tools": {
+   "file": "themes/rust/icons/gui-ui-tools.png.png",
+   "mode": "trace",
+   "name": "Rust UI tools",
+   "sha256": "91c42893ff51a9d8b16b44f26d76ef4ab97286cd84e0ca6196bf5ae63500da7e",
+   "size": [
+    256,
+    256
+   ],
+   "source": {
+    "commit": "dc357ff3b6748ccc12231135c6466a379a18adbf",
+    "downloadUrl": "https://raw.githubusercontent.com/LehaSex/rust-game-icons/dc357ff3b6748ccc12231135c6466a379a18adbf/gui/ui/tools.png",
+    "kind": "extracted-game-art",
+    "path": "gui/ui/tools.png",
+    "repo": "LehaSex/rust-game-icons"
+   },
+   "tier": "Archived source artwork",
+   "tinted": true
+  },
+  "p3-ui-warning": {
+   "file": "themes/rust/icons/gui-ui-warning_2.png.png",
+   "mode": "trace",
+   "name": "Rust UI warning",
+   "sha256": "ab6b7028e3bd48ef9a29b54897d3317127a2f3a3a06c9ee57f394b05ccebdcdd",
+   "size": [
+    256,
+    256
+   ],
+   "source": {
+    "commit": "dc357ff3b6748ccc12231135c6466a379a18adbf",
+    "downloadUrl": "https://raw.githubusercontent.com/LehaSex/rust-game-icons/dc357ff3b6748ccc12231135c6466a379a18adbf/gui/ui/warning_2.png",
+    "kind": "extracted-game-art",
+    "path": "gui/ui/warning_2.png",
+    "repo": "LehaSex/rust-game-icons"
+   },
+   "tier": "Archived source artwork",
+   "tinted": true
+  }
+ },
+ "states": {}
+}

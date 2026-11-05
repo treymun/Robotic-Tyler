@@ -1,0 +1,76 @@
+{
+ "icons": {},
+ "picks": {
+  "p3-disc-blue": {
+   "crop": [
+    9,
+    6,
+    48,
+    20
+   ],
+   "file": "themes/ricochet/icons/ricochet-gfx-vgui-640_discblue.tga.png",
+   "mode": "pixels",
+   "name": "Ricochet HUD disc, blue (gfx/vgui/640_discblue.tga)",
+   "native": [
+    48,
+    20
+   ],
+   "sha256": "9ee9373c72bbeb2f0f0ceafe842b0d079a96302989521d3f11c00cbbd65d1e8c",
+   "size": [
+    48,
+    20
+   ],
+   "source": {
+    "kind": "official-valve-ricochet-depot",
+    "path": "ricochet/gfx/vgui/640_discblue.tga"
+   },
+   "tier": "Native / official source"
+  },
+  "p3-disc-grey": {
+   "crop": [
+    9,
+    6,
+    48,
+    20
+   ],
+   "file": "themes/ricochet/icons/ricochet-gfx-vgui-640_discgrey.tga.png",
+   "mode": "pixels",
+   "name": "Ricochet HUD disc, spent (gfx/vgui/640_discgrey.tga)",
+   "native": [
+    48,
+    20
+   ],
+   "sha256": "9afeb45a99c37c88e463523f4580a39ca93a4f59be16bd5e6ca821c08a8f406e",
+   "size": [
+    48,
+    20
+   ],
+   "source": {
+    "kind": "official-valve-ricochet-depot",
+    "path": "ricochet/gfx/vgui/640_discgrey.tga"
+   },
+   "tier": "Native / official source"
+  },
+  "p3-falling": {
+   "file": "themes/ricochet/icons/ricochet-sprites-640_falling.spr.png",
+   "mode": "lum",
+   "name": "Ricochet death notice: falling (sprites/640_falling.spr)",
+   "native": [
+    32,
+    32
+   ],
+   "sha256": "fa59a7f7261ac83e4d9da8a52332f12158f02fff40cab6f31070d948346d071f",
+   "size": [
+    32,
+    32
+   ],
+   "source": {
+    "kind": "official-valve-ricochet-depot",
+    "path": "ricochet/sprites/640_falling.spr"
+   },
+   "tier": "Native / official source",
+   "tinted": true
+  }
+ },
+ "states": {}
+}

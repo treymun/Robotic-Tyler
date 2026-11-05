@@ -1,0 +1,126 @@
+{
+ "picks": {
+  "p3-heart-empty": {
+   "file": "themes/minecraft/ui/gui-icons.png.png",
+   "mode": "pixels",
+   "crop": [
+    16,
+    0,
+    9,
+    9
+   ],
+   "name": "Minecraft HUD: Heart container (gui/icons.png)"
+  },
+  "p3-heart-flash": {
+   "file": "themes/minecraft/ui/gui-icons.png.png",
+   "mode": "pixels",
+   "crop": [
+    25,
+    0,
+    9,
+    9
+   ],
+   "name": "Minecraft HUD: Heart container, hurt flash (gui/icons.png)"
+  },
+  "p3-heart-full": {
+   "file": "themes/minecraft/ui/gui-icons.png.png",
+   "mode": "pixels",
+   "crop": [
+    52,
+    0,
+    9,
+    9
+   ],
+   "name": "Minecraft HUD: Heart (gui/icons.png)"
+  },
+  "p3-heart-half": {
+   "file": "themes/minecraft/ui/gui-icons.png.png",
+   "mode": "pixels",
+   "crop": [
+    61,
+    0,
+    9,
+    9
+   ],
+   "name": "Minecraft HUD: Half heart (gui/icons.png)"
+  },
+  "p3-food-empty": {
+   "file": "themes/minecraft/ui/gui-icons.png.png",
+   "mode": "pixels",
+   "crop": [
+    16,
+    27,
+    9,
+    9
+   ],
+   "name": "Minecraft HUD: Hunger container (gui/icons.png)"
+  },
+  "p3-food-full": {
+   "file": "themes/minecraft/ui/gui-icons.png.png",
+   "mode": "pixels",
+   "crop": [
+    52,
+    27,
+    9,
+    9
+   ],
+   "name": "Minecraft HUD: Hunger shank (gui/icons.png)"
+  },
+  "p3-food-half": {
+   "file": "themes/minecraft/ui/gui-icons.png.png",
+   "mode": "pixels",
+   "crop": [
+    61,
+    27,
+    9,
+    9
+   ],
+   "name": "Minecraft HUD: Half hunger shank (gui/icons.png)"
+  },
+  "p3-record-13": {
+   "file": "themes/minecraft/icons/items-record_13.png.png",
+   "mode": "pixels",
+   "name": "Music Disc 13 (items/record_13.png)"
+  },
+  "p3-record-cat": {
+   "file": "themes/minecraft/icons/items-record_cat.png.png",
+   "mode": "pixels",
+   "name": "Music Disc Cat (items/record_cat.png)"
+  },
+  "p3-record-chirp": {
+   "file": "themes/minecraft/icons/items-record_chirp.png.png",
+   "mode": "pixels",
+   "name": "Music Disc Chirp (items/record_chirp.png)"
+  },
+  "p3-record-far": {
+   "file": "themes/minecraft/icons/items-record_far.png.png",
+   "mode": "pixels",
+   "name": "Music Disc Far (items/record_far.png)"
+  },
+  "p3-record-mall": {
+   "file": "themes/minecraft/icons/items-record_mall.png.png",
+   "mode": "pixels",
+   "name": "Music Disc Mall (items/record_mall.png)"
+  },
+  "p3-record-stal": {
+   "file": "themes/minecraft/icons/items-record_stal.png.png",
+   "mode": "pixels",
+   "name": "Music Disc Stal (items/record_stal.png)"
+  },
+  "p3-record-strad": {
+   "file": "themes/minecraft/icons/items-record_strad.png.png",
+   "mode": "pixels",
+   "name": "Music Disc Strad (items/record_strad.png)"
+  },
+  "p3-record-wait": {
+   "file": "themes/minecraft/icons/items-record_wait.png.png",
+   "mode": "pixels",
+   "name": "Music Disc Wait (items/record_wait.png)"
+  },
+  "p3-record-ward": {
+   "file": "themes/minecraft/icons/items-record_ward.png.png",
+   "mode": "pixels",
+   "name": "Music Disc Ward (items/record_ward.png)"
+  }
+ }
+}

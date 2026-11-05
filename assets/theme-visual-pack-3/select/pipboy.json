@@ -1,0 +1,7 @@
+{"picks": {
+  "p3-radio-tower": {"file": "themes/pipboy/icons/mapmarkerloctype_42_d.svg", "mode": "vector", "mono": true, "name": "Fallout 4 map marker: radio tower"},
+  "p3-radiation": {"file": "themes/pipboy/icons/mapmarkerloctype_41_d.svg", "mode": "vector", "mono": true, "name": "Fallout 4 map marker: radioactive area"}
+ },
+ "icons": {"warning": "p3-radiation"},
+ "states": {"error": "p3-radiation"}
+}

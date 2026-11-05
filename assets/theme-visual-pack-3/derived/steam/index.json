@@ -1,0 +1,215 @@
+{
+ "icons": {},
+ "picks": {
+  "p3-away": {
+   "file": "themes/steam/icons/native-steam-away.svg",
+   "mode": "vector",
+   "name": "native steam away",
+   "sha256": "c48e87f969166959ef2312f7044d16637bdc892cff5688f61d255c67e2f7040f",
+   "size": [
+    36.0,
+    36.0
+   ],
+   "source": {
+    "commit": "bf4375cef89cbfa7892e4c8e15e28f6569578017",
+    "downloadUrl": "https://raw.githubusercontent.com/SteamDatabase/SteamTracking/bf4375cef89cbfa7892e4c8e15e28f6569578017/ClientExtracted/steamui/sp.js",
+    "kind": "native-current-steam-client-svg",
+    "path": "ClientExtracted/steamui/sp.js",
+    "repo": "SteamDatabase/SteamTracking"
+   },
+   "tier": "Native / official source",
+   "tinted": true
+  },
+  "p3-chat": {
+   "file": "themes/steam/icons/native-steam-chat.svg",
+   "mode": "vector",
+   "name": "native steam chat",
+   "sha256": "3ad25c9cb41a7c1127a6ba9bbf5fd2f4dd8431734ae57201f38757ce2f6b53fb",
+   "size": [
+    36.0,
+    36.0
+   ],
+   "source": {
+    "commit": "bf4375cef89cbfa7892e4c8e15e28f6569578017",
+    "downloadUrl": "https://raw.githubusercontent.com/SteamDatabase/SteamTracking/bf4375cef89cbfa7892e4c8e15e28f6569578017/ClientExtracted/steamui/sp.js",
+    "kind": "native-current-steam-client-svg",
+    "path": "ClientExtracted/steamui/sp.js",
+    "repo": "SteamDatabase/SteamTracking"
+   },
+   "tier": "Native / official source",
+   "tinted": true
+  },
+  "p3-clock": {
+   "file": "themes/steam/icons/native-steam-clock.svg",
+   "mode": "vector",
+   "name": "native steam clock",
+   "sha256": "04dc1063f8b949fa84259dcfc200124cbd6767b4bbdcf4bbac5652e3eff2b96b",
+   "size": [
+    24.0,
+    24.0
+   ],
+   "source": {
+    "commit": "bf4375cef89cbfa7892e4c8e15e28f6569578017",
+    "downloadUrl": "https://raw.githubusercontent.com/SteamDatabase/SteamTracking/bf4375cef89cbfa7892e4c8e15e28f6569578017/ClientExtracted/steamui/sp.js",
+    "kind": "native-current-steam-client-svg",
+    "path": "ClientExtracted/steamui/sp.js",
+    "repo": "SteamDatabase/SteamTracking"
+   },
+   "tier": "Native / official source",
+   "tinted": true
+  },
+  "p3-fire": {
+   "file": "themes/steam/icons/native-steam-fire.svg",
+   "mode": "vector",
+   "name": "native steam fire",
+   "sha256": "88c74a1093ee1c23d33312061608206aeee1bd0388ac07ba806441578f3d3ca7",
+   "size": [
+    36.0,
+    36.0
+   ],
+   "source": {
+    "commit": "bf4375cef89cbfa7892e4c8e15e28f6569578017",
+    "downloadUrl": "https://raw.githubusercontent.com/SteamDatabase/SteamTracking/bf4375cef89cbfa7892e4c8e15e28f6569578017/ClientExtracted/steamui/sp.js",
+    "kind": "native-current-steam-client-svg",
+    "path": "ClientExtracted/steamui/sp.js",
+    "repo": "SteamDatabase/SteamTracking"
+   },
+   "tier": "Native / official source",
+   "tinted": true
+  },
+  "p3-home": {
+   "file": "themes/steam/icons/native-steam-home.svg",
+   "mode": "vector",
+   "name": "native steam home",
+   "sha256": "4f0aac702f8b5e174cfc82d4a59ef5a50a230da460d9418ef5141d64551b7adb",
+   "size": [
+    36.0,
+    36.0
+   ],
+   "source": {
+    "commit": "bf4375cef89cbfa7892e4c8e15e28f6569578017",
+    "downloadUrl": "https://raw.githubusercontent.com/SteamDatabase/SteamTracking/bf4375cef89cbfa7892e4c8e15e28f6569578017/ClientExtracted/steamui/sp.js",
+    "kind": "native-current-steam-client-svg",
+    "path": "ClientExtracted/steamui/sp.js",
+    "repo": "SteamDatabase/SteamTracking"
+   },
+   "tier": "Native / official source",
+   "tinted": true
+  },
+  "p3-lightning": {
+   "file": "themes/steam/icons/native-steam-lightning.svg",
+   "mode": "vector",
+   "name": "native steam lightning",
+   "sha256": "2f8cdc480aebaa1aaa769b38dab910d5a986466d087bbf198d5d71c9e3816c41",
+   "size": [
+    32.0,
+    32.0
+   ],
+   "source": {
+    "commit": "bf4375cef89cbfa7892e4c8e15e28f6569578017",
+    "downloadUrl": "https://raw.githubusercontent.com/SteamDatabase/SteamTracking/bf4375cef89cbfa7892e4c8e15e28f6569578017/ClientExtracted/steamui/sp.js",
+    "kind": "native-current-steam-client-svg",
+    "path": "ClientExtracted/steamui/sp.js",
+    "repo": "SteamDatabase/SteamTracking"
+   },
+   "tier": "Native / official source",
+   "tinted": true
+  },
+  "p3-mic": {
+   "file": "themes/steam/icons/native-steam-microphone.svg",
+   "mode": "vector",
+   "name": "native steam microphone",
+   "sha256": "57944f4f2c40efce5f631d528db9c7c6d13102e72e22fb447beb0726fcc0af4c",
+   "size": [
+    36.0,
+    36.0
+   ],
+   "source": {
+    "commit": "bf4375cef89cbfa7892e4c8e15e28f6569578017",
+    "downloadUrl": "https://raw.githubusercontent.com/SteamDatabase/SteamTracking/bf4375cef89cbfa7892e4c8e15e28f6569578017/ClientExtracted/steamui/sp.js",
+    "kind": "native-current-steam-client-svg",
+    "path": "ClientExtracted/steamui/sp.js",
+    "repo": "SteamDatabase/SteamTracking"
+   },
+   "tier": "Native / official source",
+   "tinted": true
+  },
+  "p3-music": {
+   "file": "themes/steam/icons/native-steam-music.svg",
+   "mode": "vector",
+   "name": "native steam music",
+   "sha256": "3897c8c51b91f760f3cab3d74da02dba419f0ac8f3c4fbdea9853115bd58b2d4",
+   "size": [
+    36.0,
+    36.0
+   ],
+   "source": {
+    "commit": "bf4375cef89cbfa7892e4c8e15e28f6569578017",
+    "downloadUrl": "https://raw.githubusercontent.com/SteamDatabase/SteamTracking/bf4375cef89cbfa7892e4c8e15e28f6569578017/ClientExtracted/steamui/sp.js",
+    "kind": "native-current-steam-client-svg",
+    "path": "ClientExtracted/steamui/sp.js",
+    "repo": "SteamDatabase/SteamTracking"
+   },
+   "tier": "Native / official source",
+   "tinted": true
+  },
+  "p3-refresh": {
+   "file": "themes/steam/icons/native-steam-refresh.svg",
+   "mode": "vector",
+   "name": "native steam refresh",
+   "sha256": "f90be2f5721dbd7c3121aa99620e3c98f1993a8fcebc6e9f5acb8622a7178277",
+   "size": [
+    256.0,
+    256.0
+   ],
+   "source": {
+    "commit": "bf4375cef89cbfa7892e4c8e15e28f6569578017",
+    "downloadUrl": "https://raw.githubusercontent.com/SteamDatabase/SteamTracking/bf4375cef89cbfa7892e4c8e15e28f6569578017/ClientExtracted/steamui/sp.js",
+    "kind": "native-current-steam-client-svg",
+    "path": "ClientExtracted/steamui/sp.js",
+    "repo": "SteamDatabase/SteamTracking"
+   },
+   "tier": "Native / official source",
+   "tinted": true
+  },
+  "p3-snooze": {
+   "file": "themes/steam/icons/native-steam-sleep.svg",
+   "mode": "vector",
+   "name": "native steam sleep",
+   "sha256": "13bd6d2d2f8e63ec6405c9bdbda0296eafc590822b5573dddc9db93a145c253f",
+   "size": [
+    36.0,
+    36.0
+   ],
+   "source": {
+    "commit": "bf4375cef89cbfa7892e4c8e15e28f6569578017",
+    "downloadUrl": "https://raw.githubusercontent.com/SteamDatabase/SteamTracking/bf4375cef89cbfa7892e4c8e15e28f6569578017/ClientExtracted/steamui/sp.js",
+    "kind": "native-current-steam-client-svg",
+    "path": "ClientExtracted/steamui/sp.js",
+    "repo": "SteamDatabase/SteamTracking"
+   },
+   "tier": "Native / official source",
+   "tinted": true
+  },
+  "p3-volume": {
+   "file": "themes/steam/icons/native-steam-volume.svg",
+   "mode": "vector",
+   "name": "native steam volume",
+   "sha256": "0262f4dbf3fe21f88e0391aba796bfb380e2d1d3dd595ce07b3ed7a4aad75208",
+   "size": [
+    36.0,
+    36.0
+   ],
+   "source": {
+    "commit": "bf4375cef89cbfa7892e4c8e15e28f6569578017",
+    "downloadUrl": "https://raw.githubusercontent.com/SteamDatabase/SteamTracking/bf4375cef89cbfa7892e4c8e15e28f6569578017/ClientExtracted/steamui/sp.js",
+    "kind": "native-current-steam-client-svg",
+    "path": "ClientExtracted/steamui/sp.js",
+    "repo": "SteamDatabase/SteamTracking"
+   },
+   "tier": "Native / official source",
+   "tinted": true
+  }
+ },
+ "states": {}
+}

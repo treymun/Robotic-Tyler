@@ -1,0 +1,92 @@
+{
+ "icons": {},
+ "picks": {
+  "p3-invuln": {
+   "file": "themes/quake/ui/sb_invuln.png",
+   "mode": "pixels",
+   "name": "Quake status bar Pentagram of Protection (SB_INVULN)",
+   "native": [
+    16,
+    16
+   ],
+   "sha256": "72de9c3c894a8c0dfb220f642ab1a2979e38e1bbe3e64faf5283a62243b692d0",
+   "size": [
+    16,
+    16
+   ],
+   "source": {
+    "downloadUrl": "https://raw.githubusercontent.com/pweil-/origin-quake/master/id1/pak0.pak",
+    "kind": "original-quake-shareware-art",
+    "path": "id1/pak0.pak",
+    "repo": "pweil-/origin-quake"
+   },
+   "tier": "Native / official source"
+  },
+  "p3-net": {
+   "file": "themes/quake/ui/net.png",
+   "mode": "pixels",
+   "name": "Quake connection-interrupted icon (NET)",
+   "native": [
+    32,
+    32
+   ],
+   "sha256": "00a2e05cd599504c5c5abf2dfd8ce846f32b01e7fc71141acfc0afa65eb532c6",
+   "size": [
+    32,
+    32
+   ],
+   "source": {
+    "downloadUrl": "https://raw.githubusercontent.com/pweil-/origin-quake/master/id1/pak0.pak",
+    "kind": "original-quake-shareware-art",
+    "path": "id1/pak0.pak",
+    "repo": "pweil-/origin-quake"
+   },
+   "tier": "Native / official source"
+  },
+  "p3-quad": {
+   "file": "themes/quake/ui/sb_quad.png",
+   "mode": "pixels",
+   "name": "Quake status bar Quad Damage (SB_QUAD)",
+   "native": [
+    16,
+    16
+   ],
+   "sha256": "626360f58d1652cbbf6691be1d67b54495d0d2dd8dd9d1212460e16a7270a696",
+   "size": [
+    16,
+    16
+   ],
+   "source": {
+    "downloadUrl": "https://raw.githubusercontent.com/pweil-/origin-quake/master/id1/pak0.pak",
+    "kind": "original-quake-shareware-art",
+    "path": "id1/pak0.pak",
+    "repo": "pweil-/origin-quake"
+   },
+   "tier": "Native / official source"
+  },
+  "p3-sigil": {
+   "file": "themes/quake/ui/sb_sigil1.png",
+   "mode": "pixels",
+   "name": "Quake status bar rune (SB_SIGIL1)",
+   "native": [
+    8,
+    16
+   ],
+   "sha256": "5da3e65604d64ef412a9544f7b5d1bf0947b4eb05931dcfce9506db80fcd7e9a",
+   "size": [
+    8,
+    16
+   ],
+   "source": {
+    "downloadUrl": "https://raw.githubusercontent.com/pweil-/origin-quake/master/id1/pak0.pak",
+    "kind": "original-quake-shareware-art",
+    "path": "id1/pak0.pak",
+    "repo": "pweil-/origin-quake"
+   },
+   "tier": "Native / official source"
+  }
+ },
+ "states": {
+  "waiting": "p3-net"
+ }
+}

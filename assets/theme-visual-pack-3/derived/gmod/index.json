@@ -1,0 +1,28 @@
+{
+ "icons": {},
+ "picks": {
+  "p3-silk-error": {
+   "file": "themes/gmod/icons/icons-error.png.png",
+   "mode": "pixels",
+   "name": "Silk icon16/error.png (Garry's Mod Lua error notice)",
+   "native": [
+    16,
+    16
+   ],
+   "sha256": "011f4e33d86b448078a2bd56b7060770b2c079e86aad2b7298ab0db216758f34",
+   "size": [
+    16,
+    16
+   ],
+   "source": {
+    "commit": "ae40eb194a6e4e86ad64d677611868c3d22d3c2a",
+    "downloadUrl": "https://raw.githubusercontent.com/markjames/famfamfam-silk-icons/ae40eb194a6e4e86ad64d677611868c3d22d3c2a/icons/error.png",
+    "kind": "silk-source-era-icon",
+    "path": "icons/error.png",
+    "repo": "markjames/famfamfam-silk-icons"
+   },
+   "tier": "Community / period source"
+  }
+ },
+ "states": {}
+}

@@ -1,0 +1,20 @@
+/* v2.37 Pack 3 additions for the themes in theme-pack-4.js (rust x360 ipod msn xmb): the 25-theme visual asset pack's
+   artwork (assets/theme-visual-pack-3). Loaded after theme-features.css. */
+
+/* Rust: Rust's own gui/ui glyphs on the status effects and pickups use the existing .rs-ic.rs-ic-b (white, 14 px). */
+
+/* Xbox 360: the Blades Media blade's Music icon (32 px source, shown at half size like the gamerscore icon) before the song. */
+.x-motto-bi{display:inline-block;width:16px;height:16px;margin:-3px 4px -3px 0;vertical-align:middle}
+.x-motto-bi svg{shape-rendering:geometricPrecision}
+
+/* MSN Messenger: the 16 px contact icon with its 10 px status badge on the bottom-right corner, pixel for pixel. */
+.msn-buddy{position:relative;display:inline-block;flex-shrink:0;width:16px;height:16px;line-height:0}
+.msn-buddy-bi{display:block;width:16px;height:16px}
+.msn-badge-bi{position:absolute;right:0;bottom:0;width:10px;height:10px}
+.fx-menu.msn-menu .fx-menu-mark-bi .msn-buddy{margin:0 -1px}
+/* The Nudge icon is 24 x 16: a 24 px square artboard, its empty top and bottom 4 px taken back by the margin. */
+.msn-nudge-bi{display:block;flex-shrink:0;width:24px;height:24px;margin:-4px 0}
+
+/* PS3 XMB: the Trophy Collection glyph (traced, one colour) in white on the tier tiles. */
+.xb-tr-bi,.xb-tr-head{color:#fff}
+.xb-trophy-ic .xb-tr-bi,.xb-note-ic .xb-tr-bi{width:22px;height:22px}

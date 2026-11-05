@@ -1,0 +1,66 @@
+/* v2.37 Pack 3 additions for the themes in theme-pack-1.js (steam classic tf2 cs2 portal cs16 hev): the 25-theme visual asset pack's
+   artwork (assets/theme-visual-pack-3). Loaded after theme-features.css. Native bitmaps are shown at their own pixel size.
+   Tinted drawings (currentColor) name svg[data-bi][data-bi] to colour them: theme-features.css gives every pack drawing
+   color:initial with .panel svg[data-bi][data-bi]. */
+
+/* Steam: the client's own icons on the achievement badges, and its Away moon / Snooze Zz on the persona chip. */
+.st-ach-bi{display:block;width:26px;height:26px}
+.st-ap-row .st-ach-bi{width:22px;height:22px}
+.st-p-bi{display:block;flex-shrink:0;width:12px;height:12px}
+.panel svg[data-bi][data-bi]:is(.st-ach-bi,.st-p-bi,.fx-menu-bi[data-bi^="steam/p3-"]){color:inherit}
+
+/* Classic Steam: the 2004 client's 16 x 16 Away clock (status strip) and message envelope (server list), 1:1. */
+.tally-bi[data-bi="classic/p3-away"]{width:16px;height:16px}
+.cl-bi[data-bi="classic/p3-message"]{width:16px;height:16px;vertical-align:-4px}
+
+/* Counter-Strike 2: the buy-zone cart on the B chip and beside BOUGHT; the network globe's ring while reconnecting. */
+.cs-buy:has(.cs-buy-bi){display:inline-flex;align-items:center;gap:4px}
+.cs-buy-bi{display:block;flex-shrink:0;width:13px;height:13px}
+.cs-cart-bi{display:inline-block;width:12px;height:12px;margin-right:4px;vertical-align:-1px}
+.tally-brand:has(>.cs-gc-ring){position:relative}
+.tally-bi.cs-gc-ring{position:absolute;left:0;top:0}
+@media (prefers-reduced-motion:no-preference){.tally[data-state=waiting] .cs-gc-ring{animation:p3-cs-gc 1.4s linear 8}}
+@keyframes p3-cs-gc{to{transform:rotate(360deg)}}
+.panel svg[data-bi][data-bi]:is(.cs-buy-bi,.cs-cart-bi){color:inherit}
+.panel svg[data-bi][data-bi]:is(.cs-gc-ring,[data-bi="cs2/p3-gc-globe"]){color:var(--tone,currentColor)}
+/* The network globe is CS2's own reconnecting indicator, so the strip's generic spinner steps aside for it. */
+[data-rt-theme=cs2] .tally[data-state=waiting]:has(.cs-gc-ring) .tally-label::after{display:none}
+
+/* Team Fortress 2: the Spy's emblem (paused, standby) in TF2's cream. */
+.panel svg[data-bi][data-bi][data-bi="tf2/p3-spy"]{color:#ebe2ca}
+
+/* Portal: the exit-door sign in the chamber sign's corner: the glyphs are the sign's cut-outs, on its own panel
+   colours (sampled from signage_doorstate: blue when locked, orange when open). */
+.po-sign:has(>.po-door){position:relative}
+.po-door{position:absolute;top:7px;right:8px;display:block;width:22px;height:22px;overflow:hidden;border-radius:4px;background:#e1983a;color:#33383b;pointer-events:auto}
+.po-door[data-door=locked]{background:#42bedb}
+.panel svg[data-bi][data-bi].po-door-bi{display:none;width:24px;height:24px;margin:-1px;color:inherit}
+.panel .po-door[data-door=open] svg[data-bi][data-bi].po-door-bi:first-child,.panel .po-door[data-door=locked] svg[data-bi][data-bi].po-door-bi:last-child{display:block}
+/* The sign's pictograms: dark when that part of the chamber is live, faded when it isn't, like the real sign. */
+.po-tile.po-tile-p3,.po-tile.po-tile-p3.on{background:#eef1f3}
+.panel svg[data-bi][data-bi].po-p3{display:block;width:24px;height:24px;color:#bcc3c9;transition:color .25s}
+.panel .po-tile.on svg[data-bi][data-bi].po-p3{color:#1b1d1f}
+
+/* Counter-Strike 1.6: the HUD health cross (24 x 24 sprite, 1:1) on the first stat, red at 25% health or less;
+   the thinking badge is the HUD's C4 (32 x 16), green like the game's status icons. */
+[data-rt-theme=cs16] .stat:first-child:has(>.c16-hp){display:grid;grid-template-columns:auto minmax(0,1fr);column-gap:5px;align-items:center}
+[data-rt-theme=cs16] .stat:first-child:has(>.c16-hp)>:is(dt,small){grid-column:1/-1}
+[data-rt-theme=cs16] .stat:first-child:has(>.c16-hp)>dd{grid-column:2;grid-row:2}
+[data-rt-theme=cs16] .stat:first-child:has(>.c16-hp)>dd::before{display:none}
+.panel svg[data-bi][data-bi].c16-hp{display:block;grid-column:1;grid-row:2;width:24px;height:24px;margin-top:2px;color:#ffb000;filter:drop-shadow(0 0 3px rgba(255,176,0,.55))}
+.panel svg[data-bi][data-bi].c16-hp.low{color:#ff1010;filter:drop-shadow(0 0 3px rgba(255,16,16,.55))}
+.tally-brand:has(>.tally-bi[data-bi="cs16/p3-c4"]){width:auto;min-width:18px}
+.panel svg[data-bi][data-bi].tally-bi[data-bi="cs16/p3-c4"]{width:32px;height:32px;margin:-8px 0;color:#00a000}
+
+/* HEV: the HUD flashlight (32 x 22 casing + 12 x 22 beam, 1:1): charge clipped from the left, beam while on. */
+.hev-lamp.hev-lamp-hud{display:inline-flex;align-items:center;padding:0 4px}
+.hev-flash{display:flex;align-items:center;height:22px}
+.hev-fl-casing{display:grid;width:32px;height:22px}
+.hev-fl-casing>.hev-fl{grid-area:1/1;display:block;width:32px;height:32px;margin:-5px 0}
+.hev-fl.flash-beam{display:block;width:22px;height:22px;margin:0 -5px;visibility:hidden}
+.hev-lamp-hud:not([aria-pressed=true]) .hev-flash{opacity:.62}
+.hev-lamp.hev-lamp-hud[aria-pressed=true]{background:rgba(0,0,0,.5);color:#ffdc00;box-shadow:0 0 10px rgba(255,220,0,.4),inset 0 0 0 1px rgba(255,220,0,.55)}
+.hev-lamp-hud[aria-pressed=true] .hev-fl.flash-beam{visibility:visible}
+.panel svg[data-bi][data-bi].hev-fl{color:inherit}
+/* Errors and warnings: the HUD's radiation damage icon, in the HUD's amber like the game draws it. */
+.panel svg[data-bi][data-bi].tally-bi[data-bi="hev/p3-dmg-rad"]{color:#ffa000}

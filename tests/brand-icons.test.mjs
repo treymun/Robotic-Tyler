@@ -5,6 +5,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import vm from 'node:vm';
+import crypto from 'node:crypto';
 import {BRAND} from '../tools/brand/map.mjs';
 import {ICONS} from '../tools/icons/icons.mjs';
 const ROOT=path.resolve(import.meta.dirname,'..');
@@ -91,4 +92,30 @@ test('v2.30: Pack 2\'s chosen artwork is sourced, used, shipped with its notices
  assert.match(ctx.TylerBrand.svg('msn','source-smile'),/viewBox="0 0 19 19" shape-rendering="crispEdges"/,'an emoticon stays a 19 px bitmap');
  assert.equal(ctx.TylerBrand.native('winxp','source-shell32-16'),24);assert.equal(ctx.TylerBrand.native('xmb','source-category-music'),0);
  assert.equal(ctx.TylerBrand.svg('steam','source-smile'),'','one theme\'s artwork is not another\'s');
+});
+
+test('v2.37: Pack 3\'s chosen artwork is copied as supplied, recorded with its source, used by its theme, small, and credited',()=>{
+ const base='assets/theme-visual-pack-3',packs=[1,2,3,4].map(n=>read('browser-extension/theme-pack-'+n+'.js')).join('\n');
+ const ctx={};vm.createContext(ctx);ctx.globalThis=ctx;vm.runInContext(read('browser-extension/ui-brand.js'),ctx);
+ const cf='browser-extension/ui/brand/Pack-3-CREDITS.md',credits=fs.existsSync(path.join(ROOT,cf))?read(cf):'';let n=0,themes=0,bytes=0;
+ for(const theme of ALL){
+  const f=path.join(ROOT,base,'derived',theme,'index.json');if(!fs.existsSync(f))continue;
+  const doc=JSON.parse(fs.readFileSync(f,'utf8')),sel=JSON.parse(read(base+'/select/'+theme+'.json'));
+  assert.deepEqual(Object.keys(doc.picks).sort(),Object.keys(sel.picks).sort(),theme+': drawn exactly what its select file lists (run tools/brand/pack3.py)');
+  if(Object.keys(doc.picks).length)themes++;
+  for(const [id,info] of Object.entries(doc.picks)){n++;
+   const src=path.join(ROOT,base,'source',theme,path.basename(info.file));
+   assert.ok(fs.existsSync(src),id+': the source file is kept');
+   assert.match(info.sha256||'',/^[0-9a-f]{64}$/,id+': the pack manifest\'s SHA-256');
+   assert.equal(crypto.createHash('sha256').update(fs.readFileSync(src)).digest('hex'),info.sha256,id+': copied as supplied');
+   assert.ok(info.tier&&info.source&&Object.keys(info.source).length,id+': its source is recorded');
+   assert.ok(['pixels','lum','trace','vector'].includes(info.mode),id);
+   const svg=read(base+'/derived/'+theme+'/'+id+'.svg');bytes+=svg.length;assert.ok(svg.length<48*1024,id+' is small');
+   assert.ok(ctx.TylerBrand.svg(theme,id).length>0,theme+'/'+id+' is in ui-brand.js');
+   assert.ok(packs.includes("'"+id+"'")||packs.includes('"'+id+'"')||Object.values(doc.icons||{}).includes(id)||Object.values(doc.states||{}).includes(id),theme+'/'+id+' is used');
+   assert.match(credits,new RegExp('\\| '+id+' \\('),id+' is credited');}
+ }
+ assert.ok(bytes<900*1024,'Pack 3 adds '+Math.round(bytes/1024)+' KB of drawings in all');
+ if(n)assert.ok(fs.existsSync(path.join(ROOT,'app/companion/ui/brand/Pack-3-CREDITS.md')),'the desktop app ships the credits too');
+ console.log('Pack 3: '+n+' drawings in '+themes+' themes, '+Math.round(bytes/1024)+' KB');
 });

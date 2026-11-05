@@ -1,0 +1,44 @@
+{
+ "icons": {},
+ "picks": {
+  "p3-citizen": {
+   "file": "themes/combine/icons/hl2-native-hud-glyph-u0043.svg",
+   "mode": "vector",
+   "name": "Half-Life 2 HUD squad figure (halflife2.ttf C)",
+   "sha256": "6c891a7a6b9484f2f8f9c619287f2e33125bfb6a7fc1b489fee13c8a00b281f5",
+   "size": [
+    242.0,
+    501.0
+   ],
+   "source": {
+    "commit": "f924c60c9cce64c76d170d7834222f2418666b3e",
+    "downloadUrl": "https://raw.githubusercontent.com/Hypnootize/TF2-Default-Hud/f924c60c9cce64c76d170d7834222f2418666b3e/%23HL2%20Files/resource/halflife2.ttf",
+    "kind": "archived-native-font",
+    "path": "#HL2 Files/resource/halflife2.ttf",
+    "repo": "Hypnootize/TF2-Default-Hud"
+   },
+   "tier": "Archived source artwork",
+   "tinted": true
+  },
+  "p3-stunstick": {
+   "file": "themes/combine/icons/hl2-native-hud-glyph-u006e.svg",
+   "mode": "vector",
+   "name": "Half-Life 2 HUD weapon icon: stunstick (halflife2.ttf n)",
+   "sha256": "432657c6c2d666b49fd473f1d53f67564722d47936c07feb963a2333dfce83db",
+   "size": [
+    1395.4736842105262,
+    602.3939393939394
+   ],
+   "source": {
+    "commit": "f924c60c9cce64c76d170d7834222f2418666b3e",
+    "downloadUrl": "https://raw.githubusercontent.com/Hypnootize/TF2-Default-Hud/f924c60c9cce64c76d170d7834222f2418666b3e/%23HL2%20Files/resource/halflife2.ttf",
+    "kind": "archived-native-font",
+    "path": "#HL2 Files/resource/halflife2.ttf",
+    "repo": "Hypnootize/TF2-Default-Hud"
+   },
+   "tier": "Archived source artwork",
+   "tinted": true
+  }
+ },
+ "states": {}
+}

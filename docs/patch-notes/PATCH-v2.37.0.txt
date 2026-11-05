@@ -1,0 +1,44 @@
+# ROBOTIC TYLER v2.37.0: each theme's own artwork
+
+Every theme got a review against the owner's new *25-theme visual asset pack*. Twenty-four themes gained one or two touches drawn from the games' and systems' own artwork. It's mostly HUD and status pieces that show what Tyler is really doing, in place of drawings the app made itself. Backgrounds and layouts are unchanged, and each touch falls back to the old drawing if its artwork can't be drawn.
+
+## By theme
+- **Steam:** the achievement toast and page use the Steam client's own icons (chat, microphone, volume, music, lightning, fire, home, clock, refresh). The persona chip shows Steam's moon for Away and Zz for Snooze.
+- **Classic Steam (2004):** the 2004 Away clock while Tyler is paused or on standby, and the 2004 message envelope on the server list's Chat row.
+- **Team Fortress 2:** paused or standby shows the Spy's emblem ("cloaked").
+- **Counter-Strike 2:** the HUD's buy-zone cart on the B chip and BOUGHT readout. While reconnecting, CS2's network globe; its ring turns eight times, then stops.
+- **Portal:** the chamber sign's six tiles use Portal's own sign pictograms (cube dispenser, pellet catcher, turret, Companion Cube, cake, energy pellet), dark when that part is live. The sign's corner shows the exit-door state: the orange tick while Tyler runs, the blue X while he's paused, on standby or needs attention. The chamber report has an *Exit door* row.
+- **Counter-Strike 1.6:** the HUD's own health cross, which turns red at 25% health or less, like the game. The C4 icon shows while Tyler is thinking.
+- **Half-Life HEV:** the flashlight chip uses Half-Life's own flashlight sprites, with the charge bar showing Tyler's health. Errors and warnings use the HUD's radiation icon.
+- **Left 4 Dead:** a part that isn't working at all (no AI key) shows the skull from L4D's dead-teammate panel.
+- **Windows XP:** the tray's music icon is shell32's Play icon, lit while a song plays. The arrow after All Programs is XP's green Go arrow.
+- **DOOM:** the key cards are the status bar's own keys, also used as the listening, thinking and error badges. The Replies and Health cells show the box of bullets and the medikit. The face is unchanged. Also fixed: the bar's labels used to spill below its border; it now grows to fit (about 8 px taller).
+- **Quake:** the medals are Quake's Quad Damage, Sigil and Pentagram icons. The NET icon shows while Tyler is reconnecting, as Quake shows it when a connection stalls.
+- **Fallout Pip-Boy:** Fallout 4's radio-tower marker on Tyler FM. The radiation marker is on the RADS gauge, the error badge and the warning icon.
+- **Half-Life 2 Combine:** two glyphs from HL2's HUD font. The stunstick marks *Silence audio* in the Overwatch directives. One squad figure per person in the call appears in the biosignal scan and the unit record; the count stays as text.
+- **Deadlock:** in the shop, Checks gets the max-health stat symbol and Pause AI gets Paradox's Time Wall.
+- **Minecraft:** the hearts and hunger are the game's own HUD sprites (with the white flash of a hit). The inventory's sounds are nine real music discs.
+- **PAYDAY 2:** the heist plan's steps use PD2's brush-stroke tick boxes. The drill timer has the Drill Sawgeant skill glyph, in the drill's running, jammed or done colour.
+- **Sega Dreamcast:** the collapsed VMU shows the BIOS hourglass while Tyler thinks (one frame a second, only while visible; still with reduced motion) and the invalid-VMU sign on a problem. The memory card's saves have their BIOS VMU icons.
+- **Garry's Mod:** a problem shows GMod's own "Something is creating script errors" notice with its Silk icon. The spawn menu's sound tiles show the Silk sound icon.
+- **Ricochet:** the score box shows the game's own HUD discs: blue for each one Tyler still has, grey for each a problem cost him. The disc that flies between tabs is the same blue disc, and Game over carries the falling death notice.
+- **Day of Defeat: Source:** the round-timer stopwatch from the DoD:S HUD in front of the status strip's running time.
+- **Rust:** the five status effects that were still drawn by the app use Rust's own glyphs: home (building privilege), clan (comfort), tools (crafting), broadcast (radio) and warning. The pickup notices use them too.
+- **Xbox 360:** while the Music DJ plays, the gamer card's motto shows the song after the Media blade's Music icon. A full check's result pops up as "Connection test" with the System blade's Network Settings icon.
+- **MSN Messenger:** the contact list uses Messenger 7.5's own buddy icons, with Busy and Away badges layered the way Messenger did, and so does the status menu. The Nudge button has Messenger's real Nudge icon. Also fixed: the list no longer rebuilds every second, so keyboard focus stays put.
+- **PlayStation 3 (XMB):** the trophy list, the "You have earned a trophy." notice and the Trophies header use the XMB's own Trophy Collection glyph.
+- **iPod classic: unchanged.** Its pack holds the built-in games' art (iQuiz, Klondike, Vortex) and Apple's fonts, but no menu or status pieces the panel could use honestly. Apple's fonts aren't licensed for the app.
+
+## How it's built
+- Only the chosen files are copied into the repository (`assets/theme-visual-pack-3/source/`), each checked against the pack manifest's SHA-256 with its source recorded. The full pack stays outside the app.
+- `tools/brand/pack3.py` draws them into the same inline drawings as the earlier icon packs: native pixels at whole multiples with hard edges, additive HUD sprites tinted the theme's colour, and large one-colour glyphs traced. Nothing is loaded from a URL, so Steam's page security is untouched.
+- In all there are 97 drawings, about 0.2 MB, loaded with the panel. Credits and upstream notices ship in `ui/brand/Pack-3-CREDITS.md` and `ui/brand/Pack-3-*.txt`.
+- Motion is limited to real events and stops with reduced motion.
+
+## The GitHub page
+The README's *What's new* (v2.32 to v2.37), the theme gallery and the feature cards now cover theme-voice replies, the fast engine and this artwork.
+
+## Tested
+- **Mocked** (no Steam, no Windows audio): every touch driven through its states in the preview panel at 1× and 2×. That includes paused, standby, thinking, reconnecting, errors, low health, music, the voice call and menus.
+- The layout audit across all 25 themes, and all unit and end-to-end tests.
+- **Not checked by hand:** the real Steam page, the desktop app on Windows and the phone remote. They use the same panel code.

@@ -1,0 +1,29 @@
+{
+ "picks": {
+  "p3-ui-home": {
+   "file": "themes/rust/icons/gui-ui-home.png.png",
+   "mode": "trace",
+   "name": "Rust UI home"
+  },
+  "p3-ui-clan": {
+   "file": "themes/rust/icons/gui-ui-clan.png.png",
+   "mode": "trace",
+   "name": "Rust UI clan"
+  },
+  "p3-ui-tools": {
+   "file": "themes/rust/icons/gui-ui-tools.png.png",
+   "mode": "trace",
+   "name": "Rust UI tools"
+  },
+  "p3-ui-broadcast": {
+   "file": "themes/rust/icons/gui-ui-broadcast.png.png",
+   "mode": "trace",
+   "name": "Rust UI broadcast"
+  },
+  "p3-ui-warning": {
+   "file": "themes/rust/icons/gui-ui-warning_2.png.png",
+   "mode": "trace",
+   "name": "Rust UI warning"
+  }
+ }
+}

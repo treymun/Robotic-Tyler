@@ -1,0 +1,61 @@
+{
+ "icons": {},
+ "picks": {
+  "p3-skill-drill-sawgeant": {
+   "file": "themes/payday/icons/skill-drill_sawgeant.png",
+   "mode": "trace",
+   "name": "PAYDAY 2 skill icon: Drill Sawgeant",
+   "sha256": "7fda1edd916e019522bbb52704e3390580004fc63d31c609331b93e7bfc60096",
+   "size": [
+    80,
+    80
+   ],
+   "source": {
+    "kind": "native-payday2-skill-atlas-crop",
+    "path": "public/img/skills/icons_atlas.png",
+    "repo": "r-paydaybuilds/pd2builder"
+   },
+   "tier": "Native / official source",
+   "tinted": true
+  },
+  "p3-tickbox": {
+   "file": "themes/payday/icons/checkbox.png.png",
+   "mode": "trace",
+   "name": "PAYDAY 2 tick box",
+   "sha256": "3dbab71c97e6fb4e14935b381ccfa0e5f05ff8b08eb892a08675eac28bba32be",
+   "size": [
+    96,
+    97
+   ],
+   "source": {
+    "commit": "507041aa0a6645d1a0fbff49212f3ec347c0244a",
+    "downloadUrl": "https://raw.githubusercontent.com/r-paydaybuilds/pd2builder/507041aa0a6645d1a0fbff49212f3ec347c0244a/public/img/checkbox.png",
+    "kind": "payday2-builder-game-ui-art",
+    "path": "public/img/checkbox.png",
+    "repo": "r-paydaybuilds/pd2builder"
+   },
+   "tier": "Archived source artwork",
+   "tinted": true
+  },
+  "p3-tickbox-ticked": {
+   "file": "themes/payday/logos/checkbox_marked.png.png",
+   "mode": "trace",
+   "name": "PAYDAY 2 tick box, ticked",
+   "sha256": "284fe0814e4b307985cc95382ced8140cf1efa392de0a580bcee8f3a46c50bd2",
+   "size": [
+    96,
+    97
+   ],
+   "source": {
+    "commit": "507041aa0a6645d1a0fbff49212f3ec347c0244a",
+    "downloadUrl": "https://raw.githubusercontent.com/r-paydaybuilds/pd2builder/507041aa0a6645d1a0fbff49212f3ec347c0244a/public/img/checkbox_marked.png",
+    "kind": "payday2-builder-game-ui-art",
+    "path": "public/img/checkbox_marked.png",
+    "repo": "r-paydaybuilds/pd2builder"
+   },
+   "tier": "Archived source artwork",
+   "tinted": true
+  }
+ },
+ "states": {}
+}

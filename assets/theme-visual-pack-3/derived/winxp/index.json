@@ -1,0 +1,50 @@
+{
+ "icons": {},
+ "picks": {
+  "p3-go": {
+   "file": "themes/winxp/icons/icons-windows-xp-ico-shell32.dll-icon290_1.ico.png",
+   "mode": "pixels",
+   "name": "Windows XP shell32 icon 290 (green Go arrow), 16 x 16",
+   "native": [
+    16,
+    16
+   ],
+   "sha256": "84942e209fdc69734f864c23b5c451463fe96a9af9a7dcd1680f13952187eef4",
+   "size": [
+    16,
+    16
+   ],
+   "source": {
+    "commit": "21970f48b8f66b4d44742cb30388c1454512d681",
+    "downloadUrl": "https://raw.githubusercontent.com/bartekl1/windows-ui-assets/21970f48b8f66b4d44742cb30388c1454512d681/Icons/Windows%20XP/ico/shell32.dll/ICON290_1.ico",
+    "kind": "extracted-windows-xp-resource",
+    "path": "Icons/Windows XP/ico/shell32.dll/ICON290_1.ico",
+    "repo": "bartekl1/windows-ui-assets"
+   },
+   "tier": "Archived source artwork"
+  },
+  "p3-play": {
+   "file": "themes/winxp/icons/icons-windows-xp-ico-shell32.dll-icon246_1.ico.png",
+   "mode": "pixels",
+   "name": "Windows XP shell32 icon 246 (Play), 16 x 16",
+   "native": [
+    16,
+    16
+   ],
+   "sha256": "f3e2a77f97faf1d2447a82e2870521ddfacb1c97ce2d2fc4415c4a789e6cee2c",
+   "size": [
+    16,
+    16
+   ],
+   "source": {
+    "commit": "21970f48b8f66b4d44742cb30388c1454512d681",
+    "downloadUrl": "https://raw.githubusercontent.com/bartekl1/windows-ui-assets/21970f48b8f66b4d44742cb30388c1454512d681/Icons/Windows%20XP/ico/shell32.dll/ICON246_1.ico",
+    "kind": "extracted-windows-xp-resource",
+    "path": "Icons/Windows XP/ico/shell32.dll/ICON246_1.ico",
+    "repo": "bartekl1/windows-ui-assets"
+   },
+   "tier": "Archived source artwork"
+  }
+ },
+ "states": {}
+}
