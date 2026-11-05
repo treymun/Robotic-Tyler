@@ -5,7 +5,7 @@
 // settings window. Nothing here is saved; tests and previews don't count toward Tyler's usage.
 import {chooseOpenRouter,openRouterRequest,geminiTextModel,openRouterProblem} from './models.mjs';
 import {geminiReply} from './gemini.mjs';
-import {ownerStyle,modelStyle} from './conversation.mjs';
+import {ownerStyle,modelStyle,localCharacter,localCharacterReminder} from './conversation.mjs';
 import {CHAT_RULES,CHAT_REMINDER,wrapChat} from './guard.mjs';
 import {LOCAL_CHROME_ERROR} from './local-ai.mjs';
 
@@ -63,8 +63,8 @@ function messagesFor(request,local){
  const values=request.values||{},kind=request.kind==='roast'?'roast':'normal',length=['short','normal','detailed'].includes(values.length)?values.length:'normal';
  const prompt=String(request.prompt||'').trim().slice(0,500)||(kind==='roast'?'Tyler roast me for missing every shot.':'Tyler, what do you think?');
  if(request.action==='test')return {cap:24,messages:[{role:'system',content:'You are a connection check. Reply with exactly: Ready to roll.'},{role:'user',content:'Connection check.'}]};
- return {cap:CAP[length],messages:[{role:'system',content:CHAT_RULES+' You are ROBOTIC TYLER, an identified AI gaming companion. Respond to the latest chat message directly. '+LENGTH[length]+' Use natural conversational phrasing. '+ownerStyle(values)+' '+modelStyle(local?.uncensored?'local-uncensored':null,values.roastMode)+(kind==='roast'?' Lean into a playful roast.':'')},
-  {role:'user',content:wrapChat(prompt,'Friend')+'\n'+CHAT_REMINDER}]};
+ return {cap:CAP[length],messages:[{role:'system',content:CHAT_RULES+' You are ROBOTIC TYLER, an identified AI gaming companion. Respond to the latest chat message directly. '+LENGTH[length]+' Use natural conversational phrasing. '+ownerStyle(values)+' '+modelStyle(local?.uncensored?'local-uncensored':null,values.roastMode)+(kind==='roast'?' Lean into a playful roast.':'')+' '+localCharacter(values)},
+  {role:'user',content:wrapChat(prompt,'Friend')+'\n'+localCharacterReminder(values)+'\n'+CHAT_REMINDER}]};
 }
 async function runLocal(request,local){
  const info={model:'Text AI on this PC',id:'local',provider:'This PC'};

@@ -139,3 +139,19 @@ test('the cloud providers are unchanged: OpenRouter chosen never asks the local 
  reset();store.aiProvider='openrouter';
  const r=await command('ask hi');assert.equal(r.ok,false);assert.match(r.error,/Save a key for the selected AI provider/);assert.equal(asked.length,0);
 });
+
+// v2.38.1: the small models on this PC drifted into a generic voice with the owner style in the middle
+// of the rules, so for them the character is said again last in the instructions and right before the
+// reminder after the latest chat message. Cloud replies are unchanged (tests/guard.test.mjs checks).
+test('v2.38.1: the owner\'s personality is repeated where the small model looks: last in the rules and next to the latest message',async()=>{
+ reset();const before=store.personality;store.personality='A grumpy pirate captain. Talks like a pirate (arr, matey), calls the squad his crew.';
+ try{
+  const r=await command('ask who wins, a tank or a sniper?');assert.equal(r.ok,true,r.error);
+  const m=asked.at(-1).messages,sys=m[0].content,last=m.at(-1).content;
+  assert.ok(sys.startsWith(CHAT_RULES),'the rules still come first');assert.ok(last.endsWith(CHAT_REMINDER),'the reminder still ends the message');
+  assert.match(sys,/YOUR CHARACTER \(the owner style above; it decides how every reply sounds\): A grumpy pirate captain\. Talks like a pirate \(arr, matey\), calls the squad his crew\. Stay in this character[^]*no summaries\.$/,'the character closes the instructions');
+  assert.ok(sys.indexOf('OWNER STYLE')<sys.indexOf('YOUR CHARACTER'));
+  assert.match(last,/<\/chat>\n\(Your character: A grumpy pirate captain\. Talks like a pirate \(arr, matey\), calls the squad his crew\.\)\n\(Reply to the <chat>/,'and again right before the reminder');
+  assert.equal(m.filter(x=>x.role==='system').length,1,'one instruction block, first');
+ }finally{store.personality=before;}
+});

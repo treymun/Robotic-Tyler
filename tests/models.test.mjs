@@ -8,7 +8,7 @@ import fs from 'node:fs';
 import {OPENROUTER_MODELS,GEMINI_TEXT_MODELS,chooseOpenRouter,openRouterRequest,modelLabel,geminiProblem,openRouterProblem,NEVER_PROVIDERS} from '../browser-extension/models.mjs';
 import {geminiTextBody,geminiContents} from '../browser-extension/gemini.mjs';
 import {styleGuide} from '../browser-extension/memory.mjs';
-import {modelStyle} from '../browser-extension/conversation.mjs';
+import {modelStyle,characterBrief,localCharacterReminder} from '../browser-extension/conversation.mjs';
 
 const store={openrouterKey:'sk-or-test',geminiKey:'AIza-test',aiProvider:'openrouter'};
 const calls=[];let geminiQueue=[],orQueue=[];
@@ -137,4 +137,11 @@ test('No filter: crude and loud, with range and hard limits',()=>{
  assert.match(g,/Swear constantly/);assert.match(g,/not every message is an insult/);assert.match(g,/answer properly first/);
  assert.match(g,/no slurs/);assert.match(g,/drop the teasing the moment someone asks/);
  assert.equal(modelStyle('fast','savage'),'');assert.match(modelStyle('venice','unhinged'),/no disclaimers/);
+});
+
+test('v2.38.1: the character brief for the models on this PC: the owner\'s personality (trimmed, spaces tidied) plus the persona',()=>{
+ assert.equal(characterBrief({}),'Witty gaming buddy.');
+ assert.equal(characterBrief({personality:'  Cocky\n\nCS vet.  ',v23Persona:'dry'}),'Cocky CS vet. Respond with dry, deadpan gaming humor.');
+ assert.equal(characterBrief({personality:'x'.repeat(900)}).length,400);
+ assert.equal(localCharacterReminder({personality:'y'.repeat(900)}),'(Your character: '+'y'.repeat(240)+')');
 });

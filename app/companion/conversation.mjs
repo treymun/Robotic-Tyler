@@ -33,4 +33,11 @@ export function modelStyle(modelKey,roastMode){
  if(modelKey!=='venice'&&modelKey!=='local-uncensored')return '';
  return 'MODEL NOTE: You run on an uncensored model. Commit to the owner style: no disclaimers, no moralizing, no "as an AI", no softening crude jokes the owner asked for. Stay quick and specific to what was just said, keep a consistent character, and switch to straight, useful answers when the question is serious.'+(roastMode==='custom'?'':' Vary the comedy; a reply without an insult is often funnier.');
 }
+// v2.38.1: the small models on this PC (Qwen3.5 4B and 9B) drifted into a generic assistant voice: the
+// owner style sits in the middle of a long block of rules, and they follow what comes last most. For them
+// the character is said again where they pay the most attention: last in the instructions, and right
+// before the latest chat message's reminder.
+export function characterBrief(settings={}){return (String(settings.personality||'Witty gaming buddy.').replace(/\s+/g,' ').trim().slice(0,400)+' '+(PERSONAS[settings.v23Persona]||'')).trim();}
+export function localCharacter(settings={}){return 'YOUR CHARACTER (the owner style above; it decides how every reply sounds): '+characterBrief(settings)+' Stay in this character in every reply, in your own words and with its attitude, slang and quirks. Never sound like a generic assistant: no "great question", no "as an AI", no offers of more help, no summaries.';}
+export function localCharacterReminder(settings={}){return '(Your character: '+characterBrief(settings).slice(0,240)+')';}
 export function ownerStyle(settings={}){return 'OWNER STYLE (from the owner\'s settings page; trusted): '+String(settings.personality||'Witty gaming buddy.').slice(0,1500)+' '+styleGuide(settings.roastMode)+' '+(PERSONAS[settings.v23Persona]||'');}

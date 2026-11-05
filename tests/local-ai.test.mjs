@@ -9,7 +9,7 @@ import fs from 'node:fs';import path from 'node:path';import os from 'node:os';i
 import {createRequire} from 'node:module';
 const require=createRequire(import.meta.url),root=path.resolve(import.meta.dirname,'..'),LA=path.join(root,'app','local-ai');
 const {Installer,LOCK}=require(path.join(LA,'installer.cjs'));
-const {LocalAI,threads}=require(path.join(LA,'service.cjs'));
+const {LocalAI,threads,tidyMessages}=require(path.join(LA,'service.cjs'));
 const {LlamaServer,classify}=require(path.join(LA,'server.cjs'));
 const hardware=require(path.join(LA,'hardware.cjs'));
 const {extractTarGz,stripPlace}=require(path.join(LA,'tar.cjs'));
@@ -315,4 +315,26 @@ test('v2.38 suggestion: a virtual adapter or a card Vulkan can\'t see means the 
  assert.equal(hardware.suggest({gpus:[{vendor:'NVIDIA',name:'NVIDIA GeForce RTX 3060',source:'windows',vramTotal:12*GB,integrated:false}],ram,vulkanChecked:true,vulkanListed:true}).device,'cpu','Vulkan listed no devices');
  const real=hardware.suggest({gpus:[{name:'NVIDIA GeForce RTX 5070 Ti Laptop GPU',source:'vulkan',vramTotal:12*GB,vramFree:11*GB,integrated:false}],ram,vulkanChecked:true,vulkanListed:true});
  assert.equal(real.device,'gpu');assert.equal(real.model,'9b');
+});
+
+// v2.38.1: the Qwen3.5 chat template raises 'System message must be at the beginning.' for an
+// instruction after the first message, and 'No user query found in messages.' without a user turn
+// (seen on the owner's PC as "the engine answered 500"). These are the template's two rules.
+const templateAccepts=list=>list.every((m,i)=>m.role!=='system'||i===0)&&list.some(m=>m.role==='user');
+test('v2.38.1: every instruction is moved, in order, into one opening block the model\'s template accepts',async()=>{
+ const later=[{role:'system',content:'You are ROBOTIC TYLER.'},{role:'user',content:'rush b?'},{role:'assistant',content:'Rush B.'},{role:'system',content:'  '},{role:'user',content:'again'},{role:'system',content:'Reply with fresh wording.'}];
+ assert.equal(templateAccepts(later),false,'Tyler\'s retry note breaks the template as sent');
+ const tidy=tidyMessages(later);
+ assert.ok(templateAccepts(tidy));
+ assert.deepEqual(JSON.parse(JSON.stringify(tidy)),[{role:'system',content:'You are ROBOTIC TYLER.\n\nReply with fresh wording.'},{role:'user',content:'rush b?'},{role:'assistant',content:'Rush B.'},{role:'user',content:'again'}]);
+ assert.deepEqual(JSON.parse(JSON.stringify(tidyMessages([{role:'system',content:'Rules.'}]))),[{role:'system',content:'Rules.'},{role:'user',content:'Continue.'}],'a user turn is added only when there is none');
+ assert.deepEqual(JSON.parse(JSON.stringify(tidyMessages([{role:'tool',content:'x'},{role:'user',content:7}]))),[{role:'user',content:'x'},{role:'user',content:'7'}],'unknown roles become user turns; contents are text');
+ assert.deepEqual(JSON.parse(JSON.stringify(tidyMessages(msgs))),JSON.parse(JSON.stringify(msgs)),'a conversation that is already in order is sent unchanged');
+});
+test('v2.38.1: the engine is sent the tidied conversation',{skip:!unix},async()=>{
+ const t=await setup({config:{reply:'Fresh take.'}});
+ await t.svc.chat({messages:[...msgs,{role:'system',content:'Reply with fresh wording.'}],stream:false});
+ const sent=t.seen().filter(e=>e.chat).at(-1).chat.messages;
+ assert.ok(templateAccepts(sent));assert.match(sent[0].content,/Reply with fresh wording\.$/);assert.equal(sent.filter(m=>m.role==='system').length,1);
+ await t.done();
 });

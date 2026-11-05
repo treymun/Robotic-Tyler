@@ -18,6 +18,21 @@ const NO_CLOUD=' Tyler didn’t use a cloud AI instead.';
 const WHERE='Settings → AI & personality → Text AI on this PC';
 
 /** Processor threads for the engine: the physical cores (about half the logical ones), 1–16. */
+// The models' own chat templates (Qwen3.5's among them) refuse a conversation whose
+// instructions are not all at the start ("System message must be at the beginning.") or that
+// has no user message ("No user query found in messages."). Tyler adds notes later in the list
+// (the fresh-reply and rewrite notes), so every instruction moves, in order, into one opening
+// block; empty instructions are dropped and a conversation with no user message gets one.
+function tidyMessages(list){
+ const clean=m=>({role:['system','user','assistant'].includes(m?.role)?m.role:'user',content:String(m?.content??'')});
+ const rules=[],talk=[];
+ for(const m of (Array.isArray(list)?list:[]).map(clean)){
+  if(m.role!=='system')talk.push(m);
+  else if(m.content.trim())rules.push(m.content.trim());
+ }
+ if(!talk.some(m=>m.role==='user'))talk.push({role:'user',content:'Continue.'});
+ return rules.length?[{role:'system',content:rules.join('\n\n')},...talk]:talk;
+}
 function threads(cpus=os.cpus().length){return Math.max(1,Math.min(16,cpus>=4?Math.floor(cpus/2):cpus));}
 
 class LocalAI extends EventEmitter{
@@ -207,8 +222,7 @@ class LocalAI extends EventEmitter{
    const starting=this.ensure({onStage});starting.catch(()=>{});
    srv=await Promise.race([starting,new Promise((_,j)=>{if(ctl.signal.aborted)j(err('Stopped.','cancelled','turn'));ctl.signal.addEventListener('abort',()=>j(err('Stopped.','cancelled','turn')),{once:true});})]);
    if(ctl.signal.aborted)throw err('Stopped.','cancelled','turn');
-   const clean=m=>({role:['system','user','assistant'].includes(m.role)?m.role:'user',content:String(m.content??'')});
-   const body={messages:messages.map(clean),max_tokens:Math.max(1,Math.min(1024,Number(max_tokens)||220)),stream:stream!==false,...(typeof temperature==='number'&&Number.isFinite(temperature)?{temperature}:{})};
+   const body={messages:tidyMessages(messages),max_tokens:Math.max(1,Math.min(1024,Number(max_tokens)||220)),stream:stream!==false,...(typeof temperature==='number'&&Number.isFinite(temperature)?{temperature}:{})};
    const r=await srv.chat(body,{signal:ctl.signal,onDelta:onText});
    const text=String(r.text||'').trim();
    if(!text)throw err('The AI on this PC answered without any text. Try again.','empty','turn');
@@ -237,4 +251,4 @@ class LocalAI extends EventEmitter{
  }
  async shutdown(){await this.close('quit').catch(()=>{});}
 }
-module.exports={LocalAI,DEFAULTS,threads,IDLE};
+module.exports={LocalAI,DEFAULTS,threads,IDLE,tidyMessages};
