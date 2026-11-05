@@ -8,8 +8,8 @@
  "relationship": "Direct game faction voice",
  "direction": "Brisk battlefield callouts. Individual recordings need speaker consistency review before creating a single clone.",
  "language": "English",
- "status": "pending",
- "statusNote": "",
+ "status": "ready",
+ "statusNote": "The game's radio lines come from several voices, so this clone follows the one in its reference recording.",
  "transcriptSource": "Machine transcript (Whisper small.en), corrected by hand where it clearly misheard; not checked by listening.",
  "sources": [
   {

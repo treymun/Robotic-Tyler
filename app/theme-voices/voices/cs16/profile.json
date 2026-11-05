@@ -8,8 +8,8 @@
  "relationship": "Direct game operator",
  "direction": "Short, emphatic radio delivery. Separate match announcer lines from operator lines.",
  "language": "English",
- "status": "pending",
- "statusNote": "",
+ "status": "weak",
+ "statusNote": "Recognisably the radio operator's delivery, but the clone comes out lower and only about halfway between a different voice and his own other lines on an independent speaker check. A cleaner, longer recording would help.",
  "transcriptSource": "Machine transcript (Whisper small.en), corrected by hand where it clearly misheard; not checked by listening.",
  "sources": [
   {

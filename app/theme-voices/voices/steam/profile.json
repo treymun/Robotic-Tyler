@@ -8,7 +8,7 @@
  "relationship": "Valve-associated character",
  "direction": "Low, deliberate delivery and distinctive pauses; keep processing minimal.",
  "language": "English",
- "status": "pending",
+ "status": "ready",
  "statusNote": "",
  "transcriptSource": "Machine transcript (Whisper small.en), corrected by hand where it clearly misheard; not checked by listening.",
  "sources": [

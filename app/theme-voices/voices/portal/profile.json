@@ -8,7 +8,7 @@
  "relationship": "Direct game character",
  "direction": "Cool, precisely articulated speech with the character's synthetic tone. Do not stack heavy effects over an already processed clone.",
  "language": "English",
- "status": "pending",
+ "status": "ready",
  "statusNote": "",
  "transcriptSource": "Machine transcript (Whisper small.en), corrected by hand where it clearly misheard; not checked by listening.",
  "sources": [

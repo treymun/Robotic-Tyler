@@ -8,8 +8,8 @@
  "relationship": "Original operating-system voice",
  "direction": "Keep the original robotic prosody. Prefer native synthesis if available; cloning is an optional portability route.",
  "language": "English",
- "status": "pending",
- "statusNote": "",
+ "status": "approximation",
+ "statusNote": "A clone of a recording of Microsoft Sam: close in sound on an independent speaker check, but not the synthesizer itself. With Microsoft's own voice installed (Settings → Microsoft Sam and Mary), Tyler uses the real thing.",
  "transcriptSource": "Machine transcript (Whisper small.en), corrected by hand where it clearly misheard; not checked by listening.",
  "sources": [
   {

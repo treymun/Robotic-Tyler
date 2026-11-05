@@ -1,4 +1,137 @@
-# ROBOTIC TYLER v2.34.3: chat images on a limited Steam account
+# ROBOTIC TYLER v2.35.0: theme voices (optional local voice cloning)
+
+## New: theme voices (desktop app, optional)
+- **What they are:** Tyler can say a typed message in each theme's character voice: G-Man for Steam, GLaDOS for Portal, the CS 1.6 radio operator, Bill for Left 4 Dead, and so on.
+  - The voices are **clones made on your PC** by a local model (Qwen3-TTS Base, Apache-2.0).
+  - No account, no key and no cost per message.
+- **Optional:**
+  - Setup's default is still the standard install: no voice engine, model, Python, PyTorch or GPU files.
+  - Tick *Also add local theme voices*, or later use Settings → Voice → Theme voices → **Install theme voices**.
+  - Tyler shows this PC's compatibility, the exact download, the disk space, and Quality vs Lightweight in plain words. Nothing downloads until you press Install.
+  - Tyler's normal voice (Standard voice, Gemini Live) works the same with or without theme voices.
+- **Fully managed install:**
+  - an isolated Python and pinned packages, every file checked against its SHA-256;
+  - resumable downloads, then a real voice check at the end;
+  - nothing system-wide, and other Python installs and graphics drivers are never touched.
+- **Failures and updates:**
+  - Cancelling or a failure leaves Tyler as it was, and **Retry** carries on from the files already downloaded.
+  - App updates keep the engine and models. Unchanged packages are reused if the engine ever changes.
+- **Removal:** **Remove theme voices** frees the space and keeps your settings, own recordings and saved clips.
+- **Sizes (download):**
+  - Quality on an NVIDIA card: about 6.9 GB (engine 2.7 GB plus model 4.2 GB).
+  - Lightweight: 2.3 GB for the model.
+  - Processor-only engine: 0.25 GB.
+- **Quality (1.7B) and Lightweight (0.6B):**
+  - Quality is closer to each voice and stumbles less. It needs about 6.5 GB of free graphics memory (about 6 GB of memory on the processor).
+  - Lightweight needs about 4 GB of graphics memory and sounds a little less like the originals. On the processor it takes about two-thirds of the time but needs about as much memory as Quality; on a graphics card both take about as long.
+  - Tyler suggests one from your hardware and never switches by itself.
+- **Use:**
+  - Steam panel → **Theme voices**: Follow the theme or pick a voice, type, then Generate / Preview / **Play into call** / Stop / Replay / Save.
+  - Play into call uses Tyler's own synthetic microphone, queued after anything he's saying.
+  - `!say TEXT` or `!say portal: TEXT` in chat (off by default; who may use it and the wait time are in Settings).
+  - Phone remote → **Theme voice**: the phone only sends the text.
+- **Microsoft Sam and Mary:**
+  - Windows XP and MSN can use the **real** Microsoft voices when the PC has them. *Get them from Microsoft* downloads Microsoft's Speech SDK 5.1 and checks it against its SHA-256.
+  - Otherwise they use a clone, labelled an approximation.
+- **Replacing a voice:** any voice can be replaced with your own recording plus its words. It's kept through updates.
+- **Offline bundle:** the *Theme voices offline bundle* workflow builds every file into a .tar in parts under 2 GB. Use it with **Install from a folder…**.
+
+## Readiness of the 25 voices
+| Theme | Voice | Kind | Status | Speaker match (Quality) | Words heard |
+|---|---|---|---|---|---|
+| Steam | G-Man | Valve-associated character | Ready | 65% | 100% |
+| Classic Steam | Black Mesa VOX | GoldSrc-era association | Ready | 81% | 100% |
+| Team Fortress 2 | The Administrator | Direct game character | Weak clone | 57% | 100% |
+| Counter-Strike 2 | SAS operator | Direct game operator | Ready | 59% | 96% |
+| Portal | GLaDOS | Direct game character | Ready | 86% | 100% |
+| Counter-Strike 1.6 | CS 1.6 radio operator | Direct game operator | Weak clone | 45% | 97% |
+| Half-Life HEV | HEV suit | Direct suit voice | Ready | 78% | 100% |
+| Left 4 Dead | Bill | Direct game character | Ready | 71% | 100% |
+| Windows XP | Microsoft Sam (the real voice when Windows has it) | Original operating-system voice | Approximation | n/a* (0.80 vs 0.14) | 97% |
+| DOOM | VEGA | Same-franchise adaptation | Ready | 67% | 100% |
+| Quake | Quake III announcer | Same-franchise adaptation | Ready | 78% | 98% |
+| Fallout Pip-Boy | Codsworth | Same-franchise character | Ready | 84% | 100% |
+| HL2 Combine | Combine soldier | Direct game faction voice | Approximation | 27% | 98% |
+| Deadlock | Bebop | Direct game character | Ready | 86% | 100% |
+| Minecraft | Dungeons narrator | Official franchise spin-off | Ready | 84% | 100% |
+| PAYDAY 2 | Bain | Direct game character | Weak clone | 68% | 80% |
+| Sega Dreamcast | Crazy Taxi DJ | Dreamcast-era game association | Ready | 83% | 100% |
+| Garry's Mod | Dr. Kleiner | Garry's Mod-associated character | Ready | 87% | 100% |
+| Ricochet | Ricochet countdown voice | Direct game recordings; very limited corpus | Too little audio |  |  |
+| Day of Defeat: Source | US field radio | Direct game faction voice | Ready | n/a* (0.51 vs 0.00) | 100% |
+| Rust | Scientist (radio) | Direct game NPC target; acquisition incomplete | No recordings |  |  |
+| Xbox 360 | Halo 3 announcer | Xbox 360-era game association | Ready | 63% | 98% |
+| iPod classic | Apple Alex | Apple/iPod VoiceOver-era association | Ready | n/a* (0.72 vs -0.01) | 97% |
+| MSN Messenger | Microsoft Mary (the real voice when Windows has it) | Contemporary Windows voice association | Approximation | n/a* (0.75 vs 0.09) | 97% |
+| PlayStation 3 XMB | LittleBigPlanet narrator | PlayStation 3-era character association | Ready | 84% | 100% |
+
+*Speaker match* is where the clone sits between what another theme's voice scores (0%) and what the original's own other recordings score (100%), on an independent speaker model (ECAPA). *n/a*: there are no other recordings of that voice to compare with (or, for Day of Defeat, they are several different voices); the figures are the clone's score against its reference and a different voice's. *Words heard*: the share of the intended words Whisper heard in the clones. The ratings come from these measurements; nobody has listened to every clip yet.
+
+## Measured here (development container: 2 CPU cores, no GPU)
+- **Speed on the processor (2 cores):** Quality (1.7B, bfloat16) made 564 s of speech in 9,823 s across 91 clips: about **17 s of waiting per second of speech** (9 to 69, depending on the clip and on what else the machine was doing). Lightweight (0.6B, full precision) made the same CS 1.6 and Portal lines at about **9 s per second**, against 13 s for Quality on the same lines.
+- **Speed on a graphics card (published, not measured here):** for this model's standard code path, the faster-qwen3-tts project reports an RTX 4060 on Windows at about 4 s per second of speech and an RTX 4090 at about 1.2 s, for both sizes. Theme voices are made before they play, not live.
+- **Memory on the processor:** Quality in bfloat16 peaked at 5.3 GB. Lightweight in full precision peaked at 6 GB on a long message, and on this 8 GB machine it was stopped for running out of memory. So Tyler now uses full precision (faster) only on PCs with at least 12 GB (Lightweight) or 20 GB (Quality) of memory, and the smaller bfloat16 otherwise.
+- **Loading a model:** 1.5 to 6 s.
+- **Ratings:** 17 voices rated Ready, 3 weak clones (Counter-Strike 1.6, Team Fortress 2, PAYDAY 2), 3 approximations (the Combine radio, and the Microsoft Sam and Mary clones), Ricochet with too little original speech, and Rust with no recordings yet. Each voice's note in Settings says why.
+
+## New on the phone remote
+- **Chat log:** see what's happening in the Steam chat from your phone: the latest 40 messages, with who said them and when. It refreshes every 5 seconds while the card is open (and stops when the phone's screen is off). Tyler's own messages are marked.
+- **Privacy:** until now the phone couldn't read the chat. A paired phone can now read the chat's last 40 messages (names, times and text) for this card; the page asks only while the card is open. Keys and settings still never reach it.
+- **Clear conversation:** the same as the panel's *Clear conversation & poll*. Tyler forgets this chat's conversation and poll (friend memory stays) and pauses, as on the PC; press Connect & start to carry on. It takes two taps, so a stray tap can't do it.
+
+## Polish: every theme checked for spacing and alignment
+All 25 themes were rendered and measured: the panel's five tabs, the five Settings pages and the phone remote's four tabs. Fixed:
+- **Tab labels line up.** A theme's own branded tab icons are a little taller than the plain ones, which pushed some labels 2–3 px lower than their neighbours (HEV, Left 4 Dead, Pip-Boy, Combine, Deadlock, Garry's Mod, Ricochet, Rust and others). Labels now share one line in every theme.
+- **The footer note no longer leaves one word on its own line** ("This tab runs the / bot"): it splits evenly. DOOM, whose wide type left three short lines, gets a two-row footer (the note above, the two buttons below).
+- **Windows XP taskbar:** *Pause AI*, *Stop audio* and the clock stay on one line, like the real taskbar. On the phone the tray stays on the taskbar's row instead of dropping below it.
+- **Menus:** a long choice ends in "…" instead of being cut through a letter, and the longest labels are shorter: *Auto: text, or voice when friends join*, *Auto · adjusts to the call* (the hint underneath explains it), and the theme-voice *Mode* and *Runs on* choices.
+- **The status numbers' notes fit:** the Voice box starts with *Not checked yet* and Last reply with *None yet*, which no theme cuts off (Classic, TF2, HEV, Minecraft and Day of Defeat did).
+- **PAYDAY 2:** the heist plan's four steps line up at the top.
+- **MSN Messenger:** contacts in the status list line up on the left.
+- **Minecraft:** text fields no longer stick out of their card (the game-vote title and friend ID, and on the phone the chat and music fields).
+- **Settings:** the theme name beside the logo wraps left-aligned; in Theme voices, every voice's rating and buttons sit in the same columns.
+- Left as designed: the pressed, raised or enlarged active tab in Quake, Day of Defeat and PS3, the XP Start button, and MSN's larger picture frame.
+- **GitHub page:** the README lists theme voices and chat pictures, its *What's new* picture covers v2.28 to v2.35, and the notes on old versions moved to `docs/archive/`.
+
+## Also in this version (was v2.34.3, not released on its own)
+- **Chat images on a limited Steam account:** Tyler now asks Steam whether the account may post pictures **before** drawing.
+  - A limited account (one that hasn't spent $5 on Steam) gets no picture and no charge, and the chat is told why.
+  - Spend $5 on the bot's account (adding wallet funds counts), then reload Steam chat.
+
+## Tested
+- **Mocked** (no model, no internet): `tests/theme-voices.test.mjs`, 17 tests.
+  - the pinned lock;
+  - download resume after a cut-off, a bad checksum deleted and never used;
+  - offline folders and bundle parts;
+  - ZIP safety;
+  - the install layout and the update reuse;
+  - a failed update keeping the working engine;
+  - Remove keeping recordings and saved clips;
+  - hardware suggestions;
+  - the queue, Stop, cache, crash and out-of-memory handling, and idle close;
+  - memory checks with no silent downgrade;
+  - the voice captured at request start;
+  - the panel's call and preview routes;
+  - `!say`;
+  - Chrome saying theme voices are a desktop feature.
+- **Real:**
+  - Qwen3-TTS 1.7B and 0.6B voice cloning through the production worker, in an engine built by the real installer from the pinned files (Linux, processor);
+  - all 23 voices that have recordings auditioned in Quality mode (91 clips) and two in Lightweight, scored with tools that aren't part of the voice engine (Whisper for the words, ECAPA and WavLM for the speaker);
+  - a real clone clip through the real audio bridge in Chromium: heard on the synthetic microphone, queued without overlap;
+  - the Windows processor engine installed by the installer and started under Wine (its Python and the worker protocol start; Wine can't run PyTorch).
+- **Phone chat log and Clear** (mocked): the real remote server and phone page against a mock Steam chat in Chromium: the log shows the chat's messages, Clear needs two taps and resets Tyler, and the log's polling has its own rate limit so it never blocks a button.
+- **Layout** (mocked, Chromium): `tools/preview/layout-audit.mjs` measures button rows, gaps, labels, cut-off text and fields in every theme on every surface above, before and after these fixes. Screenshots of each were checked by eye.
+- **Standard app with no theme voices installed:** all unit and end-to-end tests, and the desktop check (Electron with a mock Steam page).
+- **Not tested (needs a Windows PC with an NVIDIA card):**
+  - the Windows install and GPU speed and memory;
+  - Setup's new option;
+  - a real Steam call;
+  - native Microsoft Sam and Mary;
+  - listening review by a person.
+
+---
+
+# ROBOTIC TYLER v2.34.3 (not released on its own; part of v2.35.0): chat images on a limited Steam account
 
 ## Fixed
 - **Chat images on a limited Steam account:** Tyler drew the picture, then Steam refused it with *"Limited users cannot upload images"*.

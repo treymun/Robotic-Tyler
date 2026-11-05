@@ -8,7 +8,7 @@
  "relationship": "PlayStation 3-era character association",
  "direction": "Warm British narration with a restrained, polished presentation. Keep actor/version attribution limited to what the source establishes.",
  "language": "English",
- "status": "pending",
+ "status": "ready",
  "statusNote": "",
  "transcriptSource": "Machine transcript (Whisper small.en), corrected by hand where it clearly misheard; not checked by listening.",
  "sources": [

@@ -8,7 +8,7 @@
  "relationship": "Direct game character",
  "direction": "Older, gravelly and practical. Keep conversational speech separate from pain and combat exertion.",
  "language": "English",
- "status": "pending",
+ "status": "ready",
  "statusNote": "",
  "transcriptSource": "Machine transcript (Whisper small.en), corrected by hand where it clearly misheard; not checked by listening.",
  "sources": [

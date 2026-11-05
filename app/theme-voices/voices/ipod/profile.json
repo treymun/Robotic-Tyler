@@ -8,7 +8,7 @@
  "relationship": "Apple/iPod VoiceOver-era association",
  "direction": "Clean, restrained U.S. English system narration, without cinematic radio effects. Preserve original-system cadence.",
  "language": "English",
- "status": "pending",
+ "status": "ready",
  "statusNote": "",
  "transcriptSource": "Machine transcript (Whisper small.en), corrected by hand where it clearly misheard; not checked by listening.",
  "sources": [

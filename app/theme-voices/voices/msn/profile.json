@@ -8,8 +8,8 @@
  "relationship": "Contemporary Windows voice association",
  "direction": "Bright, classic synthetic female delivery; no hall or stadium effects by default.",
  "language": "English",
- "status": "pending",
- "statusNote": "",
+ "status": "approximation",
+ "statusNote": "A clone of a recording of Microsoft Mary: close in sound on an independent speaker check, but not the synthesizer itself. With Microsoft's own voice installed (Settings → Microsoft Sam and Mary), Tyler uses the real thing.",
  "transcriptSource": "Machine transcript (Whisper small.en), corrected by hand where it clearly misheard; not checked by listening.",
  "sources": [
   {

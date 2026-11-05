@@ -8,7 +8,7 @@
  "relationship": "Garry's Mod-associated character",
  "direction": "Nervous, enthusiastic scientist delivery. The source is Half-Life 2; this is not a Garry's Mod UI announcer.",
  "language": "English",
- "status": "pending",
+ "status": "ready",
  "statusNote": "",
  "transcriptSource": "Machine transcript (Whisper small.en), corrected by hand where it clearly misheard; not checked by listening.",
  "sources": [

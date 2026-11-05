@@ -8,8 +8,8 @@
  "relationship": "Direct game character",
  "direction": "Stern, commanding female delivery. Do not mix with Scout, Soldier, Merasmus, or alternate announcers.",
  "language": "English",
- "status": "pending",
- "statusNote": "",
+ "status": "weak",
+ "statusNote": "Usually close to the Administrator (three of four test takes), but one take came out in a different voice. Press Generate again if a take sounds wrong.",
  "transcriptSource": "Machine transcript (Whisper small.en), corrected by hand where it clearly misheard; not checked by listening.",
  "sources": [
   {

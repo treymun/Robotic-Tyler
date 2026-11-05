@@ -11,7 +11,7 @@ const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),cryp
 const sapi=require('./sapi.cjs');
 const {Installer,plan,LOCK}=require('./installer.cjs'),{WorkerHost}=require('./worker.cjs'),{Voices,THEMES,STATUS}=require('./voices.cjs'),hardware=require('./hardware.cjs');
 const GB=1024**3;
-const MODES={quality:{model:'quality',label:'Quality',about:'Qwen3-TTS 1.7B: the closest match to each voice.'},light:{model:'light',label:'Lightweight',about:'Qwen3-TTS 0.6B: about half the memory, a little less like each voice.'}};
+const MODES={quality:{model:'quality',label:'Quality',about:'Qwen3-TTS 1.7B: the closest match to each voice.'},light:{model:'light',label:'Lightweight',about:'Qwen3-TTS 0.6B: less graphics memory, a little less like each voice.'}};
 const DEFAULTS={mode:null,device:'auto',idleMinutes:5,followTheme:true,override:'',processed:true,nativeVoices:true,chat:false,chatAccess:'everyone',chatAllowed:'',chatCooldown:20,maxChars:400};
 const MAX_QUEUE=4,CACHE_LIMIT=300*1024**2,CHECK_LINE='Voice check. Theme voices are ready.';
 
@@ -164,9 +164,11 @@ class ThemeVoices extends EventEmitter{
   if(this.loaded)await this.closeWorker();
   await this.roomFor(mode,device);
   const w=await this.workerFor();
-  const dtype=device==='cuda'?'auto':os.totalmem()>=(mode==='quality'?14:7)*GB?'fp32':'bf16';
+  // On the processor, full precision is faster but bigger: measured, Lightweight (0.6B) in fp32 peaked
+  // at 6 GB on a long line (and ran out on an 8 GB machine), Quality (1.7B) in bf16 at 5.3 GB.
+  const dtype=device==='cuda'?'auto':os.totalmem()>=(mode==='quality'?20:12)*GB?'fp32':'bf16';
   let r;try{r=await w.request('load',{model_dir:dir,device,dtype,threads:Math.max(1,os.cpus().length-1)},{timeout:300000});}
-  catch(e){if(e.code==='no_gpu')throw Object.assign(Error('The graphics card can’t be used right now (the voice engine didn’t find it). Check that the NVIDIA driver is installed and up to date, or choose “Always the processor” in Settings → Theme voices.'),{code:'no_gpu'});throw e;}
+  catch(e){if(e.code==='no_gpu')throw Object.assign(Error('The graphics card can’t be used right now (the voice engine didn’t find it). Check that the NVIDIA driver is installed and up to date, or choose “Processor only” in Settings → Theme voices.'),{code:'no_gpu'});throw e;}
   if(this.worker!==w)throw Object.assign(Error('Stopped.'),{code:'cancelled'});
   this.loaded={mode,device,dtype:r.dtype_used,at:Date.now(),loadMs:r.load_ms};this.emitStatus();return {loaded:this.loaded,worker:w};
  }

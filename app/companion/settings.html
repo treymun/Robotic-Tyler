@@ -460,7 +460,7 @@
       <label>Mode
         <select id="tvMode">
           <option value="quality">Quality (1.7B): closest to each voice</option>
-          <option value="light">Lightweight (0.6B): half the memory</option>
+          <option value="light">Lightweight (0.6B): less graphics memory</option>
         </select>
         <small class="hint" id="tvModeNote">Tyler suggests a mode for this PC; it never switches by itself.</small>
       </label>
@@ -473,8 +473,8 @@
       </label>
     </div>
     <details class="tv-explain"><summary>Quality or Lightweight?</summary>
-      <p><b>Quality</b> uses the larger model (Qwen3-TTS 1.7B). It copies each character's voice more closely and stumbles less (fewer odd pauses or misread words). It needs about 6.5 GB of free graphics memory on an NVIDIA card, or about 8 GB of free memory on the processor. Download: about 4.2 GB for the model.</p>
-      <p><b>Lightweight</b> uses the smaller model (Qwen3-TTS 0.6B). It needs about 4 GB of graphics memory (or 4 GB of memory). On the processor it makes messages about twice as fast; on a graphics card the two take about as long. The voices sound a little less like the originals and odd pauses happen more often (Tyler retries a take that comes out the wrong length). Download: about 2.3 GB for the model.</p>
+      <p><b>Quality</b> uses the larger model (Qwen3-TTS 1.7B). It copies each character's voice more closely and stumbles less (fewer odd pauses or misread words). It needs about 6.5 GB of free graphics memory on an NVIDIA card, or about 6 GB of free memory on the processor. Download: about 4.2 GB for the model.</p>
+      <p><b>Lightweight</b> uses the smaller model (Qwen3-TTS 0.6B). It needs about 4 GB of graphics memory on an NVIDIA card; on the processor it needs about as much memory as Quality. On the processor it makes messages in about two-thirds of the time; on a graphics card the two take about as long. The voices sound a little less like the originals and odd pauses happen more often (Tyler retries a take that comes out the wrong length). Download: about 2.3 GB for the model.</p>
       <p>Both use the same voice engine (about 2.7 GB with graphics-card support, 0.25 GB for the processor only). You can install both and switch any time. Theme voices are made ahead of playing, not live: on a mid-range NVIDIA card a short line takes several seconds.</p>
     </details>
     <h3>Install</h3>
