@@ -11,7 +11,7 @@ class WorkerHost extends EventEmitter{
  get alive(){return !!this.proc&&this.proc.exitCode===null&&!this.proc.killed;}
  start(){
   if(this.ready)return this.ready;
-  const keep=['SystemRoot','SYSTEMROOT','WINDIR','TEMP','TMP','LOCALAPPDATA','APPDATA','USERPROFILE','HOME','PATH','NUMBER_OF_PROCESSORS','PROCESSOR_ARCHITECTURE','CUDA_VISIBLE_DEVICES'];
+  const keep=['SystemRoot','SYSTEMROOT','WINDIR','TEMP','TMP','LOCALAPPDATA','APPDATA','USERPROFILE','HOME','PATH','NUMBER_OF_PROCESSORS','PROCESSOR_ARCHITECTURE','CUDA_VISIBLE_DEVICES','TYLER_WORKER_TRACE'];
   const env={};for(const k of keep)if(process.env[k]!==undefined)env[k]=process.env[k];
   Object.assign(env,{PYTHONIOENCODING:'utf-8',PYTHONDONTWRITEBYTECODE:'1',PYTHONNOUSERSITE:'1',HF_HUB_OFFLINE:'1',TRANSFORMERS_OFFLINE:'1',HF_HUB_DISABLE_TELEMETRY:'1'},this.extraEnv);
   // -X utf8: the pipes are UTF-8 whatever the PC's code page (-I makes Python ignore PYTHONIOENCODING).

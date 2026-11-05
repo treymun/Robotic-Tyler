@@ -16,6 +16,9 @@
 # Voice data that is cached (the reference's speech codes and speaker embedding) is written as
 # safetensors, which holds only tensors and text, never code. Nothing is ever loaded with pickle.
 import sys, os, json, threading, queue, time, hashlib, re, gc, traceback, math
+# Diagnosing a hang: TYLER_WORKER_TRACE=<seconds> writes every thread's stack to stderr every <seconds>.
+if os.environ.get("TYLER_WORKER_TRACE", "").isdigit():
+    import faulthandler; faulthandler.dump_traceback_later(int(os.environ["TYLER_WORKER_TRACE"]), repeat=True, file=sys.stderr)
 # The app starts Python isolated (-I -S) and names the engine's own package folder here, so no other
 # Python install on this PC can leak in.
 if "--site" in sys.argv:
