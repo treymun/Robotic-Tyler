@@ -1,3 +1,16 @@
+# ROBOTIC TYLER v2.37.2: !say picks the voice you name
+
+## Fixed
+- **`!say cs2 Fire in the hole` now speaks in the CS2 voice.** A friend reported that naming a voice other than the current theme's just read the name out. Only `!say cs2: …` with a colon picked the voice; without it, the whole line, voice name included, was read out in the current theme's voice.
+- Now the first word picks the voice when it's exactly one of the voices on this PC and more words follow. With a colon (`!say portal: …`) it works as before. `!say doom is coming` on a PC without a DOOM voice, or `!say hello there`, still says the whole line.
+- Settings, the command list and the theme-voices guide show the shorter form.
+
+## Tested
+- **Mocked:** the chat parser and the voice pick: with and without the colon, upper case, a first word that isn't a voice, a voice name alone, and a voice the PC doesn't have. Plus all unit and end-to-end tests and the desktop check.
+- **Not tested:** in a real Steam chat.
+
+---
+
 # ROBOTIC TYLER v2.37.1: theme voices start on Windows
 
 ## Fixed

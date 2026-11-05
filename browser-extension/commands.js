@@ -33,7 +33,7 @@
  const COMMANDS=[
   {id:'tyler',label:'Ask Tyler',enabled:false,usage:['!tyler ask QUESTION'],match:t=>/^!tyler\s+\S/i.test(t)},
   {id:'moderation',label:'Moderation',enabled:false,usage:['!votekick NAME','!votemute NAME','!modhelp'],match:t=>!!globalThis.TylerModeration?.parse?.(t)},
-  {id:'theme-voices',label:'Theme voices',enabled:false,usage:['!say TEXT','!say portal: TEXT'],match:t=>!!globalThis.TylerThemeVoices?.parse?.(t)},
+  {id:'theme-voices',label:'Theme voices',enabled:false,usage:['!say TEXT','!say portal TEXT'],match:t=>!!globalThis.TylerThemeVoices?.parse?.(t)},
   {id:'image',label:'Chat images',enabled:false,usage:['!image PROMPT','!image best PROMPT','!image help'],match:t=>!!globalThis.TylerImages?.parse?.(t)},
   {id:'music',label:'Music',enabled:false,usage:['!play ARTIST SONG','music skip','music queue'],match:t=>!!globalThis.TylerMusic?.parse?.(t)},
   {id:'squad-vote',label:'Game votes',enabled:false,usage:['!vote GAME'],match:t=>squad(t)?.kind==='vote'},

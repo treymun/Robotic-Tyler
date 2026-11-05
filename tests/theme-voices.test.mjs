@@ -407,3 +407,13 @@ test('v2.37.1 Stop reaches a voice check that is still loading the model: the en
   const c=await svc.check();assert.equal(c.ok,true);
  }finally{await svc.shutdown();}
 });
+test('v2.37.2 !say picks a voice by its name without the colon ("!say cs16 Fire in the hole"); other first words stay part of the line (MOCKED)',async()=>{
+ const on=await card({chat:true}),V=on.box.TylerThemeVoices,list=[{theme:'cs16'},{theme:'portal'},{theme:'rust'}];
+ const say=line=>{const r=V.pick(V.parse(line),list);return {theme:r.theme,text:r.text};}; // the panel runs in its own realm
+ assert.deepEqual(say('!say cs16 Fire in the hole!'),{theme:'cs16',text:'Fire in the hole!'},'the voice name is taken off the line');
+ assert.deepEqual(say('!say CS16   Go go go'),{theme:'cs16',text:'Go go go'});
+ assert.deepEqual(say('!say portal: The cake is a lie.'),{theme:'portal',text:'The cake is a lie.'},'the colon form still works');
+ assert.deepEqual(say('!say hello there, friends'),{theme:null,text:'hello there, friends'},'a first word that isn\'t a voice stays in the line');
+ assert.deepEqual(say('!say cs16'),{theme:null,text:'cs16'},'a voice name alone is just the text');
+ assert.deepEqual(say('!say doom is coming'),{theme:null,text:'doom is coming'},'only voices this PC has count');
+});

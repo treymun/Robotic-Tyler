@@ -87,7 +87,7 @@ Tyler suggests a mode from the hardware it detects (the GPU and its free memory,
 - **How playback works:**
   - The voice is chosen when you press the button, so a theme change doesn't alter a message already on its way.
   - *Play into call* uses Tyler's existing synthetic microphone. It's queued after anything he's already saying, so nothing overlaps, and his listener holds while he talks.
-- **`!say TEXT`** or **`!say portal: TEXT`** in chat:
+- **`!say TEXT`**, **`!say portal TEXT`** or **`!say portal: TEXT`** in chat (v2.37.2: the voice's name works without the colon when it's the first word):
   - off by default;
   - everyone or listed Steam accounts;
   - a wait time per person.

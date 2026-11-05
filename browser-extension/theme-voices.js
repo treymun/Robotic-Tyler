@@ -5,7 +5,7 @@
 // picked when a request starts, so changing the theme meanwhile doesn't change a message on its way.
 // "Play into call" uses the same synthetic microphone as Tyler's other speech, queued after anything
 // he is already saying (so nothing overlaps, and his listener holds while he talks).
-// Chat: "!say TEXT" (or "!say portal: TEXT"), only when the owner turns it on in Settings.
+// Chat: "!say TEXT" (or "!say portal TEXT" / "!say portal: TEXT"), only when the owner turns it on in Settings.
 (() => {
  'use strict';
  const api=globalThis.TylerCompanion,mount=(api?.getFeatureMount?.()||api?.getMount?.());if(!api||!mount||globalThis.TylerThemeVoices)return;
@@ -108,6 +108,13 @@
  click('tvSave',async()=>{if(!last)return;try{const r=await send({type:'voices:save',id:last.id});status('Saved: '+r.file);}catch(e){status('Couldn’t save: '+e.message);}});
  // ── !say in chat (off unless the owner turns it on) ──────────────────────
  const seen=new WeakMap(),answered=new Set(),lastBy=new Map();let region=null,observer=null,selector=null,boundAt=0;
+ // v2.37.2: "!say cs2 Fire in the hole" (no colon) picks the CS2 voice too, when the first word is
+ // exactly a voice's name and more words follow. Before, the whole line was read out in the current voice.
+ function pick(req,list){
+  if(req.theme)return req;
+  const m=/^([a-z0-9]{2,12})\s+(\S[\s\S]*)$/i.exec(req.text),id=m?.[1].toLowerCase();
+  return id&&list.some(v=>v.theme===id)?{theme:id,text:m[2].trim()}:req;
+ }
  function parse(line){const m=/^\s*!say\s+(?:([a-z0-9]{2,12}):\s*)?(\S[\s\S]{0,399})$/i.exec(String(line||''));if(!m)return null;return {theme:m[1]?m[1].toLowerCase():null,text:m[2].trim()};}
  globalThis.TylerCommands?.set?.('theme-voices',{enabled:false});
  async function onChat(line,node){
@@ -117,6 +124,7 @@
   if(chatCfg.chatAccess==='selected'&&!(id&&String(chatCfg.chatAllowed||'').split(/\s+/).includes(id)))return;
   const key=id||name,wait=(chatCfg.chatCooldown??20)*1000,prev=lastBy.get(key)||0;
   if(Date.now()-prev<wait){status('!say from '+name+' skipped: cooldown.');return;}
+  Object.assign(req,pick(req,voices));
   if(req.theme&&!voices.some(v=>v.theme===req.theme)){api.send('🔊 '+name+', there’s no “'+req.theme+'” voice. Voices: '+voices.filter(v=>v.hasReference).map(v=>v.theme).join(', ')+'.',{kind:'game'});return;}
   lastBy.set(key,Date.now());
   if(busy){api.send('🔊 '+name+', Tyler is still on the last one. Try again in a moment.',{kind:'game'});return;}
@@ -141,5 +149,5 @@
  panel.addEventListener('toggle',()=>{if(panel.open)void refresh();});
  api.ui?.onUI?.(()=>describe());
  let lastPoll=0;void refresh();setInterval(()=>{const every=busy?2000:15000;if((panel.open||busy||chatCfg.chat)&&Date.now()-lastPoll>=every){lastPoll=Date.now();void refresh();}},2000);setInterval(watch,1500);
- globalThis.TylerThemeVoices=Object.freeze({refresh,parse,stop:stopAll,say:(text,theme)=>make('call',{text,theme}),state:()=>({busy,available:info.available,ready:!!info.status?.ready,voices:voices.filter(v=>v.hasReference).map(v=>({theme:v.theme,name:v.name}))})});
+ globalThis.TylerThemeVoices=Object.freeze({refresh,parse,pick,stop:stopAll,say:(text,theme)=>make('call',{text,theme}),state:()=>({busy,available:info.available,ready:!!info.status?.ready,voices:voices.filter(v=>v.hasReference).map(v=>({theme:v.theme,name:v.name}))})});
 })();
