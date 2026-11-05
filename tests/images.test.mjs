@@ -77,19 +77,19 @@ test('the background makes the picture with the style\'s key and model, counts i
 });
 
 // ── Steam's chat uploader ───────────────────────────────────────────────
-function steamPage({fail=null}={}){
+function steamPage({fail=null,userinfo=null}={}){
  const calls=[];const VC={m_VoiceCallState:{m_eState:0}};
  const props={eUploadState:0,strErrorDescription:''};
  const manager={m_fileUploadProps:props,async SetImageFileToUpload(file){calls.push(['set',file.name,file.type,file.size]);if(fail==='type'){props.eUploadState=5;props.strErrorDescription='File type not supported';}},
-  async BeginFileUpload(info){calls.push(['begin',info]);if(fail==='server'){props.eUploadState=3;props.strErrorDescription='Server error';}else props.eUploadState=6;},Reset(){calls.push(['reset']);props.eUploadState=0;props.strErrorDescription='';}};
+  async BeginFileUpload(info){calls.push(['begin',info]);if(fail==='server'){props.eUploadState=3;props.strErrorDescription='Server error';}else if(fail==='limited'){props.eUploadState=3;props.strErrorDescription='Failed to start upload: Limited users cannot upload images.';}else props.eUploadState=6;},Reset(){calls.push(['reset']);props.eUploadState=0;props.strErrorDescription='';}};
  const group={GetGroupID:()=>'12345',voiceRoomList:[]},text={GetGroup:()=>group,GetVoiceAllowed:()=>false,self:{accountid:2},ChatStore:{VoiceChat:VC}};
  const node={nodeType:1,isConnected:true,closest:()=>null,parentElement:null,__reactProps$x:{msg:{unAccountID:3,rtTimestamp:1700000000,unOrdinal:1},chatView:{chat:text,m_fileUploadManager:manager}}};
  let listener=null;const replies=[];
- const box={document:{querySelectorAll:()=>[],addEventListener:(t,fn)=>{if(t==='tyler-steam-chat-request')listener=fn;}},window:{postMessage:m=>replies.push(JSON.parse(JSON.stringify(m)))},location:{origin:'https://steamcommunity.com'},File,atob,Uint8Array,setTimeout,clearTimeout};
+ const box={document:{querySelectorAll:()=>[],getElementById:id=>id==='webui_config'&&userinfo?{getAttribute:k=>k==='data-userinfo'?JSON.stringify(userinfo):null}:null,addEventListener:(t,fn)=>{if(t==='tyler-steam-chat-request')listener=fn;}},window:{postMessage:m=>replies.push(JSON.parse(JSON.stringify(m)))},location:{origin:'https://steamcommunity.com'},File,atob,Uint8Array,setTimeout,clearTimeout};
  vm.runInNewContext(read('steam-chat-main.js'),box);
  // The real way in: the request rides on an attribute of a chat node, as steam-chat-client.js sends it.
  const viaPage=async ({op,...values})=>{const raw=JSON.stringify({...values,id:'0123456789abcdef',op});node.getAttribute=k=>k==='data-tyler-chat-request'?raw:null;listener({target:node});for(let i=0;i<20;i++)await new Promise(r=>setImmediate(r));return replies.splice(0);};
- return {calls,viaPage,up:r=>box.TylerSteamChatAdapter.handle(node,{op:'image-upload',...r}).then(x=>JSON.parse(JSON.stringify(x)))};
+ return {calls,viaPage,ask:op=>box.TylerSteamChatAdapter.handle(node,{op}).then(x=>JSON.parse(JSON.stringify(x))),up:r=>box.TylerSteamChatAdapter.handle(node,{op:'image-upload',...r}).then(x=>JSON.parse(JSON.stringify(x)))};
 }
 test('a real-size picture gets through the page bridge (v2.34.0 dropped anything over 12,000 characters); other big requests still don\'t',async()=>{
  const s=steamPage(),big=Buffer.alloc(1_500_000,7).toString('base64');
@@ -110,9 +110,9 @@ test('the picture goes through Steam\'s own chat uploader; Steam\'s refusal is r
 });
 
 // ── the chat side ───────────────────────────────────────────────────────
-function chat({config,generate}){
+function chat({config,generate,check=()=>({available:true,limited:null}),upload=()=>({uploaded:true})}){
  const els=new Map(),el=id=>{if(!els.has(id))els.set(id,{id,textContent:'',onclick:null,addEventListener(){}});return els.get(id);};
- const sent=[],requests=[],uploads=[],pauseHooks=[];let observer,clock=1_000_000;
+ const sent=[],requests=[],uploads=[],checks=[],pauseHooks=[];let observer,clock=1_000_000;
  class FakeDate extends Date{static now(){return clock;}}
  const later={isConnected:true,name:'a newer message'},region={isConnected:true,querySelectorAll:()=>[later]},sample={isConnected:true,name:'the setup message'};
  const api={getFeatureMount:()=>({append(){}}),isOwner:()=>true,isAiPaused:()=>false,getRegion:()=>region,getSample:()=>sample,send:t=>sent.push(t),emit(){},onPause:fn=>pauseHooks.push(fn)};
@@ -120,12 +120,12 @@ function chat({config,generate}){
   document:{createElement:()=>({set innerHTML(v){},querySelector:s=>el(s.slice(1)),addEventListener(){}})},
   MutationObserver:class{constructor(fn){observer=fn;}observe(){}disconnect(){}},TylerCompanion:api,TylerSelection:{selector:()=>'.msg'},TylerChatTag:{own:()=>false},
   TylerIdentity:{identify:n=>n.who,meta:n=>n.meta},TylerCommands:{set(){}},
-  TylerSteamChat:{request:async(node,op,v)=>{uploads.push({node:node.name,op,...v});return {uploaded:true};}},
+  TylerSteamChat:{request:async(node,op,v)=>{if(op==='upload-check'){checks.push(node.name);return check();}uploads.push({node:node.name,op,...v});return upload();}},
   chrome:{runtime:{sendMessage:async m=>{requests.push(m);if(m.type==='image:config')return {config,keys:{openrouter:true,venice:true}};if(m.type==='image:generate')return generate(m);return {};}}}};
  box.globalThis=box;vm.runInNewContext(read('image-core.js'),box);vm.runInNewContext(read('image-gen.js'),box);
  const settle=async()=>{for(let i=0;i<20;i++)await new Promise(r=>setImmediate(r));};
  const msg=(text,id,name,key)=>({nodeType:1,innerText:text,matches:()=>true,querySelectorAll:()=>[],closest:()=>null,who:{id,name},meta:{key,senderId:id,at:clock}});
- return {ticks:async()=>{for(const fn of intervals)fn();await settle();},sample,status:()=>el('imgStatus').textContent+' | '+el('imgCounts').textContent,sent,requests,uploads,pauseHooks,settle,box,post:async n=>{observer([{addedNodes:[n]}]);await settle();},msg,tick:ms=>{clock+=ms;},generates:()=>requests.filter(r=>r.type==='image:generate')};
+ return {ticks:async()=>{for(const fn of intervals)fn();await settle();},sample,status:()=>el('imgStatus').textContent+' | '+el('imgCounts').textContent,sent,requests,uploads,checks,pauseHooks,settle,box,post:async n=>{observer([{addedNodes:[n]}]);await settle();},msg,tick:ms=>{clock+=ms;},generates:()=>requests.filter(r=>r.type==='image:generate')};
 }
 test('the chat side keeps the owner\'s limits: cooldown per person, per person and per session, then posts through Steam',async()=>{
  const A='76561198000000001',B='76561198000000002',C='76561198000000003';
@@ -158,4 +158,33 @@ test('Steam redrawing the chat or scrolling the setup message away doesn\'t sile
  release({ok:true,image:'QUJD',mediaType:'image/png',model:'m',provider:'openrouter',cost:.014,ms:900,spoiler:false});await c.settle();
  assert.equal(c.uploads.length,1,'still posted');assert.equal(c.uploads[0].node,'a newer message','through another message of the same chat');
  assert.doesNotMatch(c.sent.join('\n'),/Couldn’t draw/);
+});
+
+// v2.34.3: the owner's screenshot: "Failed to start upload: Limited users cannot upload images."
+test('a limited Steam account: Steam\'s page says so, the check returns only that yes/no, and its refusal is explained',async()=>{
+ const png=Buffer.from('89504e470d0a1a0a0000000d49484452','hex').toString('base64');
+ let s=steamPage({userinfo:{logged_in:true,is_limited:true,token:'SECRET',webapi_token:'SECRET2'}});
+ const r=await s.ask('upload-check');assert.deepEqual(r,{available:true,limited:true},'only availability and the limited flag come back');assert.doesNotMatch(JSON.stringify(r),/SECRET/);
+ await assert.rejects(s.up({data:png,type:'image/png'}),/LIMITED_ACCOUNT/);assert.equal(s.calls.length,0,'nothing is handed to Steam');
+ s=steamPage({userinfo:{is_limited:false}});assert.deepEqual(await s.ask('upload-check'),{available:true,limited:false});
+ s=steamPage();assert.deepEqual(await s.ask('upload-check'),{available:true,limited:null},'unknown when Steam\'s page doesn\'t say');
+ s=steamPage({fail:'limited'});await assert.rejects(s.up({data:png,type:'image/png'}),/LIMITED_ACCOUNT: Steam doesn’t let limited accounts post pictures/);assert.deepEqual(J(s.calls.at(-1)),['reset']);
+});
+test('a limited account: nothing is drawn (so nothing is paid for), the chat is told why, and later requests are refused at once',async()=>{
+ const c=chat({config:{enabled:true,cooldownSec:0,perPerson:0,perSession:0},generate:async()=>({ok:true,image:'QUJD',mediaType:'image/png',model:'m',cost:.014,ms:900}),check:()=>({available:true,limited:true})});
+ await c.settle();
+ await c.post(c.msg('!image a cat','76561198000000001','Alex','l1'));
+ assert.equal(c.generates().length,0,'no picture made');assert.equal(c.uploads.length,0);
+ assert.match(c.sent.at(-1),/Sorry Alex, this Steam account can’t post pictures/);assert.match(c.status(),/limited Steam account.*\$5/);
+ await c.post(c.msg('!image a dog','76561198000000002','Sam','l2'));assert.equal(c.generates().length,0);assert.equal(c.checks.length,1,'refused without asking again');assert.match(c.sent.at(-1),/Sam, this Steam account can’t post pictures/);
+ assert.doesNotMatch(c.sent.join('\n'),/Drawing/,'never says it\'s drawing');
+});
+test('when Steam only says so at upload time, the queue is dropped and later requests are refused without drawing',async()=>{
+ let release;const c=chat({config:{enabled:true,cooldownSec:0,perPerson:0,perSession:0},generate:async()=>new Promise(r=>{release=r;}),upload:()=>{throw Error('LIMITED_ACCOUNT: Steam doesn’t let limited accounts post pictures.');}});
+ await c.settle();
+ await c.post(c.msg('!image a cat','76561198000000001','Alex','u1'));await c.post(c.msg('!image a dog','76561198000000002','Sam','u2'));
+ assert.equal(c.generates().length,1);assert.match(c.sent.at(-1),/Queued for Sam/);
+ release({ok:true,image:'QUJD',mediaType:'image/png',model:'m',cost:.014,ms:900});await c.settle();
+ assert.equal(c.generates().length,1,'the queued one is not drawn');assert.match(c.sent.at(-1),/Sorry Alex, this Steam account can’t post pictures/);
+ await c.post(c.msg('!image a bird','76561198000000003','Kai','u3'));assert.equal(c.generates().length,1);assert.match(c.sent.at(-1),/Kai, this Steam account can’t post pictures/);
 });

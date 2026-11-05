@@ -16,11 +16,11 @@
  <div class="btn-row"><button class="btn sm" id="imgReset" type="button">Reset session counts</button><button class="btn sm" id="imgSettings" type="button">Settings</button></div>`;
  mount.append(panel);
  const $=id=>panel.querySelector('#'+id),status=t=>{$('imgStatus').textContent=t;};
- let cfg=I.config(null),keys={openrouter:false,venice:false},region=null,observer=null,watchEpoch=0,chatEpoch=0,boundScope=null,selector=null,boundAt=0,busy=false,jobStarted=0;
+ let cfg=I.config(null),keys={openrouter:false,venice:false},blocked=null,region=null,observer=null,watchEpoch=0,chatEpoch=0,boundScope=null,selector=null,boundAt=0,busy=false,jobStarted=0;
  const seen=new WeakMap(),answered=new Set(),queue=[],people=new Map();let sessionCount=0;
  async function refreshConfig(){try{const r=await chrome.runtime.sendMessage({type:'image:config'});if(r?.ok!==false&&r?.config){cfg=I.config(r.config);keys=r.keys||keys;}}catch{}
   globalThis.TylerCommands?.set?.('image',{enabled:cfg.enabled});
-  $('imgMeta').textContent=cfg.enabled?'On · '+(I.STYLES[cfg.defaultStyle]?.label||'Fast'):'Off';counts();}
+  $('imgMeta').textContent=blocked==='limited'?'Steam account can’t post pictures':cfg.enabled?'On · '+(I.STYLES[cfg.defaultStyle]?.label||'Fast'):'Off';counts();}
  function counts(){const lim=n=>n?String(n):'no limit';$('imgCounts').textContent='This session: '+sessionCount+' of '+lim(cfg.perSession)+' · per person '+lim(cfg.perPerson)+' · cooldown '+(cfg.cooldownSec?cfg.cooldownSec>=60?cfg.cooldownSec/60+' min':cfg.cooldownSec+' s':'none')+'.';}
  function resetSession(){sessionCount=0;people.clear();counts();}
  $('imgReset').onclick=()=>{resetSession();status('Session counts reset.');};
@@ -28,8 +28,15 @@
  const say=text=>{try{api.send(text,{kind:'image'});}catch(e){status('Couldn’t post in chat: '+e.message);}};
  const human=s=>s>=60?Math.ceil(s/60)+' min':Math.ceil(s)+' s';
  // The owner's limits, checked when the request arrives (so a refusal is immediate).
+ // v2.34.3: Steam doesn't let limited accounts (ones that haven't spent $5 on Steam) post pictures.
+ const LIMITED_CHAT='this Steam account can’t post pictures (Steam limits accounts that haven’t spent $5 on Steam).';
+ const LIMITED_PANEL='Steam won’t let this account post pictures: it’s a limited Steam account (one that hasn’t spent $5 in the Steam Store). Spend $5 on this account (adding $5 to its Steam Wallet counts), then reload Steam chat. Until then Tyler refuses !image at once, so nothing is paid for.';
+ const isLimited=e=>/LIMITED_ACCOUNT|limited users? cannot upload/i.test(String(e?.message||e));
+ function block(){blocked='limited';status(LIMITED_PANEL);$('imgMeta').textContent='Steam account can’t post pictures';}
+ const anchorNow=()=>{const sample=api.getSample?.();return sample?.isConnected?sample:[...(region?.querySelectorAll?.(selector||'.msgText')||[])].reverse().find(n=>n.isConnected)||null;};
  function allowed(who,style){
   const now=Date.now(),p=people.get(who.key)||{count:0,last:0};
+  if(blocked==='limited')return LIMITED_CHAT;
   if(!cfg.styles[style])return 'that style is switched off. Try !image help.';
   if(style.startsWith('v')&&!keys.venice)return 'the Venice styles need a Venice key in Settings.';
   if(!style.startsWith('v')&&!keys.openrouter)return 'images need an OpenRouter key in Settings.';
@@ -50,7 +57,7 @@
   if(api.isAiPaused?.()){status('An image request was ignored: AI is paused.');return;}
   if(req.help){say(I.help(cfg));return;}
   const who=speakerOf(node),no=allowed(who,req.style);
-  if(no){say('🎨 '+who.name+', '+no);status('Refused for '+who.name+': '+no);return;}
+  if(no){say('🎨 '+who.name+', '+no);status(blocked==='limited'?LIMITED_PANEL:'Refused for '+who.name+': '+no);return;}
   const p=people.get(who.key)||{count:0,last:0};p.count++;p.last=Date.now();people.set(who.key,p);
   queue.push({...req,who,epoch:chatEpoch});counts();
   if(busy)say('🎨 Queued for '+who.name+' (#'+queue.length+').');
@@ -60,13 +67,18 @@
   if(busy||!queue.length)return;busy=true;jobStarted=Date.now();const job=queue.shift();
   try{
    if(job.epoch!==chatEpoch)throw Error('Cancelled: the chat changed.');
+   // Ask Steam first whether this account may post pictures, so nobody pays for one it would refuse.
+   const first=anchorNow();if(!first)throw Error('The chat isn’t connected any more.');
+   const check=await globalThis.TylerSteamChat.request(first,'upload-check',{}).catch(()=>null);
+   if(check?.limited===true)throw Error('LIMITED_ACCOUNT');
+   if(check&&check.available===false)throw Error('Steam’s image upload isn’t available in this chat. Reload Steam chat and try again.');
    const style=I.STYLES[job.style];say('🎨 Drawing “'+job.prompt.slice(0,80)+(job.prompt.length>80?'…':'')+'” for '+job.who.name+' ('+style.label+')…');
    status('Drawing for '+job.who.name+' with '+(cfg.models[job.style]||'?')+'…');
    const r=await chrome.runtime.sendMessage({type:'image:generate',style:job.style,prompt:job.prompt,speaker:job.who.speaker});
    if(!r?.ok)throw Error(r?.error||'The image request failed.');
    if(api.isAiPaused?.())throw Error('Cancelled: AI was paused.');if(job.epoch!==chatEpoch)throw Error('Cancelled: the chat changed.');
    // Any message of this chat leads to Steam's uploader (the one picked in setup may have scrolled away).
-   const sample=api.getSample?.(),anchor=sample?.isConnected?sample:[...(region?.querySelectorAll?.(selector||'.msgText')||[])].reverse().find(n=>n.isConnected);if(!anchor)throw Error('The chat isn’t connected any more.');
+   const anchor=anchorNow();if(!anchor)throw Error('The chat isn’t connected any more.');
    status('Posting the picture to Steam…');
    await globalThis.TylerSteamChat.request(anchor,'image-upload',{data:r.image,type:r.mediaType,spoiler:r.spoiler===true});
    sessionCount++;counts();
@@ -76,6 +88,7 @@
    const why=String(e.message||e).replace(/^(?:OpenRouter|Venice) \d{3}: /,'').slice(0,160);
    // A request that never produced a picture doesn't count against the person.
    const p=people.get(job.who.key);if(p&&p.count>0)p.count--;counts();
+   if(isLimited(e)){const waiting=queue.splice(0);block();say('🎨 Sorry '+job.who.name+', '+LIMITED_CHAT);for(const w of waiting){const q=people.get(w.who.key);if(q&&q.count>0)q.count--;}counts();return;}
    if(!/AI was paused|^Image cancelled/.test(why))say('🎨 Couldn’t draw that for '+job.who.name+': '+why);
    status('Not posted: '+why);
   }finally{busy=false;jobStarted=0;if(queue.length)setTimeout(()=>void next(),300);}

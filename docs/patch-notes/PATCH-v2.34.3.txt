@@ -1,0 +1,21 @@
+# ROBOTIC TYLER v2.34.3: chat images on a limited Steam account
+
+## Fixed
+- **Chat images on a limited Steam account:** Tyler drew the picture, then Steam refused it with *"Limited users cannot upload images"*.
+  - Steam doesn't let limited accounts post pictures. A limited account is one that hasn't spent $5 in the Steam Store.
+  - This is Steam's rule, and the app doesn't get around it.
+- Tyler now asks Steam whether the account may post pictures **before** drawing. On a limited account:
+  - nothing is drawn, so nothing is paid for;
+  - the chat is told why;
+  - later `!image` requests are refused straight away.
+- If Steam only refuses at upload time, Tyler stops in the same way and drops the queue.
+- **To fix it:** spend $5 on the bot's Steam account (adding $5 to its Steam Wallet counts), then reload Steam chat.
+- The check reads only Steam's "limited account" flag. The rest of Steam's page settings, including Steam's own tokens, isn't kept or sent anywhere.
+
+## Tested
+- **Mocked:**
+  - A stand-in Steam page that says the account is limited: nothing is uploaded, and only the yes/no comes back.
+  - Steam's exact refusal message at upload time.
+  - The chat side never draws, says why, and refuses later requests.
+- All unit and end-to-end tests, and the desktop check.
+- **Not tested:** a real Steam limited account. The owner's screenshot shows the refusal message these tests use.

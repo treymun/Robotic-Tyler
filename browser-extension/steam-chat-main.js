@@ -136,8 +136,17 @@
   for(const p of propsAt(node))for(const x of [get(p,'chatView'),own(p,'chatView'),p]){const m=get(x,'m_fileUploadManager');if(m&&typeof get(m,'SetImageFileToUpload')==='function'&&typeof get(m,'BeginFileUpload')==='function')return m;}
   return null;
  }
+ // v2.34.3: Steam refuses picture uploads from limited accounts (ones that haven't spent $5 on Steam).
+ // Steam's page says which kind this account is (its user config); only that one yes/no is read, the
+ // rest of that config (which holds Steam's own tokens) is never kept or passed on.
+ const LIMITED='LIMITED_ACCOUNT: Steam doesn’t let limited accounts post pictures (an account that hasn’t spent $5 on Steam).';
+ function limitedAccount(){
+  for(const id of ['webui_config','application_config']){const raw=document.getElementById(id)?.getAttribute?.('data-userinfo');if(!raw)continue;try{const v=JSON.parse(raw)?.is_limited;if(typeof v==='boolean')return v;}catch{}}
+  return null;
+ }
  async function uploadImage(node,request){
   const ctx=context(node),m=uploader(node);if(!m)throw Error('Steam’s image upload isn’t available in this chat. Reload Steam chat and try again.');
+  if(limitedAccount()===true)throw Error(LIMITED);
   const type=/^image\/(png|jpeg|webp|gif)$/.test(request.type)?request.type:'image/png',ext={'image/png':'png','image/jpeg':'jpg','image/webp':'webp','image/gif':'gif'}[type];
   const bin=atob(String(request.data||''));if(!bin.length||bin.length>25*1024*1024)throw Error('That picture is too large for Steam chat.');
   const bytes=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
@@ -147,13 +156,16 @@
   await within(call(m,'SetImageFileToUpload',file,{info:{}}),20000,'Steam couldn’t read the picture (it may be damaged or an unsupported kind).');
   const props=()=>get(m,'m_fileUploadProps')||{},state=()=>Number(get(props(),'eUploadState')),why=()=>clean(get(props(),'strErrorDescription'),160);
   if([3,4,5].includes(state())){const e=why();call(m,'Reset');throw Error('Steam didn’t accept the picture'+(e?': '+e:'.'));}
+  const failure=w=>/limited user/i.test(w)?Error(LIMITED):Error('Steam’s upload failed'+(w?': '+w:'.'));
   try{await within(call(m,'BeginFileUpload',{bSpoiler:request.spoiler===true}),50000,'Steam’s upload took over 50 s.');}
-  catch(e){const w=why();call(m,'Reset');throw Error('Steam’s upload failed'+(w?': '+w:e?.message?': '+clean(e.message,120):'.'));}
-  const failed=state()===3,w=why();call(m,'Reset');if(failed)throw Error('Steam’s upload failed'+(w?': '+w:'.'));
+  catch(e){const w=why()||clean(e?.message,120);call(m,'Reset');throw failure(w);}
+  const failed=state()===3,w=why();call(m,'Reset');if(failed)throw failure(w);
   return {uploaded:true,groupId:ctx.id,bytes:bytes.length};
  }
  async function handle(node,request){
   if(request.op==='image-upload')return uploadImage(node,request);
+  // Asked before a picture is made, so nobody pays for one Steam would refuse.
+  if(request.op==='upload-check')return {available:!!uploader(node),limited:limitedAccount()};
   if(request.op==='disarm'){armed.clear();muteArmed.clear();adminArmed.clear();mutes.clear();return {};}
   if(request.op==='disarm-moderation'){armed.clear();return {};}
   if(request.op==='disarm-vote-mute'){muteArmed.clear();clearVotedMutes();return {};}
