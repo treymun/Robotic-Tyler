@@ -209,7 +209,9 @@
  globalThis.TylerSteamChatAdapter={handle};
  document.addEventListener('tyler-steam-chat-request',event=>{
   const node=event.target;if(!node||node.nodeType!==1||!node.isConnected)return;let request;
-  try{const raw=node.getAttribute('data-tyler-chat-request');if(!raw||raw.length>12000)return;request=JSON.parse(raw);if(!/^[a-z0-9-]{8,100}$/i.test(request.id||''))return;}catch{return;}
+  // v2.34: requests stay small (12,000 characters), except a chat picture for Steam's uploader (up to
+  // about 36 MB of base64); that one must be an image-upload request (v2.34.0 dropped every picture here).
+  try{const raw=node.getAttribute('data-tyler-chat-request');if(!raw||raw.length>12000&&(raw.length>36000000||!/"op":"image-upload"\}$/.test(raw)))return;request=JSON.parse(raw);if(raw.length>12000&&request.op!=='image-upload')return;if(!/^[a-z0-9-]{8,100}$/i.test(request.id||''))return;}catch{return;}
   void handle(node,request).then(data=>window.postMessage({source:'tyler-steam-chat-reply',id:request.id,ok:true,...data},location.origin)).catch(e=>window.postMessage({source:'tyler-steam-chat-reply',id:request.id,ok:false,error:String(e.message||e).slice(0,240)},location.origin));
  });
  // v2.6: message metadata straight from Steam's record (msg.unAccountID / rtTimestamp / unOrdinal),

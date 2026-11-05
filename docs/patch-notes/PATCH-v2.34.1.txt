@@ -1,0 +1,4 @@
+ROBOTIC TYLER v2.34.1 — patch notes
+
+- Fixed: chat images were made but never posted ("Steam chat controls did not respond"). The link to Steam's page ignored requests over 12,000 characters; a picture for Steam's uploader is now let through (up to ~36 MB), other requests keep the limit.
+- Tested: a 1.5 MB picture through the real page link (mocked Steam); all tests; desktop check. Not tested: a real Steam upload.

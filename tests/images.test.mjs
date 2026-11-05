@@ -84,10 +84,20 @@ function steamPage({fail=null}={}){
   async BeginFileUpload(info){calls.push(['begin',info]);if(fail==='server'){props.eUploadState=3;props.strErrorDescription='Server error';}else props.eUploadState=6;},Reset(){calls.push(['reset']);props.eUploadState=0;props.strErrorDescription='';}};
  const group={GetGroupID:()=>'12345',voiceRoomList:[]},text={GetGroup:()=>group,GetVoiceAllowed:()=>false,self:{accountid:2},ChatStore:{VoiceChat:VC}};
  const node={nodeType:1,isConnected:true,closest:()=>null,parentElement:null,__reactProps$x:{msg:{unAccountID:3,rtTimestamp:1700000000,unOrdinal:1},chatView:{chat:text,m_fileUploadManager:manager}}};
- const box={document:{querySelectorAll:()=>[],addEventListener(){}},window:{postMessage(){}},location:{origin:'https://steamcommunity.com'},File,atob,Uint8Array};
+ let listener=null;const replies=[];
+ const box={document:{querySelectorAll:()=>[],addEventListener:(t,fn)=>{if(t==='tyler-steam-chat-request')listener=fn;}},window:{postMessage:m=>replies.push(JSON.parse(JSON.stringify(m)))},location:{origin:'https://steamcommunity.com'},File,atob,Uint8Array};
  vm.runInNewContext(read('steam-chat-main.js'),box);
- return {calls,up:r=>box.TylerSteamChatAdapter.handle(node,{op:'image-upload',...r}).then(x=>JSON.parse(JSON.stringify(x)))};
+ // The real way in: the request rides on an attribute of a chat node, as steam-chat-client.js sends it.
+ const viaPage=async ({op,...values})=>{const raw=JSON.stringify({...values,id:'0123456789abcdef',op});node.getAttribute=k=>k==='data-tyler-chat-request'?raw:null;listener({target:node});for(let i=0;i<20;i++)await new Promise(r=>setImmediate(r));return replies.splice(0);};
+ return {calls,viaPage,up:r=>box.TylerSteamChatAdapter.handle(node,{op:'image-upload',...r}).then(x=>JSON.parse(JSON.stringify(x)))};
 }
+test('a real-size picture gets through the page bridge (v2.34.0 dropped anything over 12,000 characters); other big requests still don\'t',async()=>{
+ const s=steamPage(),big=Buffer.alloc(1_500_000,7).toString('base64');
+ const ok=await s.viaPage({data:big,type:'image/jpeg',op:'image-upload'});
+ assert.equal(ok.length,1,'one reply');assert.equal(ok[0].ok,true,JSON.stringify(ok[0]).slice(0,200));assert.equal(ok[0].uploaded,true);assert.equal(s.calls[0][3],1_500_000,'the whole picture arrived');
+ const no=await s.viaPage({pad:'x'.repeat(20000),op:'voice-state'});assert.equal(no.length,0,'an oversized request of another kind is ignored');
+ const small=await s.viaPage({op:'voice-state'});assert.equal(small.length,1,'normal requests unchanged');
+});
 test('the picture goes through Steam\'s own chat uploader; Steam\'s refusal is reported, and the uploader is reset',async()=>{
  const png=Buffer.from('89504e470d0a1a0a0000000d49484452','hex').toString('base64');
  let s=steamPage();const r=await s.up({data:png,type:'image/png'});

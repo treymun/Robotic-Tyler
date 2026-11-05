@@ -1,3 +1,17 @@
+# ROBOTIC TYLER v2.34.1: chat images reach Steam
+
+## Fixed
+- **Chat images:** the picture was made but never posted. Chat showed *"Steam chat controls did not respond"*.
+  - Tyler's link to Steam's page ignores any request over 12,000 characters, which is a safety limit, and every picture is far bigger than that.
+  - A picture for Steam's uploader is now let through, up to about 36 MB. All other requests keep the old limit.
+
+## Tested
+- **Mocked:** a 1.5 MB picture goes through the same page link Tyler really uses (the earlier test called the uploader directly and missed the limit). An oversized request of another kind is still ignored.
+- All unit and end-to-end tests, and the desktop check.
+- **Not tested:** a real upload into Steam chat.
+
+---
+
 # ROBOTIC TYLER v2.34.0: chat images
 
 ## New
