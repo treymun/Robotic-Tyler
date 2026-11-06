@@ -1,6 +1,8 @@
-// Settings → AI & personality → Text AI on this PC (v2.38, desktop app). Choose a model and where it
-// runs, see the download and disk space first, install, stop, remove, and time a reply. Everything
-// heavy happens in the desktop app's main process (app/local-ai); this page only shows it.
+// Settings → AI & personality → AI on this PC → text replies (v2.38, desktop app). Choose a model and
+// where it runs, see the download and disk space first, install, stop, remove, and time a reply.
+// Everything heavy happens in the desktop app's main process (app/local-ai); this page only shows it.
+// (v2.39: hearing and voice in the same section are local-speech-settings.js. The section shows when
+// either part is in use: this file sets data-text-relevant, that one data-speech-relevant.)
 (() => {
  'use strict';
  const root=document.getElementById('localAI'),la=window.tylerSettings?.localAI;if(!root||!la)return;
@@ -15,9 +17,9 @@
  const where=d=>d==='gpu'?'the graphics card':'the processor';
  function relevant(){
   const provider=$('aiProvider')?.value;
-  root.dataset.relevant=String(provider==='local'||!!status?.installed||installing);
+  root.dataset.textRelevant=String(provider==='local'||!!status?.installed||installing);
   const note=$('laProviderNote');
-  if(status?.ready&&provider!=='local'){note.hidden=false;note.textContent='Installed and ready. To use it, choose “This PC (free, no key)” as the AI provider above, then press Save settings.';}
+  if(status?.ready&&provider!=='local'){note.hidden=false;note.textContent='Text replies on this PC are installed and ready. To use them, choose “This PC (free, no key)” as the AI provider above, then press Save settings.';}
   else if(provider==='local'&&status&&!status.ready){note.hidden=false;note.textContent='This PC is chosen as the AI provider, but '+(status.installed?'the '+label(status.model)+' model isn’t installed yet':'Text AI on this PC isn’t installed yet')+'. Until it is, Tyler’s replies fail and say so: he doesn’t switch to a cloud AI by himself.';}
   else note.hidden=true;
  }
@@ -69,7 +71,7 @@
   relevant();
  }
  async function load(){
-  let r;try{r=await la('status');}catch(e){say('laInstallState','Text AI on this PC isn’t available: '+e.message);root.dataset.relevant=String($('aiProvider')?.value==='local');return;}
+  let r;try{r=await la('status');}catch(e){say('laInstallState','Text AI on this PC isn’t available: '+e.message);root.dataset.textRelevant=String($('aiProvider')?.value==='local');return;}
   status=r.status;models=r.models;installing=!!status.installing;if(installing)$('laProgressWrap').hidden=false;if(status.installError&&!status.ready)failed=true;
   render();if(!installing)say('laInstallState',await stateText());
  }

@@ -85,7 +85,7 @@
 <section class="sheet" id="quickStart" data-ui-zone="overview">
   <div class="sheet-head">
     <h2>Get Tyler running</h2>
-    <p><span class="only-chrome">Save one AI key, open Steam chat in Chrome and press Connect &amp; start in the bot panel. Turn on extras when you want them.</span><span class="only-desktop">Save one AI key, open the Steam chat window and press Connect &amp; start in Tyler&#39;s panel. Text and voice both run in that window. Turn on extras when you want them.</span></p>
+    <p><span class="only-chrome">Save one AI key, open Steam chat in Chrome and press Connect &amp; start in the bot panel. Turn on extras when you want them.</span><span class="only-desktop">Save one AI key (or set up the AI on this PC under AI &amp; personality: then text and Standard voice need no key), open the Steam chat window and press Connect &amp; start in Tyler&#39;s panel. Text and voice both run in that window. Turn on extras when you want them.</span></p>
   </div>
   <ol class="setup-steps">
     <li class="setup-step" id="uiKeyStep">
@@ -173,7 +173,7 @@
       <select id="geminiTextModel"><option value="gemini-3.1-flash-lite">Fast · Gemini 3.1 Flash-Lite</option><option value="gemini-3.5-flash-lite">Balanced · Gemini 3.5 Flash-Lite (recommended)</option><option value="gemini-3.8-flash">Advanced · Gemini 3.8 Flash</option></select>
     </label>
   </div>
-  <p class="hint only-local only-desktop">Text replies come from <b>Text AI on this PC</b>, set up in the next section: no key and no cost per message. Voice calls still need an OpenRouter or Google key below to hear people, and for the cloud voice unless a theme voice speaks.</p>
+  <p class="hint only-local only-desktop">Text replies come from the <b>AI on this PC</b>, set up in the next section: no key and no cost per message. Voice calls need no key either when hearing and the voice run on this PC too (set up in the same section, then chosen in Settings → Voice); otherwise they use an OpenRouter or Google key below.</p>
   <p class="callout only-local only-chrome">Text AI on this PC is part of the ROBOTIC TYLER desktop app. In Chrome, choose OpenRouter or Google Gemini: with This PC chosen, Tyler can't answer here.</p>
   <div class="model-card" id="modelCard">
     <div class="mc-head"><span class="mc-tier" id="mcTier"></span><b class="mc-name" id="mcName"></b><span class="mc-badge" id="mcBadge"></span><code class="mc-id" id="mcId"></code></div>
@@ -201,17 +201,20 @@
   <p class="hint">This cap uses provider-reported text costs only (OpenRouter). Set a hard limit on your OpenRouter key too; for Gemini, use Google's own billing limits.</p>
 </section>
 
-<!-- ── Text AI on this PC (v2.38, local-ai-settings.js; the desktop app's app/local-ai) ── -->
-<section class="sheet only-desktop" id="localAI" data-ui-zone="ai" data-relevant="false">
+<!-- ── AI on this PC (desktop app, app/local-ai): text replies (v2.38, local-ai-settings.js) and
+     hearing and voice for calls (v2.39, local-speech-settings.js). Hidden until something here is used. ── -->
+<section class="sheet only-desktop" id="localAI" data-ui-zone="ai" data-text-relevant="false" data-speech-relevant="false">
   <div class="sheet-head">
-    <h2>Text AI on this PC</h2>
-    <p>Tyler's text replies written by a model running on this PC (llama.cpp with Qwen3.5): no key, no account and no cost per message, and the chat's messages aren't sent to an AI provider for them. Install a model once, then choose <b>This PC (free, no key)</b> as the AI provider above.</p>
+    <h2>AI on this PC</h2>
+    <p>Tyler can run his AI on this PC: the text replies (llama.cpp with Qwen3.5), hearing people in voice calls (NVIDIA Parakeet) and a speaking voice (Kokoro). No key, no account and no cost per message, and what's said isn't sent to an AI provider for the parts that run here. Each part is optional and nothing downloads until you press its Install button. With all three on this PC, a Standard voice call needs no key at all.</p>
   </div>
   <p class="callout" id="laProviderNote" hidden></p>
   <h3>This PC</h3>
   <p class="hint" id="laHardware" role="status">Checking this PC…</p>
   <ul class="tv-notes" id="laAdvice"></ul>
-  <h3>Model</h3>
+  <p class="hint la-text-off">Text replies on this PC: choose <b>This PC (free, no key)</b> as the AI provider above to set them up here.</p>
+  <div class="la-text">
+  <h3>Text replies: model</h3>
   <div class="engine-pick la-models" role="radiogroup" aria-label="Model for Text AI on this PC">
     <label class="engine-card"><input type="radio" name="laModel" value="4b"><span><b>Qwen3.5 4B <span class="la-tag" data-for="4b"></span></b><small>Quick and light. Fits most graphics cards and runs on the processor too.</small><small class="la-size">2.6 GB download · about 3.6 GB of graphics memory, or 4.5 GB of memory on the processor</small></span></label>
     <label class="engine-card"><input type="radio" name="laModel" value="9b"><span><b>Qwen3.5 9B <span class="la-tag" data-for="9b"></span></b><small>Smarter, better at jokes and follow-ups. Best with about 8 GB of free graphics memory.</small><small class="la-size">5.3 GB download · about 6.8 GB of graphics memory, or 8 GB of memory on the processor</small></span></label>
@@ -253,10 +256,45 @@
   <div class="actions"><button id="laCheck" type="button" class="secondary">Run a speed check</button><button id="laUnload" type="button" class="secondary">Close the AI now</button></div>
   <p id="laCheckState" role="status"></p>
   <h3>Free up space</h3>
-  <p class="hint">Removes the downloaded engine and models. Your settings are kept, and Tyler keeps working with a cloud provider. Installing again means downloading again.</p>
+  <p class="hint">Removes the downloaded engine and models for text replies. Your settings are kept, hearing and voice on this PC stay installed, and Tyler keeps working with a cloud provider. Installing again means downloading again.</p>
   <div class="actions"><button id="laRemoveModel" type="button" class="secondary">Remove this model</button><button id="laRemove" type="button" class="secondary">Remove Text AI on this PC</button></div>
+  </div>
+  <h3 id="localSpeech">Hearing and voice for calls</h3>
+  <p class="hint">For Standard voice calls. Both run on the processor, so the graphics card stays free for your game and the text AI. After installing, choose them in Settings → Voice → Standard voice: <b>Hearing → This PC</b> and <b>Speaking voice → Voice on this PC (Kokoro)</b>.</p>
+  <p class="callout" id="lsNote" hidden></p>
+  <div class="engine-pick ls-parts" role="group" aria-label="Hearing and voice on this PC">
+    <label class="engine-card"><input type="checkbox" id="lsPickHearing" value="hearing" checked><span><b>Hearing: Parakeet TDT 0.6B v3 <span class="la-tag" id="lsTagHearing"></span></b><small>NVIDIA's speech-to-text model, 25 European languages. It turns a few seconds of speech into text in well under a second on most processors.</small><small class="la-size" id="lsSizeHearing">639 MB download · about 1 GB of memory while it runs</small></span></label>
+    <label class="engine-card"><input type="checkbox" id="lsPickVoice" value="voice" checked><span><b>Voice: Kokoro-82M <span class="la-tag" id="lsTagVoice"></span></b><small>A small, natural English voice with six of its stock voices to choose from. The first words of a reply are ready in about a second.</small><small class="la-size" id="lsSizeVoice">350 MB download · about 0.5 GB of memory while it runs</small></span></label>
+  </div>
+  <p class="hint" id="lsEngineNote">Both use the sherpa-onnx speech engine (version 1.13.8, 8.5 MB download), installed with whichever comes first.</p>
+  <p id="lsInstallState" role="status">…</p>
+  <div class="tv-progress" id="lsProgressWrap" hidden><span id="lsProgress"></span></div>
+  <p class="hint" id="lsProgressText"></p>
+  <div class="actions">
+    <button id="lsInstall" type="button">Install</button>
+    <button id="lsCancel" type="button" class="secondary" hidden>Stop installing</button>
+    <button id="lsOffline" type="button" class="secondary">Install from a folder…</button>
+  </div>
+  <div class="callout" id="lsOfflineForm" hidden>
+    <label>Folder with the downloaded files<input id="lsOfflineDir" placeholder="For example D:\Tyler speech"><small class="hint">Put the engine package (sherpa-onnx-win-x64-1.13.8.tgz) and the model files in one folder (subfolders like espeak-ng-data\lang\gmw are fine). They're checked exactly like downloads; anything missing or different is downloaded instead.</small></label>
+    <div class="actions"><button id="lsOfflineGo" type="button">Install from this folder</button><button id="lsOfflineCancel" type="button" class="secondary">Cancel</button></div>
+  </div>
+  <p class="hint">Downloaded from the original sources (the sherpa-onnx project's own package on npm and the models' pages on Hugging Face, each at one pinned version), checked against the SHA-256 recorded in this version of Tyler, and kept in their own folder. The engines have no network connection: they talk only to Tyler, inside this PC. Parakeet TDT 0.6B v3 is by NVIDIA (CC BY 4.0); Kokoro-82M is by hexgrad (Apache-2.0); both in the sherpa-onnx project's ONNX versions.</p>
+  <h3>Quick check</h3>
+  <p class="hint">Starts what isn't running and times it: hearing turns a short built-in recording into text; the voice says one sentence (it plays here) and shows how long the first audio took.</p>
+  <div class="actions"><button id="lsCheckHearing" type="button" class="secondary">Check hearing</button><button id="lsCheckVoice" type="button" class="secondary">Check the voice</button><button id="lsUnload" type="button" class="secondary">Close hearing and voice now</button></div>
+  <p id="lsCheckState" role="status"></p>
+  <div class="grid two">
+    <label>Close hearing and voice after
+      <select id="lsIdle"><option value="1">1 minute idle</option><option value="2">2 minutes idle</option><option value="5">5 minutes idle</option><option value="10">10 minutes idle</option><option value="30">30 minutes idle</option><option value="60">1 hour idle</option><option value="0">Never (keep them loaded)</option></select>
+      <small class="hint">Closing gives their memory back; the next turn then waits a second or two while they load. They also close when you pause or stop Tyler, on the emergency stop and when you quit.</small>
+    </label>
+  </div>
+  <h3>Free up space for hearing and voice</h3>
+  <p class="hint">Removes the downloaded files. Your choices in Settings → Voice are kept; a turn that needs a removed part fails and says so until you install it again or choose Cloud.</p>
+  <div class="actions"><button id="lsRemoveHearing" type="button" class="secondary">Remove hearing</button><button id="lsRemoveVoice" type="button" class="secondary">Remove the voice</button></div>
   <h3>Voice calls</h3>
-  <p class="hint">This version writes text replies only. In a voice call Tyler still hears people with a cloud key (your OpenRouter key, or your Google key if that's the one saved) and speaks with the cloud voice of that key, unless you choose <b>Theme voice on this PC</b> under Voice → Standard voice. Gemini Live always uses Google. Hearing on this PC is coming next.</p>
+  <p class="hint">A Standard voice call hears people with what you choose under Settings → Voice → Standard voice → Hearing, and speaks with the Speaking voice chosen there. With <b>This PC</b> for the text replies, hearing and the voice, a call needs no key at all and nothing that's said leaves this PC. With Cloud hearing or the cloud voice, Tyler uses your OpenRouter key (or your Google key if that's the one saved). Gemini Live always uses Google.</p>
 </section>
 
 <section class="sheet" id="personalitySheet" data-ui-zone="ai">
@@ -308,7 +346,7 @@
 <section class="sheet" id="noticeSheet" data-ui-zone="ai">
   <div class="sheet-head">
     <h2>Telling each chat</h2>
-    <p>Tyler sends the chat's messages (and, in voice, what people say) to your AI provider. Connect &amp; start asks once in each new chat whether you've told everyone.<span class="only-local only-desktop"> With This PC, text replies are written on this PC, so the chat's messages aren't sent to an AI provider for them; in voice calls, what people say still goes to OpenRouter or Google to be heard.</span></p>
+    <p>Tyler sends the chat's messages (and, in voice, what people say) to your AI provider. Connect &amp; start asks once in each new chat whether you've told everyone.<span class="only-local only-desktop"> With This PC, text replies are written on this PC, so the chat's messages aren't sent to an AI provider for them; in voice calls, what people say goes to OpenRouter or Google to be heard unless Hearing is set to This PC in Settings → Voice.</span></p>
   </div>
   <div class="toggle-grid">
     <label class="toggle"><input id="noticeAsk" type="checkbox" checked><span><b>Ask in each new chat</b><small>Off: Connect &amp; start goes straight through, in every chat. You still need to let people know.</small></span></label>
@@ -388,7 +426,7 @@
   </div>
   <input id="voiceEngine" type="hidden" value="standard">
   <div class="engine-pick" role="radiogroup" aria-label="Voice engine">
-    <label class="engine-card"><input type="radio" name="voiceEnginePick" value="standard" checked><span><b>Standard</b><small>Waits for a pause, writes a reply with your AI provider, then speaks it. Works with an OpenRouter or Google key and uses your text personality and reply length.</small></span></label>
+    <label class="engine-card"><input type="radio" name="voiceEnginePick" value="standard" checked><span><b>Standard</b><small>Waits for a pause, writes a reply with your AI provider, then speaks it. Works with an OpenRouter or Google key<span class="only-desktop">, or with no key at all when hearing, the replies and the voice all run on this PC</span>, and uses your text personality and reply length.</small></span></label>
     <label class="engine-card"><input type="radio" name="voiceEnginePick" value="live"><span><b>Gemini Live</b><small>A real-time voice conversation with Google: Tyler hears speech as it happens, answers quickly and stops when someone talks over him. Needs a Google AI key. Google bills for the audio while a session runs, so you start and stop each one yourself.</small></span></label>
   </div>
   <p class="hint" id="voiceKeyState" role="status">Checking keys…</p>
@@ -399,11 +437,31 @@
     <h2>Standard voice</h2>
     <p id="standardVoiceNote">Speech uses Grok Voice through OpenRouter, with Voxtral as the fallback.</p>
   </div>
-  <label class="only-desktop">Speaking voice
-    <select id="speechEngine"><option value="cloud">Cloud voice (the voice chosen below)</option><option value="theme">Theme voice on this PC</option></select>
-    <small class="hint">Theme voice: Tyler answers in the character voice from Settings → Voice → Theme voices (the current theme's voice, or the one you picked there). It's made on this PC, so there's no speech charge. With an NVIDIA card and the fast engine a reply takes about as long as it lasts, or less; with the standard engine expect several seconds, and on the processor a minute or more. If the theme voice can't speak, Tyler answers in text and says why: he doesn't switch to the paid cloud voice by himself. Gemini Live always speaks in Google's voices.</small>
-  </label>
+  <!-- v2.39: how Standard voice hears and which voice speaks. The hidden inputs hold the saved values
+       (settings.js); the cards set them (voice-settings.js). Chrome keeps Cloud for both. -->
+  <input id="voiceHearing" type="hidden" value="cloud">
+  <input id="speechEngine" type="hidden" value="cloud">
+  <div class="only-desktop">
+    <h3>Hearing</h3>
+    <div class="engine-pick" role="radiogroup" aria-label="Hearing">
+      <label class="engine-card"><input type="radio" name="voiceHearingPick" value="cloud" checked><span><b>Cloud</b><small>As before: each short recording goes to OpenRouter (Voxtral) or Google, with your key, to be turned into text.</small></span></label>
+      <label class="engine-card"><input type="radio" name="voiceHearingPick" value="local"><span><b>This PC</b><small>NVIDIA Parakeet hears it on the processor: free, no key, and the recording never leaves this PC.</small></span></label>
+    </div>
+    <h3>Speaking voice</h3>
+    <div class="engine-pick three" role="radiogroup" aria-label="Speaking voice">
+      <label class="engine-card"><input type="radio" name="speechEnginePick" value="cloud" checked><span><b>Cloud voice</b></span></label>
+      <label class="engine-card"><input type="radio" name="speechEnginePick" value="theme"><span><b>Theme voice on this PC</b><small>Character voices and your own recordings, cloned</small></span></label>
+      <label class="engine-card"><input type="radio" name="speechEnginePick" value="kokoro"><span><b>Voice on this PC (Kokoro)</b><small>Stock voices; lighter and quick on the processor</small></span></label>
+    </div>
+    <p class="hint" id="voiceLocalTip" role="status" hidden><b>Tip:</b> the replies and the hearing already run on this PC. Choose <b>Theme voice on this PC</b> (the same character voices) or <b>Voice on this PC</b> and the whole call runs here, free, with no key.</p>
+    <p class="hint" id="speechEngineNote">Both voices on this PC need no key and have no speech charge. Theme voices are set up in Settings → Voice → Theme voices (on the processor a theme voice can take a minute or more; with an NVIDIA card about as long as the reply lasts). If a voice on this PC can't speak, Tyler answers in text and says why: he doesn't switch to the paid cloud voice by himself. Gemini Live always speaks in Google's voices.</p>
+  </div>
+  <p class="callout only-desktop" id="voiceLocalState" role="status" hidden></p>
   <div class="grid two">
+    <label class="only-desktop for-kokoro">Kokoro voice
+      <select id="kokoroVoice"><option value="am_michael">Michael · American male</option><option value="am_puck">Puck · American male, lively</option><option value="am_fenrir">Fenrir · American male, deep</option><option value="bm_george">George · British male</option><option value="af_heart">Heart · American female</option><option value="bf_emma">Emma · British female</option></select>
+      <small class="hint">Kokoro-82M's own stock voices (Apache-2.0); Michael is the default. Test voice below plays the one chosen.</small>
+    </label>
     <label data-provider="openrouter">Grok voice
       <select id="speechVoice"><option value="rex">rex</option><option value="eve">eve</option><option value="ara">ara</option><option value="sal">sal</option><option value="leo">leo</option></select>
     </label>
@@ -722,6 +780,7 @@
 <script src="image-settings.js"></script>
 <script src="theme-voice-settings.js"></script>
 <script src="local-ai-settings.js"></script>
+<script src="local-speech-settings.js"></script>
 <script src="settings.js"></script>
 <script src="v22-settings.js"></script>
 <script src="settings-navigation.js"></script>

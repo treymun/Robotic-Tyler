@@ -97,7 +97,7 @@ test('the lock pins one llama.cpp release and four Qwen3.5 GGUF files, each at o
 test('voice calls with Text AI on this PC hear with the saved OpenRouter key, else the Google key, else a clear error',()=>{
  assert.deepEqual(voiceKeyFor({aiProvider:'local',openrouterKey:'sk-or-a',geminiKey:'AIza'}),{provider:'openrouter',key:'sk-or-a',error:null});
  assert.deepEqual(voiceKeyFor({aiProvider:'local',geminiKey:'AIza'}),{provider:'gemini',key:'AIza',error:null});
- const none=voiceKeyFor({aiProvider:'local'});assert.equal(none.provider,null);assert.equal(none.key,'');assert.equal(none.error,LOCAL_HEARING_ERROR);assert.match(none.error,/local hearing is coming next/);
+ const none=voiceKeyFor({aiProvider:'local'});assert.equal(none.provider,null);assert.equal(none.key,'');assert.equal(none.error,LOCAL_HEARING_ERROR);assert.match(none.error,/choose Hearing → This PC/,'v2.39: says how to hear without a key');
  // The cloud providers are unchanged: their own key only.
  assert.deepEqual(voiceKeyFor({aiProvider:'gemini',openrouterKey:'sk-or-a',geminiKey:'AIza'}),{provider:'gemini',key:'AIza',error:null});
  assert.deepEqual(voiceKeyFor({openrouterKey:'sk-or-a',geminiKey:'AIza'}),{provider:'openrouter',key:'sk-or-a',error:null});

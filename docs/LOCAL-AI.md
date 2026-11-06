@@ -1,16 +1,26 @@
-# Text AI on this PC (v2.38, stage 1)
+# AI on this PC
 
-Tyler's **text replies** can be written by a model running on your own PC, with no key, no account
-and no cost per message. It's part of the Windows desktop app and it's optional: nothing is
-downloaded until you press **Install**, and the cloud providers (OpenRouter, Google Gemini) work as
-before.
+Tyler can run his AI on your own PC, with no key, no account and no cost per message. It's part of
+the Windows desktop app and every part is optional: nothing is downloaded until you press its
+**Install** button, and the cloud providers (OpenRouter, Google Gemini) work as before.
 
-Stage 1 is text only. In voice calls Tyler still hears people with a cloud key (see *Voice calls*).
+- **Text replies** (v2.38, stage 1): llama.cpp with a Qwen3.5 model. The first half of this page.
+- **Hearing and a voice for calls** (v2.39, stage 2): NVIDIA Parakeet hears people in Standard voice
+  calls and Kokoro speaks Tyler's replies, both through sherpa-onnx on the processor. See
+  [Hearing and voice on this PC](#hearing-and-voice-on-this-pc-v239-stage-2).
+
+With all three on this PC, a Standard voice call needs no key at all, and nothing anyone says leaves
+the PC. Gemini Live is unchanged: it always uses Google.
+
+Both live in **Settings → AI & personality → AI on this PC** (it was called *Text AI on this PC* in
+v2.38). The section shows once one of its parts is chosen or installed.
+
+# Text replies (v2.38, stage 1)
 
 ## Turning it on
 
-1. **Settings → AI & personality → AI provider → This PC (free, no key).** The section **Text AI on
-   this PC** appears below it.
+1. **Settings → AI & personality → AI provider → This PC (free, no key).** The section **AI on this
+   PC** appears below it.
 2. Pick a model. Tyler suggests one for this PC (see *Which model*), but nothing installs or switches
    by itself.
 3. The section shows the download size and the disk space needed before anything downloads. Press
@@ -114,10 +124,11 @@ environment: a short allowlist (SystemRoot, TEMP, PATH, …) plus LLAMA_API_KEY=
   (`--no-slots`) and no downloading (`--offline`). Its input is closed and it has no window.
 - Everything lives in `%LOCALAPPDATA%\RoboticTylerHydraCloudV12\LocalAI`: the engine, the models and
   downloads. Nothing is installed system-wide, nothing is added to PATH or the registry, and no
-  driver is changed. **Remove** deletes the folder's contents; Tyler's settings are kept (they're in
-  the app's own data).
-- What isn't local in stage 1: hearing people in voice calls, the cloud voice, chat images and
-  screen awareness still use their cloud providers as before.
+  driver is changed. **Remove Text AI on this PC** deletes the text engine, models and downloads;
+  Tyler's settings are kept (they're in the app's own data), and so are hearing and voice on this PC
+  (their own `speech` folder, v2.39).
+- What isn't local: chat images and screen awareness use their cloud providers as before; hearing and
+  the cloud voice are local only when you choose that (stage 2, below).
 
 ## When it can't answer
 
@@ -136,26 +147,34 @@ failed reply is skipped.
 
 ## Voice calls
 
-Stage 1 writes text replies only. A voice call (Standard voice) with *This PC* chosen:
+A Standard voice call hears and speaks the way Settings → Voice → Standard voice says (v2.39):
 
-- **hears** people with the saved **OpenRouter key** if there is one, otherwise the saved **Google
-  key**; with neither, the turn fails with "Voice calls still need an OpenRouter or Google key to
-  hear people … local hearing is coming next", and nothing is called;
-- **speaks** with that key's cloud voice (Grok Voice for OpenRouter, Gemini speech for Google),
-  unless you choose **Theme voice on this PC** under Settings → Voice → Standard voice;
+- **Hearing → This PC**: Parakeet on this PC, no key (stage 2, below). **Hearing → Cloud** (the
+  default, as before): with *This PC* as the text provider, the saved **OpenRouter key** if there is
+  one, otherwise the saved **Google key**; with neither, the turn fails with a message naming
+  *Hearing → This PC* and nothing is called.
+- **Speaking voice**: the cloud voice of that key (Grok Voice for OpenRouter, Gemini speech for
+  Google), **Voice on this PC (Kokoro)**, or **Theme voice on this PC**.
 - Gemini Live always uses Google, as before.
 
-The rule is `voiceKeyFor()` in `browser-extension/local-ai.mjs`.
+A theme voice (the character voices, including your own replacement recordings) is made on this PC,
+so it counts as speaking on this PC exactly like Kokoro: with **This PC** for the text replies,
+**Hearing → This PC** and either **Theme voice on this PC** or **Voice on this PC (Kokoro)**, a
+Standard voice call needs no key at all. The rules are `voiceKeyFor()` and `voicePlan()` in
+`browser-extension/local-ai.mjs`.
 
 ## Usage and the spending cap
 
 Local replies are counted apart from billed use: `localTextResponses`, `localPromptTokens` and
-`localCompletionTokens` in the usage record (Settings → Advanced). They don't add to requests,
-tokens or reported cost. The local spending cap counts paid use only, so with *This PC* a text reply
-still works when the cap is reached; a voice turn (cloud hearing) or cloud speech is still stopped
-by it.
+`localCompletionTokens` in the usage record (Settings → Advanced). Hearing and Kokoro on this PC
+likewise (v2.39): `localTranscriptions`, `localTranscribedSeconds`, `localSpeechResponses` and
+`localSpeechCharacters` (a theme voice keeps its own `themeSpeechResponses` and
+`themeSpeechCharacters`, as since v2.36). None of them adds to requests, tokens, transcriptions, spoken replies or
+reported cost. The local spending cap counts paid use only, so with *This PC* a text reply still works
+when the cap is reached, and so does a voice turn heard and spoken on this PC; cloud hearing or cloud
+speech is still stopped by it.
 
-## What's tested
+## What's tested (text replies)
 
 **Mocked** (no model, no internet, runs in CI):
 
@@ -199,3 +218,190 @@ server on the processor and times the speed check and one reply.
 **Not tested yet:** a real graphics card through Vulkan (NVIDIA, AMD or Intel), the two 9B models
 (their pinned SHA-256s were checked by the owner; Tyler checks them again when they download), the
 Windows workflow's first run, and replies in real Steam chat.
+
+# Hearing and voice on this PC (v2.39, stage 2)
+
+In Standard voice calls Tyler can hear people and speak his replies on this PC too. Both run on the
+**processor**, so the graphics card stays free for your game and the text AI.
+
+| Part | Model | Download | Memory while it runs | Licence |
+|---|---|---|---|---|
+| Speech engine | sherpa-onnx 1.13.8 (k2-fsa), its Node.js addon for Windows x64 | 8.5 MB (22 MB on disk) | (part of the two below) | Apache-2.0 |
+| Hearing | NVIDIA **Parakeet TDT 0.6B v3**, int8 ONNX | 639 MB | about 1 GB | CC-BY-4.0 |
+| Voice | **Kokoro-82M v1.0** (hexgrad), float32 ONNX, English parts only | 350 MB | about 0.5 GB | Apache-2.0 |
+
+Sizes as Windows shows them (1 MB = 1024² bytes). The engine comes with whichever part is installed
+first and goes when neither is left.
+
+## Turning it on
+
+1. **Settings → AI & personality → AI on this PC → Hearing and voice for calls.** Tick hearing, the
+   voice or both. The download and disk space are shown before anything downloads. Press **Install**.
+   **Stop installing** keeps what was downloaded, so **Retry** carries on from there.
+2. **Check hearing** turns a short built-in recording into text and shows the time and how many words
+   came out right. **Check the voice** says one sentence (it plays in Settings) and shows the time to
+   the first audio. The recording is `app/local-ai/check-clip.wav` (3.2 s, 16 kHz mono, "Hey Tyler, who
+   wins in a fight, a tank or a sniper?"), made with Kokoro's Michael voice by this engine, so it has
+   the same licence as Kokoro and no person's voice in it.
+3. **Settings → Voice → Standard voice**:
+   - **Hearing**: **Cloud** (as before) or **This PC**;
+   - **Speaking voice**: **Cloud voice**, **Theme voice on this PC** (character voices and your own
+     recordings, cloned) or **Voice on this PC (Kokoro)** (stock voices; lighter and quick on the
+     processor). With Kokoro, pick a **Kokoro voice**: Michael (American male, the default), Puck,
+     Fenrir, George (British male), Heart (American female) or Emma (British female): Kokoro's own
+     stock voices, speakers 16, 18, 14, 26, 3 and 21 of its voice table.
+
+   Press **Save settings**. **Test voice** there plays the chosen Kokoro voice or theme voice.
+
+With This PC for the text replies, **Hearing → This PC** and a voice on this PC (Kokoro or a theme
+voice), a Standard voice call needs **no key at all**, and nothing anyone says leaves the PC.
+
+In Chrome these choices aren't offered. If they're chosen anyway (imported settings), a voice turn
+with Hearing → This PC fails with a message saying it's part of the desktop app, and a reply meant for
+Kokoro stays text with the same reason; nothing is sent to the cloud instead.
+
+## Choices made
+
+- **sherpa-onnx 1.13.8** (published 2026-09-10): the newest release at least two weeks old (2.0.0 and
+  2.0.1 are from 23 and 26 October 2026). It runs both Parakeet TDT v3 and Kokoro, on Windows x64
+  without a graphics card. Its Windows files import only Windows' own DLLs (KERNEL32, ADVAPI32,
+  SETUPAPI, dbghelp, dxgi): no Visual C++ runtime is needed.
+- **How it runs: sherpa-onnx's own Node.js addon in a separate process, not its command-line tools.**
+  The prebuilt tools load the model for every request (about 2 s for Parakeet, 1.4 s for Kokoro), and
+  the only server among them (`sherpa-onnx-offline-websocket-server`) listens on the network with no
+  key. The addon keeps each model loaded, works asynchronously (so Stop is heard while it works), and
+  needs no network at all. The addon comes from the sherpa-onnx project's own npm package
+  (`sherpa-onnx-win-x64`, published from its GitHub repository with npm's provenance record),
+  downloaded at install time like the models; it isn't bundled with Tyler and isn't an npm dependency
+  of the app. (GitHub's release archives are `.tar.bz2`, which the installer can't unpack; the npm
+  package is a `.tgz` it already handles.)
+- **Parakeet int8 on the processor.**
+- **Kokoro float32, not int8**: the int8 model (`csukuangfj/kokoro-int8-multi-lang-v1_0`) was about
+  twice as slow on this processor (measured side by side, the same voice and sentences: a 41-character
+  sentence took 4.2 s against 2.2 s, a 95-character one 10.0 s against 4.7 s, while another job shared
+  the processor), so the float32 file (325 MB) is used. Only the English parts are downloaded: the US and UK lexicons and the
+  English espeak-ng data (8 small files); the Chinese lexicon, its dictionary and the other languages'
+  data aren't.
+
+Pinned in `app/local-ai/lock.json` (`speech`), every file with its size and SHA-256. All 19 files
+were downloaded and checked against these by the app's own installer, and the Windows package was
+downloaded and hashed separately (its SHA-512 also matches npm's record):
+
+| What | Source |
+|---|---|
+| Engine, Windows | `https://registry.npmjs.org/sherpa-onnx-win-x64/-/sherpa-onnx-win-x64-1.13.8.tgz`, 8,894,875 bytes, `fe522f02…` |
+| Engine, Linux (development and tests only) | `sherpa-onnx-linux-x64-1.13.8.tgz`, 11,089,653 bytes, `13291bcd…` |
+| Hearing | `csukuangfj/sherpa-onnx-nemo-parakeet-tdt-0.6b-v3-int8` @ `2bda32ec…` (2025-08-16): encoder, decoder, joiner (int8) and tokens |
+| Voice | `csukuangfj/kokoro-multi-lang-v1_0` @ `f7b96bb6…` (2026-09-08): `model.onnx`, `voices.bin`, tokens, `lexicon-us-en.txt`, `lexicon-gb-en.txt`, LICENSE, English espeak-ng data |
+
+Credits shown in Settings: Parakeet TDT 0.6B v3 by NVIDIA (CC BY 4.0) and Kokoro-82M by hexgrad
+(Apache-2.0), both in the sherpa-onnx project's ONNX versions. sherpa-onnx includes ONNX Runtime (MIT)
+and espeak-ng (GPL-3.0; used for words Kokoro's lexicon doesn't have).
+
+## How it runs
+
+- Each part is its own process: `app/local-ai/speech-worker.cjs`, started by the app's service
+  (`app/local-ai/speech.cjs`) with Node's `child_process.fork`, using **Tyler's own executable run as
+  Node** (`ELECTRON_RUN_AS_NODE=1`). The worker file is unpacked next to the app archive.
+- Its only connection is Node's IPC channel to the app: **no network listener, no port**, its input is
+  closed and it has no window. Node reads that channel asynchronously at both ends, so nothing waits
+  on it (the Windows pipe stall fixed in v2.37.1 was a read left blocked on a synchronous pipe; there is
+  none here). When the app goes away the channel closes and the process ends by itself; if one were
+  left anyway, the next start ends it, after checking its command line is this worker (never another
+  program with the same number).
+- Its environment is a short allowlist; the path starts with the engine's own folder.
+- Up to 4 processor threads each (about the physical cores).
+- Hearing: 16 kHz features, greedy decoding, the call's 16 kHz recording as it is (any other rate is
+  resampled by sherpa-onnx). Voice: one sentence at a time (`maxNumSentences 1`), 24 kHz, a long reply
+  split into clips of at most 30 s like theme voices; the first sentence is spoken while the rest of
+  the reply is still being written (**Start speaking sooner**). A British voice uses the British
+  lexicon: switching between an American and a British voice restarts the voice engine (about 1.5 s).
+- In the desktop app the generated audio is copied into normal memory (`enableExternalBuffer: false`):
+  Electron's V8 refuses buffers that point outside its own memory. Checked here: with the addon's
+  default, Kokoro fails under Electron 45 with "TTS settlement failed" and works under plain Node;
+  with the copy it works in both. The Windows workflow runs under Electron for this reason.
+
+## When they run
+
+- Each starts only when needed: a voice turn heard or spoken on this PC, a quick check, or Test voice.
+  When a voice turn that Kokoro will speak begins, the voice engine starts loading at once, alongside
+  hearing and the reply, so a first turn doesn't wait for it after the reply is written. Installing,
+  opening Settings and the status never start them.
+- They close after **Close hearing and voice after** (1, 2, 5, 10, 30 or 60 minutes idle, or never;
+  10 by default), when you press **Pause** or **Stop** in Tyler's panel, when the Steam chat window
+  closes, on the **emergency stop**, from Settings (**Close hearing and voice now**), and when the app
+  quits.
+
+## When they can't hear or speak
+
+Tyler never sends the recording to OpenRouter or Google instead, and never switches to the paid cloud
+voice by himself:
+
+- **Hearing** fails the turn with the reason: not installed (automatic mode then stops and says so),
+  not enough free memory, the engine couldn't start or closed in the middle (that turn is skipped),
+  took too long (20 s), or a recording it can't read.
+- **The voice**: the reply is posted as text with "Voice on this PC failed: <reason>. Tyler answered in
+  text (he doesn't switch to the paid cloud voice by himself)", the same rule as theme voices.
+
+## What's tested (hearing and voice)
+
+**Mocked** (no model, no internet, runs in CI):
+
+- `tests/local-speech.test.mjs`: the lock (every file pinned with size, SHA-256 and commit; Settings'
+  lists and the three speaking-voice choices match it); the installer against a local HTTP server
+  (plan before download, hearing alone brings the engine and the voice later only its own files, a
+  cut-off download resumed, a wrong SHA-256 deleted and never used, an offline folder used first, flat
+  or in subfolders, remove one part or both, removing the text AI keeps them); the **real worker
+  process** with a fake addon (`tests/fixtures/fake-sherpa-addon.cjs`): starts only when asked, short
+  environment, no TCP or UDP socket, input closed, threads and processor passed, Kokoro's speaker and
+  lexicon per voice, samples copied, Stop mid-sentence, idle close, release, quitting, the voice
+  started ahead of a turn, a crash in the middle, a load failure, a timeout, not installed, not enough
+  memory, an engine whose app was killed ends by itself, a leftover one is ended and an unrelated
+  process isn't, the quick checks, and the desktop wiring (the emergency stop, Settings' requests, the
+  bridge carries audio and text only).
+- `tests/local-speech-routing.test.mjs`: the real background with fake engines. **Both no-key calls**:
+  text, hearing and Kokoro on this PC, and text, hearing and a theme voice on this PC, each with no key
+  saved and **no cloud call at all**; hearing on this PC with cloud text never sends the recording for
+  transcription (OpenRouter or Gemini); Cloud hearing is unchanged; a hearing failure fails the turn
+  with the reason and calls nothing although both keys are saved; a Kokoro or theme voice failure
+  leaves the reply as text with the reason and no Grok call; Chrome gives clear errors; Start speaking
+  sooner with Kokoro and with a theme voice; the panel's connection line and voice picker; separate
+  usage counters; the spending cap; Stop, Pause and closing the Steam window.
+
+**Real, Linux** (development container, 2 processor cores of an Intel Xeon at 2.3 GHz, 7.8 GB, no
+graphics card), with the app's own installer from the real sources (npm and Hugging Face, 1,000 MB in
+19 files, 11 s here) and the real engines, through the app's service (`tools/local-ai/speech-smoke.cjs`):
+
+- hearing loaded in 1.9–2.3 s; the built-in 3 s clip heard in 0.26–0.32 s, every word right;
+- Parakeet on all 23 game voice references of the theme voices (`app/theme-voices/voices/*/reference.flac`,
+  turned into 16 kHz WAV, 5–20 s each, 326 s in all) against their transcripts: 29 s for all of them
+  (about 1.0–1.6 s for a 13–20 s line), a median of 98% of the words right, 10 of them every word; the
+  lowest was the Combine soldier's radio-filtered voice (52%), then the WW2 field radio (88%);
+- Kokoro loaded in 1.3–1.5 s; first audio of a sentence 0.6–0.9 s just after loading, 0.43–0.65 s warm;
+  a 114-character reply (7.5 s of speech) made in 2.5–3.0 s (0.33–0.40 of real time); restarting for a
+  British voice 1.3–1.5 s; that reply heard back by Parakeet in 0.74 s (95% of the words: "Tanks" came
+  out "Tan");
+- every clip checked with Whisper (faster-whisper small.en): the six voices saying the same sentence,
+  every word right (Emma's "everyone" came back "everyone's"), and the smoke test's clips;
+- the engine processes had no network socket and were gone after closing;
+- under **Electron 45.2.1** (its own Node, 24.22): run as Node, and from a real Electron main process
+  the way the app does it: the same results;
+- **a Standard voice turn through the real background, desktop wiring and real engines, with no key
+  saved** (a fixed stand-in for the text AI, which is stage 1's): the built-in clip heard right, the
+  reply spoken by Kokoro with Start speaking sooner, no cloud call, usage counted as local. The first
+  audio came 3.4 s after the turn began with both engines starting (hearing loaded in 2.0 s while Kokoro
+  loaded alongside it), 1.4 s once they were running (other tests were running on the machine at the
+  time). Before Kokoro was started at the beginning of the turn, it loaded only once the first sentence
+  was ready, and a cold turn's first audio took 6.4 s (measured while another job used most of the
+  processor, so not a like-for-like comparison).
+
+**Real, Windows:** `tools/local-ai/speech-smoke.cjs` and `tools/local-ai/speech-electron-check.cjs`, run
+by the manual workflow *Hearing and voice on this PC on Windows* (`.github/workflows/local-speech-windows.yml`):
+installs the Windows engine and both models with the app's installer on GitHub's Windows runner, runs
+the quick checks, a round trip and two other voices under Node 22, again under Electron run as Node,
+and once from a real Electron main process; the times go to the run's summary, and the logs and the
+spoken clips are kept as an artifact.
+
+**Not tested yet:** the Windows workflow's first run, a real Steam voice call, a theme voice through
+the real theme voice engine in a voice turn (its own engine is tested in its stage; here it's faked),
+other languages than English for hearing, and processors other than this container's.

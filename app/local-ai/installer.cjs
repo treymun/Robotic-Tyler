@@ -133,8 +133,11 @@ class Installer{
    if(fs.statSync(f).size!==l.size||await sha256File(f,signal)!==l.sha256)problems.push('Damaged model file '+m.file);}
   return {ok:!problems.length,problems};
  }
- /** Removes the engine, the models and any downloads. Tyler's settings are kept (they aren't in this folder). */
- async remove(){if(!fs.existsSync(this.dir))return;for(const name of fs.readdirSync(this.dir))await rmr(path.join(this.dir,name));}
+ /**
+  * Removes the engine, the models and any downloads. Tyler's settings are kept (they aren't in this
+  * folder), and so are hearing and voice on this PC (v2.39: their own speech\ folder).
+  */
+ async remove(){if(!fs.existsSync(this.dir))return;for(const name of fs.readdirSync(this.dir))if(name!=='speech')await rmr(path.join(this.dir,name));}
  async removeModel(key){const s=this.state();if(!s?.models?.[key])return;await rmr(path.join(this.dir,'models',s.models[key].dir));delete s.models[key];writeJson(this.statePath(),s);}
  saveCheck(c){const s=this.state();if(!s)return;s.check=c;writeJson(this.statePath(),s);}
 }

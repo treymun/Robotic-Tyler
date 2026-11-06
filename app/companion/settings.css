@@ -188,7 +188,9 @@ button:focus-visible,a:focus-visible,summary:focus-visible,input[type=checkbox]:
 body:not([data-ai-provider=gemini]) .for-gemini,body[data-ai-provider=gemini] .for-openrouter{display:none!important}
 /* Text AI on this PC (v2.38): what applies only to it, and the cloud model card it replaces. */
 body:not([data-ai-provider=local]) .only-local,body[data-ai-provider=local] .for-openrouter:not(.for-local),body[data-ai-provider=local] #modelCard{display:none!important}
-#localAI[data-relevant=false]{display:none!important}
+/* v2.39: AI on this PC shows when text replies or hearing/voice there are used (or being chosen). */
+#localAI[data-text-relevant=false][data-speech-relevant=false]{display:none!important}
+#localAI[data-text-relevant=false] .la-text,#localAI[data-text-relevant=true] .la-text-off{display:none!important}
 .la-tag{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:var(--rt-r-xs);font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;vertical-align:2px;color:var(--rt-success);background:color-mix(in srgb,var(--rt-success) 18%,transparent)}
 .la-tag:empty{display:none}
 .la-tag[data-kind=installed]{color:var(--rt-link);background:color-mix(in srgb,var(--rt-link) 16%,transparent)}
@@ -286,6 +288,8 @@ body:not([data-ai-provider=local]) .only-local,body[data-ai-provider=local] .for
 
 /* ── Voice page (v2.15): engine cards; sections follow the chosen engine and provider ── */
 .engine-pick{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:12px;margin:14px 0 6px}
+/* v2.39: three short cards (Speaking voice) stay in one row where they fit. */
+.engine-pick.three{grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr))}
 .engine-card{display:flex;gap:12px;align-items:flex-start;margin:0;padding:14px 16px;border:1px solid var(--rt-line-soft);border-radius:var(--rt-r-md);background:var(--rt-surface);cursor:pointer;font-weight:400;text-transform:none;letter-spacing:0;transition:border-color var(--rt-fast),background-color var(--rt-fast)}
 .engine-card:hover{background:var(--rt-surface-2)}
 .engine-card:has(input:checked){border-color:var(--rt-focus);background:var(--rt-surface-2);box-shadow:inset 3px 0 0 var(--rt-focus)}
@@ -298,6 +302,11 @@ body:not([data-ai-provider=local]) .only-local,body[data-ai-provider=local] .for
 .engine-card b{text-transform:none}
 body[data-voice-engine=standard] [data-engine=live],body[data-voice-engine=live] [data-engine=standard]{display:none!important}
 body[data-voice-provider=gemini] #voiceStandard [data-provider=openrouter],body:not([data-voice-provider=gemini]) #voiceStandard [data-provider=gemini]{display:none!important}
+/* v2.39: the Kokoro voice picker only with Voice on this PC; with a voice on this PC (Kokoro or a theme
+   voice) the cloud voices' pickers step aside. "Start speaking sooner" works with a voice on this PC
+   whatever key is saved (not with Gemini text). */
+body:not([data-speech-engine=kokoro]) #voiceStandard .for-kokoro,body[data-speech-engine=kokoro] #voiceStandard label[data-provider],body[data-speech-engine=theme] #voiceStandard label[data-provider]{display:none!important}
+body[data-speech-engine=kokoro]:not([data-ai-provider=gemini]) #voiceStandard .toggle-grid[data-provider],body[data-speech-engine=theme]:not([data-ai-provider=gemini]) #voiceStandard .toggle-grid[data-provider]{display:flex!important}
 
 /* Name tag preview (v2.16) */
 .chat-tag-preview{margin:10px 0 0;padding:10px 12px;border-radius:var(--rt-r-sm);background:var(--rt-surface);color:var(--rt-ink-strong);overflow-wrap:anywhere}

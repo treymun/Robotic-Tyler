@@ -21,7 +21,7 @@ import {injectionAttempt,refusal,cleanHistory,wrapChat,CHAT_RULES,CHAT_REMINDER}
 import './noise-filter.js';
 import {Speech,VOICES} from './speech.mjs';
 import {acceptableScope,replyCap,localBudgetReached} from './quality.mjs';
-import {voiceKeyFor,LOCAL_CHROME_ERROR} from './local-ai.mjs';
+import {voiceKeyFor,voicePlan,LOCAL_CHROME_ERROR,LOCAL_HEARING_CHROME_ERROR,LOCAL_VOICE_CHROME_ERROR,KOKORO_VOICES,kokoroVoice} from './local-ai.mjs';
 const speech=new Speech((...args)=>fetch(...args));
 import './wav-codec.js';
 import './chat-tag.js';
@@ -79,11 +79,33 @@ async function themeSpeak(text,signal){
 }
 async function countThemeSpeech(chars){const {usage={}}=await chrome.storage.local.get('usage');await chrome.storage.local.set({usage:{...usage,themeSpeechResponses:(usage.themeSpeechResponses||0)+1,themeSpeechCharacters:(usage.themeSpeechCharacters||0)+chars}});}
 const themeWarning=(error,part='')=>'Theme voice failed'+part+': '+redact(String(error?.message||error)).replace(/^Stopped\.$/,'stopped.')+' Tyler answered in text (he doesn’t switch to the paid cloud voice by himself).';
+// v2.39: the voice on this PC (Kokoro, app/local-ai/speech.cjs in the desktop app). The same clip
+// contract as theme voices (base64 WAV, at most 30 s, a long reply as a few clips). If it can't speak,
+// the reply stays text and says why: Tyler never switches to the paid cloud voice by himself.
+async function kokoroSpeak(text,voice,signal){
+ const sp=globalThis.tylerLocalSpeech;
+ if(!sp)throw Error(LOCAL_VOICE_CHROME_ERROR);
+ const r=await sp.speak({text,voice:kokoroVoice(voice).id,signal});
+ if(typeof r?.audio!=='string')throw Error('the voice engine returned no audio.');
+ return {audio:r.audio,model:'Kokoro ('+(r.voice?.label||kokoroVoice(voice).label)+', this PC)',seconds:r.seconds};
+}
+// Speech made on this PC: a theme voice or Kokoro (Settings → Voice → Standard voice → Speaking voice).
+const localSpeak=(engine,text,voice,signal)=>engine==='kokoro'?kokoroSpeak(text,voice,signal):themeSpeak(text,signal);
+async function localSpeakAll(engine,parts,voice,signal){const out=[];for(const p of parts)out.push((await localSpeak(engine,p,voice,signal)).audio);return out;}
+async function countLocalSpeech(engine,chars){if(engine!=='kokoro')return countThemeSpeech(chars);const {usage={}}=await chrome.storage.local.get('usage');await chrome.storage.local.set({usage:{...usage,localSpeechResponses:(usage.localSpeechResponses||0)+1,localSpeechCharacters:(usage.localSpeechCharacters||0)+chars}});}
+const localWarning=(engine,error,part='')=>engine==='kokoro'?'Voice on this PC failed'+part+': '+redact(String(error?.message||error)).replace(/^Stopped\.$/,'stopped.')+' Tyler answered in text (he doesn’t switch to the paid cloud voice by himself).':themeWarning(error,part);
+// v2.39: hearing on this PC (Parakeet, desktop app). If it can't hear, the turn fails with the reason:
+// the recording is never sent to OpenRouter or Google instead. Chrome has no local engine.
+async function localHear(audio,signal,onStage){
+ const sp=globalThis.tylerLocalSpeech;
+ if(!sp)throw Object.assign(Error(LOCAL_HEARING_CHROME_ERROR),{kind:'fatal'});
+ return sp.hear({audio,signal,onStage});
+}
 // v2.38: Text AI on this PC (Settings → AI & personality → This PC). The desktop app's local engine
 // (app/local-ai) writes the reply; there's no key and no cost. If it can't answer, the turn fails with
 // the reason: Tyler never asks a cloud AI instead, and never switches model by himself. Chrome has no
 // local engine, so there the turn fails with LOCAL_CHROME_ERROR.
-let localTab=null; // the Steam tab the local engine last answered (closing it frees the engine's memory)
+let localTab=null; // the Steam tab the local engines last served (closing it frees their memory)
 async function localStatus(){
  const ai=globalThis.tylerLocalAI;if(!ai)return {ready:false,problem:LOCAL_CHROME_ERROR};
  try{const s=await ai.status();return {...s,problem:s.ready?null:s.installed?'The '+s.label+' model isn’t installed. Install it in Settings → AI & personality → Text AI on this PC.':'Text AI on this PC isn’t installed yet. Install it in Settings → AI & personality.'};}
@@ -149,7 +171,8 @@ async function handleGameUnlocked(message,sender){
  // (app/theme-voices); Chrome has none, so there these only say where the feature is.
  if(typeof message.type==='string'&&message.type.startsWith('voices:'))return themeVoices(message,tab);
  // v2.38: Tyler was paused or stopped in his panel: the AI on this PC gives its memory back now.
- if(message.type==='local-ai:release'){if(globalThis.tylerLocalAI&&await lease.check(tab))await globalThis.tylerLocalAI.release('Tyler was stopped in Steam chat').catch(()=>{});return {};}
+ // v2.39: hearing and the voice on this PC are closed the same way.
+ if(message.type==='local-ai:release'){if((globalThis.tylerLocalAI||globalThis.tylerLocalSpeech)&&await lease.check(tab)){await globalThis.tylerLocalAI?.release('Tyler was stopped in Steam chat').catch(()=>{});await globalThis.tylerLocalSpeech?.release('Tyler was stopped in Steam chat').catch(()=>{});}return {};}
  if(message.type==='v23:roast'){
   const st=await chrome.storage.local.get(['v23RoastEnabled','v23RoastState','v22EmergencyStop']);
   if(st.v22EmergencyStop===true||st.v23RoastEnabled!==true)throw Error('Roast battles disabled.');
@@ -292,15 +315,18 @@ async function handleGameUnlocked(message,sender){
  if(message.type==='soundboard:rename'){const label=String(message.name||'').trim().slice(0,50);if(!TylerSoundboard.slug(label)||/^\d+$/.test(label))throw Error('Enter a name with letters or numbers.');const key=TylerSoundboard.slug(label);if(TylerSoundboard.names.some((name,i)=>i+1!==slot&&TylerSoundboard.slug(name)===key)||Object.entries(soundboardLabels).some(([n,name])=>Number(n)!==slot&&TylerSoundboard.slug(name)===key))throw Error('Choose a unique sound name.');soundboardLabels[slot]=label;await write({soundboardLabels});return {};}
  if(message.type==='soundboard:save'){if(!TylerSoundboard.validClip(message.clip))throw Error('Clip must be at most 512 KB and 12 seconds.');const {level,...clip}=message.clip;soundboardSlots[slot]=clip;}else if(message.type==='soundboard:clear'){delete soundboardSlots[slot];delete soundboardLabels[slot];delete soundboardTriggers[slot];}else throw Error('Unknown soundboard action');await write({soundboardSlots,soundboardLabels,soundboardTriggers,boardFavorites:message.type==='soundboard:clear'&&slot>10?favorites.filter(n=>n!==slot):favorites});return {};}
 
- const settings=await chrome.storage.local.get(['openrouterKey','geminiKey','aiProvider','personality','length','brain','noiseLevel','roastMode','speechVoice','voiceThreshold','minVoiced','replyPause','talkativeness','voiceControls','keyboardFilter','callbackGap','nicknameAliases','insideJokes','callbackState','quickSetup','usage','textSpeed','spendingCapUSD','streamAI','friendMemory','voiceBargeIn','voiceBargeDelay','smartRouting','suiteProfiles','suiteOptions','v23Persona','fastSpeech','geminiVoice','geminiTtsModel','voiceEngine','chatTagEnabled','chatTagName','geminiTextModel','speechEngine']);
- const localAI=settings.aiProvider==='local',google=settings.aiProvider==='gemini', selectedKey=localAI?null:google?settings.geminiKey:settings.openrouterKey, themeSpeech=settings.speechEngine==='theme';
+ const settings=await chrome.storage.local.get(['openrouterKey','geminiKey','aiProvider','personality','length','brain','noiseLevel','roastMode','speechVoice','voiceThreshold','minVoiced','replyPause','talkativeness','voiceControls','keyboardFilter','callbackGap','nicknameAliases','insideJokes','callbackState','quickSetup','usage','textSpeed','spendingCapUSD','streamAI','friendMemory','voiceBargeIn','voiceBargeDelay','smartRouting','suiteProfiles','suiteOptions','v23Persona','fastSpeech','geminiVoice','geminiTtsModel','voiceEngine','chatTagEnabled','chatTagName','geminiTextModel','speechEngine','voiceHearing','kokoroVoice']);
+ const localAI=settings.aiProvider==='local',google=settings.aiProvider==='gemini', selectedKey=localAI?null:google?settings.geminiKey:settings.openrouterKey;
+ // Speaking voice: the cloud voice, a theme voice or Kokoro (both on this PC, desktop app).
+ const speechEngine=['theme','kokoro'].includes(settings.speechEngine)?settings.speechEngine:'cloud',themeSpeech=speechEngine==='theme',localSpeech=speechEngine!=='cloud';
  // The key a voice call hears with and the cloud voice speaks with (local-ai.mjs): the text provider's own key,
- // or with Text AI on this PC the saved OpenRouter key, else the saved Google key.
- const voiceKey=voiceKeyFor(settings),speechGoogle=voiceKey.provider==='gemini';
+ // or with Text AI on this PC the saved OpenRouter key, else the saved Google key. With hearing on this PC
+ // (v2.39) no key is used for hearing; with a voice on this PC too, a voice call needs no key at all.
+ const voiceKey=voiceKeyFor(settings),speechGoogle=voiceKey.provider==='gemini',plan=voicePlan(settings),hearLocal=plan.hearing==='local';
  if(message.automatic===true){const st=await chrome.storage.local.get('v22EmergencyStop');if(st.v22EmergencyStop===true)throw Error('Emergency stop is active. Disable it in settings.');}
- if(message.type==='connection'){const lc=localAI?await localStatus():null;return {keyConfigured:localAI?!!lc.ready:!!selectedKey,provider:localAI?'This PC':google?'Gemini':'OpenRouter',local:localAI,localProblem:lc?.problem||null,hearing:voiceKey.provider,model:localAI?(lc.label||'Text AI')+' on this PC':modelLabel(settings),speechModel:themeSpeech?'theme voice (this PC)':speechGoogle?geminiTtsModel(settings.geminiTtsModel):'x-ai/grok-voice-tts-1.0',speechEngine:themeSpeech?'theme':'cloud',brain:settings.brain||'fast',noiseLevel:settings.noiseLevel||'balanced',speechVoice:speechGoogle?geminiVoiceFor(settings):VOICES.includes(settings.speechVoice)?settings.speechVoice:'rex',chatTag:TylerChatTag.config(settings),voices:voiceChoices(speechGoogle),voiceEngine:settings.voiceEngine==='live'?'live':'standard',voiceThreshold:settings.voiceThreshold??null,minVoiced:settings.minVoiced??null,replyPause:settings.replyPause??null,talkativeness:settings.talkativeness||'active',voiceControls:settings.voiceControls!==false,keyboardFilter:settings.keyboardFilter!==false,voiceBargeIn:settings.voiceBargeIn===true,voiceBargeDelay:[350,500,750,1000].includes(settings.voiceBargeDelay)?settings.voiceBargeDelay:500,textSpeed:settings.textSpeed||'balanced',quickSetup:settings.quickSetup||{}};}
+ if(message.type==='connection'){const lc=localAI?await localStatus():null;return {keyConfigured:localAI?!!lc.ready:!!selectedKey,provider:localAI?'This PC':google?'Gemini':'OpenRouter',local:localAI,localProblem:lc?.problem||null,hearing:hearLocal?'local':voiceKey.provider,voiceNeedsKey:plan.needsKey,cloudKey:!!voiceKey.key,model:localAI?(lc.label||'Text AI')+' on this PC':modelLabel(settings),speechModel:themeSpeech?'theme voice (this PC)':speechEngine==='kokoro'?'Kokoro voice (this PC)':speechGoogle?geminiTtsModel(settings.geminiTtsModel):'x-ai/grok-voice-tts-1.0',speechEngine,brain:settings.brain||'fast',noiseLevel:settings.noiseLevel||'balanced',speechVoice:speechEngine==='kokoro'?kokoroVoice(settings.kokoroVoice).id:speechGoogle?geminiVoiceFor(settings):VOICES.includes(settings.speechVoice)?settings.speechVoice:'rex',chatTag:TylerChatTag.config(settings),voices:speechEngine==='kokoro'?KOKORO_VOICES.map(v=>({value:v.id,label:v.label+' · '+v.about})):voiceChoices(speechGoogle),voiceEngine:settings.voiceEngine==='live'?'live':'standard',voiceThreshold:settings.voiceThreshold??null,minVoiced:settings.minVoiced??null,replyPause:settings.replyPause??null,talkativeness:settings.talkativeness||'active',voiceControls:settings.voiceControls!==false,keyboardFilter:settings.keyboardFilter!==false,voiceBargeIn:settings.voiceBargeIn===true,voiceBargeDelay:[350,500,750,1000].includes(settings.voiceBargeDelay)?settings.voiceBargeDelay:500,textSpeed:settings.textSpeed||'balanced',quickSetup:settings.quickSetup||{}};}
  if(message.type==='setup:save'){const old=settings.quickSetup||{},input=message.values||{},next={...old};if(typeof input.botName==='string')next.botName=input.botName.trim().slice(0,80);if(['auto','text','voice'].includes(input.mode))next.mode=input.mode;if(['text','voice-room'].includes(input.chatKind))next.chatKind=input.chatKind;if(typeof input.noticeScope==='string'&&input.noticeScope.length<=160&&input.noticeScope.startsWith('chat:'))next.notices=[...new Set([...(old.notices||[]),input.noticeScope])].slice(-30);if(typeof input.noticeAlways==='boolean')next.noticeAlways=input.noticeAlways;await chrome.storage.local.set({quickSetup:next});return {};}
- if(message.type==='preferences'){const input=message.values||{},values={};for(const [key,lo,hi]of [['voiceThreshold',.001,.06],['minVoiced',150,1000],['replyPause',400,1800]])if(Number.isFinite(input[key]))values[key]=Math.max(lo,Math.min(hi,input[key]));if(['quiet','occasional','active'].includes(input.talkativeness))values.talkativeness=input.talkativeness;if(VOICES.includes(input.speechVoice))values.speechVoice=input.speechVoice;if(typeof input.voice==='string'){if(speechGoogle&&GEMINI_VOICES.some(v=>v.name===input.voice))values.geminiVoice=input.voice;else if(!speechGoogle&&VOICES.includes(input.voice))values.speechVoice=input.voice;else throw Error('That voice isn\'t available for '+(speechGoogle?'Gemini':'Grok')+' speech.');}if(typeof input.keyboardFilter==='boolean')values.keyboardFilter=input.keyboardFilter;if(typeof input.voiceControls==='boolean')values.voiceControls=input.voiceControls;if(typeof input.voiceBargeIn==='boolean')values.voiceBargeIn=input.voiceBargeIn;if([350,500,750,1000].includes(Number(input.voiceBargeDelay)))values.voiceBargeDelay=Number(input.voiceBargeDelay);await chrome.storage.local.set(values);return {};}
+ if(message.type==='preferences'){const input=message.values||{},values={};for(const [key,lo,hi]of [['voiceThreshold',.001,.06],['minVoiced',150,1000],['replyPause',400,1800]])if(Number.isFinite(input[key]))values[key]=Math.max(lo,Math.min(hi,input[key]));if(['quiet','occasional','active'].includes(input.talkativeness))values.talkativeness=input.talkativeness;if(VOICES.includes(input.speechVoice))values.speechVoice=input.speechVoice;if(typeof input.voice==='string'){if(speechEngine==='kokoro'&&KOKORO_VOICES.some(v=>v.id===input.voice))values.kokoroVoice=input.voice;else if(speechGoogle&&GEMINI_VOICES.some(v=>v.name===input.voice))values.geminiVoice=input.voice;else if(!speechGoogle&&VOICES.includes(input.voice))values.speechVoice=input.voice;else throw Error('That voice isn\'t available for '+(speechGoogle?'Gemini':'Grok')+' speech.');}if(typeof input.keyboardFilter==='boolean')values.keyboardFilter=input.keyboardFilter;if(typeof input.voiceControls==='boolean')values.voiceControls=input.voiceControls;if(typeof input.voiceBargeIn==='boolean')values.voiceBargeIn=input.voiceBargeIn;if([350,500,750,1000].includes(Number(input.voiceBargeDelay)))values.voiceBargeDelay=Number(input.voiceBargeDelay);await chrome.storage.local.set(values);return {};}
  if(message.type==='reset'){await memory.clear(tab);const scope=acceptableScope(message.chatScope);if(scope)await memory.forget('room:'+scope);hosts.delete(tab);histories.delete(tab);histories.delete(tab+':voice');histories.delete(tab+':text');return {text:scope?'Conversation and poll reset for this chat (other chats and friend memory are kept).':'Conversation and poll reset for this tab.'};}
  // v2.33 Quiet mode: messages not for Tyler are kept as context, with no AI request. Takeover lines never are.
  if(message.type==='remember'){const text=String(message.text||'').slice(0,1400).trim(),scope=acceptableScope(message.chatScope);if(!text||!scope||injectionAttempt(text))return {};const id='room:'+scope;await memory.write(id,[...cleanHistory(await memory.read(id)),{role:'user',content:text}]);return {remembered:true};}
@@ -315,21 +341,26 @@ async function handleGameUnlocked(message,sender){
  const progress=stage=>{const pending=chrome.tabs?.sendMessage?.(tab,{source:'tyler-progress',stage});pending?.catch?.(()=>{});};
  let heard='';
  try{
-  // The cap counts paid use. With Text AI on this PC a text reply costs nothing, so only a voice turn
-  // (cloud hearing) or cloud speech is stopped by it.
-  const paidTurn=!localAI||message.type==='voice'||(!themeSpeech&&(message.speak===true||/^say(?:\s|$)/i.test(String(message.text||'').trim())));
+  // The cap counts paid use. With Text AI on this PC a text reply costs nothing, so only cloud hearing
+  // or cloud speech is stopped by it (v2.39: with hearing and a voice on this PC, nothing is).
+  const paidTurn=!localAI||(message.type==='voice'&&!hearLocal)||(!localSpeech&&(message.type==='voice'||message.speak===true||/^say(?:\s|$)/i.test(String(message.text||'').trim())));
   if(paidTurn&&localBudgetReached(settings.usage,settings.spendingCapUSD))throw Error('Local reported text-spending cap reached. Increase the cap in settings or use a new provider key with a hard billing limit.');
   const author=message.type==='voice'?null:TylerIdentity.valid(message.speaker);
   if(message.type==='voice'){
-   if(!voiceKey.key)throw Error(voiceKey.error);
+   if(!hearLocal&&!voiceKey.key)throw Error(voiceKey.error);
    let clip;try{clip=TylerWav.validate(Uint8Array.from(atob(message.audio),c=>c.charCodeAt(0)));}catch(error){throw Error('Local speech validation failed: '+error.message);}
    message.seconds=clip.seconds;
-   progress('Transcribing speech…');const sttStarted=Date.now();
-   if(speechGoogle){heard=(await geminiHear(voiceKey.key,message.audio,controller.signal)).slice(0,1400);}else{const r=await fetch('https://openrouter.ai/api/v1/audio/transcriptions',{method:'POST',signal:AbortSignal.any([AbortSignal.timeout(25000),controller.signal]),headers:{'Content-Type':'application/json',Authorization:'Bearer '+settings.openrouterKey},body:JSON.stringify({model:'mistralai/voxtral-mini-3b-2507',input_audio:{data:message.audio,format:message.format},language:'en',response_format:'json'})});
+   // Kokoro will speak the reply: its engine starts loading now, alongside hearing and the reply (v2.39).
+   if(speechEngine==='kokoro'){try{globalThis.tylerLocalSpeech?.prepare?.({voice:kokoroVoice(settings.kokoroVoice).id});}catch{}}
+   progress(hearLocal?'Hearing on this PC…':'Transcribing speech…');const sttStarted=Date.now();
+   if(hearLocal){localTab=tab;const r=await localHear(message.audio,controller.signal,progress);heard=String(r?.text||'').trim().slice(0,1400);if(r?.startMs)timings.hearingStartMs=r.startMs;}
+   else if(speechGoogle){heard=(await geminiHear(voiceKey.key,message.audio,controller.signal)).slice(0,1400);}else{const r=await fetch('https://openrouter.ai/api/v1/audio/transcriptions',{method:'POST',signal:AbortSignal.any([AbortSignal.timeout(25000),controller.signal]),headers:{'Content-Type':'application/json',Authorization:'Bearer '+settings.openrouterKey},body:JSON.stringify({model:'mistralai/voxtral-mini-3b-2507',input_audio:{data:message.audio,format:message.format},language:'en',response_format:'json'})});
    const d=await r.json().catch(()=>({}));if(!r.ok||d.error)throw apiError('OpenRouter transcription',r,d,settings.openrouterKey);
    heard=String(d.text||'').trim().slice(0,1400);}
    timings.transcribeMs=Date.now()-sttStarted;timings.captureEncodeMs=Number(message.captureEncodeMs)||0;
-   const {usage={}}=await chrome.storage.local.get('usage');await chrome.storage.local.set({usage:{...usage,transcriptionResponses:(usage.transcriptionResponses||0)+1,transcribedSeconds:(usage.transcribedSeconds||0)+Math.min(12,Math.max(0,Number(message.seconds)||0))}});
+   // Counted apart: hearing on this PC isn't billed, so it doesn't add to the cloud counters.
+   {const {usage={}}=await chrome.storage.local.get('usage'),sec=Math.min(12,Math.max(0,Number(message.seconds)||0));
+    await chrome.storage.local.set({usage:hearLocal?{...usage,localTranscriptions:(usage.localTranscriptions||0)+1,localTranscribedSeconds:(usage.localTranscribedSeconds||0)+sec}:{...usage,transcriptionResponses:(usage.transcriptionResponses||0)+1,transcribedSeconds:(usage.transcribedSeconds||0)+sec}});}
    const control=voiceControl(heard);if(control&&settings.voiceControls!==false)return {heard,control,text:''};
    if(message.controlOnly)return {heard,text:'',ignored:true,reason:'No stop command — continuing playback.'};
    if(TylerNoise.isNoise(heard))return {heard,text:'',ignored:true,reason:'Background sound ignored.'};
@@ -395,7 +426,7 @@ async function handleGameUnlocked(message,sender){
    // stream has produced it and push it to the tab, while the rest is still being written. The final
    // response then carries only the remainder. If post-processing changes the opening (skip marker,
    // repeat filter, length cap), the early clip is cancelled and the full reply is spoken as before.
-   if(message.modality==='voice'&&message.speak&&(localAI?themeSpeech||voiceKey.provider==='openrouter':!google)&&settings.streamAI!==false&&settings.fastSpeech!==false){
+   if(message.modality==='voice'&&message.speak&&!google&&(localSpeech||voiceKey.provider==='openrouter')&&settings.streamAI!==false&&settings.fastSpeech!==false){
     early={sentence:null,promise:null,feed(content){
      if(this.sentence!==null)return;
      if(/^\s*\[/.test(content)){this.sentence='';return;}
@@ -403,7 +434,8 @@ async function handleGameUnlocked(message,sender){
      const candidate=freshReply(TylerChatTag.strip(m[1].trim(),TylerChatTag.config(settings)).trim(),history);
      if(!candidate||candidate.length<12||repeatCheck(candidate,history).repeat){this.sentence='';return;}
      this.sentence=candidate;timings.firstSentenceMs=Date.now()-thinkStarted;
-     this.promise=(themeSpeech?themeSpeak(candidate,controller.signal):speech.generate(candidate,settings.openrouterKey,settings.speechVoice,controller.signal)).then(spoken=>{
+     if(localSpeech)localTab=tab;
+     this.promise=(localSpeech?localSpeak(speechEngine,candidate,settings.kokoroVoice,controller.signal):speech.generate(candidate,settings.openrouterKey,settings.speechVoice,controller.signal)).then(spoken=>{
       if(controller.signal.aborted)return null;timings.firstAudioMs=Date.now()-turnStarted;
       const pending=chrome.tabs?.sendMessage?.(tab,{source:'tyler-early-audio',requestId,audio:spoken.audio});pending?.catch?.(()=>{});return spoken;
      }).catch(error=>{this.error=error;return null;});
@@ -441,7 +473,8 @@ async function handleGameUnlocked(message,sender){
   }
   if(controller.signal.aborted)throw Error('Cancelled');
   if(!reply)return {heard,text:'',ignored:true,reason:ignoreReason||'No reply was generated — try another message.'};
-  if((command==='say'||message.speak)&&themeSpeech){
+  if((command==='say'||message.speak)&&localSpeech){
+   localTab=tab;
    const speechStarted=Date.now();
    if(early?.sentence){
     const spokenFirst=await early.promise;
@@ -449,23 +482,23 @@ async function handleGameUnlocked(message,sender){
     if(spokenFirst&&reply.startsWith(early.sentence)){
      const rest=reply.slice(early.sentence.length).trim();let restAudio=null,warning;
      let restClips=[];
-     if(rest){try{restClips=await themeSpeakAll(themeSpeechParts(rest),controller.signal);}catch(error){if(controller.signal.aborted)throw Error('Cancelled');warning=themeWarning(error,' for the rest of the reply');}}
-     await countThemeSpeech(early.sentence.length+(restClips.length?rest.length:0));
+     if(rest){try{restClips=await localSpeakAll(speechEngine,themeSpeechParts(rest),settings.kokoroVoice,controller.signal);}catch(error){if(controller.signal.aborted)throw Error('Cancelled');warning=localWarning(speechEngine,error,' for the rest of the reply');}}
+     await countLocalSpeech(speechEngine,early.sentence.length+(restClips.length?rest.length:0));
      return {heard,text:reply,early:true,firstAudio:spokenFirst.audio,audio:restClips[0]||null,moreAudio:restClips.slice(1),warning,timings:{...timings,speechMs:Date.now()-speechStarted}};
     }
     const pending=chrome.tabs?.sendMessage?.(tab,{source:'tyler-early-cancel',requestId});pending?.catch?.(()=>{});
-    // The first sentence already failed in the theme voice: the whole reply would fail the same way.
-    if(early.error)return {heard,text:reply,warning:themeWarning(early.error)};
+    // The first sentence already failed in the voice on this PC: the whole reply would fail the same way.
+    if(early.error)return {heard,text:reply,warning:localWarning(speechEngine,early.error)};
    }
    try{
-    progress('Making the theme voice…');const parts=themeSpeechParts(reply),clips=await themeSpeakAll(parts,controller.signal);
-    await countThemeSpeech(parts.join(' ').length);
+    progress(themeSpeech?'Making the theme voice…':'Speaking on this PC…');const parts=themeSpeechParts(reply),clips=await localSpeakAll(speechEngine,parts,settings.kokoroVoice,controller.signal);
+    await countLocalSpeech(speechEngine,parts.join(' ').length);
     const done={...timings,speechMs:Date.now()-speechStarted};
     return clips.length>1?{heard,text:reply,early:true,firstAudio:clips[0],audio:clips[1],moreAudio:clips.slice(2),timings:done}:{heard,text:reply,audio:clips[0],timings:done};
-   }catch(error){if(controller.signal.aborted)throw Error('Cancelled');return {heard,text:reply,warning:themeWarning(error)};}
+   }catch(error){if(controller.signal.aborted)throw Error('Cancelled');return {heard,text:reply,warning:localWarning(speechEngine,error)};}
   }
   if(command==='say'||message.speak){
-   if(!voiceKey.key)return {heard,text:reply,warning:localAI?'The AI on this PC writes text only: save an OpenRouter or Google key in Settings for speech, or choose a theme voice for speaking.':'Save your '+(google?'Gemini':'OpenRouter')+' key in Settings for speech.'};
+   if(!voiceKey.key)return {heard,text:reply,warning:localAI?'The cloud voice needs an OpenRouter or Google key: save one in Settings, or choose Voice on this PC (Kokoro) or a theme voice in Settings → Voice → Standard voice → Speaking voice.':'Save your '+(google?'Gemini':'OpenRouter')+' key in Settings for speech.'};
    if(early?.sentence){
     const spokenFirst=await early.promise;
     if(spokenFirst&&reply.startsWith(early.sentence)){
@@ -536,7 +569,7 @@ async function makeImage(message,tab){
 }
 const failure=error=>{const kind=errorKind(error),retry=kind==='transient';return {ok:false,error:redact(error.message),kind,retryable:retry,retryAfter:retry?transientDelay(error):kind==='busy'?1200:0,retryMessage:retry?error.retryMessage:undefined};};
 chrome.runtime.onMessage.addListener((m,s,reply)=>{handle(m,s).then(result=>reply({ok:true,...result})).catch(error=>reply(failure(error)));return true;});
-chrome.tabs?.onRemoved?.addListener(id=>{if(id===localTab){localTab=null;Promise.resolve(globalThis.tylerLocalAI?.release?.('The Steam window closed')).catch(()=>{});}imageJobs.get(id)?.abort();void live.stop('The Steam tab closed','tab:'+id);lease.release(id).catch(()=>{});jobs.get(id)?.controller.abort();memory.clear(id).catch(()=>{});pages.delete(id);hosts.delete(id);histories.delete(id);last.delete(id);busy.delete(id);});
+chrome.tabs?.onRemoved?.addListener(id=>{if(id===localTab){localTab=null;Promise.resolve(globalThis.tylerLocalAI?.release?.('The Steam window closed')).catch(()=>{});Promise.resolve(globalThis.tylerLocalSpeech?.release?.('The Steam window closed')).catch(()=>{});}imageJobs.get(id)?.abort();void live.stop('The Steam tab closed','tab:'+id);lease.release(id).catch(()=>{});jobs.get(id)?.controller.abort();memory.clear(id).catch(()=>{});pages.delete(id);hosts.delete(id);histories.delete(id);last.delete(id);busy.delete(id);});
 
 
 

@@ -6,7 +6,7 @@
 import {LIVE_MODELS,GEMINI_VOICES,liveConfig,liveInstructions,LiveSession,Pcm,geminiVoiceFor} from './live-core.mjs';
 import {GEMINI_TTS_MODELS,geminiSpeak} from './gemini.mjs';
 import {Speech} from './speech.mjs';
-import {voiceKeyFor,LOCAL_HEARING_ERROR} from './local-ai.mjs';
+import {voiceKeyFor,voicePlan,kokoroVoice,LOCAL_HEARING_ERROR} from './local-ai.mjs';
 
 const $=id=>document.getElementById(id);
 const desktop=document.body.dataset.desktop==='true';
@@ -23,11 +23,27 @@ function fill(){
 function engine(){return $('voiceEngine').value==='live'?'live':'standard';}
 // With Text AI on this PC, voice uses the saved OpenRouter key, else the Google key (local-ai.mjs).
 let localVoice='openrouter';
+// v2.39: how Standard voice hears (Cloud or This PC) and which voice speaks (cloud, Kokoro or a theme voice).
+const hearing=()=>desktop&&$('voiceHearing')?.value==='local'?'local':'cloud';
+const speaking=()=>{const v=desktop?$('speechEngine')?.value:'cloud';return v==='theme'||v==='kokoro'?v:'cloud';};
+function standardNote(ai,provider){
+ const hearLocal=hearing()==='local',sp=speaking(),cloudBy=ai==='gemini'?'gemini':ai==='local'?localVoice:'openrouter';
+ const hearText=hearLocal?'Tyler hears people on this PC (Parakeet)':cloudBy==='gemini'?'Tyler hears people with Google (Gemini)':cloudBy?'Tyler hears people with OpenRouter (Voxtral)':'Tyler can\'t hear people yet: save an OpenRouter or Google key, or choose Hearing → This PC';
+ const speakText=sp==='kokoro'?'speaks with Kokoro on this PC ('+kokoroVoice($('kokoroVoice')?.value).label+')':sp==='theme'?'speaks in a theme voice made on this PC':cloudBy==='gemini'?'speaks with Gemini text-to-speech in one of Google\'s voices':cloudBy?'speaks with Grok Voice through OpenRouter (Voxtral if Grok is busy)':'needs a key for the cloud voice';
+ const text=ai==='local'?'writes the replies on this PC':ai==='gemini'?'writes the replies with Google Gemini':'writes the replies with OpenRouter';
+ return hearText+', '+text+' and '+speakText+'.'+(hearLocal&&sp!=='cloud'&&ai==='local'?' Everything runs on this PC: no key is needed for a voice call.':'');
+}
 function show(){
  const ai=$('aiProvider').value,e=engine(),provider=ai==='gemini'?'gemini':ai==='local'?localVoice||'openrouter':'openrouter';
- document.body.dataset.voiceEngine=e;document.body.dataset.voiceProvider=provider;
+ document.body.dataset.voiceEngine=e;document.body.dataset.voiceProvider=provider;document.body.dataset.speechEngine=speaking();document.body.dataset.voiceHearing=hearing();
  for(const r of document.querySelectorAll('input[name=voiceEnginePick]'))r.checked=r.value===e;
- $('standardVoiceNote').textContent=ai==='local'?'Text replies are made on this PC. Voice calls still use a cloud key to hear people and for the cloud voice: '+(localVoice==='gemini'?'your Google key (Gemini speech).':localVoice?'your OpenRouter key (Grok Voice, with Voxtral to hear).':'save an OpenRouter or Google key (a theme voice can speak instead of the cloud voice, but hearing still needs the key).'):provider==='gemini'?'Your text provider is Google Gemini, so speech uses Gemini text-to-speech with one of Google\'s voices.':'Speech uses Grok Voice through OpenRouter, with Voxtral as the fallback if Grok is busy.';
+ for(const r of document.querySelectorAll('input[name=voiceHearingPick]'))r.checked=r.value===hearing();
+ for(const r of document.querySelectorAll('input[name=speechEnginePick]'))r.checked=r.value===speaking();
+ $('standardVoiceNote').textContent=desktop?standardNote(ai,provider):provider==='gemini'?'Your text provider is Google Gemini, so speech uses Gemini text-to-speech with one of Google\'s voices.':'Speech uses Grok Voice through OpenRouter, with Voxtral as the fallback if Grok is busy.';
+ // v2.39: when the replies and the hearing already run on this PC, suggest (never switch to) a voice on
+ // this PC too: the theme voices are the same character voices, and then a call needs no key at all.
+ const tip=$('voiceLocalTip');if(tip)tip.hidden=!(desktop&&e!=='live'&&ai==='local'&&hearing()==='local'&&speaking()==='cloud');
+ window.dispatchEvent(new CustomEvent('tyler:voice-choice'));
  $('liveModelNote').textContent=LIVE_MODELS.find(m=>m.id===$('liveModel').value)?.note||'';
  $('liveSilenceLabel').textContent=(Number($('liveSilenceMs').value)/1000).toFixed(2)+' s';
  // Desktop: the device list is for the VB-CABLE route only.
@@ -38,9 +54,12 @@ async function keyState(){
  try{
   const k=await store.get(['openrouterKey','geminiKey']),e=engine(),provider=$('aiProvider').value;
   if(provider==='local'){const v=voiceKeyFor({...k,aiProvider:'local'});localVoice=v.provider;show();}
+  // v2.39: with hearing and the voice on this PC, a Standard call needs no key (for the voice part).
+  const plan=voicePlan({...k,aiProvider:provider,voiceHearing:hearing(),speechEngine:speaking()});
   $('voiceKeyState').textContent=e==='live'
    ?(k.geminiKey?'✓ Google AI key saved. Gemini Live is ready to start.':'Gemini Live needs a Google AI key. Add one under AI & personality → Provider and model.')
-   :provider==='local'?(localVoice==='openrouter'?'✓ OpenRouter key saved: voice calls hear people and speak with it (text replies are made on this PC).':localVoice==='gemini'?'✓ Google AI key saved: voice calls hear people and speak with it (text replies are made on this PC).':LOCAL_HEARING_ERROR)
+   :!plan.needsKey?(provider==='local'?'✓ No key needed: Tyler hears, writes the replies and speaks on this PC.':'✓ Hearing and the voice run on this PC (no key for them); the replies use your '+(provider==='gemini'?'Google':'OpenRouter')+' key.')
+   :provider==='local'?(localVoice==='openrouter'?'✓ OpenRouter key saved: voice calls use it for '+(hearing()==='local'?'the cloud voice':speaking()!=='cloud'?'hearing':'hearing and the cloud voice')+' (text replies are made on this PC).':localVoice==='gemini'?'✓ Google AI key saved: voice calls use it for '+(hearing()==='local'?'the cloud voice':speaking()!=='cloud'?'hearing':'hearing and the cloud voice')+' (text replies are made on this PC).':hearing()==='local'?'The cloud voice needs an OpenRouter or Google key: save one, or choose a theme voice or Voice on this PC (Kokoro) as the speaking voice.':LOCAL_HEARING_ERROR)
    :provider==='gemini'?(k.geminiKey?'✓ Google AI key saved for Gemini speech.':'Add a Google AI key for Gemini speech.')
    :(k.openrouterKey?'✓ OpenRouter key saved for Grok speech.':'Add an OpenRouter key for Grok speech.');
  }catch{$('voiceKeyState').textContent='Key status unavailable.';}
@@ -59,7 +78,7 @@ async function devices(){
 let ctx,testing=null;
 async function play(b64){ctx??=new AudioContext();await ctx.resume();const bytes=Uint8Array.from(atob(b64),c=>c.charCodeAt(0));const buffer=await ctx.decodeAudioData(bytes.buffer);const src=ctx.createBufferSource();src.buffer=buffer;src.connect(ctx.destination);src.start();return buffer.duration;}
 function form(){
- const v={aiProvider:$('aiProvider').value,personality:$('personality').value,length:$('length').value,talkativeness:$('talkativeness').value,roastMode:$('roastMode').value,speechVoice:$('speechVoice').value,geminiVoice:$('geminiVoice').value,geminiTtsModel:$('geminiTtsModel').value,liveModel:$('liveModel').value,liveVoice:$('liveVoice').value,liveInterrupt:$('liveInterrupt').value!=='false',liveSilenceMs:Number($('liveSilenceMs').value),liveStartSensitivity:$('liveStartSensitivity').value,liveEndSensitivity:$('liveEndSensitivity').value};
+ const v={aiProvider:$('aiProvider').value,speechEngine:speaking(),kokoroVoice:$('kokoroVoice')?.value||'',voiceHearing:hearing(),personality:$('personality').value,length:$('length').value,talkativeness:$('talkativeness').value,roastMode:$('roastMode').value,speechVoice:$('speechVoice').value,geminiVoice:$('geminiVoice').value,geminiTtsModel:$('geminiTtsModel').value,liveModel:$('liveModel').value,liveVoice:$('liveVoice').value,liveInterrupt:$('liveInterrupt').value!=='false',liveSilenceMs:Number($('liveSilenceMs').value),liveStartSensitivity:$('liveStartSensitivity').value,liveEndSensitivity:$('liveEndSensitivity').value};
  return v;
 }
 async function liveTest(key,values,status){
@@ -99,7 +118,10 @@ async function test(){
 // ── Wiring ─────────────────────────────────────────────────────────────────
 fill();
 for(const r of document.querySelectorAll('input[name=voiceEnginePick]'))r.addEventListener('change',()=>{if(!r.checked)return;$('voiceEngine').value=r.value;$('voiceEngine').dispatchEvent(new Event('input',{bubbles:true}));show();void keyState();});
-for(const id of ['aiProvider','liveModel','liveSilenceMs'])$(id).addEventListener('input',()=>{show();void keyState();});
+// v2.39: the Hearing and Speaking voice cards set their hidden fields (saved with everything else).
+for(const [pick,id] of [['voiceHearingPick','voiceHearing'],['speechEnginePick','speechEngine']])for(const r of document.querySelectorAll('input[name='+pick+']'))r.addEventListener('change',()=>{if(!r.checked)return;$(id).value=r.value;$(id).dispatchEvent(new Event('input',{bubbles:true}));$(id).dispatchEvent(new Event('change',{bubbles:true}));});
+for(const id of ['aiProvider','liveModel','liveSilenceMs','voiceHearing','speechEngine','kokoroVoice'])$(id)?.addEventListener('input',()=>{show();void keyState();});
+$('kokoroVoice')?.addEventListener('change',()=>{show();void keyState();});
 if(desktop&&$('desktopVoice'))$('desktopVoice').addEventListener('change',show);
 $('aiProvider').addEventListener('change',()=>{show();void keyState();});
 $('voiceTest').addEventListener('click',()=>void test());

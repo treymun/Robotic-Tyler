@@ -79,6 +79,7 @@
   ],
   "asarUnpack": [
     "app/theme-voices/worker/**/*",
-    "app/theme-voices/voices/**/*"
+    "app/theme-voices/voices/**/*",
+    "app/local-ai/speech-worker.cjs"
   ]
 }
