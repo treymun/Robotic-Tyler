@@ -16,7 +16,7 @@ const sapi=require('./sapi.cjs');
 const {Installer,plan,LOCK}=require('./installer.cjs'),{WorkerHost}=require('./worker.cjs'),{Voices,THEMES,STATUS,CHARACTER_ID}=require('./voices.cjs'),hardware=require('./hardware.cjs');
 const GB=1024**3;
 const MODES={quality:{model:'quality',label:'Quality',about:'Qwen3-TTS 1.7B: the closest match to each voice.'},light:{model:'light',label:'Lightweight',about:'Qwen3-TTS 0.6B: less graphics memory, a little less like each voice.'}};
-const DEFAULTS={mode:null,device:'auto',engine:'standard',idleMinutes:5,followTheme:true,override:'',processed:true,nativeVoices:true,chat:false,chatAccess:'everyone',chatAllowed:'',chatCooldown:20,maxChars:400,characters:{},builtinVersion:{}};
+const DEFAULTS={mode:null,device:'auto',engine:'standard',idleMinutes:5,followTheme:true,override:'',processed:true,nativeVoices:true,chat:false,chatAccess:'everyone',chatAllowed:'',chatCooldown:20,maxChars:400,characters:{},builtinVersion:{},characterVersion:{}};
 const MAX_QUEUE=4,CACHE_LIMIT=300*1024**2,CHECK_LINE='Voice check. Theme voices are ready.';
 
 class ThemeVoices extends EventEmitter{
@@ -57,6 +57,10 @@ class ThemeVoices extends EventEmitter{
   if(changes.builtinVersion&&typeof changes.builtinVersion==='object'){const b={...(s.builtinVersion&&typeof s.builtinVersion==='object'?s.builtinVersion:{})};
    for(const [t,n] of Object.entries(changes.builtinVersion).slice(0,30))if(THEMES.includes(t)){const k=Number(n);if(!n)delete b[t];else if(Number.isInteger(k)&&k>0&&k<100)b[t]=k;}
    next.builtinVersion=b;}
+  // v2.42: a character can be set back to its earlier version ("theme/character" → version; 0 = its current one).
+  if(changes.characterVersion&&typeof changes.characterVersion==='object'){const b={...(s.characterVersion&&typeof s.characterVersion==='object'?s.characterVersion:{})};
+   for(const [k,n] of Object.entries(changes.characterVersion).slice(0,60)){const [t,id]=String(k).split('/');if(!THEMES.includes(t)||!CHARACTER_ID.test(String(id||'')))continue;const v=Number(n);if(!n)delete b[k];else if(Number.isInteger(v)&&v>0&&v<10)b[k]=v;}
+   next.characterVersion=b;}
   await this.setSettingsRaw(next);this.scheduleIdle(next);this.emitStatus();return next;
  }
  async hardware(refresh=false){if(!this.hw||refresh||Date.now()-this.hw.at>60000)this.hw=await this.detectFn(this.dir);return this.hw;}
@@ -92,9 +96,9 @@ class ThemeVoices extends EventEmitter{
    lastClip:this.lastClip?{id:this.lastClip.id,seconds:this.lastClip.seconds,voice:this.lastClip.voiceName,text:this.lastClip.text.slice(0,80)}:null};
  }
  emitStatus(){this.status().then(s=>this.emit('status',s)).catch(()=>{});}
- async voiceList(){const s=await this.settings();return this.voices.list({characters:s.characters||{}});}
+ async voiceList(){const s=await this.settings();return this.voices.list({characters:s.characters||{},characterVersion:s.characterVersion||{}});}
  /** The voice for theme + character, as a request starting now would use it (v2.41). */
- async voiceFor(theme,character){const s=await this.settings();const v=this.voices.voiceFor(theme,character,{version:s.builtinVersion?.[theme]});return v;}
+ async voiceFor(theme,character){const s=await this.settings();return this.voices.voiceFor(theme,character,{version:s.builtinVersion?.[theme],characterVersion:character?s.characterVersion?.[theme+'/'+character]:undefined});}
  /** The theme and character a request starting now would use (Tyler's spoken replies pin this once per reply). */
  async resolve({theme,character}={}){const t=await this.resolveTheme(theme||null),s=await this.settings();return {theme:t,character:typeof character==='string'?character:(s.characters?.[t]||'')};}
  /** Imports the owner's character voice pack (its folder or ZIP). */
@@ -275,7 +279,7 @@ class ThemeVoices extends EventEmitter{
   return this.finish(job,v,{file:fx?r.out_fx:r.out,dry:fx?r.out:null,cached:false,ms:r.ms,seconds:r.seconds,mode,device:loaded.device,retries:r.retries,processed:!!fx});
  }
  finish(job,v,r){
-  const clip={id:job.id,text:job.text,theme:job.theme,character:v.character||null,voiceName:v.name,status:v.status,custom:!!v.custom,fallback:v.fallback||null,...r};
+  const clip={id:job.id,text:job.text,theme:job.theme,character:v.character||null,characterVersion:v.characterVersion||null,versionNote:v.versionNote?.text||null,voiceName:v.name,status:v.status,custom:!!v.custom,fallback:v.fallback||null,...r};
   if(job.purpose!=='check')this.lastClip=clip;return clip;
  }
  /** Stops the voice being made and empties the queue. */

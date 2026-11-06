@@ -51,13 +51,14 @@ class Voices{
   * The voice for theme + character (v2.41). No character: the theme's own voice. A character that can't
   * be used right now: the theme's own voice, with `fallback` saying which character and why.
   */
- voiceFor(theme,character,{version}={}){
+ voiceFor(theme,character,{version,characterVersion}={}){
   const base=this.get(theme,{version});if(!base||!character)return base;
   if(!CHARACTER_ID.test(String(character)))return {...base,fallback:{character:String(character).slice(0,24),name:String(character).slice(0,24),code:'unknown',reason:'it isn’t one of this version’s character voices'}};
-  const r=this.characters.resolve(theme,character);
+  // v2.42: a character can have versions; characterVersion pins one (the owner's rollback), else its current one.
+  const r=this.characters.resolve(theme,character,{pin:characterVersion});
   return r.voice||{...base,fallback:{character,...r.problem}};
  }
- list({characters={}}={}){return THEMES.map(t=>{const v=this.get(t),cs=this.characters.summary(t),pick=cs.find(c=>c.id===characters[t])||null;
+ list({characters={},characterVersion={}}={}){return THEMES.map(t=>{const v=this.get(t),cs=this.characters.summary(t,{pins:characterVersion}),pick=cs.find(c=>c.id===characters[t])||null;
   return {theme:t,name:v.name,target:v.voiceTarget||null,relationship:v.relationship||null,status:v.status,statusLabel:STATUS[v.status]||v.status,statusNote:v.statusNote||'',custom:!!v.custom,hasReference:!!v.refPath,effects:!!v.effects,sample:v.sample?.phrase||null,
    version:v.currentVersion||v.profileVersion||1,versions:v.versions||[1],
    ...(cs.length?{characters:cs,character:pick?pick.id:'',characterName:pick?pick.name:null,characterProblem:pick&&!pick.usable?pick.problem:characters[t]&&!pick?'That character isn’t available in this version.':null}:{})};});}

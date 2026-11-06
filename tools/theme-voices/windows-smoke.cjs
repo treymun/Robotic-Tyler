@@ -6,7 +6,9 @@
 //   4. (v2.41, CHARACTERS=1) character voices on Windows paths: a stand-in pack made from two of the app's own
 //      FLAC recordings is imported from a folder (a path with spaces and an accent), the real worker speaks from the imported
 //      clips (a list of references joined in the engine), and a damaged clip falls back to the theme's voice
-//      with the reason. The owner's real pack isn't on the runner, so no real character is tested here.
+//      with the reason. v2.42: a second stand-in pack (the "voice supplement") adds a version 2; with only
+//      the first pack the character speaks its version 1 and says so, after importing the second one it
+//      speaks version 2. The owner's real packs aren't on the runner, so no real character is tested here.
 // Every step has its own time limit, so a hang shows where it is instead of running until the job's limit.
 const path=require('node:path'),fs=require('node:fs'),os=require('node:os');
 process.env.TYLER_WORKER_TRACE=process.env.TYLER_WORKER_TRACE||'30'; // the engine prints where it is every 30 s
@@ -27,11 +29,19 @@ async function characters(){
  const src=[path.join(APP,'voices','cs16','reference.flac'),path.join(APP,'voices','cs16','sample.flac'),path.join(APP,'voices','l4d','sample.flac')];
  const clips=src.map((f,i)=>{const b=fs.readFileSync(f),r=rel(i+1);fs.mkdirSync(path.dirname(path.join(pack,...r.split('/'))),{recursive:true});fs.writeFileSync(path.join(pack,...r.split('/')),b);return {file:r,sha256:sha(b),bytes:b.length,seconds:1,text:null};});
  fs.writeFileSync(path.join(pack,'manifest.json'),'{}');
- const v=svc.voices.characters;v.list=[{theme:'tf2',id:'smoke',name:'Smoke test',status:'weak',approved:true,xvectorOnly:true,clips:clips.slice(0,2),preview:clips[2]}];
+ // v2.42: version 2 adds a clip from a second pack (the stand-in "voice supplement").
+ const sup=path.join(dir,'..','Voice supplement (smoke)'),srel='themes/tf2/smoke/cleaned/11__smoke.flac',sb=fs.readFileSync(path.join(APP,'voices','tf2','sample.flac'));
+ fs.mkdirSync(path.dirname(path.join(sup,...srel.split('/'))),{recursive:true});fs.writeFileSync(path.join(sup,...srel.split('/')),sb);fs.writeFileSync(path.join(sup,'manifest.json'),'{}');
+ const sclip={file:srel,sha256:sha(sb),bytes:sb.length,seconds:1,text:null,pack:'supplement'};clips.forEach(c=>{c.pack='expansion';});
+ const v=svc.voices.characters;v.list=[{theme:'tf2',id:'smoke',name:'Smoke test',current:2,versions:[{version:1,status:'weak',approved:true,xvectorOnly:true,clips:clips.slice(0,2),preview:clips[2]},{version:2,status:'weak',approved:true,xvectorOnly:true,clips:[clips[0],sclip],preview:clips[2]}]}];
  const r1=await v.import(pack);say('[characters] folder import',JSON.stringify({imported:r1.imported,failed:r1.failed}));if(r1.imported!==1)throw Error('folder import failed');
  await svc.saveSettings({characters:{tf2:'smoke'}});
  const a=await limit(svc.speak({text:'Character voice check on Windows.',theme:'tf2'}),1500,'character speak');say('[characters] spoke',JSON.stringify({character:a.character,voice:a.voiceName,seconds:a.seconds,ms:a.ms,fallback:a.fallback}));
  if(a.character!=='smoke'||!(a.seconds>0.5))throw Error('the character voice didn\'t speak');
+ if(a.characterVersion!==1||!/voice supplement/.test(a.versionNote||''))throw Error('with only the first pack, version 1 should speak and say so');
+ const r2=await v.import(sup);say('[characters] supplement import',JSON.stringify({added:r2.added,needsSupplement:r2.needsSupplement,failed:r2.failed}));
+ const a2=await limit(svc.speak({text:'Character voice check on Windows.',theme:'tf2'}),1500,'character speak v2');say('[characters] spoke v2',JSON.stringify({version:a2.characterVersion,note:a2.versionNote,seconds:a2.seconds,ms:a2.ms}));
+ if(a2.characterVersion!==2||a2.versionNote)throw Error('after the supplement, version 2 should speak');
  const ref=(await svc.voiceFor('tf2','smoke')).refPath;fs.appendFileSync(ref[0],'x');
  const b=await limit(svc.speak({text:'Who speaks now?',theme:'tf2'}),1500,'fallback speak');say('[characters] after damage',JSON.stringify({character:b.character,voice:b.voiceName,fallback:b.fallback}));
  if(b.character||!b.fallback)throw Error('no visible fallback');

@@ -13,7 +13,7 @@ on:
         options: [windows-cuda, windows-cuda-fast, windows-cpu]
         default: windows-cuda
       characters:
-        description: Also check character voices (v2.41) with a stand-in pack made from the app's own recordings
+        description: Also check character voices (v2.41) and their versions with the voice supplement (v2.42), with stand-in packs made from the app's own recordings
         type: boolean
         default: true
 

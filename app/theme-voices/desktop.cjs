@@ -20,7 +20,7 @@ function setupThemeVoices({root,dir,vault,local,changeListeners,net,shell,log,se
   getSettings:async()=>(await vault.get('themeVoices')).themeVoices,setSettings:v=>local.set({themeVoices:v}),
   theme:async()=>(await vault.get('uiTheme')).uiTheme||'steam',log});
  const clips=new Map();
- const pub=c=>({id:c.id,text:c.text,theme:c.theme,character:c.character||null,voiceName:c.voiceName,seconds:c.seconds,ms:c.ms,cached:c.cached,mode:c.mode,device:c.device||null,processed:!!c.processed,status:c.status,custom:!!c.custom,
+ const pub=c=>({id:c.id,text:c.text,theme:c.theme,character:c.character||null,characterVersion:c.characterVersion||null,versionNote:c.versionNote?String(c.versionNote).slice(0,160):null,voiceName:c.voiceName,seconds:c.seconds,ms:c.ms,cached:c.cached,mode:c.mode,device:c.device||null,processed:!!c.processed,status:c.status,custom:!!c.custom,
   fallback:c.fallback?{name:String(c.fallback.name||c.fallback.character||'').slice(0,40),reason:String(c.fallback.reason||'').slice(0,160)}:null});
  // v2.41: only these settings may come from the Steam window: follow the theme, the voice picked, and each theme's character.
  const steamSettings=v=>{const allowed={};if(typeof v.followTheme==='boolean')allowed.followTheme=v.followTheme;if(typeof v.override==='string')allowed.override=v.override;
@@ -71,9 +71,11 @@ function setupThemeVoices({root,dir,vault,local,changeListeners,net,shell,log,se
   if(op==='characters-import'){const src=typeof r.source==='string'?r.source.trim().replace(/^["']+|["']+$/g,'').slice(0,1000):'';
    return service.importCharacters(src,e=>send({kind:'characters-import',...e}));}
   if(op==='characters-remove'){service.removeCharacters();return {};}
-  if(op==='character-sample'){const c=service.voices.characters.entry(String(r.theme||''),String(r.character||''));if(!c)throw Error('Unknown character voice.');
-   const k=service.voices.characters.check(c);if(!k.ok)throw Error(c.name+': '+k.reason+'.');const f=r.kind==='reference'?k.files.reference[0]:k.files.preview||k.files.reference[0];
-   return {audio:fs.readFileSync(f).toString('base64'),type:'audio/flac',kind:r.kind==='reference'||!k.files.preview?'reference':'line',text:r.kind==='reference'?c.clips[0].text||null:c.preview?.text||c.clips[0].text||null};}
+  if(op==='character-sample'){const t=String(r.theme||''),id=String(r.character||''),st=await service.settings();
+   const p=service.voices.characters.previewFiles(t,id,{pin:st.characterVersion?.[t+'/'+id]});if(!p)throw Error('Unknown character voice.');if(p.problem)throw Error(p.name+': '+p.problem+'.');
+   const ref=r.kind==='reference'||!p.files.preview,f=ref?p.files.reference[0]:p.files.preview;
+   return {audio:fs.readFileSync(f).toString('base64'),type:'audio/flac',kind:ref?'reference':'line',text:ref?p.version.clips[0].text||null:p.version.preview?.text||null,version:p.version.version};}
+  if(op==='characters-status')return service.voices.characters.status();
   if(op==='native-status')return service.nativeStatus();
   if(op==='native-install'){const file=await service.nativeInstaller();const err=await shell.openPath(file);if(err)throw Error('Windows couldn’t start Microsoft’s installer: '+err);return {started:true};}
   if(op==='open-folder'){const which=r.which==='saved'?path.join(service.dir,'saved'):service.dir;fs.mkdirSync(which,{recursive:true});await shell.openPath(which);return {};}

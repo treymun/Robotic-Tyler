@@ -67,7 +67,7 @@
 
  function themeVoices(){const tv=globalThis.TylerThemeVoices;if(!tv)return {available:false};const st=tv.state();if(st.available===false)return {available:false};
   // v2.41: each theme's character voices that can be used on the PC, and the one picked for it.
-  return {available:true,ready:!!st.ready,busy:!!st.busy,theme:clean(st.theme,12),voices:(st.voices||[]).slice(0,30).map(v=>({theme:clean(v.theme,12),name:clean(v.name,40),...(Array.isArray(v.characters)&&v.characters.length?{character:clean(v.character,24),characters:v.characters.slice(0,20).map(c=>({id:clean(c.id,24),name:clean(c.name,40)}))}:{})}))};}
+  return {available:true,ready:!!st.ready,busy:!!st.busy,theme:clean(st.theme,12),voices:(st.voices||[]).slice(0,30).map(v=>({theme:clean(v.theme,12),name:clean(v.name,40),...(Array.isArray(v.characters)&&v.characters.length?{character:clean(v.character,24),characters:v.characters.slice(0,20).map(c=>({id:clean(c.id,24),name:clean(c.name,40),...(c.note?{note:clean(c.note,160)}:{})}))}:{})}))};}
  // ── Live events while a phone watches ─────────────────────────────────────
  // Only these events, with only these fields (all of them are already on the panel).
  const FIELDS={state:['state','label','text','before'],hud:['voice','voiceMeta','spend','spendMeta','latency','latencyMeta'],reply:['chars'],chat:['recent','flood'],

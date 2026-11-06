@@ -23,7 +23,9 @@ function voiceList(pick={tf2:'spy'}){
  const themes=[...new Set(CAT.characters.map(c=>c.theme))];
  const own={tf2:'The Administrator',cs2:'SAS operator',portal:'GLaDOS',l4d:'Bill',deadlock:'Bebop',gmod:'Dr. Kleiner',steam:'G-Man'};
  return ['steam',...themes].map(t=>({theme:t,name:own[t]||t,status:'ready',statusLabel:'Ready',hasReference:true,versions:[1],version:1,sample:'A line.',
-  ...(t==='steam'?{}:{characters:CAT.characters.filter(c=>c.theme===t).map(c=>({id:c.id,name:c.name,status:c.status,statusNote:'',imported:true,approved:true,usable:true,problem:null,hasPreview:true,previewText:'Line.',nonlexical:!!c.nonlexical})),character:pick[t]||''})}));
+  ...(t==='steam'?{}:{characters:CAT.characters.filter(c=>c.theme===t).map(c=>({id:c.id,name:c.name,status:c.status,statusNote:'',imported:true,approved:true,usable:true,problem:null,hasPreview:true,previewText:'Line.',nonlexical:!!c.nonlexical,
+   // v2.42: Spy has an improved version that is in use; Scout's needs the voice supplement, which isn't imported.
+   ...(c.id==='spy'?{version:2,currentVersion:2,versions:[{version:1,approved:true,ready:true},{version:2,approved:true,ready:true,supplement:true}]}:c.id==='scout'?{version:1,currentVersion:2,versionCode:'needs_supplement',versionNote:'Earlier version (v1): import the voice supplement for the improved version (v2).',versions:[{version:1,approved:true,ready:true},{version:2,approved:true,ready:false,supplement:true}]}:{})})),character:pick[t]||''})}));
 }
 
 test('Settings → Theme voices → Character voices: a selector per theme, original recording vs generated speech, import and remove (mocked main process)',{timeout:120000},async()=>{
@@ -39,17 +41,21 @@ test('Settings → Theme voices → Character voices: a selector per theme, orig
      if(op==='settings'){Object.assign(st.settings.characters,x.values?.characters||{});for(const v of voices)if(x.values?.characters&&v.theme in x.values.characters)v.character=x.values.characters[v.theme];return st.settings;}
      if(op==='character-sample')return {audio:flac,type:'audio/flac',kind:'line',text:'The original line.'};if(op==='sample')return {audio:flac,type:'audio/flac',kind:'line'};
      if(op==='test')return {clip:{voiceName:x.character?'Spy':'The Administrator',seconds:1.5,ms:2000,device:'cpu',fallback:null},audio:'UklGRiQAAABXQVZFZm10IBAAAAABAAEAwF0AAIC7AAACABAAZGF0YQAAAAA='};
-     if(op==='characters-import')return {imported:30,total:30,bytes:12e6,failed:[],characters:[]};return {};}};
+     if(op==='characters-import')return {imported:30,complete:25,needsSupplement:5,added:166,total:30,bytes:12e6,packs:['the character voice pack'],failed:[],characters:[]};return {};}};
    HTMLMediaElement.prototype.play=function(){return Promise.resolve();};},[voiceList()]);
   await p.goto('http://127.0.0.1:'+files.address().port+'/app/companion/settings.html#theme-voices');
   await p.waitForFunction(()=>document.querySelectorAll('#tvChars .tv-voice').length>0);
   const rows=await p.evaluate(()=>[...document.querySelectorAll('#tvChars .tv-voice')].map(r=>({theme:r.dataset.theme,label:r.querySelector('label').textContent,value:r.querySelector('select').value,first:r.querySelector('select').options[0].textContent,buttons:[...r.querySelectorAll('button')].map(b=>b.textContent)})));
   assert.deepEqual(rows.map(r=>r.theme),[...new Set(CAT.characters.map(c=>c.theme))],'one selector per theme with characters (none for Steam)');
   const tf2=rows.find(r=>r.theme==='tf2');assert.equal(tf2.value,'spy','the remembered choice');assert.equal(tf2.first,'The Administrator (theme default)');assert.match(tf2.label,/Character voice · Team Fortress 2/);
-  assert.deepEqual(tf2.buttons,['Original recording','Generated speech']);
-  // Uses the page's existing classes only (no new CSS).
-  assert.equal(await p.evaluate(()=>[...document.querySelectorAll('#tvChars *')].flatMap(e=>[...e.classList]).filter(c=>!['tv-voice','tv-tag','tv-buttons','secondary'].includes(c)).length),0);
+  assert.deepEqual(tf2.buttons,['Use the earlier version','Original recording','Generated speech'],'Spy has an improved version, so the earlier one can be chosen (under his note)');
+  assert.match(await p.textContent('#tvCharState'),/1 of the 2 improved voices needs the voice supplement: import it too/);
+  await p.click('#tvChars .tv-voice[data-theme=tf2] button:text-is("Use the earlier version")');await p.waitForFunction(()=>/uses its earlier version \(v1\)/.test(document.getElementById('tvCharVoiceState').textContent));
+  assert.deepEqual((await p.evaluate(()=>window.__calls)).filter(c=>c[0]==='settings').at(-1)[1],{values:{characterVersion:{'tf2/spy':1}}});
+  // Uses the page's existing classes only (no new CSS): "actions" is the Import buttons' own row (v2.42: the rollback button under the note).
+  assert.equal(await p.evaluate(()=>[...document.querySelectorAll('#tvChars *')].flatMap(e=>[...e.classList]).filter(c=>!['tv-voice','tv-tag','tv-buttons','secondary','actions'].includes(c)).length),0);
   await p.selectOption('#tvChar-tf2','scout');await p.waitForFunction(()=>/now speaks as Scout/.test(document.getElementById('tvCharVoiceState').textContent));
+  assert.match(await p.textContent('#tvChars .tv-voice[data-theme=tf2] small'),/Earlier version \(v1\): import the voice supplement for the improved version \(v2\)/,'Scout says why his earlier version speaks');
   let calls=await p.evaluate(()=>window.__calls);assert.deepEqual(calls.filter(c=>c[0]==='settings').at(-1)[1],{values:{characters:{tf2:'scout'}}});
   await p.click('#tvChars .tv-voice[data-theme=tf2] button:text-is("Original recording")');await p.waitForFunction(()=>/original recording.*not generated/.test(document.getElementById('tvCharVoiceState').textContent));
   calls=await p.evaluate(()=>window.__calls);assert.deepEqual(calls.at(-1),['character-sample',{theme:'tf2',character:'scout'}]);
@@ -60,7 +66,7 @@ test('Settings → Theme voices → Character voices: a selector per theme, orig
   calls=await p.evaluate(()=>window.__calls);assert.equal(calls.filter(c=>c[0]==='test').at(-1)[1].character,'');
   // Import from a path, then remove (asks twice).
   await p.click('#tvCharImport');await p.fill('#tvCharSource','"D:\\Downloads\\Robotic-Tyler-Character-Voice-Expansion.zip"');await p.click('#tvCharGo');
-  await p.waitForFunction(()=>/Imported 30 of 30 character voices/.test(document.getElementById('tvCharState').textContent));
+  await p.waitForFunction(()=>/Checked and copied 166 recordings \(11\.4 MB from the character voice pack\)\. Imported 30 of 30 character voices; 5 improved voices still need the voice supplement\./.test(document.getElementById('tvCharState').textContent));
   calls=await p.evaluate(()=>window.__calls);assert.deepEqual(calls.filter(c=>c[0]==='characters-import').at(-1)[1],{source:'D:\\Downloads\\Robotic-Tyler-Character-Voice-Expansion.zip'});
   await p.click('#tvCharRemove');assert.match(await p.textContent('#tvCharState'),/Press the button again/);assert.equal((await p.evaluate(()=>window.__calls)).filter(c=>c[0]==='characters-remove').length,0);
   await p.click('#tvCharRemove');await p.waitForTimeout(200);assert.equal((await p.evaluate(()=>window.__calls)).filter(c=>c[0]==='characters-remove').length,1);
@@ -94,6 +100,8 @@ test('phone remote: the Character voice selector follows the theme and saves the
   await inPhone(r=>{const s=r.getElementById('rmTvChar');s.value='scout';s.dispatchEvent(new Event('change',{bubbles:true}));});
   await pc.waitForFunction(()=>window.__settings.length>0);
   assert.equal(JSON.stringify(await pc.evaluate(()=>window.__settings.at(-1))),JSON.stringify({characters:{tf2:'scout'}}));
+  // v2.42: Scout's improved version needs the voice supplement on the PC: the phone says so under the selector.
+  await phone.waitForFunction(()=>/import the voice supplement/.test(document.getElementById('tyler').shadowRoot.getElementById('rmTvCharHint').textContent),null,{timeout:20000});
   // A theme without characters hides the selector.
   await inPhone(r=>{const s=r.getElementById('rmTvVoice');s.value='steam';s.dispatchEvent(new Event('change',{bubbles:true}));});
   assert.equal(await inPhone(r=>r.getElementById('rmTvCharField').hidden),true);

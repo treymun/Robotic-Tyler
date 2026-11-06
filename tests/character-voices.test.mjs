@@ -9,7 +9,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';import path from 'node:path';import os from 'node:os';import zlib from 'node:zlib';import crypto from 'node:crypto';
 import {createRequire} from 'node:module';import {execFileSync} from 'node:child_process';
 const require=createRequire(import.meta.url),root=path.resolve(import.meta.dirname,'..'),TV=path.join(root,'app','theme-voices');
-const {Characters,validEntry,CLIP_PATH}=require(path.join(TV,'characters.cjs'));
+const {Characters,validEntry,CLIP_PATH,versionsOf,allClips}=require(path.join(TV,'characters.cjs'));
 const {Voices,THEMES}=require(path.join(TV,'voices.cjs'));
 const {ThemeVoices}=require(path.join(TV,'service.cjs'));
 const {WorkerHost}=require(path.join(TV,'worker.cjs'));
@@ -58,16 +58,19 @@ test('shipped catalog: stable theme/character IDs, no character in two themes, n
  // The theme defaults are not offered again as characters (the owner's "no repeats"): their clips went to the polish pass.
  for(const [t,id] of [['tf2','administrator'],['cs2','sas'],['portal','glados'],['l4d','bill'],['deadlock','bebop'],['gmod','dr-kleiner'],['gmod','g-man'],['dod','us-field-radio']])assert.ok(!ids.includes(t+'/'+id),t+'/'+id+' is a theme default');
  assert.ok(!list.some(c=>/g-?man/i.test(c.id+c.name)),'G-Man is the Steam theme\'s default, not a Garry\'s Mod character');
- const clipShas=list.flatMap(c=>[...c.clips,...(c.preview?[c.preview]:[])].map(x=>x.sha256));assert.equal(new Set(clipShas).size,clipShas.length,'no clip is used twice');
- const srcShas=list.flatMap(c=>(c.sources||[]).map(s=>s.originalSha256)).filter(Boolean);assert.equal(new Set(srcShas).size,srcShas.length,'no original recording is used twice');
+ // v2.42: a character's versions may share clips (an improved version keeps some of the first one's); across characters, none.
+ const clipShas=list.flatMap(c=>allClips(c).map(x=>x.sha256));assert.equal(new Set(clipShas).size,clipShas.length,'no clip is used by two characters');
+ const srcShas=list.flatMap(c=>[...new Set(versionsOf(c).flatMap(v=>(v.sources||c.sources||[]).map(s=>s.originalSha256)).filter(Boolean))]);assert.equal(new Set(srcShas).size,srcShas.length,'no original recording is used by two characters');
  // …and none is one of the built-in voices' own recordings.
  const builtin=new Set();for(const t of THEMES){const p=JSON.parse(fs.readFileSync(path.join(TV,'voices',t,'profile.json'),'utf8'));for(const s of p.sources||[])builtin.add(s.sha256);if(p.sample)builtin.add(p.sample.source.sha256);
   for(const h of p.history||[]){const q=JSON.parse(fs.readFileSync(path.join(TV,'voices',t,h.profile),'utf8'));for(const s of q.sources||[])builtin.add(s.sha256);}}
  for(const h of srcShas)assert.ok(!builtin.has(h),'a character clip is a built-in voice\'s recording: '+h);
  const pyro=list.find(c=>c.theme==='tf2'&&c.id==='pyro');
- if(pyro){assert.equal(pyro.transcript??null,null,'Pyro\'s lines are non-lexical: no invented transcript');assert.equal(pyro.xvectorOnly,true);assert.ok(pyro.clips.every(x=>x.text==null));assert.equal(pyro.nonlexical,true);}
- for(const c of list){assert.ok(c.clips.every(x=>CLIP_PATH.test(x.file)));assert.ok(c.transcript==null||c.transcript===c.clips.map(x=>x.text).join(' '),c.id+': the transcript is the clips\' own text, in order');
-  assert.ok(!c.preview||!c.clips.some(x=>x.sha256===c.preview.sha256),c.id+': the original-recording clip isn\'t part of the reference');}
+ if(pyro){assert.equal(pyro.nonlexical,true);for(const v of versionsOf(pyro)){assert.equal(v.transcript??null,null,'Pyro\'s lines are non-lexical: no invented transcript');assert.equal(v.xvectorOnly,true);assert.ok(v.clips.every(x=>x.text==null));}}
+ for(const c of list)for(const v of versionsOf(c)){assert.ok(v.clips.every(x=>CLIP_PATH.test(x.file)));assert.ok(v.transcript==null||v.transcript===v.clips.map(x=>x.text).join(' '),c.id+' v'+v.version+': the transcript is the clips\' own text, in order');
+  assert.ok(!v.preview||!v.clips.some(x=>x.sha256===v.preview.sha256),c.id+': the original-recording clip isn\'t part of the reference');
+  assert.ok(v.clips.every(x=>['expansion','supplement'].includes(x.pack)),c.id+': every clip says which pack it comes from');
+  if(v.version===1)assert.ok(allClips({versions:[v]}).every(x=>x.pack==='expansion'),c.id+': version 1 needs only the first pack');}
 });
 test('catalog entries with unsafe paths or wrong fields are ignored, never read',()=>{
  const good={theme:'tf2',id:'scout',name:'Scout',clips:[{file:'themes/tf2/scout/cleaned/01__a.flac',sha256:'a'.repeat(64),bytes:900}]};
@@ -92,7 +95,7 @@ test('import from the pack folder: only the listed clips, each checked; a change
  assert.equal(r.imported,1);assert.deepEqual(r.characters.map(c=>c.id),['tf2/scout']);
  assert.deepEqual(r.failed.map(f=>f.id).sort(),['deadlock/haze','tf2/spy']);
  assert.match(r.failed.find(f=>f.id==='tf2/spy').reason,/SHA-256/);assert.match(r.failed.find(f=>f.id==='deadlock/haze').reason,/wrong size/);
- const kept=fs.readdirSync(path.join(data,'characters','tf2','scout')).sort();assert.deepEqual(kept,['character.json','preview-04.flac','ref-01.flac','ref-02.flac','ref-03.flac']);
+ const scout=p.catalog.characters.find(c=>c.id==='scout'),kept=fs.readdirSync(path.join(data,'characters','tf2','scout')).sort();assert.deepEqual(kept,['character.json',...[...scout.clips,scout.preview].map(x=>x.sha256+'.flac')].sort());
  assert.ok(!fs.existsSync(path.join(data,'characters','tf2','spy')),'nothing kept for a character that failed');
  // Non-FLAC bytes with the right size and hash are still refused (the header is checked).
  const q=makePack({chars:[['tf2','scout',1]]}),c=q.catalog.characters[0],bad=Buffer.alloc(c.clips[0].bytes,65);fs.writeFileSync(path.join(q.packRoot,c.clips[0].file),bad);c.clips[0].sha256=sha(bad);
@@ -278,4 +281,74 @@ test('spoken replies (mocked background): every part of one reply is made with t
  const box={console,Promise,globalThis:null,tylerThemeVoices:{resolve:async()=>({...pick}),speak:async o=>{calls.push(o);pick={theme:'tf2',character:'spy'};return {audio:'AAAA',clip:{voiceName:o.character}};}}};box.globalThis=box;
  const a=src.indexOf('async function themeSpeakAll'),b=src.indexOf('async function countThemeSpeech');vm.runInNewContext(src.slice(a,b)+';globalThis.run=(parts)=>themeSpeakAll(parts,null,themePin());',box);
  await box.run(['One.','Two.','Three.']);assert.deepEqual(calls.map(c=>c.character),['scout','scout','scout']);assert.ok(calls.every(c=>c.theme==='tf2'&&c.purpose==='reply'));
+});
+
+// ── v2.42: the voice supplement (a second pack) and character versions ─────────
+// Two stand-in packs (MOCKED): the character voice pack holds version 1's clips; the voice supplement holds
+// the extra clips of version 2 (which keeps some of version 1's). Pyro-like: version 1 not offered, version 2 offered.
+function makeTwoPacks(){
+ const dir=tmp(),exp=path.join(dir,'Robotic-Tyler-Character-Voice-Expansion'),sup=path.join(dir,'Robotic-Tyler-Targeted-Voice-References-2026-11-06-COMPLETE');
+ for(const r of [exp,sup]){fs.mkdirSync(r,{recursive:true});fs.writeFileSync(path.join(r,'manifest.json'),'{}');}
+ let seed=500;const files={expansion:[],supplement:[]};
+ const clip=(pack,theme,id,n)=>{const root=pack==='expansion'?exp:sup,rel=`themes/${theme}/${id}/cleaned/${pack==='expansion'?'0':'1'}${n}__${id}_${pack}.flac`,b=fakeFlac(seed++,700+n);
+  fs.mkdirSync(path.dirname(path.join(root,rel)),{recursive:true});fs.writeFileSync(path.join(root,rel),b);files[pack].push([rel,b]);return {file:rel,sha256:sha(b),bytes:b.length,seconds:1.5,text:'Line '+pack+' '+n+'.',pack};};
+ const character=(theme,id,{v1ok=true,v2ok=true,xv=false}={})=>{
+  const e=[1,2,3].map(n=>clip('expansion',theme,id,n)),s=[1,2,3].map(n=>clip('supplement',theme,id,n));
+  const v=(version,clips,preview,approved)=>({version,status:'weak',approved,approvalNote:approved?undefined:'Not offered yet.',transcript:xv?null:clips.map(c=>c.text).join(' '),xvectorOnly:xv,clips:xv?clips.map(c=>({...c,text:null})):clips,preview});
+  return {theme,id,name:id[0].toUpperCase()+id.slice(1),current:2,versions:[v(1,e.slice(0,2),e[2],v1ok),v(2,[e[0],s[0],s[1]],s[2],v2ok)]};
+ };
+ const haze=character('deadlock','haze'); // one version only, the first pack's
+ const catalog={format:2,version:2,characters:[character('tf2','scout'),character('tf2','pyro',{v1ok:false,xv:true}),{...haze,current:1,versions:[haze.versions[0]]}]};
+ return {dir,exp,sup,files,catalog};
+}
+test('v2.42 the voice supplement: either pack first, or both from one folder; the improved version speaks only with both; nothing is imported twice (MOCKED packs)',async()=>{
+ const p=makeTwoPacks(),{v}=voicesWith(p.catalog);
+ // First pack only: Scout speaks in his earlier version and says so; Pyro (offered only in v2) isn't offered.
+ let r=await v.characters.import(p.exp);assert.equal(r.needsSupplement,2);assert.deepEqual(r.packs,['the character voice pack']);
+ let a=v.voiceFor('tf2','scout');assert.equal(a.character,'scout');assert.equal(a.characterVersion,1);assert.equal(a.versionNote.code,'needs_supplement');assert.match(a.versionNote.text,/import the voice supplement for the improved version \(v2\)/);
+ assert.equal(a.refPath.length,2);
+ let py=v.voiceFor('tf2','pyro');assert.equal(py.name,'The Administrator');assert.equal(py.fallback.code,'needs_supplement');assert.match(py.fallback.reason,/offered only in its improved version, which needs the voice supplement/);
+ const s1=v.characters.summary('tf2');assert.equal(s1.find(c=>c.id==='scout').versionCode,'needs_supplement');assert.equal(s1.find(c=>c.id==='pyro').usable,false);
+ assert.deepEqual(v.characters.status(),{total:3,imported:3,complete:1,needsSupplement:2,improved:2});
+ const k1=v.key(a);
+ // Then the supplement: the improved version, a different cache key, no note.
+ r=await v.characters.import(p.sup);assert.equal(r.needsSupplement,0);assert.equal(r.added,6,'only the supplement\'s clips were new');assert.deepEqual(r.packs,['the voice supplement']);
+ a=v.voiceFor('tf2','scout');assert.equal(a.characterVersion,2);assert.equal(a.versionNote,null);assert.equal(a.refPath.length,3);assert.notEqual(v.key(a),k1);
+ py=v.voiceFor('tf2','pyro');assert.equal(py.character,'pyro');assert.equal(py.xvectorOnly,true);assert.equal(py.transcript,'');
+ r=await v.characters.import(p.exp);assert.equal(r.added,0,'importing a pack again copies nothing new');
+ // The other order, and both at once from the folder that holds them (unpacked), and from a folder of ZIPs.
+ const w=voicesWith(p.catalog);r=await w.v.characters.import(p.sup);assert.equal(w.v.voiceFor('tf2','scout').fallback.code,'missing');assert.match(w.v.voiceFor('tf2','scout').fallback.reason,/import the character voice pack/);
+ await w.v.characters.import(p.exp);assert.equal(w.v.voiceFor('tf2','scout').characterVersion,2);
+ const both=voicesWith(p.catalog);r=await both.v.characters.import(p.dir);assert.equal(r.complete,3);assert.equal(r.needsSupplement,0);assert.deepEqual(r.packs.sort(),['the character voice pack','the voice supplement']);
+ const zdir=tmp();fs.writeFileSync(path.join(zdir,'Robotic-Tyler-Character-Voice-Expansion.zip'),zipOf(p.files.expansion,'Robotic-Tyler-Character-Voice-Expansion'));fs.writeFileSync(path.join(zdir,'Robotic-Tyler-Complete-Voice-Supplement.zip'),zipOf(p.files.supplement,'Robotic-Tyler-Targeted-Voice-References-2026-11-06-COMPLETE'));
+ const z=voicesWith(p.catalog);r=await z.v.characters.import(zdir);assert.equal(r.complete,3,'a folder holding both ZIPs');
+ const z2=voicesWith(p.catalog);r=await z2.v.characters.import(path.join(zdir,'Robotic-Tyler-Complete-Voice-Supplement.zip'));assert.equal(r.imported,0,'the supplement alone makes no voice usable (version 2 keeps a first-pack clip)');
+ // A damaged supplement clip: the import reports it and the earlier version keeps speaking.
+ const bad=voicesWith(p.catalog);await bad.v.characters.import(p.exp);const sc=p.catalog.characters[0].versions[1].clips[1];fs.writeFileSync(path.join(p.sup,sc.file),fakeFlac(4242,sc.bytes));
+ r=await bad.v.characters.import(p.sup);assert.ok(r.failed.some(f=>f.id==='tf2/scout'&&/SHA-256/.test(f.reason)));assert.equal(bad.v.voiceFor('tf2','scout').characterVersion,1);
+});
+test('v2.42 rollback: a character pinned to its earlier version speaks in it, says so, keys its own cache; a v2.41 import is moved to the new layout (MOCKED)',async()=>{
+ const p=makeTwoPacks(),{v,data}=voicesWith(p.catalog);await v.characters.import(p.dir);
+ const now=v.voiceFor('tf2','scout'),old=v.voiceFor('tf2','scout',{characterVersion:1});
+ assert.equal(now.characterVersion,2);assert.equal(old.characterVersion,1);assert.equal(old.versionNote.code,'pinned');assert.notEqual(v.key(now),v.key(old));
+ assert.equal(v.characters.summary('tf2',{pins:{'tf2/scout':1}}).find(c=>c.id==='scout').pinned,true);
+ assert.equal(v.voiceFor('tf2','scout',{characterVersion:2}).characterVersion,2,'pinning the current version is the current version');
+ const py=v.voiceFor('tf2','pyro',{characterVersion:1});assert.equal(py.fallback.code,'unapproved');assert.match(py.fallback.reason,/earlier version isn’t offered/);
+ // v2.41 stored version 1 as ref-01.flac…preview-03.flac with a format-1 record.
+ const h=p.catalog.characters[2],dir=path.join(data,'characters','deadlock','haze'),v1=h.versions[0];fs.rmSync(dir,{recursive:true,force:true});fs.mkdirSync(dir,{recursive:true});
+ [...v1.clips,v1.preview].forEach((x,i)=>fs.copyFileSync(path.join(p.exp,x.file),path.join(dir,(i<v1.clips.length?'ref-':'preview-')+String(i+1).padStart(2,'0')+'.flac')));
+ fs.writeFileSync(path.join(dir,'character.json'),JSON.stringify({format:1,id:'deadlock/haze',name:'Haze'}));
+ const hz=v.voiceFor('deadlock','haze');assert.equal(hz.character,'haze');assert.ok(hz.refPath.every(f=>/[0-9a-f]{64}\.flac$/.test(f)));assert.equal(JSON.parse(fs.readFileSync(path.join(dir,'character.json'),'utf8')).format,2);
+});
+test('v2.42 service (mocked worker): the clip says when an earlier version spoke; the rollback setting is per theme/character and validated',{skip:!python&&'needs python3'},async()=>{
+ const p=makeTwoPacks(),{svc,settings}=fakeService(p.catalog);
+ try{
+  await svc.importCharacters(p.exp);await svc.saveSettings({characters:{tf2:'scout'}});
+  const a=await svc.speak({text:'Earlier version.',theme:'tf2'});assert.equal(a.character,'scout');assert.equal(a.characterVersion,1);assert.match(a.versionNote,/voice supplement/);
+  await svc.importCharacters(p.sup);const b=await svc.speak({text:'Improved version.',theme:'tf2'});assert.equal(b.characterVersion,2);assert.equal(b.versionNote,null);
+  await svc.saveSettings({characterVersion:{'tf2/scout':1,'nope/x':1,'tf2/../x':1,'tf2/spy':'x'}});assert.deepEqual(settings().characterVersion,{'tf2/scout':1});
+  const c=await svc.speak({text:'Improved version.',theme:'tf2'});assert.equal(c.characterVersion,1);assert.match(c.versionNote,/as you chose/);assert.notEqual(c.file,b.file);
+  await svc.saveSettings({characterVersion:{'tf2/scout':0}});assert.deepEqual(settings().characterVersion,{});
+  const list=(await svc.voiceList()).find(x=>x.theme==='tf2');const sc=list.characters.find(x=>x.id==='scout');assert.equal(sc.version,2);assert.deepEqual(sc.versions.map(x=>[x.version,x.ready,x.supplement]),[[1,true,false],[2,true,true]]);
+ }finally{await svc.shutdown();}
 });

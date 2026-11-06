@@ -194,6 +194,8 @@
   const want=[['',v.name+' (theme default)'],...list.map(c=>[c.id,c.name])],now=[...sel.options].map(o=>o.value+'|'+o.textContent).join(',');
   if(now!==want.map(w=>w.join('|')).join(',')){sel.replaceChildren(...want.map(([id,name])=>{const o=document.createElement('option');o.value=id;o.textContent=name;return o;}));}
   sel.value=v.character||'';sel.dataset.theme=theme;
+  // v2.42: say when the picked character speaks in an earlier version (no voice supplement on the PC yet, or chosen there).
+  const note=list.find(c=>c.id===sel.value)?.note;$('rmTvCharHint').textContent=note||'Saved on the PC for this theme. The theme’s own voice is the default.';
  }
  function renderControls(s){
   const c=s.controls||{};

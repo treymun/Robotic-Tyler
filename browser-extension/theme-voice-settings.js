@@ -85,16 +85,17 @@
    row.append(a,b,c);box.append(row);
   }
  }
- // ── v2.41 character voices ───────────────────────────────────────────────
+ // ── v2.41 character voices (v2.42: improved versions from the voice supplement, and going back to the earlier one) ──
  const themeName=t=>globalThis.TylerTheme?.info?.[t]?.[0]||t;
- const charTag=c=>!c?null:!c.approved?'Not approved':!c.imported?'Not imported':c.nonlexical?'Non-lexical':c.status==='ready'?'Ready':c.status==='weak'?'Weak clone':c.status==='approximation'?'Approximation':'Not rated yet';
+ const charTag=c=>!c?null:!c.approved?'Not approved':!c.imported?'Not imported':!c.usable?(/voice supplement/.test(c.problem||'')?'Needs the supplement':'Unavailable'):c.nonlexical?'Non-lexical':c.status==='ready'?'Ready':c.status==='weak'?'Weak clone':c.status==='approximation'?'Approximation':'Not rated yet';
  let charBusy=false;
  function charSummary(){
   const all=voices.flatMap(v=>v.characters||[]),ok=all.filter(c=>c.usable).length,imp=all.filter(c=>c.imported).length;
   if(!all.length)return 'This version lists no character voices.';
-  const themes=voices.filter(v=>v.characters?.length).length;
+  const themes=voices.filter(v=>v.characters?.length).length,improved=all.filter(c=>(c.versions||[]).length>1),waiting=all.filter(c=>c.versionCode==='needs_supplement'||(c.imported&&!c.usable&&/voice supplement/.test(c.problem||''))).length;
+  const sup=!improved.length?'':waiting?' '+waiting+' of the '+improved.length+' improved voices need'+(waiting===1?'s':'')+' the voice supplement: import it too (until then they use their earlier version, or aren’t offered).':improved.some(c=>c.imported)?' The voice supplement is imported: '+improved.length+' voices use their improved version.':'';
   return !imp?'Not imported yet: this version lists '+all.length+' character voices for '+themes+' themes. Each theme keeps its own voice until you pick a character.':
-   'Imported: '+imp+' of '+all.length+' character voices'+(ok<imp?' ('+(imp-ok)+' imported but not approved, so their themes keep their own voice)':'')+'.';
+   'Imported: '+imp+' of '+all.length+' character voices'+(ok<imp?' ('+(imp-ok)+' imported but not offered, so their themes keep their own voice)':'')+'.'+sup;
  }
  function renderCharacters(){
   const box=$('tvChars');if(!box)return;box.replaceChildren();if(!charBusy)say('tvCharState',charSummary());
@@ -107,7 +108,7 @@
    sel.append(new Option(v.name+' (theme default)',''),...v.characters.map(ch=>{const o=new Option(ch.name+(ch.usable?ch.status==='weak'?' · weak clone':ch.nonlexical?' · non-lexical':'':' · '+(charTag(ch)||'').toLowerCase()),ch.id);o.disabled=!ch.usable;return o;}));
    sel.value=v.characters.some(ch=>ch.id===v.character)?v.character:'';
    const note=document.createElement('small'),cur=v.characters.find(ch=>ch.id===v.character);
-   note.textContent=cur?(cur.usable?cur.statusNote||'':cur.name+' can’t be used ('+(v.characterProblem||cur.problem||'not available')+'), so '+v.name+' speaks.'):'The theme’s own voice ('+v.name+').';
+   note.textContent=cur?(cur.usable?(cur.versionNote?cur.versionNote+' ':'')+(cur.statusNote||''):cur.name+' can’t be used ('+(v.characterProblem||cur.problem||'not available')+'), so '+v.name+' speaks.'):'The theme’s own voice ('+v.name+').';
    a.append(lab,sel,note);
    b.innerHTML='<span class="tv-tag"></span>';const tag=b.querySelector('.tv-tag');tag.dataset.status=cur?(cur.usable?cur.status:'missing'):v.status;tag.textContent=cur?charTag(cur):v.custom?'Your recording':'Theme default';
    sel.onchange=async()=>{try{await tv('settings',{values:{characters:{[v.theme]:sel.value}}});const ch=v.characters.find(x=>x.id===sel.value);say('tvCharVoiceState',themeName(v.theme)+(ch?' now speaks as '+ch.name+' (remembered for this theme).':' uses its own voice ('+v.name+') again.'));await load();}catch(e){say('tvCharVoiceState',e.message);}};
@@ -116,9 +117,16 @@
    btn('Original recording',async()=>{const ch=chosen();
     if(!ch){const r=await tv('sample',{theme:v.theme,kind:v.sample&&!v.custom?'line':'reference'});play(r.audio,r.type);say('tvCharVoiceState','Playing '+v.name+'’s original recording'+(r.kind==='line'&&v.sample?' “'+v.sample+'”':'')+' (from the game, not generated).');return;}
     const r=await tv('character-sample',{theme:v.theme,character:ch.id});play(r.audio,r.type);say('tvCharVoiceState','Playing '+ch.name+'’s original recording'+(r.text?' “'+r.text+'”':'')+' (from the game, not generated).');},!v.characters.some(ch=>ch.imported)&&!v.hasReference);
+   // v2.42: an improved character keeps its earlier version; go back to it (and forward again), like the built-in voices.
+   // Under the character's note (the row's button column is shared by every row, so a third button there would squeeze them all).
+   const offered=(cur?.versions||[]).filter(x=>x.approved);
+   if(cur&&offered.length>1&&(cur.pinned||cur.version===cur.currentVersion&&offered.some(x=>x.version<cur.currentVersion&&x.ready))){const older=Math.max(...offered.filter(x=>x.version<cur.currentVersion).map(x=>x.version));
+    const act=document.createElement('div');act.className='actions';const x=document.createElement('button');x.type='button';x.className='secondary';x.textContent=cur.pinned?'Use the improved version':'Use the earlier version';
+    x.onclick=async()=>{try{await tv('settings',{values:{characterVersion:{[v.theme+'/'+cur.id]:cur.pinned?0:older}}});say('tvCharVoiceState',cur.name+(cur.pinned?' uses its improved version (v'+cur.currentVersion+') again.':' uses its earlier version (v'+older+') now.'));await load();}catch(e){say('tvCharVoiceState',e.message);}};
+    act.append(x);a.append(act);}
    btn('Generated speech',async x=>{const ch=chosen();x.disabled=true;say('tvCharVoiceState','Making '+(ch?ch.name:v.name)+'’s voice… (the first one loads the model)');
     try{const r=await tv('test',{theme:v.theme,character:sel.value,text:$('tvTestText').value,fresh:true});play(r.audio);
-     say('tvCharVoiceState',(r.clip.fallback?r.clip.fallback.name+' couldn’t be used ('+r.clip.fallback.reason+'), so this is '+r.clip.voiceName+'. ':'')+r.clip.voiceName+': '+r.clip.seconds.toFixed(1)+' s of generated speech (made by the clone on the '+(r.clip.device==='cuda'?'graphics card':'processor')+' in '+(r.clip.ms/1000).toFixed(1)+' s, not a recording).');}finally{x.disabled=false;}},!status?.ready);
+     say('tvCharVoiceState',(r.clip.fallback?r.clip.fallback.name+' couldn’t be used ('+r.clip.fallback.reason+'), so this is '+r.clip.voiceName+'. ':'')+(r.clip.versionNote?r.clip.versionNote+' ':'')+r.clip.voiceName+': '+r.clip.seconds.toFixed(1)+' s of generated speech (made by the clone on the '+(r.clip.device==='cuda'?'graphics card':'processor')+' in '+(r.clip.ms/1000).toFixed(1)+' s, not a recording).');}finally{x.disabled=false;}},!status?.ready);
    row.append(a,b,c);box.append(row);
   }
  }
@@ -126,7 +134,7 @@
  $('tvCharCancel').onclick=()=>{$('tvCharForm').hidden=true;};
  $('tvCharGo').onclick=async()=>{const src=$('tvCharSource').value.trim().replace(/^["']+|["']+$/g,'');if(!src)return;$('tvCharForm').hidden=true;charBusy=true;$('tvCharGo').disabled=true;say('tvCharState','Importing and checking the character recordings…');
   try{const r=await tv('characters-import',{source:src});charBusy=false;await load();
-   say('tvCharState','Imported '+r.imported+' of '+r.total+' character voices ('+(r.bytes/1024**2).toFixed(1)+' MB).'+(r.failed.length?' Not imported: '+r.failed.slice(0,6).map(f=>f.name+' ('+f.reason+')').join('; ')+(r.failed.length>6?'; and '+(r.failed.length-6)+' more':'')+'. Those characters keep their theme’s own voice.':''));}
+   say('tvCharState','Checked and copied '+(r.added??0)+' recording'+(r.added===1?'':'s')+' ('+((r.bytes||0)/1024**2).toFixed(1)+' MB'+(r.packs?.length?' from '+r.packs.join(' and '):'')+'). Imported '+r.imported+' of '+r.total+' character voices'+(r.needsSupplement?'; '+r.needsSupplement+' improved voice'+(r.needsSupplement===1?'':'s')+' still need'+(r.needsSupplement===1?'s':'')+' the voice supplement':'')+'.'+(r.failed.length?' Not imported: '+r.failed.slice(0,6).map(f=>f.name+' ('+f.reason+')').join('; ')+(r.failed.length>6?'; and '+(r.failed.length-6)+' more':'')+'. Those characters keep their theme’s own voice.':''));}
   catch(e){charBusy=false;say('tvCharState','Import failed: '+e.message+' Nothing was changed for the characters that weren’t imported.');}finally{$('tvCharGo').disabled=false;}};
  let audioEl=null;
  function play(b64,type='audio/wav'){try{audioEl?.pause();}catch{}audioEl=new Audio('data:'+type+';base64,'+b64);void audioEl.play().catch(e=>say('tvVoiceState','Couldn’t play it here: '+e.message));}

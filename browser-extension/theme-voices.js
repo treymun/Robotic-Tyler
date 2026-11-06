@@ -33,6 +33,7 @@
   const ch=v?.character?(v.characters||[]).find(c=>c.id===v.character):null,who=ch?.usable?ch.name+' (character voice)':v?.name;
   $('tvNow').textContent=$('tvFollow').checked?'Now: '+(v?who+' ('+(api.getTheme?.()||'steam')+' theme)':t):'Using the voice picked below'+(ch?.usable?': '+ch.name+' (character voice).':'.');
   if(ch&&!ch.usable)$('tvNow').textContent+=' · '+ch.name+' can’t be used ('+(v.characterProblem||ch.problem||'not available')+'), so '+v.name+' speaks';
+  else if(ch?.versionNote)$('tvNow').textContent+=' · '+ch.versionNote; // v2.42: an earlier version speaks (no voice supplement yet, or chosen)
   else if(v&&!ch?.usable&&v.status!=='ready'&&v.status!=='custom')$('tvNow').textContent+=' · '+v.statusLabel;
  }
  function render(){
@@ -96,7 +97,7 @@
    if(mine!==gen)return null; // Stop was pressed meanwhile: a late result is never played
    last={...r.clip,audio:r.audio};lastRoute=route;
    const c=r.clip,where=c.device==='cuda'?'graphics card':c.device==='windows'?'Windows speech':'processor';
-   $('tvClip').textContent=c.voiceName+' · '+c.seconds.toFixed(1)+' s'+(c.cached?' · from the cache':' · made in '+(c.ms/1000).toFixed(1)+' s on the '+where)+' · '+(c.mode==='native'?'the original Windows voice':c.mode==='light'?'Lightweight':'Quality')+(c.processed?' · with the voice’s radio/mask sound':'')+(c.status&&!['ready','custom'].includes(c.status)?' · '+c.status:'')+(c.fallback?' · '+c.fallback.name+' couldn’t be used ('+c.fallback.reason+'), so '+c.voiceName+' spoke':'');
+   $('tvClip').textContent=c.voiceName+' · '+c.seconds.toFixed(1)+' s'+(c.cached?' · from the cache':' · made in '+(c.ms/1000).toFixed(1)+' s on the '+where)+' · '+(c.mode==='native'?'the original Windows voice':c.mode==='light'?'Lightweight':'Quality')+(c.processed?' · with the voice’s radio/mask sound':'')+(c.status&&!['ready','custom'].includes(c.status)?' · '+c.status:'')+(c.fallback?' · '+c.fallback.name+' couldn’t be used ('+c.fallback.reason+'), so '+c.voiceName+' spoke':'')+(c.versionNote?' · '+c.versionNote:'');
    if(route){try{play(route,r.audio);}catch(e){status('Made it ('+c.seconds.toFixed(1)+' s), but: '+e.message);return last;}}
    status((c.fallback?c.fallback.name+' couldn’t be used ('+c.fallback.reason+'); '+c.voiceName+' spoke instead. ':'')+(route==='call'?'Playing into the call: “'+text.slice(0,60)+'”':route==='preview'?'Previewing here only (not in the call).':'Ready. Preview it or play it into the call.'));
    return last;
@@ -166,5 +167,5 @@
   await send({type:'voices:settings',values:{characters:{[theme]:id||''}}});await refresh();return {theme,character:id||''};
  }
  globalThis.TylerThemeVoices=Object.freeze({refresh,parse,pick,stop:stopAll,setCharacter,say:(text,theme)=>make('call',{text,theme}),state:()=>({busy,available:info.available,ready:!!info.status?.ready,theme:chosen(),
-  voices:voices.filter(v=>v.hasReference).map(v=>({theme:v.theme,name:v.name,...(v.characters?.length?{character:v.characters.some(c=>c.id===v.character&&c.usable)?v.character:'',characters:v.characters.filter(c=>c.usable).map(c=>({id:c.id,name:c.name}))}:{})}))})});
+  voices:voices.filter(v=>v.hasReference).map(v=>({theme:v.theme,name:v.name,...(v.characters?.length?{character:v.characters.some(c=>c.id===v.character&&c.usable)?v.character:'',characters:v.characters.filter(c=>c.usable).map(c=>({id:c.id,name:c.name,...(c.versionNote?{note:c.versionNote}:{})}))}:{})}))})});
 })();
