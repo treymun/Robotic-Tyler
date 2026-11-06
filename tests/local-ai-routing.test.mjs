@@ -158,3 +158,16 @@ test('v2.38.1: the owner\'s personality is repeated where the small model looks:
   try{const q=await command('ask who wins?');assert.equal(q.ok,true,q.error);assert.equal(q.text,'Arr, the tank, matey.');}finally{parts=old;}
  }finally{store.personality=before;}
 });
+
+test('v2.39.1: the owner\'s "Explicit adult content on this PC" reaches only replies from the AI on this PC, and only when it\'s on',async()=>{
+ reset();const before=store.roastMode;store.roastMode='unhinged';
+ try{
+  let r=await command('ask tell me a dirty joke');assert.equal(r.ok,true,r.error);
+  let sys=asked.at(-1).messages[0].content;assert.doesNotMatch(sys,/EXPLICIT ADULT CONTENT/,'off by default');assert.match(sys,/no graphic sexual descriptions/);
+  store.localExplicit=true;
+  r=await command('ask tell me a dirtier one');assert.equal(r.ok,true,r.error);
+  sys=asked.at(-1).messages[0].content;assert.match(sys,/EXPLICIT ADULT CONTENT \(the owner turned it on for the AI on this PC\)/);
+  assert.doesNotMatch(sys,/no graphic sexual descriptions/);assert.match(sys,/no slurs about race/);assert.match(sys,/nothing sexual about real people in the chat or anyone under 18/);
+  assert.ok(sys.startsWith(CHAT_RULES),'the chat rules and takeover protection still come first');
+ }finally{delete store.localExplicit;store.roastMode=before;}
+});

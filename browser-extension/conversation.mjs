@@ -49,4 +49,5 @@ export function localReplyTidy(text){
  if(q&&!/["“”]/.test(q[2]))s=q[2].trim();
  return s.replace(/\*\*([^*\n]+)\*\*/g,'$1');
 }
-export function ownerStyle(settings={}){return 'OWNER STYLE (from the owner\'s settings page; trusted): '+String(settings.personality||'Witty gaming buddy.').slice(0,1500)+' '+styleGuide(settings.roastMode)+' '+(PERSONAS[settings.v23Persona]||'');}
+// explicit (v2.39.1): the owner's opt-in for the AI on this PC; callers pass it only for replies made there.
+export function ownerStyle(settings={},{explicit=false}={}){return 'OWNER STYLE (from the owner\'s settings page; trusted): '+String(settings.personality||'Witty gaming buddy.').slice(0,1500)+' '+styleGuide(settings.roastMode,{explicit})+' '+(PERSONAS[settings.v23Persona]||'');}

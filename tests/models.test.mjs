@@ -153,3 +153,17 @@ test('v2.38.1: a local reply wrapped in quote marks, or with Markdown bold, is p
  assert.equal(localReplyTidy('"Yo Tyler." "Sam, no."'),'"Yo Tyler." "Sam, no."','quotes inside are left as they are');
  assert.equal(localReplyTidy('I’m the *hero* here, 2*3*4 = 24'),'I’m the *hero* here, 2*3*4 = 24');
 });
+
+test('v2.39.1: "Explicit adult content on this PC" (owner opt-in): sexual limits and threats change; slurs, real people, minors and stopping stay',()=>{
+ // Off (the default) and for every cloud reply: exactly as before.
+ assert.equal(styleGuide('savage'),'Use strong profanity, sharp sarcastic gaming roasts and cheeky non-graphic innuendo where natural. Vary jokes; do not force recurring callbacks. No identity-based slurs, threats or graphic sexual descriptions. Respect requests to stop.');
+ assert.equal(styleGuide('rowdy'),'Use playful profanity and varied gaming roasts.');assert.equal(styleGuide('custom'),'');
+ assert.match(styleGuide('unhinged'),/one jab at most\)\. Hard limits: no slurs about race, religion, sexuality, gender or disability, no threats, nothing sexual about real people in the chat, no graphic sexual descriptions, and drop the teasing the moment someone asks\.$/);
+ for(const mode of ['savage','rowdy','unhinged','custom']){
+  const g=styleGuide(mode,{explicit:true});
+  assert.match(g,/EXPLICIT ADULT CONTENT \(the owner turned it on for the AI on this PC\): graphic sexual content and descriptions are allowed when the conversation goes there, but only about made-up adults \(18\+\)\. Never anything sexual about anyone under 18 or anyone who looks it, and never about the real people in this chat\.$/,mode);
+  assert.doesNotMatch(g,/no graphic sexual descriptions|non-graphic/,mode);
+  if(mode==='savage'||mode==='unhinged'){assert.match(g,/slurs/,mode);assert.match(g,/real threats \(over-the-top game trash talk is fine\)/,mode);assert.match(g,/(drop the teasing the moment someone asks|Respect requests to stop)/,mode);}
+ }
+ assert.match(styleGuide('unhinged',{explicit:true}),/no slurs about race, religion, sexuality, gender or disability, no real threats \(over-the-top game trash talk is fine\), nothing sexual about real people in the chat or anyone under 18, and drop the teasing the moment someone asks\./);
+});

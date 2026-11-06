@@ -31,7 +31,7 @@ test('the theme setting is readable by the chat panel but only the settings page
  assert.deepEqual(await contentStorage(store,{action:'get',keys:['uiTheme']}),{values:{uiTheme:'classic'}});
  await assert.rejects(contentStorage(store,{action:'set',values:{uiTheme:'steam'}}),/not allowed/);
  const {settingsKeys,sanitizeSettings}=createRequire(import.meta.url)(path.join(ROOT,'app/guards.cjs'));
- assert.ok(settingsKeys.has('uiTheme'));assert.deepEqual(sanitizeSettings({uiTheme:'classic'}),{uiTheme:'classic'});
+ assert.ok(settingsKeys.has('uiTheme'));assert.deepEqual(sanitizeSettings({localExplicit:true}),{localExplicit:true},'v2.39.1: the explicit opt-in is saved on the desktop');assert.deepEqual(sanitizeSettings({uiTheme:'classic'}),{uiTheme:'classic'});
 });
 
 const THEMES=['steam',...fs.readdirSync(path.join(ROOT,'browser-extension/ui/themes')).filter(f=>f.endsWith('.css')).map(f=>f.slice(0,-4)).sort()];

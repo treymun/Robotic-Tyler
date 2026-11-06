@@ -14,7 +14,9 @@ const settingsKeys=new Set(['imageGen','veniceKey','quickSetup','personality','l
  // v2.19 where desktop voice runs: 'window' (the Steam chat window, default) or 'cable' (VB-CABLE helper).
  'desktopVoice','desktopMuteCall',
  // v2.16 name tag in chat messages (plain text, validated by chat-tag.js).
- 'chatTagEnabled','chatTagName']);
+ 'chatTagEnabled','chatTagName',
+ // v2.39.1 the owner's opt-in "Explicit adult content on this PC" (replies from the AI on this PC only).
+ 'localExplicit']);
 function sanitizeSettings(values){if(!values||typeof values!=='object'||Array.isArray(values))throw Error('Invalid settings');const result={};for(const [key,value]of Object.entries(values)){if(!settingsKeys.has(key))continue;if(JSON.stringify(value)?.length>20000)throw Error('Settings value is too large');if(key==='quickSetup'){result[key]=quickSetup(value);continue;}if(key==='speechEngine'){result[key]=['theme','kokoro'].includes(value)?value:'cloud';continue;}if(key==='voiceHearing'){result[key]=value==='local'?'local':'cloud';continue;}if(key==='kokoroVoice'){result[key]=typeof value==='string'&&/^[a-z]{2}_[a-z]{2,16}$/.test(value)?value:'am_michael';continue;}if(key==='aiProvider'){result[key]=['gemini','local'].includes(value)?value:'openrouter';continue;}if(key==='imageGen'){result[key]=imageGen(value);continue;}if(key==='veniceKey'){if(typeof value!=='string'||!/^[A-Za-z0-9_\-.]{16,200}$/.test(value))throw Error('Invalid Venice key');result[key]=value;continue;}result[key]=value;}return result;}
 // v2.34: chat image settings, through the same checks the extension uses (image-core.js).
 function imageGen(v){let I=globalThis.TylerImages;if(!I){try{require('./companion/image-core.js');}catch{require('../browser-extension/image-core.js');}I=globalThis.TylerImages;}return I.config(v);}

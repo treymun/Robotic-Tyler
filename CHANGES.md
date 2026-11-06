@@ -1,3 +1,19 @@
+# ROBOTIC TYLER v2.39.1: Explicit adult content on this PC (opt-in)
+
+## New
+- **Settings → AI & personality → Personality → Explicit adult content on this PC** (desktop app, off unless you turn it on). Only for replies from the AI on this PC (AI provider: This PC):
+  - Graphic sexual content about made-up adults is allowed when the conversation goes there (before, every style said "no graphic sexual descriptions").
+  - "No threats" becomes "no real threats": over-the-top game trash talk is fine.
+  - These stay whatever the setting: no slurs about race, religion, sexuality, gender or disability; nothing sexual about the real people in the chat or anyone under 18; Tyler stops teasing anyone who asks; and the chat-takeover protection.
+- Cloud AIs (OpenRouter, Google) never get the setting, even when it's on.
+- The personality builder's "edgy" line no longer adds its own "graphic sexual detail" rule (the roast style says it when the setting is off).
+
+## Tested
+- **Mocked:** every roast style with the setting off (exactly as before) and on; the real reply path with the AI on this PC (off by default; on: the explicit note, the remaining limits, the rules still first) and a cloud reply with the setting on (unchanged); the setting saved by the desktop app. Plus all unit and end-to-end tests and the desktop check. The switch was checked in desktop mode in the Steam, Pip-Boy and Windows XP themes.
+- **Not tested:** with the real model on this PC, and in a real Steam chat.
+
+---
+
 # ROBOTIC TYLER v2.39.0: Hearing and a voice on this PC
 
 ## New

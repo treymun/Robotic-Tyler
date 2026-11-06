@@ -2,7 +2,7 @@
 'use strict';
 const $=id=>document.getElementById(id);
 let noiseChanged=false;
-const fields=['aiProvider','personality','length','brain','geminiTextModel','themeStats','noiseLevel','roastMode','speechVoice','talkativeness','insideJokes','callbackGap','nicknameAliases','textSpeed','spendingCapUSD','streamAI','friendMemory','smartRouting','libraryAllowedIds','activityEnabled','activitySteamIds','fastSpeech','speechEngine','voiceHearing','kokoroVoice','voiceEngine','geminiVoice','geminiTtsModel','liveModel','liveVoice','liveInterrupt','liveSilenceMs','liveStartSensitivity','liveEndSensitivity','chatTagEnabled','chatTagName'];
+const fields=['aiProvider','localExplicit','personality','length','brain','geminiTextModel','themeStats','noiseLevel','roastMode','speechVoice','talkativeness','insideJokes','callbackGap','nicknameAliases','textSpeed','spendingCapUSD','streamAI','friendMemory','smartRouting','libraryAllowedIds','activityEnabled','activitySteamIds','fastSpeech','speechEngine','voiceHearing','kokoroVoice','voiceEngine','geminiVoice','geminiTtsModel','liveModel','liveVoice','liveInterrupt','liveSilenceMs','liveStartSensitivity','liveEndSensitivity','chatTagEnabled','chatTagName'];
 const sliderIds=['humorLevel','edgeLevel','helpLevel','chaosLevel'];
 const sliderLabels={humorLevel:['Dry','Light','High','Unhinged'],edgeLevel:['Soft','Spicy','Rowdy','Savage'],helpLevel:['Low','Balanced','Helpful','Coach mode'],chaosLevel:['Controlled','Loose','Chaotic','Gremlin']};
 const presetMap={
@@ -40,7 +40,7 @@ function composePersonality(){
   const lines=[];
   lines.push('Sound like a real gaming friend, not a corporate assistant.');
   lines.push(humor>70?'Use strong humor and punchy one-liners when natural.':humor>45?'Be witty and funny without forcing a joke every message.':'Keep humor light and selective.');
-  lines.push(edge>75?'Use heavy profanity and sharp roasts when it fits, but avoid identity-based slurs and graphic sexual detail.':edge>45?'Use playful profanity and rowdy banter when it fits.':'Keep profanity limited and more relaxed.');
+  lines.push(edge>75?'Use heavy profanity and sharp roasts when it fits, but avoid identity-based slurs.':edge>45?'Use playful profanity and rowdy banter when it fits.':'Keep profanity limited and more relaxed.');
   lines.push(help>70?'When someone asks for help, switch into a clear, practical, coach-like mode.':help>45?'Balance banter with helpful answers when needed.':'Prioritize quick banter over long explanations unless explicitly asked.');
   lines.push(chaos>70?'Let replies feel unpredictable, energetic, and slightly unhinged in a funny way.':chaos>45?'Allow some absurdity and playful derailment, but stay on topic enough to feel smart.':'Stay focused and controlled.');
   lines.push('Respect boundaries, read the room, and keep replies natural and conversational.');

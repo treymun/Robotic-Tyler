@@ -50,7 +50,7 @@ export function render(){
 }
 
 function request(action,extra={}){
- const values={personality:$('personality').value,roastMode:$('roastMode').value,length:$('length').value,v23Persona:$('v23Persona')?.value||''};
+ const values={personality:$('personality').value,roastMode:$('roastMode').value,length:$('length').value,v23Persona:$('v23Persona')?.value||'',localExplicit:$('localExplicit')?.checked===true};
  return {action,aiProvider:provider(),brain:$('brain').value,smartRouting:$('smartRouting').checked,geminiTextModel:$('geminiTextModel').value,values,...extra};
 }
 async function run(req){
