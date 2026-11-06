@@ -40,7 +40,11 @@ jobs:
           node tools/local-ai/speech-smoke.cjs "$env:RUNNER_TEMP\TylerLocalSpeech" app/local-ai/check-clip.wav | Tee-Object -FilePath "$env:RUNNER_TEMP\TylerLocalSpeech\smoke-out\1-node.log"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
       - name: Install Electron (for the next two steps)
-        run: npm install --no-audit --no-fund
+        # Electron 45's package fetches its executable on first use, not when it installs, so fetch it here.
+        run: |
+          npm install --no-audit --no-fund
+          node node_modules/electron/install.js
+          if (!(Test-Path node_modules\electron\dist\electron.exe)) { Write-Error 'electron.exe is missing'; exit 1 }
       - name: The same under Electron run as Node (engines started with Electron's executable)
         env:
           VOICE: ${{ inputs.voice }}
