@@ -15,6 +15,10 @@
 #
 # Voice data that is cached (the reference's speech codes and speaker embedding) is written as
 # safetensors, which holds only tensors and text, never code. Nothing is ever loaded with pickle.
+#
+# v2.41: a character voice's reference is a list of original clips (ref_audio: [paths]), joined here
+# 0.3 s apart (as the built-in references were made); its fingerprint is the SHA-256 of every clip in
+# order. gain_db sets a voice's level a few dB above or below the usual one.
 import sys, os, json, threading, queue, time, hashlib, re, gc, traceback, math
 # Diagnosing a hang: TYLER_WORKER_TRACE=<seconds> writes every thread's stack to stderr every <seconds>.
 if os.environ.get("TYLER_WORKER_TRACE", "").isdigit():
@@ -180,9 +184,24 @@ def sha256(path):
         for b in iter(lambda: f.read(1 << 20), b""): h.update(b)
     return h.hexdigest()
 
-def read_audio(path):
+def ref_paths(ref):
+    paths = ref if isinstance(ref, list) else [ref]
+    if not paths or len(paths) > 40 or not all(isinstance(p, str) and p for p in paths): raise Failure("bad_reference", "The voice's reference recordings are missing.")
+    for p in paths:
+        if not os.path.isfile(p): raise Failure("no_reference", "One of the voice's reference recordings is missing.")
+    return paths
+
+def ref_hash(ref):
+    paths = ref_paths(ref)
+    return sha256(paths[0]) if not isinstance(ref, list) else hashlib.sha256("|".join(sha256(p) for p in paths).encode()).hexdigest()
+
+def read_audio(ref):
     import librosa
-    w, sr = librosa.load(path, sr=24000, mono=True)
+    parts = []
+    for i, p in enumerate(ref_paths(ref)):
+        w, _ = librosa.load(p, sr=24000, mono=True)
+        parts += ([np.zeros(int(24000 * 0.3), np.float32)] if i else []) + [w.astype(np.float32)]
+    w = np.concatenate(parts)
     if len(w) < 24000 * 0.5: raise Failure("short_reference", "The voice's reference recording is shorter than half a second.")
     return w.astype(np.float32), 24000
 
@@ -191,11 +210,11 @@ def prompt_for(req):
     if model is None: raise Failure("not_loaded", "The voice model isn't loaded.")
     ref, text, cache = req["ref_audio"], (req.get("ref_text") or "").strip(), req.get("cache")
     xvec = bool(req.get("xvector_only")) or not text
-    ref_hash = sha256(ref)
-    key = json.dumps([model_info["dir"], ref_hash, text, xvec])
+    rhash = ref_hash(ref)
+    key = json.dumps([model_info["dir"], rhash, text, xvec])
     if key in prompts: return prompts[key], True
     from qwen_tts.inference.qwen3_tts_model import VoiceClonePromptItem
-    meta = {"format": "tyler-voice-prompt-1", "model": os.path.basename(model_info["dir"].rstrip("/\\")), "ref_sha256": ref_hash, "ref_text": text, "xvector_only": str(xvec)}
+    meta = {"format": "tyler-voice-prompt-1", "model": os.path.basename(model_info["dir"].rstrip("/\\")), "ref_sha256": rhash, "ref_text": text, "xvector_only": str(xvec)}
     item = None
     if cache and os.path.exists(cache):
         try:
@@ -293,12 +312,13 @@ def speak(req):
     gap = np.zeros(int(sr_out * 0.14), np.float32); joined = []
     for k, w in enumerate(audio): joined += ([gap] if k else []) + [w]
     w = np.concatenate(joined) if joined else np.zeros(1, np.float32)
-    dry = level(w); out = req["out"]; os.makedirs(os.path.dirname(out), exist_ok=True)
+    gain = max(-12.0, min(6.0, float(req.get("gain_db") or 0)))
+    dry = level(w, target=-19.0 + gain); out = req["out"]; os.makedirs(os.path.dirname(out), exist_ok=True)
     write(out, dry, sr_out)
     result = {"out": out, "seconds": round(len(dry) / sr_out, 2), "ms": int((time.time() - t0) * 1000), "chunks": len(pieces), "retries": retries}
     fx = req.get("effects")
     if fx and req.get("out_fx"):
-        write(req["out_fx"], level(effects(dry, sr_out, fx)), sr_out); result["out_fx"] = req["out_fx"]
+        write(req["out_fx"], level(effects(dry, sr_out, fx), target=-19.0 + gain), sr_out); result["out_fx"] = req["out_fx"]
     return result
 
 def fast_take(piece, item, language, max_tokens, job):

@@ -101,3 +101,31 @@ test('repeat protection: if the second try repeats too, an automatic turn stays 
  assert.deepEqual(speechInputs,[],'nothing spoken');
  assert.equal(chatBodies.length,2,'no third request');
 });
+
+test('repeat protection (v2.41): a reply that keeps opening the same way is asked again, and the opening is cut if it comes back',async()=>{
+ nextStreams=[['Fuck off, ','that rotate was actually clean.']];chatBodies.length=0;
+ const first=await voiceTurn('turn-7');
+ assert.equal(first.text,'Fuck off, that rotate was actually clean.');
+ nextStreams=[['Fuck off, ','you got lucky with that spray.'],['Fuck off, ','the eco round still worked out fine.']];sent.length=0;speechInputs.length=0;chatBodies.length=0;
+ const r=await voiceTurn('turn-8');
+ assert.equal(r.ok,true,r.error);
+ assert.equal(chatBodies.length,2,'one retry');
+ assert.ok(chatBodies[1].messages.some(m=>m.role==='system'&&/keep opening with "fuck off"/.test(m.content)),'the retry names the opening');
+ assert.equal(r.text,'The eco round still worked out fine.','the repeated opening is cut, never the whole reply');
+ assert.deepEqual(speechInputs,['The eco round still worked out fine.']);
+});
+
+test('repeat protection (v2.41): a reply stuck on one word is asked again, then mended or skipped',async()=>{
+ nextStreams=[['fuck fuck fuck fuck ','fuck that round.'],['Yeah ','yeah yeah yeah yeah, that round was rough.']];sent.length=0;speechInputs.length=0;chatBodies.length=0;
+ const r=await voiceTurn('turn-9');
+ assert.equal(r.ok,true,r.error);
+ assert.equal(chatBodies.length,2,'one retry');
+ assert.ok(chatBodies[1].messages.some(m=>m.role==='system'&&/stuck repeating the same word/.test(m.content)),'the retry says it got stuck');
+ assert.equal(r.text,'Yeah yeah, that round was rough.');
+ assert.equal(sent.some(m=>m.source==='tyler-early-audio'&&m.requestId==='turn-9'),false,'the stuck first try was never spoken');
+ nextStreams=[['fuck shit fuck shit ','fuck shit fuck shit fuck shit fuck shit damn.'],['fuck shit fuck shit fuck shit ','fuck shit fuck shit fuck shit damn it.']];speechInputs.length=0;chatBodies.length=0;
+ const quiet=await voiceTurn('turn-10');
+ assert.equal(quiet.ignored,true);assert.match(quiet.reason,/stuck repeating one word/);
+ assert.deepEqual(speechInputs,[],'nothing spoken');
+ assert.equal(chatBodies.length,2,'no third request');
+});

@@ -38,5 +38,5 @@ while True:
         if stopped: send({"id": rid, "ok": False, "code": "cancelled", "error": "Stopped."}); continue
         tone(r["out"], 0.4)
         if r.get("out_fx"): tone(r["out_fx"], 0.4)
-        send({"id": rid, "ok": True, "out": r["out"], "out_fx": r.get("out_fx"), "seconds": 0.4, "ms": 150, "chunks": 1, "retries": 0, "seen": {"ref": os.path.basename(r.get("ref_audio", "")), "text": r.get("ref_text"), "fx": bool(r.get("effects"))}}); continue
+        send({"id": rid, "ok": True, "out": r["out"], "out_fx": r.get("out_fx"), "seconds": 0.4, "ms": 150, "chunks": 1, "retries": 0, "seen": {"ref": [os.path.basename(x) for x in r["ref_audio"]] if isinstance(r.get("ref_audio"), list) else os.path.basename(r.get("ref_audio", "")), "text": r.get("ref_text"), "xvector_only": bool(r.get("xvector_only")), "gain_db": r.get("gain_db", 0), "fx": bool(r.get("effects"))}}); continue
     send({"id": rid, "ok": False, "code": "unknown_op", "error": "Unknown request."})

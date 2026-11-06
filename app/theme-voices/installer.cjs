@@ -306,10 +306,10 @@ class Installer{
   problems.push(...engineProblems,...damagedModels.map(d=>(d.missing?'Missing model file ':'Damaged model file ')+d.model+'/'+d.path));
   return {ok:!problems.length,problems:problems.slice(0,40),count:problems.length,engineOk:!engineProblems.length,damagedModels};
  }
- /** Removes the engine and models. Custom voices, saved clips and settings stay unless asked. */
+ /** Removes the engine and models. Custom voices, imported character voices (v2.41), saved clips and settings stay unless asked. */
  async remove({everything=false}={}){
   for(const name of fs.existsSync(this.dir)?fs.readdirSync(this.dir):[]){
-   if(!everything&&['custom-voices','saved'].includes(name))continue;
+   if(!everything&&['custom-voices','saved','characters'].includes(name))continue;
    await rmr(path.join(this.dir,name));
   }
  }

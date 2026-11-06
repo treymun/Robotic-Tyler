@@ -5,7 +5,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {similarity,nearDuplicate,repeatCheck,repeatHint,retryNote} from '../browser-extension/repeat-guard.mjs';
+import {similarity,nearDuplicate,repeatCheck,repeatHint,retryNote,openerRut,trimOpener,stutter,unstutter} from '../browser-extension/repeat-guard.mjs';
 const H=list=>list.map(content=>({role:'assistant',content}));
 
 const REWORDED=[
@@ -63,10 +63,37 @@ test('the rut hint names reused openings and phrases, and stays out of the way o
 
 test('the background uses repeat protection for every text model, with one retry at most',()=>{
  const bg=fs.readFileSync(new URL('../browser-extension/background.js',import.meta.url),'utf8');
- assert.match(bg,/import \{repeatCheck,repeatHint,retryNote\} from '\.\/repeat-guard\.mjs'/);
+ assert.match(bg,/import \{repeatCheck,repeatHint,retryNote,stutter,trimOpener,unstutter\} from '\.\/repeat-guard\.mjs'/);
+ assert.match(bg,/retryNote\(draft,check\.like,check\.opener\|\|'',check\.stutter===true\)/,'the retry names the opening rut or the stuck word');
  assert.match(bg,/const rut=repeatHint\(history\);if\(rut\)request\.messages\[0\]\.content\+=' '\+rut;/);
  const block=bg.slice(bg.indexOf('// Repeat protection: a reply'),bg.indexOf("console.info('[ROBOTIC TYLER] Repeat protection"));
  assert.equal(block.match(/await generate\(/g).length,1,'one retry, never a loop');
  assert.doesNotMatch(block,/model:|brain|geminiTextModel/,'the retry uses the same model and provider');
  assert.match(bg,/repeatCheck\(candidate,history\)\.repeat/,'a repeated first sentence is not spoken early');
+});
+
+test('v2.41: an opening rut ("Fuck off, …" on almost every Venice reply) counts as a repeat; the retry names it; the trim is a fallback',()=>{
+ const hist=H(['Fuck off, Derpo, your aim is a rumor at best.','Fuck off with that weak bait, nobody asked.','Nah, the AWP is overrated anyway.','Fuck off, Randy, go touch grass for once.']);
+ const r=repeatCheck('Fuck off, Sam, that clutch was pure luck and you know it.',hist);
+ assert.equal(r.repeat,true);assert.equal(r.opener,'fuck off');assert.equal(r.like,'Fuck off, Randy, go touch grass for once.');
+ assert.match(retryNote('x',r.like,r.opener),/keep opening with "fuck off".*starting with different words \(not "fuck off" or a variation of it\), in your usual style/);
+ assert.equal(repeatCheck('Honestly Sam, that clutch was pure luck and you know it.',hist).repeat,false,'a different opening is fine');
+ // The same opening as the previous reply, or as two of the last four; never openings of common words only.
+ assert.equal(openerRut('Bro what are you even doing out there',['Bro you are cooked.','Nah fam.']) ,'');
+ assert.equal(openerRut('Bro you are cooked again tonight',['Bro you are cooked.']),'bro you');
+ assert.equal(openerRut('You are so bad at this game honestly',['You are cooked, man.','You are not ready.']),'','"you are" is common words only');
+ assert.equal(openerRut('lol ok',['lol ok']),'','short reactions are left alone');
+ // The fallback: the opening dropped only when it is a clause of its own and enough is left.
+ assert.equal(trimOpener('Fuck off, Sam, that clutch was pure luck and you know it.','fuck off'),'Sam, that clutch was pure luck and you know it.');
+ assert.equal(trimOpener('Fuck off — your aim is a myth, Derpo, seriously.','fuck off'),'Your aim is a myth, Derpo, seriously.');
+ assert.equal(trimOpener('Fuck off with that weak bait, nobody asked.','fuck off'),'','part of the sentence: left alone');
+ assert.equal(trimOpener('Fuck off, lol.','fuck off'),'','nothing much left');
+});
+
+test('v2.41: a reply stuck on one word ("fuck fuck fuck …") is caught, even with no history; the retry says so; runs are cut to two as a fallback',()=>{
+ for(const t of ['fuck fuck fuck fuck you Sam','Fuck you, fuck this lobby, fuck your aim, fuck the bots, fuck everything about this fucking fuck game','nice nice nice nice nice'])assert.equal(stutter(t),true,t);
+ for(const t of ['Fuck off, Sam, that clutch was pure luck and you know it.','lol lol lol','gg ez, you got clapped so hard it is not even funny honestly, fuck','What a round. Fuck yes, that was clean.'])assert.equal(stutter(t),false,t);
+ const r=repeatCheck('fuck fuck fuck fuck fuck you',[]);assert.equal(r.repeat,true);assert.equal(r.stutter,true);
+ assert.match(retryNote('x','', '',true),/stuck repeating the same word over and over.*real sentences/);
+ assert.equal(unstutter('Fuck fuck FUCK fuck, you are so bad fuck fuck fuck.'),'Fuck fuck, you are so bad fuck fuck.');
 });

@@ -44,8 +44,8 @@
 
  // ── Status tally + session-only signal trail (never logs chat text) ─────
  let previousLabel;
- function traceState(label){
-  if(label===previousLabel)return;previousLabel=label;
+ function traceState(label,note=false){
+  if(!note){if(label===previousLabel)return;previousLabel=label;} // a note (v2.41, api.trace) isn't a state change
   const list=$('trail');list.querySelector('.trail-empty')?.remove();
   const line=document.createElement('li'),badge=document.createElement('b'),time=document.createElement('time');
   badge.textContent=label;time.textContent=new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});
@@ -372,6 +372,8 @@
     const enc=r=>r?.dtls?' · encryption: '+(r.dtls.state||'unknown')+(r.dtls.role?' as '+r.dtls.role:'')+(r.dtls.version?', '+r.dtls.version:'')+(r.dtls.cipher?', '+r.dtls.cipher:'')+(r.route?' · route: '+r.route:''):'';
     const counters=ice=>ice?' · '+ice.checks+' connection check'+(ice.checks===1?'':'s')+' sent, '+ice.answers+' answered (this PC: '+(ice.local.join(', ')||'none')+'; Steam: '+(ice.remote.join(', ')||'none')+'; pairs: '+(Object.entries(ice.states||{}).map(([k,n])=>n+' '+k).join(', ')||'none')+')'+enc(ice):'';
     const recent=v.failure&&Date.now()-v.failure.at<10*60000?v.failure:null;
+    // v2.41: who Auto routing counts in the call, and where that number came from (no names).
+    {const occ=globalThis.TylerCompanion.getOccupancy?.();if(occ)row((occ.people===null?'? ':'✓ ')+'Who is in the call (Auto routing)',occ.text.replace(/\.?$/,'.'));}
     if(call&&call.state!=='unavailable'){
      row(call.state==='connected'?'✓ In the Steam voice call':call.state==='joining'||call.state==='failed'&&call.roomId?'! Steam is still connecting the call':'? Not in a voice call',
       call.state==='connected'?(call.room||'Voice')+(call.people?' · '+call.people+' other'+(call.people===1?'':'s'):' · nobody else yet')+'.':
@@ -443,7 +445,7 @@
   getMount:()=>$('automaticMount'),getFeatureMount:()=>$('featureMount'),getSoundboardMount:()=>$('soundboardMount'),getSetupMount:()=>$('automaticSetupMount'),
   getQuickMount:()=>$('quickMount'),getQuickOptions:()=>$('quickOptions'),getStyleSheet:()=>sheet,themeElement,getTheme:()=>uiTheme,
   locateChat,chooseTarget,prepareBridge,getDiscovery:()=>discovery,setChatHint:v=>{chatHint=['text','voice-room'].includes(v)?v:null;},getChatKind:()=>composer?.isConnected?TylerSelection.kind(composer):null,getVoiceState:()=>voiceReport,getChatScope:()=>TylerSetup.scope(region,document),request,showTab,setActivity,
-  notify,confirm:confirmBox,emit,
+  notify,confirm:confirmBox,emit,trace:text=>traceState(String(text||'').slice(0,160),true),
   // Theme features (theme-features.js): the panel, live state and a subscription. Isolated world only.
   ui:{root,panel,host,onUI:fn=>{uiListeners.add(fn);return ()=>uiListeners.delete(fn);},state:()=>({state:$('activityCard').dataset.state,label:$('activityLabel').textContent,text:$('activity').textContent,tab:currentTab,hud:{...hudState},mini:host.classList.contains('mini'),theme:uiTheme,owner})},
   isOwner:()=>owner,setAutomaticActive:value=>{autoActive=value;if(value)userPaused=false;},isAiPaused:()=>userPaused,isAutomaticActive:()=>autoActive,reportTurn,getIncoming:()=>incomingReport,getComposer:()=>composer,getRegion:()=>region,getSample:()=>sampleElement,getEpoch:()=>epoch,

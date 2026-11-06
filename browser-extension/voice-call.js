@@ -14,7 +14,7 @@
  const JOIN_MS=25000,LEAVE_MS=12000,FAST=1000,SLOW=3000;
  const clean=(s,n)=>String(s??'').replace(/[\u0000-\u001f\u007f-\u009f]/g,' ').replace(/\s+/g,' ').trim().slice(0,n);
  let S={state:'unavailable',room:'',roomId:'',groupId:'',people:0,error:'',reason:'Connect Tyler to the group chat first.',rooms:[],steam:null,since:Date.now()};
- let pending=null,timer=0,polling=false,remembered={},last=null;
+ let pending=null,timer=0,polling=false,remembered={},last=null,lastAt=0;
  const listeners=new Set();
  void globalThis.TylerStorage?.get?.(['voiceRooms']).then(v=>{remembered=v?.voiceRooms&&typeof v.voiceRooms==='object'?v.voiceRooms:{};}).catch(()=>{});
  function anchor(){const r=api.getRegion?.(),n=api.getSample?.();return r?.isConnected&&n?.isConnected&&r.contains(n)?n:null;}
@@ -24,15 +24,29 @@
   const pub=state();for(const fn of listeners){try{fn(pub);}catch{}}api.emit?.('voice-call',pub);render();
  }
  /** What the panel, the phone and the full check show. */
- function state(){return {state:starting&&S.state!=='connected'?'joining':S.state,room:S.room,roomId:S.roomId,groupId:S.groupId,people:S.people,elsewhere:!!last?.elsewhere,error:S.error,reason:S.reason,since:S.since,pending:!!pending||starting,rooms:S.rooms.map(r=>({id:r.id,name:r.name,count:r.count})),steamState:S.steam};}
+ function state(){return {state:starting&&S.state!=='connected'?'joining':S.state,room:S.room,roomId:S.roomId,groupId:S.groupId,people:S.people,elsewhere:!!last?.elsewhere,error:S.error,reason:S.reason,since:S.since,pending:!!pending||starting,rooms:S.rooms.map(r=>({id:r.id,name:r.name,count:r.count})),steamState:S.steam,occupancy:occupancy()};}
+ // v2.41: who else is in this group's call, for Auto routing (automatic.js), from Steam's latest answer
+ // itself, not from the card above (a failed join stays on the card for two minutes after Steam is out of
+ // the call; Join/Leave in flight show "Joining…"/"Leaving…"). Known: Steam says the bot is fully connected
+ // in this group's voice channel (the others in it), or the bot is in no call (0). Otherwise unknown, with
+ // why: "connecting" (Steam is still connecting the bot), "elsewhere" (a call outside this group) or
+ // "unavailable" (no answer from Steam in the last 10 s, or Tyler isn't connected to this group's chat).
+ function occupancy(){
+  if(!last||Date.now()-lastAt>10000)return {known:false,people:null,why:'unavailable'};
+  if(last.elsewhere)return {known:false,people:null,why:'elsewhere'};
+  const here=last.rooms.find(r=>r.id===last.activeRoom)||null;
+  if(!here)return {known:true,people:0,why:'not-in-call'};
+  if(!(here.self&&last.connected===true))return {known:false,people:null,why:'connecting'};
+  const people=Math.max(0,here.count-1);return {known:true,people,why:people?'in-call':'alone'};
+ }
  // One look at Steam: the group's voice channels, which one Steam's call is in, and its state.
  async function observe(logs=false){
   const node=anchor();
-  if(!node){set({state:pending?S.state:'unavailable',reason:'Connect Tyler to the group chat first.',room:'',people:0});return null;}
-  if(api.isOwner?.()===false){set({state:'unavailable',reason:'Another tab runs the bot. Use this tab instead first.',room:'',people:0});return null;}
+  if(!node){last=null;set({state:pending?S.state:'unavailable',reason:'Connect Tyler to the group chat first.',room:'',people:0});return null;}
+  if(api.isOwner?.()===false){last=null;set({state:'unavailable',reason:'Another tab runs the bot. Use this tab instead first.',room:'',people:0});return null;}
   let v;try{v=await globalThis.TylerSteamChat.request(node,'voice-state',{logs});}
   catch(e){if(!pending)set({state:'unavailable',reason:clean(e.message,160)||'Steam chat controls did not answer.'});return null;}
-  last=v;const here=v.rooms.find(r=>r.id===v.activeRoom)||null;
+  last=v;lastAt=Date.now();const here=v.rooms.find(r=>r.id===v.activeRoom)||null;
   const connected=!!here&&here.self&&v.connected===true,connecting=!!here&&!connected;
   if(connected&&v.groupId&&remembered[v.groupId]!==here.id){remembered={...remembered,[v.groupId]:here.id};void globalThis.TylerStorage?.set?.({voiceRooms:remembered}).catch(()=>{});}
   const base={groupId:v.groupId,rooms:v.rooms,steam:v.state,room:here?.name||'',roomId:here?.id||'',people:here?Math.max(0,here.count-(here.self?1:0)):0,reason:''};

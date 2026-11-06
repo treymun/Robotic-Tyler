@@ -7,12 +7,16 @@
 // worker closes after the idle time the owner picks, which gives back all of its memory.
 // Nothing here changes the mode or the voice by itself: a request that can't run as asked fails
 // with the reason (for example, not enough free graphics memory) instead of using something else.
+//
+// v2.41: optional character voices. Each theme remembers the character picked for it (settings.characters,
+// theme → character id; none means the theme's own voice). The theme and the character are both taken
+// when a request starts, so a message, and every part of one spoken reply, keeps one speaker.
 const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),crypto=require('node:crypto'),{EventEmitter}=require('node:events');
 const sapi=require('./sapi.cjs');
-const {Installer,plan,LOCK}=require('./installer.cjs'),{WorkerHost}=require('./worker.cjs'),{Voices,THEMES,STATUS}=require('./voices.cjs'),hardware=require('./hardware.cjs');
+const {Installer,plan,LOCK}=require('./installer.cjs'),{WorkerHost}=require('./worker.cjs'),{Voices,THEMES,STATUS,CHARACTER_ID}=require('./voices.cjs'),hardware=require('./hardware.cjs');
 const GB=1024**3;
 const MODES={quality:{model:'quality',label:'Quality',about:'Qwen3-TTS 1.7B: the closest match to each voice.'},light:{model:'light',label:'Lightweight',about:'Qwen3-TTS 0.6B: less graphics memory, a little less like each voice.'}};
-const DEFAULTS={mode:null,device:'auto',engine:'standard',idleMinutes:5,followTheme:true,override:'',processed:true,nativeVoices:true,chat:false,chatAccess:'everyone',chatAllowed:'',chatCooldown:20,maxChars:400};
+const DEFAULTS={mode:null,device:'auto',engine:'standard',idleMinutes:5,followTheme:true,override:'',processed:true,nativeVoices:true,chat:false,chatAccess:'everyone',chatAllowed:'',chatCooldown:20,maxChars:400,characters:{},builtinVersion:{}};
 const MAX_QUEUE=4,CACHE_LIMIT=300*1024**2,CHECK_LINE='Voice check. Theme voices are ready.';
 
 class ThemeVoices extends EventEmitter{
@@ -25,11 +29,11 @@ class ThemeVoices extends EventEmitter{
   * @param {Function} o.setSettings  async (object) => void
   * @param {Function} [o.theme]  async () => the active theme id
   */
- constructor({dataDir,appDir,fetch,getSettings,setSettings,theme=async()=>'steam',log=()=>{},python=null,detect=hardware.detect,freemem=os.freemem}){
+ constructor({dataDir,appDir,fetch,getSettings,setSettings,theme=async()=>'steam',log=()=>{},python=null,detect=hardware.detect,freemem=os.freemem,catalogFile}){
   super();Object.assign(this,{dir:dataDir,appDir,getSettingsRaw:getSettings,setSettingsRaw:setSettings,activeTheme:theme,log,devPython:python,detectFn:detect,freemem});
   fs.mkdirSync(dataDir,{recursive:true});
   this.installer=new Installer({dir:dataDir,fetch,workerDir:path.join(appDir,'worker'),log});
-  this.voices=new Voices({builtinDir:path.join(appDir,'voices'),dataDir});
+  this.voices=new Voices({builtinDir:path.join(appDir,'voices'),dataDir,...(catalogFile?{catalogFile}:{})});
   this.queue=[];this.active=null;this.worker=null;this.loaded=null;this.idleTimer=null;this.hw=null;this.installJob=null;this.lastClip=null;this.lastError=null;this.seq=0;
   this.cacheDir=path.join(dataDir,'cache','clips');this.promptDir=path.join(dataDir,'cache','voices');
  }
@@ -45,6 +49,14 @@ class ThemeVoices extends EventEmitter{
   if(changes.chatAccess!==undefined)next.chatAccess=changes.chatAccess==='selected'?'selected':'everyone';
   if(changes.chatAllowed!==undefined)next.chatAllowed=String(changes.chatAllowed||'').split(/[\s,]+/).filter(id=>/^7656119\d{10}$/.test(id)).slice(0,100).join('\n');
   if(changes.chatCooldown!==undefined){const n=Number(changes.chatCooldown);next.chatCooldown=[0,10,20,30,60,120,300].includes(n)?n:20;}
+  // v2.41: the character picked for each theme ('' = the theme's own voice). Only the themes named change.
+  if(changes.characters&&typeof changes.characters==='object'){const c={...(s.characters&&typeof s.characters==='object'?s.characters:{})};
+   for(const [t,id] of Object.entries(changes.characters).slice(0,30))if(THEMES.includes(t)){if(id===''||id===null)delete c[t];else if(CHARACTER_ID.test(String(id)))c[t]=String(id);}
+   next.characters=c;}
+  // v2.41: an improved built-in voice can be set back to its earlier version (its baseline) per theme.
+  if(changes.builtinVersion&&typeof changes.builtinVersion==='object'){const b={...(s.builtinVersion&&typeof s.builtinVersion==='object'?s.builtinVersion:{})};
+   for(const [t,n] of Object.entries(changes.builtinVersion).slice(0,30))if(THEMES.includes(t)){const k=Number(n);if(!n)delete b[t];else if(Number.isInteger(k)&&k>0&&k<100)b[t]=k;}
+   next.builtinVersion=b;}
   await this.setSettingsRaw(next);this.scheduleIdle(next);this.emitStatus();return next;
  }
  async hardware(refresh=false){if(!this.hw||refresh||Date.now()-this.hw.at>60000)this.hw=await this.detectFn(this.dir);return this.hw;}
@@ -80,7 +92,14 @@ class ThemeVoices extends EventEmitter{
    lastClip:this.lastClip?{id:this.lastClip.id,seconds:this.lastClip.seconds,voice:this.lastClip.voiceName,text:this.lastClip.text.slice(0,80)}:null};
  }
  emitStatus(){this.status().then(s=>this.emit('status',s)).catch(()=>{});}
- voiceList(){return this.voices.list();}
+ async voiceList(){const s=await this.settings();return this.voices.list({characters:s.characters||{}});}
+ /** The voice for theme + character, as a request starting now would use it (v2.41). */
+ async voiceFor(theme,character){const s=await this.settings();const v=this.voices.voiceFor(theme,character,{version:s.builtinVersion?.[theme]});return v;}
+ /** The theme and character a request starting now would use (Tyler's spoken replies pin this once per reply). */
+ async resolve({theme,character}={}){const t=await this.resolveTheme(theme||null),s=await this.settings();return {theme:t,character:typeof character==='string'?character:(s.characters?.[t]||'')};}
+ /** Imports the owner's character voice pack (its folder or ZIP). */
+ async importCharacters(source,onProgress){const r=await this.voices.characters.import(source,{onProgress});this.emitStatus();return r;}
+ removeCharacters(){this.voices.characters.remove();this.emitStatus();}
  // ── install, repair, remove ──────────────────────────────────────────────
  async install({mode,both=false,offline=[],device,engine,runtime,models}={}){
   if(this.installJob)throw Error('Theme voices are already being installed.');
@@ -192,13 +211,14 @@ class ThemeVoices extends EventEmitter{
   const t=await this.activeTheme();return THEMES.includes(t)?t:'steam';
  }
  /** Queue a voice message. Resolves with the finished clip ({id,file,seconds,…}). */
- async speak({text,theme,mode,purpose='call',fresh=false,signal}={}){
+ async speak({text,theme,character,mode,purpose='call',fresh=false,signal}={}){
   const s=await this.settings(),clean=String(text||'').replace(/\s+/g,' ').trim();
   // Tyler's own spoken replies (v2.36) may be longer than a typed message (up to 800 characters).
   const limit=purpose==='reply'?800:s.maxChars;
   if(!clean)throw Error('Type something for Tyler to say.');if(clean.length>limit)throw Error('That’s too long for one voice message ('+clean.length+' characters; '+limit+' at most).');
-  const voice=await this.resolveTheme(theme);
-  return this.generate({text:clean,theme:voice,mode:mode||s.mode||(await this.status()).mode,purpose,noCache:fresh,seed:fresh?1+Math.floor(Math.random()*1e6):1,signal});
+  // The theme and the character are taken now, so a change meanwhile doesn't alter a message on its way.
+  const who=await this.resolve({theme,character}),v=await this.voiceFor(who.theme,who.character);
+  return this.generate({text:clean,theme:who.theme,character:who.character,voice:v,mode:mode||s.mode||(await this.status()).mode,purpose,noCache:fresh,seed:fresh?1+Math.floor(Math.random()*1e6):1,signal});
  }
  generate(job){
   if(job.signal?.aborted)return Promise.reject(Object.assign(Error('Stopped.'),{code:'cancelled'}));
@@ -226,7 +246,7 @@ class ThemeVoices extends EventEmitter{
   finally{this.active=null;this.emitStatus();this.scheduleIdle(await this.settings());if(this.queue.length)setImmediate(()=>void this.pump());}
  }
  async run(job){
-  const v=this.voices.get(job.theme);if(!v)throw Error('Unknown voice.');
+  const v=job.voice||await this.voiceFor(job.theme,job.character);if(!v)throw Error('Unknown voice.');
   if(!v.refPath)throw Object.assign(Error((v.name||job.theme)+': '+(v.statusNote||STATUS[v.status]||'no reference recording.')),{code:'no_reference'});
   const s=await this.settings(),mode=MODES[job.mode]?job.mode:'quality';
   const vkey=this.voices.key(v),fx=s.processed&&v.effects?v.effects:null;
@@ -236,7 +256,7 @@ class ThemeVoices extends EventEmitter{
   if(job.cancelled)throw Object.assign(Error('Stopped.'),{code:'cancelled'});
   if(this.installJob&&job.purpose!=='check')throw Object.assign(Error('Theme voices are being installed. Try again when it’s done.'),{code:'installing'});
   // Microsoft Sam and Mary: the real Windows voice when this PC has it (closer than a clone, and instant).
-  if(v.native?.sapi&&s.nativeVoices!==false&&!v.custom){
+  if(v.native?.sapi&&s.nativeVoices!==false&&!v.custom&&!v.characterVoice){
    const n=await sapi.find(v.native.sapi).catch(()=>null);
    if(n){const t0=Date.now(),file=path.join(this.cacheDir,key+'-sapi.wav');if(!job.noCache&&fs.existsSync(file))return this.finish(job,v,{file,cached:true,ms:0,seconds:wavSeconds(file),mode:'native',device:'windows',native:n.name});
     await sapi.speak(n.name,job.text,file);if(job.cancelled)throw Object.assign(Error('Stopped.'),{code:'cancelled'});return this.finish(job,v,{file,cached:false,ms:Date.now()-t0,seconds:wavSeconds(file),mode:'native',device:'windows',native:n.name});}
@@ -248,14 +268,14 @@ class ThemeVoices extends EventEmitter{
   const dry=out.replace(/\.wav$/,fx?'-dry.wav':'.wav');
   this.emit('progress',{id:job.id,phase:'speaking',text:job.text.slice(0,60),voice:v.name});
   const r=await w.request('speak',{text:job.text,ref_audio:v.refPath,ref_text:v.xvectorOnly?'':(v.transcript||''),xvector_only:!!v.xvectorOnly||!v.transcript,cache:path.join(this.promptDir,vkey+'-'+mode+'.safetensors'),
-   out:dry,out_fx:fx?out:null,effects:fx,seed:job.seed||1,language:v.language||'English'},
+   out:dry,out_fx:fx?out:null,effects:fx,seed:job.seed||1,language:v.language||'English',gain_db:v.volume||0},
    {timeout:Math.min(20*60000,60000+expected*rtf*3000),onProgress:p=>this.emit('progress',{id:job.id,phase:'speaking',chunk:p.chunk,chunks:p.chunks,step:p.step,steps:p.steps,voice:v.name})});
   if(job.cancelled)throw Object.assign(Error('Stopped.'),{code:'cancelled'});
   this.pruneCache();
   return this.finish(job,v,{file:fx?r.out_fx:r.out,dry:fx?r.out:null,cached:false,ms:r.ms,seconds:r.seconds,mode,device:loaded.device,retries:r.retries,processed:!!fx});
  }
  finish(job,v,r){
-  const clip={id:job.id,text:job.text,theme:job.theme,voiceName:v.name,status:v.status,custom:!!v.custom,...r};
+  const clip={id:job.id,text:job.text,theme:job.theme,character:v.character||null,voiceName:v.name,status:v.status,custom:!!v.custom,fallback:v.fallback||null,...r};
   if(job.purpose!=='check')this.lastClip=clip;return clip;
  }
  /** Stops the voice being made and empties the queue. */

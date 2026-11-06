@@ -1,6 +1,9 @@
 // Settings → Voice → Theme voices (v2.35, desktop app). Install, repair and remove the local voice
 // engine; choose Quality or Lightweight; test, hear and replace each theme's voice. Everything heavy
 // happens in the desktop app's main process (app/theme-voices); this page only shows it.
+// v2.41: Character voices: import the owner's character voice pack, pick a character per theme (the
+// theme's own voice stays the default), and hear its original recording or new generated speech.
+// An improved built-in voice can be set back to its earlier version.
 (() => {
  'use strict';
  const root=document.getElementById('theme-voices'),tv=window.tylerSettings?.voices;if(!root||!tv)return;
@@ -61,7 +64,7 @@
   $('tvRemoveQuality').textContent='Remove the Quality model'+(models.quality?' ('+gb(models.quality.bytes)+')':'');$('tvRemoveLight').textContent='Remove the Lightweight model'+(models.light?' ('+gb(models.light.bytes)+')':'');
   for(const id of ['tvCheck','tvRepair','tvUnload'])$(id).disabled=!s.installed||installing;
   $('tvInstall').disabled=installing;$('tvOffline').disabled=installing;$('tvCancel').hidden=!installing;
-  renderVoices();
+  renderVoices();renderCharacters();
  }
  function renderVoices(){
   const box=$('tvVoices');box.replaceChildren();
@@ -73,12 +76,58 @@
    const btn=(label,fn,disabled=false)=>{const x=document.createElement('button');x.type='button';x.className='secondary';x.textContent=label;x.disabled=disabled;x.onclick=()=>fn(x).catch(e=>say('tvVoiceState',v.name+': '+e.message));c.append(x);};
    btn('Reference',async()=>{const r=await tv('sample',{theme:v.theme});play(r.audio,r.type);say('tvVoiceState','Playing '+v.name+'’s original reference recording (sample playback, not the clone).');},!v.hasReference);
    if(v.sample&&!v.custom)btn('Original line',async()=>{const r=await tv('sample',{theme:v.theme,kind:'line'});play(r.audio,r.type);say('tvVoiceState','Playing the original “'+v.sample+'” (sample playback: the game’s own recording, not the clone). Press Test to hear the clone.');});
-   btn('Test',async x=>{x.disabled=true;say('tvVoiceState','Making '+v.name+'’s voice… (the first one loads the model)');try{const r=await tv('test',{theme:v.theme,text:$('tvTestText').value,fresh:true});play(r.audio);say('tvVoiceState',v.name+': '+r.clip.seconds.toFixed(1)+' s of new speech made in '+(r.clip.ms/1000).toFixed(1)+' s on the '+(r.clip.device==='cuda'?'graphics card':'processor')+(r.clip.processed?' (with its radio/mask sound; dry version next)':'')+'.');if(r.dry)setTimeout(()=>play(r.dry),Math.ceil(r.clip.seconds*1000)+600);}finally{x.disabled=false;}},!v.hasReference||!status?.ready);
+   btn('Test',async x=>{x.disabled=true;say('tvVoiceState','Making '+v.name+'’s voice… (the first one loads the model)');try{const r=await tv('test',{theme:v.theme,character:'',text:$('tvTestText').value,fresh:true});play(r.audio);say('tvVoiceState',v.name+': '+r.clip.seconds.toFixed(1)+' s of new speech made in '+(r.clip.ms/1000).toFixed(1)+' s on the '+(r.clip.device==='cuda'?'graphics card':'processor')+(r.clip.processed?' (with its radio/mask sound; dry version next)':'')+'.');if(r.dry)setTimeout(()=>play(r.dry),Math.ceil(r.clip.seconds*1000)+600);}finally{x.disabled=false;}},!v.hasReference||!status?.ready);
+   // v2.41: an improved built-in voice keeps its earlier version; the owner can go back to it (and forward again).
+   if((v.versions||[]).length>1&&!v.custom){const pinned=status?.settings?.builtinVersion?.[v.theme],older=Math.min(...v.versions);
+    btn(pinned?'Use the improved version':'Use the earlier version',async()=>{await tv('settings',{values:{builtinVersion:{[v.theme]:pinned?0:older}}});say('tvVoiceState',v.name+(pinned?' uses its improved version (v'+v.version+') again.':' uses its earlier version (v'+older+') now.'));await load();});}
    btn('Replace…',async()=>{pick(v);});
    if(v.custom)btn('Restore original',async()=>{await tv('restore-reference',{theme:v.theme});say('tvVoiceState',v.name+' uses its built-in reference again.');await load();});
    row.append(a,b,c);box.append(row);
   }
  }
+ // ── v2.41 character voices ───────────────────────────────────────────────
+ const themeName=t=>globalThis.TylerTheme?.info?.[t]?.[0]||t;
+ const charTag=c=>!c?null:!c.approved?'Not approved':!c.imported?'Not imported':c.nonlexical?'Non-lexical':c.status==='ready'?'Ready':c.status==='weak'?'Weak clone':c.status==='approximation'?'Approximation':'Not rated yet';
+ let charBusy=false;
+ function charSummary(){
+  const all=voices.flatMap(v=>v.characters||[]),ok=all.filter(c=>c.usable).length,imp=all.filter(c=>c.imported).length;
+  if(!all.length)return 'This version lists no character voices.';
+  const themes=voices.filter(v=>v.characters?.length).length;
+  return !imp?'Not imported yet: this version lists '+all.length+' character voices for '+themes+' themes. Each theme keeps its own voice until you pick a character.':
+   'Imported: '+imp+' of '+all.length+' character voices'+(ok<imp?' ('+(imp-ok)+' imported but not approved, so their themes keep their own voice)':'')+'.';
+ }
+ function renderCharacters(){
+  const box=$('tvChars');if(!box)return;box.replaceChildren();if(!charBusy)say('tvCharState',charSummary());
+  $('tvCharRemove').disabled=!voices.some(v=>(v.characters||[]).some(c=>c.imported));
+  for(const v of voices.filter(x=>x.characters?.length)){
+   const row=document.createElement('div');row.className='tv-voice';row.dataset.theme=v.theme;
+   const a=document.createElement('div'),b=document.createElement('div'),c=document.createElement('div');c.className='tv-buttons';
+   const sel=document.createElement('select');sel.id='tvChar-'+v.theme;
+   const lab=document.createElement('label');lab.htmlFor=sel.id;lab.textContent='Character voice · '+themeName(v.theme);
+   sel.append(new Option(v.name+' (theme default)',''),...v.characters.map(ch=>{const o=new Option(ch.name+(ch.usable?ch.status==='weak'?' · weak clone':ch.nonlexical?' · non-lexical':'':' · '+(charTag(ch)||'').toLowerCase()),ch.id);o.disabled=!ch.usable;return o;}));
+   sel.value=v.characters.some(ch=>ch.id===v.character)?v.character:'';
+   const note=document.createElement('small'),cur=v.characters.find(ch=>ch.id===v.character);
+   note.textContent=cur?(cur.usable?cur.statusNote||'':cur.name+' can’t be used ('+(v.characterProblem||cur.problem||'not available')+'), so '+v.name+' speaks.'):'The theme’s own voice ('+v.name+').';
+   a.append(lab,sel,note);
+   b.innerHTML='<span class="tv-tag"></span>';const tag=b.querySelector('.tv-tag');tag.dataset.status=cur?(cur.usable?cur.status:'missing'):v.status;tag.textContent=cur?charTag(cur):v.custom?'Your recording':'Theme default';
+   sel.onchange=async()=>{try{await tv('settings',{values:{characters:{[v.theme]:sel.value}}});const ch=v.characters.find(x=>x.id===sel.value);say('tvCharVoiceState',themeName(v.theme)+(ch?' now speaks as '+ch.name+' (remembered for this theme).':' uses its own voice ('+v.name+') again.'));await load();}catch(e){say('tvCharVoiceState',e.message);}};
+   const btn=(label,fn,disabled=false)=>{const x=document.createElement('button');x.type='button';x.className='secondary';x.textContent=label;x.disabled=disabled;x.onclick=()=>fn(x).catch(e=>say('tvCharVoiceState',e.message));c.append(x);};
+   const chosen=()=>v.characters.find(x=>x.id===sel.value)||null;
+   btn('Original recording',async()=>{const ch=chosen();
+    if(!ch){const r=await tv('sample',{theme:v.theme,kind:v.sample&&!v.custom?'line':'reference'});play(r.audio,r.type);say('tvCharVoiceState','Playing '+v.name+'’s original recording'+(r.kind==='line'&&v.sample?' “'+v.sample+'”':'')+' (from the game, not generated).');return;}
+    const r=await tv('character-sample',{theme:v.theme,character:ch.id});play(r.audio,r.type);say('tvCharVoiceState','Playing '+ch.name+'’s original recording'+(r.text?' “'+r.text+'”':'')+' (from the game, not generated).');},!v.characters.some(ch=>ch.imported)&&!v.hasReference);
+   btn('Generated speech',async x=>{const ch=chosen();x.disabled=true;say('tvCharVoiceState','Making '+(ch?ch.name:v.name)+'’s voice… (the first one loads the model)');
+    try{const r=await tv('test',{theme:v.theme,character:sel.value,text:$('tvTestText').value,fresh:true});play(r.audio);
+     say('tvCharVoiceState',(r.clip.fallback?r.clip.fallback.name+' couldn’t be used ('+r.clip.fallback.reason+'), so this is '+r.clip.voiceName+'. ':'')+r.clip.voiceName+': '+r.clip.seconds.toFixed(1)+' s of generated speech (made by the clone on the '+(r.clip.device==='cuda'?'graphics card':'processor')+' in '+(r.clip.ms/1000).toFixed(1)+' s, not a recording).');}finally{x.disabled=false;}},!status?.ready);
+   row.append(a,b,c);box.append(row);
+  }
+ }
+ $('tvCharImport').onclick=()=>{$('tvCharForm').hidden=false;$('tvCharSource').focus();};
+ $('tvCharCancel').onclick=()=>{$('tvCharForm').hidden=true;};
+ $('tvCharGo').onclick=async()=>{const src=$('tvCharSource').value.trim().replace(/^["']+|["']+$/g,'');if(!src)return;$('tvCharForm').hidden=true;charBusy=true;$('tvCharGo').disabled=true;say('tvCharState','Importing and checking the character recordings…');
+  try{const r=await tv('characters-import',{source:src});charBusy=false;await load();
+   say('tvCharState','Imported '+r.imported+' of '+r.total+' character voices ('+(r.bytes/1024**2).toFixed(1)+' MB).'+(r.failed.length?' Not imported: '+r.failed.slice(0,6).map(f=>f.name+' ('+f.reason+')').join('; ')+(r.failed.length>6?'; and '+(r.failed.length-6)+' more':'')+'. Those characters keep their theme’s own voice.':''));}
+  catch(e){charBusy=false;say('tvCharState','Import failed: '+e.message+' Nothing was changed for the characters that weren’t imported.');}finally{$('tvCharGo').disabled=false;}};
  let audioEl=null;
  function play(b64,type='audio/wav'){try{audioEl?.pause();}catch{}audioEl=new Audio('data:'+type+';base64,'+b64);void audioEl.play().catch(e=>say('tvVoiceState','Couldn’t play it here: '+e.message));}
  let picking=null;
@@ -112,9 +161,10 @@
  $('tvCheck').onclick=async()=>{say('tvInstallState','Making a test voice…');try{const c=await tv('check');say('tvInstallState','Voice check passed: '+c.seconds+' s of speech in '+(c.ms/1000).toFixed(1)+' s on the '+(c.device==='cuda'?'graphics card':'processor')+(c.engine==='fast'?' with the fast engine':'')+' ('+c.rtf+' s per second of speech).');}catch(e){say('tvInstallState','Voice check failed: '+e.message);}await load();};
  $('tvRepair').onclick=async()=>{say('tvInstallState','Checking every file…');try{const r=await tv('repair');say('tvInstallState',r.repaired?'Repaired '+r.problems+' problem(s); voice check passed.':'All files are fine; voice check passed.');}catch(e){say('tvInstallState','Repair failed: '+e.message);}await load();};
  const removeConfirm=async(op,extra,label)=>{say('tvInstallState','Removing…');try{await tv(op,extra);plans={};say('tvInstallState',label);}catch(e){say('tvInstallState',e.message);}await load();};
- let armed=null;const twice=(id,fn,ask)=>{$(id).onclick=()=>{if(armed!==id){armed=id;say('tvInstallState',ask+' Press the button again to confirm.');setTimeout(()=>{if(armed===id)armed=null;},6000);return;}armed=null;void fn();};};
+ let armed=null;const twice=(id,fn,ask,where='tvInstallState')=>{$(id).onclick=()=>{if(armed!==id){armed=id;say(where,ask+' Press the button again to confirm.');setTimeout(()=>{if(armed===id)armed=null;},6000);return;}armed=null;void fn();};};
  twice('tvRemove',()=>removeConfirm('remove',{},'Theme voices removed. Your settings, recordings and saved clips are kept.'),'This removes the voice engine and models (your settings, recordings and saved clips stay).');
  twice('tvRemoveQuality',()=>removeConfirm('remove-model',{model:'quality'},'The Quality model was removed.'),'Remove the Quality model?');
+ twice('tvCharRemove',async()=>{say('tvCharState','Removing…');try{await tv('characters-remove');}catch(e){say('tvCharState',e.message);}await load();},'This removes the imported character recordings (each theme keeps its own voice; picks are kept for a later import).','tvCharState');
  twice('tvRemoveLight',()=>removeConfirm('remove-model',{model:'light'},'The Lightweight model was removed.'),'Remove the Lightweight model?');
  $('tvUnload').onclick=async()=>{await tv('unload');say('tvVoiceState','The voice engine is closed; its memory is free.');await load();};
  $('tvClearCache').onclick=async()=>{await tv('clear-cache');say('tvVoiceState','Cached clips cleared.');};
@@ -128,6 +178,7 @@
    if(e.phase==='done'){installing=false;failed=false;plans={};$('tvProgress').style.width='100%';say('tvInstallState','Theme voices are ready.'+(e.check?' Voice check: '+e.check.seconds+' s of speech in '+(e.check.ms/1000).toFixed(1)+' s.':''));void load();}
    if(e.phase==='failed'){installing=false;failed=true;plans={};say('tvInstallState',e.label+' Tyler works as before without theme voices; press Retry to carry on (what was downloaded is kept).');void load();}
   }
+  if(e.kind==='characters-import'&&charBusy)say('tvCharState','Importing and checking the character recordings… '+(e.done||0)+'/'+(e.total||0)+(e.name?' · '+e.name:''));
  });
  async function native(){try{const n=await tv('native-status');say('tvNative',!n.windows?'Only on Windows.':n.sam||n.mary?'Found on this PC: '+[n.sam&&'Microsoft Sam',n.mary&&'Microsoft Mary'].filter(Boolean).join(' and ')+'. Tyler uses them for those two themes.':'Not on this PC. Tyler uses the clones (approximations) for those two themes.');$('tvNativeGet').hidden=!n.windows||(n.sam&&n.mary);}catch(e){say('tvNative',e.message);}}
  $('tvNativeCheck').onclick=()=>void native();

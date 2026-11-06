@@ -17,7 +17,7 @@ import './trivia-bank.js';
 import {temporary,errorKind,transientDelay,voiceControl,normalizeExtras,conversationGuide,ownerStyle,modelStyle,localCharacter,localCharacterReminder,localReplyTidy} from './conversation.mjs';
 import './identity.js';
 import {Memory,freshReply,styleGuide} from './memory.mjs';
-import {repeatCheck,repeatHint,retryNote} from './repeat-guard.mjs';
+import {repeatCheck,repeatHint,retryNote,stutter,trimOpener,unstutter} from './repeat-guard.mjs';
 import {injectionAttempt,refusal,cleanHistory,wrapChat,CHAT_RULES,CHAT_REMINDER} from './guard.mjs';
 import './noise-filter.js';
 import {Speech,VOICES} from './speech.mjs';
@@ -70,11 +70,15 @@ function themeSpeechParts(text,size=240){
  }
  if(cur.trim())parts.push(cur.trim());return parts.slice(0,4);
 }
-async function themeSpeakAll(parts,signal){const out=[];for(const p of parts)out.push((await themeSpeak(p,signal)).audio);return out;}
-async function themeSpeak(text,signal){
+async function themeSpeakAll(parts,signal,pin){const out=[];for(const p of parts)out.push((await themeSpeak(p,signal,pin)).audio);return out;}
+// v2.41: one spoken reply keeps one speaker. The theme and its character voice are taken once, when the
+// reply's first part is made (pin), and every later part of that reply uses the same ones.
+function themePin(){let p=null;return ()=>p||(p=Promise.resolve(globalThis.tylerThemeVoices?.resolve?.({})).catch(()=>null));}
+async function themeSpeak(text,signal,pin){
  const tv=globalThis.tylerThemeVoices;
  if(!tv)throw Error('theme voices are made by the desktop app, and this is Chrome. Choose Cloud voice in Settings → Voice → Standard voice, or use the desktop app.');
- const r=await tv.speak({text,theme:null,purpose:'reply',from:'voice',signal});
+ const who=pin?await pin():null;
+ const r=await tv.speak({text,theme:who?.theme||null,...(who&&typeof who.character==='string'?{character:who.character}:{}),purpose:'reply',from:'voice',signal});
  if(typeof r?.audio!=='string')throw Error('the voice engine returned no audio.');
  return {audio:r.audio,model:'theme voice ('+(r.clip?.voiceName||r.clip?.theme||'local')+')',seconds:r.clip?.seconds};
 }
@@ -91,8 +95,8 @@ async function kokoroSpeak(text,voice,signal){
  return {audio:r.audio,model:'Kokoro ('+(r.voice?.label||kokoroVoice(voice).label)+', this PC)',seconds:r.seconds};
 }
 // Speech made on this PC: a theme voice or Kokoro (Settings → Voice → Standard voice → Speaking voice).
-const localSpeak=(engine,text,voice,signal)=>engine==='kokoro'?kokoroSpeak(text,voice,signal):themeSpeak(text,signal);
-async function localSpeakAll(engine,parts,voice,signal){const out=[];for(const p of parts)out.push((await localSpeak(engine,p,voice,signal)).audio);return out;}
+const localSpeak=(engine,text,voice,signal,pin)=>engine==='kokoro'?kokoroSpeak(text,voice,signal):themeSpeak(text,signal,pin);
+async function localSpeakAll(engine,parts,voice,signal,pin){const out=[];for(const p of parts)out.push((await localSpeak(engine,p,voice,signal,pin)).audio);return out;}
 async function countLocalSpeech(engine,chars){if(engine!=='kokoro')return countThemeSpeech(chars);const {usage={}}=await chrome.storage.local.get('usage');await chrome.storage.local.set({usage:{...usage,localSpeechResponses:(usage.localSpeechResponses||0)+1,localSpeechCharacters:(usage.localSpeechCharacters||0)+chars}});}
 const localWarning=(engine,error,part='')=>engine==='kokoro'?'Voice on this PC failed'+part+': '+redact(String(error?.message||error)).replace(/^Stopped\.$/,'stopped.')+' Tyler answered in text (he doesn’t switch to the paid cloud voice by himself).':themeWarning(error,part);
 // v2.39: hearing on this PC (Parakeet, desktop app). If it can't hear, the turn fails with the reason:
@@ -320,7 +324,7 @@ async function handleGameUnlocked(message,sender){
  const settings=await chrome.storage.local.get(['openrouterKey','geminiKey','aiProvider','localExplicit','personality','length','brain','noiseLevel','roastMode','speechVoice','voiceThreshold','minVoiced','replyPause','talkativeness','voiceControls','keyboardFilter','callbackGap','nicknameAliases','insideJokes','callbackState','quickSetup','usage','textSpeed','spendingCapUSD','streamAI','friendMemory','voiceBargeIn','voiceBargeDelay','smartRouting','suiteProfiles','suiteOptions','v23Persona','fastSpeech','geminiVoice','geminiTtsModel','voiceEngine','chatTagEnabled','chatTagName','geminiTextModel','speechEngine','voiceHearing','kokoroVoice']);
  const localAI=settings.aiProvider==='local',google=settings.aiProvider==='gemini', selectedKey=localAI?null:google?settings.geminiKey:settings.openrouterKey;
  // Speaking voice: the cloud voice, a theme voice or Kokoro (both on this PC, desktop app).
- const speechEngine=['theme','kokoro'].includes(settings.speechEngine)?settings.speechEngine:'cloud',themeSpeech=speechEngine==='theme',localSpeech=speechEngine!=='cloud';
+ const speechEngine=['theme','kokoro'].includes(settings.speechEngine)?settings.speechEngine:'cloud',themeSpeech=speechEngine==='theme',localSpeech=speechEngine!=='cloud',voicePin=themeSpeech?themePin():null;
  // The key a voice call hears with and the cloud voice speaks with (local-ai.mjs): the text provider's own key,
  // or with Text AI on this PC the saved OpenRouter key, else the saved Google key. With hearing on this PC
  // (v2.39) no key is used for hearing; with a voice on this PC too, a voice call needs no key at all.
@@ -437,7 +441,7 @@ async function handleGameUnlocked(message,sender){
      if(!candidate||candidate.length<12||repeatCheck(candidate,history).repeat){this.sentence='';return;}
      this.sentence=candidate;timings.firstSentenceMs=Date.now()-thinkStarted;
      if(localSpeech)localTab=tab;
-     this.promise=(localSpeech?localSpeak(speechEngine,candidate,settings.kokoroVoice,controller.signal):speech.generate(candidate,settings.openrouterKey,settings.speechVoice,controller.signal)).then(spoken=>{
+     this.promise=(localSpeech?localSpeak(speechEngine,candidate,settings.kokoroVoice,controller.signal,voicePin):speech.generate(candidate,settings.openrouterKey,settings.speechVoice,controller.signal)).then(spoken=>{
       if(controller.signal.aborted)return null;timings.firstAudioMs=Date.now()-turnStarted;
       const pending=chrome.tabs?.sendMessage?.(tab,{source:'tyler-early-audio',requestId,audio:spoken.audio});pending?.catch?.(()=>{});return spoken;
      }).catch(error=>{this.error=error;return null;});
@@ -457,12 +461,17 @@ async function handleGameUnlocked(message,sender){
     if(!check.repeat)reply=check.text;
     else {
      progress('Saying something new…');const draft=cleaned||reply;
-     const again=TylerChatTag.strip(await generate([...request.messages,{role:'system',content:retryNote(draft,check.like)}]),TylerChatTag.config(settings)).trim();
+     const again=TylerChatTag.strip(await generate([...request.messages,{role:'system',content:retryNote(draft,check.like,check.opener||'',check.stutter===true)}]),TylerChatTag.config(settings)).trim();
      const usable=!!again&&!/^\[\[SKIP\]\]$/i.test(again),second=usable?repeatCheck(freshReply(again,history)||again,history,[draft]):{repeat:true,text:''};
+     // v2.41: a second try that opens the same way again ("Fuck off, …") or gets stuck on one word is
+     // mended instead of dropped: the opening is cut when it's a clause of its own (or kept, since the
+     // rest is new), and runs of one word are cut to two. Only a reply still stuck after that is skipped.
+     const mend=r=>r.stutter?unstutter(r.text):r.opener?trimOpener(r.text,r.opener)||r.text:'',mended=usable&&second.repeat?mend(second):'',fixed=!!mended&&!stutter(mended);
      if(!second.repeat)reply=second.text;
-     else if(message.automatic){reply='';ignoreReason='Skipped a reply that repeated an earlier one (the model tried twice).';}
-     else reply=usable?second.text||again:draft;
-     console.info('[ROBOTIC TYLER] Repeat protection: '+(second.repeat?'second try repeated too':'asked for a different reply')+'.');
+     else if(fixed)reply=mended;
+     else if(message.automatic){reply='';ignoreReason=second.stutter||check.stutter?'Skipped a reply that got stuck repeating one word (the model tried twice).':'Skipped a reply that repeated an earlier one (the model tried twice).';}
+     else reply=usable?mended||second.text||again:check.stutter?unstutter(draft):check.opener?trimOpener(draft,check.opener)||draft:draft;
+     console.info('[ROBOTIC TYLER] Repeat protection: '+(second.repeat?(fixed?'second try repeated too, mended it':'second try repeated too'):'asked for a different reply')+'.');
     }
    }
    if(message.modality==='voice'&&reply.length>(settings.length==='detailed'?420:settings.length==='short'?170:270)){const cut=reply.slice(0,settings.length==='detailed'?420:settings.length==='short'?170:270);const ends=[...cut.matchAll(/[.!?](?=\s|$)/g)];const end=ends.at(-1)?.index;reply=end>=30?cut.slice(0,end+1):cut.slice(0,Math.max(1,cut.lastIndexOf(' ')))+'.';}else reply=reply.slice(0,1800);
@@ -484,7 +493,7 @@ async function handleGameUnlocked(message,sender){
     if(spokenFirst&&reply.startsWith(early.sentence)){
      const rest=reply.slice(early.sentence.length).trim();let restAudio=null,warning;
      let restClips=[];
-     if(rest){try{restClips=await localSpeakAll(speechEngine,themeSpeechParts(rest),settings.kokoroVoice,controller.signal);}catch(error){if(controller.signal.aborted)throw Error('Cancelled');warning=localWarning(speechEngine,error,' for the rest of the reply');}}
+     if(rest){try{restClips=await localSpeakAll(speechEngine,themeSpeechParts(rest),settings.kokoroVoice,controller.signal,voicePin);}catch(error){if(controller.signal.aborted)throw Error('Cancelled');warning=localWarning(speechEngine,error,' for the rest of the reply');}}
      await countLocalSpeech(speechEngine,early.sentence.length+(restClips.length?rest.length:0));
      return {heard,text:reply,early:true,firstAudio:spokenFirst.audio,audio:restClips[0]||null,moreAudio:restClips.slice(1),warning,timings:{...timings,speechMs:Date.now()-speechStarted}};
     }
@@ -493,7 +502,7 @@ async function handleGameUnlocked(message,sender){
     if(early.error)return {heard,text:reply,warning:localWarning(speechEngine,early.error)};
    }
    try{
-    progress(themeSpeech?'Making the theme voice…':'Speaking on this PC…');const parts=themeSpeechParts(reply),clips=await localSpeakAll(speechEngine,parts,settings.kokoroVoice,controller.signal);
+    progress(themeSpeech?'Making the theme voice…':'Speaking on this PC…');const parts=themeSpeechParts(reply),clips=await localSpeakAll(speechEngine,parts,settings.kokoroVoice,controller.signal,voicePin);
     await countLocalSpeech(speechEngine,parts.join(' ').length);
     const done={...timings,speechMs:Date.now()-speechStarted};
     return clips.length>1?{heard,text:reply,early:true,firstAudio:clips[0],audio:clips[1],moreAudio:clips.slice(2),timings:done}:{heard,text:reply,audio:clips[0],timings:done};
@@ -541,7 +550,7 @@ async function themeVoices(message,tab){
  if(op==='speak'){
   if(!await lease.check(tab))throw Error('Another Steam tab owns Tyler.');
   const flags=await chrome.storage.local.get('v22EmergencyStop');if(flags.v22EmergencyStop===true)throw Error('Emergency stop is on.');
-  return tv.speak({text:String(message.text||'').slice(0,800),theme:typeof message.theme==='string'?message.theme:null,fresh:message.fresh===true,purpose:message.purpose==='call'?'call':'preview',from:message.from==='chat'?'chat':'panel',speakerId:/^7656119\d{10}$/.test(String(message.speakerId||''))?String(message.speakerId):null});
+  return tv.speak({text:String(message.text||'').slice(0,800),theme:typeof message.theme==='string'?message.theme:null,...(typeof message.character==='string'&&/^[a-z0-9][a-z0-9-]{1,23}$/.test(message.character)?{character:message.character}:{}),fresh:message.fresh===true,purpose:message.purpose==='call'?'call':'preview',from:message.from==='chat'?'chat':'panel',speakerId:/^7656119\d{10}$/.test(String(message.speakerId||''))?String(message.speakerId):null});
  }
  throw Error('Unknown theme-voice request.');
 }

@@ -6,6 +6,8 @@
 // "Play into call" uses the same synthetic microphone as Tyler's other speech, queued after anything
 // he is already saying (so nothing overlaps, and his listener holds while he talks).
 // Chat: "!say TEXT" (or "!say portal TEXT" / "!say portal: TEXT"), only when the owner turns it on in Settings.
+// v2.41: a theme can speak as one of its optional characters (picked per theme in Settings or on the
+// phone; "!say tf2/scout TEXT" picks one for a single message). The theme's own voice stays the default.
 (() => {
  'use strict';
  const api=globalThis.TylerCompanion,mount=(api?.getFeatureMount?.()||api?.getMount?.());if(!api||!mount||globalThis.TylerThemeVoices)return;
@@ -23,12 +25,15 @@
  let noteAt=0;const $=id=>panel.querySelector('#'+id),status=t=>{$('tvStatus').textContent=t;noteAt=Date.now();},quiet=t=>{if(Date.now()-noteAt>8000)$('tvStatus').textContent=t;};
  const send=m=>chrome.runtime.sendMessage(m).then(r=>{if(r?.ok===false)throw Error(r.error||'Theme voices didn’t answer.');return r;});
  let info={available:null},voices=[],last=null,lastRoute=null,busy=false,chatCfg={chat:false},gen=0;
- const label=t=>voices.find(v=>v.theme===t)?.name||t;
+ const label=(t,c)=>{const v=voices.find(x=>x.theme===t),ch=c===undefined?(v?.characters||[]).find(x=>x.id===v.character&&x.usable):(v?.characters||[]).find(x=>x.id===c);return ch?ch.name:v?.name||t;};
  function chosen(){return $('tvFollow').checked?(api.getTheme?.()||'steam'):$('tvVoice').value;}
  function describe(){
   const t=chosen(),v=voices.find(x=>x.theme===t);
-  $('tvNow').textContent=$('tvFollow').checked?'Now: '+(v?v.name+' ('+(api.getTheme?.()||'steam')+' theme)':t):'Using the voice picked below.';
-  if(v&&v.status!=='ready'&&v.status!=='custom')$('tvNow').textContent+=' · '+v.statusLabel;
+  // v2.41: the character picked for this theme, or why the theme's own voice is used instead.
+  const ch=v?.character?(v.characters||[]).find(c=>c.id===v.character):null,who=ch?.usable?ch.name+' (character voice)':v?.name;
+  $('tvNow').textContent=$('tvFollow').checked?'Now: '+(v?who+' ('+(api.getTheme?.()||'steam')+' theme)':t):'Using the voice picked below'+(ch?.usable?': '+ch.name+' (character voice).':'.');
+  if(ch&&!ch.usable)$('tvNow').textContent+=' · '+ch.name+' can’t be used ('+(v.characterProblem||ch.problem||'not available')+'), so '+v.name+' speaks';
+  else if(v&&!ch?.usable&&v.status!=='ready'&&v.status!=='custom')$('tvNow').textContent+=' · '+v.statusLabel;
  }
  function render(){
   const s=info.status;
@@ -82,18 +87,18 @@
   for(const part of wavParts(audio))api.bridge('audio',{audio:part,queue:true});
  }
  /** Make (or reuse) the clip for the box's text with the voice chosen right now, then play it. */
- async function make(route,{text=$('tvText').value,theme=chosen(),fresh=false,from='panel',speakerId=null}={}){
+ async function make(route,{text=$('tvText').value,theme=chosen(),character,fresh=false,from='panel',speakerId=null}={}){
   text=String(text||'').replace(/\s+/g,' ').trim();if(!text){status('Type something for Tyler to say.');return null;}
   if(busy){status('Still making the last one. Press Stop to cancel it.');return null;}
-  busy=true;render();const started=Date.now(),mine=++gen;status('Making '+label(theme)+'’s voice…');
+  busy=true;render();const started=Date.now(),mine=++gen;status('Making '+label(theme,character)+'’s voice…');
   try{
-   const r=await send({type:'voices:speak',text,theme,fresh,purpose:route==='call'?'call':'preview',from,speakerId});
+   const r=await send({type:'voices:speak',text,theme,...(typeof character==='string'?{character}:{}),fresh,purpose:route==='call'?'call':'preview',from,speakerId});
    if(mine!==gen)return null; // Stop was pressed meanwhile: a late result is never played
    last={...r.clip,audio:r.audio};lastRoute=route;
    const c=r.clip,where=c.device==='cuda'?'graphics card':c.device==='windows'?'Windows speech':'processor';
-   $('tvClip').textContent=c.voiceName+' · '+c.seconds.toFixed(1)+' s'+(c.cached?' · from the cache':' · made in '+(c.ms/1000).toFixed(1)+' s on the '+where)+' · '+(c.mode==='native'?'the original Windows voice':c.mode==='light'?'Lightweight':'Quality')+(c.processed?' · with the voice’s radio/mask sound':'')+(c.status&&!['ready','custom'].includes(c.status)?' · '+c.status:'');
+   $('tvClip').textContent=c.voiceName+' · '+c.seconds.toFixed(1)+' s'+(c.cached?' · from the cache':' · made in '+(c.ms/1000).toFixed(1)+' s on the '+where)+' · '+(c.mode==='native'?'the original Windows voice':c.mode==='light'?'Lightweight':'Quality')+(c.processed?' · with the voice’s radio/mask sound':'')+(c.status&&!['ready','custom'].includes(c.status)?' · '+c.status:'')+(c.fallback?' · '+c.fallback.name+' couldn’t be used ('+c.fallback.reason+'), so '+c.voiceName+' spoke':'');
    if(route){try{play(route,r.audio);}catch(e){status('Made it ('+c.seconds.toFixed(1)+' s), but: '+e.message);return last;}}
-   status(route==='call'?'Playing into the call: “'+text.slice(0,60)+'”':route==='preview'?'Previewing here only (not in the call).':'Ready. Preview it or play it into the call.');
+   status((c.fallback?c.fallback.name+' couldn’t be used ('+c.fallback.reason+'); '+c.voiceName+' spoke instead. ':'')+(route==='call'?'Playing into the call: “'+text.slice(0,60)+'”':route==='preview'?'Previewing here only (not in the call).':'Ready. Preview it or play it into the call.'));
    return last;
   }catch(e){status(/Stopped/.test(e.message)?'Stopped.':'Couldn’t make that voice: '+e.message);throw e;}
   finally{if(mine===gen){busy=false;render();}if(Date.now()-started>1500)void refresh();}
@@ -110,8 +115,12 @@
  const seen=new WeakMap(),answered=new Set(),lastBy=new Map();let region=null,observer=null,selector=null,boundAt=0;
  // v2.37.2: "!say cs2 Fire in the hole" (no colon) picks the CS2 voice too, when the first word is
  // exactly a voice's name and more words follow. Before, the whole line was read out in the current voice.
+ // v2.41: "!say tf2/scout TEXT" (or "tf2/scout: TEXT") picks a theme's character voice for one message.
+ // Only an exact theme/character pair counts, so an ordinary first word is never taken for a voice.
  function pick(req,list){
   if(req.theme)return req;
+  const c=/^([a-z0-9]{2,12})\/([a-z0-9][a-z0-9-]{1,23}):?\s+(\S[\s\S]*)$/i.exec(req.text);
+  if(c){const t=c[1].toLowerCase(),id=c[2].toLowerCase(),v=list.find(x=>x.theme===t);if(v)return {theme:t,character:id,text:c[3].trim(),known:(v.characters||[]).some(x=>x.id===id&&x.usable!==false)};}
   const m=/^([a-z0-9]{2,12})\s+(\S[\s\S]*)$/i.exec(req.text),id=m?.[1].toLowerCase();
   return id&&list.some(v=>v.theme===id)?{theme:id,text:m[2].trim()}:req;
  }
@@ -126,9 +135,10 @@
   if(Date.now()-prev<wait){status('!say from '+name+' skipped: cooldown.');return;}
   Object.assign(req,pick(req,voices));
   if(req.theme&&!voices.some(v=>v.theme===req.theme)){api.send('🔊 '+name+', there’s no “'+req.theme+'” voice. Voices: '+voices.filter(v=>v.hasReference).map(v=>v.theme).join(', ')+'.',{kind:'game'});return;}
+  if(req.character&&!req.known){const v=voices.find(x=>x.theme===req.theme),ok=(v?.characters||[]).filter(c=>c.usable).map(c=>req.theme+'/'+c.id);api.send('🔊 '+name+', there’s no “'+req.theme+'/'+req.character+'” voice on this PC.'+(ok.length?' Characters: '+ok.join(', ')+'.':''),{kind:'game'});return;}
   lastBy.set(key,Date.now());
   if(busy){api.send('🔊 '+name+', Tyler is still on the last one. Try again in a moment.',{kind:'game'});return;}
-  try{await make('call',{text:req.text,theme:req.theme||chosen(),from:'chat',speakerId:id});}
+  try{await make('call',{text:req.text,theme:req.theme||chosen(),...(req.character?{character:req.character}:{}),from:'chat',speakerId:id});}
   catch(e){if(!/Stopped/.test(e.message))api.send('🔊 Couldn’t say that for '+name+': '+String(e.message).slice(0,140),{kind:'game'});}
  }
  function watch(){
@@ -149,5 +159,12 @@
  panel.addEventListener('toggle',()=>{if(panel.open)void refresh();});
  api.ui?.onUI?.(()=>describe());
  let lastPoll=0;void refresh();setInterval(()=>{const every=busy?2000:15000;if((panel.open||busy||chatCfg.chat)&&Date.now()-lastPoll>=every){lastPoll=Date.now();void refresh();}},2000);setInterval(watch,1500);
- globalThis.TylerThemeVoices=Object.freeze({refresh,parse,pick,stop:stopAll,say:(text,theme)=>make('call',{text,theme}),state:()=>({busy,available:info.available,ready:!!info.status?.ready,voices:voices.filter(v=>v.hasReference).map(v=>({theme:v.theme,name:v.name}))})});
+ // v2.41: the phone remote picks a theme's character voice (saved on the PC for that theme; '' = the theme's own voice).
+ async function setCharacter(theme,id){
+  const v=voices.find(x=>x.theme===theme);if(!v)throw Error('Unknown theme voice.');
+  if(id&&!(v.characters||[]).some(c=>c.id===id&&c.usable))throw Error('That character voice isn’t available on the PC.');
+  await send({type:'voices:settings',values:{characters:{[theme]:id||''}}});await refresh();return {theme,character:id||''};
+ }
+ globalThis.TylerThemeVoices=Object.freeze({refresh,parse,pick,stop:stopAll,setCharacter,say:(text,theme)=>make('call',{text,theme}),state:()=>({busy,available:info.available,ready:!!info.status?.ready,theme:chosen(),
+  voices:voices.filter(v=>v.hasReference).map(v=>({theme:v.theme,name:v.name,...(v.characters?.length?{character:v.characters.some(c=>c.id===v.character&&c.usable)?v.character:'',characters:v.characters.filter(c=>c.usable).map(c=>({id:c.id,name:c.name}))}:{})}))})});
 })();

@@ -55,6 +55,7 @@
   <details class="feature" id="rmTvCard"><summary><span class="feature-title">Theme voice</span><span class="feature-meta" id="rmTvMeta">On the PC</span></summary>
     <div class="feature-body"><p class="hint">Tyler says it in the call in a theme’s character voice. The voice is made on your PC; this phone only sends the text.</p>
       <form id="rmTvForm" autocomplete="off"><label class="field">Voice<select id="rmTvVoice"><option value="">Follow the theme</option></select></label>
+      <label class="field" id="rmTvCharField" hidden>Character voice<select id="rmTvChar" aria-describedby="rmTvCharHint"></select><small class="hint" id="rmTvCharHint">Saved on the PC for this theme. The theme’s own voice is the default.</small></label>
       <label class="field">What Tyler says<input id="rmTvText" type="text" maxlength="400" placeholder="Type a message for the call" aria-label="Voice message"></label>
       <div class="btn-row"><button class="btn primary" type="submit">Say in call</button><button id="rmTvStop" class="btn" type="button">Stop</button></div></form>
       <p id="rmTvState" class="hint" role="status"></p></div></details>
@@ -175,10 +176,20 @@
  }
  async function callAct(action,extra={}){if(callBusy)return;callBusy=true;renderCall(live.call||{});try{await act(action,extra);}finally{callBusy=false;renderCall(live.call||{});pollSoon(300);}}
  function renderThemeVoice(t){
-  const card=$('rmTvCard');if(!card)return;card.hidden=!t?.available;if(!t?.available)return;
+  const card=$('rmTvCard');if(!card)return;card.hidden=!t?.available;if(!t?.available)return;live.tv=t;
   $('rmTvMeta').textContent=t.ready?(t.busy?'Speaking…':'Ready'):'Not installed';
   const sel=$('rmTvVoice'),keep=sel.value;if(sel.options.length<=1&&t.voices?.length){for(const v of t.voices){const o=document.createElement('option');o.value=v.theme;o.textContent=v.name;sel.append(o);}sel.value=keep;}
+  renderCharacter();
   $('rmTvState').textContent=t.ready?(t.busy?'Tyler is making or saying a voice message.':''):'Install theme voices on the PC first: Settings → Voice → Theme voices.';
+ }
+ // v2.41: the character voice for the theme chosen above (or the theme on the PC when following it).
+ function renderCharacter(){
+  const t=live.tv,field=$('rmTvCharField'),sel=$('rmTvChar');if(!t||!field||editing(sel))return;
+  const theme=$('rmTvVoice').value||t.theme,v=(t.voices||[]).find(x=>x.theme===theme),list=v?.characters||[];
+  field.hidden=!list.length;if(!list.length)return;
+  const want=[['',v.name+' (theme default)'],...list.map(c=>[c.id,c.name])],now=[...sel.options].map(o=>o.value+'|'+o.textContent).join(',');
+  if(now!==want.map(w=>w.join('|')).join(',')){sel.replaceChildren(...want.map(([id,name])=>{const o=document.createElement('option');o.value=id;o.textContent=name;return o;}));}
+  sel.value=v.character||'';sel.dataset.theme=theme;
  }
  function renderControls(s){
   const c=s.controls||{};
@@ -323,6 +334,8 @@
    clearArmed=0;$('rmClear').textContent='Clear conversation';if(await act('clear',{},'Conversation cleared. Tyler is paused.'))void chatLog(true);};
   $('rmTvForm').addEventListener('submit',async e=>{e.preventDefault();const t=$('rmTvText').value.trim();if(!t)return;if(await act('theme-say',{text:t,theme:$('rmTvVoice').value},'Making the voice on the PC…'))$('rmTvText').value='';});
   $('rmTvStop').addEventListener('click',()=>void act('theme-stop',{},'Stopped'));
+  $('rmTvVoice').addEventListener('change',()=>renderCharacter());
+  $('rmTvChar').addEventListener('change',async()=>{const sel=$('rmTvChar'),theme=sel.dataset.theme;if(!theme)return;if(await act('theme-character',{theme,character:sel.value},'Saved on the PC'))pollSoon(300);});
   $('sayForm').addEventListener('submit',async e=>{e.preventDefault();const t=$('say').value.trim();if(!t)return;if(await act('say',{text:t},'Sent'))$('say').value='';});
   $('rmKeepCall').onchange=()=>void act('keepalive',{call:$('rmKeepCall').checked});
   $('rmKeepChat').onchange=()=>void act('keepalive',{chat:$('rmKeepChat').checked});

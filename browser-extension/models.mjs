@@ -30,7 +30,8 @@ export const OPENROUTER_MODELS=Object.freeze([
  Object.freeze({key:'venice',id:'cognitivecomputations/dolphin-mistral-24b-venice-edition',label:'Venice Uncensored',badge:'No filter',
   provider:route({only:['venice'],allow_fallbacks:false,max_price:{prompt:0.25,completion:1.00}}),
   // Venice accepts sampling settings: a little extra variety, and penalties against repeating the same jokes.
-  sampling:Object.freeze({temperature:0.95,presence_penalty:0.35,frequency_penalty:0.25}),
+  // v2.41: a stronger frequency penalty (0.25 → 0.5) against replies stuck on one word ("fuck fuck fuck …").
+  sampling:Object.freeze({temperature:0.95,presence_penalty:0.35,frequency_penalty:0.5}),
   strengths:'Dolphin Mistral 24B, Venice edition: no corporate filter, so crude humor, profanity and hard roasts land the way your personality settings ask. Served only by Venice.',
   price:'$0.20 in / $0.90 out per million tokens (Venice only, no fallback)'}),
 ]);

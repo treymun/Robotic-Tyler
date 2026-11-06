@@ -1,4 +1,4 @@
-# Theme voices (v2.35; the fast engine and spoken replies since v2.36)
+# Theme voices (v2.35; the fast engine and spoken replies since v2.36; character voices since v2.41)
 
 Tyler can say typed messages in each theme's character voice. The voices are **clones made on your PC**
 by a local model (Qwen3-TTS Base). There's no account, key or cost per message. Theme voices are
@@ -96,10 +96,43 @@ Tyler suggests a mode from the hardware it detects (the GPU and its free memory,
 - **Caching:** made clips are cached, so Replay and repeated lines are instant.
 - **Steam text chat:** voice messages aren't posted as files. Steam web chat has no voice-message feature, and its uploader only takes pictures and videos (jpg, jpeg, png, gif, webp, avif, webm, mp4, mpg, mpeg, ogv; checked in Steam's chat code). Sending speech disguised as a video wasn't tried and isn't offered.
 
+## Character voices (v2.41, optional)
+
+Six themes can also speak as one of their characters. The theme's own voice stays the default.
+
+| Theme | Its own voice (default) | Character voices |
+|---|---|---|
+| Team Fortress 2 | The Administrator | Scout, Soldier, Pyro, Demoman, Heavy, Engineer, Medic, Sniper, Spy |
+| Counter-Strike 2 | SAS operator | Phoenix and Leet (faction voices: a faction's radio voice, not a named agent; the recordings are inherited from CS:GO) |
+| Portal | GLaDOS (Portal 1) | Wheatley, Cave Johnson (Portal 2 characters: an association) |
+| Left 4 Dead | Bill | Coach, Ellis (Left 4 Dead 2), Zoey |
+| Deadlock | Bebop | Abrams, Dynamo, Haze, Infernus, Ivy, Kelvin, Lash, Rem, Seven, Shiv, Venator, Warden, Wraith |
+| Garry's Mod | Dr. Kleiner | Alyx Vance (a Half-Life 2 association, like Dr. Kleiner) |
+
+- **No repeats.** A character that is already a theme's own voice isn't offered again: the pack's Administrator, SAS, GLaDOS, Bill, Bebop, Kleiner and US field-radio folders, and its G-Man (Steam's own voice), went into the quality pass on those voices instead. No character is in two themes and no recording is used twice (checked by SHA-256 against this pack, the first pack and the built-in voices).
+- **Left out:** Day of Defeat's German field-radio bank. A speaker-model screen found at least two voices in it (the radio lines and the shouted orders), and it's in German, which the local transcriber can't write down, so it isn't a single-speaker reference.
+- **Getting them.** The recordings aren't part of the app (the installer stays as small as before, and the game audio isn't passed on further). Press **Settings → Voice → Theme voices → Import character voices**, and give the character voice pack you have: its folder, or `Robotic-Tyler-Character-Voice-Expansion.zip` itself. Tyler reads only the clips this version lists (about 12 MB), checks each one's path, size, FLAC header and SHA-256, and copies them into `ThemeVoices\characters\<theme>\<character>\`. Nothing else in the pack is read, and a clip that doesn't match is skipped with the reason (its character keeps the theme's voice). **Remove imported character voices** deletes the copies; Remove theme voices keeps them, like your own recordings.
+- **Choosing one:** Settings → Theme voices → **Character voice** (one selector per theme), or the phone remote's Theme voice card. The choice is remembered for each theme separately. **Original recording** plays one of the character's own game lines (one that isn't in its reference); **Generated speech** makes new speech with the clone.
+- **In chat:** `!say tf2/scout TEXT` (or `tf2/scout: TEXT`) uses a character for that one message; only an exact *theme/character* pair counts, so ordinary words are never taken for a voice. `!say TEXT`, `!say portal TEXT` and `!say portal: TEXT` work as before (and use the theme's picked character).
+- **One speaker per message:** the theme and the character are taken when a message starts, so changing them meanwhile doesn't change a message on its way. A spoken reply made in several parts takes them once for all its parts.
+- **Fallback, never silent:** if the picked character's recordings are missing, changed or damaged, or it didn't pass its test, the theme's own voice speaks and the panel, Settings and the clip say which character couldn't be used and why.
+- **What each one is:** a catalog in the app (`app/theme-voices/characters.json`, no audio) lists each character's stable *theme/character* ID, its reference clips with their exact text (machine transcripts, a few corrected where Whisper clearly misheard; not checked by listening; Pyro has none, as his lines are non-lexical), whether it uses only the sound of the voice (Pyro and Heavy), its level and effects (none), its readiness and the scores measured for it.
+- **Caches** are keyed by the model, the theme, the character, the SHA-256 of every reference clip, the transcript, the mode, the effects, the level and the profile version, so a changed recording or text is never answered from an old clip.
+- **Readiness (v2.41, measured on a processor with the Lightweight model, not by ear):** 28 of the 30 are offered. 16 are rated *ready* (Engineer, Phoenix, Leet, Wheatley, Cave Johnson, Ellis, Alyx and nine Deadlock heroes), 11 *weak* (seven TF2 classes with only 5–7 s of game lines each, Coach, Zoey, Lash, Seven, Venator) and Kelvin an *approximation*. **Pyro and Medic aren't offered yet**: Pyro's clone speaks words clearly, which Pyro never does, and was barely more like him than another voice; Medic's test was unreliable (his few recordings are shouts that the speaker model rates as unlike each other). They show as *not approved*, and picking one keeps the theme's voice with that reason. The scores, and how they were measured, are in the v2.41 notes (CHANGES.md).
+
+### The polish pass on the theme's own voices (v2.41)
+
+The pack also brought new recordings of nine default voices (the Administrator, SAS, GLaDOS, Bill, Bebop, Kleiner, G-Man's Episode Two lines, the HEV suit and Black Mesa VOX). For each, two reference candidates (a subset of new recordings with checked text, and the current reference plus a few new ones) were compared with the current reference: the same four new sentences, the same seed, through the app's own worker, scored against held-out real recordings that no reference uses.
+
+- **No voice changed.** No candidate beat its baseline by the rules set before scoring. Kleiner's new subset was closer on the Lightweight model on two seeds but less close on the Quality model, so it's inconclusive and the v2.40 voice stays. G-Man's Episode Two lines are a different edition: closer to Episode Two, less close to the Half-Life 2 G-Man that is the default, so switching editions is left to the owner.
+- **Not compared:** Day of Defeat (the new US lines are other speakers by the speaker-model screen, and no unused recording of the current radio voice is left to test against); Rust (no source); Ricochet (one 0.213 s fragment, never used); Sam, Mary and Alex (only the earlier renders and demo); CS 1.6, DOOM, Quake, Dreamcast, Minecraft, Xbox 360 and PS3 (the pool holds only the first pack's own files; not run for time).
+- **Built-in versions:** a built-in voice that is improved later keeps its earlier version in `voices/<theme>/v1/`, and *Use the earlier version* in Settings goes back to it. None is needed in v2.41.
+
 ## Security
 
 - **The engine:** a separate process started isolated (`-I -S`, a minimal environment) and connected only by pipes to the desktop app. There's no network listener.
-- **The phone remote** gets two fixed actions (say text, stop) through the Steam window, never the engine.
+- **The phone remote** gets fixed actions (say text, stop and, since v2.41, pick a theme's character voice) through the Steam window, never the engine.
+- **Imported character recordings** are only ever read from the catalog's own paths (`themes/<theme>/<character>/cleaned/<name>.flac`): no links, no `..`, no file outside the pack, each one at most 4 MB and 64 MB in all; in a ZIP, an entry must declare the catalog's exact size and is never inflated beyond it.
 - **Large files** (engine, models, clips) live in the ThemeVoices folder, outside the settings store.
 - **Cached voice conditioning** is stored as safetensors (tensors and text only), keyed to the model and the reference's SHA-256. Nothing is loaded with pickle, and references supplied by users are accepted only as audio files.
 
@@ -115,14 +148,16 @@ Tyler suggests a mode from the hardware it detects (the GPU and its free memory,
 
 ## Testing
 
-- **Mocked** (`tests/theme-voices.test.mjs`, `tests/theme-speech.test.mjs`): no model and no internet. Downloads come from a local server, the engine is a stand-in that writes a tone, and spoken replies use a fake local engine (checking that the cloud voice is never called).
+- **Mocked** (`tests/theme-voices.test.mjs`, `tests/theme-speech.test.mjs`, v2.41 `tests/character-voices.test.mjs` and `tests/e2e/character-voices.e2e.mjs`): no model and no internet. Downloads come from a local server, the engine is a stand-in that writes a tone, and spoken replies use a fake local engine (checking that the cloud voice is never called).
 - **Real:**
   - Qwen3-TTS inference on a Linux processor in the development container: 1.7B and 0.6B, through the production worker and the installer-built engine;
   - Whisper, ECAPA and WavLM scoring;
   - v2.36: the fast engine installed with the app's installer from the new lock (Linux, processor), its streaming code run in parity mode through the worker, and the service making and stopping a spoken reply on it.
+  - v2.41: every new character and every polish candidate, 0.6B on the processor (a 1.7B subset too), through the app's worker; the app's service importing the real pack (ZIP and folder) and speaking as a character, with the cache, the one-speaker reply and the fallback.
 - **Not tested here:**
   - a Windows install;
   - NVIDIA GPU speed and memory, and the fast engine's CUDA graphs;
   - playback in a real Steam call;
   - the native Microsoft Sam and Mary route;
-  - Setup's new option on Windows.
+  - Setup's new option on Windows;
+  - v2.41: importing the pack on Windows and character voices on a graphics card (the *Theme voices on Windows* workflow now also checks a stand-in pack made from the app's own recordings), and any listening review of the new voices.

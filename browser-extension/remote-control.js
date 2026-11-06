@@ -66,7 +66,8 @@
  }
 
  function themeVoices(){const tv=globalThis.TylerThemeVoices;if(!tv)return {available:false};const st=tv.state();if(st.available===false)return {available:false};
-  return {available:true,ready:!!st.ready,busy:!!st.busy,voices:(st.voices||[]).slice(0,30).map(v=>({theme:clean(v.theme,12),name:clean(v.name,40)}))};}
+  // v2.41: each theme's character voices that can be used on the PC, and the one picked for it.
+  return {available:true,ready:!!st.ready,busy:!!st.busy,theme:clean(st.theme,12),voices:(st.voices||[]).slice(0,30).map(v=>({theme:clean(v.theme,12),name:clean(v.name,40),...(Array.isArray(v.characters)&&v.characters.length?{character:clean(v.character,24),characters:v.characters.slice(0,20).map(c=>({id:clean(c.id,24),name:clean(c.name,40)}))}:{})}))};}
  // ── Live events while a phone watches ─────────────────────────────────────
  // Only these events, with only these fields (all of them are already on the panel).
  const FIELDS={state:['state','label','text','before'],hud:['voice','voiceMeta','spend','spendMeta','latency','latencyMeta'],reply:['chars'],chat:['recent','flood'],
@@ -124,6 +125,8 @@
   'theme-say':({text:t,theme})=>{const tv=globalThis.TylerThemeVoices,s=clean(t,400);if(!tv?.state().ready)throw Error('Theme voices aren’t installed on the PC.');if(!s)throw Error('Type a message first.');if(tv.state().busy)throw Error('Tyler is still making the last one.');
    tv.say(s,/^[a-z0-9]{2,12}$/.test(String(theme||''))?theme:undefined).catch(()=>{});return {started:true};},
   'theme-stop':()=>{const tv=globalThis.TylerThemeVoices;if(!tv)throw Error('Theme voices aren’t available in this window.');void tv.stop();return {};},
+  // v2.41: pick a theme's character voice (saved on the PC; '' = the theme's own voice).
+  'theme-character':async({theme,character})=>{const tv=globalThis.TylerThemeVoices;if(!tv?.setCharacter)throw Error('Theme voices aren’t available in this window.');return tv.setCharacter(String(theme||''),String(character||''));},
   // v2.35: the chat log on the phone: the latest messages in the open Steam chat, as Steam shows them.
   'chat-log':()=>{
    const region=api.getRegion?.(),sample=api.getSample?.();if(!region?.isConnected)return {connected:false,messages:[]};

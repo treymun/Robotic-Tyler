@@ -12,6 +12,10 @@ on:
         type: choice
         options: [windows-cuda, windows-cuda-fast, windows-cpu]
         default: windows-cuda
+      characters:
+        description: Also check character voices (v2.41) with a stand-in pack made from the app's own recordings
+        type: boolean
+        default: true
 
 permissions:
   contents: read
@@ -28,4 +32,5 @@ jobs:
       - name: Install and speak (real engine, processor)
         env:
           RT: ${{ inputs.runtime }}
+          CHARACTERS: ${{ inputs.characters && '1' || '0' }}
         run: node tools/theme-voices/windows-smoke.cjs "$env:RUNNER_TEMP\TylerThemeVoices"
