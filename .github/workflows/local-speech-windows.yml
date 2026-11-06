@@ -1,0 +1,71 @@
+# REAL test of hearing and voice on this PC on Windows (v2.39; no graphics card needed: both run on the
+# processor). Installs the speech engine (sherpa-onnx 1.13.8's Windows package from npm), hearing
+# (NVIDIA Parakeet TDT 0.6B v3, int8) and the voice (Kokoro-82M v1.0) from their real sources with the
+# app's own installer, then:
+#   1. under Node 22: the quick checks (the built-in clip heard; the first audio of a sentence), a longer
+#      reply spoken and heard back (a round trip), two other voices, no network port, closed and gone;
+#   2. under Electron 45 run as Node (the engines then start with Electron's own executable): the same;
+#   3. from a real Electron main process, the way the desktop app starts them.
+# Every step prints its times. The logs and the spoken clips are uploaded as an artifact, and the key
+# lines go to the run's summary. Run by hand: Actions → Hearing and voice on this PC on Windows → Run
+# workflow. Downloads about 1 GB (Hugging Face, npm) plus Electron (GitHub).
+name: Hearing and voice on this PC on Windows
+
+on:
+  workflow_dispatch:
+    inputs:
+      voice:
+        description: Kokoro voice for the checks
+        type: choice
+        options: [am_michael, am_puck, am_fenrir, bm_george, af_heart, bf_emma]
+        default: am_michael
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: windows-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install, hear and speak (real engines, Node 22)
+        env:
+          VOICE: ${{ inputs.voice }}
+        run: |
+          New-Item -ItemType Directory -Force "$env:RUNNER_TEMP\TylerLocalSpeech\smoke-out" | Out-Null
+          node tools/local-ai/speech-smoke.cjs "$env:RUNNER_TEMP\TylerLocalSpeech" app/local-ai/check-clip.wav | Tee-Object -FilePath "$env:RUNNER_TEMP\TylerLocalSpeech\smoke-out\1-node.log"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Install Electron (for the next two steps)
+        run: npm install --no-audit --no-fund
+      - name: The same under Electron run as Node (engines started with Electron's executable)
+        env:
+          VOICE: ${{ inputs.voice }}
+          ELECTRON_RUN_AS_NODE: '1'
+        run: |
+          & "node_modules\electron\dist\electron.exe" tools/local-ai/speech-smoke.cjs "$env:RUNNER_TEMP\TylerLocalSpeech" | Tee-Object -FilePath "$env:RUNNER_TEMP\TylerLocalSpeech\smoke-out\2-electron-as-node.log"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: From a real Electron main process (as in the desktop app)
+        run: |
+          & "node_modules\electron\dist\electron.exe" tools/local-ai/speech-electron-check.cjs "$env:RUNNER_TEMP\TylerLocalSpeech" | Tee-Object -FilePath "$env:RUNNER_TEMP\TylerLocalSpeech\smoke-out\3-electron-main.log"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: Times in the run summary
+        if: always()
+        run: |
+          "## Hearing and voice on this PC (Windows runner)" | Out-File -Append $env:GITHUB_STEP_SUMMARY
+          '```' | Out-File -Append $env:GITHUB_STEP_SUMMARY
+          Get-ChildItem "$env:RUNNER_TEMP\TylerLocalSpeech\smoke-out\*.log" -ErrorAction SilentlyContinue | ForEach-Object {
+            "== $($_.Name)" | Out-File -Append $env:GITHUB_STEP_SUMMARY
+            Select-String -Path $_.FullName -Pattern 'plan:|installed in|CHECK|warm|ROUND TRIP|heard |voice [a-z]+_|listening|closed:|PASSED|FAILED|"(ok|ms|firstMs|startMs|text|words)"' | ForEach-Object { $_.Line } | Out-File -Append $env:GITHUB_STEP_SUMMARY
+          }
+          '```' | Out-File -Append $env:GITHUB_STEP_SUMMARY
+      - name: Keep the logs and the spoken clips
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: local-speech-windows
+          path: ${{ runner.temp }}\TylerLocalSpeech\smoke-out
+          if-no-files-found: ignore
