@@ -4,6 +4,8 @@
 // the panel's !say theme/character and the phone remote's action. The real catalog shipped with the app
 // (app/theme-voices/characters.json) is checked for repeats. Real inference is reported separately
 // (CHANGES.md: before/after table); nothing here claims a voice sounds right.
+// v2.43 (end of the file): the recordings are built in. Those tests use the app's real clips
+// (app/theme-voices/characters/, or copies of them to damage), still with no model (MOCKED inference).
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';import path from 'node:path';import os from 'node:os';import zlib from 'node:zlib';import crypto from 'node:crypto';
@@ -169,7 +171,7 @@ test('built-in versions: an improved voice keeps its earlier version for rollbac
 });
 
 // ── the service with the mocked worker ──────────────────────────────────────
-function fakeService(catalog){
+function fakeService(catalog,{bundledDir}={}){
  const dir=tmp(),app=tmp();
  fs.cpSync(path.join(TV,'voices'),path.join(app,'voices'),{recursive:true});fs.writeFileSync(path.join(app,'characters.json'),JSON.stringify(catalog));
  fs.mkdirSync(path.join(app,'worker'));fs.copyFileSync(path.join(root,'tests','fixtures','fake_voice_worker.py'),path.join(app,'worker','tyler_voice_worker.py'));
@@ -178,7 +180,7 @@ function fakeService(catalog){
  fs.writeFileSync(path.join(dir,'installed.json'),JSON.stringify({format:1,engine,runtime:'linux-cpu',lock:lockHash('linux-cpu'),models:{quality:{dir:mdir,revision:LOCK.models.quality.revision}},python}));
  let saved={mode:'quality'},active='tf2';
  const hw={os:{platform:'linux'},cpu:{model:'Test CPU',threads:4},ram:{total:32*GB,free:30*GB},gpus:[],disk:{free:50*GB},at:Date.now()};
- const svc=new ThemeVoices({dataDir:dir,appDir:app,fetch:async()=>{throw Error('no network');},getSettings:async()=>saved,setSettings:async v=>{saved=v;},theme:async()=>active,detect:async()=>hw,python,freemem:()=>30*GB});
+ const svc=new ThemeVoices({dataDir:dir,appDir:app,fetch:async()=>{throw Error('no network');},getSettings:async()=>saved,setSettings:async v=>{saved=v;},theme:async()=>active,detect:async()=>hw,python,freemem:()=>30*GB,...(bundledDir?{bundledDir}:{})});
  return {svc,dir,setTheme:t=>{active=t;},settings:()=>saved};
 }
 test('settings: the character is remembered per theme; other themes keep theirs; "" goes back to the theme\'s voice; bad values are ignored',async()=>{
@@ -309,7 +311,8 @@ test('v2.42 the voice supplement: either pack first, or both from one folder; th
  assert.equal(a.refPath.length,2);
  let py=v.voiceFor('tf2','pyro');assert.equal(py.name,'The Administrator');assert.equal(py.fallback.code,'needs_supplement');assert.match(py.fallback.reason,/offered only in its improved version, which needs the voice supplement/);
  const s1=v.characters.summary('tf2');assert.equal(s1.find(c=>c.id==='scout').versionCode,'needs_supplement');assert.equal(s1.find(c=>c.id==='pyro').usable,false);
- assert.deepEqual(v.characters.status(),{total:3,imported:3,complete:1,needsSupplement:2,improved:2});
+ const st=v.characters.status();assert.deepEqual({total:st.total,imported:st.imported,complete:st.complete,needsSupplement:st.needsSupplement,improved:st.improved},{total:3,imported:3,complete:1,needsSupplement:2,improved:2});
+ assert.equal(st.builtIn,0,'a catalog without built-in packs: nothing is built in, everything comes from an import');
  const k1=v.key(a);
  // Then the supplement: the improved version, a different cache key, no note.
  r=await v.characters.import(p.sup);assert.equal(r.needsSupplement,0);assert.equal(r.added,6,'only the supplement\'s clips were new');assert.deepEqual(r.packs,['the voice supplement']);
@@ -351,4 +354,146 @@ test('v2.42 service (mocked worker): the clip says when an earlier version spoke
   await svc.saveSettings({characterVersion:{'tf2/scout':0}});assert.deepEqual(settings().characterVersion,{});
   const list=(await svc.voiceList()).find(x=>x.theme==='tf2');const sc=list.characters.find(x=>x.id==='scout');assert.equal(sc.version,2);assert.deepEqual(sc.versions.map(x=>[x.version,x.ready,x.supplement]),[[1,true,false],[2,true,true]]);
  }finally{await svc.shutdown();}
+});
+
+// ── v2.43: the recordings are built in (no import step) ─────────────────────────────
+// These use the app's own clips (app/theme-voices/characters/<theme>/<character>/<sha>.flac), or copies of
+// them that a test may damage. Still no model: nothing here makes or judges real speech (MOCKED inference).
+const BUNDLE=path.join(TV,'characters');
+const builtinFile=(c,x,dir=BUNDLE)=>path.join(dir,c.theme,c.id,x.sha256+'.flac');
+function catalogClips(){const m=new Map();for(const c of CATALOG.characters)for(const x of allClips(c))m.set(c.theme+'/'+c.id+'/'+x.sha256,{c,x});return m;}
+function voicesBuiltin({bundle=BUNDLE,file=path.join(TV,'characters.json'),data=tmp()}={}){return {data,v:new Voices({builtinDir:path.join(TV,'voices'),dataDir:data,catalogFile:file,bundledDir:bundle})};}
+// A copy of the app's clips for a few characters (so a test can damage them), and the real catalog cut to them.
+function builtinCopy(ids){
+ const app=tmp(),bundle=path.join(app,'characters'),cat={...CATALOG,characters:CATALOG.characters.filter(c=>ids.includes(c.theme+'/'+c.id))};
+ for(const c of cat.characters)fs.cpSync(path.join(BUNDLE,c.theme,c.id),path.join(bundle,c.theme,c.id),{recursive:true});
+ const file=path.join(app,'characters.json');fs.writeFileSync(file,JSON.stringify(cat));return {bundle,file,cat};
+}
+// A pack folder (and its files, for a ZIP) holding these characters' real clips at their pack paths.
+function packOf(chars,top='Robotic-Tyler-Character-Voice-Expansion'){
+ const dir=path.join(tmp(),top),files=[];
+ for(const c of chars)for(const x of allClips(c)){const b=fs.readFileSync(builtinFile(c,x)),dst=path.join(dir,...x.file.split('/'));fs.mkdirSync(path.dirname(dst),{recursive:true});fs.writeFileSync(dst,b);files.push([x.file,b]);}
+ fs.writeFileSync(path.join(dir,'manifest.json'),'{}');return {dir,files,top};
+}
+const byId=id=>CATALOG.characters.find(c=>c.theme+'/'+c.id===id);
+
+test('v2.43 built in: the app ships exactly the clips the catalog lists, byte-identical; with no import every offered character speaks from them and Original recording plays for all 30',()=>{
+ assert.ok(Object.values(CATALOG.packs).every(p=>p.builtIn===true),'both packs are marked as shipped with the app');
+ const want=catalogClips(),have=[];
+ for(const t of fs.readdirSync(BUNDLE))for(const id of fs.readdirSync(path.join(BUNDLE,t)))for(const f of fs.readdirSync(path.join(BUNDLE,t,id)))have.push(t+'/'+id+'/'+f.replace(/\.flac$/,''));
+ assert.deepEqual(have.sort(),[...want.keys()].sort(),'every reference clip and preview of every version, nothing else');
+ let bytes=0;for(const {c,x} of want.values()){const b=fs.readFileSync(builtinFile(c,x));assert.equal(b.length,x.bytes);assert.equal(sha(b),x.sha256,c.id);assert.equal(b.subarray(0,4).toString('latin1'),'fLaC');bytes+=b.length;}
+ assert.equal(want.size,196);assert.ok(bytes>14e6&&bytes<15e6,'about 15 MB ('+bytes+' bytes)');
+ const {v,data}=voicesBuiltin();let offered=0;
+ for(const c of CATALOG.characters){
+  const cur=versionsOf(c).find(x=>x.version===c.current),r=v.voiceFor(c.theme,c.id);
+  const p=v.characters.previewFiles(c.theme,c.id);assert.equal(p.files.preview,builtinFile(c,cur.preview),c.id+': its Original recording is the app\'s clip');
+  if(cur.approved!==true){assert.equal(r.fallback.code,'unapproved',c.id);assert.equal(r.character,undefined);continue;}
+  offered++;assert.equal(r.character,c.id);assert.equal(r.characterVersion,c.current);assert.equal(r.versionNote,null,c.id+': no note');assert.ok(!r.fallback);
+  assert.deepEqual(r.refPath,cur.clips.map(x=>builtinFile(c,x)),c.id+': its own clips, in order, from the app');
+ }
+ assert.equal(offered,29,'Pyro alone isn\'t offered (he never passed his voice test)');
+ const st=v.characters.status();assert.deepEqual([st.total,st.builtIn,st.offered,st.damaged,st.needsSupplement,st.complete],[30,30,29,0,0,30]);assert.deepEqual(st.extra,{clips:0,bytes:0});
+ const sum=THEMES.flatMap(t=>v.characters.summary(t));assert.equal(sum.length,30);
+ assert.ok(sum.every(c=>c.builtIn&&c.imported&&!c.damaged&&!c.versionNote&&!c.versionCode),'built in, nothing waiting for a supplement');
+ assert.deepEqual(sum.filter(c=>!c.usable).map(c=>c.id),['pyro']);
+ const l=v.list({characters:{tf2:'scout'}}).find(x=>x.theme==='tf2');assert.equal(l.character,'scout');assert.equal(l.characterProblem,null);
+ assert.ok(!fs.existsSync(path.join(data,'characters')),'nothing was written to the data folder');
+});
+test('v2.43 built in: the 5 improved voices speak their version 2 (with their voice-supplement clips); going back to version 1 still works and keys its own cache',()=>{
+ const {v}=voicesBuiltin(),improved=CATALOG.characters.filter(c=>versionsOf(c).length>1);
+ assert.deepEqual(improved.map(c=>c.theme+'/'+c.id).sort(),['deadlock/kelvin','deadlock/seven','deadlock/venator','l4d/coach','l4d/zoey']);
+ for(const c of improved){const [v1,v2]=versionsOf(c),r=v.voiceFor(c.theme,c.id);
+  assert.equal(c.current,2);assert.equal(r.characterVersion,2,c.id);assert.equal(r.versionNote,null);assert.equal(r.status,v2.status);
+  assert.deepEqual(r.refPath,v2.clips.map(x=>builtinFile(c,x)));assert.ok(v2.clips.some(x=>x.pack==='supplement'),c.id+' uses the supplement\'s clips');
+  const old=v.voiceFor(c.theme,c.id,{characterVersion:1});assert.equal(old.characterVersion,1);assert.equal(old.versionNote.code,'pinned');
+  assert.deepEqual(old.refPath,v1.clips.map(x=>builtinFile(c,x)));assert.notEqual(v.key(old),v.key(r));}
+ const s=v.characters.summary('l4d').find(c=>c.id==='coach');assert.deepEqual(s.versions.map(x=>[x.version,x.ready,x.supplement]),[[1,true,false],[2,true,true]]);
+ assert.equal(v.characters.summary('l4d',{pins:{'l4d/coach':1}}).find(c=>c.id==='coach').pinned,true);
+});
+test('v2.43 built in: a missing or damaged built-in clip falls back visibly (earlier version, or the theme\'s own voice) with the reason; an import repairs it; Remove imported copies keeps the app\'s clips',async()=>{
+ const b=builtinCopy(['l4d/coach','tf2/scout']),{v,data}=voicesBuiltin(b),coach=b.cat.characters.find(c=>c.id==='coach'),scout=b.cat.characters.find(c=>c.id==='scout');
+ const [c1,c2]=versionsOf(coach),f=x=>builtinFile(coach,x,b.bundle);
+ assert.equal(v.voiceFor('l4d','coach').characterVersion,2);
+ // A clip only version 2 uses is damaged: version 1 speaks, and says why.
+ const only2=c2.clips.find(x=>!clipsOfAll(c1).includes(x.sha256)),orig2=fs.readFileSync(f(only2));fs.appendFileSync(f(only2),'x');
+ let r=v.voiceFor('l4d','coach');assert.equal(r.character,'coach');assert.equal(r.characterVersion,1);assert.equal(r.versionNote.code,'damaged');assert.equal(r.versionNote.builtIn,true);
+ assert.equal(r.versionNote.text,'Earlier version (v1): the improved version (v2) can’t be used (one of its built-in recordings is damaged: run the Setup again to repair the app).');
+ let s=v.characters.summary('l4d').find(x=>x.id==='coach');assert.deepEqual([s.usable,s.damaged,s.version,s.versionCode],[true,true,1,'damaged']);assert.equal(v.characters.status().damaged,1);
+ fs.rmSync(f(only2));r=v.voiceFor('l4d','coach');assert.equal(r.characterVersion,1);assert.match(r.versionNote.text,/one of its built-in recordings is missing: run the Setup again/);
+ // Pinned to version 1 is still version 1 (as chosen), not the damage note.
+ assert.equal(v.voiceFor('l4d','coach',{characterVersion:1}).versionNote.code,'pinned');
+ // A clip both versions use: no version can speak, so the theme's own voice does, with the reason (never silently).
+ const shared=c1.clips.find(x=>c2.clips.some(y=>y.sha256===x.sha256)),origS=fs.readFileSync(f(shared));fs.writeFileSync(f(shared),fakeFlac(9,shared.bytes));
+ r=v.voiceFor('l4d','coach');assert.equal(r.name,'Bill');assert.equal(r.character,undefined);assert.deepEqual([r.fallback.character,r.fallback.name,r.fallback.code,r.fallback.builtIn],['coach','Coach','changed',true]);
+ assert.match(r.fallback.reason,/^one of its built-in recordings is damaged: run the Setup again to repair the app$/);
+ s=v.characters.summary('l4d').find(x=>x.id==='coach');assert.deepEqual([s.usable,s.damaged],[false,true]);
+ const pick=v.list({characters:{l4d:'coach'}}).find(x=>x.theme==='l4d');assert.equal(pick.character,'coach','the pick is kept');assert.match(pick.characterProblem,/built-in recordings is damaged/);
+ // Scout (one version): a damaged clip → the Administrator, with the reason. A link in place of a clip counts as damaged.
+ const sf=builtinFile(scout,scout.versions[0].clips[0],b.bundle);fs.appendFileSync(sf,'x');r=v.voiceFor('tf2','scout');assert.equal(r.name,'The Administrator');assert.equal(r.fallback.code,'changed');
+ if(process.platform!=='win32'){const p=builtinFile(scout,scout.versions[0].preview,b.bundle),o=fs.readFileSync(p),out=path.join(tmp(),'x.flac');fs.writeFileSync(out,o);fs.rmSync(p);fs.symlinkSync(out,p);
+  assert.match(v.characters.previewFiles('tf2','scout').problem,/built-in recordings is damaged/);fs.rmSync(p);fs.writeFileSync(p,o);}
+ // The packs repair them: only what's missing or damaged is copied (beside the app's clips), and both speak again.
+ const pack=packOf(b.cat.characters),imp=await v.characters.import(pack.dir);
+ assert.equal(imp.added,3,'the three missing or damaged clips');assert.equal(imp.already,pack.files.length-3,'the rest were already here: not copied');assert.deepEqual(imp.failed,[]);
+ assert.equal(v.voiceFor('l4d','coach').characterVersion,2);assert.equal(v.voiceFor('l4d','coach').versionNote,null);assert.equal(v.voiceFor('tf2','scout').character,'scout');
+ const st=v.characters.status();assert.equal(st.damaged,0);assert.equal(st.extra.clips,3);
+ // Remove imported copies: the app's clips stay; the damage shows again.
+ v.characters.remove();assert.equal(v.voiceFor('l4d','coach').fallback.builtIn,true);assert.ok(fs.existsSync(f(c1.clips[0])));
+ // Imported again, then the app is repaired (Setup run again): the next start removes the now-duplicate copies.
+ await v.characters.import(pack.dir);fs.writeFileSync(f(only2),orig2);fs.writeFileSync(f(shared),origS);fs.copyFileSync(builtinFile(scout,scout.versions[0].clips[0]),sf);
+ const again=voicesBuiltin({...b,data});assert.deepEqual(again.v.characters.status().extra,{clips:0,bytes:0});assert.ok(!fs.existsSync(path.join(data,'characters','l4d','coach')));
+ assert.ok(again.v.voiceFor('l4d','coach').refPath.every(x=>x.startsWith(b.bundle)));
+});
+const clipsOfAll=v=>[...v.clips,...(v.preview?[v.preview]:[])].map(x=>x.sha256);
+test('v2.43 built in: a v2.42 (or v2.41) import keeps working; its copies of built-in clips are removed once the app\'s own copy checks out (nothing kept twice); cache keys and picks are unchanged',()=>{
+ const data=tmp(),store=path.join(data,'characters'),coach=byId('l4d/coach'),haze=byId('deadlock/haze');
+ // v2.42's layout: <sha>.flac and a format-2 record (both packs imported).
+ const cdir=path.join(store,'l4d','coach');fs.mkdirSync(cdir,{recursive:true});for(const x of allClips(coach))fs.copyFileSync(builtinFile(coach,x),path.join(cdir,x.sha256+'.flac'));
+ fs.writeFileSync(path.join(cdir,'character.json'),JSON.stringify({format:2,id:'l4d/coach',name:'Coach',catalogVersion:2,importedAt:1,updatedAt:2}));
+ // v2.41's: ref-01.flac… preview-NN.flac and a format-1 record.
+ const hdir=path.join(store,'deadlock','haze'),h1=versionsOf(haze)[0];fs.mkdirSync(hdir,{recursive:true});
+ [...h1.clips,h1.preview].forEach((x,i)=>fs.copyFileSync(builtinFile(haze,x),path.join(hdir,(i<h1.clips.length?'ref-':'preview-')+String(i+1).padStart(2,'0')+'.flac')));
+ fs.writeFileSync(path.join(hdir,'character.json'),JSON.stringify({format:1,id:'deadlock/haze',name:'Haze'}));
+ // As v2.42 saw it (no built-in clips): the store speaks.
+ const old=new Voices({builtinDir:path.join(TV,'voices'),dataDir:data,catalogFile:path.join(TV,'characters.json'),bundledDir:null});
+ const oc=old.voiceFor('l4d','coach'),oh=old.voiceFor('deadlock','haze'),keys=[old.key(oc),old.key(oh)];assert.ok(oc.refPath.every(f=>f.startsWith(store))&&oh.refPath.every(f=>f.startsWith(store)));assert.equal(oc.characterVersion,2);
+ // With the built-in clips (this version): the same voices, from the app's clips, the same cache keys; the copies are gone.
+ const {v}=voicesBuiltin({data}),nc=v.voiceFor('l4d','coach'),nh=v.voiceFor('deadlock','haze');
+ assert.equal(nc.characterVersion,2);assert.ok(nc.refPath.every(f=>f.startsWith(BUNDLE))&&nh.refPath.every(f=>f.startsWith(BUNDLE)));
+ assert.deepEqual([v.key(nc),v.key(nh)],keys,'Coach and Haze keep their cached clips (keys are the clips\' SHA-256, not where they are)');
+ assert.ok(!fs.existsSync(cdir)&&!fs.existsSync(hdir),'the store copies were the same as the app\'s: removed');
+ assert.deepEqual(v.characters.status().extra,{clips:0,bytes:0});
+ assert.equal(v.list({characters:{l4d:'coach',deadlock:'haze'}}).find(x=>x.theme==='l4d').character,'coach','picks are settings: kept');
+ // Only identical copies of a checked built-in clip go: with the app's copy damaged, the import is kept and speaks.
+ const b=builtinCopy(['l4d/coach']),d2=tmp(),c2=path.join(d2,'characters','l4d','coach');fs.cpSync(path.join(BUNDLE,'l4d','coach'),c2,{recursive:true});
+ fs.writeFileSync(path.join(c2,'character.json'),JSON.stringify({format:2,id:'l4d/coach',name:'Coach'}));
+ const x0=versionsOf(coach)[1].clips[0];fs.appendFileSync(builtinFile(coach,x0,b.bundle),'x');
+ const w=voicesBuiltin({...b,data:d2}),wc=w.v.voiceFor('l4d','coach');assert.equal(wc.characterVersion,2);assert.equal(wc.versionNote,null);
+ assert.ok(wc.refPath.includes(path.join(c2,x0.sha256+'.flac')),'the imported copy stands in for the damaged one');
+ assert.deepEqual(fs.readdirSync(c2).sort(),['character.json',x0.sha256+'.flac'].sort(),'the other copies were duplicates: removed');
+});
+test('v2.43 built in: importing the packs again copies nothing (same SHA-256): no store folder, the same voices and cache keys (folder and ZIP made from the real clips)',async()=>{
+ const {v,data}=voicesBuiltin(),ids=['tf2/scout','l4d/coach','deadlock/seven'],chars=ids.map(byId),pack=packOf(chars);
+ const now=()=>ids.map(id=>{const [t,c]=id.split('/'),r=v.voiceFor(t,c);return [r.characterVersion,r.refPath,v.key(r)];}),before=now();
+ let r=await v.characters.import(pack.dir);assert.deepEqual([r.added,r.already,r.bytes,r.failed.length],[0,pack.files.length,0,0]);assert.deepEqual(r.packs,[]);
+ const zip=path.join(tmp(),'Robotic-Tyler-Character-Voice-Expansion.zip');fs.writeFileSync(zip,zipOf(pack.files,pack.top));
+ r=await v.characters.import(zip);assert.deepEqual([r.added,r.already],[0,pack.files.length]);
+ assert.ok(!fs.existsSync(path.join(data,'characters')),'nothing was written');assert.deepEqual(now(),before);
+ r=await v.characters.import(tmp());assert.deepEqual([r.added,r.already],[0,0],'a folder without a pack: nothing found, nothing written');
+});
+test('v2.43 service (mocked worker): with no import, the character picked in Settings and "!say tf2/scout" speak from the app\'s clips; every offered character is listed for the panel and the phone',{skip:!python&&'needs python3'},async()=>{
+ const {svc,dir}=fakeService(CATALOG,{bundledDir:BUNDLE}),sent=[];
+ const orig=WorkerHost.prototype.request;WorkerHost.prototype.request=function(op,payload,o){if(op==='speak')sent.push(payload);return orig.call(this,op,payload,o);};
+ try{
+  await svc.saveSettings({characters:{l4d:'coach'}});
+  const a=await svc.speak({text:'Coach here.',theme:'l4d'});assert.deepEqual([a.character,a.characterVersion,a.versionNote,a.fallback],['coach',2,null,null]);
+  const req=sent.at(-1);assert.deepEqual(req.ref_audio,versionsOf(byId('l4d/coach'))[1].clips.map(x=>builtinFile(byId('l4d/coach'),x)));assert.equal(req.ref_text,versionsOf(byId('l4d/coach'))[1].transcript);
+  const b=await svc.speak({text:'Batter up.',theme:'tf2',character:'scout'});assert.deepEqual([b.character,b.characterVersion,b.fallback],['scout',1,null]);assert.ok(sent.at(-1).ref_audio.every(f=>f.startsWith(BUNDLE)));
+  const p=await svc.speak({text:'Mmph.',theme:'tf2',character:'pyro'});assert.equal(p.character,null);assert.equal(p.fallback.name,'Pyro');assert.match(p.fallback.reason,/Not offered yet/);
+  const list=await svc.voiceList(),offered=list.flatMap(x=>(x.characters||[]).filter(c=>c.usable).map(c=>x.theme+'/'+c.id));assert.equal(offered.length,29);assert.ok(!offered.includes('tf2/pyro'));
+  assert.equal(list.find(x=>x.theme==='l4d').character,'coach');
+  assert.ok(!fs.existsSync(path.join(dir,'characters')),'nothing was imported or copied');
+  svc.removeCharacters();assert.equal((await svc.speak({text:'Still Coach.',theme:'l4d'})).character,'coach','Remove imported copies leaves the built-in recordings');
+ }finally{WorkerHost.prototype.request=orig;await svc.shutdown();}
 });

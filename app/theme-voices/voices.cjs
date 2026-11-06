@@ -8,7 +8,8 @@
 // are accepted as references; nothing a user supplies is ever loaded as code or as a model.
 //
 // v2.41: a theme can also speak as one of its optional characters (characters.cjs: TF2's classes,
-// Deadlock's heroes…), when the owner has imported them and picked one. The theme's own voice stays the
+// Deadlock's heroes…), when the owner has picked one (v2.43: their recordings are built in, nothing to
+// import; voices/../characters/<theme>/<character>/<sha>.flac). The theme's own voice stays the
 // default, and a pick that can't be used (missing, changed or not approved) falls back to it with the
 // reason attached (voice.fallback), never silently. A built-in voice that was improved keeps its earlier
 // version (voices/<theme>/v1/) so it can be used again (settings: builtinVersion).
@@ -27,7 +28,8 @@ const STATUS={
  custom:'Your own reference'};
 
 class Voices{
- constructor({builtinDir,dataDir,catalogFile=path.join(builtinDir,'..','characters.json')}){this.builtinDir=builtinDir;this.customDir=path.join(dataDir,'custom-voices');this.characters=new Characters({dataDir,catalogFile,themes:THEMES});}
+ // v2.43: the character voices' recordings ship beside the built-in voices (theme-voices/characters/, unpacked from app.asar).
+ constructor({builtinDir,dataDir,catalogFile=path.join(builtinDir,'..','characters.json'),bundledDir=path.join(builtinDir,'..','characters')}){this.builtinDir=builtinDir;this.customDir=path.join(dataDir,'custom-voices');this.characters=new Characters({dataDir,catalogFile,themes:THEMES,bundledDir});}
  /** The built-in voice; `version` picks an earlier version of an improved voice (its baseline), if it has one. */
  builtin(theme,version){
   const dir=path.join(this.builtinDir,theme);let p=null;try{p=JSON.parse(fs.readFileSync(path.join(dir,'profile.json'),'utf8'));}catch{}

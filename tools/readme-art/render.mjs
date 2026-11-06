@@ -43,7 +43,7 @@ async function panel({theme='steam',platform='chrome',tab='conversation',state=S
 }
 // v2.41 README: the desktop app's Settings with its PC-side parts answering, as on an example PC
 // (an RTX 3060 with 12 GB, a 6-core Ryzen, 32 GB): text replies on this PC installed and ready, hearing
-// and a voice installed with their checks, and the character voices imported (the shipped catalog).
+// and a voice installed with their checks, and the character voices built in (the shipped catalog; v2.43).
 // The suggestion is the app's own (app/local-ai/hardware.cjs); the rest is sample data.
 const GB=1024**3;
 const PC=(()=>{
@@ -58,7 +58,7 @@ const PC=(()=>{
  const cat=JSON.parse(fs.readFileSync(path.join(ROOT,'app','theme-voices','characters.json'),'utf8'));
  const own={tf2:'The Administrator',cs2:'SAS operator',portal:'GLaDOS',l4d:'Bill',deadlock:'Bebop',gmod:'Dr. Kleiner'},pick={tf2:'engineer',cs2:'leet',portal:'wheatley',deadlock:'haze'};
  const voices=[...new Set(cat.characters.map(c=>c.theme))].map(t=>({theme:t,name:own[t]||t,status:'ready',statusLabel:'Ready',hasReference:true,versions:[1],version:1,sample:'A line.',
-  characters:cat.characters.filter(c=>c.theme===t).map(c=>({id:c.id,name:c.name,status:c.status,statusNote:'',imported:true,approved:c.approved!==false,usable:c.approved!==false,problem:c.approved===false?'not approved':null,hasPreview:true,previewText:'Line.',nonlexical:!!c.nonlexical})),character:pick[t]||''}));
+  characters:cat.characters.filter(c=>c.theme===t).map(c=>({id:c.id,name:c.name,status:c.status,statusNote:'',imported:true,builtIn:true,damaged:false,approved:c.approved!==false,usable:c.approved!==false,problem:c.approved===false?'not approved':null,hasPreview:true,previewText:'Line.',nonlexical:!!c.nonlexical})),character:pick[t]||''}));
  const tv={installed:true,current:true,ready:true,mode:'light',modeChosen:true,modeLabel:'Lightweight',engine:'standard',models:{light:true},settings:{characters:pick,builtinVersion:{},idleMinutes:5,chatCooldown:20},recommendation:{mode:'light',notes:[]},hardware};
  return {text,speech,voices,tv,store:{aiProvider:'local',localAIModel:'9b',voiceHearing:'local',speechEngine:'kokoro',kokoroVoice:'bm_george'}};
 })();
@@ -69,7 +69,7 @@ function pcStub([theme,PC]){
  window.tylerSettings={storage:{local},tabs:{create:async()=>{}},verifyKey:async()=>true,activity:async()=>[],ai:async()=>({ok:true}),onTheme:()=>{},onVoices:()=>{},remote:async()=>({}),
   voice:{devices:async()=>[],tone:async()=>'',test:async()=>({})},onLocalAI:()=>{},
   localAI:async op=>op==='status'?{status:PC.text,models,engine:{build:'b11669'}}:op==='speech-status'?{status:PC.speech}:op==='plan'||op==='speech-plan'?{fileCount:0,download:0}:{},
-  voices:async op=>op==='status'?{status:PC.tv,voices:PC.voices,modes:{},models:{}}:op==='native-status'?{windows:true}:op==='plan'?{download:0}:{}};
+  voices:async op=>op==='status'?{status:PC.tv,voices:PC.voices,characters:{total:30,builtIn:30,offered:29,damaged:0,extra:{clips:0,bytes:0}},modes:{},models:{}}:op==='native-status'?{windows:true}:op==='plan'?{download:0}:{}};
  window.tylerNative={devices:async()=>[],status:async()=>({ok:true}),openSettings:async()=>{},openSteam:async()=>{},theme:async()=>theme};
 }
 // A real settings page screenshot: the given sheets (CSS selectors, comma separated) on the given

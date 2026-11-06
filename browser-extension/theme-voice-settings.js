@@ -1,14 +1,15 @@
 // Settings → Theme voices (v2.35, desktop app). Install, repair and remove the local voice
 // engine; choose Quality or Lightweight; test, hear and replace each theme's voice. Everything heavy
 // happens in the desktop app's main process (app/theme-voices); this page only shows it.
-// v2.41: Character voices: import the owner's character voice pack, pick a character per theme (the
-// theme's own voice stays the default), and hear its original recording or new generated speech.
-// An improved built-in voice can be set back to its earlier version.
+// v2.41: Character voices: pick a character per theme (the theme's own voice stays the default), and hear
+// its original recording or new generated speech. An improved built-in voice can be set back to its
+// earlier version. v2.43: their recordings are built into the app (nothing to import); Import character
+// voices stays as a second way to repair or add recordings from the owner's packs.
 (() => {
  'use strict';
  const root=document.getElementById('theme-voices'),tv=window.tylerSettings?.voices;if(!root||!tv)return;
  const $=id=>document.getElementById(id),GB=1024**3,gb=n=>(n/GB).toFixed(n>=10*GB?0:1)+' GB';
- let status=null,voices=[],models={},installing=false,plans={},failed=false;
+ let status=null,voices=[],models={},installing=false,plans={},failed=false,charStatus=null;
  const say=(id,t)=>{$(id).textContent=t;};
  function hardwareLine(s){
   const h=s.hardware;if(!h)return 'Checking this PC…';
@@ -27,7 +28,7 @@
  }
  async function load(){
   let r;try{r=await tv('status');}catch(e){say('tvInstallState','Theme voices aren’t available: '+e.message);return;}
-  status=r.status;voices=r.voices;models=r.models;installing=!!status.installing;if(installing)$('tvProgressWrap').hidden=false;if(status.installError&&!status.ready)failed=true;render();
+  status=r.status;voices=r.voices;models=r.models;charStatus=r.characters||null;installing=!!status.installing;if(installing)$('tvProgressWrap').hidden=false;if(status.installError&&!status.ready)failed=true;render();
   if(!installing)say('tvInstallState',await stateText());
  }
  const engineName=e=>e==='fast'?'fast':'standard';
@@ -85,21 +86,29 @@
    row.append(a,b,c);box.append(row);
   }
  }
- // ── v2.41 character voices (v2.42: improved versions from the voice supplement, and going back to the earlier one) ──
+ // ── v2.41 character voices (v2.42: improved versions from the voice supplement, and going back to the earlier one;
+ //    v2.43: built in, so the status line counts what ships and says if a built-in recording is missing or damaged) ──
  const themeName=t=>globalThis.TylerTheme?.info?.[t]?.[0]||t;
- const charTag=c=>!c?null:!c.approved?'Not approved':!c.imported?'Not imported':!c.usable?(/voice supplement/.test(c.problem||'')?'Needs the supplement':'Unavailable'):c.nonlexical?'Non-lexical':c.status==='ready'?'Ready':c.status==='weak'?'Weak clone':c.status==='approximation'?'Approximation':'Not rated yet';
+ const charTag=c=>!c?null:!c.approved?'Not approved':!c.imported?(c.builtIn?'Damaged':'Not imported'):!c.usable?(c.damaged?'Damaged':/voice supplement/.test(c.problem||'')?'Needs the supplement':'Unavailable'):c.nonlexical?'Non-lexical':c.status==='ready'?'Ready':c.status==='weak'?'Weak clone':c.status==='approximation'?'Approximation':'Not rated yet';
  let charBusy=false;
  function charSummary(){
   const all=voices.flatMap(v=>v.characters||[]),ok=all.filter(c=>c.usable).length,imp=all.filter(c=>c.imported).length;
   if(!all.length)return 'This version lists no character voices.';
-  const themes=voices.filter(v=>v.characters?.length).length,improved=all.filter(c=>(c.versions||[]).length>1),waiting=all.filter(c=>c.versionCode==='needs_supplement'||(c.imported&&!c.usable&&/voice supplement/.test(c.problem||''))).length;
+  const themes=voices.filter(v=>v.characters?.length).length;
+  // v2.43: the recordings ship with the app. A damaged install is said plainly, with what each affected character does instead.
+  if(all.every(c=>c.builtIn)){const bad=all.filter(c=>c.damaged).length;
+   return all.length+' character voices built in ('+ok+' offered) for '+themes+' themes. Each theme keeps its own voice until you pick a character.'+
+    (bad?' '+bad+' '+(bad===1?'has':'have')+' a missing or damaged built-in recording: run the Setup again to repair the app, or import the voice packs below. Until then '+(bad===1?'it uses its':'they use their')+' earlier version or '+(bad===1?'its':'their')+' theme’s own voice, and '+(bad===1?'says':'say')+' so.':'');}
+  const improved=all.filter(c=>(c.versions||[]).length>1),waiting=all.filter(c=>c.versionCode==='needs_supplement'||(c.imported&&!c.usable&&/voice supplement/.test(c.problem||''))).length;
   const sup=!improved.length?'':waiting?' '+waiting+' of the '+improved.length+' improved voices need'+(waiting===1?'s':'')+' the voice supplement: import it too (until then they use their earlier version, or aren’t offered).':improved.some(c=>c.imported)?' The voice supplement is imported: '+improved.length+' voices use their improved version.':'';
   return !imp?'Not imported yet: this version lists '+all.length+' character voices for '+themes+' themes. Each theme keeps its own voice until you pick a character.':
    'Imported: '+imp+' of '+all.length+' character voices'+(ok<imp?' ('+(imp-ok)+' imported but not offered, so their themes keep their own voice)':'')+'.'+sup;
  }
  function renderCharacters(){
-  const box=$('tvChars');if(!box)return;box.replaceChildren();if(!charBusy)say('tvCharState',charSummary());
-  $('tvCharRemove').disabled=!voices.some(v=>(v.characters||[]).some(c=>c.imported));
+  const box=$('tvChars');if(!box)return;box.replaceChildren();say('tvCharState',charSummary());
+  // v2.43: the built-in recordings can't be removed; only copies an import added beside them (shown when there are any).
+  const extra=charStatus?.extra||{clips:0,bytes:0};$('tvCharRemove').hidden=!extra.clips;$('tvCharRemove').disabled=!extra.clips;
+  $('tvCharRemove').textContent='Remove imported copies'+(extra.clips?' ('+(extra.bytes>=1e5?(extra.bytes/1024**2).toFixed(1)+' MB':Math.max(1,Math.round(extra.bytes/1024))+' KB')+')':'');
   for(const v of voices.filter(x=>x.characters?.length)){
    const row=document.createElement('div');row.className='tv-voice';row.dataset.theme=v.theme;
    const a=document.createElement('div'),b=document.createElement('div'),c=document.createElement('div');c.className='tv-buttons';
@@ -132,10 +141,15 @@
  }
  $('tvCharImport').onclick=()=>{$('tvCharForm').hidden=false;$('tvCharSource').focus();};
  $('tvCharCancel').onclick=()=>{$('tvCharForm').hidden=true;};
- $('tvCharGo').onclick=async()=>{const src=$('tvCharSource').value.trim().replace(/^["']+|["']+$/g,'');if(!src)return;$('tvCharForm').hidden=true;charBusy=true;$('tvCharGo').disabled=true;say('tvCharState','Importing and checking the character recordings…');
-  try{const r=await tv('characters-import',{source:src});charBusy=false;await load();
-   say('tvCharState','Checked and copied '+(r.added??0)+' recording'+(r.added===1?'':'s')+' ('+((r.bytes||0)/1024**2).toFixed(1)+' MB'+(r.packs?.length?' from '+r.packs.join(' and '):'')+'). Imported '+r.imported+' of '+r.total+' character voices'+(r.needsSupplement?'; '+r.needsSupplement+' improved voice'+(r.needsSupplement===1?'':'s')+' still need'+(r.needsSupplement===1?'s':'')+' the voice supplement':'')+'.'+(r.failed.length?' Not imported: '+r.failed.slice(0,6).map(f=>f.name+' ('+f.reason+')').join('; ')+(r.failed.length>6?'; and '+(r.failed.length-6)+' more':'')+'. Those characters keep their theme’s own voice.':''));}
-  catch(e){charBusy=false;say('tvCharState','Import failed: '+e.message+' Nothing was changed for the characters that weren’t imported.');}finally{$('tvCharGo').disabled=false;}};
+ // What an import did. v2.43: a recording that is already here (built in, or imported before) isn't copied again.
+ function importText(r){
+  const n=r.added??0,fails=r.failed.length?' Not imported: '+r.failed.slice(0,6).map(f=>f.name+' ('+f.reason+')').join('; ')+(r.failed.length>6?'; and '+(r.failed.length-6)+' more':'')+'. Those characters keep the voice they had.':'';
+  if(!n&&!r.failed.length)return r.already?'Nothing to import: the '+r.already+' recording'+(r.already===1?'':'s')+' found there '+(r.already===1?'is':'are')+' already here, unchanged (built in, or imported before). Nothing was copied.':'No recordings this version lists were found there. Choose the character voice pack or the voice supplement: its folder or its .zip file.';
+  return 'Checked and copied '+n+' recording'+(n===1?'':'s')+' ('+((r.bytes||0)/1024**2).toFixed(1)+' MB'+(r.packs?.length?' from '+r.packs.join(' and '):'')+')'+(r.already?'; '+r.already+' already here '+(r.already===1?'wasn’t':'weren’t')+' copied again':'')+'. '+r.complete+' of '+r.total+' character voices have every recording now'+(r.needsSupplement?'; '+r.needsSupplement+' improved voice'+(r.needsSupplement===1?'':'s')+' still need'+(r.needsSupplement===1?'s':'')+' the voice supplement':'')+'.'+fails;
+ }
+ $('tvCharGo').onclick=async()=>{const src=$('tvCharSource').value.trim().replace(/^["']+|["']+$/g,'');if(!src)return;$('tvCharForm').hidden=true;charBusy=true;$('tvCharGo').disabled=true;say('tvCharVoiceState','Importing and checking the character recordings…');
+  try{const r=await tv('characters-import',{source:src});charBusy=false;await load();say('tvCharVoiceState',importText(r));}
+  catch(e){charBusy=false;say('tvCharVoiceState','Import failed: '+e.message+' Nothing was changed for the characters that weren’t imported.');}finally{$('tvCharGo').disabled=false;}};
  let audioEl=null;
  function play(b64,type='audio/wav'){try{audioEl?.pause();}catch{}audioEl=new Audio('data:'+type+';base64,'+b64);void audioEl.play().catch(e=>say('tvVoiceState','Couldn’t play it here: '+e.message));}
  let picking=null;
@@ -172,7 +186,7 @@
  let armed=null;const twice=(id,fn,ask,where='tvInstallState')=>{$(id).onclick=()=>{if(armed!==id){armed=id;say(where,ask+' Press the button again to confirm.');setTimeout(()=>{if(armed===id)armed=null;},6000);return;}armed=null;void fn();};};
  twice('tvRemove',()=>removeConfirm('remove',{},'Theme voices removed. Your settings, recordings and saved clips are kept.'),'This removes the voice engine and models (your settings, recordings and saved clips stay).');
  twice('tvRemoveQuality',()=>removeConfirm('remove-model',{model:'quality'},'The Quality model was removed.'),'Remove the Quality model?');
- twice('tvCharRemove',async()=>{say('tvCharState','Removing…');try{await tv('characters-remove');}catch(e){say('tvCharState',e.message);}await load();},'This removes the imported character recordings (each theme keeps its own voice; picks are kept for a later import).','tvCharState');
+ twice('tvCharRemove',async()=>{say('tvCharVoiceState','Removing…');try{await tv('characters-remove');say('tvCharVoiceState','The imported copies were removed. The built-in recordings and your picks stay.');}catch(e){say('tvCharVoiceState',e.message);}await load();},'This removes only the recordings you imported. The built-in ones stay, and so do your picks.','tvCharVoiceState');
  twice('tvRemoveLight',()=>removeConfirm('remove-model',{model:'light'},'The Lightweight model was removed.'),'Remove the Lightweight model?');
  $('tvUnload').onclick=async()=>{await tv('unload');say('tvVoiceState','The voice engine is closed; its memory is free.');await load();};
  $('tvClearCache').onclick=async()=>{await tv('clear-cache');say('tvVoiceState','Cached clips cleared.');};
@@ -186,7 +200,7 @@
    if(e.phase==='done'){installing=false;failed=false;plans={};$('tvProgress').style.width='100%';say('tvInstallState','Theme voices are ready.'+(e.check?' Voice check: '+e.check.seconds+' s of speech in '+(e.check.ms/1000).toFixed(1)+' s.':''));void load();}
    if(e.phase==='failed'){installing=false;failed=true;plans={};say('tvInstallState',e.label+' Tyler works as before without theme voices; press Retry to carry on (what was downloaded is kept).');void load();}
   }
-  if(e.kind==='characters-import'&&charBusy)say('tvCharState','Importing and checking the character recordings… '+(e.done||0)+'/'+(e.total||0)+(e.name?' · '+e.name:''));
+  if(e.kind==='characters-import'&&charBusy)say('tvCharVoiceState','Importing and checking the character recordings… '+(e.done||0)+'/'+(e.total||0)+(e.name?' · '+e.name:''));
  });
  async function native(){try{const n=await tv('native-status');say('tvNative',!n.windows?'Only on Windows.':n.sam||n.mary?'Found on this PC: '+[n.sam&&'Microsoft Sam',n.mary&&'Microsoft Mary'].filter(Boolean).join(' and ')+'. Tyler uses them for those two themes.':'Not on this PC. Tyler uses the clones (approximations) for those two themes.');$('tvNativeGet').hidden=!n.windows||(n.sam&&n.mary);}catch(e){say('tvNative',e.message);}}
  $('tvNativeCheck').onclick=()=>void native();

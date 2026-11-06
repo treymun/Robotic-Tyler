@@ -1,0 +1,93 @@
+# ROBOTIC TYLER v2.43.0: Character voices built in
+
+## New
+- **The character voices' recordings come with the desktop app. There's nothing to import.**
+  - All 30 characters are built in: TF2's classes, the 13 Deadlock heroes, Wheatley, Cave Johnson, Coach, Ellis, Zoey, the Phoenix, Leet and Alyx.
+  - Install theme voices as before (the one-click download of the voice engine and model; unchanged). Then every offered character just works.
+  - Pick one in **Settings → Theme voices → Character voices** or on the phone remote, or use `!say tf2/scout TEXT` in chat.
+  - **Original recording** plays the game's own line for every character, Pyro included.
+- **The 5 improved voices use their version 2 from the start:** Coach, Seven, Zoey, Kelvin and Venator. You no longer need the voice supplement for them.
+- You asked: *"i want the user to be able to do it without installing more files to import."*
+
+## Changed
+- **The installer is about 15 MB larger.** It now holds the 196 recordings the characters use: every clip of every version, and each one's *Original recording*.
+  - They're byte for byte the clips from your two packs, *Robotic-Tyler-Character-Voice-Expansion* and *Robotic-Tyler-Complete-Voice-Supplement*.
+  - Nothing else from the packs is included.
+- **Settings' status line** now reads *"30 character voices built in (29 offered) for 6 themes."*
+  - It no longer says *"Not imported yet"*, and it no longer asks for the voice supplement.
+  - Pyro is still not offered: he never passed his voice test. He shows as *not approved*, as before.
+- **Import character voices** is still there, but it's optional now.
+  - It moved below the character list.
+  - Use it only to repair a damaged recording, or to add recordings.
+  - A recording that's already here (built in, or imported before) is never copied again. Importing your packs now changes nothing.
+- **"Remove imported character voices" is now "Remove imported copies".**
+  - It only shows when you have imported copies.
+  - It deletes only those. The built-in recordings can't be removed.
+- **If you imported the packs in v2.41 or v2.42**, your import keeps working.
+  - Its copies are the same recordings that are now built in, so Tyler removes them once each built-in copy checks out (about 15 MB freed). Nothing is kept twice.
+  - Your picks and your *Use the earlier version* choices are kept.
+- The Chrome extension doesn't change: it has no theme voices.
+
+## How it behaves
+- **Each recording is checked before it's used:** its exact size and its SHA-256 must match the catalog.
+- **A damaged install never switches silently.**
+  - If a built-in recording is missing or damaged, an improved character uses its **earlier version** and says why: *"Earlier version (v1): the improved version (v2) can't be used (one of its built-in recordings is damaged: run the Setup again to repair the app)."*
+  - If no version can be used, the **theme's own voice** speaks, with the reason.
+  - You see it in Settings (on the character's row and in the status line), on the panel, on the phone and on the clip.
+  - **To fix it:** run the Setup again, or import the voice packs.
+- **Unchanged:**
+  - The theme's own voice stays the default. Each theme remembers its own pick.
+  - *Use the earlier version* and *Use the improved version* work as before.
+  - Cached clips are keyed by the recordings' content, so they stay valid. Clips you made from an import are still used.
+  - An unknown or unapproved character falls back to the theme's voice, with the reason.
+  - The phone remote's character list works as before. It now lists every offered character without an import.
+- **Where they are:** `app/theme-voices/characters/<theme>/<character>/<sha256>.flac`.
+  - In the installed app they sit outside `app.asar` (in `app.asar.unpacked`), like the 25 theme voices' recordings and the voice engine's script.
+  - This is because the voice engine is a separate Python program, and it can't read inside `app.asar`. It reads them where they are, so nothing is copied at first use.
+
+## Tested
+- **Mocked** (no voice model; the app's real recordings, or damaged copies of them):
+  - With no import, every offered character (29) speaks from its built-in clips, in order. All 30 play their *Original recording*. Nothing is written to the data folder.
+  - The 5 improved voices use version 2, with their supplement clips. Going back to version 1 still works and keeps its own cache.
+  - The app holds exactly the 196 clips the catalog lists, byte-identical to the catalog's sizes and SHA-256.
+  - A damaged or missing clip:
+    - only in version 2: version 1 speaks, with its note;
+    - shared by both versions: the theme's voice speaks, with the reason;
+    - a link in place of a clip counts as damaged.
+  - An import repairs the damage, copying only the damaged clips. *Remove imported copies* leaves the built-in clips alone.
+  - A v2.42 store and a v2.41 store still work:
+    - the same voices and the same cache keys;
+    - their duplicate copies are removed;
+    - a copy is kept when the built-in clip is damaged.
+  - Importing identical clips (from a folder and from a ZIP) changes nothing: no files, the same voices, the same cache keys.
+  - The service with the stand-in engine: a pick from Settings and `!say tf2/scout` speak from the built-in clips with no import. Pyro falls back with his reason.
+  - Packaging: the clips are unpacked from `app.asar` by the desktop installer's config, and no exclude rule drops them. The installed app looks for them in `app.asar.unpacked`, next to the voices and the worker. `.gitattributes` keeps FLAC byte for byte.
+  - End-to-end, Settings (the real voice list, no import):
+    - *"30 character voices built in (29 offered)"*;
+    - nothing asks for an import or the supplement;
+    - Import is below the list, and Remove is hidden;
+    - *Use the earlier version*, *Original recording* and *Generated speech* work;
+    - importing anyway says nothing was copied.
+  - End-to-end, the damaged state: the status line and Coach's note say why. *Remove imported copies* asks twice, then removes only the import.
+  - End-to-end, the phone remote, with no import: TF2 lists every offered class (no Pyro), and Left 4 Dead shows Coach's earlier-version note.
+  - Layout audit, checked by eye: the Character voices block in Steam, TF2, Portal, Deadlock, Left 4 Dead, CS2, Pip-Boy and Windows XP. The audit showed the damaged state, *Remove imported copies*, and the import form open. Steam and Pip-Boy were also checked in the normal state.
+  - The README pictures (feature card and What's new) were re-rendered with the new wording.
+  - All unit tests (497), all end-to-end tests (46) and the desktop check pass.
+- **Real** (Linux, this project's test machine, processor only):
+  - **A real package:** electron-builder built a Linux `--dir` package from the desktop installer's own config.
+    - Its `app.asar` marks all 196 clips as unpacked.
+    - Each is byte-identical in `app.asar.unpacked`.
+    - The packaged app's own code, run from inside `app.asar`, found them: 30 built in, 29 offered.
+    - A separate Python process read them.
+  - **Real speech from that package**, with Qwen3-TTS 0.6B through the app's real voice worker, with no import:
+    - Coach spoke his **version 2** (3.1 s of speech in 35 s);
+    - Scout spoke his **version 1**, for one message (1.8 s in 19 s);
+    - the same line again came from the cache;
+    - Coach's *Original recording* played.
+  - **A damaged version-2 clip**: Coach's version 1 spoke with the note (2.5 s in 20 s). Version 2 came back when the clip was restored.
+  - Nothing was written to the data folder.
+  - Rated by nobody: no one listened to the voices.
+- **Not tested:**
+  - The Windows installer and an installed copy on Windows.
+  - The *Theme voices on Windows* workflow now checks the built-in clips at an installed-app path with spaces and an accent. It also checks a damaged clip and a repair by import. **It wasn't run for this change.**
+  - A graphics card, a real Steam call, and the phone remote on a real phone.

@@ -8,11 +8,15 @@
 //     pick a theme's character voice), never the engine itself.
 //   - v2.41: Settings may also import the owner's character voice pack (a folder or ZIP path) and play a
 //     character's original recording. The Steam window may pick a theme's character (a saved setting).
+//   - v2.43: the character recordings ship with the app (theme-voices/characters/, unpacked from app.asar
+//     like voices/ and worker/, so the Python worker reads them in place); importing only repairs or adds.
 // Clips go back as audio only; file paths stay here, except a saved clip's own path.
 const path=require('node:path'),fs=require('node:fs');
 const {ThemeVoices,MODES}=require('./service.cjs'),{LOCK,plan}=require('./installer.cjs'),hardware=require('./hardware.cjs');
 
 function setupThemeVoices({root,dir,vault,local,changeListeners,net,shell,log,send}){
+ // The worker, the 25 voices' references and (v2.43) the character clips are unpacked from app.asar
+ // (electron-builder.desktop.json: asarUnpack), so the Python worker can read them from this folder.
  const appDir=path.join(dir,'theme-voices').replace('app.asar'+path.sep,'app.asar.unpacked'+path.sep);
  // The character catalog (v2.41) is read from the app's own files (inside app.asar; Electron reads it there).
  const service=new ThemeVoices({dataDir:path.join(root,'ThemeVoices'),appDir,catalogFile:path.join(dir,'theme-voices','characters.json'),
@@ -44,7 +48,7 @@ function setupThemeVoices({root,dir,vault,local,changeListeners,net,shell,log,se
   save:async id=>{const c=clips.get(id);if(!c)throw Error('That clip isn’t available any more. Make it again.');const file=service.save(c);try{shell.showItemInFolder(file);}catch{}return {file};}
  };
  async function settingsRequest(op,r){
-  if(op==='status'){await service.hardware().catch(()=>null);return {status:await service.status(),voices:await service.voiceList(),modes:MODES,models:Object.fromEntries(Object.entries(LOCK.models).map(([k,m])=>[k,{label:m.label,repo:m.repo,revision:m.revision,license:m.license,bytes:m.files.reduce((n,f)=>n+f.size,0)}])),engine:LOCK.engine,python:LOCK.python.version};}
+  if(op==='status'){await service.hardware().catch(()=>null);return {status:await service.status(),voices:await service.voiceList(),characters:service.voices.characters.status(),modes:MODES,models:Object.fromEntries(Object.entries(LOCK.models).map(([k,m])=>[k,{label:m.label,repo:m.repo,revision:m.revision,license:m.license,bytes:m.files.reduce((n,f)=>n+f.size,0)}])),engine:LOCK.engine,python:LOCK.python.version};}
   if(op==='hardware'){const hw=await service.hardware(true);return {hardware:hw,recommendation:hardware.recommend(hw)};}
   if(op==='plan'){const p=await service.planFor({mode:r.mode,both:r.both===true,device:r.device,engine:r.engine==='fast'?'fast':r.engine==='standard'?'standard':undefined});return p;}
   if(op==='install'){void service.install({mode:r.mode,both:r.both===true,device:r.device,engine:r.engine==='fast'?'fast':r.engine==='standard'?'standard':undefined,offline:Array.isArray(r.offline)?r.offline.filter(x=>typeof x==='string').slice(0,3):[]}).catch(e=>log('Theme voices install failed',e.message));return {started:true};}
@@ -66,8 +70,8 @@ function setupThemeVoices({root,dir,vault,local,changeListeners,net,shell,log,se
   if(op==='sample'){const v=service.voices.get(String(r.theme||''));if(!v)throw Error('Unknown voice.');
    const line=r.kind==='line'&&v.sample?.file&&!v.custom?path.join(appDir,'voices',v.theme,v.sample.file):null,f=line||v.refPath;if(!f||!fs.existsSync(f))throw Error('No recording for that voice.');
    const ext=path.extname(f).toLowerCase();return {audio:fs.readFileSync(f).toString('base64'),kind:line?'line':'reference',type:{'.flac':'audio/flac','.mp3':'audio/mpeg','.ogg':'audio/ogg'}[ext]||'audio/wav'};}
-  // v2.41 character voices: import the owner's pack (folder or ZIP), remove the imported copies, and play
-  // a character's original recording (sample playback, never the clone).
+  // v2.41 character voices: import the owner's pack (folder or ZIP), remove the imported copies (v2.43: the
+  // built-in recordings stay), and play a character's original recording (sample playback, never the clone).
   if(op==='characters-import'){const src=typeof r.source==='string'?r.source.trim().replace(/^["']+|["']+$/g,'').slice(0,1000):'';
    return service.importCharacters(src,e=>send({kind:'characters-import',...e}));}
   if(op==='characters-remove'){service.removeCharacters();return {};}

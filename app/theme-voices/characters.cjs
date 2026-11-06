@@ -1,21 +1,34 @@
 'use strict';
-// ROBOTIC TYLER theme voices: optional character voices (v2.41; versions and the voice supplement v2.42).
+// ROBOTIC TYLER theme voices: optional character voices (v2.41; versions and the voice supplement v2.42;
+// built in since v2.43).
 //
-// The app ships only a catalog (characters.json): each character's stable "theme/character" ID, name,
-// and one or more versions. A version lists the original clips chosen as its reference (pack path, size,
-// SHA-256, exact text, and which pack it comes from), the clip played as its "original recording", and
-// its readiness. No audio ships with the app. The recordings come from the owner's packs, imported with
-// "Import character voices": the character voice pack (Robotic-Tyler-Character-Voice-Expansion) and,
-// since v2.42, the voice supplement (Robotic-Tyler-Complete-Voice-Supplement), each as its folder or its
-// ZIP, in either order or together. Each clip is checked (a safe pack path, the exact size, a FLAC header
-// and the SHA-256 in the catalog) and copied into ThemeVoices\characters\<theme>\<character>\<sha>.flac.
-// Nothing else in a pack is read, and nothing is ever loaded as code or as a model.
+// The catalog (characters.json) gives each character's stable "theme/character" ID, name, and one or more
+// versions. A version lists the original clips chosen as its reference (pack path, size, SHA-256, exact
+// text, and which pack it comes from), the clip played as its "original recording", and its readiness.
+//
+// v2.43: the recordings are built in. Every clip the catalog uses (both packs' clips, previews included,
+// about 15 MB) ships with the desktop app in app/theme-voices/characters/<theme>/<character>/<sha>.flac,
+// unpacked from app.asar (electron-builder's asarUnpack) like the 25 theme voices' references, so the
+// Python voice worker reads them where they are. A pack marked "builtIn" in the catalog ships its clips.
+// Each built-in clip is checked (exact size and SHA-256) before it is used, so a damaged install can't
+// speak with the wrong audio: the character falls back, visibly, to its earlier version or to the theme's
+// own voice, with the reason.
+//
+// Importing stays, as a second way to add or repair recordings: the character voice pack
+// (Robotic-Tyler-Character-Voice-Expansion) and the voice supplement (Robotic-Tyler-Complete-Voice-
+// Supplement), each as its folder or its ZIP. Each clip is checked (a safe pack path, the exact size, a FLAC
+// header and the SHA-256 in the catalog) and copied into ThemeVoices\characters\<theme>\<character>\<sha>.flac
+// only if it isn't already here (built in or imported): a clip with the same SHA-256 is never copied
+// again. Nothing else in a pack is read, and nothing is ever loaded as code or as a model. Copies a v2.41 or
+// v2.42 import made of clips that are now built in are removed once the built-in clip checks out (nothing
+// is kept twice); picks and version pins are settings and stay.
 //
 // A theme's own voice stays its default. A character the owner picks speaks in its current version when
-// all of that version's clips are present, unchanged and approved. If the current version needs the voice
-// supplement and only the first pack is imported, its earlier version speaks and says so (never silently);
-// if no version can be used, the theme's own voice speaks with the reason. The owner can also pin a
-// character to its earlier version (settings: characterVersion), like the built-in voices.
+// all of that version's clips are present, unchanged and approved. If the current version can't be used
+// (a clip missing or damaged, or, without built-in clips, the voice supplement not imported), its earlier
+// version speaks and says so (never silently); if no version can be used, the theme's own voice speaks
+// with the reason. The owner can also pin a character to its earlier version (settings: characterVersion),
+// like the built-in voices.
 const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto'),zlib=require('node:zlib');
 const {entries}=require('./zip.cjs');
 const ID=/^[a-z0-9][a-z0-9-]{1,23}$/;
@@ -52,18 +65,61 @@ function validEntry(c,themes){
  return allClips(c).every(x=>CLIP_PATH.test(String(x.file||''))&&x.file.split('/')[1]===c.theme&&x.file.split('/')[2]===c.id&&/^[0-9a-f]{64}$/.test(String(x.sha256||''))&&Number.isInteger(x.bytes)&&x.bytes>44&&x.bytes<=MAX_CLIP&&(!x.pack||Object.hasOwn(PACKS,x.pack)));
 }
 const NOT_IMPORTED='its recordings aren’t imported: use Import character voices in Settings → Theme voices';
+const BUILTIN_REASON={missing:'one of its built-in recordings is missing: run the Setup again to repair the app',changed:'one of its built-in recordings is damaged: run the Setup again to repair the app'};
 
 class Characters{
- constructor({dataDir,catalogFile,themes}){
-  this.dir=path.join(dataDir,'characters');this.themes=themes;
+ /**
+  * @param {object} o
+  * @param {string} o.dataDir      …\ThemeVoices (the import store is its characters\ folder)
+  * @param {string} o.catalogFile  characters.json
+  * @param {string[]} o.themes
+  * @param {string} [o.bundledDir] the app's own clips (app/theme-voices/characters, outside app.asar), v2.43
+  */
+ constructor({dataDir,catalogFile,themes,bundledDir=null}){
+  this.dir=path.join(dataDir,'characters');this.themes=themes;this.bundled=bundledDir||null;
   this.catalog=loadCatalog(catalogFile);
   this.list=this.catalog.characters.filter(c=>validEntry(c,themes));
+  // v2.43: the packs whose clips ship with the app (both, in this version's catalog).
+  const packs=this.catalog.packs&&typeof this.catalog.packs==='object'?this.catalog.packs:{};
+  this.builtinPacks=new Set(Object.keys(PACKS).filter(k=>packs[k]?.builtIn===true));
+  this.tidied=new Set();
  }
  entry(theme,id){return this.list.find(c=>c.theme===theme&&c.id===id)||null;}
  forTheme(theme){return this.list.filter(c=>c.theme===theme);}
  themesWithCharacters(){return [...new Set(this.list.map(c=>c.theme))];}
  folder(theme,id){return path.join(this.dir,theme,id);}
  clipFile(c,x){return path.join(this.folder(c.theme,c.id),x.sha256+'.flac');}
+ /** v2.43: does this clip ship with the app? (Its pack is marked builtIn and the app has a clips folder.) */
+ isBuiltIn(x){return !!this.bundled&&this.builtinPacks.has(x.pack||'expansion');}
+ builtinFile(c,x){return path.join(this.bundled,c.theme,c.id,x.sha256+'.flac');}
+ /** Is a character's every clip built in? */
+ builtIn(c){return allClips(c).every(x=>this.isBuiltIn(x));}
+ /**
+  * Where one clip is, checked: the app's own copy first, then an imported one. {state:'ok', file, builtIn}
+  * or {state:'missing'|'changed', builtIn} (builtIn: the app should have had it, so its install is damaged).
+  */
+ locate(c,x){
+  this.tidy(c);
+  let b=null;
+  if(this.isBuiltIn(x)){const f=this.builtinFile(c,x);b=fileState(f,x);if(b==='ok')return {state:'ok',file:f,builtIn:true};}
+  const s=this.meta(c)?this.clipState(c,x):'missing';
+  if(s==='ok')return {state:'ok',file:this.clipFile(c,x),builtIn:false}; // an import repaired (or added) it
+  return {state:b==='changed'||s==='changed'?'changed':'missing',builtIn:b!==null};
+ }
+ /**
+  * v2.43: an import from v2.41 or v2.42 holds copies of clips that are built in now. Once the built-in clip
+  * checks out (size and SHA-256), the copy is removed (nothing is kept twice); a character folder left with
+  * no clip goes too. Clips the app doesn't ship (or whose built-in copy is damaged) stay. Once per session.
+  */
+ tidy(c){
+  const k=c.theme+'/'+c.id;if(this.tidied.has(k)||!this.bundled)return;this.tidied.add(k);
+  const dir=this.folder(c.theme,c.id);if(!fs.existsSync(dir))return;
+  if(!this.meta(c))return; // not a store folder this version understands: leave it alone
+  let removed=0;
+  for(const x of allClips(c))if(this.isBuiltIn(x)&&fileState(this.builtinFile(c,x),x)==='ok'){const f=this.clipFile(c,x);try{if(fs.lstatSync(f).isFile()){fs.rmSync(f,{force:true});removed++;}}catch{}}
+  if(!removed)return;
+  try{if(!fs.readdirSync(dir).some(n=>/\.flac$/i.test(n)))fs.rmSync(dir,{recursive:true,force:true});}catch{}
+ }
  /** The store's record for a character (v2.41's layout, ref-01.flac…, is moved to the v2.42 one once). */
  meta(c){
   const dir=this.folder(c.theme,c.id);let meta=null;
@@ -78,28 +134,37 @@ class Characters{
   return meta.format===STORE_FORMAT?meta:null;
  }
  writeMeta(c,meta){const dir=this.folder(c.theme,c.id);fs.mkdirSync(dir,{recursive:true});const tmp=path.join(dir,'character.json.tmp');fs.writeFileSync(tmp,JSON.stringify(meta,null,1));fs.renameSync(tmp,path.join(dir,'character.json'));}
- /** Is one clip here and unchanged? 'ok', 'missing' or 'changed'. */
- clipState(c,x){const f=this.clipFile(c,x);let st;try{st=fs.lstatSync(f);}catch{return 'missing';}return st.isFile()&&st.size===x.bytes&&fileHash(f)===x.sha256?'ok':'changed';}
- /** Is one version's audio here and unchanged? {ok, files:{reference:[…], preview}} or {ok:false, code, reason}. */
+ /** Is one imported clip here and unchanged? 'ok', 'missing' or 'changed'. */
+ clipState(c,x){return fileState(this.clipFile(c,x),x);}
+ /**
+  * Is one version's audio here and unchanged (built in, or imported)? {ok, files:{reference:[…], preview}}
+  * or {ok:false, code, reason, builtIn} (builtIn: a recording the app ships is missing or damaged).
+  */
  checkVersion(c,v){
-  if(!this.meta(c))return {ok:false,code:'not_imported',reason:NOT_IMPORTED};
-  const ref=[];let preview=null;const missingPacks=new Set();let changed=false;
+  const ref=[];let preview=null;const missingPacks=new Set();let changed=false,builtinBad=null;
   for(const [i,x] of clipsOf(v).entries()){
-   const s=this.clipState(c,x);if(s==='missing')missingPacks.add(x.pack||'expansion');else if(s==='changed')changed=true;
-   else if(i<v.clips.length)ref.push(this.clipFile(c,x));else preview=this.clipFile(c,x);
+   const r=this.locate(c,x);
+   if(r.state==='ok'){if(i<v.clips.length)ref.push(r.file);else preview=r.file;continue;}
+   if(r.builtIn){if(builtinBad!=='changed')builtinBad=r.state;continue;}
+   if(r.state==='missing')missingPacks.add(x.pack||'expansion');else changed=true;
   }
+  // A clip the app ships is missing or damaged: its files aren't what this version installed.
+  if(builtinBad)return {ok:false,code:builtinBad,reason:BUILTIN_REASON[builtinBad],builtIn:true};
+  if(!missingPacks.size&&!changed)return {ok:true,files:{reference:ref,preview}};
+  // Clips the app doesn't ship (a catalog without built-in packs): they come from an import.
+  if(!this.meta(c))return {ok:false,code:'not_imported',reason:NOT_IMPORTED};
   if(missingPacks.size){const p=[...missingPacks];
    if(p.length===1&&p[0]==='supplement'&&!changed)return {ok:false,code:'needs_supplement',reason:'it needs the voice supplement: import it in Settings → Theme voices'};
    if(!(p.length===1&&p[0]==='supplement'))return {ok:false,code:'missing',reason:'one of its recordings is missing: import '+p.map(k=>PACKS[k]).join(' and ')+' (again, if you already did)'};}
-  if(changed)return {ok:false,code:'changed',reason:'one of its recordings was changed or damaged: import the pack again'};
-  return {ok:true,files:{reference:ref,preview}};
+  return {ok:false,code:'changed',reason:'one of its recordings was changed or damaged: import the pack again'};
  }
  /** v2.41's single-version check (kept for callers that don't care about versions): the current version. */
  check(c){return this.checkVersion(c,currentOf(c));}
  /**
   * The voice to use for theme/character, or why it can't be used. `pin` is a version the owner chose
-  * (rollback); otherwise the current version, or an earlier one when the current one needs the voice
-  * supplement and it isn't imported (the returned voice says so in versionNote).
+  * (rollback); otherwise the current version, or an earlier one when the current one can't be used: one
+  * of its recordings is missing or damaged (v2.43), or it needs the voice supplement and that isn't
+  * imported. The returned voice then says so in versionNote (never silently).
   */
  resolve(theme,id,{pin}={}){
   const c=this.entry(theme,id);
@@ -117,7 +182,11 @@ class Characters{
     return {problem:{code:'needs_supplement',name:c.name,reason:v1ok?'it’s offered only in its improved version, which needs the voice supplement: import it in Settings → Theme voices':k.reason}};}
    note={code:'needs_supplement',wanted:want.version,used:use.version,text:'Earlier version (v'+use.version+'): import the voice supplement for the improved version (v'+want.version+').'};
   }
-  else return {problem:{code:k.code,name:c.name,reason:k.reason}};
+  // v2.43: a recording of the improved version is missing or damaged (a damaged install, or a changed
+  // import): the earlier version speaks, and says why.
+  else if((k.code==='missing'||k.code==='changed')&&!pinned&&(use=[...vs].reverse().find(v=>v.version<want.version&&usable(v))||null))
+   note={code:'damaged',wanted:want.version,used:use.version,builtIn:!!k.builtIn,text:'Earlier version (v'+use.version+'): the improved version (v'+want.version+') can’t be used ('+k.reason+').'};
+  else return {problem:{code:k.code,name:c.name,reason:k.reason,...(k.builtIn?{builtIn:true}:{})}};
   if(pinned)note={code:'pinned',wanted:cur.version,used:use.version,text:'Earlier version (v'+use.version+'), as you chose. The improved version is v'+cur.version+'.'};
   const f=this.checkVersion(c,use).files;
   return {voice:{theme,character:id,name:c.name,voiceTarget:c.voiceTarget||c.name,relationship:c.relationship||null,direction:c.direction||'',language:c.language||'English',
@@ -128,11 +197,13 @@ class Characters{
  /** For the settings, the panel and the phone: each theme's characters and how each would speak now. */
  summary(theme,{pins={}}={}){
   return this.forTheme(theme).map(c=>{
-   const vs=versionsOf(c),cur=currentOf(c),r=this.resolve(theme,c.id,{pin:pins[theme+'/'+c.id]}),v=r.voice,anyOk=vs.some(x=>this.checkVersion(c,x).ok);
+   const vs=versionsOf(c),cur=currentOf(c),r=this.resolve(theme,c.id,{pin:pins[theme+'/'+c.id]}),v=r.voice,checks=new Map(vs.map(x=>[x.version,this.checkVersion(c,x)])),anyOk=[...checks.values()].some(k=>k.ok);
    const shown=v?vs.find(x=>x.version===v.characterVersion):cur;
-   return {id:c.id,name:c.name,status:shown.status||'ready',statusNote:shown.statusNote||'',imported:anyOk,approved:vs.some(x=>x.approved===true),usable:!!v,problem:v?null:r.problem.reason,
+   // imported: some version's audio is here (built in or imported; the v2.41 name is kept). builtIn (v2.43): the
+   // app ships its recordings. damaged: one of those is missing or damaged (an offered version can't be used).
+   return {id:c.id,name:c.name,status:shown.status||'ready',statusNote:shown.statusNote||'',imported:anyOk,builtIn:this.builtIn(c),damaged:vs.some(x=>x.approved===true&&checks.get(x.version).builtIn===true),approved:vs.some(x=>x.approved===true),usable:!!v,problem:v?null:r.problem.reason,
     version:v?v.characterVersion:null,currentVersion:cur.version,versionNote:v?.versionNote?.text||null,versionCode:v?.versionNote?.code||null,pinned:!!(pins[theme+'/'+c.id]&&pins[theme+'/'+c.id]!==cur.version),
-    versions:vs.map(x=>({version:x.version,approved:x.approved===true,ready:this.checkVersion(c,x).ok,status:x.status||'ready',supplement:clipsOf(x).some(y=>y.pack==='supplement')})),
+    versions:vs.map(x=>({version:x.version,approved:x.approved===true,ready:checks.get(x.version).ok,status:x.status||'ready',supplement:clipsOf(x).some(y=>y.pack==='supplement')})),
     hasPreview:!!shown.preview,previewText:shown.preview?.text||null,nonlexical:!!c.nonlexical};});
  }
  /** Which version's clips a preview should play (the one that would speak, or the current one). */
@@ -144,9 +215,10 @@ class Characters{
  }
  /**
   * Imports the owner's packs from a folder (a pack, or a folder holding packs: unpacked or as ZIPs) or a
-  * ZIP. Only the catalog's clips are read; each is checked before it is kept, and what is already imported
-  * stays (so the two packs can be imported in either order). Returns, per character, what was added and
-  * which versions can speak now.
+  * ZIP. Only the catalog's clips are read; each is checked before it is kept, and what is already here
+  * stays (so the two packs can be imported in either order). A clip that is already here, built in
+  * (v2.43) or imported, unchanged, isn't read or copied again: importing the same recordings changes
+  * nothing. Returns, per character, what was added and which versions can speak now.
   */
  async import(source,{onProgress}={}){
   const src=String(source||'').trim().replace(/^["']+|["']+$/g,'');
@@ -154,14 +226,15 @@ class Characters{
   let st;try{st=fs.statSync(src);}catch{throw Error('That folder or file doesn’t exist: '+src);}
   const reader=st.isDirectory()?await folderReader(src):/\.zip$/i.test(src)&&st.isFile()?await zipReader(src,st.size):null;
   if(!reader)throw Error('Choose the pack’s folder or its .zip file.');
-  const failed=[],characters=[],packs=new Set();let total=0,n=0,added=0;const all=this.list.length;
+  const failed=[],characters=[],packs=new Set();let total=0,n=0,added=0,already=0;const all=this.list.length;
   try{
    for(const c of this.list){
     onProgress?.({done:n++,total:all,name:c.name});
     this.meta(c); // moves a v2.41 import to the new layout first
     const got=[];let why=null;
     for(const x of allClips(c)){
-     if(this.clipState(c,x)==='ok')continue;
+     // Already here and unchanged (built in or imported): nothing to read or copy (counted if the pack has it).
+     if(this.locate(c,x).state==='ok'){if(reader.has(x.file))already++;continue;}
      let bytes=null;
      try{bytes=await reader.read(x.file,x.bytes,x.sha256);}catch(e){why=e.message;break;}
      if(!bytes)continue; // not in this pack (it may be in the other one)
@@ -184,18 +257,34 @@ class Characters{
   }finally{await reader.close?.();}
   onProgress?.({done:all,total:all});
   const usable=characters.filter(x=>x.ready.length);
-  return {imported:usable.length,complete:characters.filter(x=>x.complete).length,needsSupplement:characters.filter(x=>x.needsSupplement).length,added,failed,total:all,bytes:total,
+  // already (v2.43): clips the pack holds that were here, unchanged, before (built in or imported); not copied.
+  return {imported:usable.length,complete:characters.filter(x=>x.complete).length,needsSupplement:characters.filter(x=>x.needsSupplement).length,added,already,failed,total:all,bytes:total,
    packs:[...packs].map(p=>PACKS[p]),characters:characters.filter(x=>x.added||x.ready.length)};
  }
- /** What is imported, for the status line: characters with a usable version, and improved versions waiting for the supplement. */
+ /**
+  * For the status line: characters with a usable version (imported: the v2.41 name), the ones offered now,
+  * the improved versions waiting for the supplement, and (v2.43) how many are built in, how many have a
+  * missing or damaged built-in recording, and what extra imported copies are kept (Remove imported copies).
+  */
  status(){
-  let imported=0,complete=0,needs=0;
+  let imported=0,complete=0,needs=0,offered=0,damaged=0;
   for(const c of this.list){const vs=versionsOf(c),cur=currentOf(c),ok=vs.filter(v=>this.checkVersion(c,v).ok);
-   if(ok.length)imported++;if(ok.includes(cur))complete++;else if(ok.length&&this.checkVersion(c,cur).code==='needs_supplement')needs++;}
-  return {total:this.list.length,imported,complete,needsSupplement:needs,improved:this.list.filter(c=>versionsOf(c).length>1).length};
+   if(ok.length)imported++;if(ok.includes(cur))complete++;else if(ok.length&&this.checkVersion(c,cur).code==='needs_supplement')needs++;
+   if(this.resolve(c.theme,c.id).voice)offered++;if(vs.some(v=>v.approved===true&&this.checkVersion(c,v).builtIn===true))damaged++;}
+  return {total:this.list.length,imported,complete,needsSupplement:needs,improved:this.list.filter(c=>versionsOf(c).length>1).length,
+   builtIn:this.list.filter(c=>this.builtIn(c)).length,offered,damaged,extra:this.extra()};
  }
- remove(){fs.rmSync(this.dir,{recursive:true,force:true});}
+ /** v2.43: the imported copies kept beside the built-in clips (after tidying): {clips, bytes}. */
+ extra(){
+  let clips=0,bytes=0;for(const c of this.list){this.tidy(c);const dir=this.folder(c.theme,c.id);let names=[];try{names=fs.readdirSync(dir);}catch{continue;}
+   for(const n of names)if(/^[0-9a-f]{64}\.flac$/.test(n)){clips++;try{bytes+=fs.statSync(path.join(dir,n)).size;}catch{}}}
+  return {clips,bytes};
+ }
+ /** Removes the imported copies only: the built-in clips are part of the app and stay (v2.43). */
+ remove(){fs.rmSync(this.dir,{recursive:true,force:true});this.tidied.clear();}
 }
+/** Is the file at f the clip x, unchanged? 'ok', 'missing' or 'changed' (a link or folder is 'changed'). */
+function fileState(f,x){let st;try{st=fs.lstatSync(f);}catch{return 'missing';}return st.isFile()&&st.size===x.bytes&&fileHash(f)===x.sha256?'ok':'changed';}
 
 /** Reads catalog paths from unpacked packs: regular files inside the folder only (no links, no ".."). The
  *  folder may be a pack itself or hold packs (unpacked in folders with a manifest.json, or as pack ZIPs). */
@@ -219,7 +308,10 @@ async function folderReader(root){
   // only taken when its size and SHA-256 match; otherwise the first mismatch is reported.
   const a=plain(rel,expected);if(a&&(!hash||sha(a)===hash))return a;let first=a||yieldBad;
   for(const z of zips){const b=await z.read(rel,expected);if(b&&b.length===expected&&(!hash||sha(b)===hash))return b;first=first||b;}
-  return first;},close:async()=>{for(const z of zips)await z.close();}};
+  return first;},
+  // Does the pack hold this path at all? (Only counted, never read, when the clip is already here.)
+  has(rel){if(!CLIP_PATH.test(rel))return false;for(const r of roots){try{if(fs.lstatSync(path.join(r,...rel.split('/'))).isFile())return true;}catch{}}return zips.some(z=>z.has(rel));},
+  close:async()=>{for(const z of zips)await z.close();}};
 }
 /** Reads catalog paths from a pack's ZIP without unpacking anything else. Each entry's declared sizes
  *  must match the catalog, and inflating stops at that size (so a damaged or hostile ZIP can't fill the disk). */
@@ -239,6 +331,6 @@ async function zipReader(file,size){
   const start=e.offset+30+h.readUInt16LE(26)+h.readUInt16LE(28),body=Buffer.alloc(e.csize);await fd.read(body,0,e.csize,start);
   if(e.method===0)return body;
   try{return zlib.inflateRawSync(body,{maxOutputLength:expected+1});}catch{throw Error('a recording in the ZIP is damaged: '+rel);}
- },close:()=>fd.close()};
+ },has:rel=>by.has(rel),close:()=>fd.close()};
 }
 module.exports={Characters,ID,CLIP_PATH,MAX_CLIP,MAX_TOTAL,PACKS,validEntry,fileHash,versionsOf,allClips,currentOf};

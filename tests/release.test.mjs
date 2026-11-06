@@ -5,8 +5,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 import zlib from 'node:zlib';
 import crypto from 'node:crypto';
+import os from 'node:os';
 import {execFileSync} from 'node:child_process';
-const ROOT=path.resolve(import.meta.dirname,'..');
+import {createRequire} from 'node:module';
+const ROOT=path.resolve(import.meta.dirname,'..'),require=createRequire(import.meta.url);
 const read=f=>fs.readFileSync(path.join(ROOT,f),'utf8');
 const version=JSON.parse(read('browser-extension/manifest.json')).version;
 
@@ -82,4 +84,28 @@ test('the release notes lead with the one Setup download and the CI publishes it
  assert.match(ci,/workflow_dispatch:\n    inputs:\n      publish:/,'Run workflow can publish');
  assert.match(ci,/Release tag, and leave an already-published release alone/,'a published release is never rebuilt');
  assert.ok(ci.indexOf('npm run release')<ci.indexOf('npm run build:setup'),'the setup is built after the app installers it records');
+});
+
+// v2.43: the character voices' recordings ship with the desktop app. The voice worker is a separate Python
+// process and can't read inside app.asar, so they're unpacked beside it (asarUnpack), exactly like the 25
+// theme voices' references and the worker itself, and the app reads them from app.asar.unpacked.
+// (A real Linux "--dir" package of this config was also built and checked by hand: see the release notes.)
+test('the desktop app ships the character voices\' recordings unpacked from app.asar, where the Python voice worker reads them',()=>{
+ const cfg=JSON.parse(read('electron-builder.desktop.json'));
+ assert.ok(cfg.files.includes('app/**/*'));assert.equal(cfg.asar,true);
+ for(const g of ['app/theme-voices/worker/**/*','app/theme-voices/voices/**/*','app/theme-voices/characters/**/*'])assert.ok(cfg.asarUnpack.includes(g),g);
+ const cat=JSON.parse(read('app/theme-voices/characters.json'));assert.deepEqual(Object.keys(cat.packs).filter(k=>cat.packs[k].builtIn===true).sort(),['expansion','supplement']);
+ const rels=new Map();for(const c of cat.characters)for(const v of c.versions)for(const x of [...v.clips,...(v.preview?[v.preview]:[])])rels.set('app/theme-voices/characters/'+c.theme+'/'+c.id+'/'+x.sha256+'.flac',x);
+ assert.equal(rels.size,196);let bytes=0;
+ for(const [rel,x] of rels){const b=fs.readFileSync(path.join(ROOT,rel));assert.equal(b.length,x.bytes,rel);assert.equal(crypto.createHash('sha256').update(b).digest('hex'),x.sha256,rel);bytes+=b.length;
+  // Packed (files), not excluded by a "!" pattern, and unpacked (asarUnpack): the same globs electron-builder applies.
+  if(path.matchesGlob){assert.ok(cfg.files.some(g=>!g.startsWith('!')&&path.matchesGlob(rel,g)),rel);assert.ok(!cfg.files.some(g=>g.startsWith('!')&&path.matchesGlob(rel,g.slice(1))),rel+' is excluded');assert.ok(cfg.asarUnpack.some(g=>path.matchesGlob(rel,g)),rel+' stays in app.asar');}}
+ assert.ok(bytes<15.5e6,'the installer grows by about 15 MB of FLAC ('+(bytes/1e6).toFixed(1)+' MB)');
+ assert.match(read('.gitattributes'),/^\*\.flac binary$/m,'checked out byte for byte (their SHA-256 is checked before use)');
+ // In the installed app, desktop.cjs points the service at app.asar.unpacked: the clips, the voices and the worker.
+ const {setupThemeVoices}=require(path.join(ROOT,'app','theme-voices','desktop.cjs'));
+ const res=path.join(fs.mkdtempSync(path.join(os.tmpdir(),'tyler-pack-')),'resources'),dir=path.join(res,'app.asar','app');
+ const r=setupThemeVoices({root:path.join(res,'..','data'),dir,vault:{get:async k=>({[k]:undefined})},local:{set:async()=>{}},changeListeners:[],net:{fetch:async()=>{throw Error('offline');}},shell:{},log:()=>{},send:()=>{}});
+ const un=path.join(res,'app.asar.unpacked','app','theme-voices');
+ assert.equal(r.service.voices.characters.bundled,path.join(un,'characters'));assert.equal(r.service.voices.builtinDir,path.join(un,'voices'));assert.equal(r.service.installer.workerDir,path.join(un,'worker'));
 });

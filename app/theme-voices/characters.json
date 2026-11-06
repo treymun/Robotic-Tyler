@@ -1,14 +1,16 @@
 {
  "format": 2,
  "version": 2,
- "about": "ROBOTIC TYLER character voices (v2.41; versions and the voice supplement v2.42). No audio here: the clips come from the owner's packs (Import character voices) and are checked against these sizes and SHA-256 values. Version 1 needs only the character voice pack; a version 2 also needs the voice supplement.",
+ "about": "ROBOTIC TYLER character voices (v2.41; versions and the voice supplement v2.42; built in since v2.43). The clips every version uses, and each one's original-recording clip, ship with the app in app/theme-voices/characters/<theme>/<character>/<sha256>.flac (packs marked builtIn), and are checked against these sizes and SHA-256 values before use. Version 1 came from the character voice pack; a version 2 also uses clips from the voice supplement. Import character voices can still add or repair them from the packs.",
  "packs": {
   "expansion": {
-   "name": "Robotic-Tyler-Character-Voice-Expansion"
+   "name": "Robotic-Tyler-Character-Voice-Expansion",
+   "builtIn": true
   },
   "supplement": {
    "name": "Robotic-Tyler-Complete-Voice-Supplement",
-   "folder": "Robotic-Tyler-Targeted-Voice-References-2026-11-06-COMPLETE"
+   "folder": "Robotic-Tyler-Targeted-Voice-References-2026-11-06-COMPLETE",
+   "builtIn": true
   }
  },
  "characters": [
@@ -594,7 +596,7 @@
      "version": 1,
      "status": "weak",
      "approved": true,
-     "statusNote": "Offered since v2.42. The voice is unchanged (version 1, 6.1 s of reference speech) and needs only the character voice pack. v2.41 couldn't rate it because its held-out recordings don't even match his own reference (0.34, another voice 0.25). Re-measured against 8 more held-out recordings of him from the voice supplement, which do (his own reference scores 0.60 against them, another voice 0.16): version 1 scores 0.42 and 0.40 on two seeds, likeness ratio 0.59 and 0.53; word accuracy 1.00. Measured on the processor with the Lightweight model. Rated by a speaker model and a speech recogniser, not by ear.",
+     "statusNote": "Offered since v2.42. The voice is unchanged (version 1, 6.1 s of reference speech). v2.41 couldn't rate it because its held-out recordings don't even match his own reference (0.34, another voice 0.25). Re-measured against 8 more held-out recordings of him from the voice supplement, which do (his own reference scores 0.60 against them, another voice 0.16): version 1 scores 0.42 and 0.40 on two seeds, likeness ratio 0.59 and 0.53; word accuracy 1.00. Measured on the processor with the Lightweight model. Rated by a speaker model and a speech recogniser, not by ear.",
      "transcriptSource": "Machine transcript (Whisper small.en); not checked by listening.",
      "transcript": "Did that sting? SORRY! The healing is not as rewarding as the hurting.",
      "xvectorOnly": false,
@@ -1487,7 +1489,7 @@
      "version": 2,
      "status": "ready",
      "approved": true,
-     "statusNote": "Improved with the voice supplement (v2.42): likeness 0.59 to held-out recordings, up from 0.43 for version 1 (its own real reference scores 0.88, another voice 0.07); word accuracy 1.00. Measured on the processor with the Lightweight model on two seeds, and checked on the Quality model. Rated by a speaker model and a speech recogniser, not by ear.",
+     "statusNote": "Improved in v2.42 with more of the game's recordings: likeness 0.59 to held-out recordings, up from 0.43 for version 1 (its own real reference scores 0.88, another voice 0.07); word accuracy 1.00. Measured on the processor with the Lightweight model on two seeds, and checked on the Quality model. Rated by a speaker model and a speech recogniser, not by ear.",
      "transcriptSource": "Version 1's clips: Machine transcript (Whisper small.en); not checked by listening. Added clips: Whisper small.en machine transcripts; not checked by listening.",
      "transcript": "This used to be a nice neighborhood! Hurry up and get your asses over this plank. Thanks. Easy now, don't be playin' on this board. They left us here to die! Thought they were supposed to be getting us outta this shit",
      "xvectorOnly": false,
@@ -1854,7 +1856,7 @@
      "version": 2,
      "status": "weak",
      "approved": true,
-     "statusNote": "Improved with the voice supplement (v2.42): likeness 0.51 to held-out recordings, up from 0.43 for version 1 (its own real reference scores 0.86, another voice 0.03); word accuracy 1.00. Measured on the processor with the Lightweight model on two seeds, and checked on the Quality model. Rated by a speaker model and a speech recogniser, not by ear.",
+     "statusNote": "Improved in v2.42 with more of the game's recordings: likeness 0.51 to held-out recordings, up from 0.43 for version 1 (its own real reference scores 0.86, another voice 0.03); word accuracy 1.00. Measured on the processor with the Lightweight model on two seeds, and checked on the Quality model. Rated by a speaker model and a speech recogniser, not by ear.",
      "transcriptSource": "Whisper small.en machine transcripts; not checked by listening.",
      "transcript": "Great! Maybe we can meet some new people and leave them behind. Good thing we left all those people behind so we could escape. Good thing we left all those people behind so we could escape. Sure, it's the rest of the world we can just let die. Louis, you of all people should understand. Are you kidding me? This is the middle of nowhere. We left all those people behind for this?",
      "xvectorOnly": false,
@@ -2311,7 +2313,7 @@
      "version": 2,
      "status": "weak",
      "approved": true,
-     "statusNote": "Improved with the voice supplement (v2.42): likeness 0.54 to held-out recordings, up from 0.47 for version 1 (its own real reference scores 0.92, another voice 0.14); word accuracy 1.00. Measured on the processor with the Lightweight model on two seeds, and checked on the Quality model. Rated by a speaker model and a speech recogniser, not by ear.",
+     "statusNote": "Improved in v2.42 with more of the game's recordings: likeness 0.54 to held-out recordings, up from 0.47 for version 1 (its own real reference scores 0.92, another voice 0.14); word accuracy 1.00. Measured on the processor with the Lightweight model on two seeds, and checked on the Quality model. Rated by a speaker model and a speech recogniser, not by ear.",
      "transcriptSource": "the game's own captions, checked against a Whisper small.en transcript; not checked by listening.",
      "transcript": "He's as dangerous as they said, but at least he's on our side. Turns out the government actually is here to help. Hm. I can get some high tier equipment. They're cursing Lady Geist's name for sure. Remind me never to get on her hit list. I knew I could count on you, old friend. I wonder what they have at the curiosity shoppe. This is the moment I've been saving for.",
      "xvectorOnly": false,
@@ -3307,7 +3309,7 @@
      "version": 2,
      "status": "ready",
      "approved": true,
-     "statusNote": "Improved with the voice supplement (v2.42): likeness 0.66 to held-out recordings, up from 0.54 for version 1 (its own real reference scores 0.95, another voice 0.07); word accuracy 1.00. Measured on the processor with the Lightweight model on two seeds, and checked on the Quality model. Rated by a speaker model and a speech recogniser, not by ear.",
+     "statusNote": "Improved in v2.42 with more of the game's recordings: likeness 0.66 to held-out recordings, up from 0.54 for version 1 (its own real reference scores 0.95, another voice 0.07); word accuracy 1.00. Measured on the processor with the Lightweight model on two seeds, and checked on the Quality model. Rated by a speaker model and a speech recogniser, not by ear.",
      "transcriptSource": "the game's own captions, checked against a Whisper small.en transcript; not checked by listening.",
      "transcript": "Time for the guardian to earn its keep. Letting someone else do the work, eh Paradox? Wonder if the store has anything I need. You're a team player, Dynamo: thank you. The right purchase can cement our victory. The Detective will run through them all. I can't let these souls go to waste. I knew I could count on you, Holliday. I should pay the curiosity shop a visit.",
      "xvectorOnly": false,
@@ -3753,7 +3755,7 @@
      "version": 2,
      "status": "weak",
      "approved": true,
-     "statusNote": "Improved with the voice supplement (v2.42): likeness 0.51 to held-out recordings, up from 0.48 for version 1 (its own real reference scores 0.91, another voice 0.04); word accuracy 1.00. Measured on the processor with the Lightweight model on two seeds, and checked on the Quality model. Rated by a speaker model and a speech recogniser, not by ear.",
+     "statusNote": "Improved in v2.42 with more of the game's recordings: likeness 0.51 to held-out recordings, up from 0.48 for version 1 (its own real reference scores 0.91, another voice 0.04); word accuracy 1.00. Measured on the processor with the Lightweight model on two seeds, and checked on the Quality model. Rated by a speaker model and a speech recogniser, not by ear.",
      "transcriptSource": "Version 1's clips: Machine transcript (Whisper small.en); not checked by listening. Added clips: the game's own captions, checked against a Whisper small.en transcript; not checked by listening.",
      "transcript": "After the ritual's complete, I'm going to drive a stake in your heart. You've never fought a man like me before. Don't worry, I'll shepherd you. Some people need to die. I don't expect you to understand the nuance of my world. You're the one destined for greatness, right? I've never seen a man take such punishment. The golem is a cruel one, isn't he? Your aim's as steady as ever, Talon. Always a pleasure to work with The Baxter Society.",
      "xvectorOnly": false,

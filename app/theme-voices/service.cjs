@@ -23,17 +23,18 @@ class ThemeVoices extends EventEmitter{
  /**
   * @param {object} o
   * @param {string} o.dataDir   …\RoboticTylerHydraCloudV12\ThemeVoices
-  * @param {string} o.appDir    the app's theme-voices folder (worker/, voices/, engine-lock.json)
+  * @param {string} o.appDir    the app's theme-voices folder (worker/, voices/, characters/, engine-lock.json)
   * @param {Function} o.fetch   fetch for downloads
   * @param {Function} o.getSettings  async () => saved themeVoices settings object
   * @param {Function} o.setSettings  async (object) => void
   * @param {Function} [o.theme]  async () => the active theme id
+  * @param {string} [o.bundledDir] the character clips (v2.43; default: appDir/characters)
   */
- constructor({dataDir,appDir,fetch,getSettings,setSettings,theme=async()=>'steam',log=()=>{},python=null,detect=hardware.detect,freemem=os.freemem,catalogFile}){
+ constructor({dataDir,appDir,fetch,getSettings,setSettings,theme=async()=>'steam',log=()=>{},python=null,detect=hardware.detect,freemem=os.freemem,catalogFile,bundledDir}){
   super();Object.assign(this,{dir:dataDir,appDir,getSettingsRaw:getSettings,setSettingsRaw:setSettings,activeTheme:theme,log,devPython:python,detectFn:detect,freemem});
   fs.mkdirSync(dataDir,{recursive:true});
   this.installer=new Installer({dir:dataDir,fetch,workerDir:path.join(appDir,'worker'),log});
-  this.voices=new Voices({builtinDir:path.join(appDir,'voices'),dataDir,...(catalogFile?{catalogFile}:{})});
+  this.voices=new Voices({builtinDir:path.join(appDir,'voices'),dataDir,...(catalogFile?{catalogFile}:{}),...(bundledDir?{bundledDir}:{})});
   this.queue=[];this.active=null;this.worker=null;this.loaded=null;this.idleTimer=null;this.hw=null;this.installJob=null;this.lastClip=null;this.lastError=null;this.seq=0;
   this.cacheDir=path.join(dataDir,'cache','clips');this.promptDir=path.join(dataDir,'cache','voices');
  }
@@ -101,8 +102,9 @@ class ThemeVoices extends EventEmitter{
  async voiceFor(theme,character){const s=await this.settings();return this.voices.voiceFor(theme,character,{version:s.builtinVersion?.[theme],characterVersion:character?s.characterVersion?.[theme+'/'+character]:undefined});}
  /** The theme and character a request starting now would use (Tyler's spoken replies pin this once per reply). */
  async resolve({theme,character}={}){const t=await this.resolveTheme(theme||null),s=await this.settings();return {theme:t,character:typeof character==='string'?character:(s.characters?.[t]||'')};}
- /** Imports the owner's character voice pack (its folder or ZIP). */
+ /** Imports the owner's character voice pack (its folder or ZIP). v2.43: the recordings are built in; this repairs or adds. */
  async importCharacters(source,onProgress){const r=await this.voices.characters.import(source,{onProgress});this.emitStatus();return r;}
+ /** Removes the imported copies only (v2.43: the built-in recordings are part of the app and stay). */
  removeCharacters(){this.voices.characters.remove();this.emitStatus();}
  // ── install, repair, remove ──────────────────────────────────────────────
  async install({mode,both=false,offline=[],device,engine,runtime,models}={}){

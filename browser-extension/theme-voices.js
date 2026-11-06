@@ -33,7 +33,7 @@
   const ch=v?.character?(v.characters||[]).find(c=>c.id===v.character):null,who=ch?.usable?ch.name+' (character voice)':v?.name;
   $('tvNow').textContent=$('tvFollow').checked?'Now: '+(v?who+' ('+(api.getTheme?.()||'steam')+' theme)':t):'Using the voice picked below'+(ch?.usable?': '+ch.name+' (character voice).':'.');
   if(ch&&!ch.usable)$('tvNow').textContent+=' · '+ch.name+' can’t be used ('+(v.characterProblem||ch.problem||'not available')+'), so '+v.name+' speaks';
-  else if(ch?.versionNote)$('tvNow').textContent+=' · '+ch.versionNote; // v2.42: an earlier version speaks (no voice supplement yet, or chosen)
+  else if(ch?.versionNote)$('tvNow').textContent+=' · '+ch.versionNote; // v2.42: an earlier version speaks (chosen, or v2.43: a recording of the improved one is missing or damaged)
   else if(v&&!ch?.usable&&v.status!=='ready'&&v.status!=='custom')$('tvNow').textContent+=' · '+v.statusLabel;
  }
  function render(){
