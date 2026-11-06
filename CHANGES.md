@@ -1,3 +1,21 @@
+# ROBOTIC TYLER v2.38.1: Text AI on this PC keeps its personality
+
+## Fixed
+- **"The AI on this PC failed: the engine answered 500 … line 85 … loop.first"** is fixed. The Qwen3.5 models' own chat rules refuse a conversation whose instructions aren't all at the start, and Tyler adds a short note at the end when he retries a reply (a fresh reply, or a rewrite of one that repeated itself). The model refused, and Tyler skipped the reply (he never asks a cloud AI instead). Now every instruction is put, in order, into one block at the start before it reaches the AI on this PC, and a conversation without a chat message gets one, which the same rules also require.
+- **Replies from the AI on this PC follow your personality.** With your personality in the middle of a long list of rules, the small models on this PC often answered like a generic assistant ("got any specific playstyle? I can dive deeper"). For them, Tyler now repeats your personality where they pay the most attention: at the end of the instructions, and next to the latest chat message. The Settings preview does the same. Cloud replies are unchanged.
+- **No more quote marks around a whole reply or `**double asterisks**`** from the AI on this PC (Steam chat shows them as they are). A single *word* in asterisks is left alone.
+
+## Tested
+- **Mocked:** the message tidying (instructions moved in order, empty ones dropped, a user turn only when there's none, an ordered conversation sent unchanged) and the engine receiving it; the quote and bold tidy; the repeated personality in the real reply path (rules still first, the reminder still last, one instruction block) and cloud replies without it. Plus all unit and end-to-end tests and the desktop check.
+- **Real:** Tyler's retry messages rendered with the chat template inside each of the four model files (read from the files themselves): refused before, accepted now.
+- **Real, the owner's model** (Qwen3.5 4B uncensored, the real llama.cpp engine on a 2-core Linux test machine, no graphics card), through the real reply path, with two test personalities ("Cocky CS veteran… calls everyone 'bot', brags about his 2016 aim. Short, punchy, all lowercase" and "a grumpy pirate captain… calls the squad his crew") and the same five chat lines each:
+  - **Before:** replies averaged 316 and 340 characters, 2 of 5 were lowercase, a pirate word appeared 6 times in 5 replies, and 3 of 10 made an assistant-style offer ("got any specific playstyle? I can dive deeper"). One reply gave the veteran's 2016 aim to the person he was talking to.
+  - **After:** 194 and 259 characters, 4 of 5 lowercase, the 2016 brag in 5 of 5, pirate words 16 times, and no assistant-style offers.
+  - **Still there:** a 4B model gets game facts wrong more often than the cloud models (in character, it made up a gun called the "awepter"), and now and then it narrates ("I roared, slamming a hand on the table"). The 9B models weren't tested here.
+- **Not tested:** on a graphics card, the 9B models, and in a real Steam chat.
+
+---
+
 # ROBOTIC TYLER v2.38.0: Text AI on this PC
 
 ## New
