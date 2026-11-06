@@ -201,12 +201,13 @@
   <p class="hint">This cap uses provider-reported text costs only (OpenRouter). Set a hard limit on your OpenRouter key too; for Gemini, use Google's own billing limits.</p>
 </section>
 
-<!-- ── AI on this PC (desktop app, app/local-ai): text replies (v2.38, local-ai-settings.js) and
-     hearing and voice for calls (v2.39, local-speech-settings.js). Hidden until something here is used. ── -->
-<section class="sheet only-desktop" id="localAI" data-ui-zone="ai" data-text-relevant="false" data-speech-relevant="false">
+<!-- ── AI on this PC (desktop app, app/local-ai): text replies (v2.38, local-ai-settings.js),
+     hearing and voice for calls (v2.39, local-speech-settings.js) and pictures (v2.40, app/local-images,
+     local-images-settings.js). Hidden until something here is used. ── -->
+<section class="sheet only-desktop" id="localAI" data-ui-zone="ai" data-text-relevant="false" data-speech-relevant="false" data-images-relevant="false">
   <div class="sheet-head">
     <h2>AI on this PC</h2>
-    <p>Tyler can run his AI on this PC: the text replies (llama.cpp with Qwen3.5), hearing people in voice calls (NVIDIA Parakeet) and a speaking voice (Kokoro). No key, no account and no cost per message, and what's said isn't sent to an AI provider for the parts that run here. Each part is optional and nothing downloads until you press its Install button. With all three on this PC, a Standard voice call needs no key at all.</p>
+    <p>Tyler can run his AI on this PC: the text replies (llama.cpp with Qwen3.5), hearing people in voice calls (NVIDIA Parakeet), a speaking voice (Kokoro) and the chat's pictures (stable-diffusion.cpp). No key, no account and no cost per message, and what's said isn't sent to an AI provider for the parts that run here. Each part is optional and nothing downloads until you press its Install button. With all three on this PC, a Standard voice call needs no key at all.</p>
   </div>
   <p class="callout" id="laProviderNote" hidden></p>
   <h3>This PC</h3>
@@ -295,6 +296,56 @@
   <div class="actions"><button id="lsRemoveHearing" type="button" class="secondary">Remove hearing</button><button id="lsRemoveVoice" type="button" class="secondary">Remove the voice</button></div>
   <h3>Voice calls</h3>
   <p class="hint">A Standard voice call hears people with what you choose under Settings → Voice → Standard voice → Hearing, and speaks with the Speaking voice chosen there. With <b>This PC</b> for the text replies, hearing and the voice, a call needs no key at all and nothing that's said leaves this PC. With Cloud hearing or the cloud voice, Tyler uses your OpenRouter key (or your Google key if that's the one saved). Gemini Live always uses Google.</p>
+  <h3 id="localImages">Images on this PC</h3>
+  <p class="hint">Tyler can draw the chat's pictures on this PC: no key and no cost per image, and the description isn't sent anywhere. Each picture runs the engine (stable-diffusion.cpp) once, with no network port, and gives all of its memory back when it's done. Use it with your own Draw box in the panel's Chat images card, and let friends use <code>!image pc …</code> if you want.</p>
+  <p class="callout" id="liNote" hidden></p>
+  <p class="hint" id="liHardware" role="status">Checking this PC…</p>
+  <ul class="tv-notes" id="liAdvice"></ul>
+  <div class="engine-pick la-models" role="radiogroup" aria-label="Model for images on this PC">
+    <label class="engine-card"><input type="radio" name="liModel" value="zimage-8gb"><span><b>Z-Image Turbo · 6–8 GB cards <span class="la-tag" data-for="zimage-8gb"></span></b><small>Quick and sharp, good with text in pictures. On 6 GB cards, 768 × 768.</small><small class="la-size">6.2 GB download · about 5.5 GB of graphics memory</small></span></label>
+    <label class="engine-card"><input type="radio" name="liModel" value="zimage-12gb"><span><b>Z-Image Turbo · 12 GB cards <span class="la-tag" data-for="zimage-12gb"></span></b><small>The same model at higher precision: a little more detail.</small><small class="la-size">10.4 GB download · about 8 GB of graphics memory</small></span></label>
+    <label class="engine-card"><input type="radio" name="liModel" value="chroma-8gb"><span><b>Chroma1-HD uncensored · 8 GB cards <span class="la-tag" data-for="chroma-8gb"></span></b><small>Uncensored for made-up adults; Tyler's image rules still apply. About four times slower than Z-Image, and on the processor about an hour for one small picture.</small><small class="la-size">8.1 GB download · about 7 GB of graphics memory</small></span></label>
+    <label class="engine-card"><input type="radio" name="liModel" value="chroma-12gb"><span><b>Chroma1-HD uncensored · 12 GB cards <span class="la-tag" data-for="chroma-12gb"></span></b><small>Uncensored for made-up adults, higher precision.</small><small class="la-size">12.2 GB download · about 9.5 GB of graphics memory</small></span></label>
+  </div>
+  <p class="hint" id="liModelNote">Tyler suggests a model for this PC (never an uncensored one). Nothing installs or switches by itself.</p>
+  <div class="grid two">
+    <label>Where it runs
+      <select id="liDevice"><option value="gpu">Graphics card</option><option value="cpu">Processor only (much slower)</option></select>
+      <small class="hint" id="liDeviceNote">Any recent NVIDIA, AMD or Intel card (through Vulkan). If a picture doesn't fit while you play, Tyler says so instead of moving it.</small>
+    </label>
+    <label>Picture size
+      <select id="liSize"><option value="">The model's own size</option><option value="256">256 × 256 (for the processor)</option><option value="512">512 × 512</option><option value="768">768 × 768</option><option value="1024">1024 × 1024</option></select>
+      <small class="hint">Smaller pictures are faster and need less graphics memory.</small>
+    </label>
+  </div>
+  <div class="toggle-grid">
+    <label class="toggle"><input id="liFriends" type="checkbox"><span><b>Friends can ask for images on this PC</b><small>Off by default. When on, <code>!image pc …</code> works for friends, within the Chat images limits (who, how often, how many).</small></span></label>
+    <label class="toggle"><input id="liFriendsUncensored" type="checkbox"><span><b>Friends can use the uncensored model</b><small>Off by default. When off and the model is uncensored, a friend's request is refused (Tyler never switches to another model).</small></span></label>
+  </div>
+  <p id="liInstallState" role="status">…</p>
+  <p class="callout" id="liRuntime" hidden>Windows needs one more free part from Microsoft before the image engine can start: the Visual C++ Redistributable (x64). Most PCs already have it, because games install it. <a target="_blank" rel="noopener noreferrer" href="https://aka.ms/vc14/vc_redist.x64.exe">Download it from Microsoft</a>, run it, then press Install again (what was downloaded is kept). <a target="_blank" rel="noopener noreferrer" href="https://learn.microsoft.com/cpp/windows/latest-supported-vc-redist">What it is</a>. Tyler never installs system software himself.</p>
+  <div class="tv-progress" id="liProgressWrap" hidden><span id="liProgress"></span></div>
+  <p class="hint" id="liProgressText"></p>
+  <div class="actions">
+    <button id="liInstall" type="button">Install</button>
+    <button id="liCancel" type="button" class="secondary" hidden>Stop installing</button>
+    <button id="liOffline" type="button" class="secondary">Install from a folder…</button>
+  </div>
+  <div class="callout" id="liOfflineForm" hidden>
+    <label>Folder with the downloaded files<input id="liOfflineDir" placeholder="For example D:\Tyler images"><small class="hint">Put the engine archive (sd-master-be48649-bin-win-vulkan-x64.zip) and the model's files (.gguf and ae.safetensors) in one folder. They're checked exactly like downloads; anything missing or different is downloaded instead.</small></label>
+    <div class="actions"><button id="liOfflineGo" type="button">Install from this folder</button><button id="liOfflineCancel" type="button" class="secondary">Cancel</button></div>
+  </div>
+  <p class="hint">Downloaded from the original sources (stable-diffusion.cpp's own release on GitHub and the models' pages on Hugging Face, each at one pinned version), checked against the SHA-256 recorded in this version of Tyler, and kept in their own folder: nothing is installed system-wide and no driver is changed. It needs Microsoft's Visual C++ runtime, which almost every Windows PC has; if it's missing, Install says so. <a href="#" id="liOpenFolder">Open the folder</a>.</p>
+  <h3>Tyler's image rules</h3>
+  <p class="hint">They apply to every model (uncensored ones too), every style (the cloud ones too) and everyone, you included: never anything sexual, nude or revealing involving minors, and never sexual, nude or revealing pictures of real people (celebrities, streamers, people in the chat, anyone's friends). Any sign of an age under 18 counts, however it's written. A refusal says why.</p>
+  <h3>Test picture</h3>
+  <p class="hint">Makes one picture with the chosen model and shows it here with its times (it isn't posted anywhere). On the processor this takes many minutes.</p>
+  <div class="actions"><button id="liTest" type="button" class="secondary">Make a test image</button><button id="liStop" type="button" class="secondary" hidden>Stop</button></div>
+  <p id="liTestState" role="status"></p>
+  <img id="liTestImage" alt="The test picture" hidden>
+  <h3>Free up space for pictures</h3>
+  <p class="hint">Removes the downloaded engine and models for pictures. Your settings are kept, and so are text replies, hearing and the voice on this PC.</p>
+  <div class="actions"><button id="liRemoveModel" type="button" class="secondary">Remove this model</button><button id="liRemove" type="button" class="secondary">Remove images on this PC</button></div>
 </section>
 
 <section class="sheet" id="personalitySheet" data-ui-zone="ai">
@@ -382,7 +433,7 @@
   <div class="image-styles" id="imgStyles"></div>
   <label class="narrow">Default style<select id="imgDefault"></select></label>
   <div class="toggle-grid">
-    <label class="toggle"><input id="imgSpoiler" type="checkbox" checked><span><b>Post Venice pictures as spoilers</b><small>Steam blurs them until someone clicks.</small></span></label>
+    <label class="toggle"><input id="imgSpoiler" type="checkbox" checked><span><b>Post uncensored pictures as spoilers</b><small>The Venice styles, and the uncensored model on this PC. Steam blurs them until someone clicks.</small></span></label>
   </div>
   <h3>Limits</h3>
   <div class="grid two">
@@ -782,6 +833,7 @@
 <script src="theme-voice-settings.js"></script>
 <script src="local-ai-settings.js"></script>
 <script src="local-speech-settings.js"></script>
+<script src="local-images-settings.js"></script>
 <script src="settings.js"></script>
 <script src="v22-settings.js"></script>
 <script src="settings-navigation.js"></script>

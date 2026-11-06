@@ -189,7 +189,8 @@ body:not([data-ai-provider=gemini]) .for-gemini,body[data-ai-provider=gemini] .f
 /* Text AI on this PC (v2.38): what applies only to it, and the cloud model card it replaces. */
 body:not([data-ai-provider=local]) .only-local,body[data-ai-provider=local] .for-openrouter:not(.for-local),body[data-ai-provider=local] #modelCard{display:none!important}
 /* v2.39: AI on this PC shows when text replies or hearing/voice there are used (or being chosen). */
-#localAI[data-text-relevant=false][data-speech-relevant=false]{display:none!important}
+#localAI[data-text-relevant=false][data-speech-relevant=false][data-images-relevant=false]{display:none!important}
+#localAI[data-images-relevant=true] #liTestImage:not([hidden]){display:block;max-width:min(100%,384px);height:auto;margin-top:8px;border-radius:var(--rt-r-sm)}
 #localAI[data-text-relevant=false] .la-text,#localAI[data-text-relevant=true] .la-text-off{display:none!important}
 .la-tag{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:var(--rt-r-xs);font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;vertical-align:2px;color:var(--rt-success);background:color-mix(in srgb,var(--rt-success) 18%,transparent)}
 .la-tag:empty{display:none}

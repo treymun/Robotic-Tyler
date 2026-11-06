@@ -29,7 +29,9 @@ function usageSummary(usage={}){
   $('sumCost').textContent=cost;
   $('sumSpeech').textContent=speech.toLocaleString();
   $('usage').textContent=JSON.stringify(usage,null,2);
-  $('usageSummary').textContent='Model requests: '+requests+' · Tokens: '+tokens+' · Reported text cost: '+cost+' · Spoken replies: '+speech+' (speech/STT provider charges excluded)';
+  // v2.40: pictures made on this PC are counted apart: they cost nothing and aren't in the spending cap.
+  const localImages=Number(usage.localImageRequests||0);
+  $('usageSummary').textContent='Model requests: '+requests+' · Tokens: '+tokens+' · Reported text cost: '+cost+' · Spoken replies: '+speech+' (speech/STT provider charges excluded)'+(localImages?' · Pictures made on this PC: '+localImages+' (free, not in the cost)':'');
 }
 function sliderLabel(id){
   const value=Number($(id).value||0),set=sliderLabels[id],index=Math.min(set.length-1,Math.floor(value/25));

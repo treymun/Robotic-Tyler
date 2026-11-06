@@ -1,3 +1,50 @@
+# ROBOTIC TYLER v2.40.0: Images on this PC
+
+## New
+- **Tyler can draw the chat's pictures on your own PC: no key, no account, no cost per picture** (desktop app). The description isn't sent to an image service. **Settings → AI & personality → AI on this PC → Images on this PC** (also linked from Settings → Images → This PC). It runs **stable-diffusion.cpp** (master-1017, MIT) on any recent graphics card (NVIDIA, AMD or Intel, through Vulkan) or on the processor.
+- **Four models, all Apache-2.0:** **Z-Image Turbo** for **6–8 GB cards** (6.2 GB) and for **12 GB cards** (10.4 GB), and **Chroma1-HD uncensored** for **8 GB** (8.1 GB) and **12 GB cards** (12.2 GB). Tyler suggests one for your PC. He never suggests an uncensored one, and nothing installs or switches by itself.
+- **Draw from the panel:** Tyler's panel → Room → **Chat images** has a **Draw** box. Type a description, press **Draw and post**, and the picture is posted in the chat with Steam's own uploader, like `!image`. Stop is next to it. Only your own click in the box counts as you; Tyler still ignores your own chat lines.
+- **Friends can use it too, only if you allow it:** `!image pc …` works for friends when *Friends can ask for images on this PC* is on (off by default), within the Chat images limits. **Friends never get an uncensored model** unless *Friends can use the uncensored model* is on as well (also off by default). Otherwise the request is refused in plain words, and Tyler never uses another model instead.
+- **Tyler's image rules now run before every picture, cloud styles included:** OpenRouter, Venice and this PC, for everyone, you included. Never anything sexual, nude or revealing involving minors (any age cue, in many languages, however it's spelled), and never sexual or revealing pictures of real people (public figures, streamers, the people in the chat, "my friend …"). The chat's names are checked too. A refusal says why: a short line in the chat, and the whole reason in the panel.
+- Settings shows your PC, the suggestion with its reasons, the download size and the disk space before anything downloads. It has Install, Stop installing, Install from a folder, Remove (one model, or all; your settings are kept), and **Make a test image**, which shows the picture with its times.
+- **The processor works, and Settings says plainly how slow it is:** Z-Image is suggested there. Chroma1-HD takes about an hour for one small (256 × 256) picture on a 4-core processor, and several hours at 512 × 512. It's still allowed if you choose it. There's a new 256 × 256 size for the processor.
+
+## How it behaves
+- **No silent fallback.** If a picture can't be made as chosen, it fails and says why. That covers: not installed, the chosen model isn't installed, it doesn't fit in the card's free memory while a game runs, no card can be used, or the engine stopped. Tyler never uses another model, the processor instead of the card, or a cloud service by himself.
+- **No network port:** each picture runs the engine once, with the description in a file that's deleted afterwards, and the picture carries no metadata. When it's done, all of the engine's memory is given back. One picture at a time.
+- **Stop** (in Settings and next to the Draw box), **Pause**, the Steam window closing, the **emergency stop** and **quitting** end a picture at once. While the emergency stop is on, no picture starts.
+- **If Windows lacks Microsoft's Visual C++ Redistributable**, Install says so in plain words. It gives a *Download it from Microsoft* link to Microsoft's own installer, and what was downloaded is kept. Tyler never bundles or installs it.
+- Pictures made on this PC are counted apart from billed use (Settings → Advanced), and the spending cap doesn't block them.
+- *Post Venice pictures as spoilers* is now **Post uncensored pictures as spoilers**: the Venice styles and the uncensored model on this PC.
+- In Chrome the section is hidden, and the This PC style is switched off and says it's part of the desktop app.
+- No CUDA build for now: Vulkan covers NVIDIA, AMD and Intel in one 28 MB download.
+
+## Tested
+- **Mocked** (fake engine, fake desktop bridge, no model, no internet):
+  - The lock: every file is pinned with its size, SHA-256 and commit, and no licence is non-commercial.
+  - The installer against a local server: plan first, a resumed download, a bad file rejected, an offline folder, the Windows layout, a missing Visual C++ runtime explained, remove keeps settings and shared parts.
+  - Over 100 prompts for the image rules: spacing, leetspeak, look-alike letters, other languages, "18 year old" vs "1 8".
+  - The service on a fake engine: it starts only when asked, and the prompt is never on the command line. It returns a PNG of the right size with timings, and the process is gone afterwards. A refused prompt never starts it. Also covered: Stop, the emergency stop (it also blocks new pictures and the test image), quitting, out of memory, a crash, a stall, the card chosen from Vulkan's list, and no quiet move to the processor. The suggestion is Z-Image on the processor, with Chroma's hour said plainly.
+  - The real background:
+    - The rules refuse before any OpenRouter or Venice request, and nothing is sent. The chat's names are passed for real people.
+    - This PC makes no cloud call, isn't blocked by the spending cap and is counted apart.
+    - Friends are refused unless allowed, and the uncensored model is refused for friends unless that's allowed too.
+    - The panel flag never skips the chat switches for a cloud style. Pause ends a picture. Chrome says it's a desktop-app feature.
+  - The chat side: only a real click on the Draw box counts. It posts with Steam's uploader and sends the chat's names.
+  - Settings → Images on this PC and the panel's Draw box were checked in desktop mode, with the layout audit and by eye, in the Steam, Windows XP, Pip-Boy, Minecraft, DOOM, MSN, Dreamcast and CS 1.6 themes. The Chrome build's Settings was checked too.
+  - Plus all unit and end-to-end tests and the desktop check.
+- **Real, Linux** (2-core test machine, no graphics card, a small development-only model, Stable Diffusion 1.5):
+  - The app's installer downloaded and checked the engine and model (1.48 GB in 18 s).
+  - A forbidden prompt was refused in 9 ms.
+  - A 320 × 320 picture in 10 steps took 95 s (7.8 s a step), with no network socket and the process gone afterwards.
+  - Stop ended a picture in 17 s.
+- **Real, Windows** (GitHub's Windows runner: 4 cores, 16 GB, processor only), with the app's own installer and service. Vulkan listed no devices, and the runner's Hyper-V video adapter was correctly not used.
+  - **Z-Image Turbo for 6–8 GB cards:** the plan said 6.26 GB to download and 6.60 GB of disk. It installed in 176 s. A forbidden prompt was refused in 29 ms with no engine started. 256 × 256 in 4 steps took 106 s in all (about 23 s a step, finishing 11 s) and used 6.2 GB of memory. The picture was clean. There was no listening socket, the process was gone afterwards, and Stop worked.
+  - **Chroma1-HD uncensored for 8 GB cards:** the plan said 8.10 GB to download. It installed in 204 s. 256 × 256 in 4 steps took 800 s (about 178 s a step, reading the prompt 70 s) and used 8.1 GB of memory. The picture was still noisy at 4 steps: Chroma needs about 20, so a usable picture on the processor takes about an hour even at 256 × 256. There was no socket, the process was gone afterwards, and Stop worked.
+- **Not tested:** a real graphics card, posting to a real Steam chat. Also not yet: the 12 GB models, and the Visual C++ notice on a PC that really lacks the runtime (GitHub's runner has it). On your PC, **Make a test image** after installing is the first real test on a graphics card.
+
+---
+
 # ROBOTIC TYLER v2.39.1: Explicit adult content on this PC (opt-in)
 
 ## New

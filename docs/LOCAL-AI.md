@@ -8,6 +8,8 @@ the Windows desktop app and every part is optional: nothing is downloaded until 
 - **Hearing and a voice for calls** (v2.39, stage 2): NVIDIA Parakeet hears people in Standard voice
   calls and Kokoro speaks Tyler's replies, both through sherpa-onnx on the processor. See
   [Hearing and voice on this PC](#hearing-and-voice-on-this-pc-v239-stage-2).
+- **Pictures** (v2.40, stage 3): stable-diffusion.cpp with Z-Image Turbo or Chroma1-HD (uncensored),
+  for the chat's pictures. See [Images on this PC](LOCAL-IMAGES.md).
 
 With all three on this PC, a Standard voice call needs no key at all, and nothing anyone says leaves
 the PC. Gemini Live is unchanged: it always uses Google.
@@ -127,8 +129,9 @@ environment: a short allowlist (SystemRoot, TEMP, PATH, …) plus LLAMA_API_KEY=
   driver is changed. **Remove Text AI on this PC** deletes the text engine, models and downloads;
   Tyler's settings are kept (they're in the app's own data), and so are hearing and voice on this PC
   (their own `speech` folder, v2.39).
-- What isn't local: chat images and screen awareness use their cloud providers as before; hearing and
-  the cloud voice are local only when you choose that (stage 2, below).
+- What isn't local: screen awareness uses its cloud provider as before; chat images are local only
+  with the This PC style or the panel's Draw box (stage 3, [Images on this PC](LOCAL-IMAGES.md));
+  hearing and the voice are local only when you choose that (stage 2, below).
 
 ## When it can't answer
 

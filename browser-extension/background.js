@@ -11,6 +11,7 @@ import {LiveHost} from './live-host.mjs';
 import {TabLease} from './lease.mjs';
 import './soundboard-core.js';
 import './image-core.js';
+import './image-rules.js'; // v2.40: Tyler's image rules, before every picture (cloud styles and this PC)
 import {themeSound} from './theme-sounds.mjs';
 import './trivia-bank.js';
 import {temporary,errorKind,transientDelay,voiceControl,normalizeExtras,conversationGuide,ownerStyle,modelStyle,localCharacter,localCharacterReminder,localReplyTidy} from './conversation.mjs';
@@ -164,7 +165,7 @@ async function handleGameUnlocked(message,sender){
   const result=parseScene(data.choices?.[0]?.message?.content||'');return {scene:result};
  }
  // v2.34: chat images (image-core.js). The keys stay here; the chat side keeps the per-person limits.
- if(message.type==='image:config'){const {imageGen,veniceKey,openrouterKey}=await chrome.storage.local.get(['imageGen','veniceKey','openrouterKey']);return {config:TylerImages.config(imageGen),keys:{openrouter:!!openrouterKey,venice:!!veniceKey}};}
+ if(message.type==='image:config'){const {imageGen,veniceKey,openrouterKey}=await chrome.storage.local.get(['imageGen','veniceKey','openrouterKey']);return {config:TylerImages.config(imageGen),keys:{openrouter:!!openrouterKey,venice:!!veniceKey},local:await localImagesInfo()};}
  if(message.type==='image:cancel'){imageJobs.get(tab)?.abort();return {};}
  if(message.type==='image:generate')return makeImage(message,tab);
  // v2.35: theme voices (voice clones made on this PC). The engine lives in the desktop app
@@ -172,7 +173,8 @@ async function handleGameUnlocked(message,sender){
  if(typeof message.type==='string'&&message.type.startsWith('voices:'))return themeVoices(message,tab);
  // v2.38: Tyler was paused or stopped in his panel: the AI on this PC gives its memory back now.
  // v2.39: hearing and the voice on this PC are closed the same way.
- if(message.type==='local-ai:release'){if((globalThis.tylerLocalAI||globalThis.tylerLocalSpeech)&&await lease.check(tab)){await globalThis.tylerLocalAI?.release('Tyler was stopped in Steam chat').catch(()=>{});await globalThis.tylerLocalSpeech?.release('Tyler was stopped in Steam chat').catch(()=>{});}return {};}
+ // v2.40: an image being made on this PC ends too.
+ if(message.type==='local-ai:release'){if((globalThis.tylerLocalAI||globalThis.tylerLocalSpeech||globalThis.tylerLocalImages)&&await lease.check(tab)){await globalThis.tylerLocalAI?.release('Tyler was stopped in Steam chat').catch(()=>{});await globalThis.tylerLocalSpeech?.release('Tyler was stopped in Steam chat').catch(()=>{});await globalThis.tylerLocalImages?.release('Tyler was stopped in Steam chat').catch(()=>{});}return {};}
  if(message.type==='v23:roast'){
   const st=await chrome.storage.local.get(['v23RoastEnabled','v23RoastState','v22EmergencyStop']);
   if(st.v22EmergencyStop===true||st.v23RoastEnabled!==true)throw Error('Roast battles disabled.');
@@ -543,14 +545,41 @@ async function themeVoices(message,tab){
  }
  throw Error('Unknown theme-voice request.');
 }
+// v2.40: images on this PC (the desktop app's app/local-images), as the chat side needs to know them.
+const LOCAL_IMAGES_CHROME='Images on this PC are part of the ROBOTIC TYLER desktop app, and this is Chrome. Use another style, or the desktop app.';
+const LOCAL_IMAGES_WHERE='Settings → AI & personality → AI on this PC → Images on this PC';
+async function localImagesInfo(){
+ const li=globalThis.tylerLocalImages;if(!li)return {available:false,ready:false,problem:LOCAL_IMAGES_CHROME};
+ const s=await li.status().catch(()=>null);if(!s)return {available:true,ready:false,problem:'Images on this PC aren’t available right now.'};
+ return {available:true,ready:!!s.ready,installed:!!s.installed,label:s.label||null,uncensored:!!s.uncensored,friends:!!s.friends,friendsUncensored:!!s.friendsUncensored,
+  problem:s.ready?null:s.installed?'The '+(s.label||'chosen')+' model isn’t installed on this PC. Install it in '+LOCAL_IMAGES_WHERE+'.':'Images on this PC aren’t installed yet. Install them in '+LOCAL_IMAGES_WHERE+'.'};
+}
+const cleanNames=list=>Array.isArray(list)?[...new Set(list.filter(x=>typeof x==='string').map(x=>x.replace(/[\u0000-\u001f]/g,' ').trim().slice(0,64)).filter(Boolean))].slice(0,300):[];
+/**
+ * One chat picture. message: {style, prompt, speaker, names (people in the chat, for the rules), fromPanel
+ * (the owner's own Draw box)}. Tyler's image rules run first for every style and everyone; a cloud style
+ * then uses its key, This PC the desktop app's engine (no key, no cost, nothing sent anywhere).
+ */
 async function makeImage(message,tab){
  const s=await chrome.storage.local.get(['imageGen','openrouterKey','veniceKey','usage','spendingCapUSD','v22EmergencyStop']),cfg=TylerImages.config(s.imageGen);
  if(s.v22EmergencyStop===true)throw Error('Emergency stop is on. Unlock it in Settings first.');
- if(!cfg.enabled)throw Error('Chat images are off. Turn them on in Settings → Images.');
- const style=TylerImages.STYLES[message.style]?message.style:cfg.defaultStyle;if(!cfg.styles[style])throw Error('That image style is switched off in Settings → Images.');
- if(cfg.access==='selected'){const who=TylerIdentity.valid(message.speaker);if(!who||!cfg.allowedIDs.split('\n').includes(who.id))throw Error('This sender isn’t on the image allow list.');}
+ const style=TylerImages.STYLES[message.style]?message.style:cfg.defaultStyle,local=TylerImages.STYLES[style].provider==='local';
+ // The owner's Draw box in the panel isn't a chat request: the chat switches and the allow list are for friends.
+ // Only that box sets fromPanel (image-gen.js, on a real click), and only for This PC: a chat line never does.
+ const owner=message.fromPanel===true&&local;
+ if(!owner){
+  if(!cfg.enabled)throw Error('Chat images are off. Turn them on in Settings → Images.');
+  if(!cfg.styles[style])throw Error('That image style is switched off in Settings → Images.');
+  if(cfg.access==='selected'){const who=TylerIdentity.valid(message.speaker);if(!who||!cfg.allowedIDs.split('\n').includes(who.id))throw Error('This sender isn’t on the image allow list.');}
+ }
+ const req=TylerImages.request(cfg,style,message.prompt,NEVER_PROVIDERS),names=cleanNames(message.names);
+ const info=local?await localImagesInfo():null;
+ // Tyler's image rules (image-rules.js): every model, everyone, the owner too. Venice is uncensored, and so may be the PC's model.
+ const rules=globalThis.TylerImageRules.check({prompt:req.text??req.prompt??req.body?.prompt,names,uncensored:req.provider==='venice'||!!info?.uncensored});
+ if(!rules.ok)throw Object.assign(Error(rules.reason),{kind:'turn',code:'refused'});
+ if(local)return makeLocalImage(message,tab,{info,owner,names,prompt:req.prompt,style,spoiler:cfg.spoilerVenice});
  if(localBudgetReached(s.usage,s.spendingCapUSD))throw Error('The local spending cap is reached, so no more images. Raise it in Settings.');
- const req=TylerImages.request(cfg,style,message.prompt,NEVER_PROVIDERS),key=req.provider==='venice'?s.veniceKey:s.openrouterKey;
+ const key=req.provider==='venice'?s.veniceKey:s.openrouterKey;
  if(!key)throw Error(req.provider==='venice'?'Save a Venice API key in Settings → Images first.':'Save an OpenRouter key in Settings first.');
  if(imageJobs.has(tab))throw Error('Tyler is already drawing one. Try again once it’s posted.');
  const controller=new AbortController();imageJobs.set(tab,controller);const started=Date.now();
@@ -565,6 +594,28 @@ async function makeImage(message,tab){
   await chrome.storage.local.set({usage:{...usage,imageRequests:(usage.imageRequests||0)+1,imageCostUSD:(usage.imageCostUSD||0)+cost,reportedCostUSD:(usage.reportedCostUSD||0)+cost,unpriced:(usage.unpriced||0)+(out.cost===null&&req.provider!=='venice'?1:0)}});
   return {image:out.data,mediaType:out.type,style,model:req.model,provider:req.provider,cost,estimated:out.cost===null,ms:Date.now()-started,spoiler:req.provider==='venice'&&cfg.spoilerVenice};
  }catch(e){if(controller.signal.aborted)throw Error('Image cancelled.');throw Error(redact(String(e.message||e).split(key).join('[redacted]')));}
+ finally{imageJobs.delete(tab);}
+}
+/**
+ * This PC (v2.40): the desktop app's engine makes the picture. No key, no cost (the spending cap doesn't
+ * apply), nothing sent anywhere. Friends only when the owner allows them, and never the uncensored model
+ * unless the owner allows that too (the bridge refuses; Tyler never switches to another model).
+ * Pause, Stop and the tab closing abort it (imageJobs), which ends the engine.
+ */
+async function makeLocalImage(message,tab,{info,owner,names,prompt,style,spoiler}){
+ const li=globalThis.tylerLocalImages;if(!li)throw Error(LOCAL_IMAGES_CHROME);
+ if(!info.ready)throw Error(info.problem);
+ if(!owner&&!info.friends)throw Error('Only the owner can use images on this PC (the owner can allow friends in '+LOCAL_IMAGES_WHERE+').');
+ if(!owner&&info.uncensored&&!info.friendsUncensored)throw Error('The image model on this PC is uncensored, and only the owner can use it. Tyler didn’t switch to another model.');
+ if(imageJobs.has(tab))throw Error('Tyler is already drawing one. Try again once it’s posted.');
+ const controller=new AbortController();imageJobs.set(tab,controller);
+ try{
+  const r=await li.generate({prompt,from:owner?'owner':'friend',names,signal:controller.signal});
+  if(controller.signal.aborted)throw Error('Cancelled');
+  const {usage={}}=await chrome.storage.local.get('usage');
+  await chrome.storage.local.set({usage:{...usage,localImageRequests:(usage.localImageRequests||0)+1,localImageSeconds:(usage.localImageSeconds||0)+Math.round((r.ms||0)/1000)}});
+  return {image:r.image,mediaType:'image/png',style,model:r.label+' (this PC)',provider:'local',cost:0,estimated:false,ms:r.ms,device:r.device,spoiler:!!r.uncensored&&spoiler};
+ }catch(e){if(controller.signal.aborted||e.code==='cancelled')throw Error('Image cancelled.');throw Error(redact(String(e.message||e)));}
  finally{imageJobs.delete(tab);}
 }
 const failure=error=>{const kind=errorKind(error),retry=kind==='transient';return {ok:false,error:redact(error.message),kind,retryable:retry,retryAfter:retry?transientDelay(error):kind==='busy'?1200:0,retryMessage:retry?error.retryMessage:undefined};};

@@ -12,11 +12,14 @@ const read=f=>readFileSync(new URL('../browser-extension/'+f,import.meta.url),'u
 const J=x=>JSON.parse(JSON.stringify(x));
 const core=()=>{const box={};box.globalThis=box;vm.runInNewContext(read('image-core.js'),box);return box.TylerImages;};
 
-test('image-core: six styles (three OpenRouter, three Venice), safe settings, the command and the requests',()=>{
+test('image-core: seven styles (three OpenRouter, three Venice, v2.40: This PC), safe settings, the command and the requests',()=>{
  const I=core();
- assert.deepEqual(J(Object.keys(I.STYLES)),['fast','standard','best','vfast','vstandard','vbest']);
- assert.deepEqual(J(Object.values(I.STYLES).map(s=>s.provider)),['openrouter','openrouter','openrouter','venice','venice','venice']);
- const d=I.config(null);assert.equal(d.enabled,false,'off until the owner turns it on');assert.equal(d.styles.vfast,false,'the Venice styles start off');
+ assert.deepEqual(J(Object.keys(I.STYLES)),['fast','standard','best','vfast','vstandard','vbest','pc']);
+ assert.deepEqual(J(Object.values(I.STYLES).map(s=>s.provider)),['openrouter','openrouter','openrouter','venice','venice','venice','local']);
+ const d=I.config(null);assert.equal(d.enabled,false,'off until the owner turns it on');assert.equal(d.styles.vfast,false,'the Venice styles start off');assert.equal(d.styles.pc,false,'This PC starts off');
+ assert.equal(I.parse('!image pc a robot',d).style,'pc');assert.notEqual(I.parse('!image local pub at night',d).style,'pc','"local" is an ordinary word in a prompt, not a style');
+ assert.deepEqual(J(I.request(d,'pc','a robot  waving')),{provider:'local',model:null,prompt:'a robot waving'},'This PC: no URL, no key, no model id');
+ assert.equal(I.config({models:{pc:'evil/model'}}).models.pc,'','no model id can be set for This PC');assert.match(I.price('pc',''),/free/);
  const c=I.config({enabled:true,cooldownSec:77,perPerson:3,perSession:999,allowedIDs:'76561198000000001, nope\n76561198000000002',models:{fast:'evil"; x',vfast:'lustify-v7'},defaultStyle:'best',access:'selected'});
  assert.equal(c.cooldownSec,120,'only the offered choices');assert.equal(c.perPerson,3);assert.equal(c.perSession,20);
  assert.equal(c.allowedIDs,'76561198000000001\n76561198000000002');assert.equal(c.models.fast,I.DEFAULT_MODEL.fast,'a broken model id is ignored');assert.equal(c.models.vfast,'lustify-v7');
@@ -110,22 +113,22 @@ test('the picture goes through Steam\'s own chat uploader; Steam\'s refusal is r
 });
 
 // ── the chat side ───────────────────────────────────────────────────────
-function chat({config,generate,check=()=>({available:true,limited:null}),upload=()=>({uploaded:true})}){
+function chat({config,generate,check=()=>({available:true,limited:null}),upload=()=>({uploaded:true}),localInfo={available:false,ready:false},onScreen=[]}){
  const els=new Map(),el=id=>{if(!els.has(id))els.set(id,{id,textContent:'',onclick:null,addEventListener(){}});return els.get(id);};
  const sent=[],requests=[],uploads=[],checks=[],pauseHooks=[];let observer,clock=1_000_000;
  class FakeDate extends Date{static now(){return clock;}}
- const later={isConnected:true,name:'a newer message'},region={isConnected:true,querySelectorAll:()=>[later]},sample={isConnected:true,name:'the setup message'};
+ const later={isConnected:true,name:'a newer message'},region={isConnected:true,querySelectorAll:()=>[later,...onScreen]},sample={isConnected:true,name:'the setup message'};
  const api={getFeatureMount:()=>({append(){}}),isOwner:()=>true,isAiPaused:()=>false,getRegion:()=>region,getSample:()=>sample,send:t=>sent.push(t),emit(){},onPause:fn=>pauseHooks.push(fn)};
  const intervals=[];const box={Date:FakeDate,setTimeout:(fn)=>{Promise.resolve().then(fn);return 1;},setInterval:fn=>{intervals.push(fn);return intervals.length;},clearTimeout(){},console,
   document:{createElement:()=>({set innerHTML(v){},querySelector:s=>el(s.slice(1)),addEventListener(){}})},
   MutationObserver:class{constructor(fn){observer=fn;}observe(){}disconnect(){}},TylerCompanion:api,TylerSelection:{selector:()=>'.msg'},TylerChatTag:{own:()=>false},
   TylerIdentity:{identify:n=>n.who,meta:n=>n.meta},TylerCommands:{set(){}},
-  TylerSteamChat:{request:async(node,op,v)=>{if(op==='upload-check'){checks.push(node.name);return check();}uploads.push({node:node.name,op,...v});return upload();}},
-  chrome:{runtime:{sendMessage:async m=>{requests.push(m);if(m.type==='image:config')return {config,keys:{openrouter:true,venice:true}};if(m.type==='image:generate')return generate(m);return {};}}}};
+  TylerSteamChat:{request:async(node,op,v)=>{if(op==='upload-check'){checks.push(node.name);return check();}if(op==='group')return {members:[{name:'Alex'},{name:'Big Sam'}]};uploads.push({node:node.name,op,...v});return upload();}},
+  chrome:{runtime:{sendMessage:async m=>{requests.push(m);if(m.type==='image:config')return {config,keys:{openrouter:true,venice:true},local:localInfo};if(m.type==='image:generate')return generate(m);return {};}}}};
  box.globalThis=box;vm.runInNewContext(read('image-core.js'),box);vm.runInNewContext(read('image-gen.js'),box);
  const settle=async()=>{for(let i=0;i<20;i++)await new Promise(r=>setImmediate(r));};
  const msg=(text,id,name,key)=>({nodeType:1,innerText:text,matches:()=>true,querySelectorAll:()=>[],closest:()=>null,who:{id,name},meta:{key,senderId:id,at:clock}});
- return {ticks:async()=>{for(const fn of intervals)fn();await settle();},sample,status:()=>el('imgStatus').textContent+' | '+el('imgCounts').textContent,sent,requests,uploads,checks,pauseHooks,settle,box,post:async n=>{observer([{addedNodes:[n]}]);await settle();},msg,tick:ms=>{clock+=ms;},generates:()=>requests.filter(r=>r.type==='image:generate')};
+ return {el,ticks:async()=>{for(const fn of intervals)fn();await settle();},sample,status:()=>el('imgStatus').textContent+' | '+el('imgCounts').textContent,sent,requests,uploads,checks,pauseHooks,settle,box,post:async n=>{observer([{addedNodes:[n]}]);await settle();},msg,tick:ms=>{clock+=ms;},generates:()=>requests.filter(r=>r.type==='image:generate')};
 }
 test('the chat side keeps the owner\'s limits: cooldown per person, per person and per session, then posts through Steam',async()=>{
  const A='76561198000000001',B='76561198000000002',C='76561198000000003';
@@ -187,4 +190,85 @@ test('when Steam only says so at upload time, the queue is dropped and later req
  release({ok:true,image:'QUJD',mediaType:'image/png',model:'m',cost:.014,ms:900});await c.settle();
  assert.equal(c.generates().length,1,'the queued one is not drawn');assert.match(c.sent.at(-1),/Sorry Alex, this Steam account can’t post pictures/);
  await c.post(c.msg('!image a bird','76561198000000003','Kai','u3'));assert.equal(c.generates().length,1);assert.match(c.sent.at(-1),/Kai, this Steam account can’t post pictures/);
+});
+
+// ── v2.40: Tyler's image rules before every picture, and the This PC style ──────────────────────
+// Mocked: no OpenRouter, no Venice, no engine (globalThis.tylerLocalImages is a stand-in for the
+// desktop app's bridge, app/local-images/desktop.cjs). The rules themselves are the real ones.
+test('v2.40: Tyler’s image rules run before every cloud picture, for everyone: a refusal says why and nothing is sent',async()=>{
+ store.imageGen={enabled:true,styles:{fast:true,standard:true,best:true,vfast:true,vstandard:true,vbest:true}};store.openrouterKey='sk-or-abc';store.veniceKey='venice-key-1234567890';delete store.spendingCapUSD;
+ fetchImpl=async()=>json({data:[{b64_json:'iVBORw0KGgo=',media_type:'image/png'}],usage:{cost:.014}});
+ const n=fetches.length;
+ for(const [style,prompt,rule] of [['fast','nude t33n','points to someone under 18'],['vfast','a n.u.d.e 16 year old','points to someone under 18'],['vbest','Taylor Swift topless','real person'],['best','sexy schoolgirl','under 18']]){
+  const r=await ask({type:'image:generate',style,prompt});assert.equal(r.ok,false,style+' '+prompt);assert.match(r.error,/^Tyler won’t make this image/);assert.match(r.error,new RegExp(rule));}
+ // The people in the chat are passed along, so "nude <someone here>" is refused too.
+ let r=await ask({type:'image:generate',style:'vfast',prompt:'nude xXSniperXx in a bikini',names:['xXSniperXx','Alex']});assert.match(r.error,/real person/);
+ // Venice is uncensored: a child is refused there even in an ordinary prompt; a mainstream style may draw it.
+ r=await ask({type:'image:generate',style:'vfast',prompt:'a kid playing soccer'});assert.match(r.error,/uncensored model/);
+ assert.equal(fetches.length,n,'no request went out for any of them');
+ r=await ask({type:'image:generate',style:'fast',prompt:'a kid playing soccer'});assert.equal(r.ok,true);
+ fetchImpl=async()=>json({images:['/9j/4AAQ']});r=await ask({type:'image:generate',style:'vfast',prompt:'a nude adult woman on a beach, oil painting'});assert.equal(r.ok,true,'adult content about made-up adults is allowed on Venice');
+ // "fromPanel" only means the owner for This PC (the Draw box): it never skips the chat switches for a cloud style.
+ store.imageGen={enabled:false,styles:{fast:true}};const m=fetches.length;
+ r=await ask({type:'image:generate',style:'fast',prompt:'a robot',fromPanel:true});assert.equal(r.ok,false);assert.match(r.error,/Chat images are off/);assert.equal(fetches.length,m);
+});
+test('v2.40: This PC in Chrome says it’s a desktop-app feature; in the desktop app it uses the bridge (no key, no cost, no cap), with friends and the uncensored model only when the owner allows',async()=>{
+ store.imageGen={enabled:true,styles:{fast:true,pc:true}};delete store.openrouterKey;delete store.veniceKey;store.spendingCapUSD=.01;store.usage={reportedCostUSD:5};
+ delete globalThis.tylerLocalImages;const n=fetches.length;
+ let r=await ask({type:'image:generate',style:'pc',prompt:'a robot'});assert.equal(r.ok,false);assert.match(r.error,/part of the ROBOTIC TYLER desktop app, and this is Chrome/);
+ let cfg=await ask({type:'image:config'});assert.equal(cfg.local.available,false);
+ const calls=[];let li={ready:true,installed:true,label:'Z-Image Turbo for 6–8 GB cards',uncensored:false,friends:false,friendsUncensored:false};
+ globalThis.tylerLocalImages={status:async()=>({...li}),release:async()=>{},generate:async o=>{calls.push(o);if(o.prompt==='slow')await new Promise((res,rej)=>o.signal.addEventListener('abort',()=>rej(Object.assign(Error('Stopped.'),{code:'cancelled'}))));return {image:'iVBORw0KGgo=',mime:'image/png',label:li.label,uncensored:li.uncensored,device:'gpu',ms:2400};}};
+ cfg=await ask({type:'image:config'});assert.deepEqual(J(cfg.local),{available:true,ready:true,installed:true,label:li.label,uncensored:false,friends:false,friendsUncensored:false,problem:null});
+ r=await ask({type:'image:generate',style:'pc',prompt:'a robot',speaker:{id:'76561198000000002',name:'Sam'}});assert.match(r.error,/Only the owner can use images on this PC/);assert.equal(calls.length,0);
+ // The owner's Draw box: no key and the spending cap is reached, still fine (it costs nothing); posted like any picture.
+ r=await ask({type:'image:generate',style:'pc',prompt:'a robot',fromPanel:true,names:['Alex','Sam']});
+ assert.equal(r.ok,true,JSON.stringify(r));assert.equal(r.provider,'local');assert.equal(r.cost,0);assert.equal(r.mediaType,'image/png');assert.equal(r.image,'iVBORw0KGgo=');assert.match(r.model,/this PC/);
+ assert.equal(calls[0].from,'owner');assert.deepEqual(J(calls[0].names),['Alex','Sam']);assert.equal(calls[0].prompt,'a robot');
+ assert.equal(store.usage.localImageRequests,1);assert.equal(store.usage.reportedCostUSD,5,'nothing added to the bill');
+ // Friends allowed: from:'friend'. The uncensored model: refused for friends unless the owner allows it too; never another model.
+ li.friends=true;r=await ask({type:'image:generate',style:'pc',prompt:'a robot',speaker:{id:'76561198000000002',name:'Sam'}});assert.equal(r.ok,true);assert.equal(calls.at(-1).from,'friend');
+ li.uncensored=true;li.label='Chroma1-HD uncensored for 8 GB cards';const before=calls.length;
+ r=await ask({type:'image:generate',style:'pc',prompt:'a robot',speaker:{id:'76561198000000002',name:'Sam'}});assert.match(r.error,/uncensored, and only the owner can use it. Tyler didn’t switch to another model/);assert.equal(calls.length,before);
+ r=await ask({type:'image:generate',style:'pc',prompt:'a kid playing soccer',fromPanel:true});assert.match(r.error,/uncensored model/,'the uncensored rule applies to the owner too');assert.equal(calls.length,before);
+ li.friendsUncensored=true;r=await ask({type:'image:generate',style:'pc',prompt:'a robot',speaker:{id:'76561198000000002',name:'Sam'}});assert.equal(r.ok,true);assert.equal(r.spoiler,true,'uncensored pictures are posted as spoilers (the Venice spoiler setting)');
+ // Not installed: said, nothing made. Pause/Stop (image:cancel) ends a picture being made.
+ li={...li,ready:false,installed:false};r=await ask({type:'image:generate',style:'pc',prompt:'a robot',fromPanel:true});assert.match(r.error,/aren’t installed yet/);
+ li={...li,ready:true,installed:true,uncensored:false};const p=ask({type:'image:generate',style:'pc',prompt:'slow',fromPanel:true});
+ for(let i=0;i<50&&!calls.some(c=>c.prompt==='slow');i++)await new Promise(res=>setTimeout(res,5));await ask({type:'image:cancel'});r=await p;assert.equal(r.ok,false);assert.match(r.error,/Image cancelled/);
+ assert.equal(fetches.length,n,'This PC never calls a cloud service');
+ delete globalThis.tylerLocalImages;delete store.spendingCapUSD;
+});
+test('v2.40 chat side: This PC needs the desktop app and the owner’s permission; the owner’s Draw box posts like !image, sends the chat’s names, and a rules refusal is a short line in chat',async()=>{
+ const A='76561198000000001',img={ok:true,image:'QUJD',mediaType:'image/png',model:'Z-Image Turbo (this PC)',provider:'local',cost:0,ms:3000,spoiler:false};
+ let c=chat({config:{enabled:true,cooldownSec:0,perPerson:0,perSession:0,styles:{fast:true,pc:true}},generate:async()=>img});
+ await c.settle();await c.post(c.msg('!image pc a robot',A,'Alex','p1'));assert.equal(c.generates().length,0);assert.match(c.sent.at(-1),/part of the ROBOTIC TYLER desktop app/);
+ assert.equal(c.el('imgDrawBox').hidden,true,'no Draw box in Chrome');
+ c=chat({config:{enabled:true,cooldownSec:0,perPerson:0,perSession:0,styles:{fast:true,pc:true}},generate:async()=>img,localInfo:{available:true,ready:true,label:'Z-Image Turbo',uncensored:true,friends:true,friendsUncensored:false}});
+ await c.settle();assert.equal(c.el('imgDrawBox').hidden,false,'the Draw box shows in the desktop app');
+ await c.post(c.msg('!image pc a robot',A,'Alex','p2'));assert.equal(c.generates().length,0);assert.match(c.sent.at(-1),/uncensored model is for the owner only/);
+ // The owner's Draw box: posted, no "Drawing…" line from the owner's account, the request says it's the owner's, with the chat's names.
+ c.el('imgDrawPrompt').value='  a chrome robot   cheering ';
+ // A click made by a script on the page (not the owner's own click) does nothing.
+ c.el('imgDraw').onclick({isTrusted:false});c.el('imgDraw').onclick();await c.settle();assert.equal(c.generates().length,0,'only a real click on the Draw box counts');
+ c.el('imgDraw').onclick({isTrusted:true});await c.settle();
+ const g=c.generates().at(-1);assert.equal(g.style,'pc');assert.equal(g.fromPanel,true);assert.equal(g.prompt,'a chrome robot cheering');
+ assert.ok(g.names.includes('Alex')&&g.names.includes('Big Sam'),'names from the chat and the group list: '+JSON.stringify(g.names));
+ assert.equal(c.uploads.length,1);assert.equal(c.uploads[0].type,'image/png');assert.doesNotMatch(c.sent.join('\n'),/Drawing “a chrome robot/);assert.match(c.status(),/Posted your picture · Z-Image Turbo \(this PC\) · free/);
+ // A friend's request only ever carries fromPanel when it came from the box: chat lines never do.
+ assert.ok(c.generates().filter(x=>x!==g).every(x=>x.fromPanel!==true));
+ // A rules refusal: a short line in chat, the whole reason in the panel.
+ c=chat({config:{enabled:true,cooldownSec:0,perPerson:0,perSession:0,styles:{fast:true}},generate:async()=>({ok:false,error:'Tyler won’t make this image: it’s sexual or revealing and points to someone under 18 (“teen”). Tyler never makes sexual or revealing images involving minors. This rule applies to every model (uncensored ones too) and to everyone, the owner included.'})});
+ await c.settle();await c.post(c.msg('!image nude teen',A,'Alex','p3'));
+ assert.match(c.sent.at(-1),/Sorry Alex, Tyler won’t draw that \(his image rules: nothing sexual involving minors or real people\)/);assert.doesNotMatch(c.sent.at(-1),/teen/);assert.match(c.status(),/points to someone under 18/);
+});
+test('v2.40 chat side: the owner’s Draw box works with chat images off for friends, and still sends the names of the people on screen',async()=>{
+ const img={ok:true,image:'QUJD',mediaType:'image/png',model:'Z-Image Turbo (this PC)',provider:'local',cost:0,ms:3000,spoiler:false};
+ const c=chat({config:{enabled:false,styles:{fast:true}},generate:async()=>img,localInfo:{available:true,ready:true,label:'Z-Image Turbo',uncensored:false,friends:false,friendsUncensored:false},
+  onScreen:[{isConnected:true,name:'m1',who:{name:'Casey Jones'},meta:{}},{isConnected:true,name:'m2',who:{name:'ROBOTIC TYLER'},meta:{self:true}}]});
+ await c.settle();assert.match(c.el('imgStatus').textContent,/Chat images are off for friends.*Your Draw box works either way/);
+ c.el('imgDrawPrompt').value='a robot waving';c.el('imgDraw').onclick({isTrusted:true});await c.settle();
+ const g=c.generates().at(-1);assert.equal(g.fromPanel,true);assert.equal(g.style,'pc');
+ assert.ok(g.names.includes('Casey Jones'),'someone on screen is passed for the real-people rule: '+JSON.stringify(g.names));assert.ok(!g.names.includes('ROBOTIC TYLER'),'the bot’s own lines aren’t counted');
+ assert.equal(c.uploads.length,1);assert.match(c.status(),/Posted your picture/);
 });

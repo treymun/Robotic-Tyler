@@ -55,7 +55,7 @@
   say('laHardware',hardwareLine(s));
   const rec=s.suggestion;$('laAdvice').replaceChildren(...(rec?.notes||[]).map(t=>{const li=document.createElement('li');li.textContent=t;return li;}));
   if(!root.contains(document.activeElement)||document.activeElement.name!=='laModel')for(const r of radios())r.checked=r.value===s.model;
-  for(const tag of root.querySelectorAll('.la-tag')){const k=tag.dataset.for,inst=!!s.models?.[k],sug=rec?.model===k;tag.textContent=inst?'Installed':sug?'Suggested':'';tag.dataset.kind=inst?'installed':sug?'suggested':'';}
+  for(const tag of root.querySelectorAll('.la-text .la-tag[data-for]')){const k=tag.dataset.for,inst=!!s.models?.[k],sug=rec?.model===k;tag.textContent=inst?'Installed':sug?'Suggested':'';tag.dataset.kind=inst?'installed':sug?'suggested':'';}
   $('laModelNote').textContent=(rec?'Suggested for this PC: '+label(rec.model)+' on '+where(rec.device)+'. ':'')+(s.modelChosen?'Your choice: '+label(s.model)+'.':'Nothing chosen yet: the suggestion is selected.')+' Nothing installs or switches by itself.';
   if(document.activeElement!==$('laDevice'))$('laDevice').value=s.settings.device==='cpu'?'cpu':'auto';
   if(document.activeElement!==$('laIdle'))$('laIdle').value=String(s.settings.idleMinutes??10);

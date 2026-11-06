@@ -1,6 +1,6 @@
 {
   "name": "robotic-tyler-desktop",
-  "version": "2.39.1",
+  "version": "2.40.0",
   "private": true,
   "main": "main.cjs"
 }

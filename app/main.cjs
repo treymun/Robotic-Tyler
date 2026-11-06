@@ -17,7 +17,7 @@ steamVoice.registerScheme(protocol);
 const root=path.join(process.env.LOCALAPPDATA||app.getPath('appData'),'RoboticTylerHydraCloudV12');fs.mkdirSync(path.join(root,'Data'),{recursive:true});app.setPath('userData',path.join(root,'Data'));
 const OLD_VOICE_DIR=path.join(app.getPath('appData'),'RoboticTylerNativeSteamCompanion');
 const OLD_VOICE_GUID='b0b8de7d-76bb-5d6f-99fa-c8a2fe9a49c6'; // electron-builder key for com.robotictyler.nativesteamcompanion
-let themeVoices=null,localAI=null,pendingVoicesSetup=false;
+let themeVoices=null,localAI=null,localImages=null,pendingVoicesSetup=false;
 let bot,options,voiceWin,listener,tray,voice,updates,vault,remote,windowVoice=true,muteCall=false,steamWindow,media,quitting=false;const removed=[];const activity=[];function eventLog(kind,details=''){activity.unshift({at:Date.now(),kind,details:String(details).slice(0,140)});if(activity.length>120)activity.pop();}
 const icon=path.join(__dirname,'..','assets','robotic-tyler.png');
 function helperPath(){const p=app.isPackaged?path.join(process.resourcesPath,'windows-audio-bridge','RoboticTylerAudio.exe'):path.join(__dirname,'..','windows-audio-bridge','publish','RoboticTylerAudio.exe');if(!fs.existsSync(p))throw Error('The Windows audio helper is missing. Reinstall ROBOTIC TYLER (or build it with BUILD-WINDOWS-EXE.cmd).');return p;}
@@ -80,6 +80,13 @@ if(!app.requestSingleInstanceLock()){app.quit();}else{
  // Also loaded inside a try, so a problem with it never stops the rest of Tyler.
  try{localAI=require('./local-ai/desktop.cjs').setupLocalAI({root,vault,local,changeListeners,net,shell,log:eventLog,send:e=>{try{if(options&&!options.isDestroyed())options.webContents.send('tyler:local-ai',e);}catch{}}});}
  catch(error){localAI=null;eventLog('Text AI on this PC unavailable',error.message);}
+ // Images on this PC (v2.40, app/local-images): pictures from a local model (stable-diffusion.cpp's sd-cli,
+ // one run per picture, no network port), no key. Loaded inside a try like the others. Text AI's Vulkan
+ // list gives every card's free memory when its engine is installed.
+ try{localImages=require('./local-images/desktop.cjs').setupLocalImages({root,vault,local,changeListeners,net,shell,log:eventLog,
+  textVulkan:async()=>localAI?.service?await localAI.service.vulkan().catch(()=>null):null,
+  send:e=>{try{if(options&&!options.isDestroyed())options.webContents.send('tyler:local-images',e);}catch{}}});}
+ catch(error){localImages=null;eventLog('Images on this PC unavailable',error.message);}
  globalThis.tylerOpenSettings=section=>openSettings(section);
  if(pendingVoicesSetup){pendingVoicesSetup=false;setTimeout(()=>void openSettings('theme-voices-setup'),1500);}
  await import(pathToFileURL(path.join(__dirname,'companion','background.js')).href);
@@ -131,6 +138,7 @@ if(!app.requestSingleInstanceLock()){app.quit();}else{
   if(request.action==='activity'){return activity.slice(0,60);}
   if(request.action==='remote')return remote.handle(String(request.op||''),request);
   if(request.action==='local-ai'){if(!localAI)throw Error('Text AI on this PC isn’t available in this copy of Tyler (see Settings → Advanced → activity log).');return localAI.settingsRequest(String(request.op||''),request);}
+  if(request.action==='local-images'){if(!localImages)throw Error('Images on this PC aren’t available in this copy of Tyler (see Settings → Advanced → activity log).');return localImages.settingsRequest(String(request.op||''),request);}
   if(request.action==='voices'){if(!themeVoices)throw Error('Theme voices aren’t available in this copy of Tyler (see Settings → Advanced → activity log).');return themeVoices.settingsRequest(String(request.op||''),request);}
   if(request.action==='verify'){
    const key=request.key;if(typeof key!=='string'||!key.trim()||key.length>1024)throw Error('Paste the secret from your OpenRouter Keys page.');
@@ -219,7 +227,7 @@ if(!app.requestSingleInstanceLock()){app.quit();}else{
  if(process.argv.includes('--install-theme-voices'))setTimeout(()=>void openSettings('theme-voices-setup'),1500);
  await bot.loadURL('https://steamcommunity.com/chat/');
  }).catch(error=>{dialog.showErrorBox('ROBOTIC TYLER could not start',String(error.message).replace(/sk-or-[\w-]+|AIza[\w-]+/g,'[redacted]'));app.quit();});
- app.on('before-quit',()=>{try{void voice?.stop('ROBOTIC TYLER is closing.');}catch{}try{void remote?.stop();}catch{}try{themeVoices?.kill();}catch{}try{localAI?.kill();}catch{}});
+ app.on('before-quit',()=>{try{void voice?.stop('ROBOTIC TYLER is closing.');}catch{}try{void remote?.stop();}catch{}try{themeVoices?.kill();}catch{}try{localAI?.kill();}catch{}try{localImages?.kill();}catch{}});
  app.on('window-all-closed',()=>{if(!voice||voice.mode==='off')app.quit();});
 }
 
