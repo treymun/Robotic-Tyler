@@ -15,7 +15,7 @@
 
 <p align="center"><b>Tyler is an AI squadmate for Steam.</b> He sits in your group chat and voice channel, talks like one of the crew, and keeps the night going with trivia, votes, sounds and music.</p>
 
-<p align="center"><a href="CHANGES.md"><img src="assets/readme/whats-new.png" width="100%" alt="What's new since v2.33: text AI on your PC with no key (v2.38), Tyler answers in theme voices (v2.36), a fast voice engine for NVIDIA cards (v2.36), each theme's own game artwork (v2.37), theme voices (v2.35), steadier voices and an offline bundle (v2.35.1), chat pictures (v2.34) and the chat on your phone (v2.35)."></a></p>
+<p align="center"><a href="CHANGES.md"><img src="assets/readme/whats-new.png" width="100%" alt="What's new since v2.38: character voices (v2.41), Settings from your phone (v2.41), fewer repeated openings and stuck words (v2.41), who's in the call from Steam's own data (v2.41), pictures on your PC (v2.40), hearing and voice on your PC (v2.39), text AI on your PC (v2.38) and keeping your personality on it (v2.38.1)."></a></p>
 
 ---
 
@@ -39,8 +39,11 @@
 <td valign="top"><img src="assets/readme/icon-images.png" width="52" align="left" alt="">&nbsp;<b>Chat pictures</b> <sup>new</sup><br>&nbsp;<code>!image</code> and a description: Tyler draws it and posts it in the chat, with your own OpenRouter or Venice key and within your spending cap, or on your own PC with no key (desktop app, v2.40).</td>
 </tr>
 <tr>
-<td valign="top"><img src="assets/readme/icon-remote.png" width="52" align="left" alt="">&nbsp;<b>Phone remote</b><br>&nbsp;Tyler's panel on your phone, live and in your theme. Start or pause him, play clips, run the music, read and type in chat, switch the theme, change his settings. Nothing to install.</td>
+<td valign="top"><img src="assets/readme/icon-remote.png" width="52" align="left" alt="">&nbsp;<b>Phone remote</b><br>&nbsp;Tyler's panel on your phone, live and in your theme. Start or pause him, play clips, run the music, read and type in chat, switch the theme, and open his <b>Settings</b> to change them (your keys stay on the PC). Nothing to install.</td>
 <td valign="top"><img src="assets/readme/icon-stay.png" width="52" align="left" alt="">&nbsp;<b>Stays in the call</b><br>&nbsp;A soft hum after 45 quiet minutes keeps Steam from dropping him, and he reconnects to the chat by himself. A full check tests every part in one pass.</td>
+</tr>
+<tr>
+<td colspan="2" valign="top"><img src="assets/readme/icon-pc.png" width="52" align="left" alt="">&nbsp;<b>AI on your own PC</b> <sup>new</sup><br>&nbsp;In the desktop app, Tyler can write his replies, hear the call, speak and draw the chat's pictures on your own graphics card or processor: no key, no account, no cost per message, and he never switches to a cloud AI by himself. Each part is an optional download.</td>
 </tr>
 </table>
 
@@ -50,10 +53,12 @@
 <p align="center"><img src="assets/readme/feature-personality.png" width="100%" alt="Personality: presets, humor, edginess, helpfulness and chaos sliders, a written description, roast intensity, reply length, speed and talkativeness."></p>
 <p align="center"><img src="assets/readme/feature-room.png" width="100%" alt="Room tools: the panel's Room tab with Music DJ open, and the Sounds tab with its soundboard pads."></p>
 <p align="center"><img src="assets/readme/feature-desktop.png" width="100%" alt="The desktop app: its own Steam chat window, with Tyler's panel on air docked beside the chat."></p>
-<p align="center"><img src="assets/readme/feature-remote.png" width="100%" alt="Phone remote: Tyler's panel on three phones, in the Steam, PAYDAY 2 and Pip-Boy themes, the last one showing the theme picker."></p>
+<p align="center"><img src="assets/readme/feature-pc.png" width="100%" alt="AI on your own PC: Settings → AI on this PC on an example PC with an RTX 3060, the Qwen3.5 9B model installed, and hearing (Parakeet) and voice (Kokoro) installed."></p>
+<p align="center"><img src="assets/readme/feature-characters.png" width="100%" alt="Character voices: Settings → Theme voices → Character voices, with a picker for Team Fortress 2, Counter-Strike 2, Portal and Left 4 Dead, each with Original recording and Generated speech."></p>
+<p align="center"><img src="assets/readme/feature-remote.png" width="100%" alt="Phone remote: Tyler's panel on three phones, in the Steam, PAYDAY 2 and Pip-Boy themes, the last one showing Tyler's Settings on the phone (AI & personality)."></p>
 <p align="center"><img src="assets/readme/feature-reliability.png" width="100%" alt="Long nights: the panel's Stay connected settings (hum after 45 quiet minutes, keep the chat connected) and the Checks tab with Run full check."></p>
 
-<sub>Screenshots of the real panel and settings with sample data (the text spend and names are examples).</sub>
+<sub>Screenshots of the real panel and settings with sample data (the text spend, names and the example PC are examples).</sub>
 
 ## Get going in a few minutes
 
@@ -61,7 +66,7 @@
 2. Open ROBOTIC TYLER and sign in to your bot's Steam account in its Steam chat window.
 3. In **Settings**, add an **OpenRouter** or **Google Gemini** key and pick a personality. In the desktop app you can instead choose **This PC (free, no key)**: Tyler's text replies are written by a model on your own PC (see below).
 4. Open your group chat, then **Tyler's panel → Connect & start**, and join the voice channel. That's it: no virtual audio cable, no extra microphone.
-5. *Optional:* **Settings → Overview → Phone remote**, scan the QR code with your phone and type the 6-digit code. Add the page to your home screen and Tyler is one tap away.
+5. *Optional:* **Settings → Overview → Phone remote**, scan the QR code with your phone and type the 6-digit code. Add the page to your home screen and Tyler is one tap away; its **Setup → Open Settings** changes his settings from the phone.
 
 > Setup isn't code-signed. If Windows says *"Windows protected your PC"*, choose **More info → Run anyway**. Setup checks each download's SHA-256 before it runs it, and the desktop app updates itself.
 
@@ -74,6 +79,7 @@
 | Tyler's panel | Docked beside the chat (or floating), resizable | Floating over the chat, resizable |
 | Music DJ and screen commentary | In-app YouTube window and screen picker | A YouTube tab and Chrome's share picker |
 | Phone remote | Yes: a page on your home Wi-Fi | No (an extension can't serve one) |
+| AI on your own PC | Yes: text replies, hearing, a voice and pictures, no key | No (it uses a cloud key) |
 | Staying connected | Quiet-call hum, chat reconnect | The same, and the tab stays awake in the background |
 | Install and updates | Setup installs it, it updates itself | Setup unpacks it; Chrome needs *Developer mode → Load unpacked* once |
 | Good for | A dedicated bot PC or account | Running Tyler next to your normal browsing |

@@ -41,17 +41,57 @@ async function panel({theme='steam',platform='chrome',tab='conversation',state=S
  await page.close();
  return 'data:image/png;base64,'+png.toString('base64');
 }
+// v2.41 README: the desktop app's Settings with its PC-side parts answering, as on an example PC
+// (an RTX 3060 with 12 GB, a 6-core Ryzen, 32 GB): text replies on this PC installed and ready, hearing
+// and a voice installed with their checks, and the character voices imported (the shipped catalog).
+// The suggestion is the app's own (app/local-ai/hardware.cjs); the rest is sample data.
+const GB=1024**3;
+const PC=(()=>{
+ const req=createRequire(path.join(ROOT,'package.json'));const {suggest}=req('./app/local-ai/hardware.cjs');
+ const hardware={cpu:{model:'AMD Ryzen 5 5600X 6-Core Processor',threads:12},ram:{total:32*GB,free:20*GB},gpus:[{name:'NVIDIA GeForce RTX 3060',vramTotal:12*GB,vramFree:10.4*GB,integrated:false,source:'vulkan'}],disk:{free:412*GB},vulkanChecked:true,vulkanListed:true};
+ const text={supported:true,installed:true,models:{'4b':false,'9b':true,'4b-uncensored':false,'9b-uncensored':false},build:'b11669',check:null,model:'9b',modelChosen:true,modelLabel:'Qwen3.5 9B',uncensored:false,ready:true,needs:null,
+  suggestion:suggest(hardware),hardware,running:false,starting:false,loaded:null,busy:false,installing:null,installError:null,lastError:null,settings:{model:'9b',device:'auto',idleMinutes:10}};
+ const now=Date.parse('2026-11-06T12:00:00Z');
+ const speech={supported:true,engine:{name:'sherpa-onnx',version:'1.13.8'},installed:{runtime:true,hearing:true,voice:true},ready:{hearing:true,voice:true},running:{hearing:null,voice:null},starting:{hearing:false,voice:false},
+  sizes:{runtime:8894875,runtimeUnpacked:23453246,hearing:670478772,voice:366912005},models:{hearing:{label:'Parakeet TDT 0.6B v3'},voice:{label:'Kokoro-82M v1.0'}},voices:[{id:'am_michael',label:'Michael'},{id:'bm_george',label:'George'}],
+  checks:{hearing:{ok:true,at:now-60e3,seconds:3.04,ms:301,startMs:2072,text:'Hey Tyler, who wins in a fight, a tank or a sniper?',words:100},voice:{ok:true,at:now-50e3,seconds:2.83,ms:1312,firstMs:693,startMs:1358,voice:'George'}},installing:null,installError:null,lastError:{hearing:null,voice:null},settings:{idleMinutes:10}};
+ const cat=JSON.parse(fs.readFileSync(path.join(ROOT,'app','theme-voices','characters.json'),'utf8'));
+ const own={tf2:'The Administrator',cs2:'SAS operator',portal:'GLaDOS',l4d:'Bill',deadlock:'Bebop',gmod:'Dr. Kleiner'},pick={tf2:'engineer',cs2:'leet',portal:'wheatley',deadlock:'haze'};
+ const voices=[...new Set(cat.characters.map(c=>c.theme))].map(t=>({theme:t,name:own[t]||t,status:'ready',statusLabel:'Ready',hasReference:true,versions:[1],version:1,sample:'A line.',
+  characters:cat.characters.filter(c=>c.theme===t).map(c=>({id:c.id,name:c.name,status:c.status,statusNote:'',imported:true,approved:c.approved!==false,usable:c.approved!==false,problem:c.approved===false?'not approved':null,hasPreview:true,previewText:'Line.',nonlexical:!!c.nonlexical})),character:pick[t]||''}));
+ const tv={installed:true,current:true,ready:true,mode:'light',modeChosen:true,modeLabel:'Lightweight',engine:'standard',models:{light:true},settings:{characters:pick,builtinVersion:{},idleMinutes:5,chatCooldown:20},recommendation:{mode:'light',notes:[]},hardware};
+ return {text,speech,voices,tv,store:{aiProvider:'local',localAIModel:'9b',voiceHearing:'local',speechEngine:'kokoro',kokoroVoice:'bm_george'}};
+})();
+function pcStub([theme,PC]){
+ const store={uiTheme:theme,...PC.store,usage:{requests:42,promptTokens:18234,completionTokens:5120,reportedCostUSD:0.0314,speechResponses:9}};
+ const local={get:async k=>{const l=k==null?Object.keys(store):Array.isArray(k)?k:[k];return Object.fromEntries(l.filter(x=>x in store).map(x=>[x,store[x]]));},set:async v=>Object.assign(store,v),remove:async()=>{}};
+ const models={'4b':{label:'Qwen3.5 4B',bytes:2740937888},'9b':{label:'Qwen3.5 9B',bytes:5680522464},'4b-uncensored':{label:'Qwen3.5 4B uncensored',bytes:2707514688},'9b-uncensored':{label:'Qwen3.5 9B uncensored',bytes:5627045248}};
+ window.tylerSettings={storage:{local},tabs:{create:async()=>{}},verifyKey:async()=>true,activity:async()=>[],ai:async()=>({ok:true}),onTheme:()=>{},onVoices:()=>{},remote:async()=>({}),
+  voice:{devices:async()=>[],tone:async()=>'',test:async()=>({})},onLocalAI:()=>{},
+  localAI:async op=>op==='status'?{status:PC.text,models,engine:{build:'b11669'}}:op==='speech-status'?{status:PC.speech}:op==='plan'||op==='speech-plan'?{fileCount:0,download:0}:{},
+  voices:async op=>op==='status'?{status:PC.tv,voices:PC.voices,modes:{},models:{}}:op==='native-status'?{windows:true}:op==='plan'?{download:0}:{}};
+ window.tylerNative={devices:async()=>[],status:async()=>({ok:true}),openSettings:async()=>{},openSteam:async()=>{},theme:async()=>theme};
+}
 // A real settings page screenshot: the given sheets (CSS selectors, comma separated) on the given
 // page (zone), from the Chrome options page or the desktop app's settings window, in a window
 // `width` CSS pixels wide.
-async function settings({zone='overview',sheets='',desktop='',width=1280,scale=2,theme='steam'}){
- const page=await browser.newPage({viewport:{width:Number(width),height:1400},deviceScaleFactor:Number(scale)});
- await page.addInitScript(theme=>{window.chrome={storage:{local:{get:async()=>({uiTheme:theme,usage:{requests:42,promptTokens:18234,completionTokens:5120,reportedCostUSD:0.0314,speechResponses:9}}),set:async()=>{},remove:async()=>{}}},tabs:{create:()=>{},query:async()=>[]}};window.tylerSettings={storage:{local:window.chrome.storage.local},tabs:{create:async()=>{}},verifyKey:async()=>true,activity:async()=>[]};window.tylerNative={devices:async()=>[{kind:'output',id:'a',name:'CABLE Input (VB-Audio Virtual Cable)'},{kind:'output',id:'b',name:'Speakers (Realtek Audio)'}],status:async()=>({ok:true}),openSettings:async()=>{},openSteam:async()=>{},theme:async()=>theme};},theme);
+async function settings({zone='overview',sheets='',desktop='',width=1280,height=1400,scale=2,theme='steam',stub='',from='',until='',hide=''}){
+ const page=await browser.newPage({viewport:{width:Number(width),height:Number(height)},deviceScaleFactor:Number(scale)});
+ if(stub==='pc')await page.addInitScript(pcStub,[theme,PC]);else await page.addInitScript(theme=>{window.chrome={storage:{local:{get:async()=>({uiTheme:theme,usage:{requests:42,promptTokens:18234,completionTokens:5120,reportedCostUSD:0.0314,speechResponses:9}}),set:async()=>{},remove:async()=>{}}},tabs:{create:()=>{},query:async()=>[]}};window.tylerSettings={storage:{local:window.chrome.storage.local},tabs:{create:async()=>{}},verifyKey:async()=>true,activity:async()=>[]};window.tylerNative={devices:async()=>[{kind:'output',id:'a',name:'CABLE Input (VB-Audio Virtual Cable)'},{kind:'output',id:'b',name:'Speakers (Realtek Audio)'}],status:async()=>({ok:true}),openSettings:async()=>{},openSteam:async()=>{},theme:async()=>theme};},theme);
  await page.goto(base+(desktop?'/app/companion/settings.html':'/browser-extension/settings.html')+'#'+zone);
- await page.waitForTimeout(600);await page.evaluate(()=>document.fonts.ready);
- const box=await page.evaluate(list=>{const els=list.split(',').map(s=>document.querySelector(s.trim())).filter(Boolean);if(!els.length)throw Error('no '+list);
-  const r=els.map(e=>e.getBoundingClientRect());const x=Math.min(...r.map(b=>b.left)),y=Math.min(...r.map(b=>b.top));return {x,y,width:Math.max(...r.map(b=>b.right))-x,height:Math.max(...r.map(b=>b.bottom))-y};},sheets);
- const png=await page.screenshot({clip:box,animations:'disabled'});
+ await page.waitForTimeout(stub?1400:600);await page.evaluate(()=>document.fonts.ready);
+ // v2.41: hide (CSS selectors) leaves parts out of the picture; the save bar is always hidden, so a
+ // sheet further down the page is never cut by it. from/until crop a sheet between two of its elements
+ // (from's top to until's top); the clip is in page coordinates, so the sheet can be anywhere.
+ // (Through the elements' own style: the page's CSP doesn't allow a new <style>.)
+ await page.evaluate(h=>{for(const e of document.querySelectorAll('footer.savebar'))e.style.setProperty('visibility','hidden','important');if(h)for(const e of document.querySelectorAll(h))e.style.setProperty('display','none','important');},hide);
+ await page.waitForTimeout(150);
+ const box=await page.evaluate(([list,from,until])=>{const els=list.split(',').map(s=>document.querySelector(s.trim())).filter(Boolean);if(!els.length)throw Error('no '+list);
+  const r=els.map(e=>e.getBoundingClientRect());let x=Math.min(...r.map(b=>b.left)),y=Math.min(...r.map(b=>b.top)),bottom=Math.max(...r.map(b=>b.bottom));
+  if(from){const f=document.querySelector(from);if(!f)throw Error('no '+from);y=f.getBoundingClientRect().top-14;}
+  if(until){const u=document.querySelector(until);if(!u)throw Error('no '+until);bottom=u.getBoundingClientRect().top-4;}
+  return {x,y:y+scrollY,width:Math.max(...r.map(b=>b.right))-x,height:bottom-y};},[sheets,from,until]);
+ const png=await page.screenshot({clip:box,animations:'disabled',fullPage:true});
  await page.close();
  return 'data:image/png;base64,'+png.toString('base64');
 }
@@ -90,13 +130,34 @@ async function remote({theme='steam',state=SPEAKING,tab='conversation',scale=2})
   return 'data:image/png;base64,'+png.toString('base64');
  }finally{await ctx.close();await pc.close();await srv.stop();}
 }
-// [data-panel] keys: "hero", "theme:<name>", "panel:<query>", "settings:<query>", "window:<query>" or "remote:<query>".
+// v2.41 README: Settings on the phone remote: the desktop app's Settings page from the real remote
+// server, on a phone-sized screen, in a zone, scrolled so the element `to` is near the top. The PC's
+// settings are a memory store with sample values (an OpenRouter key saved, which the phone only sees as
+// "Saved on your PC").
+async function phoneSettings({theme='steam',zone='ai',to='',scale=2}){
+ const req=createRequire(path.join(ROOT,'package.json')),{setupRemote}=req('./app/remote.cjs'),{memoryStorage}=req('./app/vault.cjs');
+ const vault=memoryStorage();await vault.set({uiTheme:theme,openrouterKey:'sample-key',aiProvider:'openrouter',usage:{requests:42,promptTokens:18234,completionTokens:5120,reportedCostUSD:0.0314,speechResponses:9}});
+ const srv=setupRemote({vault,ask:async a=>a==='state'?{ready:false,error:'README'}:{},pageDir:path.join(ROOT,'app','remote'),uiDir:path.join(ROOT,'app','companion','ui'),libDir:path.join(ROOT,'app','companion'),version:'readme',theme:async()=>theme,
+  settings:{read:k=>vault.get(k),write:v=>vault.set(v),remove:k=>vault.remove(k)}});
+ const st=await srv.handle('enable'),at='http://127.0.0.1:'+st.port;
+ const ctx=await browser.newContext({viewport:{width:390,height:844},deviceScaleFactor:Number(scale),isMobile:true,hasTouch:true,userAgent:'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.0 Mobile/15E148 Safari/604.1'});
+ try{
+  const phone=await ctx.newPage();await phone.request.post(at+'/pair',{headers:{'content-type':'application/json','x-tyler-remote':'1'},data:{code:st.code}});
+  await phone.goto(at+'/settings/#'+zone);await phone.waitForFunction(()=>document.body.classList.contains('ui-ready'));await phone.evaluate(()=>window.tylerSettingsLoaded);
+  await phone.waitForTimeout(1500);await phone.evaluate(()=>document.fonts.ready);
+  if(to)await phone.evaluate(sel=>{const el=document.querySelector(sel);if(el)window.scrollTo(0,el.getBoundingClientRect().top+scrollY-70);},to);
+  await phone.waitForTimeout(400);
+  const png=await phone.screenshot({animations:'disabled'});
+  return 'data:image/png;base64,'+png.toString('base64');
+ }finally{await ctx.close();await srv.stop();}
+}
+// [data-panel] keys: "hero", "theme:<name>", "panel:<query>", "settings:<query>", "window:<query>", "remote:<query>" or "phoneset:<query>".
 const cache=new Map();
 async function source(key){
  if(!cache.has(key)){
   const q=k=>Object.fromEntries(new URLSearchParams(key.slice(k.length+1)));
   cache.set(key,key==='hero'?panel({tab:'soundboard',height:440,scale:2.5}):key.startsWith('theme:')?panel({theme:key.slice(6),height:230,scale:1.5})
-   :key.startsWith('panel:')?panel(q('panel')):key.startsWith('settings:')?settings(q('settings')):key.startsWith('window:')?window_(q('window')):key.startsWith('remote:')?remote(q('remote')):Promise.reject(Error('unknown '+key)));
+   :key.startsWith('panel:')?panel(q('panel')):key.startsWith('settings:')?settings(q('settings')):key.startsWith('window:')?window_(q('window')):key.startsWith('remote:')?remote(q('remote')):key.startsWith('phoneset:')?phoneSettings(q('phoneset')):Promise.reject(Error('unknown '+key)));
  }
  return cache.get(key);
 }
