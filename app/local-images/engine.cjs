@@ -98,9 +98,8 @@ function run({exe,args,env:e,cwd,signal,onProgress=()=>{},onSpawn=()=>{},timeout
 }
 /** Vulkan devices sd-cli sees ("Vulkan0\tNVIDIA GeForce RTX 4060"), with ggml_vulkan's "uma" flag (built-in graphics). */
 function parseDevices(text){
- const uma={},devices=[];
- for(const m of String(text).matchAll(/ggml_vulkan:\s*(\d+)\s*=\s*.*?\|\s*uma:\s*(\d)/g))uma[m[1]]=m[2]==='1';
- for(const m of String(text).matchAll(/^\s*(Vulkan(\d+))\t(.+?)\s*$/gm))devices.push({id:m[1],name:m[3],integrated:uma[m[2]]===true,source:'vulkan'});
+ const {umaFlags,builtIn}=require('../local-ai/hardware.cjs'),uma=umaFlags(text),devices=[];
+ for(const m of String(text).matchAll(/^\s*(Vulkan(\d+))\t(.+?)\s*$/gm))devices.push({id:m[1],name:m[3],integrated:builtIn(m[3],uma,m[2]),source:'vulkan'});
  return devices;
 }
 function listDevices(exe,{env:e,timeout=20000}={}){

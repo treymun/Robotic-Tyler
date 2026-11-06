@@ -29,12 +29,25 @@ async function windowsAdapterMemory(){
  */
 async function vulkanDevices(exe,env){
  const r=await run(exe,['--list-devices'],{timeout:20000,env});
- const text=r.out+'\n'+r.err,devices=[];
- // ggml_vulkan's own line says whether a card shares the PC's memory ("uma: 1" = built into the processor).
- const uma={};for(const m of text.matchAll(/ggml_vulkan:\s*(\d+)\s*=\s*.*?\|\s*uma:\s*(\d)/g))uma[m[1]]=m[2]==='1';
+ const text=r.out+'\n'+r.err,devices=[],uma=umaFlags(text);
  for(const m of text.matchAll(/^\s*(Vulkan(\d+)):\s*(.+?)\s*\((\d+)\s*MiB,\s*(\d+)\s*MiB free\)\s*$/gm))
-  devices.push({id:m[1],name:m[3],vramTotal:Number(m[4])*MiB,vramFree:Number(m[5])*MiB,integrated:uma[m[2]]===true,source:'vulkan'});
+  devices.push({id:m[1],name:m[3],vramTotal:Number(m[4])*MiB,vramFree:Number(m[5])*MiB,integrated:builtIn(m[3],uma,m[2]),source:'vulkan'});
  return {ok:r.ok,devices,listed:/Available devices:/.test(text)};
+}
+/**
+ * v2.40: whether a Vulkan device is built into the processor (it shares the PC's memory, so Vulkan
+ * reports most of the PC's memory as "free" graphics memory). Found on a friend's PC: an Intel UHD
+ * Graphics 770 showed 15 GB free beside an RTX 4070 with 11 GB, and Text AI ran on the built-in one.
+ * ggml_vulkan's own line ("N = name (driver) | uma: 1") is matched by the device's name first (its
+ * number isn't always the same as the "VulkanN" in the device list, and the line isn't always
+ * printed), then by number; the name alone also counts (Intel UHD/Iris/HD Graphics, Intel's built-in
+ * Arc in Core Ultra processors, AMD's "Radeon Graphics" and "Radeon 780M Graphics"-style names).
+ */
+function umaFlags(text){const list=[];for(const m of String(text).matchAll(/ggml_vulkan:\s*(\d+)\s*=\s*(.+?)\s*\([^()|]*\)\s*\|\s*uma:\s*(\d)/g))list.push({index:m[1],name:m[2].trim(),uma:m[3]==='1'});return list;}
+const BUILT_IN=/\b(UHD|Iris|HD Graphics)\b|^Intel\(R\) (Arc\(TM\) )?Graphics$|^Intel\(R\) Arc\(TM\) \d{3}[VTH]\b|^AMD Radeon(\(TM\))?( \d{3,4}M| Vega \d+)? Graphics$|^AMD Radeon\(TM\) (Vega \d+ )?Graphics$|Microsoft Basic/i;
+function builtIn(name,uma=[],index=null){
+ const byName=uma.find(u=>u.name===name),byIndex=uma.find(u=>u.index===String(index));
+ return (byName?byName.uma:byIndex?.uma===true&&!uma.some(u=>u.name===name))||BUILT_IN.test(String(name||''));
 }
 /** This PC: processor, memory, disk and graphics cards (with memory where it can be read). */
 async function detect(dataDir,{vulkan=null,adapters=windowsAdapterMemory,baseDetect=base.detect}={}){
@@ -45,7 +58,7 @@ async function detect(dataDir,{vulkan=null,adapters=windowsAdapterMemory,baseDet
   const mem=await adapters().catch(()=>[]);
   for(const g of gpus)if(!g.vramTotal){const a=mem.find(x=>x.name===g.name);if(a?.vramTotal)Object.assign(g,{vramTotal:a.vramTotal,source:'windows'});}
   // Built-in graphics share the PC's memory: Intel UHD/Iris and AMD's "Radeon Graphics" without a model number.
-  for(const g of gpus)if(g.integrated===undefined)g.integrated=/\b(UHD|Iris|HD Graphics)\b/i.test(g.name)||/^AMD Radeon(\(TM\))? Graphics$/i.test(g.name)||/Microsoft Basic/i.test(g.name);
+  for(const g of gpus)if(g.integrated===undefined)g.integrated=BUILT_IN.test(String(g.name||''));
  }
  return {...hw,gpus,vulkanChecked:!!vulkan,vulkanListed:!!vulkan?.listed};
 }
@@ -70,4 +83,4 @@ function suggest(hw){
  notes.push('A game uses graphics memory too: if the model doesn’t fit while you play, Tyler says so (he never switches model by himself).');
  return {model,device:'gpu',card:best,notes};
 }
-module.exports={detect,suggest,vulkanDevices,windowsAdapterMemory,NEEDS,NINE_B_FREE,sizeOf,GB};
+module.exports={detect,suggest,vulkanDevices,windowsAdapterMemory,umaFlags,builtIn,NEEDS,NINE_B_FREE,sizeOf,GB};

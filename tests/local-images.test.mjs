@@ -399,3 +399,8 @@ test('the image engine’s Vulkan list is matched with memory figures from nvidi
  assert.equal(hw.sdListed,true);assert.equal(hw.gpus[0].id,'Vulkan0');assert.equal(hw.gpus[0].vramFree,7*GB);
  assert.equal(hardware.suggest(hw).card.name,'NVIDIA GeForce RTX 4060');
 });
+
+test('v2.40: the image engine never takes built-in graphics for a card either (a friend\'s RTX 4070 + UHD 770, no ggml_vulkan lines)',()=>{
+ const d=engine.parseDevices('Available devices:\nVulkan0\tIntel(R) UHD Graphics 770\nVulkan1\tNVIDIA GeForce RTX 4070\n');
+ assert.deepEqual(d.map(x=>[x.id,x.name,x.integrated]),[['Vulkan0','Intel(R) UHD Graphics 770',true],['Vulkan1','NVIDIA GeForce RTX 4070',false]]);
+});

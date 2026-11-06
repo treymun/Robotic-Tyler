@@ -338,3 +338,25 @@ test('v2.38.1: the engine is sent the tidied conversation',{skip:!unix},async()=
  assert.ok(templateAccepts(sent));assert.match(sent[0].content,/Reply with fresh wording\.$/);assert.equal(sent.filter(m=>m.role==='system').length,1);
  await t.done();
 });
+
+// v2.40: a friend's PC ran Text AI on an Intel UHD Graphics 770 (built into the processor, 4.2 tokens a
+// second) instead of its RTX 4070: Vulkan reports built-in graphics with most of the PC's memory "free"
+// (15 GB beside the 4070's 11 GB), and the built-in flag wasn't found.
+test('v2.40: built-in graphics are never taken for a graphics card, whatever Vulkan says is free (a friend\'s RTX 4070 + UHD 770)',{skip:!unix},async()=>{
+ // 1. The engine's own device list, with no ggml_vulkan lines at all: the name says it's built in.
+ const t=await setup({settings:{model:'9b',device:'auto',idleMinutes:0},config:{devices:[{id:'Vulkan0',name:'Intel(R) UHD Graphics 770',total:16280,free:15460},{id:'Vulkan1',name:'NVIDIA GeForce RTX 4070',total:11980,free:11264}]}});
+ const hw=await t.svc.hardware(true);
+ assert.deepEqual(hw.gpus.map(g=>[g.name,g.integrated]),[['Intel(R) UHD Graphics 770',true],['NVIDIA GeForce RTX 4070',false]]);
+ const s=hardware.suggest(hw);assert.equal(s.card.name,'NVIDIA GeForce RTX 4070');assert.equal(s.model,'9b','11 GB free on the 4070');assert.doesNotMatch(s.notes.join(' '),/UHD Graphics 770 has/);
+ await t.svc.chat({messages:msgs});
+ const start=t.seen().find(e=>e.start);assert.equal(start.argv[start.argv.indexOf('--device')+1],'Vulkan1','the replies run on the RTX 4070');
+ await t.done();
+});
+test('v2.40: ggml_vulkan\'s "uma" flag is matched by name, not only by number; names alone also count',()=>{
+ const text='ggml_vulkan: Found 2 Vulkan devices:\nggml_vulkan: 0 = NVIDIA GeForce RTX 4070 (NVIDIA) | uma: 0 | fp16: 1\nggml_vulkan: 1 = Intel(R) UHD Graphics 770 (Intel Corporation) | uma: 1 | fp16: 1\n';
+ const uma=hardware.umaFlags(text);
+ // The device list numbers them the other way round: the names decide.
+ assert.equal(hardware.builtIn('Intel(R) UHD Graphics 770',uma,'0'),true);assert.equal(hardware.builtIn('NVIDIA GeForce RTX 4070',uma,'1'),false);
+ for(const n of ['Intel(R) Iris(R) Xe Graphics','Intel(R) Arc(TM) Graphics','Intel(R) Arc(TM) 140V GPU (16GB)','AMD Radeon(TM) Graphics','AMD Radeon(TM) 780M Graphics','AMD Radeon 890M Graphics'])assert.equal(hardware.builtIn(n),true,n);
+ for(const n of ['NVIDIA GeForce RTX 4070','AMD Radeon RX 7800 XT','Intel(R) Arc(TM) A770 Graphics','Intel(R) Arc(TM) B580 Graphics'])assert.equal(hardware.builtIn(n),false,n);
+});
