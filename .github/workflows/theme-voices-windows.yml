@@ -16,6 +16,10 @@ on:
         description: Also check character voices with the recordings built into the app (v2.43, no import), a damaged-recording fallback and a repair by import
         type: boolean
         default: true
+      sharper:
+        description: Also download voice conversion (about 1.33 GB, v2.44) and convert one line for Medic (the sharper voice)
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -33,4 +37,5 @@ jobs:
         env:
           RT: ${{ inputs.runtime }}
           CHARACTERS: ${{ inputs.characters && '1' || '0' }}
+          SHARPER: ${{ inputs.sharper && '1' || '0' }}
         run: node tools/theme-voices/windows-smoke.cjs "$env:RUNNER_TEMP\TylerThemeVoices"

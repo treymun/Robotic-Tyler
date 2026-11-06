@@ -306,7 +306,7 @@ class Installer{
   problems.push(...engineProblems,...damagedModels.map(d=>(d.missing?'Missing model file ':'Damaged model file ')+d.model+'/'+d.path));
   return {ok:!problems.length,problems:problems.slice(0,40),count:problems.length,engineOk:!engineProblems.length,damagedModels};
  }
- /** Removes the engine and models. Custom voices, imported character voices (v2.41), saved clips and settings stay unless asked. */
+ /** Removes the engine and models (and v2.44's optional components, which need the engine). Custom voices, imported character voices (v2.41), saved clips and settings stay unless asked. */
  async remove({everything=false}={}){
   for(const name of fs.existsSync(this.dir)?fs.readdirSync(this.dir):[]){
    if(!everything&&['custom-voices','saved','characters'].includes(name))continue;
@@ -314,6 +314,70 @@ class Installer{
   }
  }
  async removeModel(key){const s=this.state();if(!s?.models?.[key])return;await rmr(path.join(this.dir,'models',s.models[key].dir));delete s.models[key];writeJson(this.statePath(),s);}
+
+ // ── optional components (v2.44: the kNN-VC weights for the "sharper voice") ──────────────────
+ // Listed in the lock like the models (LOCK.components: each file's address, size and SHA-256), fetched
+ // with the same verified, resumable obtain(), placed in components/<key>-<revision>/ and recorded in
+ // components.json (its own file, so installing or updating the engine never forgets it). Never installed
+ // by itself: only installComponent() fetches, and only when the owner asks.
+ componentsPath(){return path.join(this.dir,'components.json');}
+ componentsState(){try{const s=JSON.parse(fs.readFileSync(this.componentsPath(),'utf8'));return s&&typeof s==='object'?{format:1,components:{},...s}:{format:1,components:{}};}catch{return {format:1,components:{}};}}
+ static componentDirName(key){return key+'-'+LOCK.components[key].revision.slice(0,12);}
+ /** The files a component needs, as the downloader takes them. */
+ componentPlan(key){
+  const c=LOCK.components?.[key];if(!c)throw Error('Unknown component: '+key);
+  const files=c.files.map(f=>({...f,name:key+'/'+f.path,group:'component',component:key}));
+  return {key,label:c.label,files,download:files.reduce((n,f)=>n+f.size,0)};
+ }
+ /** {installed, current, dir, bytes, partial}: current = this version's files, all there at their exact size (checked by SHA-256 when installed). */
+ componentStatus(key){
+  const c=LOCK.components?.[key];if(!c)return {installed:false,current:false,dir:null,bytes:0,partial:0};
+  const s=this.componentsState().components?.[key],dir=s?.dir?safeJoin(path.join(this.dir,'components'),s.dir):null;
+  const placed=f=>{try{return !!dir&&fs.statSync(path.join(dir,f.path)).size===f.size;}catch{return false;}};
+  const current=!!s&&s.revision===c.revision&&c.files.every(placed);
+  let partial=0;if(!current)for(const f of c.files){const q=path.join(this.downloads,f.sha256.slice(0,16)+'-'+path.basename(f.path));let k=0;for(const x of [q,q+'.partial'])try{k=Math.max(k,fs.statSync(x).size);}catch{}partial+=Math.min(k,f.size);}
+  return {installed:!!s,current,dir:current?dir:null,bytes:c.files.reduce((n,f)=>n+f.size,0),partial,installedAt:s?.at||null};
+ }
+ /** Downloads (or resumes), checks and places a component. Progress: {phase,label,done,total,bytes,totalBytes}. */
+ async installComponent(key,{offline=[],signal,onProgress=()=>{}}={}){
+  const p=this.componentPlan(key),dirName=Installer.componentDirName(key),dir=path.join(this.dir,'components',dirName);
+  const placed=f=>{try{return fs.statSync(path.join(dir,f.path)).size===f.size;}catch{return false;}};
+  const get=p.files.filter(f=>!placed(f)),totalBytes=get.reduce((n,f)=>n+f.size,0);
+  // What a download that was stopped already has isn't needed again (it resumes); plus a little room.
+  const have=get.reduce((n,f)=>{const q=path.join(this.downloads,f.sha256.slice(0,16)+'-'+path.basename(f.name));let k=0;for(const x of [q,q+'.partial'])try{k=Math.max(k,fs.statSync(x).size);}catch{}return n+Math.min(k,f.size);},0);
+  const need=totalBytes-have+64*1024**2,free=await fs.promises.statfs(this.dir).then(s=>s.bavail*s.bsize).catch(()=>null);
+  if(get.length&&free!==null&&free<need)throw Object.assign(Error('Not enough free disk space: voice conversion needs about '+(need/GB).toFixed(1)+' GB and '+(free/GB).toFixed(1)+' GB is free on that drive.'),{code:'DISK'});
+  let got=0;const tick=(phase,label,extra={})=>onProgress({phase,label,bytes:got,totalBytes,...extra});
+  await fs.promises.mkdir(dir,{recursive:true});let i=0;
+  for(const f of get){
+   i++;let last=0;tick('download','Downloading '+f.path,{done:i-1,total:get.length});
+   const file=await this.obtain(f,{offline,signal,onBytes:n=>{got+=n;if(Date.now()-last>250){last=Date.now();tick('download','Downloading '+f.path,{done:i-1,total:get.length});}}});
+   const target=safeJoin(dir,f.path);if(!target)throw Error('Unsafe component path '+f.path);
+   await fs.promises.rename(file,target).catch(async()=>{await fs.promises.copyFile(file,target+'.tmp');await fs.promises.rename(target+'.tmp',target);await rmr(file);});
+  }
+  const st=this.componentsState();
+  st.components={...st.components,[key]:{dir:dirName,revision:LOCK.components[key].revision,at:Date.now(),files:p.files.map(f=>({path:f.path,size:f.size,sha256:f.sha256}))}};
+  writeJson(this.componentsPath(),st);
+  // An older revision of the same component isn't kept.
+  const root=path.join(this.dir,'components');for(const name of fs.existsSync(root)?fs.readdirSync(root):[])if(name.startsWith(key+'-')&&name!==dirName)await rmr(path.join(root,name)).catch(()=>{});
+  tick('done','Installed',{done:1,total:1});
+  return st.components[key];
+ }
+ /** Checks a component's files against their SHA-256 (Check and repair files). */
+ async verifyComponent(key,{signal}={}){
+  const c=LOCK.components?.[key],st=this.componentStatus(key);if(!c||!st.installed)return {installed:false,damaged:[]};
+  const s=this.componentsState().components[key],dir=path.join(this.dir,'components',s.dir),damaged=[];
+  for(const f of c.files){const t=path.join(dir,f.path);if(!fs.existsSync(t)||fs.statSync(t).size!==f.size||await sha256File(t,signal)!==f.sha256)damaged.push({path:f.path,file:t});}
+  return {installed:true,damaged};
+ }
+ /** Removes one component (its folder, its record and its unfinished downloads). Nothing else is touched. */
+ async removeComponent(key){
+  const st=this.componentsState(),had=!!st.components?.[key],root=path.join(this.dir,'components');
+  for(const name of fs.existsSync(root)?fs.readdirSync(root):[])if(name.startsWith(key+'-'))await rmr(path.join(root,name));
+  for(const f of LOCK.components?.[key]?.files||[]){const q=path.join(this.downloads,f.sha256.slice(0,16)+'-'+path.basename(f.path));await rmr(q);await rmr(q+'.partial');}
+  if(had){delete st.components[key];writeJson(this.componentsPath(),st);}
+  return {removed:had};
+ }
  saveCheck(c){const s=this.state();if(!s)return;s.check=c;writeJson(this.statePath(),s);}
 }
 // Where each file of a wheel goes (the wheel format: NAME.data/purelib|platlib go with the packages,

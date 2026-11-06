@@ -230,7 +230,7 @@
   </details>
   <div class="grid two">
     <label>Runs on
-      <select id="laDevice"><option value="auto">Graphics card when possible</option><option value="cpu">Processor only</option></select>
+      <select id="laDevice"><option value="auto">Graphics card: the whole model</option><option value="split">Split between graphics card and processor</option><option value="cpu">Processor only</option></select>
       <small class="hint" id="laDeviceNote">Any recent NVIDIA, AMD or Intel card (through Vulkan): the whole model goes on the card. If it doesn't fit while you play, Tyler says so instead of moving it.</small>
     </label>
     <label>Close the AI after
@@ -530,6 +530,10 @@
   <div class="toggle-grid" data-provider="openrouter">
     <label class="toggle"><input id="fastSpeech" type="checkbox" checked><span><b>Start speaking sooner</b><small>Tyler starts saying the first sentence while the rest of the reply is still being written. Needs Stream AI text. Turn off if replies ever sound cut or repeated.</small></span></label>
   </div>
+  <!-- v2.44: who said each voice line (voice-speakers.js). Optional: off is exactly the voice path before v2.44. -->
+  <div class="toggle-grid">
+    <label class="toggle"><input id="voiceSpeakers" type="checkbox" checked><span><b>Tell the AI who's speaking in voice</b><small>Tyler works out who said each line from Steam's own call data and each person's audio, so he answers the right person and doesn't mix people up ("Sam (in voice): …"). Names come only from Steam, the recording sent for hearing doesn't change, and no voice is stored. Standard voice only. Turn off if names ever come out wrong: Tyler then hears the call as one mix, as before.</small></span></label>
+  </div>
   <p class="hint"><span class="only-chrome">Sensitivity, interruptions and turn-taking are tuned live in the Conversation section of Tyler's panel in Steam.</span><span class="only-desktop">Long replies are spoken in full, a sentence group at a time. Sensitivity, interruptions and turn-taking are tuned in the Conversation section of Tyler&#39;s panel in Steam chat (with the VB-CABLE route, in the Voice window).</span></p>
 </section>
 
@@ -640,10 +644,11 @@
       </label>
       <label>Runs on
         <select id="tvDevice">
-          <option value="auto">Graphics card when possible, else the processor</option>
+          <option value="auto">Graphics card, or the processor when it's full</option>
+          <option value="cuda">Graphics card only (stops with a message if full)</option>
           <option value="cpu">Processor only (keeps the graphics card free)</option>
         </select>
-        <small class="hint">The processor is much slower: a few seconds of speech can take a minute or more. On a graphics card, expect a few seconds of waiting for each second of speech with the standard engine.</small>
+        <small class="hint">With the first choice, Tyler checks the graphics card's free memory each time it loads the voice model. If a game or the text AI has filled it (or it runs out while speaking), the same voice runs on the processor instead, and Tyler says so wherever the voice status shows; it tries the card again the next time the engine starts. The processor is much slower: a few seconds of speech can take a minute or more. On a graphics card, expect a few seconds of waiting for each second of speech with the standard engine.</small>
       </label>
     </div>
     <label>Engine
@@ -721,6 +726,12 @@
       <label>The character voice pack or the voice supplement: its folder or its .zip file, or a folder holding both<input id="tvCharSource" placeholder="For example D:\Downloads\Robotic-Tyler-Complete-Voice-Supplement.zip"><small class="hint">You don't need this: the recordings are built in. Use it to repair a built-in recording that is missing or damaged, or to add recordings this version lists. Only those are read, each checked by its size, type and SHA-256. One that's already here isn't copied again, and nothing else in a pack is read or kept.</small></label>
       <div class="actions"><button id="tvCharGo" type="button">Import</button><button id="tvCharCancel" type="button" class="secondary">Cancel</button></div>
     </div>
+    <h3>Sharper character voices (experimental)</h3>
+    <p class="hint">For Medic, Lash and Kelvin, Tyler can also run the generated speech through voice conversion (kNN-VC): each moment of the clone's speech is swapped for the closest-sounding moments of that character's own recordings, which are built into the app. It's off until you switch it on in the character's row above, and it needs a separate download. It was measured, not listened to: closer for Medic, and nearly for Lash and Kelvin (each missed one test on one of two tries). It's slower (about 0.35–0.6 s more per second of speech on a processor), uses about 1.7 GB more memory while it's loaded, and its sound is made at 16 kHz (then resampled to 24 kHz), so it's a little less crisp. If it's on but can't run, the character's normal voice speaks and says why.</p>
+    <p class="hint" id="tvConvState" role="status">Checking voice conversion…</p>
+    <div class="tv-progress" id="tvConvProgressWrap" hidden><span id="tvConvProgress"></span></div>
+    <div class="actions"><button id="tvConvInstall" type="button" class="secondary">Download voice conversion</button><button id="tvConvCancel" type="button" class="secondary" hidden>Stop downloading</button><button id="tvConvRemove" type="button" class="secondary" hidden>Remove voice conversion</button></div>
+    <p class="hint">Downloaded only when you press the button, from the kNN-VC project's v0.1 release on GitHub, and each file is checked against the SHA-256 recorded in this version of Tyler (a stopped download carries on where it stopped). WavLM-Large is Microsoft's (its model card points to a Creative Commons Attribution-ShareAlike 3.0 licence); the vocoder and kNN-VC's code are MIT-licensed. <b>Remove voice conversion</b> deletes only these files; your switches and everything else stay.</p>
     <h3>The 25 voices</h3>
     <p class="hint">Each theme's voice can be replaced with your own recording (5–20 seconds of one person speaking clearly, plus exactly what they say). Your replacements are kept through updates. <b>Reference</b> plays the original recording the clone learns from; <b>Test</b> makes new speech with the clone.</p>
     <label>Test sentence<input id="tvTestText" maxlength="200" value="Good evening. This is a test of my brand new voice."></label>

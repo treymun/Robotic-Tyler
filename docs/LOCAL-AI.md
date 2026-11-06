@@ -88,6 +88,7 @@ llama-server -m <model.gguf> --host 127.0.0.1 --port <free port> -c 8192 -np 1 -
   --temp 0.7 --top-p 0.8 --top-k 20 --min-p 0 --presence-penalty 1.5
   --no-webui --no-slots --offline --cache-ram 0 --fit off -t <threads> -tb <threads>
   graphics card:  --device VulkanN -ngl all      (GGML_BACKEND_PATH=gpu\ggml-vulkan.dll)
+  split (v2.44):  --device VulkanN -ngl <N>      (GGML_BACKEND_PATH=gpu\ggml-vulkan.dll; N worked out by Tyler)
   processor:      --device none -ngl 0
   --alias tyler-local --log-colors off
 environment: a short allowlist (SystemRoot, TEMP, PATH, …) plus LLAMA_API_KEY=<new key>
@@ -103,6 +104,70 @@ environment: a short allowlist (SystemRoot, TEMP, PATH, …) plus LLAMA_API_KEY=
 - Threads: about the number of physical cores (half the logical processors, 1 to 16).
 - On the graphics card, every layer goes on the one Vulkan card with the most free memory
   (a built-in graphics chip is only used when it's the only one).
+
+## Runs on (v2.44: three choices)
+
+**Settings → On this PC → Runs on**:
+
+| Choice | What happens |
+|---|---|
+| **Graphics card: the whole model** (`auto`, the default; it was *Graphics card when possible*) | Exactly as before v2.44: every layer on the card. If the card's free memory is under 90% of the model's need when it starts (a game or a theme voice may be using it), the reply fails with the reason; nothing is moved to the processor. A PC where Vulkan never found a card runs on the processor and says so. |
+| **Split between graphics card and processor** (`split`, new) | As many layers as fit go on the card and the rest run on the processor in the PC's memory. Slower than the whole model on the card, faster than the processor alone. |
+| **Processor only** (`cpu`) | As before: no card at all, and the Vulkan backend isn't loaded. |
+
+Any other saved value is read as `auto`. The setting belongs to the PC: the phone remote shows the
+section as "set up on your PC" and can't change it (`localAI` isn't one of the settings it may write).
+
+### Split between graphics card and processor
+
+Written for a friend's PC where the text AI (llama.cpp, Vulkan) and a theme voice (Qwen3-TTS on CUDA)
+share one NVIDIA card: whichever loaded first took the card's memory and the other failed.
+
+- **When it's decided:** at each start of the engine (the first reply, after the idle close, after a
+  model or setting change), from the free memory Vulkan reports for the card at that moment. A game
+  that's running is already left out of that reading.
+- **What's kept free on the card**, before any layer goes there:
+  - **room for theme voices**, when they're installed with the graphics-card engine (CUDA, standard or
+    fast) and their *Runs on* isn't *Processor only*: the theme voices' own figure (`vramReserve()` in
+    `app/theme-voices/service.cjs`: their mode's need from `app/theme-voices/hardware.cjs`, Quality 6.5 GB
+    or Lightweight 4 GB, plus 1.3 GB while a sharper voice is installed and switched on).
+    If the voice engine is already loaded on the card, its model is already left out of the free
+    reading, so only the rest of its need (what it uses while it speaks) is kept, not the whole model
+    again. Tyler only reads the theme voices' settings and state for this; nothing of theirs changes.
+  - **a safety margin of 1 GB** (the same as llama.cpp's own default for its automatic fitting), and
+    **0.5 GB for llama.cpp's working buffers** on the card.
+- **How many layers:** llama.cpp puts the output layer on the card first and then the repeating layers
+  from the last one down, and it counts the output layer as one of them: Qwen3.5 4B and 9B have 32
+  layers, so llama.cpp speaks of 33 ("offloaded 18/33 layers to GPU"). Tyler adds them up in that order
+  until the next one wouldn't fit, using each layer's size from the pinned file's GGUF header plus its
+  cache for the 8192-token context (`lock.json → models.*.layers`, read by
+  `tools/local-ai/gguf-layers.cjs`). The context stays 8192 tokens.
+- **The flags:** Tyler passes that exact number, `-ngl N`, and keeps `--fit off`. The pinned build also
+  has llama.cpp's own fitting (`--fit on` with a per-card margin, `-fitt`); it was checked against
+  Tyler's numbers (below) and chooses the same counts, but Tyler's own count is known before the start
+  (so the note can say it), it includes the theme voice's room, it never lets llama.cpp change anything
+  else by itself, and when no layer fits the engine starts with `--device none`, so Vulkan isn't even
+  loaded.
+- **Examples** (a 12 GB card with 0.9 GB used by Windows): the 9B beside a Quality theme voice: 18 of 33
+  layers on the card; the 4B beside a Quality voice, or the 9B beside a Lightweight voice: the whole
+  model fits; a game using 7 GB: 14 of 33 (9B) or 29 of 33 (4B); a game using 7 GB and a Lightweight
+  voice, or an 8 GB card with a Quality voice: no layer fits.
+- **If no layer fits** it runs on the processor, with the same model. If the start still runs out of
+  memory (the card's memory changed, or Vulkan needed more than estimated), it's tried once more with
+  about 60% of the layers; a second failure is the reason, and nothing else is tried. A card that was
+  used before and has gone (a driver problem) is an error, as with *Graphics card*.
+- **It's always said**, never done silently. The note, for example *"Split: 18 of 33 layers on the
+  NVIDIA GeForce RTX 3060, the rest on the processor (slower than all on the card). Room is kept on the
+  card for the theme voice (Quality, 6.5 GB)."*, shows in the Steam window's status line while it starts
+  ("Starting the AI on this PC… Split: …"), under *Runs on* in Settings (now, or at the last start), in
+  the install state ("Running now. Split: …"), in the speed check ("on the RTX 3060 and the processor
+  (18 of 33 layers on the card)") and in the activity log. When no layer fits: *"Split: no layer fits on
+  the NVIDIA GeForce RTX 3060 right now (4.1 GB free, 4.0 GB kept for the theme voice), so it runs on
+  the processor (slower)."*
+- The processor's part needs the PC's memory: the start checks there's about the model's processor
+  figure minus what went on the card free (at least 1 GB), and says so if not.
+- Same model, same provider: only where its layers run changes. Tyler never switches to a cloud AI or
+  another model.
 
 ## When it runs
 
@@ -189,7 +254,16 @@ speech is still stopped by it.
   line, `/health`, streamed `/v1/chat/completions` and key rule): starts only when asked, 127.0.0.1,
   key in the environment and required, idle close, Stop/release, the emergency stop, quitting, a crash
   mid-reply, a model that doesn't fit, a missing model, the graphics card chosen from Vulkan's list,
-  the suggestion.
+  the suggestion. v2.44 split: the lock's layer data, the GGUF header reader (a small made-up file),
+  the plan on a 12 GB card (theme voice Quality, Lightweight or none on the card; a game using memory;
+  nothing fits; the 4B's and 9B's 33 layers), the theme voices' room (only on the card, a loaded model
+  not counted twice, the sharper voice, read from their service without changing it), the note's
+  words, the theme voices' `vramReserve()` figure (and a service without it), the command line and
+  environment for each choice, the setting's sanitising (an unknown value
+  is `auto`; the phone can't write it), and on the fake engine: `-ngl 18` beside a Quality voice with
+  the note at start and in the status, re-decided at the next start, the processor with `--device none`
+  when nothing fits, one retry with fewer layers, the reason after a second failure, no card at all,
+  and *Graphics card* and *Processor only* exactly as before.
 - `tests/local-ai-routing.test.mjs`: the real background with a fake local engine: the reply uses
   the same chat rules, no OpenRouter or Gemini call is made, streaming, a failure gives the reason
   and no cloud call, Chrome gives a clear error, the voice-call key rule, usage counters, the
@@ -218,7 +292,23 @@ PC on Windows* (`.github/workflows/local-ai-windows.yml`): installs the Windows 
 the app's installer on GitHub's Windows runner (no graphics card), asks Vulkan for cards, starts the
 server on the processor and times the speed check and one reply.
 
-**Not tested yet:** a real graphics card through Vulkan (NVIDIA, AMD or Intel), the two 9B models
+**Real, Linux, split (v2.44)** (`tools/local-ai/split-real.cjs`, development container, 2 cores, no
+graphics card): the pinned b11669 Linux build, with llama.cpp's own RPC server (`ggml-rpc-server` from
+the same build, on the processor) standing in for the card: llama-server sees it as a device (`RPC0`)
+like a Vulkan card. The models were copies of the pinned 4B and 9B files with their real GGUF header
+(the tensor layout) and empty weights, to save 8 GB of downloads. With the app's own command line
+(`LlamaServer`, plus `--rpc` and a log file): the 4B with 29 of 33 layers, the 9B with 18 of 33 and the
+4B with none (`--device none -ngl 0`) each started, answered a streamed request, and llama.cpp reported
+"offloaded 29/33" and "18/33" layers; the device's model, cache and state buffers were 2596.36 and
+3138.01 MiB against 2596.35 and 3138.00 MiB planned. llama.cpp's own `llama-fit-params` on the same
+device, with margins giving the same room, chose the same counts as Tyler in five of six cases and one
+layer more in the sixth (4B: 29, 14, 1; 9B: 14, 6, 0 against Tyler's 14, 5, 0). Not shown by this:
+Vulkan's own buffers on a real card (the RPC device's working buffer was 72–96 MiB; Tyler keeps
+0.5 GB) and a real card's free-memory reading. `DEVICE=split` in `tools/local-ai/windows-smoke.cjs`
+runs the real thing on a Windows PC with a card.
+
+**Not tested yet:** a real graphics card through Vulkan (NVIDIA, AMD or Intel), including *Split* on
+a real NVIDIA card beside a theme voice, the two 9B models
 (their pinned SHA-256s were checked by the owner; Tyler checks them again when they download), the
 Windows workflow's first run, and replies in real Steam chat.
 

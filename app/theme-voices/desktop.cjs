@@ -10,6 +10,8 @@
 //     character's original recording. The Steam window may pick a theme's character (a saved setting).
 //   - v2.43: the character recordings ship with the app (theme-voices/characters/, unpacked from app.asar
 //     like voices/ and worker/, so the Python worker reads them in place); importing only repairs or adds.
+//   - v2.44: Settings may also download, stop and remove the optional voice conversion (the "sharper voice"),
+//     and switch it per character (a saved setting); the clip says when it was converted or why not.
 // Clips go back as audio only; file paths stay here, except a saved clip's own path.
 const path=require('node:path'),fs=require('node:fs');
 const {ThemeVoices,MODES}=require('./service.cjs'),{LOCK,plan}=require('./installer.cjs'),hardware=require('./hardware.cjs');
@@ -25,13 +27,15 @@ function setupThemeVoices({root,dir,vault,local,changeListeners,net,shell,log,se
   theme:async()=>(await vault.get('uiTheme')).uiTheme||'steam',log});
  const clips=new Map();
  const pub=c=>({id:c.id,text:c.text,theme:c.theme,character:c.character||null,characterVersion:c.characterVersion||null,versionNote:c.versionNote?String(c.versionNote).slice(0,160):null,voiceName:c.voiceName,seconds:c.seconds,ms:c.ms,cached:c.cached,mode:c.mode,device:c.device||null,processed:!!c.processed,status:c.status,custom:!!c.custom,
-  fallback:c.fallback?{name:String(c.fallback.name||c.fallback.character||'').slice(0,40),reason:String(c.fallback.reason||'').slice(0,160)}:null});
+  fallback:c.fallback?{name:String(c.fallback.name||c.fallback.character||'').slice(0,40),reason:String(c.fallback.reason||'').slice(0,160)}:null,
+  sharper:c.sharper===true,sharperNote:c.sharperNote?String(c.sharperNote).slice(0,240):null,deviceNote:c.deviceNote?String(c.deviceNote).slice(0,240):null});
  // v2.41: only these settings may come from the Steam window: follow the theme, the voice picked, and each theme's character.
  const steamSettings=v=>{const allowed={};if(typeof v.followTheme==='boolean')allowed.followTheme=v.followTheme;if(typeof v.override==='string')allowed.override=v.override;
   if(v.characters&&typeof v.characters==='object')allowed.characters=Object.fromEntries(Object.entries(v.characters).slice(0,30).filter(([t,id])=>typeof t==='string'&&typeof id==='string'));return allowed;};
  service.on('install',e=>send({kind:'install',...e}));
  service.on('status',s=>send({kind:'status',status:s}));
  service.on('progress',e=>send({kind:'progress',...e}));
+ service.on('conversion',e=>send({kind:'conversion',...e}));
  // An emergency stop also stops a voice being made.
  changeListeners.push(changes=>{if(changes.v22EmergencyStop?.newValue===true)void service.stop();});
  globalThis.tylerThemeVoices={
@@ -80,6 +84,10 @@ function setupThemeVoices({root,dir,vault,local,changeListeners,net,shell,log,se
    const ref=r.kind==='reference'||!p.files.preview,f=ref?p.files.reference[0]:p.files.preview;
    return {audio:fs.readFileSync(f).toString('base64'),type:'audio/flac',kind:ref?'reference':'line',text:ref?p.version.clips[0].text||null:p.version.preview?.text||null,version:p.version.version};}
   if(op==='characters-status')return service.voices.characters.status();
+  // v2.44: the optional voice conversion. Downloaded only when the owner presses Install; Remove deletes only it.
+  if(op==='conversion-install'){void service.installConversion().catch(e=>log('Theme voices: voice conversion install failed',e.message));return {started:true};}
+  if(op==='conversion-cancel'){service.cancelConversionInstall();return {};}
+  if(op==='conversion-remove')return service.removeConversion();
   if(op==='native-status')return service.nativeStatus();
   if(op==='native-install'){const file=await service.nativeInstaller();const err=await shell.openPath(file);if(err)throw Error('Windows couldn’t start Microsoft’s installer: '+err);return {started:true};}
   if(op==='open-folder'){const which=r.which==='saved'?path.join(service.dir,'saved'):service.dir;fs.mkdirSync(which,{recursive:true});await shell.openPath(which);return {};}

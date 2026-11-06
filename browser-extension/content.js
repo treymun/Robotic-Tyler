@@ -403,6 +403,16 @@
     // Steam's codec settings for Tyler's audio and his send rate (v2.20.2): what the call allows.
     const codec=v.codec;if(codec?.codec)row('✓ Call audio: '+codec.codec.replace(/^opus$/i,'Opus')+(codec.kbps?' · '+codec.kbps+' kbps':''),'Steam\'s settings: '+(codec.fmtp||'none listed')+(/maxplaybackrate=(8|12|16|24)000/.test(codec.fmtp)?' (Steam limits the call\'s audio range; music loses its highest notes)':''));
     row(inputSnapshot?.tracks?'✓ Hearing the call':'? Incoming voice not verified',inputSnapshot?.tracks?inputSnapshot.tracks+' incoming voice track(s) seen.':'Start automatic mode with a friend in voice to check incoming tracks.');
+    // v2.44: who's speaking in voice. On: what Steam's talking data looks like in this call (names of fields and
+    // classes, with counts; never what anyone said), so one real call can confirm or correct how it's read.
+    {const on=globalThis.TylerCompanion.voiceSpeakersOn?.();
+     if(on===false)row('? Who is speaking in voice','Off in Settings → Voice → Standard voice: Tyler hears the call as one mix, as before.');
+     else if(on){
+      const rep=await new Promise(resolve=>{let t=0;const done=v=>{clearTimeout(t);window.removeEventListener('message',hear);resolve(v);},hear=e=>{if(e.source===window&&e.data?.source==='tyler-listener'&&e.data.type==='speakers-report')done(e.data);};t=setTimeout(()=>done(null),1500);window.addEventListener('message',hear);window.postMessage({source:'tyler-listener-control',type:'speakers-report',force:true},location.origin);});
+      const used=!!rep?.report?.signals?.some(s=>s.switched),last=rep?.last;
+      const audio=[rep?.learned?rep.learned+' track'+(rep.learned===1?'':'s')+' matched to Steam names':'',rep?.labels?rep.labels+' kept apart as Speaker N':''].filter(Boolean).join(', ')||'nothing measured yet this call';
+      row((used?'✓ ':'? ')+'Who is speaking in voice',rep?'Each person\'s audio: '+audio+(last?' · last line: '+last.source+(last.how&&last.how!==last.source?' ('+last.how+')':''):'')+(rep.problem?' · meter problem: '+rep.problem:'')+'. '+(rep.text||''):'The voice listener didn\'t answer.');
+     }}
    }
    const music=globalThis.TylerCompanion.musicStatus?.();
    if(music)row(music.sharing?(music.quality?.processed?'! Music DJ shared, but Chrome is processing it':'✓ Music DJ shared'):music.open?'? Music DJ not shared':'? Music DJ off',music.sharing?'The YouTube '+(platform.id==='desktop'?'window':'tab')+'\'s sound goes into the call'+(music.quality?(music.quality.processed?' with Chrome\'s microphone cleanup still on, so music may warble. Update Chrome, then press Share its audio again.':', untouched'+(music.quality.channels>1?' and in stereo':'')+(music.quality.bitrate?(music.quality.level==='auto'?', on Auto quality, now ':', at up to ')+Math.round(music.quality.bitrate/1000)+' kbps.':' at Steam\'s default rate.')+' If it stutters, type music quality low or medium in chat.'):'.'):music.open?'Press Start Music DJ again and share the YouTube '+(platform.id==='desktop'?'window':'tab')+'.':'Optional. Start it from Room → Music DJ.');

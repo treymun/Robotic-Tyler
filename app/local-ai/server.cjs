@@ -13,6 +13,9 @@
 //     at all (--device none -ngl 0), and the Vulkan backend isn't even loaded. --fit off: llama.cpp
 //     doesn't shrink the context or move layers to the processor by itself; if the model doesn't fit,
 //     the start fails with that reason.
+//   - v2.44 split: an exact number of layers on one Vulkan card, the rest on the processor
+//     (--device VulkanN -ngl N, still --fit off and -c 8192). N is decided by Tyler before the start
+//     (split.cjs), so llama.cpp never picks or changes it by itself.
 const {spawn}=require('node:child_process'),{EventEmitter}=require('node:events'),http=require('node:http'),net=require('node:net'),crypto=require('node:crypto'),path=require('node:path');
 
 const CTX=8192;
@@ -39,19 +42,22 @@ class LlamaServer extends EventEmitter{
   * @param {object} o
   * @param {string} o.exe        llama-server(.exe) in the engine folder
   * @param {string} o.model      the .gguf file
-  * @param {'gpu'|'cpu'} o.device
-  * @param {string} [o.gpuId]    the Vulkan device to use (VulkanN), for 'gpu'
-  * @param {string} [o.gpuBackend] the Vulkan backend file, loaded only for 'gpu'
+  * @param {'gpu'|'split'|'cpu'} o.device
+  * @param {string} [o.gpuId]    the Vulkan device to use (VulkanN), for 'gpu' and 'split'
+  * @param {number} [o.layers]   for 'split': how many layers go on the card (1 or more)
+  * @param {string} [o.gpuBackend] the Vulkan backend file, loaded only for 'gpu' and 'split'
   * @param {number} o.threads
   */
- constructor({exe,model,device,gpuId=null,gpuBackend=null,threads=4,ctx=CTX,log=()=>{},startTimeout=180000,extraArgs=[]}){
-  super();Object.assign(this,{exe,model,device,gpuId,gpuBackend,threads,ctx,log,startTimeout,extraArgs});
+ constructor({exe,model,device,gpuId=null,layers=0,gpuBackend=null,threads=4,ctx=CTX,log=()=>{},startTimeout=180000,extraArgs=[]}){
+  super();Object.assign(this,{exe,model,device,gpuId,layers,gpuBackend,threads,ctx,log,startTimeout,extraArgs});
   this.proc=null;this.port=null;this.key=null;this.tail=[];this.ready=null;this.exitInfo=null;this.stopping=false;this.requests=new Set();
  }
  get alive(){return !!this.proc&&this.proc.exitCode===null&&this.proc.signalCode===null;}
+ get usesCard(){return this.device==='gpu'||this.device==='split'&&this.layers>0;}
  /** The command line (without the key, which is in the environment). */
  args(port){
-  const where=this.device==='gpu'?['--device',this.gpuId||'Vulkan0','-ngl','all']:['--device','none','-ngl','0'];
+  const n=Math.max(0,Math.floor(Number(this.layers)||0));
+  const where=this.device==='gpu'?['--device',this.gpuId||'Vulkan0','-ngl','all']:this.device==='split'&&n>0?['--device',this.gpuId||'Vulkan0','-ngl',String(n)]:['--device','none','-ngl','0'];
   return ['-m',this.model,'--host','127.0.0.1','--port',String(port),'-c',String(this.ctx),'-np','1','--jinja',...THINKING_OFF,...SAMPLING,
    '--no-webui','--no-slots','--offline','--cache-ram','0','--fit','off','-t',String(this.threads),'-tb',String(this.threads),...where,
    '--alias','tyler-local','--log-colors','off',...this.extraArgs];
@@ -59,7 +65,7 @@ class LlamaServer extends EventEmitter{
  env(){
   const env={};for(const k of KEEP_ENV)if(process.env[k]!==undefined)env[k]=process.env[k];
   env.LLAMA_API_KEY=this.key;
-  if(this.device==='gpu'&&this.gpuBackend)env.GGML_BACKEND_PATH=this.gpuBackend;
+  if(this.usesCard&&this.gpuBackend)env.GGML_BACKEND_PATH=this.gpuBackend;
   return env;
  }
  redact(s){return this.key?String(s).split(this.key).join('[key]'):String(s);}
@@ -98,7 +104,7 @@ class LlamaServer extends EventEmitter{
     throw Object.assign(Error(kind==='bind'?'port in use':this.lastLines()),{code:kind,detail:this.lastLines()});
    }
    const h=await this.health().catch(()=>null);
-   if(h===200){const ms=Date.now()-started;this.log('Local AI','ready on 127.0.0.1 ('+this.device+', '+path.basename(this.model)+') after '+ms+' ms');return {port,loadMs:ms};}
+   if(h===200){const ms=Date.now()-started;this.log('Local AI','ready on 127.0.0.1 ('+this.device+(this.device==='split'?' '+this.layers+' layers on the card':'')+', '+path.basename(this.model)+') after '+ms+' ms');return {port,loadMs:ms};}
    if(Date.now()>deadline){this.kill();throw Object.assign(Error('The AI on this PC didn’t finish loading within '+Math.round(this.startTimeout/1000)+' seconds.'),{code:'start_timeout'});}
   }
  }

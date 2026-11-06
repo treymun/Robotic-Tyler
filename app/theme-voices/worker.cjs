@@ -25,7 +25,7 @@ class WorkerHost extends EventEmitter{
     const job=this.pending.get(m.id);if(!job)return;
     if(m.event==='progress'){job.onProgress?.(m);return;}
     this.pending.delete(m.id);clearTimeout(job.timer);
-    m.ok?job.resolve(m):job.reject(Object.assign(Error(m.error||'The voice engine failed.'),{code:m.code||'error',trace:m.trace}));});
+    m.ok?job.resolve(m):job.reject(Object.assign(Error(m.error||'The voice engine failed.'),{code:m.code||'error',trace:m.trace,info:m.info&&typeof m.info==='object'?m.info:null}));});
    proc.stderr.on('data',d=>{for(const l of String(d).split(/\r?\n/))if(l.trim()){this.stderrTail.push(l.slice(0,300));if(this.stderrTail.length>40)this.stderrTail.shift();}});
    proc.on('error',e=>{clearTimeout(timer);reject(Object.assign(Error('The voice engine couldn’t start: '+e.message),{code:'spawn'}));});
    proc.on('exit',(code,signal)=>{clearTimeout(timer);this.ready=null;this.proc=null;

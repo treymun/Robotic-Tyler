@@ -381,9 +381,10 @@ test('v2.43 built in: the app ships exactly the clips the catalog lists, byte-id
  assert.ok(Object.values(CATALOG.packs).every(p=>p.builtIn===true),'both packs are marked as shipped with the app');
  const want=catalogClips(),have=[];
  for(const t of fs.readdirSync(BUNDLE))for(const id of fs.readdirSync(path.join(BUNDLE,t)))for(const f of fs.readdirSync(path.join(BUNDLE,t,id)))have.push(t+'/'+id+'/'+f.replace(/\.flac$/,''));
- assert.deepEqual(have.sort(),[...want.keys()].sort(),'every reference clip and preview of every version, nothing else');
+ assert.deepEqual(have.sort(),[...want.keys()].sort(),'every reference clip and preview of every version (v2.44: and the sharper voice\'s matching recordings), nothing else');
  let bytes=0;for(const {c,x} of want.values()){const b=fs.readFileSync(builtinFile(c,x));assert.equal(b.length,x.bytes);assert.equal(sha(b),x.sha256,c.id);assert.equal(b.subarray(0,4).toString('latin1'),'fLaC');bytes+=b.length;}
- assert.equal(want.size,196);assert.ok(bytes>14e6&&bytes<15e6,'about 15 MB ('+bytes+' bytes)');
+ // v2.43: 196 clips (about 15 MB); v2.44 adds 40 for the sharper voice's matching sets (about 3.2 MB).
+ assert.equal(want.size,236);assert.ok(bytes>17.5e6&&bytes<18.2e6,'about 17.8 MB ('+bytes+' bytes)');
  const {v,data}=voicesBuiltin();let offered=0;
  for(const c of CATALOG.characters){
   const cur=versionsOf(c).find(x=>x.version===c.current),r=v.voiceFor(c.theme,c.id);

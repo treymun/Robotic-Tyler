@@ -43,6 +43,7 @@ You can also install them later from **Settings → Theme voices → Install the
 | Quality model (Qwen3-TTS 1.7B Base) | 4.23 GB |
 | Lightweight model (Qwen3-TTS 0.6B Base) | 2.34 GB (its 0.64 GB speech tokenizer is shared with Quality) |
 | Microsoft Speech SDK 5.1 (optional; the original Microsoft Sam and Mary) | 0.07 GB, from Microsoft |
+| Voice conversion for the sharper voice (optional, v2.44: WavLM-Large and kNN-VC's prematched HiFi-GAN) | 1.33 GB (1.26 GB and 66 MB), from the kNN-VC v0.1 release on GitHub |
 
 ## Quality and Lightweight
 
@@ -57,7 +58,24 @@ You can also install them later from **Settings → Theme voices → Install the
 
 **Speed.** Theme voices are made before they play, not live. Published measurements of this model's standard code path (the faster-qwen3-tts project's README, not measured by us) put an RTX 4060 on Windows at about 4 seconds per second of speech and an RTX 4090 at about 1.2 seconds, for both sizes. On this project's 2-core test machine without a graphics card, with nothing else running, Quality took about 7 seconds per second of speech and Lightweight about 6 (both in bfloat16, as on a PC with less than 12 GB of memory).
 
-Tyler suggests a mode from the hardware it detects (the GPU and its free memory, the driver, system memory). It never switches by itself. If the model doesn't fit right now (for example a game is using the graphics memory), the message fails and says so, rather than quietly using the other model.
+Tyler suggests a mode from the hardware it detects (the GPU and its free memory, the driver, system memory). It never switches mode (Quality or Lightweight) by itself.
+
+### Runs on (v2.44)
+
+Settings → Theme voices → **Runs on** has three choices:
+
+- **Graphics card, or the processor when it's full** (the default).
+  - Each time Tyler loads the voice model on the card, it first checks the card's free memory against the mode's need: about 4.0 GB for Lightweight and 6.5 GB for Quality, the weights plus room for speaking. At least 85% of that has to be free.
+  - The free memory is read twice: from NVIDIA's `nvidia-smi`, and by the engine itself just before loading (`torch.cuda.mem_get_info`).
+  - If it doesn't fit, or loading or speaking runs out of graphics memory, the same model loads on the processor, with the standard engine (the fast engine needs the card). The voice and model are the same; nothing else changes.
+  - A clip that ran out of memory while speaking is made once more on the processor. If that fails too, the message fails with the reason.
+  - The note says why, for example: *"The graphics card was full (1.2 GB free, the voice needs about 4.0 GB), so this voice runs on the processor: much slower. The card is tried again the next time the engine starts."* It shows in Settings (the status line and the made-speech line), on the panel, on the clip line and on the phone remote.
+  - The processor stays in use until the engine closes (the idle time, or *Close the engine now*); the next load checks the card again.
+  - The old label, "Graphics card when possible, else the processor", only meant "no card", not "card full". This choice now does what that label said.
+- **Graphics card only (stops with a message if full):** exactly the behaviour before v2.44. A full card or an out-of-memory error stops the message with the reason, and nothing moves to the processor.
+- **Processor only (keeps the graphics card free):** unchanged.
+
+**For other local AI on the same card:** `hardware.vramNeed(settings)` and the service's `vramReserve()` are read-only. They give how much graphics memory theme voices want kept free: the mode's need, plus about 1.3 GB while a sharper voice is on and installed, or 0 with *Processor only* or a processor-only engine. `vramReserve()` also says whether a voice model is on the card right now.
 
 ## The fast engine (v2.36, NVIDIA only)
 
@@ -65,7 +83,7 @@ Tyler suggests a mode from the hardware it detects (the GPU and its free memory,
 - **Choosing it:** Settings → Theme voices → **Engine: Fast**, then **Switch to the fast engine**. It's opt-in: Tyler suggests it on a PC with a usable NVIDIA card but never switches by itself. With **Processor only** the standard engine is used.
 - **What's installed:** its own engine folder from the same lock (`windows-cuda-fast`): the same PyTorch 2.11 + CUDA 12.8 wheel, `qwen-tts-hf` 0.1.1.post1 (Apache-2.0: a Transformers 5 build of the `qwen_tts` package), `faster-qwen3-tts` 0.5.4, and Transformers pinned to **5.15.1** (qwen-tts-hf fails with 5.20.2 and 5.22.1: measured). Both engine packages are installed without their dependency lists (qwen-tts-hf's would add a Gradio demo); the packages they need are in the lock. Every file is checked by SHA-256 like the rest.
 - **Switching** downloads only the files that differ (about 15 MB) and copies the rest from the installed engine. Switching back works the same way. The old engine folder is removed once the new one works.
-- **When it can't run** (out of graphics memory, or the CUDA graphs can't be captured on that card), the message fails and says so, naming the standard engine as the way back. Tyler doesn't switch engines by himself.
+- **When it can't run** (out of graphics memory, or the CUDA graphs can't be captured on that card), the message fails and says so, naming the standard engine as the way back. Tyler doesn't switch engines by himself. Since v2.44, with the default *Runs on* (the card, or the processor when it's full), running out of graphics memory moves the voice to the processor with the standard engine instead, and says so (see *Runs on*); a card that can't capture the graphs still fails as before.
 - **Speed (published, not measured by us):** the faster-qwen3-tts README gives, for an RTX 4060 on Windows, about 1.8 seconds of speech made per second with the 1.7B model (first audio after 0.46 s) and 2.3 with the 0.6B (0.41 s), against about 0.23 for the standard code path; an RTX 4090 makes about 4.2. How fast it is on your card is what **Run a voice check** shows.
 - **What's tested here:** no NVIDIA card was available. The fast engine's own streaming code was run on the processor (its CUDA-graph-free parity mode, `TYLER_FAST_PARITY=1`) through Tyler's worker, with the installer-built Linux engine; Whisper heard the right words. The CUDA graphs themselves, the speed and the memory on a real card are untested until you run a voice check.
 
@@ -111,7 +129,7 @@ Six themes can also speak as one of their characters. The theme's own voice stay
 
 - **No repeats.** A character that is already a theme's own voice isn't offered again: the pack's Administrator, SAS, GLaDOS, Bill, Bebop, Kleiner and US field-radio folders, and its G-Man (Steam's own voice), went into the quality pass on those voices instead. No character is in two themes and no recording is used twice (checked by SHA-256 against this pack, the first pack and the built-in voices).
 - **Left out:** Day of Defeat's German field-radio bank. A speaker-model screen found at least two voices in it (the radio lines and the shouted orders), and it's in German, which the local transcriber can't write down, so it isn't a single-speaker reference.
-- **Built in (v2.43).** The recordings are part of the desktop app: the 196 original clips the catalog uses (every reference clip and every *Original recording* clip of every version, from both of the owner's packs), about 15 MB of FLAC, byte for byte as in the packs. They're in `app/theme-voices/characters/<theme>/<character>/<sha256>.flac`, unpacked from `app.asar` like the 25 voices' references (`asarUnpack` in `electron-builder.desktop.json`), so the separate Python voice worker reads them where they are: nothing is copied at first use. Each clip is checked by its size and SHA-256 before it's used. The installer is about 15 MB larger.
+- **Built in (v2.43).** The recordings are part of the desktop app: the 196 original clips the catalog uses (every reference clip and every *Original recording* clip of every version, from both of the owner's packs), about 15 MB of FLAC, byte for byte as in the packs. They're in `app/theme-voices/characters/<theme>/<character>/<sha256>.flac`, unpacked from `app.asar` like the 25 voices' references (`asarUnpack` in `electron-builder.desktop.json`), so the separate Python voice worker reads them where they are: nothing is copied at first use. Each clip is checked by its size and SHA-256 before it's used. The installer is about 15 MB larger. v2.44 adds 40 more (3.2 MB): the rest of the sharper voice's matching recordings for Medic, Lash and Kelvin (below), so 236 clips, about 17.8 MB.
 - **Before v2.43** the recordings came from the owner's packs, imported with **Import character voices** into `ThemeVoices\characters\`. Such an import keeps working; its copies of clips that are now built in are removed once the built-in clip checks out, so nothing is kept twice. Picks and version choices are settings and stay.
 - **Import character voices** stays as a second way: it repairs a built-in recording that is missing or damaged, or adds recordings this version lists. Give the character voice pack or the voice supplement (its folder or its ZIP, or a folder holding both). Tyler reads only the clips this version lists, checks each one's path, size, FLAC header and SHA-256, and copies it into `ThemeVoices\characters\<theme>\<character>\` only if it isn't already here: a clip that is built in (or imported before) and unchanged is never copied again, so importing the packs anyway changes nothing. **Remove imported copies** (shown only when there are some) deletes only those copies; the built-in recordings can't be removed. Remove theme voices keeps imported copies, like your own recordings.
 - **Choosing one:** Settings → Theme voices → **Character voice** (one selector per theme), or the phone remote's Theme voice card. The choice is remembered for each theme separately. **Original recording** plays one of the character's own game lines (one that isn't in its reference); **Generated speech** makes new speech with the clone.
@@ -147,6 +165,45 @@ The owner's second pack, `Robotic-Tyler-Complete-Voice-Supplement.zip`, adds 213
     - Scout, Soldier, Demoman, Heavy, Spy and Lash: no candidate passed. That includes Soldier with his v2.41 reference plus the supplement's whole 4.5 s.
     - Sniper and Pyro: a candidate passed on one seed but not the other.
     - **Pyro still isn't offered:** his version 1's likeness ratio is 0.09 and 0.27 (it needs 0.15 on both), and no transcript is invented for him.
+
+### The sharper voice (v2.44, experimental, optional)
+
+For three of the weak voices, Medic, Lash and Kelvin, Tyler can also run the generated speech through voice conversion. It's off until the owner switches it on for that character, and it needs a separate download.
+
+- **What it does:** kNN-VC (Baas, Kamper and Shall, 2023; [bshall/knn-vc](https://github.com/bshall/knn-vc), MIT).
+  - Qwen3-TTS makes the take as usual.
+  - Each moment of it (WavLM-Large layer-6 features, 50 a second) is replaced by the mean of its 4 closest moments among the character's own recordings.
+  - kNN-VC's HiFi-GAN vocoder, trained on prematched features, turns that back into sound at 16 kHz. Tyler resamples it to 24 kHz and levels it like every voice.
+  - Nothing is trained. Qwen3-TTS only listens to a 5–25 s reference; this uses every recording of the character the app has.
+- **The matching recordings are built in**, in the same layout and with the same size and SHA-256 checks as the reference clips (`matching` in `characters.json`).
+  - It's exactly the measured set: every clean recording of the character in both of the owner's packs, minus the ones held out to score against. That's Medic 10 clips (30.6 s), Lash 23 (63.1 s) and Kelvin 27 (64.5 s).
+  - The held-out recordings were left out on purpose, so the shipped voice is the one that was measured and the held-out set stays a fair test for later.
+  - 20 of these clips were already built in (references and previews). The other 40 add 3.2 MB to the installer. They were taken from the owner's two uploaded ZIPs by exact path and checked against the packs' SHA-256 values.
+- **The evidence:** the same test as the v2.42 re-tune. The current voice and the same take converted (k=4) were scored on four sentences and two seeds against held-out recordings, by a speaker model (ECAPA) and Whisper. **No one listened.**
+  - **Medic, measured closer:** likeness 0.42 → 0.51 and 0.40 → 0.51, closer on every sentence, words 1.00.
+  - **Lash, nearly:** much closer (0.34 → 0.51, 0.35 → 0.52), but on one seed one word came out unclear ("microphone" heard as "micro song").
+  - **Kelvin, nearly:** 0.54 → 0.64 and 0.59 → 0.64, but on one seed 0.001 less close to his first pack's held-out recordings.
+  - **Venator** didn't gain (+0.03 and +0.02) and isn't offered.
+  - **A control:** the same takes converted with another character's recordings scored well below the current voice, so the gain is the character's own voice and not "a recording from the game".
+  - These measurements can't tell how it sounds: artefacts, 16 kHz, and the little audio there is (24–49 s after trimming, where the method's authors suggest several minutes).
+- **The download:** Settings → Theme voices → *Download voice conversion* shows its size (1.33 GB) and the free disk space first, and downloads only when pressed.
+  - It's pinned in `engine-lock.json` (`components.knnvc`: the kNN-VC v0.1 release's `WavLM-Large.pt` and `prematch_g_02500000.pt`, each with its size and SHA-256), fetched with the installer's resumable, checked downloader, and kept in `ThemeVoices\components\knnvc-<revision>\` (recorded in `components.json`).
+  - *Remove voice conversion* deletes only that folder, its record and any unfinished download. The switches and everything else stay.
+  - *Check and repair files* also checks its SHA-256s. A damaged file is deleted, and the owner is told to download it again.
+  - **Licences:** the kNN-VC code and the vocoder are MIT. WavLM-Large is Microsoft's: its model card gives the licence as the UniSpeech repository's LICENSE, which a mirror shows as Creative Commons Attribution-ShareAlike 3.0 Unported (checked 2026-11-06; GitHub itself couldn't be read from the build machine). The app doesn't redistribute the weights: it downloads them from the kNN-VC release.
+- **The code** is vendored in the worker folder, so nothing is downloaded as code:
+  - `knnvc_wavlm.py` is Microsoft's WavLM (MIT) as kNN-VC ships it. `knnvc_hifigan.py` is the generator kNN-VC adapted from jik876/hifi-gan (MIT). Each keeps its copyright and MIT notice.
+  - The worker loads them by their exact path and loads both checkpoints with `torch.load(weights_only=True)`.
+- **When it runs:** in the voice worker after Qwen3-TTS, on the same device (the graphics card when the voice model is on it, otherwise the processor).
+  - WavLM loads on first use and goes when the worker closes (the idle timer).
+  - The matching recordings' features are made once and cached as safetensors (tensors only), keyed by the WavLM checkpoint's SHA-256, the settings and every clip's SHA-256.
+  - A clip's cache key adds the conversion (the component's revision and both checkpoints' SHA-256, k=4, the prematched vocoder, the matching clips), so a converted clip and a normal one never stand in for each other.
+  - Stop, an interrupted reply, the emergency stop and quitting end it like generation: it checks between steps, and Stop closes the engine if a step takes longer than 4 s.
+- **The cost** (measured on this project's 2-core test PC, processor, Lightweight model):
+  - **Time:** 0.35 s more per second of speech in the experiment (2 threads); 0.57–0.65 s in the app, which gives the engine one thread on a 2-core PC. That's 5–7% on top of Qwen's own time there.
+  - **First use:** the first conversion after the engine starts also loads WavLM (about 4 s). Once per character it also makes its matching recordings' features (about 5 s; cached after that).
+  - **Memory:** about 1.7 GB more (+1.7 GB in the worker after its first conversion). WavLM is memory-mapped from its checkpoint; a plain load measured +2.4 GB. On the processor Tyler doesn't try it with less than about 1.4 GB free.
+- **Never silent:** if it's on but can't run, the character's normal voice speaks and says why, in its Settings row, on the panel and clip line, and on the phone remote. That covers not installed, a matching recording missing or damaged, too little free memory, or the conversion failing. A failed conversion's take is filed as the normal clip, so the next message tries again.
 
 ### The polish pass on the theme's own voices (v2.41)
 

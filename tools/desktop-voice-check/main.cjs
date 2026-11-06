@@ -39,6 +39,9 @@ ipcMain.handle('tyler:request',(_e,m)=>{if(m?.type==='remote:event'){liveRemote?
  // right, with the (mock) Steam page narrowed so it isn't covered.
  await new Promise(r=>setTimeout(r,400));
  result.dock=await win.webContents.executeJavaScript('(()=>{const h=document.getElementById("tyler-companion-root");return {dock:h?.dataset.dock,body:Math.round(document.body.getBoundingClientRect().width),window:innerWidth,height:innerHeight};})()',true);
+ // v2.44: who's speaking in voice is bundled into the Steam window's page world, and the listener answers its
+ // report (no Steam voice room in this mock, so Steam's talking data isn't read: room false).
+ result.speakers=await win.webContents.executeJavaScript(`new Promise(r=>{const on=e=>{if(e.data?.source==='tyler-listener'&&e.data.type==='speakers-report'){removeEventListener('message',on);r({core:typeof window.TylerVoiceSpeakers?.attribute,reader:typeof window.TylerSteamChatAdapter?.voiceTalking,room:e.data.report?.room??null,on:e.data.on});}};addEventListener('message',on);postMessage({source:'tyler-listener-control',type:'speakers-report',force:true},location.origin);setTimeout(()=>r({timeout:true}),3000);})`,true);
  await media.openYouTube('https://www.youtube.com/');await new Promise(r=>setTimeout(r,1500));
  // A click in Tyler's panel starts these in the app; here a simulated user gesture does.
  const shares=await win.webContents.executeJavaScript('window.__shareChecks()',true);

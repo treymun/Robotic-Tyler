@@ -60,7 +60,14 @@ class Voices{
   const r=this.characters.resolve(theme,character,{pin:characterVersion});
   return r.voice||{...base,fallback:{character,...r.problem}};
  }
- list({characters={},characterVersion={}}={}){return THEMES.map(t=>{const v=this.get(t),cs=this.characters.summary(t,{pins:characterVersion}),pick=cs.find(c=>c.id===characters[t])||null;
+ /**
+  * Every theme's voice and its characters, for Settings, the panel and the phone. v2.44: a character that offers the
+  * optional "sharper voice" says whether it's on (sharper: {theme/id: true}) and, when it's on but can't run
+  * (conversion: is voice conversion installed?), why the normal voice speaks instead (sharperNote).
+  */
+ list({characters={},characterVersion={},sharper={},conversion=false}={}){return THEMES.map(t=>{const v=this.get(t),cs=this.characters.summary(t,{pins:characterVersion}).map(c=>{
+   if(!c.sharper)return c;const on=sharper[t+'/'+c.id]===true,m=on?this.characters.matching(t,c.id):null;
+   return {...c,sharperOn:on,sharperNote:!on?null:!conversion?'Sharper voice is on, but voice conversion isn’t installed (Settings → Theme voices): the normal voice speaks.':m&&!m.ok?'Sharper voice is on, but '+m.reason+': the normal voice speaks.':null};}),pick=cs.find(c=>c.id===characters[t])||null;
   return {theme:t,name:v.name,target:v.voiceTarget||null,relationship:v.relationship||null,status:v.status,statusLabel:STATUS[v.status]||v.status,statusNote:v.statusNote||'',custom:!!v.custom,hasReference:!!v.refPath,effects:!!v.effects,sample:v.sample?.phrase||null,
    version:v.currentVersion||v.profileVersion||1,versions:v.versions||[1],
    ...(cs.length?{characters:cs,character:pick?pick.id:'',characterName:pick?pick.name:null,characterProblem:pick&&!pick.usable?pick.problem:characters[t]&&!pick?'That character isn’t available in this version.':null}:{})};});}

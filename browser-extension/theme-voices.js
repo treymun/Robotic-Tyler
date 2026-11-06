@@ -34,6 +34,8 @@
   $('tvNow').textContent=$('tvFollow').checked?'Now: '+(v?who+' ('+(api.getTheme?.()||'steam')+' theme)':t):'Using the voice picked below'+(ch?.usable?': '+ch.name+' (character voice).':'.');
   if(ch&&!ch.usable)$('tvNow').textContent+=' · '+ch.name+' can’t be used ('+(v.characterProblem||ch.problem||'not available')+'), so '+v.name+' speaks';
   else if(ch?.versionNote)$('tvNow').textContent+=' · '+ch.versionNote; // v2.42: an earlier version speaks (chosen, or v2.43: a recording of the improved one is missing or damaged)
+  // v2.44: the optional sharper voice: on, or on but it can't run (the normal voice speaks).
+  if(ch?.usable&&ch.sharperOn)$('tvNow').textContent+=' · '+(ch.sharperNote||'sharper voice on (experimental)');
   else if(v&&!ch?.usable&&v.status!=='ready'&&v.status!=='custom')$('tvNow').textContent+=' · '+v.statusLabel;
  }
  function render(){
@@ -52,7 +54,7 @@
    else if(!s.current)quiet('Theme voices need a quick update for this version. Open Settings → Theme voices.');
    else if(s.needs==='model')quiet(s.modeLabel+' mode’s model isn’t installed. Open Settings → Theme voices.');
    else if(s.lastError)quiet('Last try: '+s.lastError.message);
-   else quiet('Ready · '+s.modeLabel+' mode'+(s.check?.ok?' · last check: '+s.check.seconds+' s of speech in '+(s.check.ms/1000).toFixed(1)+' s on the '+(s.check.device==='cuda'?'graphics card':'processor'):'')+'.');
+   else quiet('Ready · '+s.modeLabel+' mode'+(s.check?.ok?' · last check: '+s.check.seconds+' s of speech in '+(s.check.ms/1000).toFixed(1)+' s on the '+(s.check.device==='cuda'?'graphics card':'processor'):'')+'.'+(s.deviceNote?' '+s.deviceNote:'')); // v2.44: the card was full: on the processor
   }
   $('tvReplay').disabled=!last;$('tvSave').disabled=!last;describe();
  }
@@ -97,7 +99,7 @@
    if(mine!==gen)return null; // Stop was pressed meanwhile: a late result is never played
    last={...r.clip,audio:r.audio};lastRoute=route;
    const c=r.clip,where=c.device==='cuda'?'graphics card':c.device==='windows'?'Windows speech':'processor';
-   $('tvClip').textContent=c.voiceName+' · '+c.seconds.toFixed(1)+' s'+(c.cached?' · from the cache':' · made in '+(c.ms/1000).toFixed(1)+' s on the '+where)+' · '+(c.mode==='native'?'the original Windows voice':c.mode==='light'?'Lightweight':'Quality')+(c.processed?' · with the voice’s radio/mask sound':'')+(c.status&&!['ready','custom'].includes(c.status)?' · '+c.status:'')+(c.fallback?' · '+c.fallback.name+' couldn’t be used ('+c.fallback.reason+'), so '+c.voiceName+' spoke':'')+(c.versionNote?' · '+c.versionNote:'');
+   $('tvClip').textContent=c.voiceName+' · '+c.seconds.toFixed(1)+' s'+(c.cached?' · from the cache':' · made in '+(c.ms/1000).toFixed(1)+' s on the '+where)+' · '+(c.mode==='native'?'the original Windows voice':c.mode==='light'?'Lightweight':'Quality')+(c.processed?' · with the voice’s radio/mask sound':'')+(c.status&&!['ready','custom'].includes(c.status)?' · '+c.status:'')+(c.fallback?' · '+c.fallback.name+' couldn’t be used ('+c.fallback.reason+'), so '+c.voiceName+' spoke':'')+(c.versionNote?' · '+c.versionNote:'')+(c.sharper?' · sharper voice (experimental, voice conversion)':c.sharperNote?' · '+c.sharperNote:'')+(c.deviceNote?' · '+c.deviceNote:'');
    if(route){try{play(route,r.audio);}catch(e){status('Made it ('+c.seconds.toFixed(1)+' s), but: '+e.message);return last;}}
    status((c.fallback?c.fallback.name+' couldn’t be used ('+c.fallback.reason+'); '+c.voiceName+' spoke instead. ':'')+(route==='call'?'Playing into the call: “'+text.slice(0,60)+'”':route==='preview'?'Previewing here only (not in the call).':'Ready. Preview it or play it into the call.'));
    return last;
@@ -166,6 +168,6 @@
   if(id&&!(v.characters||[]).some(c=>c.id===id&&c.usable))throw Error('That character voice isn’t available on the PC.');
   await send({type:'voices:settings',values:{characters:{[theme]:id||''}}});await refresh();return {theme,character:id||''};
  }
- globalThis.TylerThemeVoices=Object.freeze({refresh,parse,pick,stop:stopAll,setCharacter,say:(text,theme)=>make('call',{text,theme}),state:()=>({busy,available:info.available,ready:!!info.status?.ready,theme:chosen(),
-  voices:voices.filter(v=>v.hasReference).map(v=>({theme:v.theme,name:v.name,...(v.characters?.length?{character:v.characters.some(c=>c.id===v.character&&c.usable)?v.character:'',characters:v.characters.filter(c=>c.usable).map(c=>({id:c.id,name:c.name,...(c.versionNote?{note:c.versionNote}:{})}))}:{})}))})});
+ globalThis.TylerThemeVoices=Object.freeze({refresh,parse,pick,stop:stopAll,setCharacter,say:(text,theme)=>make('call',{text,theme}),state:()=>({busy,available:info.available,ready:!!info.status?.ready,theme:chosen(),deviceNote:info.status?.deviceNote||null,
+  voices:voices.filter(v=>v.hasReference).map(v=>({theme:v.theme,name:v.name,...(v.characters?.length?{character:v.characters.some(c=>c.id===v.character&&c.usable)?v.character:'',characters:v.characters.filter(c=>c.usable).map(c=>{const note=[c.versionNote,c.sharperOn?c.sharperNote||'Sharper voice (experimental) is on.':null].filter(Boolean).join(' ');return {id:c.id,name:c.name,...(note?{note}:{})};})}:{})}))})});
 })();

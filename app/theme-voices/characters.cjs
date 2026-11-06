@@ -54,14 +54,21 @@ function versionsOf(c){
 }
 /** Every clip a version needs (its reference clips, then its original-recording clip). */
 const clipsOf=v=>[...(v.clips||[]),...(v.preview?[v.preview]:[])];
-/** Every distinct clip a character needs across its versions. */
-function allClips(c){const seen=new Map();for(const v of versionsOf(c))for(const x of clipsOf(v))if(!seen.has(x.sha256))seen.set(x.sha256,x);return [...seen.values()];}
+/** Every distinct clip a character needs across its versions (v2.44: and its voice-conversion matching set). */
+function allClips(c){const seen=new Map();for(const x of [...versionsOf(c).flatMap(clipsOf),...(Array.isArray(c.matching)?c.matching:[])])if(!seen.has(x.sha256))seen.set(x.sha256,x);return [...seen.values()];}
+/**
+ * v2.44: the "sharper voice" (optional kNN-VC voice conversion) is offered only for a character whose catalog
+ * entry has both a matching set (its own recordings, built in like its reference clips) and its settings.
+ */
+const sharperOf=c=>c&&c.sharper&&typeof c.sharper==='object'&&Array.isArray(c.matching)&&c.matching.length?c.sharper:null;
 const currentOf=c=>{const vs=versionsOf(c);return vs.find(v=>v.version===c.current)||vs.at(-1);};
 /** A catalog entry is usable only if its fields are what this code expects (a bad catalog never reaches the disk). */
 function validEntry(c,themes){
  if(!c||!themes.includes(c.theme)||!ID.test(String(c.id||''))||!c.name)return false;
  const vs=versionsOf(c);if(!vs.length||vs.length>9||!vs.every(v=>Number.isInteger(v.version)&&v.version>0&&v.clips?.length&&clipsOf(v).length<=40))return false;
  if(new Set(vs.map(v=>v.version)).size!==vs.length)return false;
+ // v2.44: a matching set (at most 80 clips) comes with its conversion settings, and k is a small whole number.
+ if(c.matching!==undefined&&!(Array.isArray(c.matching)&&c.matching.length<=80&&c.sharper&&Number.isInteger(c.sharper.k)&&c.sharper.k>=1&&c.sharper.k<=16))return false;
  return allClips(c).every(x=>CLIP_PATH.test(String(x.file||''))&&x.file.split('/')[1]===c.theme&&x.file.split('/')[2]===c.id&&/^[0-9a-f]{64}$/.test(String(x.sha256||''))&&Number.isInteger(x.bytes)&&x.bytes>44&&x.bytes<=MAX_CLIP&&(!x.pack||Object.hasOwn(PACKS,x.pack)));
 }
 const NOT_IMPORTED='its recordings aren’t imported: use Import character voices in Settings → Theme voices';
@@ -204,7 +211,9 @@ class Characters{
    return {id:c.id,name:c.name,status:shown.status||'ready',statusNote:shown.statusNote||'',imported:anyOk,builtIn:this.builtIn(c),damaged:vs.some(x=>x.approved===true&&checks.get(x.version).builtIn===true),approved:vs.some(x=>x.approved===true),usable:!!v,problem:v?null:r.problem.reason,
     version:v?v.characterVersion:null,currentVersion:cur.version,versionNote:v?.versionNote?.text||null,versionCode:v?.versionNote?.code||null,pinned:!!(pins[theme+'/'+c.id]&&pins[theme+'/'+c.id]!==cur.version),
     versions:vs.map(x=>({version:x.version,approved:x.approved===true,ready:checks.get(x.version).ok,status:x.status||'ready',supplement:clipsOf(x).some(y=>y.pack==='supplement')})),
-    hasPreview:!!shown.preview,previewText:shown.preview?.text||null,nonlexical:!!c.nonlexical};});
+    hasPreview:!!shown.preview,previewText:shown.preview?.text||null,nonlexical:!!c.nonlexical,
+    // v2.44: offered the optional "sharper voice"? (its evidence, in plain words)
+    sharper:sharperOf(c)?{evidence:sharperOf(c).evidence||null,evidenceNote:String(sharperOf(c).evidenceNote||''),clips:c.matching.length,seconds:Math.round(c.matching.reduce((n,x)=>n+(x.seconds||0),0))}:null};});
  }
  /** Which version's clips a preview should play (the one that would speak, or the current one). */
  previewFiles(theme,id,{pin}={}){
@@ -213,6 +222,20 @@ class Characters{
   if(!v)return {problem:r.problem?.reason||NOT_IMPORTED,name:c.name};
   const k=this.checkVersion(c,v);return k.ok?{files:k.files,version:v,name:c.name}:{problem:k.reason,name:c.name};
  }
+ /**
+  * v2.44: the recordings kNN-VC matches against for the "sharper voice", each checked (size and SHA-256) like a
+  * reference clip. null: not offered for this character. {ok:true, files, shas, k, settings} or {ok:false, reason}.
+  */
+ matching(theme,id){
+  const c=this.entry(theme,id),sh=sharperOf(c);if(!sh)return null;
+  const files=[];
+  for(const x of c.matching){const r=this.locate(c,x);
+   if(r.state!=='ok')return {ok:false,code:r.state,reason:'one of the recordings it matches against is '+(r.state==='missing'?'missing':'damaged')+(r.builtIn?': run the Setup again to repair the app':': import the voice packs again')};
+   files.push(r.file);}
+  return {ok:true,files,shas:c.matching.map(x=>x.sha256),k:sh.k,settings:{k:sh.k,layer:sh.layer||6,vocoder:sh.vocoder||'prematched'}};
+ }
+ /** v2.44: the characters that offer the "sharper voice" ("theme/id"). */
+ sharperIds(){return this.list.filter(c=>sharperOf(c)).map(c=>c.theme+'/'+c.id);}
  /**
   * Imports the owner's packs from a folder (a pack, or a folder holding packs: unpacked or as ZIPs) or a
   * ZIP. Only the catalog's clips are read; each is checked before it is kept, and what is already here
@@ -333,4 +356,4 @@ async function zipReader(file,size){
   try{return zlib.inflateRawSync(body,{maxOutputLength:expected+1});}catch{throw Error('a recording in the ZIP is damaged: '+rel);}
  },has:rel=>by.has(rel),close:()=>fd.close()};
 }
-module.exports={Characters,ID,CLIP_PATH,MAX_CLIP,MAX_TOTAL,PACKS,validEntry,fileHash,versionsOf,allClips,currentOf};
+module.exports={Characters,ID,CLIP_PATH,MAX_CLIP,MAX_TOTAL,PACKS,validEntry,fileHash,versionsOf,allClips,currentOf,sharperOf};

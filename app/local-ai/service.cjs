@@ -7,10 +7,16 @@
 // Nothing here changes the model or where it runs by itself: a reply that can't be made as chosen
 // (not installed, doesn't fit, the card isn't there) fails with the reason. Nothing is ever sent to a
 // cloud AI instead; that decision is the caller's, and the caller (background.js) never makes it.
+// v2.44: Runs on → "Split between the graphics card and the processor" (split.cjs) puts as many layers
+// as fit on the card and the rest on the processor, decided at each start; when none fits it runs on
+// the processor. Same model, same provider: only where its layers run changes, and the note says so.
 const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),{EventEmitter}=require('node:events'),{execFile}=require('node:child_process');
-const {Installer,LOCK,GB}=require('./installer.cjs'),{LlamaServer}=require('./server.cjs'),hardware=require('./hardware.cjs');
+const {Installer,LOCK,GB}=require('./installer.cjs'),{LlamaServer}=require('./server.cjs'),hardware=require('./hardware.cjs'),split=require('./split.cjs');
 const MODELS=Object.keys(LOCK.models);
 const DEFAULTS={model:null,device:'auto',idleMinutes:10};
+// Runs on: 'auto' the whole model on the graphics card (a message when it doesn't fit), 'split' (v2.44)
+// as many layers as fit on the card and the rest on the processor, 'cpu' the processor only.
+const DEVICES=['auto','split','cpu'];
 const IDLE=[0,1,2,5,10,20,30,60];
 const SPEED_PROMPT=[{role:'system',content:'You are ROBOTIC TYLER, a friendly gaming companion in a Steam chat. Reply in one or two short sentences.'},{role:'user',content:'Hey Tyler, say hi to the squad and hype them up for the next match.'}];
 const err=(message,code,kind='fatal',extra={})=>Object.assign(Error(message),{code,kind,...extra});
@@ -42,13 +48,14 @@ class LocalAI extends EventEmitter{
   * @param {Function} o.fetch        fetch for downloads
   * @param {Function} o.getSettings  async () => saved localAI settings
   * @param {Function} o.setSettings  async (object) => void
+  * @param {Function} [o.cardReserve] async () => room to keep on the card for a theme voice (split.voiceReserve) or null
   */
- constructor({dataDir,fetch,getSettings,setSettings,log=()=>{},lock,platform=process.platform,detect=hardware.detect,freemem=os.freemem,startTimeout=180000,retryDelay,serverArgs=[],minuteMs=60000}){
-  super();Object.assign(this,{dir:dataDir,getSettingsRaw:getSettings,setSettingsRaw:setSettings,log,detectFn:detect,freemem,startTimeout,serverArgs,minuteMs});
+ constructor({dataDir,fetch,getSettings,setSettings,log=()=>{},lock,platform=process.platform,detect=hardware.detect,freemem=os.freemem,startTimeout=180000,retryDelay,serverArgs=[],minuteMs=60000,cardReserve=async()=>null}){
+  super();Object.assign(this,{dir:dataDir,getSettingsRaw:getSettings,setSettingsRaw:setSettings,log,detectFn:detect,freemem,startTimeout,serverArgs,minuteMs,cardReserve});
   fs.mkdirSync(dataDir,{recursive:true});
   this.installer=new Installer({dir:dataDir,fetch,log,lock,platform,retryDelay});
   this.lock=this.installer.lock;this.platform=platform;
-  this.server=null;this.starting=null;this.loaded=null;this.idleTimer=null;this.installJob=null;this.lastError=null;this.lastInstallError=null;this.hw=null;this.vk=null;
+  this.server=null;this.starting=null;this.loaded=null;this.idleTimer=null;this.installJob=null;this.lastError=null;this.lastInstallError=null;this.hw=null;this.vk=null;this.placed=null;
   this.active=new Set();
   this.cleanStale();
  }
@@ -57,7 +64,7 @@ class LocalAI extends EventEmitter{
  async saveSettings(changes={}){
   const s=await this.settings(),next={...s};
   if(changes.model!==undefined)next.model=MODELS.includes(changes.model)?changes.model:null;
-  if(changes.device!==undefined)next.device=changes.device==='cpu'?'cpu':'auto';
+  if(changes.device!==undefined)next.device=DEVICES.includes(changes.device)?changes.device:'auto';
   if(changes.idleMinutes!==undefined){const n=Number(changes.idleMinutes);next.idleMinutes=IDLE.includes(n)?n:DEFAULTS.idleMinutes;}
   await this.setSettingsRaw(next);
   // A different model or place takes effect at the next reply: the running one is closed now, so its memory is free.
@@ -112,28 +119,47 @@ class LocalAI extends EventEmitter{
    model,modelChosen:!!s.model,modelLabel:this.lock.models[model]?.label||model,uncensored:!!this.lock.models[model]?.uncensored,
    ready:inst.installed&&modelOk,needs:!inst.installed?'install':!modelOk?'model':null,
    suggestion:rec,hardware:hw?{cpu:hw.cpu,ram:hw.ram,gpus:hw.gpus,disk:hw.disk,vulkanChecked:hw.vulkanChecked}:null,
-   running:!!this.server?.alive&&!!this.loaded,starting:!!this.starting,loaded:this.loaded?{model:this.loaded.model,device:this.loaded.device,gpu:this.loaded.gpu||null,since:this.loaded.at,loadMs:this.loaded.loadMs}:null,
+   running:!!this.server?.alive&&!!this.loaded,starting:!!this.starting,loaded:this.loaded?{model:this.loaded.model,device:this.loaded.device,gpu:this.loaded.gpu||null,since:this.loaded.at,loadMs:this.loaded.loadMs,split:this.loaded.split||null,note:this.loaded.note||null}:null,
+   placement:this.placed,
    busy:this.active.size>0,installing:this.installJob?{model:this.installJob.model,...this.installJob.progress}:null,installError:this.lastInstallError,lastError:this.lastError,settings:s};
  }
  supported(){try{this.installer.runtimeId();return true;}catch{return false;}}
  emitStatus(){this.status().then(s=>this.emit('status',s)).catch(()=>{});}
  // ── the engine process ──────────────────────────────────────────────────
  /** Where the chosen model runs, decided at start: never moved to the processor quietly. */
- async placement(s){
+ async placement(s,key){
   if(s.device==='cpu')return {device:'cpu'};
   const vk=await this.vulkan(true).catch(e=>({devices:[],error:e}));
   const cards=(vk?.devices||[]).filter(d=>!d.integrated),any=vk?.devices||[];
   const pick=(cards.length?cards:any).slice().sort((a,b)=>b.vramFree-a.vramFree)[0];
+  if(pick&&s.device==='split')return this.splitPlacement(key,pick);
   if(pick)return {device:'gpu',gpuId:pick.id,gpu:pick};
-  // "Graphics card when possible": a PC with no card Vulkan can use runs on the processor, and says so.
+  // "Graphics card" (auto) and Split: a PC with no card Vulkan can use runs on the processor, and says so.
   // A card that was used before and has gone (a driver problem) is a failure, not a quiet move.
   if(this.installer.state()?.gpuSeen)throw err('The graphics card can’t be used right now: Vulkan found none. Update or reinstall the graphics driver, or choose “Processor only” in '+WHERE+'.'+NO_CLOUD,'no_gpu');
+  if(s.device==='split'){const p=split.plan({layers:split.layersOf(this.lock.models[key]),free:0}),n=split.note({p,noCard:true});return {device:'cpu',noCard:true,split:{layers:0,of:p.of,bytes:0,free:0,reserve:null,retried:false},note:n,brief:n};}
   return {device:'cpu',noCard:true};
+ }
+ /** v2.44 split: as many layers as fit on `card`, after the theme voice's room and the margins (split.cjs). */
+ async splitPlacement(key,card){
+  const layers=split.layersOf(this.lock.models[key]);
+  const reserve=await Promise.resolve().then(()=>this.cardReserve()).catch(e=>{this.log('Local AI','couldn’t read the theme voices’ settings: '+e.message);return null;});
+  return this.splitWhere(split.plan({layers,free:card.vramFree||0,reserve:reserve?.bytes||0}),{card,reserve,layers});
+ }
+ splitWhere(p,ctx){
+  const {card,reserve}=ctx,full=split.note({p,card:card.name,reserve}),brief=split.note({p,card:card.name,reserve:null});
+  const info={layers:p.layers,of:p.of,bytes:p.bytes,free:p.free,reserve:reserve?{bytes:reserve.bytes,mode:reserve.mode,loaded:!!reserve.loaded,conversion:!!reserve.conversion}:null,retried:!!p.retried};
+  const base={split:info,note:full,brief,plan:p,ctx};
+  if(p.none)return {device:'cpu',...base};
+  if(p.all)return {device:'gpu',gpuId:card.id,gpu:card,...base};
+  return {device:'split',gpuId:card.id,gpu:card,layers:p.layers,...base};
  }
  roomFor(key,where){
   const need=hardware.NEEDS[hardware.sizeOf(key)],label=this.lock.models[key].label;
-  if(where.device==='gpu'&&where.gpu?.vramFree&&where.gpu.vramFree<need.vram*0.9)
+  if(where.device==='gpu'&&!where.split&&where.gpu?.vramFree&&where.gpu.vramFree<need.vram*0.9)
    throw err(label+' needs about '+(need.vram/GB).toFixed(1)+' GB of free graphics memory and '+where.gpu.name+' has '+(where.gpu.vramFree/GB).toFixed(1)+' GB free right now (a game may be using it). Close it'+(hardware.sizeOf(key)==='9b'?', choose a 4B model,':'')+' or choose “Processor only” in '+WHERE+'.'+NO_CLOUD,'out_of_memory');
+  // v2.44 split: the processor's part of the model (and its buffers) needs the PC's memory.
+  if(where.device==='split'){const free=this.freemem(),ram=Math.max(GB,need.ram-where.split.bytes);if(free<ram*0.8)throw err(label+' split between the graphics card and the processor needs about '+(ram/GB).toFixed(1)+' GB of free memory for the processor’s part and '+(free/GB).toFixed(1)+' GB is free. Close some programs'+(hardware.sizeOf(key)==='9b'?', or choose a 4B model':'')+'.'+NO_CLOUD,'out_of_memory');}
   if(where.device==='cpu'){const free=this.freemem();if(free<need.ram*0.8)throw err(label+' on the processor needs about '+(need.ram/GB).toFixed(1)+' GB of free memory and '+(free/GB).toFixed(1)+' GB is free. Close some programs'+(hardware.sizeOf(key)==='9b'?', or choose a 4B model':'')+'.'+NO_CLOUD,'out_of_memory');}
  }
  /** The running engine for the chosen model, started if needed (one start at a time). */
@@ -149,24 +175,40 @@ class LocalAI extends EventEmitter{
   if(this.starting)return this.starting;
   this.starting=(async()=>{
    if(this.server)await this.close('switching');
-   const where=await this.placement(s);this.roomFor(key,where);
-   onStage?.('Starting the AI on this PC…');
-   const srv=new LlamaServer({exe:this.installer.exe(st),model:this.installer.modelFile(key,st),device:where.device,gpuId:where.gpuId,gpuBackend:this.installer.gpuBackend(st),threads:threads(),log:this.log,startTimeout:this.startTimeout,extraArgs:this.serverArgs});
-   this.server=srv;
-   srv.on('exit',e=>{if(this.server!==srv)return;const wasLoaded=!!this.loaded;this.server=null;this.loaded=null;clearTimeout(this.idleTimer);this.clearPid();
-    if(!e.stopped&&wasLoaded){const label=this.lock.models[key].label;
-     this.lastError={message:(e.reason==='out_of_memory'?label+' ran out of memory and the AI on this PC closed. Close other programs'+(hardware.sizeOf(key)==='9b'?' or choose a 4B model':'')+' in '+WHERE+'.':'The AI on this PC closed unexpectedly.')+NO_CLOUD+' (Engine: '+srv.lastLines().slice(0,160)+')',code:e.reason,at:Date.now()};
-     this.log('Local AI','the engine closed unexpectedly: '+srv.lastLines());}
-    this.emitStatus();});
-   let r;
-   try{r=await srv.start();}
-   catch(e){if(this.server===srv)this.server=null;throw this.explain(e,key,where);}
+   let where=await this.placement(s,key);this.roomFor(key,where);
+   const placed=w=>{if(!w.note)return;this.placed={note:w.note,device:w.device,split:w.split,card:w.ctx?.card?.name||null,model:key,at:Date.now()};this.log('Local AI',w.note);};placed(where);
+   // Auto and Processor only say just this; Split also says where the layers go (never silently).
+   onStage?.('Starting the AI on this PC…'+(where.brief?' '+where.brief:''));
+   let srv,r;
+   for(let attempt=1;;attempt++){
+    srv=this.spawn(key,st,where);
+    try{r=await srv.start();break;}
+    catch(e){if(this.server===srv)this.server=null;
+     // Split only: a start that didn't fit (the card's memory changed, or llama.cpp needed more than
+     // estimated) is tried once more with fewer layers on the card, and the note says so.
+     if(attempt===1&&e.code==='out_of_memory'&&where.plan&&where.device!=='cpu'){
+      this.log('Local AI','split start didn’t fit with '+where.split.layers+' layers on the card: '+srv.lastLines().slice(0,160));
+      where=this.splitWhere(split.fewer(where.plan,where.ctx.layers),where.ctx);this.roomFor(key,where);placed(where);
+      onStage?.('Starting the AI on this PC again… '+where.brief);continue;}
+     throw this.explain(e,key,where);}
+   }
    this.writePid(srv);
-   if(where.device==='gpu'&&!st.gpuSeen){const now=this.installer.state();if(now){now.gpuSeen=true;fs.writeFileSync(this.installer.statePath(),JSON.stringify(now,null,1));}}
-   this.loaded={model:key,device:where.device,deviceSetting:s.device,gpu:where.gpu?{name:where.gpu.name,id:where.gpu.id}:null,noCard:!!where.noCard,at:Date.now(),loadMs:r.loadMs};
+   if(where.device!=='cpu'&&!st.gpuSeen){const now=this.installer.state();if(now){now.gpuSeen=true;fs.writeFileSync(this.installer.statePath(),JSON.stringify(now,null,1));}}
+   this.loaded={model:key,device:where.device,deviceSetting:s.device,gpu:where.device!=='cpu'&&where.gpu?{name:where.gpu.name,id:where.gpu.id}:null,noCard:!!where.noCard,split:where.split||null,note:where.note||null,at:Date.now(),loadMs:r.loadMs};
    this.lastError=null;this.scheduleIdle(s);this.emitStatus();return srv;
   })();
   try{return await this.starting;}finally{this.starting=null;}
+ }
+ /** A new engine process for `where` (not started yet); this.server follows it until it ends. */
+ spawn(key,st,where){
+  const srv=new LlamaServer({exe:this.installer.exe(st),model:this.installer.modelFile(key,st),device:where.device,gpuId:where.gpuId,layers:where.layers||0,gpuBackend:this.installer.gpuBackend(st),threads:threads(),log:this.log,startTimeout:this.startTimeout,extraArgs:this.serverArgs});
+  this.server=srv;
+  srv.on('exit',e=>{if(this.server!==srv)return;const wasLoaded=!!this.loaded;this.server=null;this.loaded=null;clearTimeout(this.idleTimer);this.clearPid();
+   if(!e.stopped&&wasLoaded){const label=this.lock.models[key].label;
+    this.lastError={message:(e.reason==='out_of_memory'?label+' ran out of memory and the AI on this PC closed. Close other programs'+(hardware.sizeOf(key)==='9b'?' or choose a 4B model':'')+' in '+WHERE+'.':'The AI on this PC closed unexpectedly.')+NO_CLOUD+' (Engine: '+srv.lastLines().slice(0,160)+')',code:e.reason,at:Date.now()};
+    this.log('Local AI','the engine closed unexpectedly: '+srv.lastLines());}
+   this.emitStatus();});
+  return srv;
  }
  /** A failure in words the owner can act on. */
  explain(e,key,where){
@@ -176,8 +218,8 @@ class LocalAI extends EventEmitter{
    case 'cancelled':return err('Stopped.','cancelled','turn');
    case 'not_installed':return err(e.message+NO_CLOUD,'not_installed');
    case 'start_timeout':return err(e.message+(hardware.sizeOf(key)==='9b'?' A 4B model loads faster.':'')+NO_CLOUD,'start_timeout');
-   case 'out_of_memory':{const alt=[hardware.sizeOf(key)==='9b'?'choose a 4B model':null,gpu?'choose “Processor only”':null].filter(Boolean);
-    return err(label+' didn’t fit in '+(gpu?'the graphics card’s free memory':'the free memory')+' right now'+(gpu?' (a game may be using it)':'')+'. Close other programs'+(alt.length?', or '+alt.join(', or ')+' in '+WHERE:'')+'.'+NO_CLOUD+' (Engine: '+detail+')','out_of_memory');}
+   case 'out_of_memory':{const both=where?.device==='split',alt=[hardware.sizeOf(key)==='9b'?'choose a 4B model':null,gpu||both?'choose “Processor only”':null].filter(Boolean);
+    return err(label+' didn’t fit in '+(both?'the graphics card’s and the PC’s free memory, split between them,':gpu?'the graphics card’s free memory':'the free memory')+' right now'+(gpu||both?' (a game may be using it)':'')+'. Close other programs'+(alt.length?', or '+alt.join(', or ')+' in '+WHERE:'')+'.'+NO_CLOUD+' (Engine: '+detail+')','out_of_memory');}
    case 'model_load':return err('The AI engine couldn’t load '+label+'. Remove it and install it again in '+WHERE+'.'+NO_CLOUD+' (Engine: '+detail+')','model_load');
    default:return err('The AI on this PC couldn’t start: '+detail+'.'+NO_CLOUD,e.code||'crashed');
   }
@@ -245,10 +287,10 @@ class LocalAI extends EventEmitter{
   const wasRunning=!!this.server?.alive&&!!this.loaded,t0=Date.now();
   const r=await this.chat({messages:SPEED_PROMPT,max_tokens:60,stream:true,timeoutMs:240000});
   const t=r.timings||{},gen=t.predicted_per_second||(t.predicted_n&&t.predicted_ms?t.predicted_n/(t.predicted_ms/1000):null);
-  const c={ok:true,at:Date.now(),model:r.model,label:r.label,device:r.device,gpu:this.loaded?.gpu?.name||null,startMs:wasRunning?0:this.loaded?.loadMs||null,
+  const c={ok:true,at:Date.now(),model:r.model,label:r.label,device:r.device,gpu:this.loaded?.gpu?.name||null,split:this.loaded?.split?{layers:this.loaded.split.layers,of:this.loaded.split.of}:null,startMs:wasRunning?0:this.loaded?.loadMs||null,
    firstTokenMs:r.firstTokenMs,totalMs:Date.now()-t0,tokensPerSecond:gen?+gen.toFixed(1):null,promptTokensPerSecond:t.prompt_per_second?+t.prompt_per_second.toFixed(1):null,tokens:t.predicted_n||r.usage?.completion||null,text:r.text.slice(0,160)};
   this.installer.saveCheck(c);this.emitStatus();return c;
  }
  async shutdown(){await this.close('quit').catch(()=>{});}
 }
-module.exports={LocalAI,DEFAULTS,threads,IDLE,tidyMessages};
+module.exports={LocalAI,DEFAULTS,DEVICES,threads,IDLE,tidyMessages};

@@ -19,7 +19,10 @@ if(argv.includes('--list-devices')){
 }
 log({start:true,argv,envKeys:Object.keys(process.env).sort(),keyLength:key.length,keyInArgv:!!key&&argv.some(a=>a.includes(key)),backend:process.env.GGML_BACKEND_PATH||null,stdinIsTTY:!!process.stdin.isTTY});
 const model=arg('-m');if(!model||!fs.existsSync(model)){console.error('gguf_init_from_file: failed to open GGUF file');process.exit(1);}
-if(cfg.mode==='oom'){setTimeout(()=>{console.error('ggml_vulkan: Device memory allocation of size 5000000000 failed.');console.error('llama_model_load: error loading model: unable to allocate Vulkan0 buffer');process.exit(1);},100);return;}
+// v2.44: cfg.maxLayers: the "card" holds at most that many layers (-ngl all or a larger N runs out of memory).
+const ngl=arg('-ngl'),tooMany=cfg.maxLayers!=null&&arg('--device')!=='none'&&(ngl==='all'||Number(ngl)>cfg.maxLayers);
+if(cfg.mode==='oom'||tooMany){setTimeout(()=>{console.error('ggml_vulkan: Device memory allocation of size 5000000000 failed.');console.error('llama_model_load: error loading model: unable to allocate Vulkan0 buffer');process.exit(1);},100);return;}
+if(ngl&&ngl!=='all'&&ngl!=='0')console.error('load_tensors: offloaded '+ngl+'/33 layers to GPU');
 let loaded=false;setTimeout(()=>{loaded=true;},cfg.loadMs??200);
 const send=(res,status,obj)=>{res.writeHead(status,{'Content-Type':'application/json'});res.end(JSON.stringify(obj));};
 const server=http.createServer((req,res)=>{

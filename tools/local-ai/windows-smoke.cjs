@@ -8,12 +8,12 @@
 //      127.0.0.1 and refuses requests without the key, runs the speed check and one streamed reply,
 //      with times for each step; then closes it and checks the process is gone.
 // Usage: node tools/local-ai/windows-smoke.cjs <data folder>
-//   env: MODEL (4b), DEVICE=cpu|auto, OFFLINE=<folder with files already downloaded, checked like downloads>
+//   env: MODEL (4b), DEVICE=cpu|auto|split (v2.44: split prints where the layers went), OFFLINE=<folder with files already downloaded, checked like downloads>
 'use strict';
 const path=require('node:path'),os=require('node:os'),http=require('node:http'),fs=require('node:fs');
 const APP=path.join(__dirname,'..','..','app','local-ai');
 const {LocalAI}=require(path.join(APP,'service.cjs')),hardware=require(path.join(APP,'hardware.cjs'));
-const dir=process.argv[2]||path.join(os.tmpdir(),'TylerLocalAI'),MODEL=process.env.MODEL||'4b',DEVICE=process.env.DEVICE==='auto'?'auto':'cpu';
+const dir=process.argv[2]||path.join(os.tmpdir(),'TylerLocalAI'),MODEL=process.env.MODEL||'4b',DEVICE=['auto','split'].includes(process.env.DEVICE)?process.env.DEVICE:'cpu';
 let saved={model:MODEL,device:DEVICE,idleMinutes:0};
 const t0=Date.now(),at=()=>((Date.now()-t0)/1000).toFixed(1).padStart(7)+' s ';
 const say=(...a)=>console.log(at()+a.join(' '));
@@ -28,6 +28,7 @@ const get=(port,p,headers={})=>new Promise((resolve,reject)=>{const r=http.get({
  const ti=Date.now();await limit(svc.install({model:MODEL,offline:process.env.OFFLINE?[process.env.OFFLINE]:[]}),3000,'install');say('installed in',((Date.now()-ti)/1000).toFixed(0),'s:',JSON.stringify(svc.installer.status()));
  if(process.platform==='win32'){const vk=await svc.vulkan(true);say('Vulkan devices (GGML_BACKEND_PATH=gpu\\ggml-vulkan.dll):',JSON.stringify(vk));}
  const c=await limit(svc.speedCheck(),900,'speed check');say('SPEED CHECK',JSON.stringify(c));
+ if(svc.loaded?.note)say('PLACEMENT',svc.loaded.note);
  const port=svc.server.port;
  const h=await get(port,'/health');say('/health',h.status,h.body.slice(0,80));
  const noKey=await get(port,'/v1/models');say('/v1/models without the key:',noKey.status,noKey.body.slice(0,100));if(noKey.status!==401)throw Error('the engine answered without the key');

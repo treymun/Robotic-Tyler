@@ -1,0 +1,325 @@
+# ROBOTIC TYLER v2.44.0: Who's speaking, sharing the graphics card, and a sharper voice
+
+Four changes, each with its own section below: Tyler can tell who's speaking in voice (optional), the text AI on this PC can split between the graphics card and the processor, theme voices can move to the processor when the card is full (the old behaviour stays as an option), and an experimental sharper voice for Medic, Lash and Kelvin (optional download).
+
+## Tyler knows who’s speaking in voice (optional)
+
+You asked: *"can you add ability for ai to see who is speaking in voice so its not mixing people up"*
+
+- **Tyler now knows who said each line in a Standard voice call**, so he answers the right person and doesn't mix people up.
+  - The AI sees the speaker in front of the line: *"Sam (in voice): who planted?"*.
+  - Someone Tyler can't name yet is kept apart from the others: *"Speaker 2 (in voice, name unknown): …"*.
+  - Two people at once: *"Sam and Alex talking at once: …"*.
+  - When nothing can tell: *"Unknown speaker (in voice): …"*. **A name is never guessed.**
+- **A new rule for the AI:** answer that person, use only that name, never say that someone else said those words, and don't invent a name for "Speaker 2".
+- **The panel's *Heard* line shows who:** *"Heard Sam: who planted?"*.
+- **The Signal trail** says where the name came from (when that changes; never what was said).
+- **Checks → Full check** has a new row, *Who is speaking in voice*. It lists the Steam fields and classes Tyler found for "who's talking", with counts. It shows names of fields only, never what anyone said and never people's names.
+- **It's optional, and on by default:** Settings → Voice → Standard voice → **Tell the AI who's speaking in voice**. It's also on the phone's Settings page.
+
+### How it behaves
+- **Where the name comes from, best first:**
+  1. **Steam's own talking data.** This is whatever lights up a talking member in Steam's voice list.
+     - Steam doesn't document it, so Tyler looks carefully, read-only, in the plausible places: talking-like fields and methods on the voice members, Steam's voice stores, and talking-like classes in the voice list.
+     - A signal only counts once Tyler has seen it switch on **and** off for the same person. A flag that's always on, or never changes, is ignored.
+  2. **Each person's own audio.** Steam's voice server gives everyone else in the call their own audio track. Tyler now measures each track's level separately, before the mix.
+     - **One other person in voice:** every line is theirs. This is certain.
+     - **Several people:** the track that carried the speech decides. Tyler can name a track in two ways:
+       - from an id Steam gives the track, if Steam exposes one;
+       - by learning it: while Steam's talking data lit up Sam, Sam's track was the one talking. This is remembered for the rest of that call.
+     - **Until a track has a name,** that person is *"Speaker 1"*, *"Speaker 2"*. The numbers stay the same for the whole call.
+     - **Two tracks both clearly talking** means overlap.
+  3. **Otherwise unknown**, and Tyler says so.
+- **Memory:**
+  - The conversation memory keeps the labelled line, so later replies know who said what.
+  - **Per-friend memory** only gets a voice line from someone known by their Steam account, talking alone. Never from "Speaker 2", overlap or unknown.
+- **The rest is consistent with text chat:**
+  - A known voice speaker gets the same speaker rules as a text message's author.
+  - In text chat's Quiet mode, a message from someone Tyler just answered in voice (within 30 s) counts as a follow-up for him, as it already did after a text reply.
+  - Repeat protection only looks at Tyler's own replies, so it isn't affected.
+- **Turned off:** the voice path is exactly as in v2.43.
+  - No per-person level meters, no Steam talking-data reads.
+  - The same prompt and the same requests. I checked this byte for byte against v2.43's own code.
+- **If it breaks:** say Steam changes its data, or a level meter fails. Then that line goes out **unlabelled, exactly as before**, and the Signal trail gets one line, e.g. *"Voice speakers: couldn't tell who spoke (…), sent unlabelled"*. The reply is never held up or dropped.
+- **Privacy:**
+  - Names come only from Steam's own member data.
+  - Nothing about anyone's voice is stored: no voiceprints, no speaker models. What Tyler learned about whose track is whose lasts for that call only.
+  - The recording sent for hearing is unchanged. The only new thing the AI gets is the name in front of the line, plus the same Steam account note a text message's author already gets.
+- **Gemini Live is unchanged.** It still hears the call as one mix, and Tyler doesn't tell it who's speaking. Why:
+  - On Gemini 3.8 Live, the default model, text sent during a session counts as something said to Tyler, so he would answer "(now speaking: Sam)" out loud.
+  - On the 2.5 model, Google's docs say such a message interrupts whatever Tyler is saying, and it isn't kept in order with the audio.
+  - Either way it would break Live's turn-taking.
+- The desktop app's VB-CABLE route (the Windows helper) hears one mixed device, so this doesn't apply there.
+
+### Tested
+- **Mocked** (fake Steam objects and a fake voice list, numbers standing in for each person's levels, mocked AI and speech providers; the real attribution code and the real background):
+  - The loudest track is the speaker; two clearly talking tracks are overlap; silence names nobody.
+  - One other person in voice: always theirs, and the bot itself is never a speaker.
+  - Steam talking flags on the voice members, a talking method on Steam's VoiceChat store, and a talking class in the voice list (matched by Steam's mini-profile id, or by a unique name) all name the speaker.
+  - Ignored: flags that never switch, mute flags, volume flags, and the bot's own flag.
+  - Steam's store throwing errors, or changing shape, never breaks anything.
+  - Learning which track is whose from Steam's flags, then naming people from their tracks once the flags stop. Someone who left isn't named from an old track. A person Steam never lit up stays "Speaker N".
+  - An id Steam gives a track (an SSRC in its store, or a Steam id in the call description) names it. Steam's usual "Peer-<number>" ids name nobody.
+  - "Speaker N" labels stay the same for the call, and start again in a new call.
+  - The exact line formats, and that the background rejects junk (it goes out unlabelled).
+  - Through the real background:
+    - the prompt, the speaker rules and per-friend memory for a known speaker;
+    - no per-friend memory for Speaker N, overlap or unknown;
+    - a voice turn retried after a provider error keeps its speaker, labelled once.
+  - **Setting off:** with the panel's speaker still attached, every request (hearing, AI, speech) is byte-identical to a v2.43-style turn. A one-off run against the real v2.43 code also matched byte for byte.
+  - The listener: off means no extra analysers and no Steam reads. On adds one meter per person's track, and turning it off disconnects them.
+- **Real (in a browser, with a fake Steam):** headless Chromium, real WebRTC with two people's audio tracks talking in turn, the real listener, panel and background.
+  - With Steam talking flags: lines come out as "Sam (in voice)" and "Alex (in voice)", then Sam is still named from his track once the flags stop. Per-friend memory gets each person's own lines. The full check row lists Steam's field (`member.is_speaking`) with no people's names.
+  - Without flags: "Speaker 1", "Speaker 2", "Speaker 1", and both at once comes out as overlap. No per-friend memory.
+  - Setting off: what the panel sends is exactly v2.43's, with no extra analysers and no Steam reads.
+  - Steam's data throwing: the reply still comes, unlabelled, with one Signal trail line.
+  - Desktop app check (real Electron, mock Steam page): the new code is bundled into the Steam window and answers its report.
+- **Not tested:**
+  - **A real Steam call.** I can't see what Steam's own "who's talking" data really is, so that part is a careful guess.
+  - Steam's real voice server, Windows audio, Gemini Live.
+
+**What one real call will confirm:** join a Standard voice call with two friends, let each talk a few times, then run **Checks → Full check** and copy the report. The *Who is speaking in voice* row will show:
+- which Steam talking fields or classes switched on and off ("used"), or that none did;
+- which talking-like fields exist but never switched;
+- the field names on Steam's voice members and voice store.
+
+That tells me whether Steam's data is being read correctly, or exactly what to read instead. Until then, people are still kept apart by their own audio tracks ("Speaker 1", "Speaker 2"), and someone alone in a call with Tyler is always named.
+
+## Text AI on this PC can split between the graphics card and the processor
+
+### New: a third choice for Runs on (desktop app)
+- **Settings → On this PC → Runs on → Split between graphics card and processor.**
+  - As many of the model's layers as fit go on the graphics card. The rest run on the processor, in the PC's memory.
+  - Slower than the whole model on the card, faster than the processor alone.
+  - The same model and the same provider. Only where its layers run changes, and Tyler says so.
+- **Written for a friend's PC.** He runs Text AI on this PC and a theme voice on the same NVIDIA card. Together they didn't fit: whichever loaded first took the card's memory, and the other failed.
+- **The two old choices stay exactly as they were:**
+  - **Graphics card: the whole model** (it was called *Graphics card when possible*). Every layer goes on the card. If the card is too full, the reply fails with a message. Nothing is moved to the processor.
+  - **Processor only.** No card at all.
+- Each choice has a short hint under the list.
+- The phone remote shows On this PC as "set up on your PC", as before, so this choice is made on the PC.
+
+### How Split behaves
+- **It's decided each time the AI starts:** the first reply, after the idle close, and after a model or setting change. It uses the card's free memory at that moment, so a game that's running is already left out.
+- **What's kept free on the card first:**
+  - **Room for the theme voice**, when theme voices are installed with the graphics-card engine and their Runs on isn't Processor only:
+    - The figure is the theme voices' own: Quality mode needs 6.5 GB, Lightweight 4 GB, plus 1.3 GB while a sharper voice is installed and switched on.
+    - If the voice is already loaded on the card, its model already counts as used. Only what it still needs while it speaks is kept, so it isn't counted twice.
+    - Tyler only reads the theme voices' settings for this. Nothing of theirs changes.
+  - **A 1 GB safety margin**, plus **0.5 GB for llama.cpp's working buffers**.
+- **Then Tyler counts layers until the next one wouldn't fit.**
+  - It uses each layer's real size, read from the model file. The context stays 8192 tokens.
+  - llama.cpp counts the output layer as a layer, so the 4B and 9B have 33.
+- **Examples on a 12 GB card:**
+  - The 9B beside a Quality theme voice: 18 of 33 layers on the card.
+  - The 4B beside a Quality voice, or the 9B beside a Lightweight voice: the whole model fits.
+  - With a game using 7 GB: 14 of 33 layers (9B) or 29 of 33 (4B).
+  - With a game using 7 GB and a Lightweight voice: no layer fits.
+- **If no layer fits, it runs on the processor and says so.** It's never silent.
+- **If a start still runs out of memory**, Tyler tries once more with about 60% of the layers, and the note says so. A second failure gives the reason, and nothing else is tried.
+- **If a graphics card that was used before has gone** (a driver problem), you get an error, as with Graphics card.
+- **Where the note shows:**
+  - in the Steam window's status line while it starts;
+  - under Runs on in Settings;
+  - in Settings' "Running now" line;
+  - in the speed check result;
+  - in the activity log.
+  - For example: *"Split: 18 of 33 layers on the NVIDIA GeForce RTX 3060, the rest on the processor (slower than all on the card). Room is kept on the card for the theme voice (Quality, 6.5 GB)."*
+- **How it's started:** Tyler gives llama.cpp the exact layer count (`-ngl 18`) and keeps `--fit off`.
+  - llama.cpp's own automatic fitting (`--fit on -fitt`) was checked and picks the same counts.
+  - Tyler's own count is used because:
+    - it's known before the start, so the note can say it;
+    - it includes the theme voice's room;
+    - llama.cpp never changes anything by itself;
+    - when nothing fits, the engine starts without the graphics card at all.
+- The engine's safety rules are unchanged: it listens only on this PC, uses a new key for each start, has no window, and its environment is limited to a short allowlist.
+
+### Tested
+- **Mocked** (`tests/local-ai.test.mjs`, 12 new tests; the 36 earlier local AI tests pass unchanged):
+  - the layer sizes recorded for all four models, and the file-header reader on a small made-up file;
+  - the plan on a 12 GB card: a Quality, Lightweight or no theme voice on the card, a game using memory, and nothing fitting;
+  - the theme voice's room:
+    - only when the voice runs on the card;
+    - a voice that's already loaded isn't counted twice;
+    - the sharper voice adds its share;
+    - taken from the theme voices' own figure (and read the older way from a service without it), without changing anything of theirs;
+  - the note's words;
+  - the command line for each choice;
+  - the setting: an unknown value goes back to Graphics card, and the phone can't change it;
+  - with a fake engine:
+    - 18 of 33 layers beside a Quality voice, with the note at start and in the status;
+    - decided again at the next start;
+    - the processor with no graphics card loaded when nothing fits;
+    - one retry with fewer layers, then the reason;
+    - no card at all;
+    - Graphics card and Processor only exactly as before.
+- **Real, on Linux** (no graphics card):
+  - **Setup:**
+    - the pinned llama.cpp build;
+    - llama.cpp's own RPC server, which stands in for a graphics card;
+    - copies of the 4B and 9B files with their real layout but empty weights, to save 8 GB of downloads.
+  - **Results:**
+    - llama.cpp put exactly the planned layers on the stand-in card: 29 of 33 for the 4B, 18 of 33 for the 9B, and none on the processor-only run;
+    - each run answered a request;
+    - the memory used on the stand-in card matched the plan to 0.01 MB;
+    - llama.cpp's own fitting chose the same counts as Tyler, or one layer more in one case.
+- **Settings:** the On this PC tab was checked in the Steam, Windows XP, Pip-Boy and DOOM themes, with no layout problems.
+- **Not tested:**
+  - a real graphics card, including an NVIDIA card on Windows sharing memory with a theme voice;
+  - how much llama.cpp's Vulkan backend needs on a real card (the 0.5 GB allowance is an estimate);
+  - a real card's free-memory reading during a game.
+  - `DEVICE=split node tools/local-ai/windows-smoke.cjs` runs the real thing on a Windows PC with a card.
+
+## Theme voices move to the processor when the graphics card is full
+
+### Fixed: "Not enough free graphics memory to load the voice model" with the text AI on the same card
+- **What went wrong:** with the text AI running on the same NVIDIA card, its memory filled up and theme voices stopped with *"Not enough free graphics memory to load the voice model."*
+  - **Runs on** said *"Graphics card when possible, else the processor"*, but "else the processor" only ever happened on a PC with no card.
+- **Settings → Theme voices → Runs on now has three choices.** The original two are still there.
+  - **Graphics card, or the processor when it's full** (the default):
+    - Before loading the voice model on the card, Tyler checks how much of the card's memory is free: about 4.0 GB is needed for Lightweight and 6.5 GB for Quality (at least 85% of that must be free).
+    - If it doesn't fit, or loading or speaking runs out of graphics memory, the same voice runs on the processor instead, which is much slower.
+    - Tyler says so wherever the voice status shows: in Settings, on the panel, on the clip line and on the phone remote. For example: *"The graphics card was full (1.2 GB free, the voice needs about 4.0 GB), so this voice runs on the processor: much slower. The card is tried again the next time the engine starts."*
+    - A message that ran out of graphics memory while being made is made once more on the processor. If that fails too, it fails with the reason.
+    - The voice goes back to the card the next time the engine starts, after it closes when idle or with *Close the engine now*, if there's room then.
+    - Only where the voice runs changes: the same model, the same voice. The fast engine needs the card, so on the processor the standard engine is used.
+  - **Graphics card only (stops with a message if full):** exactly the behaviour before v2.44.
+  - **Processor only (keeps the graphics card free):** unchanged.
+  - The two long labels are slightly shorter than first proposed ("when it's full", "if full") so they fit the selector in every theme.
+- **For the text AI's "split between card and processor":** theme voices can now say how much graphics memory they want kept free. This is read-only: `hardware.vramNeed(settings)` in `app/theme-voices/hardware.cjs`, and the service's `vramReserve()`, which also says whether a voice model is on the card right now.
+
+### How it's built
+- **Settings:** `settings.device` keeps its three values: `auto` (the default), `cuda` and `cpu`. A saved `cuda` is now shown as itself, no longer as the default.
+- **The free-memory check happens twice:**
+  - NVIDIA's `nvidia-smi` reading, before the engine starts;
+  - the engine's own reading just before loading (`torch.cuda.mem_get_info`). The worker refuses with `low_vram` and the numbers.
+- **Nothing stays on the card after a fallback:** the engine that tried is closed before the processor load starts.
+
+### Tested
+- **Mocked** (no graphics card, no model). The fake worker plays a full card: 1.2 GB free, out of memory while loading, or out of memory while speaking.
+  - `tests/theme-device.test.mjs`, 5 new tests:
+    - **The default, card full by the engine's check:** the processor, with the note in the clip and the status. No reload for each message. Back on the card after the engine closes, with the note gone.
+    - **The default, card full by `nvidia-smi`:** the card isn't even tried.
+    - **The default, out of memory while loading:** the processor.
+    - **The default, out of memory while speaking:** the clip is made again on the processor; out of memory there too fails with the reason, after exactly one retry.
+    - **Graphics card only:** full → the old message, nothing loaded; out of memory loading → the old error, no free-memory check asked, no processor try; the setting is never changed by itself.
+    - **Processor only:** unchanged, no note.
+    - **Fast engine with a full card:** the processor with the standard engine, kept until the engine closes.
+    - **The read-only hook:** `vramNeed` and `vramReserve`.
+  - `tests/e2e/character-voices.e2e.mjs`:
+    - **1 new test:** the three Runs-on choices with their labels; a saved "card only" shown as it is; the default; the hint; saving each choice; the note in the Settings status line.
+    - **The phone test checks the note** on the phone's Theme voice card and in the panel's status line.
+  - **Layout audit** of the whole Theme voices section in steam, tf2, deadlock, pipboy, winxp, cs2, portal and l4d, with each of the three choices selected:
+    - No findings once the two labels were shortened. The first wording of the default was cut off in TF2's selector.
+    - Outside the section, the theme chip wraps in cs2 and pipboy, as before.
+  - **Totals:** shared with the sharper-voice notes (`npm test` 543 of 543 (the whole working copy, other agents' v2.44 work included), `npm run test:e2e` 55 of 55, `npm run check` up to date, desktop voice check passed).
+- **Real, Linux** (this project's 2-core test machine, **processor only: it has no graphics card**). The app's own service and worker:
+  - the default `auto` on a processor-only engine loads on the processor, with no note;
+  - *Processor only* is unchanged;
+  - "Graphics card only" is kept as a setting;
+  - `vramReserve()` reports 0.
+- **Not tested:**
+  - **Every graphics-card path on real hardware.** That covers the engine's own free-memory check, a real out-of-memory while loading or speaking on CUDA, the fast engine on a full card, and going back to the card. No NVIDIA card was available; these are mocked only.
+  - **Windows.**
+  - **With the text AI really sharing the card.**
+
+## A sharper voice for Medic, Lash and Kelvin (experimental, optional)
+
+### New: the sharper voice (desktop app)
+- **For Medic, Lash and Kelvin, Tyler can now run their generated speech through voice conversion.**
+  - Each moment of the clone's speech is swapped for the closest-sounding moments of that character's own game recordings. The method is kNN-VC.
+  - Qwen3-TTS only listens to a 5–25 s reference. This uses every recording of the character that the app has.
+- **Off until you switch it on.** Each of the three has its own **Sharper voice (experimental)** switch, in its row under Settings → Theme voices → Character voices.
+- **It needs a separate download: voice conversion, about 1.33 GB.**
+  - **Settings → Theme voices → Sharper character voices** shows its size and the free disk space first. It downloads only when you press **Download voice conversion**.
+  - The download is checked file by file against the SHA-256 recorded in this version of Tyler. A stopped download carries on where it stopped.
+  - **Remove voice conversion** deletes only those files. Your switches and everything else stay.
+- **No one listened to it before this release.** It was measured with the same test as the v2.42 re-tune:
+  - **Medic: measured closer.** Likeness to held-out recordings of him went from 0.42 and 0.40 to 0.51 on both of two tries. He was closer on every sentence, and every word was still recognised.
+  - **Lash: nearly.** Much closer (0.34 and 0.35 → 0.51 and 0.52), but on one try one word came out unclear ("microphone" was heard as "micro song").
+  - **Kelvin: nearly.** Closer (0.54 and 0.59 → 0.64), but on one try he was 0.001 less close to his first pack's held-out recordings, so he missed one rule.
+  - **Venator** didn't gain, so he isn't offered.
+  - The scores come from a speaker model and a speech recogniser, not from listening.
+- **What it costs:**
+  - **Slower:** about 0.35–0.6 s more per second of speech on a processor. It measured 0.35 s with two threads; in the app on a 2-core PC, which gives the engine one thread, 0.57–0.65 s. That's 5–7% on top of the clone's own time there.
+  - **Memory:** about 1.7 GB more while it's loaded (measured in the voice worker). On a processor, Tyler doesn't try it with less than about 1.4 GB free.
+  - **Sound:** made at 16 kHz and resampled to 24 kHz, so it's a little less crisp than the normal voice.
+  - **First use:** the first message after the voice engine starts also loads the conversion model (about 4 s on the test PC). The first message for each character also prepares its recordings once (about 5 s); that's cached afterwards.
+- **Never silent.** If the sharper voice is on but can't run, the character's normal voice speaks and says why:
+  - in its Settings row, on the panel, on the clip line and on the phone remote;
+  - the reasons are: voice conversion not installed, one of the character's recordings missing or damaged, not enough free memory, or the conversion failing.
+  - Nothing is ever downloaded by itself.
+
+### How it's built
+- **The download:** one optional component in `engine-lock.json`, `components.knnvc`. It holds the kNN-VC project's v0.1 release files:
+  - `WavLM-Large.pt`: 1,261,965,425 bytes, SHA-256 `6fb4b3c3…f100f`.
+  - `prematch_g_02500000.pt`: 66,214,643 bytes, SHA-256 `f924c763…ed2dd5`.
+  - It's fetched with the theme-voice installer's own resumable, checked downloader and kept in `ThemeVoices\components\knnvc-cfba7e0808fc\`. Installing or updating the engine doesn't touch it.
+  - **Check and repair files** checks its SHA-256s too. A damaged file is deleted, and you're told to download it again.
+- **Licences:**
+  - The kNN-VC code and its vocoder are MIT.
+  - WavLM-Large is Microsoft's. Its model card points to the UniSpeech repository's licence, which a mirror shows as **Creative Commons Attribution-ShareAlike 3.0** (not MIT). That couldn't be read on GitHub itself from the build machine, so please confirm it before publishing.
+  - Tyler doesn't redistribute the weights: it downloads them from the kNN-VC release.
+- **The code:** vendored into the worker folder, with its copyright and MIT notices: `knnvc_wavlm.py` (Microsoft's WavLM, as kNN-VC ships it) and `knnvc_hifigan.py` (kNN-VC's HiFi-GAN generator, adapted from jik876/hifi-gan).
+  - Nothing is downloaded as code.
+  - The worker loads both checkpoints with `torch.load(weights_only=True)`.
+- **The matching recordings are built in:** exactly the measured set, Medic 10 clips, Lash 23 and Kelvin 27. Each is listed in `characters.json` with its size and SHA-256 and checked before use.
+  - The recordings held out for testing were left out on purpose, so the shipped voice is the one measured.
+  - 40 of the clips are new to the app (the rest were already its reference clips), which makes the installer **3.2 MB larger**.
+- **Where it runs:** in the voice worker after Qwen3-TTS, on the same device as the voice model.
+  - It loads on first use and is unloaded when the worker closes after its idle time.
+  - The matching recordings' features are cached. A converted clip has its own cache entry, so switching the sharper voice off gives the normal clip again, never a converted one.
+- **Stopping:** Stop, an interrupted reply, the emergency stop and quitting end a conversion like generation.
+
+### Tested
+- **Mocked** (no model, no real download):
+  - `tests/sharper-voice.test.mjs`, 6 tests, all new:
+    - the lock entry: two pinned files, 1.33 GB, the licences recorded, the engine's identity unchanged, both checkpoint loads using `weights_only=True`;
+    - the download from a local server, with small stand-in files:
+      - a cut-off download resumes with a Range request;
+      - a wrong download is refused and nothing is installed;
+      - Check and repair finds a changed file;
+      - Remove deletes only the component, its record and unfinished downloads; the engine, your recordings and saved clips stay;
+    - the catalog: only Medic, Lash and Kelvin offer it; each matching set is that character's own built-in recordings (10, 23, 27 clips);
+    - the switch: saved per character, only for those three, off by default, anything else ignored, kept after Remove;
+    - the service with the mocked worker:
+      - not installed: the normal voice with a note, and nothing fetched;
+      - installed: converted, with the 10 matching clips and k=4, and its own cache entry, while the normal clip keeps its own;
+      - a failed conversion: the normal voice with the reason, filed as the normal clip;
+      - too little memory: not tried, said why;
+      - other characters: never converted;
+    - Stop, a single interrupted reply and quitting during a conversion.
+  - `tests/e2e/character-voices.e2e.mjs`, 2 new tests and 2 updated, in Chromium:
+    - Settings: the size and free space are shown first, and the download starts only on a press;
+    - the switch appears only in Medic's and Lash's rows, off by default, with its note (what it does, 1.33 GB, +0.35–0.6 s per second, 1.7 GB memory, 16 kHz, the evidence, "no one listened");
+    - switching it on saves exactly that character's switch;
+    - Remove asks twice;
+    - a stopped download offers the rest;
+    - only existing classes are used;
+    - the phone remote shows "Sharper voice is on, but voice conversion isn't installed … the normal voice speaks."
+  - Updated: the built-in clips test (236 clips, about 17.8 MB).
+  - **Totals:** `npm test` 543 of 543 (the whole working copy, other agents' v2.44 work included); `npm run test:e2e` 55 of 55; `npm run check`: generated files up to date; the desktop voice check (real Electron, mock Steam page; a regression check for code this release doesn't touch): passed.
+  - **Layout audit** of Theme voices in steam, tf2, deadlock, pipboy and winxp: no findings in the section, with voice conversion installed and not installed; the screenshots were read (the switch sits under the character's note like the v2.42 rollback button, with the existing `toggle` and `actions` classes). Outside the section, the Pip-Boy theme chip wraps to two lines, as before.
+- **Real, Linux** (this project's 2-core test machine, processor, Qwen3-TTS 0.6B; the app's own service, installer and worker):
+  - **The whole path with Medic** (`knnvc/scripts/real-sharper.cjs` in the scratchpad; all checks passed):
+    - **Installed** with the app's installer from a folder holding the two release files (downloaded from GitHub and checked against the same SHA-256 values): 2–3 s, no network.
+    - **Stop while the model was loading** (a fresh engine): cancelled after 3.6 s.
+    - **First converted line:** 2.3 s of speech. The conversion took 10.7 s of that: 4.4 s loading WavLM, the matching recordings' features made once, then the conversion itself.
+    - **Memory:** the worker grew from 1.64 GB to 3.37 GB (+1.7 GB; +1.4 GB in a second run). An earlier plain load measured +3.0 GB, so the app now memory-maps WavLM.
+    - **Second line:** 2.56 s of speech, converted in 1.46 s (0.57 s per second). The whole message took 8.7 s per second on one thread.
+    - **Cache:** the same line again came from the cache. Switched off, the normal voice used its own cache entry and wasn't converted.
+    - **Stop between the pieces of a longer line:** cancelled at once, and the engine stayed ready.
+    - **Remove:** deleted only voice conversion and kept the switch. The next message was the normal voice, with "Sharper voice is on, but voice conversion isn't installed …".
+  - **Scored the app's own takes** (Medic, seed 1, same scorer as the evaluation):
+    - Line 1: normal 0.470 → converted 0.526 (the experiment had 0.481 → 0.567).
+    - Line 2: converted 0.597 (experiment 0.563).
+    - Words 1.00 throughout.
+    - This only shows the shipped path gives the effect that was measured; it isn't a new evaluation.
+  - **The evaluation behind the switch** (the kNN-VC experiment, earlier in this session): four sentences, two seeds, against held-out recordings, with a control that converted with another character's recordings.
+- **Not tested:**
+  - **Listening:** no one listened to a converted take.
+  - **Windows:** the smoke workflow has a new opt-in input (**sharper**) that downloads voice conversion and converts one line for Medic. It wasn't run.
+  - **A real download of the component through the app:** the real check installed it from a local folder holding the two files already downloaded from the release (the same SHA-256 checks). The mocked tests cover downloading over HTTP.
+  - **On an NVIDIA card:** the conversion on CUDA, its speed and its graphics memory.
+  - **The Quality (1.7B) model with conversion.**
+  - **The phone toggle:** there isn't one; the phone only shows the note.

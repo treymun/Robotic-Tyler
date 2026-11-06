@@ -78,7 +78,8 @@ if(!app.requestSingleInstanceLock()){app.quit();}else{
  catch(error){themeVoices=null;eventLog('Theme voices unavailable',error.message);}
  // Text AI on this PC (v2.38, app/local-ai): Tyler's text replies from a local model (llama.cpp), no key.
  // Also loaded inside a try, so a problem with it never stops the rest of Tyler.
- try{localAI=require('./local-ai/desktop.cjs').setupLocalAI({root,vault,local,changeListeners,net,shell,log:eventLog,send:e=>{try{if(options&&!options.isDestroyed())options.webContents.send('tyler:local-ai',e);}catch{}}});}
+ // v2.44: Runs on → Split keeps room on the card for theme voices; it only reads their service.
+ try{localAI=require('./local-ai/desktop.cjs').setupLocalAI({root,vault,local,changeListeners,net,shell,log:eventLog,themeVoices:()=>themeVoices?.service||null,send:e=>{try{if(options&&!options.isDestroyed())options.webContents.send('tyler:local-ai',e);}catch{}}});}
  catch(error){localAI=null;eventLog('Text AI on this PC unavailable',error.message);}
  // Images on this PC (v2.40, app/local-images): pictures from a local model (stable-diffusion.cpp's sd-cli,
  // one run per picture, no network port), no key. Loaded inside a try like the others. Text AI's Vulkan

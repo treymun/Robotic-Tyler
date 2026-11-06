@@ -69,4 +69,20 @@ function recommend(hw){
  if(hw.ram.total<NEEDS[mode].ram)notes.push('This PC has '+(hw.ram.total/GB).toFixed(0)+' GB of memory; '+NEEDS[mode].label+' works best with '+(NEEDS[mode].ram/GB).toFixed(0)+' GB or more.');
  return {mode,device,notes,driverTooOld:!!driverTooOld,card:card||gpu||null,gpu:gpu||null};
 }
-module.exports={detect,recommend,usableGpu,NEEDS,CUDA,GB};
+// v2.44 "Runs on": with "Graphics card, or the processor when the card is full" (auto), a voice model loads on the
+// card only if at least this share of its mode's need (NEEDS: the weights plus a working margin for speaking)
+// is free right now; otherwise it runs on the processor and says so. The same share the "card only" message uses.
+const FIT=0.85;
+/** Does a mode fit in this much free graphics memory? */
+const fitsCard=(mode,free)=>!(Number.isFinite(free)&&free>0)||free>=(NEEDS[mode]||NEEDS.quality).vram*FIT;
+/**
+ * v2.44, read-only: how much graphics memory theme voices want kept free on the card, for other local AI that
+ * shares it (bytes; 0 with "Processor only"). Settings as saved (themeVoices: mode, device); with sharper voices on,
+ * the voice conversion's WavLM adds about 1.3 GB on the card.
+ */
+function vramNeed(settings={},{conversion=false}={}){
+ if(settings?.device==='cpu')return 0;
+ const mode=NEEDS[settings?.mode]?settings.mode:'quality';
+ return NEEDS[mode].vram+(conversion?1.3*GB:0);
+}
+module.exports={detect,recommend,usableGpu,NEEDS,CUDA,GB,FIT,fitsCard,vramNeed};

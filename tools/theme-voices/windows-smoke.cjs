@@ -11,6 +11,10 @@
 //      to the theme's voice with the reason; importing a pack folder made from the app's clips (spaces and an
 //      accent too) copies only the two damaged clips, and Coach speaks version 2 again (from the cache: the
 //      key is the clips' content).
+//   5. (SHARPER=1, v2.44) the optional sharper voice: downloads voice conversion (the pinned kNN-VC weights,
+//      about 1.33 GB, with the app's installer), switches it on for Medic and converts one line on the processor
+//      (the real worker and the vendored kNN-VC code); then switches it off and checks the normal clip is a
+//      different cache entry, and removes the component (the switch stays and falls back with a note).
 // Every step has its own time limit, so a hang shows where it is instead of running until the job's limit.
 const path=require('node:path'),fs=require('node:fs'),os=require('node:os');
 process.env.TYLER_WORKER_TRACE=process.env.TYLER_WORKER_TRACE||'30'; // the engine prints where it is every 30 s
@@ -56,6 +60,24 @@ async function characters(){
  if(!(await svc.voiceFor('tf2','scout')).character)throw Error('after the repair, Scout should be usable again');
  say('CHARACTER CHECK PASSED');
 }
+async function sharper(){
+ const t1=Date.now();let last=0;
+ svc.on('conversion',e=>{if(Date.now()-last>15000||e.phase!=='download'){last=Date.now();say('[sharper]',e.phase,e.label||'',e.bytes?((e.bytes/1e9).toFixed(2)+'/'+((e.totalBytes||0)/1e9).toFixed(2)+' GB'):'');}});
+ await limit(svc.installConversion({}),1800,'voice conversion download');
+ const st=svc.installer.componentStatus('knnvc');say('[sharper] installed',JSON.stringify({current:st.current,dir:st.dir,seconds:((Date.now()-t1)/1000).toFixed(0)}));
+ if(!st.current)throw Error('voice conversion should be installed');
+ await svc.saveSettings({sharper:{'tf2/medic':true},characters:{tf2:'medic'}});
+ const line='Sharper voice check on Windows.';
+ const a=await limit(svc.speak({text:line,theme:'tf2'}),1800,'medic converted');say('[sharper] medic',JSON.stringify({character:a.character,sharper:a.sharper,note:a.sharperNote,seconds:a.seconds,ms:a.ms}));
+ if(a.character!=='medic'||a.sharper!==true||!(a.seconds>0.5))throw Error('Medic should speak converted (sharper voice)');
+ await svc.saveSettings({sharper:{'tf2/medic':false}});
+ const b=await limit(svc.speak({text:line,theme:'tf2'}),1500,'medic normal');say('[sharper] medic, switched off',JSON.stringify({sharper:b.sharper,cached:b.cached,same:b.file===a.file}));
+ if(b.sharper||b.file===a.file)throw Error('the normal clip should be its own cache entry');
+ await svc.saveSettings({sharper:{'tf2/medic':true}});await svc.removeConversion();
+ const c=await limit(svc.speak({text:'After removing it.',theme:'tf2'}),1500,'medic after remove');say('[sharper] medic after Remove',JSON.stringify({sharper:c.sharper,note:c.sharperNote}));
+ if(c.sharper||!/isn’t installed/.test(c.sharperNote||''))throw Error('after Remove, the normal voice should speak and say why');
+ say('SHARPER VOICE CHECK PASSED');
+}
 const limit=(p,s,what)=>Promise.race([p,new Promise((_,j)=>setTimeout(()=>j(Error(what+': no answer after '+s+' s')),s*1000))]);
 (async()=>{
  say('Windows',os.release(),'node',process.version,'cpus',os.cpus().length,'ram',(os.totalmem()/2**30).toFixed(1),'GB; runtime',RT,'into',dir);
@@ -66,5 +88,6 @@ const limit=(p,s,what)=>Promise.race([p,new Promise((_,j)=>setTimeout(()=>j(Erro
  const hello=await limit(w.request('hello',{},{timeout:240000}),250,'hello');say('hello',JSON.stringify(hello));
  const c=await limit(svc.check(),1500,'voice check');say('VOICE CHECK PASSED',JSON.stringify(c));
  if(process.env.CHARACTERS==='1')await characters();
+ if(process.env.SHARPER==='1')await sharper();
  await svc.shutdown();process.exit(0);
 })().catch(async e=>{say('FAILED:',e.stack||e.message);try{say('stderr tail:',JSON.stringify(svc.worker?.stderrTail||[]));}catch{}try{svc.killNow();}catch{}process.exit(1);});

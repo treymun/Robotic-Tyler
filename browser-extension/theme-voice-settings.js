@@ -5,6 +5,9 @@
 // its original recording or new generated speech. An improved built-in voice can be set back to its
 // earlier version. v2.43: their recordings are built into the app (nothing to import); Import character
 // voices stays as a second way to repair or add recordings from the owner's packs.
+// v2.44: the optional "sharper voice" (kNN-VC voice conversion) for Medic, Lash and Kelvin: a separate download
+// (its size and the free disk space are shown first; nothing downloads by itself) and a switch per character,
+// off by default, whose note says what it does, what it costs and how it was measured (not listened to).
 (() => {
  'use strict';
  const root=document.getElementById('theme-voices'),tv=window.tylerSettings?.voices;if(!root||!tv)return;
@@ -49,7 +52,7 @@
   const have=Object.entries(s.models).filter(([,v])=>v).map(([k])=>k==='quality'?'Quality':'Lightweight').join(' and ')||'no model';
   const chk=s.check?(s.check.ok?' Last voice check: '+s.check.seconds+' s of speech in '+(s.check.ms/1000).toFixed(1)+' s on the '+(s.check.device==='cuda'?'graphics card':'processor')+(s.check.engine==='fast'?' with the fast engine':'')+' ('+new Date(s.check.at).toLocaleString()+').':' Last voice check failed: '+s.check.error):'';
   const sw=s.engineSwitch?' You chose the '+engineName(s.engineWanted)+' engine: press Switch to install it. '+plan:'';
-  return 'Installed: '+have+', '+engineName(s.engine)+' engine.'+(s.needs==='model'?' The '+s.modeLabel+' model isn’t installed yet: press Install to add it. '+plan:'')+sw+chk;
+  return 'Installed: '+have+', '+engineName(s.engine)+' engine.'+(s.deviceNote?' '+s.deviceNote:'')+(s.needs==='model'?' The '+s.modeLabel+' model isn’t installed yet: press Install to add it. '+plan:'')+sw+chk;
  }
  function render(){
   const s=status;if(!s)return;
@@ -58,15 +61,34 @@
   if(rec){const opt=[...$('tvMode').options];for(const o of opt)o.textContent=o.textContent.replace(/ · suggested$/,'')+(o.value===rec.mode?' · suggested':'');}
   if(document.activeElement!==$('tvMode'))$('tvMode').value=s.mode;
   $('tvModeNote').textContent=s.modeChosen?'Your choice. Suggested for this PC: '+(rec?.mode==='light'?'Lightweight':'Quality')+'.':'Not chosen yet: the suggestion for this PC is selected. Tyler never switches mode by itself.';
-  const st=s.settings;$('tvNativeUse').checked=st.nativeVoices!==false;$('tvDevice').value=st.device==='cpu'?'cpu':'auto';$('tvEngine').value=st.engine==='fast'?'fast':'standard';say('tvEngineNote',engineNote(s));$('tvIdle').value=String(st.idleMinutes);$('tvProcessed').checked=st.processed!==false;
+  const st=s.settings;$('tvNativeUse').checked=st.nativeVoices!==false;$('tvDevice').value=['cpu','cuda'].includes(st.device)?st.device:'auto';$('tvEngine').value=st.engine==='fast'?'fast':'standard';say('tvEngineNote',engineNote(s));$('tvIdle').value=String(st.idleMinutes);$('tvProcessed').checked=st.processed!==false;
   $('tvChat').checked=!!st.chat;$('tvChatAccess').value=st.chatAccess==='selected'?'selected':'everyone';$('tvChatCooldown').value=String(st.chatCooldown??20);$('tvChatAllowed').value=st.chatAllowed||'';
   $('tvInstall').textContent=failed?'Retry':!s.installed?'Install theme voices':!s.current||s.updateAvailable?'Update theme voices':s.engineSwitch?'Switch to the '+engineName(s.engineWanted)+' engine':s.needs==='model'||$('tvBoth').checked?'Install the model':'Reinstall';
   $('tvRemove').disabled=!s.installed||installing;$('tvRemoveQuality').disabled=!s.models?.quality||installing;$('tvRemoveLight').disabled=!s.models?.light||installing;
   $('tvRemoveQuality').textContent='Remove the Quality model'+(models.quality?' ('+gb(models.quality.bytes)+')':'');$('tvRemoveLight').textContent='Remove the Lightweight model'+(models.light?' ('+gb(models.light.bytes)+')':'');
   for(const id of ['tvCheck','tvRepair','tvUnload'])$(id).disabled=!s.installed||installing;
   $('tvInstall').disabled=installing;$('tvOffline').disabled=installing;$('tvCancel').hidden=!installing;
-  renderVoices();renderCharacters();
+  renderVoices();renderCharacters();renderConversion();
  }
+ // ── v2.44: voice conversion (the "sharper voice") ──
+ let convBusy=false;
+ // Decimal units here, as the download is described everywhere (1.33 GB = 1,328,180,068 bytes).
+ const mb=n=>n<1e9?Math.max(1,Math.round(n/1e6))+' MB':(n/1e9).toFixed(2)+' GB';
+ function renderConversion(){
+  const c=status?.conversion;if(!c||!$('tvConvState'))return;
+  const busy=convBusy||!!c.installing;$('tvConvCancel').hidden=!busy;$('tvConvInstall').hidden=busy||c.current;$('tvConvRemove').hidden=busy||!c.installed&&!c.partial;
+  $('tvConvInstall').disabled=!status.installed;$('tvConvInstall').textContent=(c.installed||c.partial?'Download the rest of voice conversion (':'Download voice conversion (')+mb(Math.max(0,c.download-c.partial))+')';
+  $('tvConvRemove').textContent='Remove voice conversion'+(c.installed?' ('+mb(c.download)+')':'');
+  $('tvConvProgressWrap').hidden=!busy;if(busy)return;
+  const free=c.free!=null?' '+(c.free/1e9).toFixed(1)+' GB is free on the data drive.':'';
+  say('tvConvState',c.current?'Installed ('+mb(c.download)+'). Switch the sharper voice on for Medic, Lash or Kelvin in their row above.':
+   (c.error?c.error.message+' ':'')+(!status.installed?'Install theme voices first: voice conversion runs in their engine. ':'')+
+   (c.installed?'A voice conversion file is missing or changed: download it again (only what’s missing is fetched).':'Not installed. The download is about '+mb(c.download)+' (WavLM-Large, 1.26 GB, and a 66 MB vocoder).')+free+
+   (c.partial&&!c.current?' A stopped download already has '+mb(c.partial)+': it carries on from there.':''));
+ }
+ $('tvConvInstall').onclick=async()=>{convBusy=true;renderConversion();$('tvConvProgressWrap').hidden=false;$('tvConvProgress').style.width='0%';say('tvConvState','Starting the download… You can keep using Tyler meanwhile.');
+  try{await tv('conversion-install');}catch(e){convBusy=false;say('tvConvState',e.message);renderConversion();}};
+ $('tvConvCancel').onclick=()=>void tv('conversion-cancel').catch(()=>{});
  function renderVoices(){
   const box=$('tvVoices');box.replaceChildren();
   for(const v of voices){
@@ -77,7 +99,7 @@
    const btn=(label,fn,disabled=false)=>{const x=document.createElement('button');x.type='button';x.className='secondary';x.textContent=label;x.disabled=disabled;x.onclick=()=>fn(x).catch(e=>say('tvVoiceState',v.name+': '+e.message));c.append(x);};
    btn('Reference',async()=>{const r=await tv('sample',{theme:v.theme});play(r.audio,r.type);say('tvVoiceState','Playing '+v.name+'’s original reference recording (sample playback, not the clone).');},!v.hasReference);
    if(v.sample&&!v.custom)btn('Original line',async()=>{const r=await tv('sample',{theme:v.theme,kind:'line'});play(r.audio,r.type);say('tvVoiceState','Playing the original “'+v.sample+'” (sample playback: the game’s own recording, not the clone). Press Test to hear the clone.');});
-   btn('Test',async x=>{x.disabled=true;say('tvVoiceState','Making '+v.name+'’s voice… (the first one loads the model)');try{const r=await tv('test',{theme:v.theme,character:'',text:$('tvTestText').value,fresh:true});play(r.audio);say('tvVoiceState',v.name+': '+r.clip.seconds.toFixed(1)+' s of new speech made in '+(r.clip.ms/1000).toFixed(1)+' s on the '+(r.clip.device==='cuda'?'graphics card':'processor')+(r.clip.processed?' (with its radio/mask sound; dry version next)':'')+'.');if(r.dry)setTimeout(()=>play(r.dry),Math.ceil(r.clip.seconds*1000)+600);}finally{x.disabled=false;}},!v.hasReference||!status?.ready);
+   btn('Test',async x=>{x.disabled=true;say('tvVoiceState','Making '+v.name+'’s voice… (the first one loads the model)');try{const r=await tv('test',{theme:v.theme,character:'',text:$('tvTestText').value,fresh:true});play(r.audio);say('tvVoiceState',v.name+': '+r.clip.seconds.toFixed(1)+' s of new speech made in '+(r.clip.ms/1000).toFixed(1)+' s on the '+(r.clip.device==='cuda'?'graphics card':'processor')+(r.clip.processed?' (with its radio/mask sound; dry version next)':'')+'.'+(r.clip.deviceNote?' '+r.clip.deviceNote:''));if(r.dry)setTimeout(()=>play(r.dry),Math.ceil(r.clip.seconds*1000)+600);}finally{x.disabled=false;}},!v.hasReference||!status?.ready);
    // v2.41: an improved built-in voice keeps its earlier version; the owner can go back to it (and forward again).
    if((v.versions||[]).length>1&&!v.custom){const pinned=status?.settings?.builtinVersion?.[v.theme],older=Math.min(...v.versions);
     btn(pinned?'Use the improved version':'Use the earlier version',async()=>{await tv('settings',{values:{builtinVersion:{[v.theme]:pinned?0:older}}});say('tvVoiceState',v.name+(pinned?' uses its improved version (v'+v.version+') again.':' uses its earlier version (v'+older+') now.'));await load();});}
@@ -133,9 +155,17 @@
     const act=document.createElement('div');act.className='actions';const x=document.createElement('button');x.type='button';x.className='secondary';x.textContent=cur.pinned?'Use the improved version':'Use the earlier version';
     x.onclick=async()=>{try{await tv('settings',{values:{characterVersion:{[v.theme+'/'+cur.id]:cur.pinned?0:older}}});say('tvCharVoiceState',cur.name+(cur.pinned?' uses its improved version (v'+cur.currentVersion+') again.':' uses its earlier version (v'+older+') now.'));await load();}catch(e){say('tvCharVoiceState',e.message);}};
     act.append(x);a.append(act);}
+   // v2.44: the optional sharper voice (voice conversion), only for the characters that offer it; off by default.
+   if(cur?.usable&&cur.sharper){const conv=status?.conversion,lab=document.createElement('label'),box=document.createElement('input'),span=document.createElement('span'),bb=document.createElement('b'),sm=document.createElement('small');
+    lab.className='toggle';box.type='checkbox';box.checked=!!cur.sharperOn;bb.textContent='Sharper voice (experimental)';
+    sm.textContent=(cur.sharperOn&&cur.sharperNote?cur.sharperNote+' ':'')+'Runs '+cur.name+'’s generated speech through voice conversion, matching it to '+cur.sharper.clips+' of '+cur.name+'’s own recordings ('+cur.sharper.seconds+' s, built in). '+
+     'Needs the voice conversion download below ('+(conv?.current?'installed':'about '+mb(conv?.download||1.33e9))+'). Slower (about 0.35–0.6 s more per second of speech on a processor) and about 1.7 GB more memory. Made at 16 kHz, resampled to 24 kHz. '+cur.sharper.evidenceNote;
+    span.append(bb,sm);lab.append(box,span);
+    box.onchange=async()=>{try{await tv('settings',{values:{sharper:{[v.theme+'/'+cur.id]:box.checked}}});say('tvCharVoiceState',cur.name+(box.checked?': sharper voice on.'+(conv?.current?'':' It needs the voice conversion download below; until then the normal voice speaks.'):': sharper voice off.'));await load();}catch(e){box.checked=!box.checked;say('tvCharVoiceState',e.message);}};
+    a.append(lab);}
    btn('Generated speech',async x=>{const ch=chosen();x.disabled=true;say('tvCharVoiceState','Making '+(ch?ch.name:v.name)+'’s voice… (the first one loads the model)');
     try{const r=await tv('test',{theme:v.theme,character:sel.value,text:$('tvTestText').value,fresh:true});play(r.audio);
-     say('tvCharVoiceState',(r.clip.fallback?r.clip.fallback.name+' couldn’t be used ('+r.clip.fallback.reason+'), so this is '+r.clip.voiceName+'. ':'')+(r.clip.versionNote?r.clip.versionNote+' ':'')+r.clip.voiceName+': '+r.clip.seconds.toFixed(1)+' s of generated speech (made by the clone on the '+(r.clip.device==='cuda'?'graphics card':'processor')+' in '+(r.clip.ms/1000).toFixed(1)+' s, not a recording).');}finally{x.disabled=false;}},!status?.ready);
+     say('tvCharVoiceState',(r.clip.fallback?r.clip.fallback.name+' couldn’t be used ('+r.clip.fallback.reason+'), so this is '+r.clip.voiceName+'. ':'')+(r.clip.versionNote?r.clip.versionNote+' ':'')+(r.clip.sharperNote?r.clip.sharperNote+' ':'')+r.clip.voiceName+': '+r.clip.seconds.toFixed(1)+' s of generated speech (made by the clone'+(r.clip.sharper?' and sharpened by voice conversion':'')+' on the '+(r.clip.device==='cuda'?'graphics card':'processor')+' in '+(r.clip.ms/1000).toFixed(1)+' s, not a recording).'+(r.clip.deviceNote?' '+r.clip.deviceNote:''));}finally{x.disabled=false;}},!status?.ready);
    row.append(a,b,c);box.append(row);
   }
  }
@@ -187,6 +217,7 @@
  twice('tvRemove',()=>removeConfirm('remove',{},'Theme voices removed. Your settings, recordings and saved clips are kept.'),'This removes the voice engine and models (your settings, recordings and saved clips stay).');
  twice('tvRemoveQuality',()=>removeConfirm('remove-model',{model:'quality'},'The Quality model was removed.'),'Remove the Quality model?');
  twice('tvCharRemove',async()=>{say('tvCharVoiceState','Removing…');try{await tv('characters-remove');say('tvCharVoiceState','The imported copies were removed. The built-in recordings and your picks stay.');}catch(e){say('tvCharVoiceState',e.message);}await load();},'This removes only the recordings you imported. The built-in ones stay, and so do your picks.','tvCharVoiceState');
+ twice('tvConvRemove',async()=>{say('tvConvState','Removing…');try{await tv('conversion-remove');say('tvCharVoiceState','Voice conversion was removed. Your switches stay; those characters use their normal voice until you download it again.');}catch(e){say('tvConvState',e.message);}await load();},'This removes only voice conversion. Your switches and everything else stay.','tvConvState');
  twice('tvRemoveLight',()=>removeConfirm('remove-model',{model:'light'},'The Lightweight model was removed.'),'Remove the Lightweight model?');
  $('tvUnload').onclick=async()=>{await tv('unload');say('tvVoiceState','The voice engine is closed; its memory is free.');await load();};
  $('tvClearCache').onclick=async()=>{await tv('clear-cache');say('tvVoiceState','Cached clips cleared.');};
@@ -199,6 +230,12 @@
    say('tvProgressText',(e.label||'')+(e.totalBytes&&e.phase==='download'?' · '+gb(e.bytes||0)+' of '+gb(e.totalBytes):'')+(e.total&&e.phase!=='download'?' · '+(e.done||0)+'/'+e.total:''));
    if(e.phase==='done'){installing=false;failed=false;plans={};$('tvProgress').style.width='100%';say('tvInstallState','Theme voices are ready.'+(e.check?' Voice check: '+e.check.seconds+' s of speech in '+(e.check.ms/1000).toFixed(1)+' s.':''));void load();}
    if(e.phase==='failed'){installing=false;failed=true;plans={};say('tvInstallState',e.label+' Tyler works as before without theme voices; press Retry to carry on (what was downloaded is kept).');void load();}
+  }
+  if(e.kind==='conversion'){
+   const pct=e.totalBytes?Math.min(100,Math.round(100*(e.bytes||0)/e.totalBytes)):null;if(pct!==null)$('tvConvProgress').style.width=pct+'%';
+   if(e.phase==='download'||e.phase==='start'){convBusy=true;$('tvConvProgressWrap').hidden=false;say('tvConvState',(e.label||'Downloading')+(e.totalBytes?' · '+mb(e.bytes||0)+' of '+mb(e.totalBytes):''));}
+   if(e.phase==='done'){convBusy=false;say('tvCharVoiceState','Voice conversion is installed. Switch the sharper voice on in Medic’s, Lash’s or Kelvin’s row.');void load();}
+   if(e.phase==='failed'){convBusy=false;void load().then(()=>say('tvConvState',e.label+' Tyler works as before; press the button to carry on.'));}
   }
   if(e.kind==='characters-import'&&charBusy)say('tvCharVoiceState','Importing and checking the character recordings… '+(e.done||0)+'/'+(e.total||0)+(e.name?' · '+e.name:''));
  });

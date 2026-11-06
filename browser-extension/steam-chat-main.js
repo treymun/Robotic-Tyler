@@ -111,6 +111,8 @@
    try{id=String(call(room,'GetRoomID'));self=get(room,'voice_active_contains_self')===true;const m=get(get(room,'voice_active_member_list'),'member_list');count=Array.isArray(m)?Math.min(m.length,256):0;active=call(room,'BVoiceActive')===true;}catch{}
    return {id,name:clean(get(room,'name'),60)||'Voice',self,count,active,room};}).filter(r=>/^\d{1,20}$/.test(r.id));
   const state=Number.isFinite(e)?e:null,here=list.find(r=>r.active)||null;
+  // v2.44: the room Steam's call is in, for who's talking in voice (voiceSource below).
+  try{const vc=get(get(ctx.chat,'ChatStore'),'VoiceChat');activeVoice=here?{room:new WeakRef(here.room),self:ctx.self,store:vc&&typeof vc==='object'?new WeakRef(vc):null}:null;}catch{}
   let connected=state===10;
   try{const vc=get(get(ctx.chat,'ChatStore'),'VoiceChat');if(ctx.self&&typeof get(vc,'IsAccountFullyConnectedToActiveVoiceChat')==='function')connected=call(vc,'IsAccountFullyConnectedToActiveVoiceChat',ctx.self)===true;}catch{}
   return {groupId:ctx.id,state,connected,activeRoom:here?.id||null,elsewhere:state!==null&&state>0&&!here&&!(at&&String(get(at,'groupID')??'')===ctx.id),rooms:list};
@@ -220,7 +222,34 @@
   const execute=(async()=>{try{await call(ctx.group,'KickUser',target,Math.floor(Date.now()/1000)+3600);return {kicked:true,groupId:ctx.id,targetId:request.targetId,seconds:3600};}finally{if(kickInFlight===request.ballotId)kickInFlight=null;}})();
   executions.set(request.ballotId,execute);while(executions.size>50)executions.delete(executions.keys().next().value);return execute;
  }
- globalThis.TylerSteamChatAdapter={handle};
+ // v2.44: who's talking in voice, for voice-listener.js (both MAIN world; only while "Tell the AI who's
+ // speaking in voice" is on). The voice room Steam's call is in (the active voice channel on screen, else the
+ // one voiceCall() last saw), its members with Steam's own names, the objects that may say who is talking,
+ // and the voice list on screen. TylerVoiceSpeakers.SteamReader does the reading; it only reads.
+ let activeVoice=null,speakerReader=null,roomSeen=null;
+ function voiceSource(){
+  let room=null,self=null;const now=Date.now();
+  // Looked at about every 100 ms while someone talks: the room found is kept for 2 s (its members are read every time).
+  if(roomSeen&&now-roomSeen.at<2000){room=roomSeen.room.deref?.()||null;self=roomSeen.self;}
+  if(!room){
+   try{const channels=[...document.querySelectorAll('.chatRoomVoiceChannel.ActiveVoiceChannel')].filter(n=>n.isConnected&&n.getClientRects?.().length);if(channels.length===1){const a=context(channels[0],true);room=a.chat;self=a.self;}}catch{}
+   if(!room&&activeVoice){room=activeVoice.room?.deref?.()||null;self=activeVoice.self;}
+   roomSeen=room?{room:new WeakRef(room),self,at:now}:null;
+  }
+  if(!room)return null;
+  const store=get(get(room,'ChatStore'),'VoiceChat')||activeVoice?.store?.deref?.()||null,list=get(room,'voice_active_member_list'),raw=get(list,'member_list');
+  const members=(Array.isArray(raw)?raw.slice(0,64):[]).map(f=>({accountid:get(f,'accountid'),name:[get(f,'primary_display_name'),get(f,'display_name')].map(s=>clean(s,60)).find(Boolean)||'',obj:f}));
+  let roomId='';try{roomId=String(call(room,'GetRoomID'));}catch{}
+  return {roomId,self,members,holders:[['member list',list],['room',room],['VoiceChat',store],['call state',get(store,'m_VoiceCallState')]],dom:voiceDom};
+ }
+ function voiceDom(){
+  try{const all=[...document.querySelectorAll('.chatRoomVoiceChannel.ActiveVoiceChannel,[class*="voicechat" i],[class*="voicechannel" i],[class*="voicemember" i],[class*="voiceparticipant" i]')].filter(n=>n.isConnected&&n.getClientRects?.().length).slice(0,60);
+   return all.filter(n=>!all.some(o=>o!==n&&o.contains(n))).slice(0,6);}catch{return [];}
+ }
+ const reader=()=>globalThis.TylerVoiceSpeakers?(speakerReader||=new globalThis.TylerVoiceSpeakers.SteamReader()):null;
+ function voiceTalking(){const r=reader();return r?r.sample(voiceSource()):null;}
+ function voiceTalkingReport(){const r=reader();if(!r)return null;try{return r.report(voiceSource());}catch(e){return {error:String(e?.message||e).slice(0,160)};}}
+ globalThis.TylerSteamChatAdapter={handle,voiceTalking,voiceTalkingReport};
  document.addEventListener('tyler-steam-chat-request',event=>{
   const node=event.target;if(!node||node.nodeType!==1||!node.isConnected)return;let request;
   // v2.34: requests stay small (12,000 characters), except a chat picture for Steam's uploader (up to

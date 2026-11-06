@@ -71,6 +71,6 @@ async function runLocal(request,local){
  if(!local)return {ok:false,...info,error:LOCAL_CHROME_ERROR};
  const st=await local.status().catch(()=>null);if(st?.label)Object.assign(info,{model:st.label,id:st.model});
  const {messages,cap}=messagesFor(request,st);const started=Date.now();
- try{const r=await local.chat({messages,max_tokens:cap,stream:false});return {ok:true,...info,text:String(r.text||'').trim(),ms:Date.now()-started,servedBy:'this PC'+(r.device==='gpu'?' (graphics card)':r.device==='cpu'?' (processor)':'')};}
+ try{const r=await local.chat({messages,max_tokens:cap,stream:false});return {ok:true,...info,text:String(r.text||'').trim(),ms:Date.now()-started,servedBy:'this PC'+(r.device==='gpu'?' (graphics card)':r.device==='split'?' (graphics card and processor)':r.device==='cpu'?' (processor)':'')};}
  catch(error){return {ok:false,...info,ms:Date.now()-started,error:String(error?.message||error).slice(0,300)};}
 }

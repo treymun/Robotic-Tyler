@@ -2868,5 +2868,47 @@
     }
    ]
   }
+ },
+ "components": {
+  "knnvc": {
+   "label": "Voice conversion for sharper character voices (kNN-VC)",
+   "about": "kNN-VC (Baas, Kamper and Shall, 2023): WavLM-Large features of a take, each frame replaced by the mean of its 4 nearest neighbours among the character’s own recordings, vocoded by a HiFi-GAN trained on prematched features. No training; the code is in the app (worker/knnvc_*.py), only these weights are downloaded.",
+   "repo": "bshall/knn-vc",
+   "release": "v0.1",
+   "revision": "cfba7e0808fcf3df1fe9ed2ff10e2031b25d9954",
+   "page": "https://github.com/bshall/knn-vc/releases/tag/v0.1",
+   "license": "MIT (the kNN-VC code and its HiFi-GAN vocoder); the WavLM-Large weights: see licenses",
+   "licenses": {
+    "WavLM-Large.pt": "Microsoft’s WavLM-Large, re-hosted by kNN-VC. Its model card (huggingface.co/microsoft/wavlm-large) gives the licence as the UniSpeech repository’s LICENSE, which a mirror shows as Creative Commons Attribution-ShareAlike 3.0 Unported (not MIT; checked 2026-11-06, GitHub itself couldn’t be read from the build machine). The WavLM code is MIT.",
+    "prematch_g_02500000.pt": "MIT (bshall/knn-vc: the HiFi-GAN vocoder its authors trained on prematched WavLM layer-6 features)"
+   },
+   "settings": {
+    "k": 4,
+    "layer": 6,
+    "vocoder": "prematched",
+    "sampleRate": 16000,
+    "vad": 7
+   },
+   "memory": {
+    "ram": 1800000000,
+    "note": "about 1.7 GB more memory while it is loaded: measured +1.7 GB in the voice worker after its first conversion (WavLM-Large memory-mapped from its checkpoint, the vocoder and working memory), on a 2-core Linux PC"
+   },
+   "files": [
+    {
+     "kind": "component",
+     "path": "WavLM-Large.pt",
+     "url": "https://github.com/bshall/knn-vc/releases/download/v0.1/WavLM-Large.pt",
+     "size": 1261965425,
+     "sha256": "6fb4b3c3e6aa567f0a997b30855859cb81528ee8078802af439f7b2da0bf100f"
+    },
+    {
+     "kind": "component",
+     "path": "prematch_g_02500000.pt",
+     "url": "https://github.com/bshall/knn-vc/releases/download/v0.1/prematch_g_02500000.pt",
+     "size": 66214643,
+     "sha256": "f924c7632c6eaf99004386d62293e124419e33582573552a6ae976eb88ed2dd5"
+    }
+   ]
+  }
  }
 }

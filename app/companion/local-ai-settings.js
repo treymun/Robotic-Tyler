@@ -3,6 +3,8 @@
 // Everything heavy happens in the desktop app's main process (app/local-ai); this page only shows it.
 // (v2.39: hearing and voice in the same section are local-speech-settings.js. The section shows when
 // either part is in use: this file sets data-text-relevant, that one data-speech-relevant.)
+// (v2.44: Runs on → Split between the graphics card and the processor; its hint shows where the
+// layers went at the last start, from the main process's own note.)
 (() => {
  'use strict';
  const root=document.getElementById('localAI'),la=window.tylerSettings?.localAI;if(!root||!la)return;
@@ -37,7 +39,7 @@
  }
  function checkText(c){
   if(!c)return '';if(!c.ok)return 'Last speed check failed: '+c.error;
-  return 'Speed check ('+new Date(c.at).toLocaleString()+'): '+c.label+' on '+(c.device==='gpu'?(c.gpu||'the graphics card'):'the processor')+(c.startMs?' · loaded in '+(c.startMs/1000).toFixed(1)+' s':'')+' · first word after '+(c.firstTokenMs/1000).toFixed(2)+' s · '+(c.tokensPerSecond??'?')+' tokens a second'+(c.promptTokensPerSecond?' (reading: '+c.promptTokensPerSecond+' a second)':'')+'.';
+  return 'Speed check ('+new Date(c.at).toLocaleString()+'): '+c.label+' on '+(c.device==='split'?(c.gpu||'the graphics card')+' and the processor'+(c.split?' ('+c.split.layers+' of '+c.split.of+' layers on the card)':''):c.device==='gpu'?(c.gpu||'the graphics card'):'the processor')+(c.startMs?' · loaded in '+(c.startMs/1000).toFixed(1)+' s':'')+' · first word after '+(c.firstTokenMs/1000).toFixed(2)+' s · '+(c.tokensPerSecond??'?')+' tokens a second'+(c.promptTokensPerSecond?' (reading: '+c.promptTokensPerSecond+' a second)':'')+'.';
  }
  async function stateText(){
   const s=status;if(!s)return '…';
@@ -47,8 +49,13 @@
   if(!s.installed)return 'Not installed. '+plan;
   const have=Object.entries(s.models||{}).filter(([,v])=>v).map(([k])=>label(k)).join(', ')||'no model';
   if(!s.models?.[chosen()])return 'Installed: the engine (llama.cpp '+s.build+') and '+have+'. '+label(chosen())+' isn’t installed yet: press Install to add it. '+plan;
-  const run=s.loaded?' Running now on '+(s.loaded.device==='gpu'?(s.loaded.gpu?.name||'the graphics card'):'the processor')+'.':' Not running: it starts with the first reply.';
+  const run=s.loaded?(s.loaded.note?' Running now. '+s.loaded.note:' Running now on '+(s.loaded.device==='gpu'?(s.loaded.gpu?.name||'the graphics card'):'the processor')+'.'):' Not running: it starts with the first reply.';
   return 'Ready: '+label(chosen())+' with llama.cpp '+s.build+(have!==label(chosen())?' (installed: '+have+')':'')+'.'+run+(s.lastError?' Last problem: '+s.lastError.message:'');
+ }
+ // v2.44 split: what it does, then where the layers went at the last start (or now).
+ function splitNote(s){
+  const last=s.loaded?.note?'Now: '+s.loaded.note:s.placement?.note&&s.placement.model===s.model?'Last start ('+new Date(s.placement.at).toLocaleTimeString()+'): '+s.placement.note:'';
+  return 'As many layers as fit go on the card, the rest on the processor: slower than the whole model on the card, faster than the processor alone. Room is kept for a theme voice on the card, plus a margin. Decided at each start; if no layer fits, it runs on the processor and says so.'+(last?' '+last:'');
  }
  function render(){
   const s=status;if(!s)return;
@@ -57,10 +64,10 @@
   if(!root.contains(document.activeElement)||document.activeElement.name!=='laModel')for(const r of radios())r.checked=r.value===s.model;
   for(const tag of root.querySelectorAll('.la-text .la-tag[data-for]')){const k=tag.dataset.for,inst=!!s.models?.[k],sug=rec?.model===k;tag.textContent=inst?'Installed':sug?'Suggested':'';tag.dataset.kind=inst?'installed':sug?'suggested':'';}
   $('laModelNote').textContent=(rec?'Suggested for this PC: '+label(rec.model)+' on '+where(rec.device)+'. ':'')+(s.modelChosen?'Your choice: '+label(s.model)+'.':'Nothing chosen yet: the suggestion is selected.')+' Nothing installs or switches by itself.';
-  if(document.activeElement!==$('laDevice'))$('laDevice').value=s.settings.device==='cpu'?'cpu':'auto';
+  if(document.activeElement!==$('laDevice'))$('laDevice').value=['split','cpu'].includes(s.settings.device)?s.settings.device:'auto';
   if(document.activeElement!==$('laIdle'))$('laIdle').value=String(s.settings.idleMinutes??10);
   const noCard=rec&&rec.device==='cpu'&&$('laDevice').value==='auto';
-  say('laDeviceNote',$('laDevice').value==='cpu'?'The processor only: slower, and the graphics card stays free for games.':noCard?'No graphics card Vulkan can use was found, so it runs on the processor.':'Any recent NVIDIA, AMD or Intel card (through Vulkan): the whole model goes on the card. If it doesn’t fit while you play, Tyler says so instead of moving it.');
+  say('laDeviceNote',$('laDevice').value==='split'?splitNote(s):$('laDevice').value==='cpu'?'The processor only: slower, and the graphics card stays free for games.':noCard?'No graphics card Vulkan can use was found, so it runs on the processor.':'Any recent NVIDIA, AMD or Intel card (through Vulkan): the whole model goes on the card. If it doesn’t fit while you play, Tyler says so instead of moving it.');
   const ready=!!s.models?.[chosen()]&&s.installed;
   $('laInstall').textContent=failed?'Retry':!s.installed?'Install '+label(chosen()):ready?'Installed':'Install '+label(chosen());
   $('laInstall').disabled=installing||ready||!s.supported;$('laOffline').disabled=installing||!s.supported;$('laCancel').hidden=!installing;

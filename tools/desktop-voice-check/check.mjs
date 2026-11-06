@@ -7,7 +7,7 @@
 // exactly the app's YouTube window (its sound reaches Tyler's audio bridge), also when Start Music
 // DJ asks for the share in the same click that opens the window; Tyler still hears the call when the
 // window's sound is muted (Settings → Mute the call in this window); and screen awareness
-// gets a picture only, of what the picker chose.
+// gets a picture only, of what the picker chose; and (v2.44) who's speaking in voice is bundled into the page.
 import fs from 'node:fs';import path from 'node:path';import os from 'node:os';import {spawnSync} from 'node:child_process';import {createRequire} from 'node:module';import {fileURLToPath} from 'node:url';
 const HERE=path.dirname(fileURLToPath(import.meta.url)),ROOT=path.resolve(HERE,'..','..');
 let ELECTRON=process.env.ELECTRON;if(!ELECTRON){try{ELECTRON=createRequire(path.join(ROOT,'package.json'))('electron');}catch{}}
@@ -36,5 +36,6 @@ if(res.remote?.paired!==200||res.remote?.state!==200||!res.remote?.ready||!res.r
 if(res.remoteGesture?.withGesture!=='ok')bad.push('phone remote: Start Music DJ share after the app\'s gesture: '+JSON.stringify(res.remoteGesture));
 if(!res.remote?.live?.snap||!res.remote?.live?.events?.includes('state:paused')||res.remote?.live?.timeout)bad.push('phone remote live events: '+JSON.stringify(res.remote?.live));
 if(res.dock?.dock!=='side'||res.dock.window-res.dock.body<340)bad.push('the panel did not dock beside the chat: '+JSON.stringify(res.dock));
+if(res.speakers?.core!=='function'||res.speakers?.reader!=='function'||res.speakers?.room!==false)bad.push('who is speaking in voice (v2.44) is not in the Steam window\'s page, or its listener didn\'t answer: '+JSON.stringify(res.speakers));
 if(bad.length){console.error('FAILED:\n'+bad.join('\n'));process.exit(1);}
 console.log('PASS (mock Steam page in Electron)');

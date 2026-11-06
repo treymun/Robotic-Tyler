@@ -19,6 +19,16 @@
 # v2.41: a character voice's reference is a list of original clips (ref_audio: [paths]), joined here
 # 0.3 s apart (as the built-in references were made); its fingerprint is the SHA-256 of every clip in
 # order. gain_db sets a voice's level a few dB above or below the usual one.
+#
+# v2.44: an optional "sharper voice" for a few characters. When a speak request carries "convert", the take is run
+# through kNN-VC (Baas, Kamper & Shall 2023) after Qwen3-TTS: its WavLM-Large layer-6 features are each replaced by
+# the mean of their k nearest neighbours among the character's own recordings ("match"), then vocoded by the
+# prematched HiFi-GAN, at 16 kHz, and resampled back to 24 kHz. The code is vendored (knnvc_wavlm.py,
+# knnvc_hifigan.py, MIT); the two checkpoints are the app's verified download and are loaded with
+# torch.load(weights_only=True). WavLM loads on first use, on the device the voice model uses, and goes with
+# "unload" (the app's idle timer closes the worker). The matching set's features are cached as safetensors, keyed
+# by the WavLM checkpoint's SHA-256 and every clip's SHA-256. Cancel stops it between steps, like generation.
+# If the conversion itself fails, the normal take is kept and the reply says why (convert_error).
 import sys, os, json, threading, queue, time, hashlib, re, gc, traceback, math
 # Diagnosing a hang: TYLER_WORKER_TRACE=<seconds> writes every thread's stack to stderr every <seconds>.
 if os.environ.get("TYLER_WORKER_TRACE", "").isdigit():
@@ -41,7 +51,7 @@ def send(obj):
         proto.write(json.dumps(obj, ensure_ascii=False) + "\n"); proto.flush()
 
 class Failure(Exception):
-    def __init__(self, code, message): super().__init__(message); self.code = code
+    def __init__(self, code, message, info=None): super().__init__(message); self.code = code; self.info = info
 
 # ── requests are read on their own thread, so "cancel" works while a voice is being made ──
 requests = queue.Queue(); cancelled = set(); current = {"id": None}
@@ -111,8 +121,8 @@ def hello(req):
 
 def unload(req=None):
     global model, model_info, fast
-    had = model is not None
-    model = None; fast = None; model_info = {}; prompts.clear(); gc.collect()
+    had = model is not None or bool(knn)
+    model = None; fast = None; model_info = {}; prompts.clear(); knn_unload(); gc.collect()
     if torch is not None and torch.cuda.is_available(): torch.cuda.empty_cache()
     return {"unloaded": had}
 
@@ -125,6 +135,12 @@ def load(req):
     from qwen_tts import Qwen3TTSModel
     device = want["device"]
     if device == "cuda" and not torch.cuda.is_available(): raise Failure("no_gpu", "The graphics card isn't available to the voice engine.")
+    # v2.44: with "Graphics card, or the processor when the card is full", the app asks how much must be free first;
+    # too little and nothing is loaded here (the app then loads the same model on the processor and says so).
+    need = int(req.get("min_free_vram") or 0)
+    if device == "cuda" and need:
+        free, total = torch.cuda.mem_get_info(0)
+        if free < need: raise Failure("low_vram", "Not enough free graphics memory for the voice model.", {"free": int(free), "total": int(total), "need": need})
     dtype = want["dtype"]
     if dtype == "auto": dtype = "bf16" if device == "cuda" and torch.cuda.is_bf16_supported() else ("fp16" if device == "cuda" else "fp32")
     tdtype = {"bf16": torch.bfloat16, "fp16": torch.float16, "fp32": torch.float32}[dtype]
@@ -280,7 +296,7 @@ def speak(req):
     if not text: raise Failure("empty", "There's nothing to say.")
     item, _ = prompt_for(req)
     language = req.get("language") or "English"; seed = int(req.get("seed") or 1)
-    pieces = chunks(text); sr_out = 24000; audio = []; t0 = time.time(); retries = 0
+    pieces = chunks(text); sr_out = 24000; audio = []; t0 = time.time(); retries = 0; converted = {}
     step.job, step.chunks = job, len(pieces)
     try:
         for i, piece in enumerate(pieces):
@@ -307,6 +323,15 @@ def speak(req):
                 if 0.4 * exp <= dur <= 2.2 * exp: break
                 retries += 1
             audio.append(best[1])
+        # v2.44: the "sharper voice". Stopping ends it like generation; any other failure keeps the normal take.
+        if req.get("convert"):
+            try: audio, converted = convert_pieces(audio, sr_out, req["convert"], job)
+            except Failure as f:
+                if f.code == "cancelled": raise
+                converted = {"convert_error": str(f)[:300]}
+            except (MemoryError, Exception) as e:
+                if isinstance(e, MemoryError) or "out of memory" in str(e).lower(): knn_unload()
+                converted = {"convert_error": (type(e).__name__ + ": " + str(e))[:300]}
     finally:
         step.job = None; cancelled.discard(job)
     gap = np.zeros(int(sr_out * 0.14), np.float32); joined = []
@@ -315,7 +340,7 @@ def speak(req):
     gain = max(-12.0, min(6.0, float(req.get("gain_db") or 0)))
     dry = level(w, target=-19.0 + gain); out = req["out"]; os.makedirs(os.path.dirname(out), exist_ok=True)
     write(out, dry, sr_out)
-    result = {"out": out, "seconds": round(len(dry) / sr_out, 2), "ms": int((time.time() - t0) * 1000), "chunks": len(pieces), "retries": retries}
+    result = {"out": out, "seconds": round(len(dry) / sr_out, 2), "ms": int((time.time() - t0) * 1000), "chunks": len(pieces), "retries": retries, **converted}
     fx = req.get("effects")
     if fx and req.get("out_fx"):
         write(req["out_fx"], level(effects(dry, sr_out, fx), target=-19.0 + gain), sr_out); result["out_fx"] = req["out_fx"]
@@ -335,6 +360,103 @@ def fast_take(piece, item, language, max_tokens, job):
             if job in cancelled: raise Failure("cancelled", "Stopped.")
     finally: gen.close()
     return [np.concatenate(parts) if parts else np.zeros(1, np.float32)], sr
+
+# ── v2.44: kNN-VC voice conversion (the optional "sharper voice") ────────────────────────────────────────
+knn = {}; match_cache = {}
+# The HiFi-GAN generator's shape (kNN-VC's hifigan/config_v1_wavlm.json; only what the generator reads).
+HIFI = {"resblock": "1", "upsample_rates": [10, 8, 2, 2], "upsample_kernel_sizes": [20, 16, 4, 4], "upsample_initial_channel": 512,
+        "resblock_kernel_sizes": [3, 7, 11], "resblock_dilation_sizes": [[1, 3, 5], [1, 3, 5], [1, 3, 5]], "hubert_dim": 1024, "hifi_dim": 512, "sampling_rate": 16000}
+KNN_SR = 16000
+
+def vendored(name):
+    """One of the app's own vendored modules, loaded from this folder by its exact path (never from anywhere else)."""
+    import importlib.util
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), name + ".py")
+    if not os.path.isfile(path): raise Failure("no_conversion_code", "This voice engine's worker doesn't include voice conversion (" + name + ".py).")
+    sys.dont_write_bytecode = True  # no __pycache__ beside the app's own files
+    spec = importlib.util.spec_from_file_location(name, path); mod = importlib.util.module_from_spec(spec); spec.loader.exec_module(mod)
+    return mod
+
+def knn_unload():
+    knn.clear(); match_cache.clear()
+    if torch is not None and torch.cuda.is_available(): torch.cuda.empty_cache()
+
+def knn_load(cv):
+    device = model_info.get("device") or "cpu"
+    key = (cv["wavlm"], cv["vocoder"], device)
+    if knn.get("key") == key: return
+    knn_unload()
+    for f in (cv["wavlm"], cv["vocoder"]):
+        if not os.path.isfile(f): raise Failure("no_conversion", "A voice conversion file is missing.")
+    W = vendored("knnvc_wavlm"); H = vendored("knnvc_hifigan"); t0 = time.time()
+    # Memory-mapped and assigned in place (not copied): about 1.2 GB less memory than a plain load (measured).
+    ck = torch.load(cv["wavlm"], map_location="cpu", weights_only=True, mmap=True)
+    wavlm = W.WavLM(W.WavLMConfig(ck["cfg"])); wavlm.load_state_dict(ck["model"], assign=True); del ck; gc.collect()
+    wavlm = wavlm.eval().to(device)
+    gen = H.Generator(H.AttrDict(HIFI)); gen.load_state_dict(torch.load(cv["vocoder"], map_location="cpu", weights_only=True)["generator"])
+    gen.eval(); gen.remove_weight_norm(); gen = gen.to(device)
+    knn.update(key=key, wavlm=wavlm, vocoder=gen, device=device, load_ms=int((time.time() - t0) * 1000))
+
+def knn_features(x):
+    """WavLM-Large layer-6 features of a 16 kHz waveform (a 1 x samples tensor)."""
+    with torch.inference_mode():
+        return knn["wavlm"].extract_features(x.to(knn["device"]), output_layer=6, ret_layer_results=False)[0].squeeze(0)
+
+def load16(path):
+    import torchaudio.functional as AF
+    w, sr = sf.read(path, dtype="float32", always_2d=True); x = torch.from_numpy(np.ascontiguousarray(w.mean(axis=1)))[None]
+    return AF.resample(x, sr, KNN_SR) if sr != KNN_SR else x
+
+def matching_set(cv, job):
+    """The features of the character's own recordings, as kNN-VC's get_matching_set makes them (each clip trimmed by VAD at
+    both ends, trigger level 7). Built once, then cached in memory and as safetensors (tensors only)."""
+    paths = cv.get("match")
+    if not isinstance(paths, list) or not paths or len(paths) > 80 or not all(isinstance(p, str) and os.path.isfile(p) for p in paths):
+        raise Failure("no_matching", "One of the recordings the sharper voice matches against is missing.")
+    h = hashlib.sha256(("|".join([cv.get("wavlm_sha256", ""), str(cv.get("layer", 6)), str(cv.get("vad", 7))] + [sha256(p) for p in paths])).encode()).hexdigest()
+    if h in match_cache: return match_cache[h], True
+    meta = {"format": "tyler-knnvc-matching-1", "key": h, "clips": str(len(paths))}; cache = cv.get("cache")
+    if cache and os.path.exists(cache):
+        try:
+            from safetensors import safe_open
+            with safe_open(cache, framework="pt", device="cpu") as f:
+                if (f.metadata() or {}) == meta: feats = f.get_tensor("feats"); match_cache.clear(); match_cache[h] = feats.to(knn["device"]); return match_cache[h], True
+        except Exception: pass
+    import torchaudio.transforms as T
+    vad = T.Vad(sample_rate=KNN_SR, trigger_level=float(cv.get("vad", 7))); parts = []
+    for p in paths:
+        if job in cancelled: raise Failure("cancelled", "Stopped.")
+        x = load16(p); front = vad(x)
+        y = torch.flip(vad(torch.flip(front, (-1,))), (-1,)) if front.shape[-1] >= 0.3 * KNN_SR else front
+        parts.append(knn_features(y if y.shape[-1] >= 0.3 * KNN_SR else x).float().cpu())
+    feats = torch.cat(parts)
+    if cache:
+        from safetensors.torch import save_file
+        os.makedirs(os.path.dirname(cache), exist_ok=True); tmp = cache + ".tmp"; save_file({"feats": feats.contiguous()}, tmp, metadata=meta); os.replace(tmp, cache)
+    match_cache.clear(); match_cache[h] = feats.to(knn["device"])
+    return match_cache[h], False
+
+def convert_pieces(audio, sr, cv, job):
+    """Each piece of the take through kNN-VC: features, the mean of the k nearest (cosine) matching frames, the vocoder."""
+    import torchaudio.functional as AF
+    t0 = time.time(); send({"id": job, "event": "progress", "phase": "convert", "chunk": 0, "chunks": len(audio)})
+    knn_load(cv)
+    if job in cancelled: raise Failure("cancelled", "Stopped.")
+    pool, cached = matching_set(cv, job); k = max(1, min(16, int(cv.get("k") or 4)))
+    norms = torch.norm(pool, p=2, dim=-1); out = []
+    for i, w in enumerate(audio):
+        if job in cancelled: raise Failure("cancelled", "Stopped.")
+        send({"id": job, "event": "progress", "phase": "convert", "chunk": i + 1, "chunks": len(audio)})
+        if len(w) < int(0.1 * sr): out.append(w); continue
+        q = knn_features(AF.resample(torch.from_numpy(np.ascontiguousarray(w))[None], sr, KNN_SR))
+        with torch.inference_mode():
+            # kNN-VC's fast_cosine_dist (matcher.py), then the mean of the k nearest matching frames
+            qn = torch.norm(q, p=2, dim=-1); dot = (-torch.cdist(q[None], pool[None], p=2)[0] ** 2 + qn[:, None] ** 2 + norms[None] ** 2) / 2
+            dists = 1 - dot / (qn[:, None] * norms[None]); best = dists.topk(k=min(k, pool.shape[0]), largest=False, dim=-1)
+            y = knn["vocoder"](pool[best.indices].mean(dim=1)[None]).squeeze().float().cpu()
+        if job in cancelled: raise Failure("cancelled", "Stopped.")
+        out.append(AF.resample(y[None], KNN_SR, sr)[0].numpy().astype(np.float32))
+    return out, {"converted": True, "convert_ms": int((time.time() - t0) * 1000), "convert_load_ms": knn.get("load_ms"), "convert_features": {"frames": int(pool.shape[0]), "cached": cached, "k": k}}
 
 def level(w, target=-19.0, ceiling=-1.0):
     """Same loudness for every voice (about −19 dBFS RMS), peaks kept under −1 dBFS."""
@@ -374,7 +496,7 @@ while True:
     if fn is None: send({"id": rid, "ok": False, "code": "unknown_op", "error": "Unknown request."}); continue
     current["id"] = rid
     try: send({"id": rid, "ok": True, **(fn(req) or {})})
-    except Failure as f: send({"id": rid, "ok": False, "code": f.code, "error": str(f)})
+    except Failure as f: send({"id": rid, "ok": False, "code": f.code, "error": str(f), **({"info": f.info} if f.info else {})})
     except MemoryError: unload(); send({"id": rid, "ok": False, "code": "out_of_memory", "error": "The computer ran out of memory for the voice model."})
     except Exception as e:
         code = "out_of_memory" if "out of memory" in str(e).lower() else "error"

@@ -109,6 +109,9 @@ const lock={format:1,engine:'1',created:new Date().toISOString().slice(0,10),exc
  runtimes:{},models:{}};
 for(const [id,rt] of Object.entries(RUNTIMES))lock.runtimes[id]=await runtime(id,rt);
 for(const [k,m] of Object.entries(MODELS))lock.models[k]=await model(k,m);
+// v2.44: optional components (the kNN-VC weights for sharper character voices) are pinned by hand to one
+// GitHub release's files (their size and SHA-256 were checked when they were added); a rebuild keeps them.
+try{const prev=JSON.parse(fs.readFileSync(out,'utf8'));if(prev.components)lock.components=prev.components;}catch{}
 fs.writeFileSync(out,JSON.stringify(lock,null,1)+'\n');
 const total=files=>files.reduce((n,f)=>n+f.size,0),gb=n=>(n/1024**3).toFixed(2)+' GB';
 for(const [id,r] of Object.entries(lock.runtimes))console.log(id.padEnd(13),r.files.length,'files',gb(total(r.files)));

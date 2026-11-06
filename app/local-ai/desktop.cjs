@@ -10,13 +10,35 @@
 //   - v2.39 (stage 2): hearing and the voice on this PC (speech.cjs). The background gets
 //     globalThis.tylerLocalSpeech: status, hear (a recording in, text out), speak (text in, a WAV
 //     clip out) and release. Settings may also install, remove, run the quick checks and close them.
+//   - v2.44: Runs on → Split keeps room on the card for theme voices. Their settings, install and
+//     whether their engine is loaded are only read here (themeVoiceCard), never changed.
 const path=require('node:path'),fs=require('node:fs');
-const {LocalAI}=require('./service.cjs'),{LOCK}=require('./installer.cjs'),hardware=require('./hardware.cjs');
+const {LocalAI}=require('./service.cjs'),{LOCK}=require('./installer.cjs'),hardware=require('./hardware.cjs'),split=require('./split.cjs');
+
+/**
+ * Room for theme voices on the graphics card, read from their service: installed with the graphics-card
+ * engine (CUDA) and Runs on isn't "Processor only". Their own vramReserve() gives the figure (their mode's
+ * need, plus the sharper voice's while it's on); split.reserveFrom() leaves out a model that's already
+ * loaded on the card. A service without vramReserve() is read the v2.44-draft way (split.voiceReserve).
+ * `getService` returns the theme-voice service or null. Read only: nothing of theirs is changed or started.
+ */
+function themeVoiceCard(getService){
+ return async()=>{
+  const tv=typeof getService==='function'?getService():null;if(!tv?.installer)return null;
+  const tvHardware=require('../theme-voices/hardware.cjs'),{LOCK:TV}=require('../theme-voices/installer.cjs');
+  const modelBytes=Object.fromEntries(Object.entries(TV.models||{}).map(([k,m])=>[k,(m.files||[]).reduce((n,f)=>n+(f.size||0),0)]));
+  if(typeof tv.vramReserve==='function')return split.reserveFrom(await tv.vramReserve(),{needs:tvHardware.NEEDS,modelBytes,loadedMode:tv.loaded?.device==='cuda'?tv.loaded.mode:null});
+  const s=await tv.settings(),inst=tv.installer.status()||{};
+  // v2.44 sharper voice (kNN-VC): it runs on the same device as the voice, so it counts when it's installed and switched on.
+  let conversion=null;try{const c=TV.components?.knnvc,on=Object.values(s.sharper||{}).some(v=>v===true);if(c&&on&&tv.installer.componentStatus?.('knnvc')?.current)conversion={on:true,bytes:Number(c.memory?.vram||c.memory?.ram)||0};}catch{}
+  return split.voiceReserve({installed:!!inst.installed,runtime:inst.runtime,device:s.device,mode:s.mode,models:inst.models||{},loaded:tv.loaded?{mode:tv.loaded.mode,device:tv.loaded.device}:null,conversion},{needs:tvHardware.NEEDS,modelBytes});
+ };
+}
 const {LocalSpeech}=require('./speech.cjs');
 
-function setupLocalAI({root,vault,local,changeListeners,net,shell,log,send,execPath}){
+function setupLocalAI({root,vault,local,changeListeners,net,shell,log,send,execPath,themeVoices=null}){
  const fetch=(url,opts)=>net.fetch(url,{...opts,bypassCustomProtocolHandlers:true});
- const service=new LocalAI({dataDir:path.join(root,'LocalAI'),fetch,
+ const service=new LocalAI({dataDir:path.join(root,'LocalAI'),fetch,cardReserve:themeVoiceCard(themeVoices),
   getSettings:async()=>(await vault.get('localAI')).localAI,setSettings:v=>local.set({localAI:v}),log});
  // The engines' own process runs this file from outside the app archive (it's unpacked next to it).
  const script=path.join(__dirname,'speech-worker.cjs').replace('app.asar'+path.sep,'app.asar.unpacked'+path.sep);
@@ -71,4 +93,4 @@ function setupLocalAI({root,vault,local,changeListeners,net,shell,log,send,execP
  }
  return {service,speech,settingsRequest,shutdown:async()=>{await Promise.all([service.shutdown(),speech.shutdown()]);},kill:()=>{service.killNow();speech.killNow();}};
 }
-module.exports={setupLocalAI};
+module.exports={setupLocalAI,themeVoiceCard};

@@ -360,3 +360,186 @@ test('v2.40: ggml_vulkan\'s "uma" flag is matched by name, not only by number; n
  for(const n of ['Intel(R) Iris(R) Xe Graphics','Intel(R) Arc(TM) Graphics','Intel(R) Arc(TM) 140V GPU (16GB)','AMD Radeon(TM) Graphics','AMD Radeon(TM) 780M Graphics','AMD Radeon 890M Graphics'])assert.equal(hardware.builtIn(n),true,n);
  for(const n of ['NVIDIA GeForce RTX 4070','AMD Radeon RX 7800 XT','Intel(R) Arc(TM) A770 Graphics','Intel(R) Arc(TM) B580 Graphics'])assert.equal(hardware.builtIn(n),false,n);
 });
+
+// ── v2.44: Runs on → "Split between the graphics card and the processor" ─────────────────────────
+// MOCKED like the rest of this file: the layer plan is plain arithmetic on the lock's numbers, and the
+// engine is the fake llama-server (its "card" is a device list in fake-config.json). The real llama.cpp
+// run with these arguments is tools/local-ai/split-real.cjs (docs/LOCAL-AI.md, Split).
+const split=require(path.join(LA,'split.cjs'));
+const {themeVoiceCard}=require(path.join(LA,'desktop.cjs'));
+const TVHW=require(path.join(root,'app','theme-voices','hardware.cjs'));
+const {parseHeader,summary}=require(path.join(root,'tools','local-ai','gguf-layers.cjs'));
+const MiB=1024**2,RTX3060={id:'Vulkan0',name:'NVIDIA GeForce RTX 3060',total:12288,free:11366}; // 12 GB, 0.9 GB used by Windows
+const quality={bytes:TVHW.NEEDS.quality.vram,mode:'quality',label:'Quality',loaded:false,conversion:false},light={bytes:TVHW.NEEDS.light.vram,mode:'light',label:'Lightweight',loaded:false,conversion:false};
+const layersOf=k=>split.layersOf(LOCK.models[k]);
+
+test('v2.44 split: the lock has every model’s layers from its GGUF header (32 layers, the output layer, the cache of the attention layers)',()=>{
+ for(const [k,m] of Object.entries(LOCK.models)){const l=m.layers;
+  assert.equal(l.count,32,k);assert.equal(l.bytes.length,32,k);assert.ok(l.bytes.every(b=>Number.isInteger(b)&&b>50*MiB&&b<150*MiB),k+': each layer 50–150 MB');
+  assert.deepEqual(l.attention,[3,7,11,15,19,23,27,31],k+': Qwen3.5 has attention every 4th layer, linear attention in the others');
+  assert.equal(l.kvBytes,8192*4*(256+256)*2,k+': K and V for 8192 tokens, 4 KV heads of 256, f16');assert.equal(l.stateBytes,4*(3*8192+32*128*128),k+': Gated DeltaNet state, f32');assert.equal(l.ctx,8192);
+  const weights=l.bytes.reduce((a,b)=>a+b,0)+(l.outputTied?0:l.output);assert.ok(weights<m.size&&weights>m.size*0.7,k+': the layers are most of the file');
+  assert.equal(l.outputTied,k.startsWith('4b'),k+': the 4B ties the output layer to the token embeddings, the 9B has its own');
+ }
+ assert.equal(split.units(layersOf('4b')).length,33,'llama.cpp counts the output layer too: 33 for a 32-layer model');assert.equal(split.units(layersOf('9b')).length,33);
+ assert.deepEqual(split.units(layersOf('4b')).slice(0,3).map(u=>u.kind+(u.index??'')),['output','layer31','layer30'],'the order llama.cpp offloads them in');
+ assert.equal(+(split.units(layersOf('9b')).reduce((a,u)=>a+u.bytes,0)/GB).toFixed(2),5.05);assert.equal(+(split.units(layersOf('4b')).reduce((a,u)=>a+u.bytes,0)/GB).toFixed(2),2.84);
+});
+test('v2.44 split: the GGUF header reader finds the layers, the output layer and the attention layers (a small made-up file)',()=>{
+ const parts=[],str=s=>{const b=Buffer.from(s),n=Buffer.alloc(8);n.writeBigUInt64LE(BigInt(b.length));return Buffer.concat([n,b]);},u32=v=>{const b=Buffer.alloc(4);b.writeUInt32LE(v);return b;},u64=v=>{const b=Buffer.alloc(8);b.writeBigUInt64LE(BigInt(v));return b;};
+ const kv=[['general.architecture',8,str('qwen35')],['qwen35.block_count',4,u32(2)],['qwen35.embedding_length',4,u32(64)],['qwen35.attention.head_count',4,u32(4)],['qwen35.attention.head_count_kv',4,u32(2)],['qwen35.attention.key_length',4,u32(16)],['qwen35.attention.value_length',4,u32(16)],
+  ['qwen35.ssm.conv_kernel',4,u32(4)],['qwen35.ssm.inner_size',4,u32(32)],['qwen35.ssm.group_count',4,u32(2)],['qwen35.ssm.state_size',4,u32(8)],['qwen35.ssm.time_step_rank',4,u32(4)],
+  ['tokenizer.ggml.tokens',9,Buffer.concat([u32(8),u64(3),str('a'),str('b'),str('c')])]];
+ const tensors=[['token_embd.weight',1000],['blk.0.attn_qkv.weight',300],['blk.0.ssm_a',16],['blk.1.attn_k.weight',200],['blk.1.attn_q.weight',200],['output_norm.weight',8]];
+ parts.push(Buffer.from('GGUF'),u32(3),u64(tensors.length),u64(kv.length));for(const [k,t,v] of kv)parts.push(str(k),u32(t),v);
+ let off=0;for(const [name,size] of tensors){parts.push(str(name),u32(1),u64(size),u32(0),u64(off));off+=Math.ceil(size/32)*32;}
+ let head=Buffer.concat(parts);const start=Math.ceil(head.length/32)*32,file=Buffer.concat([head,Buffer.alloc(start-head.length),Buffer.alloc(off)]);
+ assert.throws(()=>parseHeader(file.subarray(0,40)),e=>e.code==='short','a header cut short asks for more bytes');
+ const h=parseHeader(file),s=summary(h,file.length,{ctx:100});
+ assert.equal(s.count,2);assert.deepEqual(s.bytes,[320+32,224+224],'each layer’s tensors, by their offsets');assert.equal(s.outside.embed,1024);assert.equal(s.outside.output,0,'tied: no output.weight');
+ assert.deepEqual(s.cache,[0,100*2*(16+16)*2],'only the attention layer keeps a K/V cache');assert.ok(s.state[0]>0&&s.state[1]===0,'only the linear layer keeps a recurrent state');
+});
+test('v2.44 split: the plan on a 12 GB card with theme voices on the card (Quality, Lightweight, none), a game, and nothing that fits',()=>{
+ const free=RTX3060.free*MiB,plan=(k,o)=>split.plan({layers:layersOf(k),...o});
+ // The friend's case: the 9B and a Quality theme voice on one 12 GB card.
+ let p=plan('9b',{free,reserve:quality.bytes});assert.equal(p.of,33);assert.equal(p.layers,18,'18 of 33 on the card');assert.ok(p.bytes<=p.budget&&p.budget===free-quality.bytes-split.MARGIN-split.OVERHEAD);
+ assert.ok(p.bytes+split.units(layersOf('9b'))[18].bytes>p.budget,'as many as fit: one more wouldn’t');
+ assert.equal(plan('4b',{free,reserve:quality.bytes}).all,true,'the 4B fits whole beside a Quality voice');
+ assert.equal(plan('9b',{free,reserve:light.bytes}).all,true,'the 9B fits whole beside a Lightweight voice');
+ assert.equal(plan('9b',{free,reserve:0}).all,true,'no theme voice: the whole 9B');
+ // A game using 7 GB of the card (the free reading at start already leaves it out).
+ assert.equal(plan('9b',{free:free-7*GB}).layers,14);assert.equal(plan('4b',{free:free-7*GB}).layers,29);
+ // Nothing fits: the game and a Lightweight voice, or an 8 GB card with a Quality voice.
+ for(const [k,o] of [['9b',{free:free-7*GB,reserve:light.bytes}],['4b',{free:free-7*GB,reserve:light.bytes}],['4b',{free:7.4*GB,reserve:quality.bytes}],['4b',{free:0}]]){const q=plan(k,o);assert.equal(q.layers,0);assert.equal(q.none,true);assert.equal(q.bytes,0);}
+ // Fewer layers after a start that didn't fit: about 60%.
+ assert.equal(split.fewer(p,layersOf('9b')).layers,10);assert.equal(split.fewer({...plan('4b',{free}),},layersOf('4b')).layers,19);
+});
+test('v2.44 split: room for theme voices only when they run on the card; their loaded model isn’t counted twice; the sharper voice adds its share',()=>{
+ const needs=TVHW.NEEDS,modelBytes={quality:4.23*GB,light:2.34*GB},base={installed:true,runtime:'windows-cuda',device:'auto',mode:'quality',models:{quality:true,light:false},loaded:null};
+ assert.equal(split.voiceReserve(base,{needs,modelBytes}).bytes,6.5*GB);
+ assert.equal(split.voiceReserve({...base,runtime:'windows-cuda-fast',mode:'light'},{needs,modelBytes}).bytes,4*GB,'the fast engine runs on the card too');
+ assert.equal(split.voiceReserve({...base,mode:null},{needs,modelBytes}).mode,'quality','no mode chosen: the larger installed one');
+ assert.equal(split.voiceReserve({...base,mode:null,models:{light:true}},{needs,modelBytes}).mode,'light');
+ for(const off of [{installed:false},{runtime:'windows-cpu'},{runtime:'windows-cpu-fast'},{device:'cpu'}])assert.equal(split.voiceReserve({...base,...off},{needs,modelBytes}),null,JSON.stringify(off)+': no room needed on the card');
+ assert.equal(split.voiceReserve(null,{needs}),null);
+ const loaded=split.voiceReserve({...base,loaded:{mode:'quality',device:'cuda'}},{needs,modelBytes});assert.equal(loaded.loaded,true);assert.equal(loaded.bytes,6.5*GB-4.23*GB,'already on the card: only what it adds while speaking');
+ assert.equal(split.voiceReserve({...base,loaded:{mode:'light',device:'cuda'}},{needs,modelBytes}).bytes,6.5*GB,'another mode loaded: the chosen mode’s whole need');
+ assert.equal(split.voiceReserve({...base,loaded:{mode:'quality',device:'cpu'}},{needs,modelBytes}).bytes,6.5*GB);
+ const conv=split.voiceReserve({...base,conversion:{on:true,bytes:1.8e9}},{needs,modelBytes});assert.equal(conv.bytes,6.5*GB+1.8e9);assert.equal(conv.conversion,true);
+});
+test('v2.44 split: the room for theme voices is their own vramReserve() figure; a model already loaded on the card isn’t kept twice; nothing of theirs changes',async()=>{
+ const {LOCK:TV}=require(path.join(root,'app','theme-voices','installer.cjs')),q=TV.models.quality.files.reduce((n,f)=>n+f.size,0),calls=[];
+ const svc={vramReserve:async()=>{calls.push('vramReserve');return {bytes:TVHW.NEEDS.quality.vram+1.3*GB,mode:'quality',device:'auto',onCard:false,fallback:null};},loaded:null,installer:{status:()=>{throw Error('not needed');}},settings:async()=>{throw Error('not needed');}};
+ const read=themeVoiceCard(()=>Object.freeze({...svc})); // a frozen copy: only read
+ let r=await read();assert.deepEqual(calls,['vramReserve']);assert.deepEqual(r,{bytes:TVHW.NEEDS.quality.vram+1.3*GB,mode:'quality',label:'Quality',loaded:false,conversion:true});
+ svc.loaded={mode:'quality',device:'cuda'};svc.vramReserve=async()=>({bytes:TVHW.NEEDS.quality.vram,mode:'quality',device:'auto',onCard:true});
+ r=await read();assert.equal(r.loaded,true);assert.equal(r.bytes,TVHW.NEEDS.quality.vram-q,'loaded on the card: only what it adds while speaking');
+ svc.loaded={mode:'light',device:'cuda'};r=await read();assert.equal(r.bytes,TVHW.NEEDS.quality.vram,'the other mode loaded: the chosen mode’s whole need');
+ svc.vramReserve=async()=>({bytes:0,mode:'quality',device:'cpu',onCard:false});assert.equal(await read(),null,'Processor only: nothing kept on the card');
+ svc.vramReserve=async()=>({bytes:TVHW.NEEDS.light.vram,mode:null,device:'auto',onCard:false});assert.equal((await read()).mode,'quality','no mode chosen: their figure, labelled with their default');
+});
+test('v2.44 split: a theme-voice service without vramReserve() is read from its settings, install and loaded model, never changed',async()=>{
+ const calls=[],svc={settings:async()=>{calls.push('settings');return {mode:'quality',device:'auto',sharper:{'tf2/medic':true}};},loaded:{mode:'quality',device:'cuda'},
+  installer:{status:()=>{calls.push('status');return {installed:true,current:true,runtime:'windows-cuda',models:{quality:true,light:true}};},componentStatus:k=>{calls.push('component:'+k);return {current:true};}}};
+ const read=themeVoiceCard(()=>Object.freeze(svc));const r=await read();
+ assert.deepEqual(calls,['settings','status','component:knnvc'],'only reads');
+ const {LOCK:TV}=require(path.join(root,'app','theme-voices','installer.cjs')),q=TV.models.quality.files.reduce((n,f)=>n+f.size,0);
+ assert.equal(r.mode,'quality');assert.equal(r.loaded,true);assert.equal(r.conversion,!!TV.components?.knnvc);
+ assert.equal(r.bytes,TVHW.NEEDS.quality.vram-q+(TV.components?.knnvc?Number(TV.components.knnvc.memory?.vram||TV.components.knnvc.memory?.ram):0));
+ assert.equal(await themeVoiceCard(()=>null)(),null,'theme voices unavailable: nothing kept');
+ svc.installer.status=()=>({installed:true,runtime:'windows-cpu',models:{light:true}});assert.equal(await read(),null,'processor engine: nothing kept on the card');
+});
+test('v2.44 split: the note says how many layers are on which card, or that it runs on the processor, and why',()=>{
+ const l=layersOf('9b'),card=RTX3060.name;
+ assert.equal(split.note({p:split.plan({layers:l,free:RTX3060.free*MiB,reserve:quality.bytes}),card,reserve:quality}),'Split: 18 of 33 layers on NVIDIA GeForce RTX 3060, the rest on the processor (slower than all on the card). Room is kept on the card for the theme voice (Quality, 6.5 GB).');
+ assert.equal(split.note({p:split.plan({layers:l,free:RTX3060.free*MiB}),card}),'Split: all 33 layers fit on NVIDIA GeForce RTX 3060, so the whole model runs on the card.');
+ assert.equal(split.note({p:split.plan({layers:l,free:5*GB,reserve:light.bytes}),card,reserve:light}),'Split: no layer fits on NVIDIA GeForce RTX 3060 right now (5.0 GB free, 4.0 GB kept for the theme voice), so it runs on the processor (slower).');
+ assert.equal(split.note({p:split.plan({layers:l,free:0}),noCard:true}),'Split: no graphics card Vulkan can use was found, so it runs on the processor (slower).');
+ assert.match(split.note({p:split.fewer(split.plan({layers:l,free:RTX3060.free*MiB,reserve:quality.bytes}),l),card}),/^Split: 10 of 33 layers on .*\(The first try didn’t fit, so fewer layers\.\)$/);
+ assert.match(split.note({p:split.plan({layers:l,free:RTX3060.free*MiB,reserve:{...quality,loaded:true,bytes:2.27*GB,conversion:true}}),card,reserve:{...quality,loaded:true,bytes:2.27*GB,conversion:true}}),/theme voice \(Quality with the sharper voice, already loaded, 2\.3 GB more\)\.$/);
+});
+test('v2.44: the engine’s command line for each Runs on choice (graphics card, split, processor); split loads the Vulkan backend and keeps --fit off and 8192 tokens',()=>{
+ const make=o=>new LlamaServer({exe:'/x/llama-server',model:'/m.gguf',gpuBackend:'/x/gpu/ggml-vulkan.dll',threads:6,...o});
+ const where=a=>{const i=a.indexOf('--device');return a.slice(i,i+4);};
+ const gpu=make({device:'gpu',gpuId:'Vulkan1'}),sp=make({device:'split',gpuId:'Vulkan1',layers:18}),cpu=make({device:'cpu'}),zero=make({device:'split',gpuId:'Vulkan1',layers:0});
+ assert.deepEqual(where(gpu.args(1234)),['--device','Vulkan1','-ngl','all']);
+ assert.deepEqual(where(sp.args(1234)),['--device','Vulkan1','-ngl','18']);
+ assert.deepEqual(where(cpu.args(1234)),['--device','none','-ngl','0']);assert.deepEqual(where(zero.args(1234)),['--device','none','-ngl','0'],'no layer: no card');
+ for(const s of [gpu,sp,cpu]){const a=s.args(1234);assert.equal(a[a.indexOf('--fit')+1],'off');assert.equal(a[a.indexOf('-c')+1],'8192');assert.equal(a[a.indexOf('--host')+1],'127.0.0.1');assert.ok(a.includes('--no-webui')&&a.includes('--offline'));assert.equal(a.filter(x=>x==='--device').length,1);}
+ for(const [srv,backend] of [[gpu,true],[sp,true],[cpu,false],[zero,false]]){srv.key='k';const env=srv.env();assert.equal(env.GGML_BACKEND_PATH,backend?'/x/gpu/ggml-vulkan.dll':undefined);assert.ok(Object.keys(env).every(k=>k==='LLAMA_API_KEY'||k==='GGML_BACKEND_PATH'||!/^LLAMA_ARG|^GGML_|^HF_/.test(k)));}
+});
+test('v2.44: Runs on is saved as auto, split or cpu; anything else goes back to auto (service and the Settings window’s request)',async()=>{
+ let saved={model:'4b',device:'auto',idleMinutes:10};
+ const svc=new LocalAI({dataDir:tmp(),fetch:globalThis.fetch,getSettings:async()=>saved,setSettings:async v=>{saved=v;},platform:'linux'});
+ for(const [v,want] of [['split','split'],['cpu','cpu'],['auto','auto'],['gpu','auto'],['turbo','auto'],['',"auto"],[null,'auto'],[{x:1},'auto'],['SPLIT','auto']]){await svc.saveSettings({device:v});assert.equal(saved.device,want,JSON.stringify(v));}
+ // The Settings window's request (desktop.cjs) goes through the same check.
+ const store={},app=setupLocalAI({root:tmp(),vault:{get:async k=>({[k]:store[k]})},local:{set:async v=>Object.assign(store,v)},changeListeners:[],net:{fetch:globalThis.fetch},shell:{openPath:async()=>''},log:()=>{},send:()=>{}});
+ try{await app.settingsRequest('settings',{values:{device:'split',extra:'x'}});assert.equal(store.localAI.device,'split');assert.equal(store.localAI.extra,undefined);
+  await app.settingsRequest('settings',{values:{device:'vulkan'}});assert.equal(store.localAI.device,'auto');}
+ finally{delete globalThis.tylerLocalAI;delete globalThis.tylerLocalSpeech;}
+ // The phone can't change it: localAI isn't one of the settings the phone (or the settings store) accepts; its section is PC-only there.
+ const guards=require(path.join(root,'app','guards.cjs'));assert.equal(guards.settingsKeys.has('localAI'),false);assert.equal(guards.phoneWritable.has('localAI'),false);assert.deepEqual(guards.sanitizeSettings({localAI:{device:'split'}}),{});
+ assert.match(fs.readFileSync(path.join(root,'app','remote','phone-settings.js'),'utf8'),/\['#localAI','',/);
+ const html=fs.readFileSync(path.join(root,'browser-extension','settings.html'),'utf8'),sel=/<select id="laDevice">(.*?)<\/select>/.exec(html)[1];
+ assert.deepEqual([...sel.matchAll(/<option value="(\w+)">([^<]+)<\/option>/g)].map(m=>[m[1],m[2]]),[['auto','Graphics card: the whole model'],['split','Split between graphics card and processor'],['cpu','Processor only']]);
+});
+test('v2.44 split on the fake engine: 18 of 33 layers on the card beside a Quality voice, the note at start and in the status; re-decided at the next start',{skip:!unix},async()=>{
+ let reserve=quality,asked=0;const stages=[],logs=[];
+ const t=await setup({settings:{model:'9b',device:'split',idleMinutes:0},install:['9b'],freemem:()=>32*GB,cardReserve:async()=>{asked++;return reserve;},log:(...a)=>logs.push(a.join(' ')),config:{devices:[{id:'Vulkan0',name:'Intel(R) UHD Graphics 770',total:16280,free:15460},{...RTX3060,id:'Vulkan1'}]}});
+ const r=await t.svc.chat({messages:msgs,onStage:x=>stages.push(x)});
+ assert.equal(r.device,'split');assert.equal(r.label,'Qwen3.5 9B','the same model');
+ const start=t.seen().find(e=>e.start),arg=n=>start.argv[start.argv.indexOf(n)+1];
+ assert.equal(arg('--device'),'Vulkan1','the RTX 3060, not the built-in graphics');assert.equal(arg('-ngl'),'18');assert.equal(arg('--fit'),'off');assert.equal(arg('-c'),'8192');
+ assert.equal(start.backend,path.join(t.engine,'gpu','libggml-vulkan.so'),'the Vulkan backend is loaded');assert.ok(!start.envKeys.some(k=>/^LLAMA_ARG|^HF_/.test(k)));assert.equal(start.keyInArgv,false);
+ assert.deepEqual(stages,['Starting the AI on this PC… Split: 18 of 33 layers on NVIDIA GeForce RTX 3060, the rest on the processor (slower than all on the card).'],'said in the Steam window’s status line');
+ const st=await t.svc.status();assert.equal(st.loaded.device,'split');assert.deepEqual([st.loaded.split.layers,st.loaded.split.of],[18,33]);assert.match(st.loaded.note,/^Split: 18 of 33 layers .* Room is kept on the card for the theme voice \(Quality, 6\.5 GB\)\.$/);
+ assert.equal(st.loaded.gpu.name,RTX3060.name);assert.equal(st.placement.note,st.loaded.note);assert.ok(logs.some(l=>l.includes('Split: 18 of 33')),'in the activity log');
+ // The next start (after the idle close) decides again: the voice was switched to Lightweight.
+ reserve=light;await t.svc.close('idle');await t.svc.chat({messages:msgs});
+ assert.equal(t.seen().filter(e=>e.start).at(-1).argv.includes('all'),true,'the whole 9B fits beside a Lightweight voice: -ngl all');assert.equal((await t.svc.status()).loaded.device,'gpu');
+ // A game takes the card's memory: no layer fits, so the processor, with Vulkan not loaded at all, and the note says so.
+ reserve=light;await t.svc.close('idle');t.configure({devices:[{...RTX3060,free:4000}]});const st2=[];
+ const r2=await t.svc.chat({messages:msgs,onStage:x=>st2.push(x)});assert.equal(r2.device,'cpu');assert.equal(r2.label,'Qwen3.5 9B');
+ const last=t.seen().filter(e=>e.start).at(-1);assert.deepEqual(last.argv.slice(last.argv.indexOf('--device'),last.argv.indexOf('--device')+4),['--device','none','-ngl','0']);assert.equal(last.backend,null);
+ assert.match(st2[0],/^Starting the AI on this PC… Split: no layer fits on NVIDIA GeForce RTX 3060 right now \(3\.9 GB free\), so it runs on the processor \(slower\)\.$/);
+ assert.match((await t.svc.status()).loaded.note,/3\.9 GB free, 4\.0 GB kept for the theme voice\), so it runs on the processor/);
+ // A setting change closes it; the model change is re-decided too (the 4B isn't installed: a reason, not another model).
+ assert.equal(asked,3,'the theme voices are read at each start');
+ await t.svc.saveSettings({device:'cpu'});assert.equal(t.svc.server,null,'a different Runs on closes the engine');
+ await t.done();
+});
+test('v2.44 split on the fake engine: a start that doesn’t fit is tried once with fewer layers; a second failure is the reason; no card at all runs on the processor and says so',{skip:!unix},async()=>{
+ const stages=[];
+ const t=await setup({settings:{model:'4b',device:'split',idleMinutes:0},freemem:()=>32*GB,cardReserve:async()=>null,config:{maxLayers:20,devices:[{...RTX3060,free:4500}]}});
+ const r=await t.svc.chat({messages:msgs,onStage:x=>stages.push(x)});assert.equal(r.device,'split');
+ const starts=t.seen().filter(e=>e.start).map(e=>e.argv[e.argv.indexOf('-ngl')+1]);assert.deepEqual(starts,['all','19'],'33 didn’t fit (all), then 19 of 33');
+ assert.equal(stages.length,2);assert.match(stages[1],/^Starting the AI on this PC again… Split: 19 of 33 layers on NVIDIA GeForce RTX 3060, the rest on the processor \(slower than all on the card\)\. \(The first try didn’t fit, so fewer layers\.\)$/);
+ assert.equal((await t.svc.status()).loaded.split.retried,true);
+ // Still too full the second time: the reason, and nothing else is tried.
+ await t.svc.close('idle');t.configure({maxLayers:5,devices:[{...RTX3060,free:4500}]});const before=t.seen().filter(e=>e.start).length;
+ await assert.rejects(t.svc.chat({messages:msgs}),e=>e.code==='out_of_memory'&&/didn’t fit in the graphics card’s and the PC’s free memory, split between them/.test(e.message)&&/Processor only/.test(e.message)&&/didn’t use a cloud AI/.test(e.message));
+ assert.equal(t.seen().filter(e=>e.start).length-before,2,'two tries, no more');
+ // The card used before has gone (a driver problem): the same error as Graphics card, not a quiet move.
+ t.configure({devices:[]});await assert.rejects(t.svc.chat({messages:msgs}),e=>e.code==='no_gpu'&&/Vulkan found none/.test(e.message));
+ await t.done();
+ // A PC where Vulkan never found a card: the processor, with the note.
+ const u=await setup({settings:{model:'4b',device:'split',idleMinutes:0},freemem:()=>32*GB,config:{devices:[]}});stages.length=0;
+ const r3=await u.svc.chat({messages:msgs,onStage:x=>stages.push(x)});assert.equal(r3.device,'cpu');
+ assert.deepEqual(stages,['Starting the AI on this PC… Split: no graphics card Vulkan can use was found, so it runs on the processor (slower).']);
+ assert.match((await u.svc.status()).loaded.note,/no graphics card Vulkan can use/);
+ await u.done();
+});
+test('v2.44: Graphics card (auto) and Processor only work exactly as before: no theme-voice reading, -ngl all or none, the same messages',{skip:!unix},async()=>{
+ let asked=0;const stages=[];
+ const t=await setup({settings:{model:'4b',device:'auto',idleMinutes:0},freemem:()=>32*GB,cardReserve:async()=>{asked++;return quality;},config:{devices:[RTX3060]}});
+ await t.svc.chat({messages:msgs,onStage:x=>stages.push(x)});let a=t.seen().filter(e=>e.start).at(-1).argv;
+ assert.deepEqual(a.slice(a.indexOf('--device'),a.indexOf('--device')+4),['--device','Vulkan0','-ngl','all']);assert.deepEqual(stages,['Starting the AI on this PC…']);
+ const st=await t.svc.status();assert.equal(st.loaded.device,'gpu');assert.equal(st.loaded.split,null);assert.equal(st.loaded.note,null);assert.equal(st.placement,null);
+ // Too full for the whole model: the same message as v2.38, never a split by itself.
+ await t.svc.close('idle');t.configure({devices:[{...RTX3060,free:2500}]});
+ await assert.rejects(t.svc.chat({messages:msgs}),e=>e.code==='out_of_memory'&&/^Qwen3\.5 4B needs about 3\.6 GB of free graphics memory and NVIDIA GeForce RTX 3060 has 2\.4 GB free right now \(a game may be using it\)\. Close it or choose “Processor only” in Settings → On this PC\./.test(e.message));
+ await t.svc.saveSettings({device:'cpu'});stages.length=0;await t.svc.chat({messages:msgs,onStage:x=>stages.push(x)});a=t.seen().filter(e=>e.start).at(-1).argv;
+ assert.deepEqual(a.slice(a.indexOf('--device'),a.indexOf('--device')+4),['--device','none','-ngl','0']);assert.deepEqual(stages,['Starting the AI on this PC…']);
+ assert.equal(asked,0,'the theme voices aren’t even read');
+ await t.done();
+});
