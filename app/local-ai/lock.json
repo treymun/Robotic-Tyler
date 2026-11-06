@@ -90,5 +90,231 @@
    "quant": "Q4_K_M",
    "uncensored": true
   }
+ },
+ "speech": {
+  "created": "2026-11-05",
+  "engine": {
+   "name": "sherpa-onnx (Node.js addon)",
+   "version": "1.13.8",
+   "date": "2026-09-10",
+   "license": "Apache-2.0",
+   "includes": "ONNX Runtime (MIT) and espeak-ng (GPL-3.0, used for words Kokoro has no pronunciation for)",
+   "page": "https://github.com/k2-fsa/sherpa-onnx/releases/tag/v1.13.8",
+   "runtimes": {
+    "windows-x64": {
+     "label": "sherpa-onnx 1.13.8 for Windows x64 (processor)",
+     "dev": false,
+     "kind": "tar.gz",
+     "name": "sherpa-onnx-win-x64-1.13.8.tgz",
+     "url": "https://registry.npmjs.org/sherpa-onnx-win-x64/-/sherpa-onnx-win-x64-1.13.8.tgz",
+     "size": 8894875,
+     "sha256": "fe522f02a5c113c2567a43982107ef41ae517f9a431931e90731e7e4d4341073",
+     "unpacked": 23453246,
+     "strip": "package/",
+     "addon": "sherpa-onnx.node",
+     "needs": [
+      "sherpa-onnx.node",
+      "sherpa-onnx-c-api.dll",
+      "onnxruntime.dll"
+     ]
+    },
+    "linux-x64": {
+     "label": "sherpa-onnx 1.13.8 for Linux x64 (processor; for development and tests)",
+     "dev": true,
+     "kind": "tar.gz",
+     "name": "sherpa-onnx-linux-x64-1.13.8.tgz",
+     "url": "https://registry.npmjs.org/sherpa-onnx-linux-x64/-/sherpa-onnx-linux-x64-1.13.8.tgz",
+     "size": 11089653,
+     "sha256": "13291bcd825da5858ca27a35443e9a2c229a40616c0910086de2db12c5c9312c",
+     "unpacked": 33381117,
+     "strip": "package/",
+     "addon": "sherpa-onnx.node",
+     "needs": [
+      "sherpa-onnx.node",
+      "libsherpa-onnx-c-api.so",
+      "libonnxruntime.so"
+     ]
+    }
+   }
+  },
+  "hearing": {
+   "label": "Parakeet TDT 0.6B v3",
+   "by": "NVIDIA",
+   "base": "nvidia/parakeet-tdt-0.6b-v3",
+   "license": "CC-BY-4.0",
+   "credit": "Parakeet TDT 0.6B v3 by NVIDIA (CC BY 4.0), converted to ONNX (int8) by the sherpa-onnx project",
+   "repo": "csukuangfj/sherpa-onnx-nemo-parakeet-tdt-0.6b-v3-int8",
+   "revision": "2bda32ec70b097a55adaa07d9a7173915b43cc78",
+   "date": "2025-08-16",
+   "quant": "int8",
+   "languages": 25,
+   "files": [
+    {
+     "path": "encoder.int8.onnx",
+     "url": "https://huggingface.co/csukuangfj/sherpa-onnx-nemo-parakeet-tdt-0.6b-v3-int8/resolve/2bda32ec70b097a55adaa07d9a7173915b43cc78/encoder.int8.onnx",
+     "size": 652184281,
+     "sha256": "acfc2b4456377e15d04f0243af540b7fe7c992f8d898d751cf134c3a55fd2247"
+    },
+    {
+     "path": "decoder.int8.onnx",
+     "url": "https://huggingface.co/csukuangfj/sherpa-onnx-nemo-parakeet-tdt-0.6b-v3-int8/resolve/2bda32ec70b097a55adaa07d9a7173915b43cc78/decoder.int8.onnx",
+     "size": 11845275,
+     "sha256": "179e50c43d1a9de79c8a24149a2f9bac6eb5981823f2a2ed88d655b24248db4e"
+    },
+    {
+     "path": "joiner.int8.onnx",
+     "url": "https://huggingface.co/csukuangfj/sherpa-onnx-nemo-parakeet-tdt-0.6b-v3-int8/resolve/2bda32ec70b097a55adaa07d9a7173915b43cc78/joiner.int8.onnx",
+     "size": 6355277,
+     "sha256": "3164c13fc2821009440d20fcb5fdc78bff28b4db2f8d0f0b329101719c0948b3"
+    },
+    {
+     "path": "tokens.txt",
+     "url": "https://huggingface.co/csukuangfj/sherpa-onnx-nemo-parakeet-tdt-0.6b-v3-int8/resolve/2bda32ec70b097a55adaa07d9a7173915b43cc78/tokens.txt",
+     "size": 93939,
+     "sha256": "d58544679ea4bc6ac563d1f545eb7d474bd6cfa467f0a6e2c1dc1c7d37e3c35d"
+    }
+   ]
+  },
+  "voice": {
+   "label": "Kokoro-82M v1.0",
+   "by": "hexgrad",
+   "base": "hexgrad/Kokoro-82M",
+   "license": "Apache-2.0",
+   "credit": "Kokoro-82M v1.0 by hexgrad (Apache-2.0), in the sherpa-onnx project’s ONNX export",
+   "repo": "csukuangfj/kokoro-multi-lang-v1_0",
+   "revision": "f7b96bb6bef5c5da4d3aa4f4e0498fbbf62dc78b",
+   "date": "2026-09-08",
+   "quant": "float32",
+   "files": [
+    {
+     "path": "model.onnx",
+     "url": "https://huggingface.co/csukuangfj/kokoro-multi-lang-v1_0/resolve/f7b96bb6bef5c5da4d3aa4f4e0498fbbf62dc78b/model.onnx",
+     "size": 325560556,
+     "sha256": "b40f62b166ac8164b0627ef48a0b358eda0985e272fb03ef5252e7206305da11"
+    },
+    {
+     "path": "voices.bin",
+     "url": "https://huggingface.co/csukuangfj/kokoro-multi-lang-v1_0/resolve/f7b96bb6bef5c5da4d3aa4f4e0498fbbf62dc78b/voices.bin",
+     "size": 28200960,
+     "sha256": "1c5a5b983d3d50d8586d437a51f3faa2da7919ce76a013c081e65671a3447c29"
+    },
+    {
+     "path": "tokens.txt",
+     "url": "https://huggingface.co/csukuangfj/kokoro-multi-lang-v1_0/resolve/f7b96bb6bef5c5da4d3aa4f4e0498fbbf62dc78b/tokens.txt",
+     "size": 687,
+     "sha256": "6ebb6bb288f20f3ae8d004d3c2ca27697da27c037d75e81a60e2a6a663f95425"
+    },
+    {
+     "path": "lexicon-us-en.txt",
+     "url": "https://huggingface.co/csukuangfj/kokoro-multi-lang-v1_0/resolve/f7b96bb6bef5c5da4d3aa4f4e0498fbbf62dc78b/lexicon-us-en.txt",
+     "size": 5956885,
+     "sha256": "7daaab53a181be9885b853a8582bf1838186317e5dadacbcef9c426d6fa0da14"
+    },
+    {
+     "path": "lexicon-gb-en.txt",
+     "url": "https://huggingface.co/csukuangfj/kokoro-multi-lang-v1_0/resolve/f7b96bb6bef5c5da4d3aa4f4e0498fbbf62dc78b/lexicon-gb-en.txt",
+     "size": 6366635,
+     "sha256": "c4cbb37316f62210dff52718a7afcaae24f50c032cc75ab47ae67b831d1049e7"
+    },
+    {
+     "path": "LICENSE",
+     "url": "https://huggingface.co/csukuangfj/kokoro-multi-lang-v1_0/resolve/f7b96bb6bef5c5da4d3aa4f4e0498fbbf62dc78b/LICENSE",
+     "size": 11358,
+     "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    {
+     "path": "espeak-ng-data/phontab",
+     "url": "https://huggingface.co/csukuangfj/kokoro-multi-lang-v1_0/resolve/f7b96bb6bef5c5da4d3aa4f4e0498fbbf62dc78b/espeak-ng-data/phontab",
+     "size": 55796,
+     "sha256": "886f3fa402cb0ba73d483aa8ad000af47a6b7cc06293c75a97913fba68a530f6"
+    },
+    {
+     "path": "espeak-ng-data/phonindex",
+     "url": "https://huggingface.co/csukuangfj/kokoro-multi-lang-v1_0/resolve/f7b96bb6bef5c5da4d3aa4f4e0498fbbf62dc78b/espeak-ng-data/phonindex",
+     "size": 39074,
+     "sha256": "3ca7b8fa3b42624e4b0f152707e7a39245fce569aa99ea47c055d9e622fcf0c4"
+    },
+    {
+     "path": "espeak-ng-data/phondata",
+     "url": "https://huggingface.co/csukuangfj/kokoro-multi-lang-v1_0/resolve/f7b96bb6bef5c5da4d3aa4f4e0498fbbf62dc78b/espeak-ng-data/phondata",
+     "size": 550424,
+     "sha256": "4e0288957874029a8c3c9f41a8f517ad4bf18127046decbdd4b9d1d6807ce3a3"
+    },
+    {
+     "path": "espeak-ng-data/intonations",
+     "url": "https://huggingface.co/csukuangfj/kokoro-multi-lang-v1_0/resolve/f7b96bb6bef5c5da4d3aa4f4e0498fbbf62dc78b/espeak-ng-data/intonations",
+     "size": 2040,
+     "sha256": "3f8af65fd3eda9759a10f021d61361c120871f463515229c925995c7f90918cc"
+    },
+    {
+     "path": "espeak-ng-data/en_dict",
+     "url": "https://huggingface.co/csukuangfj/kokoro-multi-lang-v1_0/resolve/f7b96bb6bef5c5da4d3aa4f4e0498fbbf62dc78b/espeak-ng-data/en_dict",
+     "size": 166944,
+     "sha256": "71bd330ba8a2e3e8076e631508208ef49449d6147c17b7bd2b4b1e1468292e35"
+    },
+    {
+     "path": "espeak-ng-data/lang/gmw/en",
+     "url": "https://huggingface.co/csukuangfj/kokoro-multi-lang-v1_0/resolve/f7b96bb6bef5c5da4d3aa4f4e0498fbbf62dc78b/espeak-ng-data/lang/gmw/en",
+     "size": 140,
+     "sha256": "4605d5330801de3641c6e366d15f129ea1f5ffbce8722642aba01ace07ab9c83"
+    },
+    {
+     "path": "espeak-ng-data/lang/gmw/en-US",
+     "url": "https://huggingface.co/csukuangfj/kokoro-multi-lang-v1_0/resolve/f7b96bb6bef5c5da4d3aa4f4e0498fbbf62dc78b/espeak-ng-data/lang/gmw/en-US",
+     "size": 257,
+     "sha256": "41534c2a22df5dd4f1052ff9e1a33a3ea7bff5a26b5c02bdad5ba8ddb7524704"
+    },
+    {
+     "path": "espeak-ng-data/lang/gmw/en-GB-x-rp",
+     "url": "https://huggingface.co/csukuangfj/kokoro-multi-lang-v1_0/resolve/f7b96bb6bef5c5da4d3aa4f4e0498fbbf62dc78b/espeak-ng-data/lang/gmw/en-GB-x-rp",
+     "size": 249,
+     "sha256": "d0625af7f58561b1b8cf96fd7f93eee6553bcb3eadb9020ae0757bf96e5115e5"
+    }
+   ],
+   "voices": [
+    {
+     "id": "am_michael",
+     "sid": 16,
+     "label": "Michael",
+     "accent": "us",
+     "about": "American male"
+    },
+    {
+     "id": "am_puck",
+     "sid": 18,
+     "label": "Puck",
+     "accent": "us",
+     "about": "American male, lively"
+    },
+    {
+     "id": "am_fenrir",
+     "sid": 14,
+     "label": "Fenrir",
+     "accent": "us",
+     "about": "American male, deep"
+    },
+    {
+     "id": "bm_george",
+     "sid": 26,
+     "label": "George",
+     "accent": "gb",
+     "about": "British male"
+    },
+    {
+     "id": "af_heart",
+     "sid": 3,
+     "label": "Heart",
+     "accent": "us",
+     "about": "American female"
+    },
+    {
+     "id": "bf_emma",
+     "sid": 21,
+     "label": "Emma",
+     "accent": "gb",
+     "about": "British female"
+    }
+   ]
+  }
  }
 }

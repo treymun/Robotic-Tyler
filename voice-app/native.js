@@ -16,7 +16,7 @@ function render(s){
  info={...info,...s};const live=info.engine==='live',on=info.mode&&info.mode!=='off';
  $('engine-name').textContent=live?'Gemini Live':'Standard voice';
  $('engine-note').textContent=live?'A real-time conversation with Google: Tyler hears the voice chat as people talk, answers quickly and stops when someone talks over him. Google bills for the audio while it runs.':'Tyler waits for a pause, writes a reply with your AI provider and speaks it into Steam. Say “Tyler, stop” to cut him off.';
- const checks=[[info.bridge,'Windows audio helper installed'],[info.keyForEngine,live?'Google AI key saved':'AI key saved'],[info.devicesChosen,'Devices chosen (speaks into / listens to)'],[info.consent,'Everyone in the voice chat knows Tyler is listening']];
+ const checks=[[info.bridge,'Windows audio helper installed'],[info.keyForEngine,live?'Google AI key saved':info.noKeyNeeded?'No key needed (all on this PC)':'AI key saved (or the AI on this PC)'],[info.devicesChosen,'Devices chosen (speaks into / listens to)'],[info.consent,'Everyone in the voice chat knows Tyler is listening']];
  $('checklist').replaceChildren(...checks.map(([ok,text])=>{const li=document.createElement('li');li.dataset.ok=String(!!ok);li.textContent=text;return li;}));
  const ready=checks.every(c=>c[0]);
  $('start').disabled=on||!ready;$('stop').disabled=!on;$('start').querySelector('.lbl').textContent=live?'Start Gemini Live':'Start listening';

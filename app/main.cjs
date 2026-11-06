@@ -167,14 +167,22 @@ if(!app.requestSingleInstanceLock()){app.quit();}else{
    return {audio:Buffer.concat([h,pcm]).toString('base64'),note:'Gemini Live answered'+(first!==null?' · first audio after '+first+' ms (measured on this connection)':'')+(said?': “'+said+'”':'.')};
   }
   const started=Date.now();
-  if(values.aiProvider==='local'&&!speechBy)throw Error('Voice calls with Text AI on this PC still need an OpenRouter or Google key for hearing and for the cloud voice. Save one, or choose a theme voice for speaking.');
+  // v2.39: the voice on this PC (Kokoro): made here, no key.
+  if(values.speechEngine==='kokoro'){const sp=globalThis.tylerLocalSpeech;if(!sp)throw Error('The voice on this PC isn’t available in this copy of Tyler (see Settings → Advanced → activity log).');
+   const r=await sp.speak({text:LINE,voice:typeof values.kokoroVoice==='string'?values.kokoroVoice:'',signal:AbortSignal.timeout(180000)});
+   return {audio:r.audio,note:'Playing Kokoro ('+r.voice.label+') made on this PC · first audio after '+r.firstMs+' ms'+(r.startMs?' (it loaded first, in '+(r.startMs/1000).toFixed(1)+' s)':'')+'.'};}
+  // A theme voice on this PC (the current theme's character voice or the one picked in Theme voices): no key either.
+  if(values.speechEngine==='theme'){const tv=globalThis.tylerThemeVoices;if(!tv)throw Error('Theme voices aren’t available in this copy of Tyler (see Settings → Advanced → activity log).');
+   const r=await tv.speak({text:LINE,theme:null,purpose:'reply',from:'voice',signal:AbortSignal.timeout(600000)});
+   return {audio:r.audio,note:'Playing the theme voice ('+(r.clip?.voiceName||r.clip?.theme||'this PC')+') made on this PC · ready after '+((Date.now()-started)/1000).toFixed(1)+' s.'};}
+  if(values.aiProvider==='local'&&!speechBy)throw Error('The cloud voice needs an OpenRouter or Google key. Save one, or choose Voice on this PC (Kokoro) or a theme voice as the speaking voice.');
   if(speechBy==='gemini'){if(!keys.geminiKey)throw Error('Save a Google AI key first.');const g=await import(pathToFileURL(path.join(__dirname,'companion','gemini.mjs')).href);const r=await g.geminiSpeak(keys.geminiKey,LINE,values.geminiVoice,AbortSignal.timeout(30000),values.geminiTtsModel);return {audio:r.audio,note:'Playing '+r.model+' · ready after '+(Date.now()-started)+' ms.'};}
   if(!keys.openrouterKey)throw Error('Save an OpenRouter key first.');const sp=await import(pathToFileURL(path.join(__dirname,'companion','speech.mjs')).href);const r=await new sp.Speech().generate(LINE,keys.openrouterKey,values.speechVoice,AbortSignal.timeout(30000));return {audio:r.audio,note:'Playing '+r.model+' · ready after '+(Date.now()-started)+' ms.'};
  }
  // The Voice window: start/stop, status, manual listening and typed messages.
  ipcMain.handle('tyler:native',async(event,req)=>{
   if(!voiceWin||event.sender!==voiceWin.webContents||event.senderFrame!==voiceWin.webContents.mainFrame||!isLocal(event.senderFrame.url,voicePath)||!req||typeof req!=='object')throw Error('Unauthorized request');
-  if(req.action==='status'){const s=await vault.get(['voiceEngine','voiceOutputDevice','voiceListenDevice','voiceListenConsent','aiProvider','geminiKey','openrouterKey']);let bridge=true;try{helperPath();}catch{bridge=false;}const {voiceKeyFor}=await import(pathToFileURL(path.join(__dirname,'companion','local-ai.mjs')).href);return {...voice.status(),engine:s.voiceEngine==='live'?'live':'standard',devicesChosen:!!(s.voiceOutputDevice&&s.voiceListenDevice),consent:s.voiceListenConsent===true,keyForEngine:s.voiceEngine==='live'?!!s.geminiKey:!!voiceKeyFor(s).key,bridge,steamOpen:!!steamTab(),version:app.getVersion()};}
+  if(req.action==='status'){const s=await vault.get(['voiceEngine','voiceOutputDevice','voiceListenDevice','voiceListenConsent','aiProvider','geminiKey','openrouterKey','voiceHearing','speechEngine']);let bridge=true;try{helperPath();}catch{bridge=false;}const {voicePlan}=await import(pathToFileURL(path.join(__dirname,'companion','local-ai.mjs')).href);return {...voice.status(),engine:s.voiceEngine==='live'?'live':'standard',devicesChosen:!!(s.voiceOutputDevice&&s.voiceListenDevice),consent:s.voiceListenConsent===true,keyForEngine:s.voiceEngine==='live'?!!s.geminiKey:voicePlan(s).ready,noKeyNeeded:s.voiceEngine!=='live'&&s.aiProvider==='local'&&!voicePlan(s).needsKey,bridge,steamOpen:!!steamTab(),version:app.getVersion()};}
   if(req.action==='start'){await startVoice();return voice.status();}
   if(req.action==='stop'){await voice.stop('Voice stopped by you.');return voice.status();}
   if(req.action==='listen')return voice.listenOnce(req.seconds);

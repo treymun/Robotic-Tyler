@@ -92,7 +92,7 @@ test('voice call: hearing uses the saved OpenRouter key, the reply is local, and
  assert.ok(cloud[0].endsWith('/audio/transcriptions'),'heard with OpenRouter');assert.ok(!cloud.some(u=>u.includes('/chat/completions')||u.includes('generateContent')),'the reply wasn’t a cloud AI');
  assert.ok(cloud.some(u=>u.endsWith('/audio/speech')),'spoken with the cloud voice of that key');assert.equal(asked[0].messages.length>=2,true);
 });
-test('voice call with only a Google key: heard with Google; with no key at all: the clear “local hearing is coming next” error, nothing called',async()=>{
+test('voice call with only a Google key: heard with Google; with no key and Cloud hearing: a clear error naming Hearing → This PC, nothing called',async()=>{
  reset();store.geminiKey='AIza-test';store.speechEngine='theme';
  const r=await new Promise(res=>setTimeout(res,950)).then(()=>ask({type:'voice',audio:wav,format:'wav',seconds:1,automatic:true,requestId:'v2'}));
  assert.equal(r.ok,true,r.error);assert.ok(cloud.every(u=>u.includes('generativelanguage')),'only Google, for hearing: '+cloud);assert.equal(cloud.length,1);
@@ -103,7 +103,7 @@ test('voice call with only a Google key: heard with Google; with no key at all: 
 });
 test('text chat with no key at all works; “say” without a key or theme voice gives the text and a clear note',async()=>{
  reset();const r=await command('ask gg?');assert.equal(r.ok,true,r.error);assert.deepEqual(cloud,[]);
- const s=await command('say nice shot',{speak:true});assert.equal(s.ok,true,s.error);assert.match(s.warning,/writes text only/);assert.deepEqual(cloud,[]);
+ const s=await command('say nice shot',{speak:true});assert.equal(s.ok,true,s.error);assert.match(s.warning,/cloud voice needs an OpenRouter or Google key/);assert.match(s.warning,/Voice on this PC \(Kokoro\)/);assert.deepEqual(cloud,[]);
 });
 test('the spending cap counts paid use only: a local text reply still runs at the cap; a voice turn (cloud hearing) stops',async()=>{
  reset();store.openrouterKey='sk-or-test';store.spendingCapUSD=1;store.usage={reportedCostUSD:2};
