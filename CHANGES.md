@@ -1,3 +1,195 @@
+# ROBOTIC TYLER v2.41.0: The voice update
+
+## New: character voices (desktop app, optional)
+- **Six themes can also speak as one of their characters.** The theme's own voice stays the default, and the character you pick is remembered for each theme.
+  - **Team Fortress 2:** Scout, Soldier, Pyro, Demoman, Heavy, Engineer, Medic, Sniper, Spy (the Administrator stays the default).
+  - **Counter-Strike 2:** the Phoenix and Leet faction voices (a faction's radio voice, not a named agent; the recordings are inherited from CS:GO). SAS stays the default.
+  - **Portal:** Wheatley and Cave Johnson (Portal 2 characters: an association). GLaDOS stays the default.
+  - **Left 4 Dead:** Coach, Ellis and Zoey. Bill stays the default.
+  - **Deadlock:** Abrams, Dynamo, Haze, Infernus, Ivy, Kelvin, Lash, Rem, Seven, Shiv, Venator, Warden and Wraith. Bebop stays the default.
+  - **Garry's Mod:** Alyx Vance (a Half-Life 2 association, like the default Dr. Kleiner).
+- **28 of the 30 can be picked now. Pyro and Medic aren't offered yet** (see the readiness table): Pyro's clone speaks words clearly, which Pyro never does, and Medic's test was unreliable. They show as *not approved*, and picking one keeps the theme's own voice with that reason.
+- **No repeats:** a character that is already a theme's own voice isn't offered again. The pack's Administrator, SAS, GLaDOS, Bill, Bebop, Kleiner and US field-radio folders, and its Garry's Mod G-Man (already the Steam theme's voice), went into the polish pass below instead. No character is in two themes and no recording is used twice: checked by SHA-256 across this pack, the first pack and the built-in voices.
+- **Left out: Day of Defeat's German field-radio bank.** A speaker-model screen found at least two voices in it (the radio lines and the shouted orders). It's also in German, which the local transcriber can't write down. So it isn't a single-speaker reference.
+- **Where the recordings come from:** they aren't in the app, so the installer is no bigger and the game audio isn't passed on. Press **Settings → Voice → Theme voices → Import character voices** and give the character voice pack you have: its folder, or the ZIP itself.
+  - Tyler reads only the 166 clips this version lists (about 12 MB). He checks each one's path, size, FLAC header and SHA-256, then copies it into `ThemeVoices\characters\`.
+  - A clip that doesn't match is skipped with the reason, and its character keeps the theme's own voice.
+  - **Remove imported character voices** deletes the copies. *Remove theme voices* keeps them, like your own recordings.
+- **Picking one:** Settings → Theme voices → **Character voice** (a selector per theme, in every theme's own look), or the phone remote's **Theme voice** card.
+  - **Original recording** plays one of the character's game lines. It's a line that isn't in its reference, and it's never the clone.
+  - **Generated speech** makes new speech with the clone.
+- **In chat:** `!say tf2/scout TEXT` (or `tf2/scout: TEXT`) uses a character for one message. Only an exact *theme/character* pair counts, so an ordinary word is never taken for a voice. `!say TEXT`, `!say portal TEXT` and `!say portal: TEXT` work as before, with the theme's picked character.
+
+## New: Settings from your phone
+- **Settings from your phone** (desktop app). On the phone remote, **Setup → Open Settings** opens Tyler's own Settings page, in your theme, sized for the phone. Change personality, AI provider and model, voice, squad features, chat images, the name tag, the theme and more, and press **Save settings** as on the PC. The theme extras' own *Settings* entries open it too. **‹ Remote** at the top goes back.
+- **Your API keys never reach the phone.** It only shows whether each key is saved ("Saved on your PC" or "Not set"). Keys can't be added, changed or removed from the phone, and the page says so: *API keys are added, changed and removed in Settings on your PC, not from the phone.*
+- **What stays on the PC says so**, with its buttons hidden: pairing and removing phones, installing or removing anything (AI on this PC, theme voices, character voices), Test selected model and Preview a reply (they use your saved key), the voice test and test tone, audio devices, the activity log, and exporting or importing settings files.
+
+## Fixed
+### Who is in the voice call (Auto routing)
+- **Steam's own call data is now the source whenever Steam answers.** Before, Connect & start ignored it and read only the visible voice list. If the bot was already in the call with friends, Start stopped with "Finish Setup: choose your bot in the voice list" or "The selected chat or voice room still needs a hint". Tyler runs as the Steam account signed in here, so Steam's data needs no name and no click. Start now also asks Steam right away instead of waiting for its next 3-second check.
+- **The "Voice room needs one hint" status no longer sticks.** It showed up for a moment, either just after Connect & start (before Steam had been asked) or while Steam was still connecting the bot. Nothing ever cleared it, so it stayed on screen next to "In the call · 4 others". It now appears only when nothing at all can say who is in the call, and it clears itself as soon as Steam's data (or the voice list) answers.
+- **Nothing overrides Steam's count any more.** Before, a "no Steam voice connection" reading from Tyler's audio side could turn friends in voice into text replies. That reading is now used only when Steam's data isn't available.
+- **A failed join no longer leaves the count unknown for two minutes.** After a failed join, Tyler's card keeps showing "Couldn't finish" for up to two minutes, and during that time Auto routing had no count. It now follows Steam itself: once Steam is out of the call, the count is 0 and replies are typed.
+- **Unknown still means wait, and the panel says why.** While Steam is still connecting the bot, Tyler shows "Waiting — Steam is still connecting the voice call". If Steam reports the bot's voice in use outside this group, it says so. Either way Tyler neither listens nor replies until the count is known. Tyler still never listens without the chat notice, and never uses your real microphone.
+- **The Chat tab now says where the count comes from**, on a line under the routing chips, and Setup shows the same line. Examples:
+  - "4 other participants in the call → spoken replies · from Steam's own call data"
+  - "The bot isn't in this group's voice call → text replies · from Steam's own call data"
+  - "… · from Tyler's audio connection"
+  - "… · from the visible voice list"
+  - "Voice occupancy unknown: …", with the reason
+- **New diagnostics.** Checks → Full check (and its Copy report) has a "Who is in the call (Auto routing)" row. Checks → Signal trail adds a line whenever the source or the count changes, for example "Voice occupancy: steam-call · 4 others · in-call · Steam step 10". These lines use fixed wording only: no names and no chat text.
+
+### Replies that open the same way every time, or get stuck on one word
+- **Venice started almost every reply with "Fuck off".** The rest of each reply was new, so repeat protection let it through, and the model ignored the "variety" hint because the opening matched its persona's habit. Now a reply that opens with the same two words as Tyler's last reply, or as two of his last four, counts as a repeat. Tyler asks once for a reply that starts differently. If the second try opens the same way again, the opening is cut when it's a clause of its own ("Fuck off, the eco round still worked out" becomes "The eco round still worked out"). Otherwise the reply is kept as it is: an opening rut never makes Tyler go quiet. Openings made only of everyday words ("i mean", "oh yeah") don't count.
+- **"fuck fuck fuck fuck …" loops are caught.** That means one word 4 or more times in a row, one word making up 30% or more of a longer reply, or the same three-word phrase 4 times. It's caught even in the first reply of a chat, and it's never spoken early. Tyler asks once more, telling the model it got stuck. If the second try is stuck too, runs of one word are cut to two ("yeah yeah yeah yeah yeah" becomes "yeah yeah"). If it's still stuck after that, an automatic reply is skipped (the panel says why), and a reply you asked for is sent with the runs cut.
+- **Venice's repetition penalty is higher** (frequency penalty 0.25 → 0.5), so the model itself reuses words less. Other providers are unchanged.
+- Both checks work for every text AI (OpenRouter, Venice, Gemini and the AI on this PC), with one retry at most, on the same model.
+
+## Polished voices: before and after
+Measured on this project's 2-core test machine without a graphics card, with **Qwen3-TTS 0.6B (Lightweight)** through the app's own voice worker. Each voice said the same four new sentences, which aren't in any reference ("The next session starts in five minutes." and three more), with the same seed and settings, at the same level.
+- **Likeness** is a speaker model's score (ECAPA): how close the new speech is to real recordings of that voice that no reference uses. Higher is closer. It's **not a listening verdict**. Nobody listened to these during the work.
+- **Word accuracy** comes from a local speech recogniser (Whisper small.en) transcribing the new speech.
+- **Time** is seconds of work per second of speech on the processor. Your NVIDIA card is far faster.
+- A candidate replaced a voice only if it passed every rule, set before the scores were seen, on two seeds: at least +0.03 likeness overall, not lower on any group of held-out recordings, higher on at least 3 of 4 sentences, no loss of word accuracy, and no slower.
+
+| Voice (theme) | v2.40 likeness | Candidates (likeness) | Word accuracy | Time, s per s | Result |
+|---|---:|---|---|---|---|
+| The Administrator (tf2) | 0.439 | C1 0.379; C2 0.426 | 1.00 → 1.00 / 1.00 | 12.41 → 12.89 / 9.2 | **Unchanged.** No candidate was closer (−0.060, −0.013). |
+| SAS operator (cs2) | 0.503 | C1 0.464; C2 0.517 | 1.00 → 1.00 / 1.00 | 8.29 → 10.13 / 10.15 | **Unchanged.** +0.014 with the current reference plus 3 new lines: under the +0.03 bar, and lower on the v2.40 sample. |
+| GLaDOS (portal) | 0.797 | C1 0.790; C2 0.777 | 1.00 → 1.00 / 1.00 | 8.27 → 9.28 / 9.42 | **Unchanged.** Both a little less close (−0.007, −0.020). |
+| Bill (l4d) | 0.691 | C1 0.630; C2 0.613 | 1.00 → 1.00 / 1.00 | 7.7 → 7.01 / 9.68 | **Unchanged.** Both less close (−0.061, −0.078). |
+| Bebop (deadlock) | 0.668 | C1 0.503; C2 0.479 | 0.93 → 1.00 / 1.00 | 7.76 → 8.82 / 10.47 | **Unchanged.** Both much less close (−0.165, −0.189). |
+| Dr. Kleiner (gmod) | 0.547 | C1 0.623; C2 0.606 | 1.00 → 1.00 / 1.00 | 8.3 → 8.98 / 9.27 | **Unchanged.** New subset +0.076 (seed 1) and +0.069 (seed 2) on 0.6B, but −0.054 on 1.7B: inconclusive. |
+| G-Man (steam) | 0.589 | Cep2 0.594 | 1.00 → 1.00 | 7.12 → 6.51 | **Unchanged.** Episode Two lines: +0.190 to the Episode Two recording, −0.066 to the Half-Life 2 one. The default stays Half-Life 2; switching editions is the owner's choice. |
+| HEV suit (hev) | 0.591 | C1 0.571; C2 0.513 | 1.00 → 1.00 / 1.00 | 6.61 → 7.27 / 7.62 | **Unchanged.** Both less close (−0.020, −0.078). |
+| Black Mesa VOX (classic) | 0.504 | C1 0.530; C2 0.517 | 1.00 → 1.00 / 1.00 | 6.28 → 10.88 / 7.51 | **Unchanged.** +0.026 and +0.013 (VOX word fragments): under the bar. |
+
+- **Result: no default voice changed.** The v2.35.1 references, which were already chosen this way, stayed ahead. Adding more recordings didn't help either: *duration alone* didn't make a closer clone.
+- **Dr. Kleiner was the near miss.** A subset of his other Half-Life 2 lines was closer on the Lightweight model on both seeds (+0.076, +0.069). It was less close on the Quality model (−0.054, one seed; that check was queued before the second seed was scored). So it's inconclusive, and the v2.40 voice stays. The takes are in the audition folder if you want to decide by ear.
+- **G-Man's new lines are from Episode Two,** a different edition. They're closer to Episode Two's G-Man and less close to Half-Life 2's, which is the Steam default. They were kept apart, never merged, and switching editions is your call.
+- **Not compared:**
+  - *Day of Defeat:* the new US lines are other speakers by the speaker-model screen (−0.05 to 0.34 against the current radio voice), and no unused recording of the radio voice is left to test against.
+  - *Rust:* no source.
+  - *Ricochet:* its one 0.213 s fragment is never used.
+  - *Sam, Mary and Alex:* only the earlier renders and demo.
+  - *CS 1.6, DOOM, Quake, Dreamcast, Minecraft, Xbox 360 and PS3:* the pool holds only the first pack's own files. Not run, for time.
+  - *Pip-Boy, Combine and PAYDAY 2:* not in the pack.
+- **1.7B (Quality) subset,** one seed. Kleiner: v2.40 0.606, candidate 0.552. Scout 0.380 (0.6B: 0.362), Wheatley 0.556 (0.564), Haze 0.520 (0.566). Word accuracy was 1.00 for all of them.
+
+## New characters: readiness
+Likeness as above. *Own real* is how close the character's own reference recordings are to the held-out ones (a ceiling of sorts). *Other voice* is the Steam G-Man's real recording against the same held-out ones (a floor). *Rated* comes from those numbers, not from listening: **ready** reaches at least 60% of the way from the floor to the ceiling with word accuracy of at least 0.9, **weak** at least 30%, and **offered** needs at least 15%. Every character made all four sentences, and every sentence was transcribed correctly (word accuracy 1.00 everywhere). Times are on the processor. The TF2 classes are faster because their references are shorter, and Pyro and Heavy use none of the reference's speech codes.
+
+| Character | Reference | Text | Likeness (own real / other voice) | Word acc. | Time, s per s | Rated | Offered |
+|---|---:|---|---|---:|---:|---|---|
+| tf2/scout | 7.1 s | machine | 0.36 (0.58 / 0.13) | 1.00 | 6.3 | weak | yes |
+| tf2/soldier | 4.6 s | machine | 0.39 (0.67 / 0.15) | 1.00 | 4.93 | weak | yes |
+| tf2/pyro | 6.4 s | none (non-lexical) | 0.17 (0.68 / 0.10) | 1.00 | 3.86 | approximation | **no** |
+| tf2/demoman | 5.0 s | machine | 0.37 (0.67 / 0.24) | 1.00 | 4.72 | weak | yes |
+| tf2/heavy | 7.0 s | none (voice only) | 0.37 (0.52 / 0.16) | 1.00 | 3.96 | weak | yes |
+| tf2/engineer | 6.9 s | machine | 0.43 (0.59 / 0.01) | 1.00 | 5.7 | ready | yes |
+| tf2/medic | 6.1 s | machine | 0.25 (0.34 / 0.25) | 1.00 | 5.75 | approximation | **no** |
+| tf2/sniper | 6.2 s | machine | 0.34 (0.69 / -0.02) | 1.00 | 5.56 | weak | yes |
+| tf2/spy | 6.8 s | machine | 0.48 (0.77 / 0.13) | 1.00 | 5.7 | weak | yes |
+| cs2/phoenix | 12.8 s | machine, 2 fixed | 0.40 (0.60 / 0.09) | 1.00 | 7.47 | ready | yes |
+| cs2/leet | 14.4 s | machine | 0.58 (0.86 / 0.14) | 1.00 | 8.73 | ready | yes |
+| portal/wheatley | 12.3 s | machine | 0.56 (0.77 / -0.03) | 1.00 | 7.79 | ready | yes |
+| portal/cave-johnson | 14.1 s | machine, 1 fixed | 0.65 (0.86 / -0.03) | 1.00 | 8.19 | ready | yes |
+| l4d/coach | 5.6 s | machine | 0.45 (0.80 / 0.07) | 1.00 | 5.52 | weak | yes |
+| l4d/ellis | 7.4 s | machine | 0.53 (0.74 / 0.04) | 1.00 | 7.54 | ready | yes |
+| l4d/zoey | 7.9 s | machine, 1 fixed | 0.34 (0.68 / -0.01) | 1.00 | 6.4 | weak | yes |
+| deadlock/dynamo | 13.4 s | machine, 1 fixed | 0.67 (0.84 / 0.06) | 1.00 | 7.44 | ready | yes |
+| deadlock/haze | 12.7 s | machine | 0.57 (0.74 / 0.19) | 1.00 | 7.24 | ready | yes |
+| deadlock/kelvin | 14.3 s | machine | 0.26 (0.54 / 0.20) | 1.00 | 7.52 | approximation | yes |
+| deadlock/lash | 14.2 s | machine | 0.32 (0.77 / -0.05) | 1.00 | 7.53 | weak | yes |
+| deadlock/warden | 12.4 s | machine | 0.65 (0.91 / 0.06) | 1.00 | 7.77 | ready | yes |
+| deadlock/wraith | 15.0 s | machine | 0.45 (0.69 / -0.04) | 1.00 | 7.67 | ready | yes |
+| deadlock/shiv | 14.3 s | machine, 1 fixed | 0.69 (0.90 / 0.18) | 1.00 | 8.38 | ready | yes |
+| deadlock/abrams | 16.5 s | machine | 0.55 (0.80 / 0.03) | 1.00 | 8.26 | ready | yes |
+| deadlock/infernus | 14.0 s | machine | 0.67 (0.83 / 0.13) | 1.00 | 9.38 | ready | yes |
+| deadlock/seven | 14.2 s | machine | 0.49 (0.80 / 0.05) | 1.00 | 7.65 | weak | yes |
+| deadlock/ivy | 17.2 s | machine | 0.45 (0.70 / 0.02) | 1.00 | 9.45 | ready | yes |
+| deadlock/venator | 15.8 s | machine | 0.47 (0.83 / 0.15) | 1.00 | 8.36 | weak | yes |
+| deadlock/rem | 14.1 s | machine | 0.50 (0.73 / 0.02) | 1.00 | 7.94 | ready | yes |
+| gmod/alyx | 11.0 s | machine | 0.42 (0.75 / -0.09) | 1.00 | 7.2 | ready | yes |
+
+- **Short sources:** each TF2 class has only 5–10 s of game lines, mostly shouted, so 4.6–7.1 s went into each reference. Expect them to be the least like their character.
+- **Heavy** uses only the sound of the voice (*voice only*): his lines have no reliable transcript.
+- **Pyro** has no transcript at all: his lines are non-lexical.
+- **Machine transcripts:** made by Whisper small.en, with 6 corrected where it clearly misheard a game word (for example "bombsite", "Lady Geist", "Bean counters"). They were not checked by listening.
+
+## How it behaves
+### Character voices
+- **The default doesn't change.** Without the pack, or with no character picked, every theme sounds exactly as in v2.40.
+- **One speaker per message:** the theme and the character are taken when a message starts, so a change meanwhile doesn't alter a message on its way. A spoken reply made in several parts takes them once for all of its parts.
+- **Never a silent switch:** if the picked character's recordings are missing, changed or damaged, or it didn't pass its test, the theme's own voice speaks. The panel, Settings and the clip each say which character couldn't be used and why.
+- **Caches** are keyed by the model, the theme, the character, the SHA-256 of every reference clip, the transcript, the effects, the level and the profile version. A changed recording or text is never answered from an old clip. The first message after updating rebuilds each voice's conditioning once (a few seconds).
+- **Built-in voices are versioned now.** If one is improved later, its earlier version is kept, and **Use the earlier version** in Settings → Theme voices goes back to it. No voice has a second version yet.
+- **The phone remote** only sends a theme and a character name for the choice. The voice is still made on the PC.
+- Standard voice, Gemini Live, `!say`, the panel's buttons and your own replacement recordings work as before.
+
+### Settings from your phone
+- **Only a paired phone.** It's the same home-network (or Tailscale) remote, the same pairing and the same security headers. An unpaired phone that opens Settings is sent to the pairing screen, and it gets nothing from the settings endpoints. No new network port.
+- **Same checks as the PC.** A phone's change goes through the same checks as the PC's Settings and into the same place, so the Steam window follows at once. Only a fixed list of settings can be changed (`app/guards.cjs`); anything else is dropped. A request with a key in it is refused as a whole. The phone can reset theme stats, but it can't touch usage counts or audio devices.
+- **Only what you changed is saved.** A Save on the phone sends only the values you changed since the page opened, so it can't put back something that was changed on the PC in the meantime. Unsaved edits on the phone stay on the phone.
+- **The PC follows.** If Settings is open on the PC when the phone saves, the PC's page reloads to show the new values and says what changed ("Changed from your phone"). Edits made on the PC and not saved yet stay, and its next Save keeps the phone's change. The remote's own call-mute switch works the same way now.
+- **No silent cost.** A provider or model change on the phone shows the same model card, price and notes as the PC. Nothing changes until you save.
+- The activity log notes *Phone remote changed settings* with the setting names only, never the values.
+- Settings from the phone have their own limits: at most 4 saves a second and 30 a minute, 64 KB per save, 10 reads a second (the page asks for everything it needs in one go).
+- **When the PC's Settings page reloads,** unsaved edits in its main fields stay. An unsaved edit in another card (Images, the extra options, a key typed but not saved) is lost, so save on the PC before changing things from the phone.
+- **Not on the phone yet:** theme-voice settings (the character for each theme is on the remote's Theme voice card), the AI, hearing and images on this PC, and the VB-CABLE audio devices. They go through their installers on the PC.
+
+## Tested
+### Character voices and the polish pass
+- **Mocked** (no model, no real pack audio):
+  - `tests/character-voices.test.mjs`, 14 tests: the shipped catalog (stable IDs; no theme default offered again; no character in two themes; no clip used twice; Pyro without a transcript). Import from a folder and a ZIP: only the listed clips; wrong hash, size or header; links; `..` names; a ZIP entry that lies about its size or inflates past it. Fallback with the reason for missing, changed, unapproved and unknown characters. The choice per theme. Cache keys. Built-in versions and rollback. The service with the stand-in engine: the character's clips reach the engine, and one speaker per message and per reply. Removing the engine keeps the imports. `!say tf2/scout`, the remote's action, and the reply pin.
+  - `tests/e2e/character-voices.e2e.mjs` (headless Chromium): Settings in desktop mode (the selectors, the remembered choice, Original recording vs Generated speech, import and remove), and the phone remote's selector against the real remote server.
+  - Settings → Character voices was checked in desktop mode with the project's layout audit in Steam, Team Fortress 2, Portal, Deadlock, Left 4 Dead, Counter-Strike 2, Pip-Boy and Windows XP (no problem in the new block; screenshots checked by eye).
+  - Plus every unit and end-to-end test and the desktop check: 479 unit tests, 42 end-to-end tests, the build check and the desktop check in Electron all pass.
+- **Real, Linux** (this project's 2-core test machine, processor, Qwen3-TTS 0.6B bf16, the app's own worker):
+  - **Every new character** and **every polish candidate with its v2.40 baseline**, through the app's own worker: 56 voice sets × 4 sentences = 224 takes, plus a second seed for Kleiner and a 1.7B subset (5 sets). All scored with ECAPA likeness against held-out recordings and Whisper small.en word accuracy.
+  - **The app's service with the real pack:** import from the ZIP and from the folder (30 characters, 12.0 MB, about 0.1 s each). TF2 speaks as the Administrator by default, and as Scout once he's picked. A replayed line comes from the cache, with a separate cache and conditioning per voice. A two-part reply keeps Scout when Spy is picked between the parts. A damaged Sniper clip falls back to the Administrator with the reason, and importing again repairs it.
+  - Speed on this machine: 4–13 s per second of speech (median 7.5 for the new characters). This 2-core processor is noisy, so the time column is only a rough guide.
+- **Not tested:**
+  - **No listening review.** Likeness is a speaker model's score, not a listening verdict. Nobody listened to these voices during the work.
+  - Importing the pack on Windows. The *Theme voices on Windows* workflow now also imports a stand-in pack made from the app's own recordings and speaks from it, but it hasn't been run yet.
+  - Character voices on an NVIDIA card, in the fast engine, or in a real Steam call.
+  - The phone remote on a real phone.
+  - The 1.7B model for all but five voice sets.
+
+### Settings from your phone
+- **Mocked** (memory store standing in for the app's settings, no Steam window):
+  - The server (`tests/phone-settings.test.mjs`, real HTTP on this machine). Every setting has exactly one place in the phone lists, and anything named like a key is a secret. An unpaired phone (no cookie, or a made-up one) is refused, and the store isn't even read. Reads show settings but only true for a saved key: never the key itself, nor speechKey, the draft, pairing or remote settings. A key in a save or a removal is refused and nothing is written. Unknown, pairing, remote, draft and read-only settings are dropped. Values are cleaned as on the PC (an unknown provider becomes OpenRouter, setup settings keep their shape, a value over 20,000 characters is refused, an unknown theme is refused). Only changed values are written and logged, with names only. There is no way to the PC's pairing, key check, AI test, installs or activity log. The size and rate limits hold. Only the page's own files are served.
+  - End to end (`tests/e2e/phone-settings.e2e.mjs`, headless Chromium, a 390 × 844 touch screen, the real remote server and page, the PC's real Settings page with a stand-in for the app's main process). Pair, then Setup → Open Settings. Change a select, a switch, the personality text, a squad switch and the provider and model, then save: the store has the values, and keys and unchanged settings are untouched. The phone's model card matches the PC's. The PC's page reloads with the phone's values, keeps its own unsaved edit, and its Save keeps the phone's change. Theme from Appearance. The refused parts are hidden and say *Do this on your PC*; the bridge and the server refuse keys. No key value is in the page, the phone's storage or any answer it got. The phone talks only to the PC. Nothing scrolls sideways.
+  - The layout audit on Settings on the phone at 390 px in the Steam, Windows XP, Pip-Boy, Minecraft, DOOM, MSN, CS 1.6, TF2, PS3 (XMB) and iPod themes, every section, checked by eye. Also checked at 360 and 430 px. Fixed on the way: themes with a see-through top bar or save bar (Pip-Boy, PS3, CS2, L4D, Dreamcast, PAYDAY 2 and others) showed the page through them on a phone. They now have the page's colour underneath and keep their own tint.
+  - Plus all unit and end-to-end tests and the desktop check.
+- **Real, Linux** (Electron 45 under a virtual display, the app's real Settings preload, the page and the IPC; the rest of the app stood in): the PC's Settings window got *changed from your phone* and reloaded with the new values. It kept the edit not saved yet, showed the note, and its Save kept the phone's change. No key was in the page.
+- **Not tested:** a real phone (iPhone or Android browser) on Wi-Fi or Tailscale, the full desktop app on Windows, and real Steam. Long option names in some selects show with "…" until tapped (the phone's picker shows them in full).
+
+### Who is in the voice call
+- *Mocked (no Steam):*
+  - `tests/occupancy.test.mjs`, 8 tests. A stand-in shaped like Steam's chat objects runs through the real steam-chat-main.js, voice-call.js and automatic.js. It covers:
+    - starting while already in the call
+    - joining after starting in text (Steam's steps 1–9, then connected)
+    - friends leaving, then the bot alone, then the bot leaving
+    - Steam's count against the audio side
+    - a failed join
+    - a call outside the group
+    - Steam's data missing, then coming back
+    - the voice-list fallback
+    - text-only routing
+    - Signal trail lines that never contain names
+  - `tests/e2e/occupancy.e2e.mjs`, 3 tests. Headless Chromium on the panel preview as the desktop app, with the real panel scripts and Tyler's real steam-chat-main.js reading a stand-in Steam. It runs Connect & start with the bot already in the call, Join voice from text mode, and the hint showing and then clearing itself.
+  - Against v2.40.0's scripts, the same stand-in reproduces the reported screen: "In the call · 3 others", Listening, and "Voice room needs one hint…" still shown.
+- *Real Electron with a mock Steam page:* `tools/desktop-voice-check` passes.
+- **Not tested: real Steam.** That covers Steam's real call data for this group, the real voice list, and Windows audio.
+
+### Repeat protection
+- **Mocked:** `tests/repeat-guard.test.mjs` covers the opening rut (two words, the last reply or two of the last four, everyday-word openings ignored), the trim only when the opening is its own clause, the stuck word (runs, one word making up 30% of a reply, a repeated three-word phrase, with no history), the cut to two, and the retry notes. The real background script with a stand-in provider (`tests/early-speech.test.mjs`): a "Fuck off, …" reply after a "Fuck off, …" reply is asked again, with the opening named in the retry note, and when it comes back the same way the opening is cut and the rest is spoken. A "fuck fuck fuck …" reply is never spoken early; it's asked again and mended; a second try still stuck after the cut is skipped in an automatic turn, with no third request.
+- **Not tested:** real Venice replies.
+
+---
+
 # ROBOTIC TYLER v2.40.0: Images on this PC
 
 ## New

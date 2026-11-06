@@ -1,0 +1,863 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tyler Settings</title>
+<meta name="theme-color" content="#171a21">
+<link rel="icon" href="icons/icon-32.png">
+<link rel="stylesheet" href="ui/tokens.css?v=2.41.0">
+<link rel="stylesheet" href="settings.css?v=2.41.0">
+<link rel="stylesheet" href="ui/icons.css?v=2.41.0">
+<link rel="stylesheet" href="ui/kit.css?v=2.41.0">
+<link rel="stylesheet" href="ui/fonts/fonts.css?v=2.41.0">
+<link rel="stylesheet" href="ui/themes/classic.css?v=2.41.0">
+<link rel="stylesheet" href="ui/themes/tf2.css?v=2.41.0">
+<link rel="stylesheet" href="ui/themes/cs2.css?v=2.41.0">
+<link rel="stylesheet" href="ui/themes/portal.css?v=2.41.0">
+<link rel="stylesheet" href="ui/themes/cs16.css?v=2.41.0">
+<link rel="stylesheet" href="ui/themes/hev.css?v=2.41.0">
+<link rel="stylesheet" href="ui/themes/l4d.css?v=2.41.0">
+<link rel="stylesheet" href="ui/themes/winxp.css?v=2.41.0">
+<link rel="stylesheet" href="ui/themes/doom.css?v=2.41.0">
+<link rel="stylesheet" href="ui/themes/quake.css?v=2.41.0">
+<link rel="stylesheet" href="ui/themes/pipboy.css?v=2.41.0">
+<link rel="stylesheet" href="ui/themes/combine.css?v=2.41.0">
+<link rel="stylesheet" href="ui/themes/deadlock.css?v=2.41.0">
+<link rel="stylesheet" href="ui/themes/minecraft.css?v=2.41.0">
+<link rel="stylesheet" href="ui/themes/payday.css?v=2.41.0">
+<link rel="stylesheet" href="ui/themes/dreamcast.css?v=2.41.0">
+<link rel="stylesheet" href="ui/themes/gmod.css?v=2.41.0">
+<link rel="stylesheet" href="ui/themes/ricochet.css?v=2.41.0">
+<link rel="stylesheet" href="ui/themes/dod.css?v=2.41.0">
+<link rel="stylesheet" href="ui/themes/rust.css?v=2.41.0">
+<link rel="stylesheet" href="ui/themes/x360.css?v=2.41.0">
+<link rel="stylesheet" href="ui/themes/ipod.css?v=2.41.0">
+<link rel="stylesheet" href="ui/themes/msn.css?v=2.41.0">
+<link rel="stylesheet" href="ui/themes/xmb.css?v=2.41.0">
+<link rel="stylesheet" href="phone-settings.css?v=2.41.0">
+<script src="phone-settings.js?v=2.41.0"></script>
+<script src="theme.js?v=2.41.0"></script>
+</head>
+<body data-desktop="true" data-phone="true">
+<div class="app">
+  <aside class="side">
+    <div class="brand">
+      <img class="mark" src="ui/logos/steam.png" alt="">
+      <span class="brand-text"><strong>ROBOTIC TYLER</strong><small id="uiPlatform">Settings</small></span>
+    </div>
+    <nav class="section-nav" aria-label="Settings sections"></nav>
+    <div class="side-foot">
+      <div class="side-key"><span class="key-dot" id="uiKeyDot" aria-hidden="true"></span>
+      <span id="uiKeySide">Checking saved keys…</span></div>
+      <button type="button" class="theme-chip" data-target="appearance"><span data-icon="appearance"></span><span>Theme: <b id="uiThemeName">Steam</b></span></button>
+    </div>
+  </aside>
+
+  <main class="content" id="top">
+    <header class="page-head" aria-live="polite">
+      <h1 id="uiSectionTitle">Overview</h1>
+      <p id="uiSectionDescription">Setup steps and account status</p>
+    </header>
+
+    <div id="sections" class="sections">
+
+<!-- ── Appearance: theme gallery (theme-gallery.js) ────────────── -->
+<section class="sheet" id="appearance" data-ui-zone="appearance">
+  <div class="sheet-head">
+    <h2 id="tgHeading">Theme</h2>
+    <p>Pick a look for every ROBOTIC TYLER window: the chat panel, these settings and the Voice Studio. Previews use sample content only; nothing is sent until you press Apply.</p>
+  </div>
+  <div class="tg-layout">
+    <div id="themeGallery" class="tg-grid" role="radiogroup" aria-labelledby="tgHeading"></div>
+    <div id="themeStage" class="tg-stage" aria-live="polite">
+      <div class="tg-stage-head"><img id="tgLogo" class="tg-logo-lg" src="ui/logos/steam.png" alt=""><div><h3 id="tgName">Steam</h3><p id="tgDesc"></p><p id="tgExtras" class="tg-extras"></p></div></div>
+      <div class="tg-actions"><button type="button" id="tgApply" class="primary"><span class="lbl">Apply</span></button><p id="tgState" class="hint"></p></div>
+      <div class="tg-stage-preview"><div class="tg-host"></div></div>
+    </div>
+  </div>
+  <div class="toggle-grid tg-stats">
+    <label class="toggle"><input id="themeStats" type="checkbox" checked><span><b>Remember theme stats between sessions</b><small>Achievements, levels, high scores, souls, heist numbers and the like build up over time. Counts only, kept on this <span class="only-chrome">profile</span><span class="only-desktop">PC</span>; no chat text or names.</small></span></label>
+  </div>
+  <div class="actions"><button type="button" id="themeStatsReset" class="secondary">Reset theme stats</button><span id="themeStatsNote" class="hint" role="status"></span></div>
+  <p class="hint tg-credit">ROBOTIC TYLER is a free fan project. The themes are tributes to each game's interface style and aren't affiliated with or endorsed by Valve, id Software, Bethesda, Mojang, Microsoft, Overkill Software, Starbreeze, Sega, Facepunch Studios or any other publisher. Theme fonts are bundled under the SIL Open Font License (licence texts in <code>ui/fonts</code>).</p>
+</section>
+
+<!-- ── Overview ─────────────────────────────────────────────── -->
+<section class="sheet" id="quickStart" data-ui-zone="overview">
+  <div class="sheet-head">
+    <h2>Get Tyler running</h2>
+    <p><span class="only-chrome">Save one AI key, open Steam chat in Chrome and press Connect &amp; start in the bot panel. Turn on extras when you want them.</span><span class="only-desktop">Save one AI key (or set up the AI on this PC under AI &amp; personality: then text and Standard voice need no key), open the Steam chat window and press Connect &amp; start in Tyler&#39;s panel. Text and voice both run in that window. Turn on extras when you want them.</span></p>
+  </div>
+  <ol class="setup-steps">
+    <li class="setup-step" id="uiKeyStep">
+      <span class="setup-n" aria-hidden="true">1</span>
+      <div><b>Add an AI key</b><small id="uiKeyState">Checking saved keys…</small></div>
+      <button type="button" class="secondary" data-target="ai">Set up AI</button>
+    </li>
+    <li class="setup-step">
+      <span class="setup-n" aria-hidden="true">2</span>
+      <div><b>Connect in Steam chat</b><small><span class="only-chrome">Open Steam web chat and press Connect &amp; start in Tyler's panel.</span><span class="only-desktop">Open the Steam chat window and press Connect &amp; start.</span></small></div>
+      <button type="button" class="secondary" id="uiOpenSteam">Open Steam chat</button>
+    </li>
+    <li class="setup-step">
+      <span class="setup-n" aria-hidden="true">3</span>
+      <div><b>Pick your extras</b><small>Party host, trivia, votes and custom commands are off until you enable them.</small></div>
+      <button type="button" class="secondary" data-target="squad">Squad features</button>
+    </li>
+  </ol>
+  <p id="easyStatus" class="hint" role="status">Checking saved setup…</p>
+</section>
+
+<!-- ── Phone remote (desktop app, remote-settings.js, app/remote.cjs) ─────────── -->
+<section class="sheet" id="phoneRemote" data-ui-zone="overview">
+  <div class="sheet-head">
+    <h2>Phone remote</h2>
+    <p class="only-desktop">Control Tyler from your phone's browser on the same Wi-Fi. The phone shows Tyler's panel in your theme, live, with the theme's extras: start or pause him, play clips, run the Music DJ, type in chat, change the theme and more. Nothing to install. A paired phone can read the chat's latest 40 messages for its <b>Chat log</b> card (it asks only while the card is open), and can open these Settings to change them. It never sees your API keys (only whether one is saved) and can't add or remove them; pairing phones, installs and tests stay on this PC.</p>
+    <p class="only-chrome">The phone remote is part of the desktop app: it runs a small page on your home network, which a Chrome extension can't do.</p>
+  </div>
+  <div class="only-desktop">
+    <div class="toggle-grid"><label class="toggle"><input id="remoteOn" type="checkbox"><span><b>Let my phone control Tyler</b><small>Only devices on your home network (or, if you turn it on below, your own Tailscale network) can reach it, and only after pairing with a code from this page. Use it on your own Wi-Fi, not on public networks.</small></span></label></div>
+    <div id="remotePanel" class="remote-panel" hidden>
+      <div class="remote-pair">
+        <canvas id="remoteQr" class="remote-qr" width="232" height="232" aria-label="QR code with the remote's address and pairing code"></canvas>
+        <div class="remote-steps">
+          <p><b>1.</b> On your phone, scan the code with the camera, or open <b id="remoteUrl" class="remote-url"></b> <button type="button" id="remoteCopy" class="secondary remote-copy">Copy</button></p>
+          <p><b>2.</b> Enter this pairing code: <b id="remoteCode" class="remote-code">––– –––</b></p>
+          <p class="hint" id="remoteExpiry"></p>
+          <div class="actions"><button type="button" id="remoteNewCode" class="secondary">New code</button><select id="remoteAddress" aria-label="This PC's address" hidden></select></div>
+          <p class="hint">If Windows asks whether ROBOTIC TYLER may use the network, allow it on <b>private networks</b>. Tip: on the phone, add the page to your home screen.</p>
+        </div>
+      </div>
+      <h3>Away from home</h3>
+      <div class="toggle-grid"><label class="toggle"><input id="remoteAway" type="checkbox"><span><b>Use the remote away from home, through Tailscale</b><small>Install the free Tailscale app on this PC and on your phone and sign in to the same account. Your phone then reaches Tyler from anywhere (mobile data, another Wi-Fi) over Tailscale's encrypted private network. Nothing else on the internet can reach it, and the phone still needs pairing.</small></span></label></div>
+      <p class="hint" id="remoteAwayHint" hidden></p>
+      <h3>Paired phones</h3>
+      <ul id="remoteDevices" class="remote-devices"><li class="hint">No phones yet.</li></ul>
+      <div class="actions"><button type="button" id="remoteForgetAll" class="secondary" hidden>Remove all phones</button></div>
+    </div>
+    <p id="remoteStatus" class="hint" role="status"></p>
+  </div>
+</section>
+
+<section class="sheet" id="usagePulse" data-ui-zone="overview">
+  <div class="sheet-head">
+    <h2>This profile's usage</h2>
+    <p>Successful text generations reported by your provider. Speech and transcription are billed separately.</p>
+  </div>
+  <dl class="pulse">
+    <div><dt>Requests</dt><dd id="sumRequests">0</dd></div>
+    <div><dt>Tokens</dt><dd id="sumTokens">0</dd></div>
+    <div><dt>Text cost</dt><dd id="sumCost">$0.0000</dd></div>
+    <div><dt>Spoken replies</dt><dd id="sumSpeech">0</dd></div>
+  </dl>
+  <div class="link-row">
+    <a target="_blank" rel="noopener noreferrer" href="https://openrouter.ai/settings/keys">Create an OpenRouter key</a>
+    <a target="_blank" rel="noopener noreferrer" href="https://openrouter.ai/settings/credits">Check OpenRouter credits</a>
+    <a target="_blank" rel="noopener noreferrer" href="https://aistudio.google.com/apikey">Get a Google AI Studio key</a>
+  </div>
+</section>
+
+<!-- ── AI & personality ─────────────────────────────────────── -->
+<section class="sheet" id="studio" data-ui-zone="ai">
+  <div class="sheet-head">
+    <h2>Provider and model</h2>
+    <p>Pick who answers and which model, then test it. One key powers text<span class="only-chrome"> and voice</span>; keys stay <span class="only-chrome">in this profile</span><span class="only-desktop">on this PC</span> and are checked with the provider when you save.</p>
+  </div>
+  <div class="grid two">
+    <label>AI provider
+      <select id="aiProvider"><option value="openrouter">OpenRouter</option><option value="gemini">Google Gemini</option><option value="local" class="only-desktop">This PC (free, no key)</option></select>
+    </label>
+    <label class="for-openrouter">Text model
+      <select id="brain"><option value="fast">Llama 3.3 70B · default</option><option value="budget">Mistral Small 3.2 · budget</option><option value="venice">Venice Uncensored · no filter</option></select>
+    </label>
+    <label class="for-gemini">Text model
+      <select id="geminiTextModel"><option value="gemini-3.1-flash-lite">Fast · Gemini 3.1 Flash-Lite</option><option value="gemini-3.5-flash-lite">Balanced · Gemini 3.5 Flash-Lite (recommended)</option><option value="gemini-3.8-flash">Advanced · Gemini 3.8 Flash</option></select>
+    </label>
+  </div>
+  <p class="hint only-local only-desktop">Text replies come from the <b>AI on this PC</b>, set up in the next section: no key and no cost per message. Voice calls need no key either when hearing and the voice run on this PC too (set up in the same section, then chosen in Settings → Voice); otherwise they use an OpenRouter or Google key below.</p>
+  <p class="callout only-local only-chrome">Text AI on this PC is part of the ROBOTIC TYLER desktop app. In Chrome, choose OpenRouter or Google Gemini: with This PC chosen, Tyler can't answer here.</p>
+  <div class="model-card" id="modelCard">
+    <div class="mc-head"><span class="mc-tier" id="mcTier"></span><b class="mc-name" id="mcName"></b><span class="mc-badge" id="mcBadge"></span><code class="mc-id" id="mcId"></code></div>
+    <p class="mc-strengths" id="mcStrengths"></p>
+    <dl class="mc-facts"><div><dt>Served by</dt><dd id="mcProvider"></dd></div><div><dt>Price</dt><dd id="mcPrice"></dd></div><div><dt id="mcExtraLabel">Routing</dt><dd id="mcExtra"></dd></div></dl>
+    <p class="mc-note" id="mcNote"></p>
+    <div class="mc-test"><button type="button" id="modelTest" class="secondary"><span data-icon="checks"></span>Test selected model</button><span id="modelTestResult" class="mc-result" role="status" aria-live="polite"></span></div>
+  </div>
+  <div class="grid two">
+    <label>OpenRouter API key
+      <input id="openrouterKey" type="password" autocomplete="off" placeholder="Leave blank to keep the saved key">
+    </label>
+    <label>Google Gemini API key
+      <input id="geminiKey" type="password" autocomplete="off" placeholder="Leave blank to keep the saved key">
+    </label>
+  </div>
+  <div class="toggle-grid">
+    <label class="toggle for-openrouter"><input id="smartRouting" type="checkbox"><span><b>Smart model routing</b><small>With Llama 3.3 or Mistral Small selected: casual comments use Mistral Small, longer or complex questions Llama 3.3. Venice and Gemini models are never switched.</small></span></label>
+    <label class="toggle for-openrouter for-local"><input id="streamAI" type="checkbox" checked><span><b>Stream AI text</b><small>Use streaming for a faster first reply (OpenRouter, or the AI on this PC).</small></span></label>
+    <label class="toggle"><input id="friendMemory" type="checkbox"><span><b>Remember verified friends</b><small>Separate local memory for confirmed Steam accounts, kept for 7 days.</small></span></label>
+  </div>
+  <label class="narrow">Local text spending cap (USD, 0 = off)
+    <input id="spendingCapUSD" type="number" min="0" max="100" step="0.25" value="0">
+  </label>
+  <p class="hint">This cap uses provider-reported text costs only (OpenRouter). Set a hard limit on your OpenRouter key too; for Gemini, use Google's own billing limits.</p>
+</section>
+
+<!-- ── AI on this PC (desktop app, app/local-ai): text replies (v2.38, local-ai-settings.js),
+     hearing and voice for calls (v2.39, local-speech-settings.js) and pictures (v2.40, app/local-images,
+     local-images-settings.js). Hidden until something here is used. ── -->
+<section class="sheet only-desktop" id="localAI" data-ui-zone="ai" data-text-relevant="false" data-speech-relevant="false" data-images-relevant="false">
+  <div class="sheet-head">
+    <h2>AI on this PC</h2>
+    <p>Tyler can run his AI on this PC: the text replies (llama.cpp with Qwen3.5), hearing people in voice calls (NVIDIA Parakeet), a speaking voice (Kokoro) and the chat's pictures (stable-diffusion.cpp). No key, no account and no cost per message, and what's said isn't sent to an AI provider for the parts that run here. Each part is optional and nothing downloads until you press its Install button. With all three on this PC, a Standard voice call needs no key at all.</p>
+  </div>
+  <p class="callout" id="laProviderNote" hidden></p>
+  <h3>This PC</h3>
+  <p class="hint" id="laHardware" role="status">Checking this PC…</p>
+  <ul class="tv-notes" id="laAdvice"></ul>
+  <p class="hint la-text-off">Text replies on this PC: choose <b>This PC (free, no key)</b> as the AI provider above to set them up here.</p>
+  <div class="la-text">
+  <h3>Text replies: model</h3>
+  <div class="engine-pick la-models" role="radiogroup" aria-label="Model for Text AI on this PC">
+    <label class="engine-card"><input type="radio" name="laModel" value="4b"><span><b>Qwen3.5 4B <span class="la-tag" data-for="4b"></span></b><small>Quick and light. Fits most graphics cards and runs on the processor too.</small><small class="la-size">2.6 GB download · about 3.6 GB of graphics memory, or 4.5 GB of memory on the processor</small></span></label>
+    <label class="engine-card"><input type="radio" name="laModel" value="9b"><span><b>Qwen3.5 9B <span class="la-tag" data-for="9b"></span></b><small>Smarter, better at jokes and follow-ups. Best with about 8 GB of free graphics memory.</small><small class="la-size">5.3 GB download · about 6.8 GB of graphics memory, or 8 GB of memory on the processor</small></span></label>
+    <label class="engine-card"><input type="radio" name="laModel" value="4b-uncensored"><span><b>Qwen3.5 4B uncensored <span class="la-tag" data-for="4b-uncensored"></span></b><small>Uncensored (refusals removed by the community; a little less accurate).</small><small class="la-size">2.5 GB download · the same memory as the 4B</small></span></label>
+    <label class="engine-card"><input type="radio" name="laModel" value="9b-uncensored"><span><b>Qwen3.5 9B uncensored <span class="la-tag" data-for="9b-uncensored"></span></b><small>Uncensored (refusals removed by the community; a little less accurate).</small><small class="la-size">5.2 GB download · the same memory as the 9B</small></span></label>
+  </div>
+  <p class="hint" id="laModelNote">Tyler suggests a model for this PC. Nothing installs or switches by itself.</p>
+  <details class="tv-explain"><summary>Which model, and what “uncensored” means</summary>
+    <p><b>4B</b> and <b>9B</b> are Alibaba's Qwen3.5 models (Apache-2.0 licence) in a 4-bit file (Q4_K_M) made by Unsloth. The 9B writes better replies and follows the chat better; the 4B is about twice as fast and needs half the memory. Both run with their thinking turned off, so they answer straight away.</p>
+    <p><b>Uncensored</b> versions are huihui-ai's “abliterated” Qwen3.5 (also Apache-2.0), packed by mradermacher: the community removed the model's habit of refusing, so crude banter and hard roasts aren't turned down. That edit makes them a little less accurate. Tyler's own chat rules and the protection against chat takeovers still apply to every model.</p>
+    <p>None of these is as capable as the large cloud models: expect shorter, simpler banter. Your personality settings and reply length are used as with any provider.</p>
+  </details>
+  <div class="grid two">
+    <label>Runs on
+      <select id="laDevice"><option value="auto">Graphics card when possible</option><option value="cpu">Processor only</option></select>
+      <small class="hint" id="laDeviceNote">Any recent NVIDIA, AMD or Intel card (through Vulkan): the whole model goes on the card. If it doesn't fit while you play, Tyler says so instead of moving it.</small>
+    </label>
+    <label>Close the AI after
+      <select id="laIdle"><option value="1">1 minute idle</option><option value="2">2 minutes idle</option><option value="5">5 minutes idle</option><option value="10">10 minutes idle</option><option value="30">30 minutes idle</option><option value="60">1 hour idle</option><option value="0">Never (keep it loaded)</option></select>
+      <small class="hint">Closing it gives all of its memory back to your games; the next reply then waits a few seconds while it loads. It also closes when you pause or stop Tyler, on the emergency stop and when you quit.</small>
+    </label>
+  </div>
+  <h3>Install</h3>
+  <p id="laInstallState" role="status">…</p>
+  <div class="tv-progress" id="laProgressWrap" hidden><span id="laProgress"></span></div>
+  <p class="hint" id="laProgressText"></p>
+  <div class="actions">
+    <button id="laInstall" type="button">Install</button>
+    <button id="laCancel" type="button" class="secondary" hidden>Stop installing</button>
+    <button id="laOffline" type="button" class="secondary">Install from a folder…</button>
+  </div>
+  <div class="callout" id="laOfflineForm" hidden>
+    <label>Folder with the downloaded files<input id="laOfflineDir" placeholder="For example D:\Tyler local AI"><small class="hint">Put the engine archive (llama-b11669-bin-win-vulkan-x64.zip) and the model's .gguf file in one folder. They're checked exactly like downloads; anything missing or different is downloaded instead.</small></label>
+    <div class="actions"><button id="laOfflineGo" type="button">Install from this folder</button><button id="laOfflineCancel" type="button" class="secondary">Cancel</button></div>
+  </div>
+  <p class="hint">Downloaded from the original sources (llama.cpp's own release on GitHub and the model's page on Hugging Face, each at one pinned version), checked against the SHA-256 recorded in this version of Tyler, and kept in their own folder: nothing is installed system-wide and no driver is changed. The AI only listens inside this PC (127.0.0.1) with a new secret key each time it starts. <a href="#" id="laOpenFolder">Open the folder</a>.</p>
+  <h3>Speed check</h3>
+  <p class="hint">Starts the AI if it isn't running and times one short reply: how long until the first word, and how many tokens (word pieces) a second.</p>
+  <div class="actions"><button id="laCheck" type="button" class="secondary">Run a speed check</button><button id="laUnload" type="button" class="secondary">Close the AI now</button></div>
+  <p id="laCheckState" role="status"></p>
+  <h3>Free up space</h3>
+  <p class="hint">Removes the downloaded engine and models for text replies. Your settings are kept, hearing and voice on this PC stay installed, and Tyler keeps working with a cloud provider. Installing again means downloading again.</p>
+  <div class="actions"><button id="laRemoveModel" type="button" class="secondary">Remove this model</button><button id="laRemove" type="button" class="secondary">Remove Text AI on this PC</button></div>
+  </div>
+  <h3 id="localSpeech">Hearing and voice for calls</h3>
+  <p class="hint">For Standard voice calls. Both run on the processor, so the graphics card stays free for your game and the text AI. After installing, choose them in Settings → Voice → Standard voice: <b>Hearing → This PC</b> and <b>Speaking voice → Voice on this PC (Kokoro)</b>.</p>
+  <p class="callout" id="lsNote" hidden></p>
+  <div class="engine-pick ls-parts" role="group" aria-label="Hearing and voice on this PC">
+    <label class="engine-card"><input type="checkbox" id="lsPickHearing" value="hearing" checked><span><b>Hearing: Parakeet TDT 0.6B v3 <span class="la-tag" id="lsTagHearing"></span></b><small>NVIDIA's speech-to-text model, 25 European languages. It turns a few seconds of speech into text in well under a second on most processors.</small><small class="la-size" id="lsSizeHearing">639 MB download · about 1 GB of memory while it runs</small></span></label>
+    <label class="engine-card"><input type="checkbox" id="lsPickVoice" value="voice" checked><span><b>Voice: Kokoro-82M <span class="la-tag" id="lsTagVoice"></span></b><small>A small, natural English voice with six of its stock voices to choose from. The first words of a reply are ready in about a second.</small><small class="la-size" id="lsSizeVoice">350 MB download · about 0.5 GB of memory while it runs</small></span></label>
+  </div>
+  <p class="hint" id="lsEngineNote">Both use the sherpa-onnx speech engine (version 1.13.8, 8.5 MB download), installed with whichever comes first.</p>
+  <p id="lsInstallState" role="status">…</p>
+  <div class="tv-progress" id="lsProgressWrap" hidden><span id="lsProgress"></span></div>
+  <p class="hint" id="lsProgressText"></p>
+  <div class="actions">
+    <button id="lsInstall" type="button">Install</button>
+    <button id="lsCancel" type="button" class="secondary" hidden>Stop installing</button>
+    <button id="lsOffline" type="button" class="secondary">Install from a folder…</button>
+  </div>
+  <div class="callout" id="lsOfflineForm" hidden>
+    <label>Folder with the downloaded files<input id="lsOfflineDir" placeholder="For example D:\Tyler speech"><small class="hint">Put the engine package (sherpa-onnx-win-x64-1.13.8.tgz) and the model files in one folder (subfolders like espeak-ng-data\lang\gmw are fine). They're checked exactly like downloads; anything missing or different is downloaded instead.</small></label>
+    <div class="actions"><button id="lsOfflineGo" type="button">Install from this folder</button><button id="lsOfflineCancel" type="button" class="secondary">Cancel</button></div>
+  </div>
+  <p class="hint">Downloaded from the original sources (the sherpa-onnx project's own package on npm and the models' pages on Hugging Face, each at one pinned version), checked against the SHA-256 recorded in this version of Tyler, and kept in their own folder. The engines have no network connection: they talk only to Tyler, inside this PC. Parakeet TDT 0.6B v3 is by NVIDIA (CC BY 4.0); Kokoro-82M is by hexgrad (Apache-2.0); both in the sherpa-onnx project's ONNX versions.</p>
+  <h3>Quick check</h3>
+  <p class="hint">Starts what isn't running and times it: hearing turns a short built-in recording into text; the voice says one sentence (it plays here) and shows how long the first audio took.</p>
+  <div class="actions"><button id="lsCheckHearing" type="button" class="secondary">Check hearing</button><button id="lsCheckVoice" type="button" class="secondary">Check the voice</button><button id="lsUnload" type="button" class="secondary">Close hearing and voice now</button></div>
+  <p id="lsCheckState" role="status"></p>
+  <div class="grid two">
+    <label>Close hearing and voice after
+      <select id="lsIdle"><option value="1">1 minute idle</option><option value="2">2 minutes idle</option><option value="5">5 minutes idle</option><option value="10">10 minutes idle</option><option value="30">30 minutes idle</option><option value="60">1 hour idle</option><option value="0">Never (keep them loaded)</option></select>
+      <small class="hint">Closing gives their memory back; the next turn then waits a second or two while they load. They also close when you pause or stop Tyler, on the emergency stop and when you quit.</small>
+    </label>
+  </div>
+  <h3>Free up space for hearing and voice</h3>
+  <p class="hint">Removes the downloaded files. Your choices in Settings → Voice are kept; a turn that needs a removed part fails and says so until you install it again or choose Cloud.</p>
+  <div class="actions"><button id="lsRemoveHearing" type="button" class="secondary">Remove hearing</button><button id="lsRemoveVoice" type="button" class="secondary">Remove the voice</button></div>
+  <h3>Voice calls</h3>
+  <p class="hint">A Standard voice call hears people with what you choose under Settings → Voice → Standard voice → Hearing, and speaks with the Speaking voice chosen there. With <b>This PC</b> for the text replies, hearing and the voice, a call needs no key at all and nothing that's said leaves this PC. With Cloud hearing or the cloud voice, Tyler uses your OpenRouter key (or your Google key if that's the one saved). Gemini Live always uses Google.</p>
+  <h3 id="localImages">Images on this PC</h3>
+  <p class="hint">Tyler can draw the chat's pictures on this PC: no key and no cost per image, and the description isn't sent anywhere. Each picture runs the engine (stable-diffusion.cpp) once, with no network port, and gives all of its memory back when it's done. Use it with your own Draw box in the panel's Chat images card, and let friends use <code>!image pc …</code> if you want.</p>
+  <p class="callout" id="liNote" hidden></p>
+  <p class="hint" id="liHardware" role="status">Checking this PC…</p>
+  <ul class="tv-notes" id="liAdvice"></ul>
+  <div class="engine-pick la-models" role="radiogroup" aria-label="Model for images on this PC">
+    <label class="engine-card"><input type="radio" name="liModel" value="zimage-8gb"><span><b>Z-Image Turbo · 6–8 GB cards <span class="la-tag" data-for="zimage-8gb"></span></b><small>Quick and sharp, good with text in pictures. On 6 GB cards, 768 × 768.</small><small class="la-size">6.2 GB download · about 5.5 GB of graphics memory</small></span></label>
+    <label class="engine-card"><input type="radio" name="liModel" value="zimage-12gb"><span><b>Z-Image Turbo · 12 GB cards <span class="la-tag" data-for="zimage-12gb"></span></b><small>The same model at higher precision: a little more detail.</small><small class="la-size">10.4 GB download · about 8 GB of graphics memory</small></span></label>
+    <label class="engine-card"><input type="radio" name="liModel" value="chroma-8gb"><span><b>Chroma1-HD uncensored · 8 GB cards <span class="la-tag" data-for="chroma-8gb"></span></b><small>Uncensored for made-up adults; Tyler's image rules still apply. About four times slower than Z-Image, and on the processor about an hour for one small picture.</small><small class="la-size">8.1 GB download · about 7 GB of graphics memory</small></span></label>
+    <label class="engine-card"><input type="radio" name="liModel" value="chroma-12gb"><span><b>Chroma1-HD uncensored · 12 GB cards <span class="la-tag" data-for="chroma-12gb"></span></b><small>Uncensored for made-up adults, higher precision.</small><small class="la-size">12.2 GB download · about 9.5 GB of graphics memory</small></span></label>
+  </div>
+  <p class="hint" id="liModelNote">Tyler suggests a model for this PC (never an uncensored one). Nothing installs or switches by itself.</p>
+  <div class="grid two">
+    <label>Where it runs
+      <select id="liDevice"><option value="gpu">Graphics card</option><option value="cpu">Processor only (much slower)</option></select>
+      <small class="hint" id="liDeviceNote">Any recent NVIDIA, AMD or Intel card (through Vulkan). If a picture doesn't fit while you play, Tyler says so instead of moving it.</small>
+    </label>
+    <label>Picture size
+      <select id="liSize"><option value="">The model's own size</option><option value="256">256 × 256 (for the processor)</option><option value="512">512 × 512</option><option value="768">768 × 768</option><option value="1024">1024 × 1024</option></select>
+      <small class="hint">Smaller pictures are faster and need less graphics memory.</small>
+    </label>
+  </div>
+  <div class="toggle-grid">
+    <label class="toggle"><input id="liFriends" type="checkbox"><span><b>Friends can ask for images on this PC</b><small>Off by default. When on, <code>!image pc …</code> works for friends, within the Chat images limits (who, how often, how many).</small></span></label>
+    <label class="toggle"><input id="liFriendsUncensored" type="checkbox"><span><b>Friends can use the uncensored model</b><small>Off by default. When off and the model is uncensored, a friend's request is refused (Tyler never switches to another model).</small></span></label>
+  </div>
+  <p id="liInstallState" role="status">…</p>
+  <p class="callout" id="liRuntime" hidden>Windows needs one more free part from Microsoft before the image engine can start: the Visual C++ Redistributable (x64). Most PCs already have it, because games install it. <a target="_blank" rel="noopener noreferrer" href="https://aka.ms/vc14/vc_redist.x64.exe">Download it from Microsoft</a>, run it, then press Install again (what was downloaded is kept). <a target="_blank" rel="noopener noreferrer" href="https://learn.microsoft.com/cpp/windows/latest-supported-vc-redist">What it is</a>. Tyler never installs system software himself.</p>
+  <div class="tv-progress" id="liProgressWrap" hidden><span id="liProgress"></span></div>
+  <p class="hint" id="liProgressText"></p>
+  <div class="actions">
+    <button id="liInstall" type="button">Install</button>
+    <button id="liCancel" type="button" class="secondary" hidden>Stop installing</button>
+    <button id="liOffline" type="button" class="secondary">Install from a folder…</button>
+  </div>
+  <div class="callout" id="liOfflineForm" hidden>
+    <label>Folder with the downloaded files<input id="liOfflineDir" placeholder="For example D:\Tyler images"><small class="hint">Put the engine archive (sd-master-be48649-bin-win-vulkan-x64.zip) and the model's files (.gguf and ae.safetensors) in one folder. They're checked exactly like downloads; anything missing or different is downloaded instead.</small></label>
+    <div class="actions"><button id="liOfflineGo" type="button">Install from this folder</button><button id="liOfflineCancel" type="button" class="secondary">Cancel</button></div>
+  </div>
+  <p class="hint">Downloaded from the original sources (stable-diffusion.cpp's own release on GitHub and the models' pages on Hugging Face, each at one pinned version), checked against the SHA-256 recorded in this version of Tyler, and kept in their own folder: nothing is installed system-wide and no driver is changed. It needs Microsoft's Visual C++ runtime, which almost every Windows PC has; if it's missing, Install says so. <a href="#" id="liOpenFolder">Open the folder</a>.</p>
+  <h3>Tyler's image rules</h3>
+  <p class="hint">They apply to every model (uncensored ones too), every style (the cloud ones too) and everyone, you included: never anything sexual, nude or revealing involving minors, and never sexual, nude or revealing pictures of real people (celebrities, streamers, people in the chat, anyone's friends). Any sign of an age under 18 counts, however it's written. A refusal says why.</p>
+  <h3>Test picture</h3>
+  <p class="hint">Makes one picture with the chosen model and shows it here with its times (it isn't posted anywhere). On the processor this takes many minutes.</p>
+  <div class="actions"><button id="liTest" type="button" class="secondary">Make a test image</button><button id="liStop" type="button" class="secondary" hidden>Stop</button></div>
+  <p id="liTestState" role="status"></p>
+  <img id="liTestImage" alt="The test picture" hidden>
+  <h3>Free up space for pictures</h3>
+  <p class="hint">Removes the downloaded engine and models for pictures. Your settings are kept, and so are text replies, hearing and the voice on this PC.</p>
+  <div class="actions"><button id="liRemoveModel" type="button" class="secondary">Remove this model</button><button id="liRemove" type="button" class="secondary">Remove images on this PC</button></div>
+</section>
+
+<section class="sheet" id="personalitySheet" data-ui-zone="ai">
+  <div class="sheet-head">
+    <h2>Personality</h2>
+    <p>Start from a preset, shape it with the sliders, or write your own description.</p>
+  </div>
+  <div class="preset-strip" role="group" aria-label="Personality presets">
+    <button type="button" class="preset" data-preset="rowdy">Rowdy squad</button>
+    <button type="button" class="preset" data-preset="coach">Helpful coach</button>
+    <button type="button" class="preset" data-preset="chaos">Chaos goblin</button>
+    <button type="button" class="preset" data-preset="chill">Chill wingman</button>
+    <button type="button" class="preset" data-preset="nofilter">No filter</button>
+  </div>
+  <div class="slider-grid">
+    <label>Humor <small id="humorLevelLabel">High</small>
+      <input id="humorLevel" type="range" min="0" max="100" step="1" value="72">
+    </label>
+    <label>Edginess <small id="edgeLevelLabel">Rowdy</small>
+      <input id="edgeLevel" type="range" min="0" max="100" step="1" value="68">
+    </label>
+    <label>Helpfulness <small id="helpLevelLabel">Balanced</small>
+      <input id="helpLevel" type="range" min="0" max="100" step="1" value="52">
+    </label>
+    <label>Chaos <small id="chaosLevelLabel">Controlled</small>
+      <input id="chaosLevel" type="range" min="0" max="100" step="1" value="44">
+    </label>
+  </div>
+  <button type="button" id="forgePrompt" class="secondary">Write personality from sliders</button>
+  <label>Personality description
+    <textarea id="personality" rows="5" placeholder="A witty gaming buddy. Respect boundaries and reply to the latest message."></textarea>
+  </label>
+  <div class="grid two">
+    <label>Roast intensity
+      <select id="roastMode"><option value="savage">Savage: strong profanity and sharp roasts</option><option value="rowdy">Rowdy: playful profanity</option><option value="unhinged">No filter: crude, constant profanity (best with Venice)</option><option value="custom">Custom personality only</option></select>
+    </label>
+    <label>Reply length
+      <select id="length"><option value="short">Fast: short banter</option><option value="normal">Adaptive: concise, longer when helpful</option><option value="detailed">Detailed: up to two short paragraphs</option></select>
+    </label>
+    <label>Text response speed
+      <select id="textSpeed"><option value="balanced">Turbo: quick replies with adaptive pacing</option><option value="cautious">Cautious: more time between messages</option></select>
+    </label>
+    <label>Talkativeness
+      <select id="talkativeness"><option value="quiet">Quiet: only when addressed</option><option value="occasional">Occasional banter</option><option value="active" selected>Active conversation</option></select>
+    </label>
+  </div>
+  <label class="toggle only-desktop"><input id="localExplicit" type="checkbox"><span><b>Explicit adult content on this PC</b><small>Only for replies from the AI on this PC (AI provider: This PC). Lets it write graphic sexual content about made-up adults, and allows over-the-top threats as game trash talk. Still never slurs, nothing sexual about the real people in the chat or anyone under 18, and Tyler stops teasing anyone who asks. Off unless you turn it on.</small></span></label>
+</section>
+
+<section class="sheet" id="noticeSheet" data-ui-zone="ai">
+  <div class="sheet-head">
+    <h2>Telling each chat</h2>
+    <p>Tyler sends the chat's messages (and, in voice, what people say) to your AI provider. Connect &amp; start asks once in each new chat whether you've told everyone.<span class="only-local only-desktop"> With This PC, text replies are written on this PC, so the chat's messages aren't sent to an AI provider for them; in voice calls, what people say goes to OpenRouter or Google to be heard unless Hearing is set to This PC in Settings → Voice.</span></p>
+  </div>
+  <div class="toggle-grid">
+    <label class="toggle"><input id="noticeAsk" type="checkbox" checked><span><b>Ask in each new chat</b><small>Off: Connect &amp; start goes straight through, in every chat. You still need to let people know.</small></span></label>
+  </div>
+  <p class="hint" id="noticeStatus" role="status"></p>
+</section>
+<section class="sheet" id="chatTagSheet" data-ui-zone="ai">
+  <div class="sheet-head">
+    <h2>Name tag in chat</h2>
+    <p>An optional name printed at the start of Tyler's messages, so friends can tell his messages apart. It doesn't change the Steam account's name, which Steam shows as usual.</p>
+  </div>
+  <div class="toggle-grid">
+    <label class="toggle"><input id="chatTagEnabled" type="checkbox" checked><span><b>Show name tag in chat messages</b><small>Off: Tyler's messages are sent without a tag. Your custom name is kept for when you turn it back on.</small></span></label>
+  </div>
+  <label class="narrow">Chat display name
+    <input id="chatTagName" type="text" maxlength="64" value="ROBOTIC TYLER" autocomplete="off" spellcheck="false" aria-describedby="chatTagHelp">
+  </label>
+  <p class="hint" id="chatTagHelp">Up to 32 characters, shown exactly as typed (capitals, accents and emoji are fine). No line breaks.</p>
+  <p class="chat-tag-preview" aria-live="polite"><span class="hint">Preview:</span> <span id="chatTagPreview">(ROBOTIC TYLER) Anyone up for another round?</span></p>
+</section>
+
+<section class="sheet" id="imageSheet" data-ui-zone="ai">
+  <div class="sheet-head">
+    <h2>Chat images</h2>
+    <p>Friends type <code>!image</code> and a description (for example <code>!image a cat in a smoke grenade</code>, or <code>!image best …</code>, <code>!image venice …</code>); Tyler draws it and posts it in the chat as a normal Steam image. Every picture is a paid request to the style's provider, counted in your spending and stopped by the spending cap. Steam only lets the bot's account post pictures once it has spent $5 on Steam (a <a href="https://help.steampowered.com/faqs/view/71D3-35C2-AD96-AA3A" target="_blank" rel="noopener">limited account</a> can't); Tyler checks that before drawing, so a limited account never pays for a picture.</p>
+  </div>
+  <div class="toggle-grid">
+    <label class="toggle"><input id="imgEnabled" type="checkbox"><span><b>Let the chat request images</b><small>Off by default. Pause AI also stops images.</small></span></label>
+  </div>
+  <h3>Styles</h3>
+  <p class="hint">Three styles use your OpenRouter key; three use a Venice key and are uncensored as far as Venice allows (its own servers, safe mode off; illegal content is always blocked). Pick the model for each style; the default style is what a plain <code>!image</code> uses.</p>
+  <div class="image-styles" id="imgStyles"></div>
+  <label class="narrow">Default style<select id="imgDefault"></select></label>
+  <div class="toggle-grid">
+    <label class="toggle"><input id="imgSpoiler" type="checkbox" checked><span><b>Post uncensored pictures as spoilers</b><small>The Venice styles, and the uncensored model on this PC. Steam blurs them until someone clicks.</small></span></label>
+  </div>
+  <h3>Limits</h3>
+  <div class="grid two">
+    <label>Time between requests, per person<select id="imgCooldown"></select></label>
+    <label>Images per person, per session<select id="imgPerPerson"></select></label>
+    <label>Images in total, per session<select id="imgPerSession"></select></label>
+    <label>Who can ask<select id="imgAccess"><option value="everyone">Everyone in the chat</option><option value="selected">Only the Steam accounts below</option></select></label>
+  </div>
+  <label>Allowed Steam accounts (64-bit IDs, one per line)<textarea id="imgAllowed" rows="3" spellcheck="false" placeholder="7656119…"></textarea></label>
+  <p class="hint">A session starts when Tyler connects to a chat. The panel's Chat images card shows the counts and can reset them.</p>
+  <h3>Venice key</h3>
+  <label class="narrow">Venice API key<input id="veniceKey" type="password" autocomplete="off" spellcheck="false" placeholder="Paste a Venice API key"></label>
+  <div class="link-row">
+    <a target="_blank" rel="noopener noreferrer" href="https://venice.ai/settings/api">Create a Venice API key</a>
+    <a target="_blank" rel="noopener noreferrer" href="https://docs.venice.ai/models/image">Venice image models and prices</a>
+    <a target="_blank" rel="noopener noreferrer" href="https://openrouter.ai/collections/image-models">OpenRouter image models</a>
+  </div>
+  <div class="btn-row"><button id="imgSave" class="btn primary" type="button">Save image settings</button><button id="imgForgetVenice" class="btn" type="button">Remove the Venice key</button></div>
+  <p class="hint" id="imgStatus" role="status"></p>
+</section>
+<section class="sheet" id="playground" data-ui-zone="ai">
+  <div class="sheet-head">
+    <h2>Preview a reply</h2>
+    <p>Uses the model selected above, its real provider routing and your current, unsaved personality. Nothing is saved or counted as usage.</p>
+  </div>
+  <label>What a friend says
+    <textarea id="previewPrompt" rows="3" placeholder="Tyler, who's throwing this match?"></textarea>
+  </label>
+  <div class="actions">
+    <button id="previewReply" type="button">Preview reply</button>
+    <button id="previewRoast" type="button" class="secondary">Preview roast</button>
+  </div>
+  <pre id="previewOutput" class="output" aria-live="polite">Previews appear here before you save.</pre>
+  <p class="hint" id="previewMeta"></p>
+</section>
+
+<!-- ── Voice: one page for both engines (voice-settings.js) ─────── -->
+<section class="sheet" id="voice" data-ui-zone="voice">
+  <div class="sheet-head">
+    <h2>Voice engine</h2>
+    <p>Pick how Tyler talks in Steam voice chat. Each engine keeps its own settings, so switching back and forth loses nothing.</p>
+  </div>
+  <input id="voiceEngine" type="hidden" value="standard">
+  <div class="engine-pick" role="radiogroup" aria-label="Voice engine">
+    <label class="engine-card"><input type="radio" name="voiceEnginePick" value="standard" checked><span><b>Standard</b><small>Waits for a pause, writes a reply with your AI provider, then speaks it. Works with an OpenRouter or Google key<span class="only-desktop">, or with no key at all when hearing, the replies and the voice all run on this PC</span>, and uses your text personality and reply length.</small></span></label>
+    <label class="engine-card"><input type="radio" name="voiceEnginePick" value="live"><span><b>Gemini Live</b><small>A real-time voice conversation with Google: Tyler hears speech as it happens, answers quickly and stops when someone talks over him. Needs a Google AI key. Google bills for the audio while a session runs, so you start and stop each one yourself.</small></span></label>
+  </div>
+  <p class="hint" id="voiceKeyState" role="status">Checking keys…</p>
+</section>
+
+<section class="sheet" id="voiceStandard" data-ui-zone="voice" data-engine="standard">
+  <div class="sheet-head">
+    <h2>Standard voice</h2>
+    <p id="standardVoiceNote">Speech uses Grok Voice through OpenRouter, with Voxtral as the fallback.</p>
+  </div>
+  <!-- v2.39: how Standard voice hears and which voice speaks. The hidden inputs hold the saved values
+       (settings.js); the cards set them (voice-settings.js). Chrome keeps Cloud for both. -->
+  <input id="voiceHearing" type="hidden" value="cloud">
+  <input id="speechEngine" type="hidden" value="cloud">
+  <div class="only-desktop">
+    <h3>Hearing</h3>
+    <div class="engine-pick" role="radiogroup" aria-label="Hearing">
+      <label class="engine-card"><input type="radio" name="voiceHearingPick" value="cloud" checked><span><b>Cloud</b><small>As before: each short recording goes to OpenRouter (Voxtral) or Google, with your key, to be turned into text.</small></span></label>
+      <label class="engine-card"><input type="radio" name="voiceHearingPick" value="local"><span><b>This PC</b><small>NVIDIA Parakeet hears it on the processor: free, no key, and the recording never leaves this PC.</small></span></label>
+    </div>
+    <h3>Speaking voice</h3>
+    <div class="engine-pick three" role="radiogroup" aria-label="Speaking voice">
+      <label class="engine-card"><input type="radio" name="speechEnginePick" value="cloud" checked><span><b>Cloud voice</b></span></label>
+      <label class="engine-card"><input type="radio" name="speechEnginePick" value="theme"><span><b>Theme voice on this PC</b><small>Character voices and your own recordings, cloned</small></span></label>
+      <label class="engine-card"><input type="radio" name="speechEnginePick" value="kokoro"><span><b>Voice on this PC (Kokoro)</b><small>Stock voices; lighter and quick on the processor</small></span></label>
+    </div>
+    <p class="hint" id="voiceLocalTip" role="status" hidden><b>Tip:</b> the replies and the hearing already run on this PC. Choose <b>Theme voice on this PC</b> (the same character voices) or <b>Voice on this PC</b> and the whole call runs here, free, with no key.</p>
+    <p class="hint" id="speechEngineNote">Both voices on this PC need no key and have no speech charge. Theme voices are set up in Settings → Voice → Theme voices (on the processor a theme voice can take a minute or more; with an NVIDIA card about as long as the reply lasts). If a voice on this PC can't speak, Tyler answers in text and says why: he doesn't switch to the paid cloud voice by himself. Gemini Live always speaks in Google's voices.</p>
+  </div>
+  <p class="callout only-desktop" id="voiceLocalState" role="status" hidden></p>
+  <div class="grid two">
+    <label class="only-desktop for-kokoro">Kokoro voice
+      <select id="kokoroVoice"><option value="am_michael">Michael · American male</option><option value="am_puck">Puck · American male, lively</option><option value="am_fenrir">Fenrir · American male, deep</option><option value="bm_george">George · British male</option><option value="af_heart">Heart · American female</option><option value="bf_emma">Emma · British female</option></select>
+      <small class="hint">Kokoro-82M's own stock voices (Apache-2.0); Michael is the default. Test voice below plays the one chosen.</small>
+    </label>
+    <label data-provider="openrouter">Grok voice
+      <select id="speechVoice"><option value="rex">rex</option><option value="eve">eve</option><option value="ara">ara</option><option value="sal">sal</option><option value="leo">leo</option></select>
+    </label>
+    <label data-provider="gemini">Gemini speech model
+      <select id="geminiTtsModel"></select>
+    </label>
+    <label data-provider="gemini">Gemini voice
+      <select id="geminiVoice"></select>
+    </label>
+    <label>Noise filter
+      <select id="noiseLevel"><option value="balanced">Balanced: 0.55 s of speech (default)</option><option value="strong">Strong: louder input, 0.8 s of speech</option><option value="sensitive">Sensitive: quiet voices, 0.2 s of speech</option></select>
+    </label>
+  </div>
+  <div class="toggle-grid" data-provider="openrouter">
+    <label class="toggle"><input id="fastSpeech" type="checkbox" checked><span><b>Start speaking sooner</b><small>Tyler starts saying the first sentence while the rest of the reply is still being written. Needs Stream AI text. Turn off if replies ever sound cut or repeated.</small></span></label>
+  </div>
+  <p class="hint"><span class="only-chrome">Sensitivity, interruptions and turn-taking are tuned live in the Conversation section of Tyler's panel in Steam.</span><span class="only-desktop">Long replies are spoken in full, a sentence group at a time. Sensitivity, interruptions and turn-taking are tuned in the Conversation section of Tyler&#39;s panel in Steam chat (with the VB-CABLE route, in the Voice window).</span></p>
+</section>
+
+<section class="sheet" id="voiceLive" data-ui-zone="voice" data-engine="live">
+  <div class="sheet-head">
+    <h2>Gemini Live</h2>
+    <p>Uses your Google AI key even when text replies use OpenRouter. Live sessions use the personality, reply length and talkativeness from AI &amp; personality.</p>
+  </div>
+  <div class="grid two">
+    <label>Live model
+      <select id="liveModel"></select>
+      <small id="liveModelNote" class="hint"></small>
+    </label>
+    <label>Live voice
+      <select id="liveVoice"></select>
+    </label>
+    <label>When someone talks over Tyler
+      <select id="liveInterrupt"><option value="true">Tyler stops and listens (natural)</option><option value="false">Tyler finishes his sentence</option></select>
+    </label>
+    <label>Pause before Tyler answers <small id="liveSilenceLabel">0.70 s</small>
+      <input id="liveSilenceMs" type="range" min="300" max="2000" step="50" value="700">
+    </label>
+    <label>Detecting the start of speech
+      <select id="liveStartSensitivity"><option value="low">Less sensitive: ignores coughs and game noise</option><option value="high">More sensitive: catches quiet voices</option></select>
+    </label>
+    <label>Detecting the end of speech
+      <select id="liveEndSensitivity"><option value="high">Quick: answers as soon as people pause</option><option value="low">Patient: lets people finish long thoughts</option></select>
+    </label>
+  </div>
+  <p class="hint">Changes here apply the next time you start a live session. A running session keeps the settings it started with; stop and start it again to switch.</p>
+  <p class="hint"><span class="only-chrome">Start and stop live sessions from the Gemini Live card in Tyler's panel in Steam. Tyler hears only the Steam voice call in that tab, never your microphone.</span><span class="only-desktop">Start and stop live sessions from the Gemini Live card in Tyler's panel in Steam chat. With the VB-CABLE route, use the Voice window or the tray icon instead; Tyler then hears only the device you choose below.</span></p>
+</section>
+
+<section class="sheet only-desktop" id="voiceRoute" data-ui-zone="voice">
+  <div class="sheet-head">
+    <h2>Where Tyler joins voice</h2>
+    <p>Tyler can join Steam voice right in this app's Steam chat window, like the Chrome extension: no VB-CABLE, no Steam desktop app. Or the older way, through a virtual audio cable and the Steam desktop app.</p>
+  </div>
+  <label>Voice route
+    <select id="desktopVoice">
+      <option value="window">In this app's Steam chat window (recommended, no VB-CABLE)</option>
+      <option value="cable">Through VB-CABLE and the Steam desktop app</option>
+    </select>
+    <small class="hint" id="desktopVoiceNote">Start voice from Tyler's panel in Steam chat (Connect &amp; start, or Start live voice), then join the voice channel. Tyler's own synthetic microphone talks into the call; your physical microphone is never used.</small>
+  </label>
+  <div class="toggle-grid">
+    <label class="toggle"><input id="desktopMuteCall" type="checkbox"><span><b>Mute the call in this window (Tyler still hears it)</b><small>Turn this on if you're in the same call on Steam.exe with your own account, so you don't hear yourself and everyone twice through this window. Only this window's speakers go quiet: Tyler still hears everyone and still talks into the call. Sound previews in Tyler's panel go quiet too. Also in the tray menu.</small></span></label>
+  </div>
+</section>
+
+<section class="sheet only-desktop" id="voiceDevices" data-ui-zone="voice">
+  <div class="sheet-head">
+    <h2>Audio devices</h2>
+    <p>Tyler talks into a virtual audio cable that Steam uses as its microphone, and listens to the device Steam plays your friends through.</p>
+  </div>
+  <div class="grid two">
+    <label>Tyler speaks into
+      <select id="voiceOutputDevice"><option value="">Choose a device…</option></select>
+      <small class="hint">Usually CABLE Input (VB-CABLE). In Steam, set the microphone to CABLE Output.</small>
+    </label>
+    <label>Tyler listens to
+      <select id="voiceListenDevice"><option value="">Choose a device…</option></select>
+      <small class="hint">The speakers or headset Steam plays voice chat through. Everything playing on it is heard.</small>
+    </label>
+  </div>
+  <div class="toggle-grid">
+    <label class="toggle"><input id="voiceListenConsent" type="checkbox"><span><b>Everyone in the voice chat knows Tyler is listening</b><small>Required before Tyler listens. Their speech goes to your AI provider (or to Google in Gemini Live).</small></span></label>
+  </div>
+  <div class="actions"><button id="voiceDevicesRefresh" type="button" class="secondary">Refresh devices</button><button id="voiceToneTest" type="button" class="secondary">Play test tone into Steam</button></div>
+  <p class="hint" id="voiceDeviceState" role="status">Devices load when this page opens.</p>
+</section>
+
+<section class="sheet" id="voiceTestSheet" data-ui-zone="voice">
+  <div class="sheet-head">
+    <h2>Test the voice</h2>
+    <p>Plays a short line on this computer only, with the engine, model and voice selected above (saved or not).</p>
+  </div>
+  <div class="actions"><button id="voiceTest" type="button">Test voice</button></div>
+  <p class="hint" id="voiceTestState" role="status">Nothing is sent until you press Test voice.</p>
+</section>
+
+<section class="sheet" id="theme-voices" data-ui-zone="voice">
+  <div class="sheet-head">
+    <h2>Theme voices</h2>
+    <p>Tyler can say typed messages in each theme's character voice: G-Man for Steam, GLaDOS for Portal, the radio operator for Counter-Strike 1.6, and so on. The voices are clones made on this PC by a local engine (Qwen3-TTS), so they need no key, account or payment per message. Use them from the <b>Theme voices</b> card in Tyler's Steam chat panel, the phone remote, or <code>!say</code> in chat if you allow it below.</p>
+  </div>
+  <p class="callout only-chrome">Theme voices are part of the desktop app: its installer sets up the voice engine on your PC. In Chrome, open Steam chat in the ROBOTIC TYLER desktop app to use them.</p>
+  <div class="only-desktop">
+    <div class="callout" id="tvGuide" hidden>
+      <h3>Add local theme voices</h3>
+      <p>You chose theme voices in Setup. Tyler works normally without them; this adds the voice engine and a model, all downloaded and checked automatically. Nothing is downloaded until you press <b>Install now</b>.</p>
+      <p class="hint" id="tvGuidePc"></p>
+      <p id="tvGuidePlan"></p>
+      <div class="actions"><button id="tvGuideGo" type="button">Install now</button><button id="tvGuideSkip" type="button" class="secondary">Not now</button></div>
+      <small class="hint">Not now: Tyler won't ask again. You can install them any time here, in Settings → Voice → Theme voices.</small>
+    </div>
+    <p class="hint">Optional. Theme voices change Tyler's own spoken replies only if you choose <b>Theme voice on this PC</b> in Standard voice → Speaking voice; Gemini Live always uses Google's voices.</p>
+    <h3>This PC</h3>
+    <p class="hint" id="tvHardware" role="status">Checking this PC…</p>
+    <ul class="tv-notes" id="tvAdvice"></ul>
+    <div class="grid two">
+      <label>Mode
+        <select id="tvMode">
+          <option value="quality">Quality (1.7B): closest to each voice</option>
+          <option value="light">Lightweight (0.6B): less graphics memory</option>
+        </select>
+        <small class="hint" id="tvModeNote">Tyler suggests a mode for this PC; it never switches by itself.</small>
+      </label>
+      <label>Runs on
+        <select id="tvDevice">
+          <option value="auto">Graphics card when possible, else the processor</option>
+          <option value="cpu">Processor only (keeps the graphics card free)</option>
+        </select>
+        <small class="hint">The processor is much slower: a few seconds of speech can take a minute or more. On a graphics card, expect a few seconds of waiting for each second of speech with the standard engine.</small>
+      </label>
+    </div>
+    <label>Engine
+      <select id="tvEngine">
+        <option value="standard">Standard (Qwen3-TTS)</option>
+        <option value="fast">Fast (NVIDIA only, new): several times quicker</option>
+      </select>
+      <small class="hint" id="tvEngineNote">The fast engine runs the same models and voices on an NVIDIA card, much faster. Choosing it takes effect when you install it below.</small>
+    </label>
+    <details class="tv-explain"><summary>Quality or Lightweight?</summary>
+      <p><b>Quality</b> uses the larger model (Qwen3-TTS 1.7B). It copies each character's voice more closely and stumbles less (fewer odd pauses or misread words). It needs about 6.5 GB of free graphics memory on an NVIDIA card, or about 6 GB of free memory on the processor. Download: about 4.2 GB for the model.</p>
+      <p><b>Lightweight</b> uses the smaller model (Qwen3-TTS 0.6B). It needs about 4 GB of graphics memory on an NVIDIA card; on the processor it needs about as much memory as Quality. On the processor it's a little faster; on a graphics card the two take about as long. The voices sound a little less like the originals and odd pauses happen more often (Tyler retries a take that comes out the wrong length). Download: about 2.3 GB for the model.</p>
+      <p>Both use the same voice engine (about 2.7 GB with graphics-card support, 0.25 GB for the processor only). You can install both and switch any time. With the standard engine, theme voices are made ahead of playing, not live: on a mid-range NVIDIA card a short line takes several seconds.</p>
+    </details>
+    <details class="tv-explain"><summary>Standard or fast engine?</summary>
+      <p><b>Standard</b> is Qwen3-TTS's own code. It works on any PC, with or without a graphics card.</p>
+      <p><b>Fast</b> is faster-qwen3-tts (MIT licence): the same Qwen3-TTS models and the same 25 voices, run with CUDA graphs on an NVIDIA card. Its published figures, on an RTX 4060 laptop-class card under Windows, are about 1.8 seconds of speech made per second with Quality and 2.3 with Lightweight (the standard engine: about 0.23), with the first audio ready in under half a second. That's quick enough for Tyler to answer in a theme voice during a call (Settings → Voice → Speaking voice). It's new in Tyler and hasn't been tested on every card yet: <b>Run a voice check</b> after switching shows the real speed on your PC.</p>
+      <p>Switching downloads only what's different (about 15 MB); the rest of the engine is reused. You can switch back the same way. It needs the graphics card: with <b>Processor only</b> Tyler uses the standard engine.</p>
+    </details>
+    <h3>Install</h3>
+    <p id="tvInstallState" role="status">…</p>
+    <div class="tv-progress" id="tvProgressWrap" hidden><span id="tvProgress"></span></div>
+    <p class="hint" id="tvProgressText"></p>
+    <label class="toggle"><input id="tvBoth" type="checkbox"><span><b>Also install the other mode's model</b><small>So you can switch between Quality and Lightweight without another download.</small></span></label>
+    <div class="actions">
+      <button id="tvInstall" type="button">Install theme voices</button>
+      <button id="tvCancel" type="button" class="secondary" hidden>Stop installing</button>
+      <button id="tvCheck" type="button" class="secondary">Run a voice check</button>
+      <button id="tvRepair" type="button" class="secondary">Check and repair files</button>
+      <button id="tvOffline" type="button" class="secondary">Install from a folder…</button>
+    </div>
+    <div class="callout" id="tvOfflineForm" hidden>
+      <label>Folder with the offline bundle's files<input id="tvOfflineDir" placeholder="For example D:\Tyler theme voices"><small class="hint">Download every part of the offline bundle (from the <a href="https://github.com/treymun/Robotic-Tyler/releases/tag/theme-voices-engine-1" target="_blank" rel="noopener">theme-voices-engine-1 release</a>) into one folder first. Its files are checked exactly like downloads; anything missing or damaged is downloaded instead.</small></label>
+      <div class="actions"><button id="tvOfflineGo" type="button">Install from this folder</button><button id="tvOfflineCancel" type="button" class="secondary">Cancel</button></div>
+    </div>
+    <p class="hint">Everything is downloaded from its original source (python.org, PyPI, PyTorch and Hugging Face), checked against the SHA-256 recorded in this version of Tyler, and kept in its own folder: nothing is installed system-wide and other Python installs aren't touched. Interrupted downloads carry on where they stopped. <a href="#" id="tvOpenFolder">Open the folder</a>.</p>
+    <h3>While you play</h3>
+    <div class="grid two">
+      <label>Close the voice engine after
+        <select id="tvIdle">
+          <option value="1">1 minute idle</option><option value="2">2 minutes idle</option><option value="5">5 minutes idle</option><option value="10">10 minutes idle</option><option value="30">30 minutes idle</option><option value="0">Never (keep it loaded)</option>
+        </select>
+        <small class="hint">Closing it gives all of its memory back. The next message then takes a few seconds longer to start.</small>
+      </label>
+      <label class="toggle"><input id="tvProcessed" type="checkbox"><span><b>Add the voice's radio or mask sound</b><small>Only for voices whose original recordings have it (for example the Combine mask). Off plays the clone dry.</small></span></label>
+    </div>
+    <div class="actions"><button id="tvUnload" type="button" class="secondary">Close the engine now</button><button id="tvClearCache" type="button" class="secondary">Clear the cache of made clips</button></div>
+    <h3>Free up space</h3>
+    <p class="hint">Removes the downloaded engine and models. Your settings, your own reference recordings and clips you saved are kept, and Tyler keeps working without theme voices. You can install them again later (a remove means downloading again).</p>
+    <div class="actions"><button id="tvRemoveQuality" type="button" class="secondary">Remove the Quality model</button><button id="tvRemoveLight" type="button" class="secondary">Remove the Lightweight model</button><button id="tvRemove" type="button" class="secondary">Remove theme voices</button></div>
+    <h3><code>!say</code> in chat</h3>
+    <div class="grid two">
+      <label class="toggle"><input id="tvChat" type="checkbox"><span><b>Let the chat use !say</b><small><code>!say TEXT</code>, <code>!say portal TEXT</code> or, for a character voice, <code>!say tf2/scout TEXT</code> plays into the voice call. Off by default.</small></span></label>
+      <label>Who can use it
+        <select id="tvChatAccess"><option value="everyone">Everyone in the chat</option><option value="selected">Only these Steam accounts</option></select>
+      </label>
+      <label>Wait between one person's messages
+        <select id="tvChatCooldown"><option value="0">No wait</option><option value="10">10 seconds</option><option value="20">20 seconds</option><option value="30">30 seconds</option><option value="60">1 minute</option><option value="120">2 minutes</option><option value="300">5 minutes</option></select>
+      </label>
+      <label>Allowed Steam accounts (SteamID64, one per line)<textarea id="tvChatAllowed" rows="2" placeholder="7656119…"></textarea></label>
+    </div>
+    <div class="actions"><button id="tvSaveSettings" type="button">Save theme voice settings</button></div>
+    <h3>Microsoft Sam and Mary</h3>
+    <p class="hint">The Windows XP and MSN Messenger voices can be the real thing: Microsoft's own SAPI 5 voices, when this PC has them. Windows 10 and 11 don't include them; Microsoft's Speech SDK 5.1 adds them. Without them, Tyler uses a clone of a reference recording of each voice (an approximation).</p>
+    <p class="hint" id="tvNative" role="status">Checking for Microsoft Sam and Mary…</p>
+    <div class="actions"><button id="tvNativeGet" type="button" class="secondary">Get them from Microsoft (Speech SDK 5.1, 68 MB)</button><button id="tvNativeCheck" type="button" class="secondary">Check again</button></div>
+    <label class="toggle"><input id="tvNativeUse" type="checkbox" checked><span><b>Use the original Windows voices when this PC has them</b><small>Off uses the clones instead.</small></span></label>
+    <h3>Character voices</h3>
+    <p class="hint">Six themes can also speak as one of their characters: Team Fortress 2's nine classes, thirteen more Deadlock heroes, Wheatley and Cave Johnson for Portal, Coach, Ellis and Zoey for Left 4 Dead, the Phoenix and Leet faction voices for Counter-Strike 2, and Alyx for Garry's Mod. The theme's own voice stays the default, and the character you pick is remembered for that theme. The recordings aren't part of the app: press <b>Import character voices</b> and give the character voice pack (its folder or its ZIP). Only the recordings this version lists are read, each checked by its size, type and SHA-256. <b>Original recording</b> plays the game's own line (not the clone); <b>Generated speech</b> makes new speech with the clone.</p>
+    <p class="hint" id="tvCharState" role="status">Checking the character voices…</p>
+    <div class="actions"><button id="tvCharImport" type="button" class="secondary">Import character voices…</button><button id="tvCharRemove" type="button" class="secondary">Remove imported character voices</button></div>
+    <div class="callout" id="tvCharForm" hidden>
+      <label>The character voice pack: its folder, or its .zip file<input id="tvCharSource" placeholder="For example D:\Downloads\Robotic-Tyler-Character-Voice-Expansion.zip"><small class="hint">Nothing else in the pack is read or kept. A recording that doesn't match this version's list is skipped, and its character keeps the theme's own voice.</small></label>
+      <div class="actions"><button id="tvCharGo" type="button">Import</button><button id="tvCharCancel" type="button" class="secondary">Cancel</button></div>
+    </div>
+    <div class="tv-voices" id="tvChars"></div>
+    <p class="hint" id="tvCharVoiceState" role="status"></p>
+    <h3>The 25 voices</h3>
+    <p class="hint">Each theme's voice can be replaced with your own recording (5–20 seconds of one person speaking clearly, plus exactly what they say). Your replacements are kept through updates. <b>Reference</b> plays the original recording the clone learns from; <b>Test</b> makes new speech with the clone.</p>
+    <label>Test sentence<input id="tvTestText" maxlength="200" value="Good evening. This is a test of my brand new voice."></label>
+    <div class="tv-voices" id="tvVoices"></div>
+    <p class="hint" id="tvVoiceState" role="status"></p>
+    <input id="tvRefFile" type="file" accept=".wav,.flac,.mp3,.ogg,audio/*" hidden>
+    <div class="callout" id="tvRefForm" hidden>
+      <label><span id="tvRefTitle">What is said in the recording</span><textarea id="tvRefText" rows="2" maxlength="600" placeholder="Type exactly what the person says. Leave it empty if you don't know (the clone then uses only the sound of the voice)."></textarea></label>
+      <div class="actions"><button id="tvRefSave" type="button">Use this recording</button><button id="tvRefCancel" type="button" class="secondary">Cancel</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Squad & friends ─────────────────────────────────────── -->
+<section class="sheet" id="suiteSettings" data-ui-zone="squad">
+  <div class="sheet-head">
+    <h2>Squad features</h2>
+    <p>Group features for the Steam chat Tyler is connected to. Everything here is off until you turn it on.</p>
+  </div>
+  <div class="toggle-grid">
+    <label class="toggle"><input id="suiteVoting" type="checkbox"><span><b>Game voting</b><small>Approved friends type <code>!vote GAME</code>.</small></span></label>
+    <label class="toggle"><input id="suiteParty" type="checkbox"><span><b>Party host</b><small>Approved friends create game nights, join and get rotating teams.</small></span></label>
+    <label class="toggle"><input id="suiteArcade" type="checkbox"><span><b>Multiplayer trivia</b><small><code>!trivia</code> and <code>!answer 1–4</code> to earn XP, with questions from the same 500 as <code>play trivia</code>.</small></span></label>
+    <label class="toggle"><input id="suiteEvents" type="checkbox"><span><b>Manual personality events</b><small>One-click GG, tough-loss and achievement messages. Never automatic.</small></span></label>
+    <label class="toggle"><input id="suiteProfiles" type="checkbox"><span><b>Friend preferences</b><small>Notes you maintain about friends who opted in. Never inferred.</small></span></label>
+    <label class="toggle"><input id="suiteCoaching" type="checkbox"><span><b>Game-coach replies</b><small>Practical advice when someone asks. No fake real-time telemetry.</small></span></label>
+    <label class="toggle"><input id="suiteAwareness" type="checkbox"><span><b>Conversation awareness</b><small>Follow-ups use recent chat history without guessing who spoke.</small></span></label>
+    <label class="toggle"><input id="suiteAdaptive" type="checkbox"><span><b>Adaptive personality</b><small>Recent conversation cues adjust the tone of replies.</small></span></label>
+    <label class="toggle only-chrome"><input id="suiteDirector" type="checkbox"><span><b>Soundboard director</b><small>When chat says gg, we won, we lost and the like, plays Victory or Sad trombone (your soundboard’s sounds, its volume and who-can-trigger rule), with a 90-second cooldown. Uses the Chrome voice bridge.</small></span></label>
+    <label class="toggle"><input id="suiteNudges" type="checkbox"><span><b>Party check-in</b><small>One text check-in after 12 quiet minutes, at most once an hour.</small></span></label>
+    <label class="toggle"><input id="suiteHud" type="checkbox" checked><span><b>Extended squad HUD</b><small>Queue status, XP and diagnostics inside Steam.</small></span></label>
+  </div>
+</section>
+
+<section class="sheet" id="approvedFriends" data-ui-zone="squad">
+  <div class="sheet-head">
+    <h2>Approved friends</h2>
+    <p>Steam accounts allowed to use game voting, party host, multiplayer trivia and custom commands.</p>
+  </div>
+  <label>Approved Steam account IDs<textarea id="libraryAllowedIds" rows="3" placeholder="One verified 17-digit Steam ID per line" spellcheck="false"></textarea></label>
+</section>
+
+<section class="sheet" id="friendProfiles" data-ui-zone="squad">
+  <div class="sheet-head">
+    <h2>Verified friends</h2>
+    <p>Nicknames for explicitly configured 17-digit Steam account IDs. This never identifies anyone in voice chat.</p>
+  </div>
+  <div class="grid two">
+    <label>Steam account ID<input id="friendID" type="text" inputmode="numeric" maxlength="17" placeholder="7656119XXXXXXXXXX"></label>
+    <label>Nickname<input id="friendNickname" type="text" maxlength="60" placeholder="Their chosen nickname"></label>
+  </div>
+  <div class="actions"><button id="friendSave" type="button">Add or update</button><button id="friendErase" class="secondary" type="button">Remove nickname</button></div>
+  <p class="hint" id="friendStatus" role="status">Names are only used for confirmed message authors.</p>
+  <div id="friendCards" class="friend-cards"></div>
+</section>
+
+<!-- ── Games ───────────────────────────────────────────────── -->
+<section class="sheet" id="steamActivity" data-ui-zone="games">
+  <div class="sheet-head">
+    <h2>Public game activity</h2>
+    <p>Checks public Steam profiles only. It can't see private games, game telemetry or friends lists, and some profiles block the XML feed.</p>
+  </div>
+  <label class="toggle"><input type="checkbox" id="activityEnabled"><span><b>Check public game activity</b><small>Off by default. The squad panel in Steam checks only while it's open.</small></span></label>
+  <label>Steam account IDs to watch, one per line
+    <textarea id="activitySteamIds" rows="3" placeholder="7656119…"></textarea>
+  </label>
+  <p class="hint">Up to eight visible profiles. No Steam API key needed; IDs are stored locally.</p>
+</section>
+
+<!-- ── Advanced ────────────────────────────────────────────── -->
+<section class="sheet" id="social" data-ui-zone="advanced">
+  <div class="sheet-head">
+    <h2>Memory and running jokes</h2>
+    <p>Unknown speakers stay unnamed. Clearing the conversation in Steam resets the local running context.</p>
+  </div>
+  <label>Inside jokes, one per line
+    <textarea id="insideJokes" rows="4" maxlength="3600" placeholder="A running joke or shared gaming memory"></textarea>
+  </label>
+  <label class="narrow">AI turns between callback opportunities
+    <input id="callbackGap" type="number" min="3" max="30" value="6">
+  </label>
+  <label>Nicknames for confirmed accounts: Steam account ID = nickname
+    <textarea id="nicknameAliases" rows="3" maxlength="2400" placeholder="7656119XXXXXXXXXX = nickname"></textarea>
+  </label>
+</section>
+
+<section class="sheet" id="usageSection" data-ui-zone="advanced">
+  <div class="sheet-head">
+    <h2>Keys and usage detail</h2>
+    <p>The summary covers successful text generations. Speech and transcription charges are tracked by your provider.</p>
+  </div>
+  <p id="status" role="status">Loading current settings…</p>
+  <div id="usageSummary" class="usage-banner" aria-live="polite"></div>
+  <details class="raw"><summary>Raw usage record</summary><pre id="usage"></pre></details>
+</section>
+
+    </div>
+
+    <footer class="savebar">
+      <p id="uiNavStatus" class="ui-clean" role="status">All changes are kept when you press Save settings.</p>
+      <div class="actions">
+        <button id="clear" class="secondary" type="button">Remove saved API keys</button>
+        <button id="steam" class="secondary" type="button">Open Steam chat</button>
+        <button id="save" class="primary" type="button">Save settings</button>
+      </div>
+    </footer>
+    <p class="fineprint">Keys are stored in this <span class="only-chrome">Chrome profile</span><span class="only-desktop">app's Windows data folder, encrypted with your Windows account</span> and never bundled into exports.</p>
+  </main>
+</div>
+
+<script src="ui-icons.js?v=2.41.0"></script>
+<script src="ui-logos.js?v=2.41.0"></script>
+<script src="ui-brand.js?v=2.41.0"></script>
+<script src="ui-kit.js?v=2.41.0"></script>
+<script src="ui-template.js?v=2.41.0"></script>
+<script src="chat-tag.js?v=2.41.0"></script>
+<script src="notice-settings.js?v=2.41.0"></script>
+<script src="image-core.js?v=2.41.0"></script>
+<script src="image-settings.js?v=2.41.0"></script>
+<script src="theme-voice-settings.js?v=2.41.0"></script>
+<script src="local-ai-settings.js?v=2.41.0"></script>
+<script src="local-speech-settings.js?v=2.41.0"></script>
+<script src="local-images-settings.js?v=2.41.0"></script>
+<script src="settings.js?v=2.41.0"></script>
+<script src="v22-settings.js?v=2.41.0"></script>
+<script src="settings-navigation.js?v=2.41.0"></script>
+<script src="v23-settings.js?v=2.41.0"></script>
+<script src="theme-showcase.js?v=2.41.0"></script>
+<script src="theme-pack-1.js?v=2.41.0"></script>
+<script src="theme-pack-2.js?v=2.41.0"></script>
+<script src="theme-pack-3.js?v=2.41.0"></script>
+<script src="theme-pack-4.js?v=2.41.0"></script>
+<script src="theme-gallery.js?v=2.41.0"></script>
+<script src="remote-settings.js?v=2.41.0"></script>
+<script src="voice-settings.js?v=2.41.0" type="module"></script>
+<script src="ai-settings.js?v=2.41.0" type="module"></script>
+</body>
+</html>

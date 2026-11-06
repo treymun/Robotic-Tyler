@@ -11,7 +11,7 @@
 const {app,BrowserWindow,ipcMain,Menu,shell,safeStorage,webContents,Tray,nativeImage,dialog,session,protocol,desktopCapturer,net}=require('electron');
 const path=require('node:path'),fs=require('node:fs'),{pathToFileURL}=require('node:url'),{execFile,spawn}=require('node:child_process');
 const {setupUpdates}=require('./updates.cjs'),{Vault,memoryStorage}=require('./vault.cjs'),{isChat,isSteam,isLocal,settingsKeys,sanitizeSettings}=require('./guards.cjs');
-const {setupRemote}=require('./remote.cjs'),{NativeVoice}=require('./native-voice.cjs'),{importVoiceStudio}=require('./migrate.cjs'),steamVoice=require('./steam-voice.cjs'),{setupDesktopMedia,isYouTube}=require('./desktop-media.cjs');
+const {setupRemote,draftWithPhone}=require('./remote.cjs'),{NativeVoice}=require('./native-voice.cjs'),{importVoiceStudio}=require('./migrate.cjs'),steamVoice=require('./steam-voice.cjs'),{setupDesktopMedia,isYouTube}=require('./desktop-media.cjs');
 steamVoice.registerScheme(protocol);
 // Same data folder as the Control Center, so its users keep settings, keys and memory as they are.
 const root=path.join(process.env.LOCALAPPDATA||app.getPath('appData'),'RoboticTylerHydraCloudV12');fs.mkdirSync(path.join(root,'Data'),{recursive:true});app.setPath('userData',path.join(root,'Data'));
@@ -125,10 +125,22 @@ if(!app.requestSingleInstanceLock()){app.quit();}else{
   const id='r'+(++remoteSeq),timer=setTimeout(()=>{remoteJobs.delete(id);reject(Error('Tyler\u2019s Steam window didn\u2019t answer. Is Steam chat loaded?'));},8000);
   remoteJobs.set(id,{resolve,reject,timer});bot.webContents.send('tyler:message',{type:'remote:action',id,action,args});});}
  function remoteAnswer(m){const job=remoteJobs.get(m?.id);if(!job)return;remoteJobs.delete(m.id);clearTimeout(job.timer);m.ok?job.resolve(m.data&&typeof m.data==='object'?m.data:{}):job.reject(Error(String(m.error||'Tyler couldn\u2019t do that.')));}
- // v2.26: the phone may change two settings here (the theme and muting the call in this window), and
- // Start Music DJ gets the click its screen-share needs (the share itself is still only the YouTube window).
+ // v2.41: a setting changed from the phone goes into the same store as the PC's Settings (so the Steam
+ // window follows), and reaches an open Settings window: its unsaved edits (settingsDraft) take the
+ // phone's values, and the page reloads to show them, so its Save can't put the old values back.
+ // remote.cjs has already checked the values (guards.cjs phone lists, sanitizeSettings).
+ async function fromPhone(values){
+  const keys=Object.keys(values);if(!keys.length)return;
+  await local.set(values);
+  const draft=draftWithPhone((await vault.get('settingsDraft')).settingsDraft,values);if(draft)await vault.set({settingsDraft:draft});
+  const shown=keys.filter(k=>k!=='uiTheme'); // the theme follows live (tyler:theme below)
+  if(shown.length&&options&&!options.isDestroyed())options.webContents.send('tyler:phone-settings',shown);
+ }
+ // v2.26: the phone's own theme picker and call mute, and Start Music DJ gets the click its
+ // screen-share needs (the share itself is still only the YouTube window). v2.41: Settings from the phone.
  remote=setupRemote({vault,log:eventLog,ask:askSteamWindow,pageDir:path.join(__dirname,'remote'),uiDir:path.join(__dirname,'companion','ui'),libDir:path.join(__dirname,'companion'),version:app.getVersion(),theme:async()=>(await vault.get('uiTheme')).uiTheme||'steam',
-  prefs:{get:async()=>{const v=await vault.get(['uiTheme','desktopMuteCall']);return {theme:v.uiTheme||'steam',muteCall:v.desktopMuteCall===true};},theme:t=>local.set({uiTheme:t}),muteCall:on=>local.set({desktopMuteCall:on===true})},
+  prefs:{get:async()=>{const v=await vault.get(['uiTheme','desktopMuteCall']);return {theme:v.uiTheme||'steam',muteCall:v.desktopMuteCall===true};},theme:t=>fromPhone({uiTheme:t}),muteCall:on=>fromPhone({desktopMuteCall:on===true})},
+  settings:{read:keys=>vault.get(keys),write:fromPhone,remove:keys=>local.remove(keys)},
   gesture:async()=>{if(bot&&!bot.isDestroyed()&&!bot.webContents.isDestroyed())await bot.webContents.executeJavaScript('0',true);}});
  // A theme chosen elsewhere (the phone remote) reaches an open settings window too.
  changeListeners.push(changes=>{if(changes.uiTheme&&options&&!options.isDestroyed())options.webContents.send('tyler:theme',changes.uiTheme.newValue);});

@@ -1,9 +1,12 @@
 #!/usr/bin/env node
-// Layout audit: renders the panel (every tab), Settings and the phone remote in every theme and
+// Layout audit: renders the panel (every tab), Settings, the phone remote and (v2.41) Settings on the
+// phone remote in every theme and
 // measures what the eye picks up as "slightly off": buttons in one row with different heights or
 // centres, uneven gaps between them, controls poking out of their card, clipped labels and
 // overlapping controls. Prints the problems per theme and writes out/layout-audit.json.
-// Usage: node tools/preview/layout-audit.mjs [outDir]   (THEMES=steam,tf2 to limit)
+// Usage: node tools/preview/layout-audit.mjs [outDir]   (THEMES=steam,tf2 to limit; PANEL=0, SETTINGS=0,
+// REMOTE=0 or PHONE_SETTINGS=0 to skip a view; SHOTS=1 for screenshots: Settings on the phone as the
+// phone shows it, one screen at a time down each section)
 import http from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -131,6 +134,7 @@ const stub=theme=>{window.chrome={storage:{local:{get:async()=>({uiTheme:theme,u
 for(const theme of THEMES){
  const out=results[theme]={};
  // The panel, every tab, with the feature groups open.
+ if(process.env.PANEL!=='0'){
  const page=await browser.newPage({viewport:{width:1280,height:860},reducedMotion:'reduce'});
  await page.goto(base+'/tools/preview/panel.html?platform=chrome&theme='+theme);
  await page.waitForFunction(()=>window.__tylerReady===true);await page.waitForTimeout(SHOTS?4000:500);await page.evaluate(()=>document.fonts.ready);
@@ -141,7 +145,9 @@ for(const theme of THEMES){
   if(SHOTS){const box=await page.evaluate(shadow(`const b=r.querySelector('.panel').getBoundingClientRect();return {x:b.x,y:b.y,width:b.width,height:b.height};`));await page.screenshot({path:path.join(OUT,'audit-'+theme+'-panel-'+tab+'.png'),clip:box});}
  }
  await page.close();
+ }
  // Settings, each zone.
+ if(process.env.SETTINGS!=='0'){
  const s=await browser.newPage({viewport:{width:1280,height:900},reducedMotion:'reduce'});
  await s.addInitScript(stub,theme);await s.goto(base+'/browser-extension/settings.html');await s.waitForTimeout(500);await s.evaluate(()=>document.fonts.ready);
  for(const zone of ['ai','voice','squad','games','advanced']){
@@ -150,6 +156,7 @@ for(const theme of THEMES){
   if(SHOTS)await s.screenshot({path:path.join(OUT,'audit-'+theme+'-settings-'+zone+'.png'),fullPage:true});
  }
  await s.close();
+ }
  // The phone remote on a phone-sized screen (the real remote server and page, the panel preview as the PC).
  if(process.env.REMOTE!=='0'){
   const pc=await browser.newPage({viewport:{width:1280,height:900}});let srv=null;
@@ -170,6 +177,26 @@ for(const theme of THEMES){
     if(SHOTS)await phone.screenshot({path:path.join(OUT,'audit-'+theme+'-phone-'+tab+'.png'),fullPage:true});
    }
   }finally{await ctx.close();await pc.close();await srv.stop();}
+ }
+ // v2.41: Settings on the phone remote: the desktop app's Settings page from the real remote server,
+ // on a 390 px phone, each zone (the PC's settings are a memory store here).
+ if(process.env.PHONE_SETTINGS!=='0'){
+  const vault=memoryStorage();await vault.set({uiTheme:theme,openrouterKey:'audit-key',usage:{requests:42,promptTokens:18234,completionTokens:5120,reportedCostUSD:0.0314,speechResponses:9}});
+  const srv=setupRemote({vault,ask:async a=>a==='state'?{ready:false,error:'Audit'}:{},pageDir:path.join(ROOT,'app','remote'),uiDir:path.join(ROOT,'app','companion','ui'),libDir:path.join(ROOT,'app','companion'),version:'audit',theme:async()=>theme,
+   settings:{read:k=>vault.get(k),write:v=>vault.set(v),remove:k=>vault.remove(k)}});
+  const st=await srv.handle('enable'),at='http://127.0.0.1:'+st.port;
+  const ctx=await browser.newContext({viewport:{width:390,height:844},isMobile:true,hasTouch:true,reducedMotion:'reduce'});
+  try{
+   const phone=await ctx.newPage();await phone.request.post(at+'/pair',{headers:{'content-type':'application/json','x-tyler-remote':'1'},data:{code:st.code}});
+   await phone.goto(at+'/settings/');await phone.waitForFunction(()=>document.body.classList.contains('ui-ready'));await phone.evaluate(()=>window.tylerSettingsLoaded);
+   await phone.waitForTimeout(SHOTS?1500:500);await phone.evaluate(()=>document.fonts.ready);
+   for(const zone of ['overview','ai','voice','squad','games','appearance','advanced']){
+    await phone.evaluate(z=>{location.hash=z;},zone);await phone.waitForTimeout(300);
+    out['phone-settings-'+zone]=await phone.evaluate(audit,'document');
+    if(SHOTS){const h=await phone.evaluate(()=>document.documentElement.scrollHeight),step=844-150;
+     for(let i=0,y=0;y<h&&i<14;i++,y+=step){await phone.evaluate(y=>window.scrollTo(0,y),y);await phone.waitForTimeout(120);await phone.screenshot({path:path.join(OUT,'audit-'+theme+'-phone-settings-'+zone+'-'+String(i+1).padStart(2,'0')+'.png')});}}
+   }
+  }finally{await ctx.close();await srv.stop();}
  }
 }
 await browser.close();server.close();

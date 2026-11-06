@@ -39,7 +39,7 @@
 <td valign="top"><img src="assets/readme/icon-images.png" width="52" align="left" alt="">&nbsp;<b>Chat pictures</b> <sup>new</sup><br>&nbsp;<code>!image</code> and a description: Tyler draws it and posts it in the chat, with your own OpenRouter or Venice key and within your spending cap, or on your own PC with no key (desktop app, v2.40).</td>
 </tr>
 <tr>
-<td valign="top"><img src="assets/readme/icon-remote.png" width="52" align="left" alt="">&nbsp;<b>Phone remote</b><br>&nbsp;Tyler's panel on your phone, live and in your theme. Start or pause him, play clips, run the music, read and type in chat, switch the theme. Nothing to install.</td>
+<td valign="top"><img src="assets/readme/icon-remote.png" width="52" align="left" alt="">&nbsp;<b>Phone remote</b><br>&nbsp;Tyler's panel on your phone, live and in your theme. Start or pause him, play clips, run the music, read and type in chat, switch the theme, change his settings. Nothing to install.</td>
 <td valign="top"><img src="assets/readme/icon-stay.png" width="52" align="left" alt="">&nbsp;<b>Stays in the call</b><br>&nbsp;A soft hum after 45 quiet minutes keeps Steam from dropping him, and he reconnects to the chat by himself. A full check tests every part in one pass.</td>
 </tr>
 </table>
@@ -102,7 +102,7 @@ Your personality, reply length and rules always apply, and people in the call ca
 - Tyler only hears the Steam voice call he's in, and only after you confirm everyone knows he's listening. He never uses your physical microphone: his voice is a synthetic microphone that only carries what he says and plays.
 - Your keys stay on your PC (encrypted by Windows in the desktop app) and never reach Steam's pages.
 - Screen commentary only sees the window you pick, as still pictures, and only while you share it.
-- The phone remote is off until you turn it on. It answers only devices on your home network, and only after pairing with a code from Settings. The phone sees what the panel shows and the chat's latest messages (for its Chat log card), never your keys. Remove a phone (or all of them) in Settings at any time.
+- The phone remote is off until you turn it on. It answers only devices on your home network, and only after pairing with a code from Settings. The phone sees what the panel shows, the chat's latest messages (for its Chat log card) and, in its Settings, the settings it can change. It never sees your API keys (only whether one is saved) and can't add or remove them; pairing phones, installs and tests that use your keys stay on the PC. Remove a phone (or all of them) in Settings at any time.
 
 ## Trivia
 

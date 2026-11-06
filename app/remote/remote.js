@@ -9,6 +9,8 @@
 // What the extras need from the panel comes from a stand-in (TylerCompanion below): Tyler's status
 // from the PC, and their buttons (menus, hotkeys) send the same fixed list of actions as the
 // remote's own buttons. Nothing is stored on the phone except the pairing cookie.
+//
+// v2.41: the Setup tab opens Tyler's Settings on the PC (/settings/, app/remote/phone-settings.js).
 (() => {
  'use strict';
  const THEMES=['steam','classic','tf2','cs2','portal','cs16','hev','l4d','winxp','doom','quake','pipboy','combine','deadlock','minecraft','payday','dreamcast','gmod','ricochet','dod','rust','x360','ipod','msn','xmb'];
@@ -86,6 +88,8 @@
   <p id="rmBoardStatus" class="hint" role="status"></p>
 </section>
 <section id="view-setup" class="view" role="tabpanel" aria-labelledby="tab-setup" data-view="setup" hidden>
+  <div class="rm-settings"><button id="rmSettings" class="btn primary block" type="button">${icon('setup')}Open Settings</button>
+  <small class="hint">Tyler’s Settings on your PC, from this phone: personality, AI and model, voice, squad and more. API keys, installs and tests stay on the PC.</small></div>
   <div class="view-head"><h2>Theme</h2><p>Changes every Tyler window on your PC, and this remote.</p></div>
   <div id="rmThemes" class="rm-themes" role="group" aria-label="Theme"></div>
   <details class="feature" open><summary><span class="feature-title">Voice and playback</span><span class="feature-meta">On your PC</span></summary>
@@ -325,7 +329,9 @@
   $('rmJoin').onclick=()=>void callAct('voice-join');$('rmLeave').onclick=()=>void callAct('voice-leave');
   $('rmNoticeYes').onclick=()=>void act('notice',{always:false},'Continuing…');
   $('rmNoticeAlways').onclick=()=>void act('notice',{always:true},'Continuing. Tyler won’t ask again.');
-  $('settings').onclick=()=>showTab('setup');
+  // v2.41: Settings on the PC, from this phone (app/remote/phone-settings.js). The theme extras' own
+  // "Settings" entries (their menus press the panel's settings button) open it too.
+  $('rmSettings').onclick=$('settings').onclick=()=>location.assign('/settings/');
   $('rmMode').onchange=()=>void act('mode',{mode:$('rmMode').value},'Mode saved for the next Connect & start');
   $('rmLogRefresh').onclick=()=>void chatLog(true);
   $('rmLogCard').addEventListener('toggle',()=>{if($('rmLogCard').open)void chatLog(true);});

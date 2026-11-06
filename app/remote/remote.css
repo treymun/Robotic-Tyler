@@ -52,3 +52,7 @@
 .rm-log-line.self{box-shadow:inset 3px 0 0 var(--rt-active)}
 .rm-log-who{font-size:var(--rt-text-xs,11px);font-weight:700;color:var(--rt-ink-4);text-transform:uppercase;letter-spacing:.04em}
 .rm-log-text{white-space:pre-wrap;overflow-wrap:anywhere}
+
+/* v2.41: Settings on the PC, at the top of the Setup tab. */
+.rm-settings{margin:0 0 16px}
+.rm-settings .btn{min-height:48px;margin-top:0}

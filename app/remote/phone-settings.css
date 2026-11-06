@@ -1,0 +1,44 @@
+/* Settings on the phone remote (v2.41): the desktop app's own Settings page on a paired phone
+   (app/remote/phone-settings.js). The page's stylesheet and the theme do the look; this only hides
+   what stays on the PC, shows the notes that say so, and adds the way back to the remote. */
+.phone-hidden{display:none!important}
+.phone-pc-only>:not(.sheet-head):not(.phone-note){display:none!important}
+body:not([data-zone=overview]) .phone-intro{display:none!important}
+
+/* "Do this on your PC" notes: the theme's own banner style, with a mark on the left. */
+.phone-note{margin:12px 0;box-shadow:inset 3px 0 0 var(--rt-active)}
+.phone-note.phone-inline{margin:8px 0 0}
+.phone-pc-only .phone-note{margin-bottom:0}
+
+/* Whether an API key is saved (never the key). */
+.phone-keys{display:grid;gap:6px;margin:14px 0 0}
+.phone-key{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:44px;padding:8px 12px;border-radius:var(--rt-r-sm);background:var(--rt-block,rgba(0,0,0,.2));font-size:14px}
+.phone-key>span{min-width:0;color:var(--rt-ink)}
+.phone-key>b{flex-shrink:0;font-weight:600;color:var(--rt-ink-3)}
+.phone-key>b[data-on=true]{color:var(--rt-state-speaking,var(--rt-success))}
+.phone-keys+.phone-note{margin-top:6px}
+
+/* Back to the remote, first in the bar with the sections. */
+.phone-back{display:inline-flex;align-items:center;gap:6px;flex-shrink:0;min-height:40px;padding:0 12px 0 8px;border-radius:var(--rt-r-sm);color:var(--rt-ink-strong);text-decoration:none;font-weight:600;white-space:nowrap}
+.phone-back>span:first-child{font-size:22px;line-height:1}
+.phone-back:hover,.phone-back:focus-visible{background:var(--rt-select);color:var(--rt-ink-strong)}
+
+/* The bar with the sections: the way back and the logo stay put (without the name, so more sections
+   fit) and only the sections scroll sideways. The save bar in one row. */
+.brand-text{display:none!important}
+.side{overflow:hidden!important}
+.side .section-nav{flex:1 1 auto;min-width:0;overflow-x:auto;overscroll-behavior-x:contain;scrollbar-width:none}
+.side .section-nav::-webkit-scrollbar{display:none}
+.savebar{flex-wrap:nowrap}
+.savebar p{flex:1 1 auto;min-width:0}
+.savebar .actions{flex-shrink:0;flex-wrap:nowrap}
+
+/* Some themes' bars are see-through (they were made as a side column). On a phone the page scrolls
+   under the bar, so it gets the page's colour underneath, the theme's tint still on top. */
+.phone-underlay{display:none}
+@media (max-width:860px){.phone-underlay{display:block;position:fixed;top:0;left:0;right:0;height:var(--phone-bar-h,0);z-index:5;background:var(--rt-bg);pointer-events:none}}
+/* The save bar too, where a theme leaves it see-through (PS3, Dreamcast, L4D, CS 1.6, PAYDAY 2 …):
+   it sits in a holder with the page's colour, and keeps its own look on top. */
+.phone-savebar{position:sticky;bottom:0;z-index:5;margin:24px -40px 0;background:var(--rt-bg)}
+.phone-savebar>.savebar{position:static;margin:0}
+@media (max-width:860px){.phone-savebar{margin:20px -16px 0}}

@@ -13,9 +13,16 @@
 //    chat's latest 40 messages (names, times, text) for its Chat log card, which asks only while open.
 //  - v2.26: the page is a copy of Tyler's panel in his theme, with the theme's live extras: it loads
 //    the panel's own stylesheet and theme code (/lib/, a fixed list) and gets the panel's UI events
-//    as they happen over /events (paired phones only). Two settings can be changed from it: the
-//    theme and muting the call on this PC; nothing else in Settings.
+//    as they happen over /events (paired phones only).
+//  - v2.41: Settings from the phone. A paired phone opens the desktop app's own Settings page at
+//    /settings/ (app/companion/phone-settings.html, a fixed list of its files) and changes settings
+//    there. The page's storage goes to /settings/get, /settings/set and /settings/remove (paired phones
+//    only, their own size and rate limits): only the keys in guards.cjs phoneWritable are changed, through
+//    the same sanitizeSettings as the PC, into the same store. API keys never leave the PC: the phone
+//    learns only whether one is saved, and can't set or remove one. Pairing, phones, installs, tests
+//    that spend money or play on the PC, and settings files stay on the PC (app/remote/phone-settings.js).
 const http=require('node:http'),crypto=require('node:crypto'),os=require('node:os'),fs=require('node:fs'),path=require('node:path'),zlib=require('node:zlib');
+const {sanitizeSettings,secretKeys,phoneWritable,phoneReadable,phoneRemovable}=require('./guards.cjs');
 
 const DEFAULT_PORT=47820,CODE_MS=600000,MAX_TRIES=8,MAX_DEVICES=8,COOKIE='rt_remote';
 const THEMES=new Set(['steam','classic','tf2','cs2','portal','cs16','hev','l4d','winxp','doom','quake','pipboy','combine','deadlock','minecraft','payday','dreamcast','gmod','ricochet','dod','rust','x360','ipod','msn','xmb']);
@@ -31,7 +38,16 @@ const ACTIONS={pause:()=>({}),start:()=>({}),notice:b=>({always:b.always===true}
 // The panel's own stylesheet, logos, icons, notifications and theme code (generated into app/companion).
 const LIB=new Set(['ui-template.js','ui-logos.js','ui-brand.js','ui-icons.js','ui-kit.js','theme-features.js','theme-pack-1.js','theme-pack-2.js','theme-pack-3.js','theme-pack-4.js']);
 const MAX_STREAMS=8;
-const TYPES={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.png':'image/png','.woff2':'font/woff2','.svg':'image/svg+xml'};
+const TYPES={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.png':'image/png','.woff2':'font/woff2','.svg':'image/svg+xml'};
+// v2.41: the Settings page's own files (generated into app/companion), at /settings/<file>: its
+// stylesheets and scripts and the modules they import. Theme stylesheets, logos and fonts by pattern.
+const SETTINGS_LIB=new Set(['settings.css','ui/tokens.css','ui/icons.css','ui/kit.css','ui/logo-mark.svg','icons/icon-32.png','theme.js','ui-icons.js','ui-logos.js','ui-brand.js','ui-kit.js','ui-template.js','chat-tag.js',
+ 'notice-settings.js','image-core.js','image-settings.js','theme-voice-settings.js','local-ai-settings.js','local-speech-settings.js','local-images-settings.js','settings.js','v22-settings.js','settings-navigation.js',
+ 'v23-settings.js','theme-showcase.js','theme-pack-1.js','theme-pack-2.js','theme-pack-3.js','theme-pack-4.js','theme-gallery.js','remote-settings.js','voice-settings.js','ai-settings.js',
+ 'live-core.mjs','live-pcm.js','guard.mjs','conversation.mjs','memory.mjs','gemini.mjs','speech.mjs','models.mjs','quality.mjs','local-ai.mjs','settings-ai.mjs']);
+// The phone's bridge to the page (window.tylerSettings) and its phone styles, from app/remote.
+const SETTINGS_OWN=new Set(['phone-settings.js','phone-settings.css']);
+const SETTINGS_BODY=65536,MAX_KEYS=160;
 
 /** 10/8, 172.16/12, 192.168/16, 127/8, 169.254/16 and IPv6 loopback/link-local/unique-local, also IPv4-mapped. */
 function privateAddress(address){
@@ -58,10 +74,13 @@ const cookieOf=(req,name)=>{for(const part of String(req.headers.cookie||'').spl
 const deviceName=ua=>{const s=String(ua||'');return /iPhone/.test(s)?'iPhone':/iPad/.test(s)?'iPad':/Android/.test(s)?(/Mobile/.test(s)?'Android phone':'Android tablet'):/Windows/.test(s)?'Windows PC':/Mac OS/.test(s)?'Mac':'Phone';};
 
 /**
- * prefs: {get() → {theme, muteCall}, theme(name), muteCall(on)} for the two settings the phone may
- * change. gesture(): lets the Steam window start what needs a click (Start Music DJ's share).
+ * prefs: {get() → {theme, muteCall}, theme(name), muteCall(on)} for the remote's own theme picker and
+ * call mute. gesture(): lets the Steam window start what needs a click (Start Music DJ's share).
+ * settings (v2.41): {read(keys) → values, write(values), remove(keys)}: the store the PC's Settings
+ * uses. This file decides what reaches it (guards.cjs phone lists, sanitizeSettings); write() gets
+ * only checked values that changed.
  */
-function setupRemote({vault,log=()=>{},ask,pageDir,uiDir,libDir=path.dirname(uiDir||'.'),version='',theme=async()=>'steam',prefs=null,gesture=async()=>{}}){
+function setupRemote({vault,log=()=>{},ask,pageDir,uiDir,libDir=path.dirname(uiDir||'.'),version='',theme=async()=>'steam',prefs=null,gesture=async()=>{},settings=null}){
  let server=null,port=0,code=null,codeUntil=0,tries=0,starting=null;const seen=new Map();let lastSeenWrite=0;
  const streams=new Set();let watchTimer=0;
  const readConfig=async()=>{const v=await vault.get(['remoteControl','remoteDevices']);const c={on:v.remoteControl?.on===true,away:v.remoteControl?.away===true,port:Number(v.remoteControl?.port)||DEFAULT_PORT,devices:Array.isArray(v.remoteDevices)?v.remoteDevices:[]};away=c.away;return c;};
@@ -94,11 +113,14 @@ function setupRemote({vault,log=()=>{},ask,pageDir,uiDir,libDir=path.dirname(uiD
   }
   send(res,200,fs.readFileSync(full),type,extra);
  }
- function body(req){return new Promise((resolve,reject)=>{let size=0;const parts=[];req.on('data',c=>{size+=c.length;if(size>4096){reject(Error('Too large'));req.destroy();}else parts.push(c);});req.on('end',()=>{try{resolve(JSON.parse(Buffer.concat(parts).toString('utf8')||'{}'));}catch{reject(Error('Invalid request'));}});req.on('error',reject);});}
+ function body(req,limit=4096){return new Promise((resolve,reject)=>{let size=0,done=false;const parts=[];req.on('data',c=>{if(done)return;size+=c.length;if(size>limit){done=true;reject(Error('Too large'));}else parts.push(c);});req.on('end',()=>{if(done)return;done=true;try{const v=JSON.parse(Buffer.concat(parts).toString('utf8')||'{}');if(!v||typeof v!=='object'||Array.isArray(v))throw Error();resolve(v);}catch{reject(Error('Invalid request'));}});req.on('error',e=>{if(!done){done=true;reject(e);}});});}
  // Actions from one phone at most 5 a second.
- const recent=[];const limited=()=>{const t=Date.now();while(recent.length&&t-recent[0]>1000)recent.shift();if(recent.length>=5)return true;recent.push(t);return false;};
+ const allowance=(max,ms)=>{const list=[];return ()=>{const t=Date.now();while(list.length&&t-list[0]>ms)list.shift();if(list.length>=max)return true;list.push(t);return false;};};
+ const limited=allowance(5,1000);
  // v2.35: reading the chat log has its own small allowance, so it never uses up the buttons' one.
- const reads=[];const readLimited=()=>{const t=Date.now();while(reads.length&&t-reads[0]>1000)reads.shift();if(reads.length>=3)return true;reads.push(t);return false;};
+ const readLimited=allowance(3,1000);
+ // v2.41: Settings from the phone have their own: reads (the page batches them) and saves.
+ const settingsReadLimited=allowance(10,1000),writeSecond=allowance(4,1000),writeMinute=allowance(30,60000),settingsWriteLimited=()=>writeSecond()||writeMinute();
 
  async function run(action,args){
   if(action==='theme'){if(!THEMES.has(args.theme))throw Error('Unknown theme.');if(!prefs)throw Error('Not available.');await prefs.theme(args.theme);return {theme:args.theme};}
@@ -106,6 +128,51 @@ function setupRemote({vault,log=()=>{},ask,pageDir,uiDir,libDir=path.dirname(uiD
   if(action==='music-start')await gesture().catch(()=>{});
   return ask(action,args);
  }
+ // ── Settings from the phone (v2.41) ──────────────────────────────────────
+ const keyList=v=>{const list=Array.isArray(v)?v:typeof v==='string'?[v]:null;if(!list||list.length>MAX_KEYS||list.some(k=>typeof k!=='string'||k.length>64))throw Error('Invalid request');return [...new Set(list)];};
+ const same=(a,b)=>JSON.stringify(a)===JSON.stringify(b);
+ const ON_PC='API keys are added, changed and removed in Settings on your PC, not from the phone.';
+ /** The values the phone may see. A saved key shows only as true; speechKey not at all. */
+ async function settingsGet(keys){
+  const want=keys.filter(phoneReadable),secret=keys.filter(k=>secretKeys.has(k)&&k!=='speechKey');
+  const raw=await settings.read([...want,...secret]),values={};
+  for(const k of want)if(raw[k]!==undefined)values[k]=raw[k];
+  for(const k of secret)if(raw[k])values[k]=true;
+  return values;
+ }
+ /** Only phoneWritable keys, through sanitizeSettings; only what changed reaches the store. */
+ async function settingsSet(input){
+  if(!input||typeof input!=='object'||Array.isArray(input))throw Object.assign(Error('Invalid settings'),{status:400});
+  const keys=Object.keys(input);if(keys.length>MAX_KEYS)throw Object.assign(Error('Invalid settings'),{status:400});
+  const secret=keys.filter(k=>secretKeys.has(k));if(secret.length)throw Object.assign(Error(ON_PC),{status:403,refused:secret});
+  const allowed=keys.filter(k=>phoneWritable.has(k)),dropped=keys.filter(k=>!phoneWritable.has(k));
+  if(allowed.includes('uiTheme')&&!THEMES.has(input.uiTheme))throw Object.assign(Error('Unknown theme.'),{status:400});
+  let clean;try{clean=sanitizeSettings(Object.fromEntries(allowed.map(k=>[k,input[k]])));}catch(e){throw Object.assign(Error(String(e.message||e).slice(0,200)),{status:400});}
+  const names=Object.keys(clean),before=names.length?await settings.read(names):{},changed=names.filter(k=>!same(before[k],clean[k]));
+  if(changed.length){await settings.write(Object.fromEntries(changed.map(k=>[k,clean[k]])));log('Phone remote changed settings',changed.join(', '));}
+  return {saved:changed,dropped};
+ }
+ async function settingsRemove(keys){
+  const secret=keys.filter(k=>secretKeys.has(k));if(secret.length)throw Object.assign(Error(ON_PC),{status:403,refused:secret});
+  const allowed=keys.filter(k=>phoneRemovable.has(k)),dropped=keys.filter(k=>!phoneRemovable.has(k));
+  if(allowed.length){await settings.remove(allowed);log('Phone remote changed settings','reset '+allowed.join(', '));}
+  return {removed:allowed,dropped};
+ }
+ async function settingsRoute(req,res,p){
+  if(!settings)return send(res,409,{error:'Settings from the phone aren’t available in this copy of Tyler.'});
+  const write=p!=='/settings/get';
+  if(write?settingsWriteLimited():settingsReadLimited())return send(res,429,{error:'Slow down a little.'});
+  let b;try{b=await body(req,write?SETTINGS_BODY:8192);}catch(e){return send(res,e.message==='Too large'?413:400,{error:e.message==='Too large'?'That’s too much to save at once.':e.message},'application/json; charset=utf-8',{connection:'close'});}
+  try{
+   if(p==='/settings/get')return send(res,200,{values:await settingsGet(keyList(b.keys))});
+   if(p==='/settings/set')return send(res,200,{ok:true,...await settingsSet(b.values)});
+   return send(res,200,{ok:true,...await settingsRemove(keyList(b.keys))});
+  }catch(e){return send(res,e.status||(e.message==='Invalid request'?400:500),{error:String(e.message||e).slice(0,240),...(e.refused?{refused:e.refused}:{})});}
+ }
+ // The Settings page's own files: the page itself for paired phones (others go to the pairing screen).
+ const settingsFile=(rest,m)=>SETTINGS_OWN.has(rest)?['own',rest]:SETTINGS_LIB.has(rest)?['lib',rest]:
+  (m=/^ui\/themes\/([a-z0-9]+)\.css$/.exec(rest))&&THEMES.has(m[1])||(m=/^ui\/logos\/([a-z0-9]+)\.png$/.exec(rest))&&THEMES.has(m[1])||/^ui\/fonts\/(?:fonts\.css|[\w-]+\.woff2)$/.test(rest)?['lib',rest]:null;
+
  async function snapshot(){
   let state;try{state=await ask('state',{});}catch(e){state={ready:false,error:String(e.message||e).slice(0,200)};}
   const p=prefs?await prefs.get().catch(()=>({})):{};
@@ -149,6 +216,10 @@ function setupRemote({vault,log=()=>{},ask,pageDir,uiDir,libDir=path.dirname(uiD
   if(req.method==='GET'&&(m=/^\/ui\/themes\/([a-z0-9]+)\.css$/.exec(p))&&THEMES.has(m[1]))return file(res,path.join(uiDir,'themes'),m[1]+'.css',req);
   if(req.method==='GET'&&(m=/^\/ui\/logos\/([a-z0-9]+)\.png$/.exec(p))&&THEMES.has(m[1]))return file(res,path.join(uiDir,'logos'),m[1]+'.png',req,{cache:true});
   if(req.method==='GET'&&(m=/^\/lib\/([\w.-]+\.js)$/.exec(p))&&LIB.has(m[1]))return file(res,libDir,m[1],req,{cache:url.searchParams.get('v')===version});
+  // v2.41: Settings on the phone.
+  if(req.method==='GET'&&p==='/settings')return send(res,308,'','text/plain; charset=utf-8',{location:'/settings/'});
+  if(req.method==='GET'&&(p==='/settings/'||p==='/settings/index.html')){if(!settings||!await device(req))return send(res,303,'','text/plain; charset=utf-8',{location:'/'});return file(res,libDir,'phone-settings.html',req);}
+  if(req.method==='GET'&&p.startsWith('/settings/')&&(m=settingsFile(p.slice(10)))){const [where,rest]=m;return file(res,where==='own'?pageDir:libDir,rest,req,{cache:!!version&&url.searchParams.get('v')===version});}
   if(req.method==='POST'){
    // A request from another site can't set this header without the browser asking first, and the
    // remote never answers that question: a web page elsewhere can't press buttons here.
@@ -163,6 +234,7 @@ function setupRemote({vault,log=()=>{},ask,pageDir,uiDir,libDir=path.dirname(uiD
     return send(res,200,{ok:true},'application/json; charset=utf-8',{'set-cookie':COOKIE+'='+id+'.'+key+'; Path=/; HttpOnly; SameSite=Strict; Max-Age=31536000'});
    }
    const d=await device(req);if(!d)return send(res,401,{error:'Pair this phone first.',pair:true});
+   if(p==='/settings/get'||p==='/settings/set'||p==='/settings/remove')return settingsRoute(req,res,p);
    if(p==='/forget'){const {devices}=await readConfig();await writeDevices(devices.filter(x=>x.id!==d.id));dropStreams(d.id);return send(res,200,{ok:true},'application/json; charset=utf-8',{'set-cookie':COOKIE+'=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0'});}
    if(p==='/action'){
     let b;try{b=await body(req);}catch(e){return send(res,400,{error:e.message});}
@@ -231,4 +303,11 @@ async function stop(){if(starting)await starting.catch(()=>{});if(!server)return
  void readConfig().then(cfg=>{if(cfg.on)return start();}).catch(e=>log('Phone remote',e.message));
  return {handle,stop,status,push,get port(){return port;},get watching(){return streams.size;}};
 }
-module.exports={setupRemote,privateAddress,tailnetAddress,hostAllowed,lanAddresses,tailnetAddresses,deviceName};
+/** v2.41: the PC Settings window's unsaved edits (settingsDraft) with the values a phone just saved,
+ *  or null when they don't touch it. Then the window's Save keeps the phone's change. */
+function draftWithPhone(draft,values){
+ if(!draft||typeof draft!=='object'||!draft.values||typeof draft.values!=='object'||Array.isArray(draft.values))return null;
+ const keys=Object.keys(values||{}).filter(k=>Object.hasOwn(draft.values,k));if(!keys.length)return null;
+ return {...draft,values:{...draft.values,...Object.fromEntries(keys.map(k=>[k,values[k]]))}};
+}
+module.exports={setupRemote,privateAddress,tailnetAddress,hostAllowed,lanAddresses,tailnetAddresses,deviceName,draftWithPhone};

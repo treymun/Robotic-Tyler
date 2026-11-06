@@ -139,8 +139,9 @@ $('save').onclick=async()=>{
     await storage().remove('settingsDraft');
     noiseChanged=false;
     $('openrouterKey').value='';
-    $('status').textContent='Settings saved. You can return to Steam.';
-    window.close();
+    // v2.41: Settings on the phone remote (app/remote/phone-settings.js) stays open after a save.
+    if(window.tylerSettings.phone){$('status').textContent='Settings saved on your PC.';}
+    else{$('status').textContent='Settings saved. You can return to Steam.';window.close();}
   }catch(error){
     $('status').textContent='Settings stayed open. '+String(error.message||'Save failed').replace(/sk-or-[\w-]+/gi,'[hidden]');
   }finally{$('save').disabled=false;}
@@ -150,6 +151,15 @@ window.tylerSettingsLoaded=load();
 document.getElementById('themeStatsReset')?.addEventListener('click',async()=>{if(!window.confirm('Reset every theme\'s lifetime stats (achievements, levels, high scores)?'))return;await storage().remove('tylerLifetime');document.getElementById('themeStatsNote').textContent='Theme stats reset.';});
 // The Voice page fills its model and voice lists after this script runs, then loads the values again.
 window.tylerSettingsReload=load;
+// v2.41: settings changed from the paired phone. The page reloads to show them, so its Save can't put
+// the old values back; edits not saved yet stay (the main process gave the draft the phone's values).
+// A save in progress here finishes first.
+window.tylerSettings.onPhoneSettings?.(keys=>{
+  try{sessionStorage.setItem('tylerPhoneChanged',JSON.stringify(keys.slice(0,40)));}catch{}
+  const go=()=>{if($('save').disabled){setTimeout(go,400);return;}location.reload();};go();
+});
+try{const keys=JSON.parse(sessionStorage.getItem('tylerPhoneChanged')||'null');sessionStorage.removeItem('tylerPhoneChanged');
+  if(Array.isArray(keys)&&keys.length)window.tylerSettingsLoaded.then(()=>globalThis.TylerKit?.page()?.toast({kind:'info',title:'Changed from your phone',text:'This page now shows the new '+(keys.length===1?'value':'values')+': '+keys.join(', ')+'.'}));}catch{}
 
 // Advanced options stay visible by default; can be collapsed without affecting saved settings.
 const advancedToggle=document.getElementById('advancedToggle');advancedToggle?.addEventListener('click',()=>{const hidden=document.body.classList.toggle('advanced-hidden');advancedToggle.textContent=hidden?'Show advanced controls':'Hide advanced controls';});
