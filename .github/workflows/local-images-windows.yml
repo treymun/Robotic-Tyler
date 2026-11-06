@@ -1,0 +1,60 @@
+# REAL test of images on this PC on Windows (v2.40; no graphics card: the image is made on the processor).
+# Installs stable-diffusion.cpp master-1017 (the Vulkan build, which also carries the processor
+# backends) and an image model from their real sources with the app's own installer, asks Vulkan for
+# graphics cards the way the app does, checks that Tyler's image rules refuse a forbidden prompt before
+# the engine starts, then makes a small image on the processor with times for each step, checks the
+# engine listens on no network port and is gone afterwards, and that Stop ends an image.
+# The images are uploaded as an artifact to look at. Run by hand: Actions → Images on this PC on
+# Windows → Run workflow. Downloads about 6.3 GB (the 6–8 GB model) to 12.2 GB (the uncensored 12 GB one)
+# from GitHub and Hugging Face.
+name: Images on this PC on Windows
+
+on:
+  workflow_dispatch:
+    inputs:
+      model:
+        description: Model to install (the 6–8 GB one is the quickest)
+        type: choice
+        options: [zimage-8gb, zimage-12gb, chroma-8gb, chroma-12gb]
+        default: zimage-8gb
+      size:
+        description: Image size on the processor (square)
+        type: choice
+        options: ['256', '384', '512']
+        default: '256'
+      steps:
+        description: Steps (empty = the model's own default; fewer is faster on the processor)
+        type: string
+        default: '4'
+      size2:
+        description: A second, bigger image for a realistic time (empty = none; 512 can take 15+ minutes)
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: windows-latest
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install, check the rules, make an image and stop one (real engine and model, processor)
+        env:
+          MODEL: ${{ inputs.model }}
+          SIZE: ${{ inputs.size }}
+          STEPS: ${{ inputs.steps }}
+          SIZE2: ${{ inputs.size2 }}
+          DEVICE: cpu
+        run: node tools/local-images/windows-smoke.cjs "$env:RUNNER_TEMP\TylerLocalImages"
+      - name: Keep the images
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: local-images-${{ inputs.model }}
+          path: ${{ runner.temp }}\TylerLocalImages\smoke-out
+          if-no-files-found: ignore
