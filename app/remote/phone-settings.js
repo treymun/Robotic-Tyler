@@ -98,6 +98,7 @@
   ['#playground','','Do this on your PC: Preview a reply uses your saved key there.'],
   ['#voiceTestSheet','','Do this on your PC: the voice test plays there.'],
   ['#theme-voices','','Theme voices are installed and set up in Settings on your PC. Pick a theme’s character voice in the remote’s Theme voice card.'],
+  ['#localAI','','Text replies, hearing and the voice, and pictures on this PC are installed and set up in Settings on your PC (On this PC). Choosing them for Tyler works from here: AI & personality, Voice and Chat images.'],
   ['#voiceDevices','.grid.two,.actions,#voiceDeviceState','Do this on your PC: it lists its audio devices and plays the test tone. The cable route uses the devices chosen there.','.sheet-head'],
   ['#v22Tools','#v22Backup,#v22Import','Settings files are exported and imported on your PC.','.v22-actions'],
  ];

@@ -1,4 +1,4 @@
-// Settings → Voice → Theme voices (v2.35, desktop app). Install, repair and remove the local voice
+// Settings → Theme voices (v2.35, desktop app). Install, repair and remove the local voice
 // engine; choose Quality or Lightweight; test, hear and replace each theme's voice. Everything heavy
 // happens in the desktop app's main process (app/theme-voices); this page only shows it.
 // v2.41: Character voices: import the owner's character voice pack, pick a character per theme (the

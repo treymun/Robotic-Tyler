@@ -14,7 +14,7 @@
 //   - The files, the engine process and the settings stay in this process.
 const path=require('node:path'),fs=require('node:fs');
 const {LocalImages,SIZES}=require('./service.cjs'),{LOCK}=require('./installer.cjs'),hardware=require('./hardware.cjs');
-const WHERE='Settings → AI & personality → AI on this PC → Images on this PC';
+const WHERE='Settings → On this PC → Images on this PC';
 const TEST_PROMPT='A friendly chrome robot giving a thumbs up in a neon-lit gaming room, digital art';
 
 /**

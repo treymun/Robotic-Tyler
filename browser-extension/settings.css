@@ -48,7 +48,8 @@ h1{font:300 var(--rt-text-3xl)/1.15 var(--rt-font-display);letter-spacing:.02em;
 .sections{display:flex;flex-direction:column;gap:14px;flex:1}
 [data-ui-zone]{display:none}
 body[data-zone=overview] [data-ui-zone=overview],body[data-zone=ai] [data-ui-zone=ai],body[data-zone=voice] [data-ui-zone=voice],
-body[data-zone=squad] [data-ui-zone=squad],body[data-zone=games] [data-ui-zone=games],body[data-zone=advanced] [data-ui-zone=advanced],body[data-zone=appearance] [data-ui-zone=appearance]{display:block}
+body[data-zone=squad] [data-ui-zone=squad],body[data-zone=games] [data-ui-zone=games],body[data-zone=advanced] [data-ui-zone=advanced],body[data-zone=appearance] [data-ui-zone=appearance],
+body[data-zone=images] [data-ui-zone=images],body[data-zone=themevoices] [data-ui-zone=themevoices],body[data-zone=pc] [data-ui-zone=pc]{display:block}
 body[data-desktop=true] [data-ui-zone].only-chrome{display:none!important}
 
 /* ── Sheets (setting groups) ─────────────────────────────── */
@@ -189,7 +190,6 @@ body:not([data-ai-provider=gemini]) .for-gemini,body[data-ai-provider=gemini] .f
 /* Text AI on this PC (v2.38): what applies only to it, and the cloud model card it replaces. */
 body:not([data-ai-provider=local]) .only-local,body[data-ai-provider=local] .for-openrouter:not(.for-local),body[data-ai-provider=local] #modelCard{display:none!important}
 /* v2.39: AI on this PC shows when text replies or hearing/voice there are used (or being chosen). */
-#localAI[data-text-relevant=false][data-speech-relevant=false][data-images-relevant=false]{display:none!important}
 #localAI[data-images-relevant=true] #liTestImage:not([hidden]){display:block;max-width:min(100%,384px);height:auto;margin-top:8px;border-radius:var(--rt-r-sm)}
 #localAI[data-text-relevant=false] .la-text,#localAI[data-text-relevant=true] .la-text-off{display:none!important}
 .la-tag{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:var(--rt-r-xs);font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;vertical-align:2px;color:var(--rt-success);background:color-mix(in srgb,var(--rt-success) 18%,transparent)}
@@ -225,15 +225,15 @@ body:not([data-ai-provider=local]) .only-local,body[data-ai-provider=local] .for
 
 /* ── Appearance: theme gallery (v2.14) ─────────────────── */
 .tg-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,410px);gap:18px;align-items:start}
-.tg-grid{display:grid;grid-template-columns:repeat(auto-fill,188px);justify-content:start;gap:12px}
+.tg-grid{display:grid;grid-template-columns:repeat(auto-fill,176px);justify-content:start;gap:12px}
 .tg-card{display:flex;flex-direction:column;gap:0;padding:0;overflow:hidden;cursor:pointer;background:var(--rt-block);
   border:1px solid var(--rt-line);border-radius:var(--rt-r-md);outline:0;transition:border-color var(--rt-fast,.12s),transform var(--rt-fast,.12s)}
 .tg-card:hover{border-color:var(--rt-line-strong)}
 .tg-card[aria-checked=true]{border-color:var(--rt-active);box-shadow:0 0 0 2px var(--rt-active)}
 .tg-card:focus-visible{outline:2px solid var(--rt-focus);outline-offset:3px}
-.tg-shot{height:124px;overflow:hidden;position:relative;background:#0b0d10;border-bottom:1px solid var(--rt-line)}
+.tg-shot{height:116px;overflow:hidden;position:relative;background:#0b0d10;border-bottom:1px solid var(--rt-line)}
 .tg-host{display:block}
-.tg-shot .tg-host{width:392px;transform:scale(.48);transform-origin:0 0}
+.tg-shot .tg-host{width:392px;transform:scale(.449);transform-origin:0 0}
 .tg-meta{display:flex;align-items:center;gap:7px;min-height:42px;padding:6px 8px}
 .tg-logo{width:30px;height:30px;flex-shrink:0;object-fit:contain}
 .tg-name{flex:1;min-width:0;font:700 12px/1.25 var(--rt-font);color:var(--rt-ink-strong)}
@@ -260,7 +260,8 @@ body:not([data-ai-provider=local]) .only-local,body[data-ai-provider=local] .for
 .tg-states button[data-state=success][aria-pressed=true]{border-color:var(--rt-success,#8fb93b);box-shadow:inset 0 -2px 0 var(--rt-success,#8fb93b)}
 .tg-states button:focus-visible{outline:2px solid var(--rt-focus);outline-offset:2px}
 .tg-actions .hint{margin:0}
-@media (max-width:1180px){.tg-layout{grid-template-columns:minmax(0,1fr)}.tg-stage{position:static;order:-1}}
+/* v2.41.1: beside the preview the cards are 176 px so two fit (one column left a gap); stacked, 188 px as before. */
+@media (max-width:1180px){.tg-layout{grid-template-columns:minmax(0,1fr)}.tg-stage{position:static;order:-1}.tg-grid{grid-template-columns:repeat(auto-fill,188px)}.tg-shot{height:124px}.tg-shot .tg-host{transform:scale(.48)}}
 @media (max-width:520px){.tg-grid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}.tg-shot{height:100px}.tg-shot .tg-host{transform:scale(.38)}}
 
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}

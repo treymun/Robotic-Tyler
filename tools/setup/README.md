@@ -67,7 +67,7 @@ was built against.
 5. **Opens** the installed apps on Finish, if you leave their boxes ticked.
 6. **Theme voices (optional, v2.35):** *Also add local theme voices* is unticked by default (the standard
    install). Ticked, Setup opens the desktop app on Finish with `--install-theme-voices`, which shows a
-   guided step in Settings → Voice → Theme voices: this PC's compatibility, the download size and disk
+   guided step in Settings → Theme voices: this PC's compatibility, the download size and disk
    space, and Quality vs Lightweight. Nothing is downloaded until **Install now**; **Not now** skips it
    for good (it can be installed later from the same place). Setup itself never downloads the voice
    engine or models, so the normal setup and desktop installer stay small.

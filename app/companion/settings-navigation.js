@@ -6,16 +6,21 @@ const isDesktop=document.body.dataset.desktop==='true';
 const store=isDesktop?window.tylerSettings?.storage?.local:globalThis.chrome?.storage?.local;
 // Themed icons (ui-icons.js): every theme styles the same symbols its own way.
 const icon=name=>globalThis.TylerIcons?.svg(name)||'';
+// v2.41.1: Chat images, Theme voices and On this PC have tabs of their own (they made AI & personality
+// and Voice very long). On this PC is the desktop app's only; Chrome shows the other nine.
 const definitions=[
  ['overview','Overview','Setup steps and usage for this profile',icon('overview')],
  ['ai','AI & personality','Provider, model, personality and reply previews',icon('ai')],
- ['voice','Voice','Voice engine, voices, devices and a voice test',icon('voice')],
+ ['images','Chat images','Pictures Tyler draws for the chat with !image',icon('images')],
+ ['voice','Voice','Voice engine, speaking voice, devices and a voice test',icon('voice')],
+ ['themevoices','Theme voices',isDesktop?'Each theme’s character voice, and the characters you can pick':'Each theme’s character voice (in the desktop app)',icon('themevoices')],
+ ['pc','On this PC','Text replies, hearing, a voice and pictures made on this PC, with no key',icon('pc'),'desktop'],
  ['squad','Squad & friends','Group features, party host and verified friends',icon('squad')],
  ['games','Games','Public Steam game activity',icon('games')],
  ['appearance','Appearance','Theme gallery for every Tyler window',icon('appearance')],
  ['advanced','Advanced','Memory, usage, safety tools and experimental options',icon('advanced')],
-];
-const mapping={appearance:'appearance',quickStart:'overview',phoneRemote:'overview',usagePulse:'overview',top:'overview',studio:'ai',localAI:'ai',localSpeech:'ai',localImages:'ai',imageSheet:'ai',personalitySheet:'ai',chatTagSheet:'ai',playground:'ai',voice:'voice',voiceStandard:'voice',voiceLive:'voice',voiceDevices:'voice',voiceTestSheet:'voice','theme-voices':'voice','theme-voices-setup':'voice',steamActivity:'games',suiteSettings:'squad',approvedFriends:'squad',friendProfiles:'squad',social:'advanced',usageSection:'advanced',v22Tools:'advanced',v23Tools:'advanced'};
+].filter(d=>d[4]!=='desktop'||isDesktop);
+const mapping={appearance:'appearance',quickStart:'overview',phoneRemote:'overview',usagePulse:'overview',top:'overview',studio:'ai',localAI:'pc',localSpeech:'pc',localImages:'pc',imageSheet:'images',personalitySheet:'ai',noticeSheet:'ai',chatTagSheet:'ai',playground:'ai',voice:'voice',voiceStandard:'voice',voiceLive:'voice',voiceRoute:'voice',voiceDevices:'voice',voiceTestSheet:'voice','theme-voices':'themevoices','theme-voices-setup':'themevoices',steamActivity:'games',suiteSettings:'squad',approvedFriends:'squad',friendProfiles:'squad',social:'advanced',usageSection:'advanced',v22Tools:'advanced',v23Tools:'advanced'};
 document.getElementById('uiPlatform').textContent=isDesktop?'Desktop settings':'Chrome settings';
 globalThis.TylerIcons?.fill(document);
 

@@ -13,7 +13,7 @@ const fs=require('node:fs'),path=require('node:path'),os=require('node:os'),{for
 const {SpeechInstaller,SPEECH_LOCK,PARTS,GB}=require('./speech-installer.cjs');
 const DEFAULTS={idleMinutes:10};
 const IDLE=[0,1,2,5,10,20,30,60];
-const WHERE='Settings → AI & personality → AI on this PC';
+const WHERE='Settings → On this PC';
 const NO_CLOUD=' Tyler didn’t use a cloud service instead.';
 const NAMES={hearing:'Hearing on this PC',voice:'The voice on this PC'};
 // Approximate memory while running (measured: Parakeet int8 about 0.9 GB, Kokoro about 0.5 GB).

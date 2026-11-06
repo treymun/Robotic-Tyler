@@ -184,7 +184,7 @@
   $('rmTvMeta').textContent=t.ready?(t.busy?'Speaking…':'Ready'):'Not installed';
   const sel=$('rmTvVoice'),keep=sel.value;if(sel.options.length<=1&&t.voices?.length){for(const v of t.voices){const o=document.createElement('option');o.value=v.theme;o.textContent=v.name;sel.append(o);}sel.value=keep;}
   renderCharacter();
-  $('rmTvState').textContent=t.ready?(t.busy?'Tyler is making or saying a voice message.':''):'Install theme voices on the PC first: Settings → Voice → Theme voices.';
+  $('rmTvState').textContent=t.ready?(t.busy?'Tyler is making or saying a voice message.':''):'Install theme voices on the PC first: Settings → Theme voices.';
  }
  // v2.41: the character voice for the theme chosen above (or the theme on the PC when following it).
  function renderCharacter(){

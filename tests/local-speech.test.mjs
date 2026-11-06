@@ -219,7 +219,7 @@ test('speaking: Kokoro’s speaker for the chosen voice, a WAV clip back; a Brit
 test('failures say why and never switch to anything else: not installed, a load failure, a crash in the middle, too long',async()=>{
  const t=await setup({install:['voice']});
  try{
-  await assert.rejects(t.svc.hear({audio:CLIP}),e=>e.code==='not_installed'&&e.kind==='fatal'&&/Hearing on this PC isn’t installed yet/.test(e.message)&&/AI on this PC/.test(e.message)&&/didn’t use a cloud service/.test(e.message));
+  await assert.rejects(t.svc.hear({audio:CLIP}),e=>e.code==='not_installed'&&e.kind==='fatal'&&/Hearing on this PC isn’t installed yet/.test(e.message)&&/Settings → On this PC/.test(e.message)&&/didn’t use a cloud service/.test(e.message));
   await t.svc.install({parts:['hearing']});t.configure({mode:'load-fail'});
   await assert.rejects(t.svc.hear({audio:CLIP}),e=>e.kind==='fatal'&&/couldn’t start|couldn’t be loaded/.test(e.message)&&/protobuf/.test(e.message));
   assert.equal(t.svc.workers.hearing,null,'a failed start leaves nothing running');

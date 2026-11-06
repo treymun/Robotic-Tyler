@@ -92,7 +92,7 @@ class LlamaServer extends EventEmitter{
    const done=await Promise.race([exited.then(()=>'exit'),new Promise(r=>setTimeout(()=>r('poll'),250))]);
    if(done==='exit'||!this.alive){
     const info=this.exitInfo||{};
-    if(info.error)throw Object.assign(Error(info.error.code==='ENOENT'?'The AI engine is missing ('+path.basename(this.exe)+'). Install it again in Settings → AI & personality → Text AI on this PC.':'The AI engine couldn’t start: '+info.error.message),{code:info.error.code==='ENOENT'?'not_installed':'spawn'});
+    if(info.error)throw Object.assign(Error(info.error.code==='ENOENT'?'The AI engine is missing ('+path.basename(this.exe)+'). Install it again in Settings → On this PC.':'The AI engine couldn’t start: '+info.error.message),{code:info.error.code==='ENOENT'?'not_installed':'spawn'});
     if(this.stopping)throw Object.assign(Error('Stopped.'),{code:'cancelled'});
     const kind=classify(this.tail);
     throw Object.assign(Error(kind==='bind'?'port in use':this.lastLines()),{code:kind,detail:this.lastLines()});

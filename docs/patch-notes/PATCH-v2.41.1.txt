@@ -1,0 +1,31 @@
+# ROBOTIC TYLER v2.41.1: Tidier Settings
+
+## Changed
+- **Settings has three more tabs, so the long tabs are much shorter.** The tabs are the same everywhere: in the desktop app, in Chrome and in Settings on the phone remote.
+  - **Chat images** has the `!image` settings: styles and models, limits, who can ask, and the Venice key. They used to be at the bottom of AI & personality.
+  - **Theme voices** has the theme voices and the character voices. They used to be at the bottom of Voice. In Chrome the tab says they're part of the desktop app.
+  - **On this PC** (desktop app) has text replies, hearing and the voice, and images on this PC, with their installs. They used to sit in the middle of AI & personality, and only showed once you chose one of them. The tab is always there now, so you can install them first and choose them after.
+- **Appearance shows two columns of theme cards beside the big preview.** One column left an empty gap, so the gallery is about half as long. The cards are a little smaller; the themes themselves are unchanged.
+- **How long the tabs are now** (the desktop app at 1280 × 900, nothing installed):
+  - AI & personality: about 4,600 → 2,900 pixels. It was longer still when the AI on this PC was in use.
+  - Voice: 4,000 → 1,850 (theme voices moved out).
+  - Appearance: 5,100 → 2,850.
+  - On the phone, AI & personality went from 6,500 to 3,800.
+- **Links that open Settings at a section open its tab:** from the panel, the phone remote, the setup guide, and the messages that say where something is set up. Those messages now say *Settings → On this PC*, *Settings → Chat images* and *Settings → Theme voices*.
+- Each new tab has its own icon, drawn in every theme's style (pixel art in DOOM).
+
+## Tested
+- **Mocked** (stubbed storage and desktop bridge, nothing installed):
+  - A new end-to-end test, in Chrome's and the desktop app's Settings:
+    - the tabs are in order, and On this PC is only in the desktop app;
+    - every section belongs to a tab that exists;
+    - a link to a section opens its tab, including the "On this PC" link next to the AI provider;
+    - On this PC shows its install buttons with nothing installed;
+    - the image, AI-on-this-PC and theme-voice settings are no longer in AI & personality or Voice;
+    - the gallery has two columns, and AI & personality and Appearance are under 3,400 pixels.
+  - The phone Settings test now goes through every tab, the three new ones included. The phone says theme voices and the AI on this PC are set up on the PC, and keeps their installs hidden.
+  - Layout audit:
+    - the sidebar in all 25 themes, desktop and Chrome: all tabs visible, nothing cut off;
+    - Settings and phone Settings in ten themes (Steam, Windows XP, Pip-Boy, DOOM, iPod, Minecraft, CS 1.6, PS3, MSN and TF2), checked by eye.
+  - Plus all unit and end-to-end tests and the desktop check.
+- **Not tested:** the real desktop app on Windows, and a real phone.

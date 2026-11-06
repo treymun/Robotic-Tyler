@@ -1,12 +1,12 @@
 // ROBOTIC TYLER: chat images (v2.34). Shared by the background (which makes the request with the key)
 // and the chat side (which reads commands and keeps the limits). Classic script: sets TylerImages.
 //
-// Six styles, each one model the owner can change in Settings → Images:
+// Six styles, each one model the owner can change in Settings → Chat images:
 //   OpenRouter key: fast · standard · best      (mainstream models with their companies' content rules)
 //   Venice key:     vfast · vstandard · vbest   (uncensored as far as Venice allows: its own servers,
 //                   safe mode off; Venice still blocks illegal content)
 //   This PC (v2.40):  pc                         (the desktop app's images on this PC: no key, no cost;
-//                   the model is the one chosen in Settings → AI on this PC → Images on this PC)
+//                   the model is the one chosen in Settings → On this PC → Images on this PC)
 // A chatter types "!image PROMPT" (the default style) or "!image best PROMPT", "!image venice PROMPT"…
 // Tyler's image rules (image-rules.js) run before every picture, whatever the style.
 // Nothing is ever switched to another model or provider on its own.
@@ -39,7 +39,7 @@
    {id:'chroma',name:'Chroma',price:'$0.01',styles:['vfast','vstandard']},
    {id:'krea-2-turbo',name:'Krea 2 Turbo',price:'$0.04',styles:['vstandard']},
    {id:'hunyuan-image-v3',name:'Hunyuan Image 3.0',price:'$0.09',styles:['vbest']}],
-  // This PC: the model is chosen in Settings → AI on this PC → Images on this PC, not here.
+  // This PC: the model is chosen in Settings → On this PC → Images on this PC, not here.
   local:[]});
  const DEFAULT_MODEL=Object.freeze({fast:'black-forest-labs/flux.2-klein-4b',standard:'google/gemini-nano-banana-2.1',best:'sourceful/riverflow-v2.5-pro',vfast:'lustify-v8',vstandard:'krea-2-turbo',vbest:'hunyuan-image-v3',pc:''});
  const COOLDOWNS=Object.freeze([0,15,30,60,120,300,600,1800,3600]),PER_PERSON=Object.freeze([1,2,3,5,10,20,50,0]),PER_SESSION=Object.freeze([3,5,10,20,50,100,200,0]);

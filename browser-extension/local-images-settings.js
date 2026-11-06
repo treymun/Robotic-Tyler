@@ -1,4 +1,4 @@
-// Settings → AI & personality → AI on this PC → Images on this PC (v2.40, desktop app). Choose a model,
+// Settings → On this PC → Images on this PC (v2.40, desktop app). Choose a model,
 // where it runs and the size, see the download and disk space first, install, stop, remove, make a test
 // picture, and say whether friends may use it (and the uncensored model). Everything heavy happens in the
 // desktop app's main process (app/local-images); this page only shows it. In Chrome the whole AI on this

@@ -4,8 +4,8 @@
 //
 //   node tools/theme-voices/make-offline-bundle.mjs --out DIR [--runtimes windows-cuda,windows-cpu] [--models quality,light]
 //
-// To use it: download every part into one folder, then in Tyler press Settings → Voice → Theme
-// voices → Install from a folder… and choose that folder. Nothing is downloaded that the bundle has.
+// To use it: download every part into one folder, then in Tyler press Settings → Theme voices
+// → Install from a folder… and choose that folder. Nothing is downloaded that the bundle has.
 import fs from 'node:fs';import path from 'node:path';import crypto from 'node:crypto';import {createRequire} from 'node:module';
 const require=createRequire(import.meta.url),root=path.resolve(import.meta.dirname,'..','..');
 const {Installer,plan,LOCK}=require(path.join(root,'app','theme-voices','installer.cjs'));
@@ -30,7 +30,7 @@ function header(entry,size){
 }
 const pad=n=>Buffer.alloc((512-n%512)%512);
 const index={format:1,engine:LOCK.engine,created:new Date().toISOString(),runtimes,models,files:[]};
-const readme=`ROBOTIC TYLER theme voices: offline bundle (engine ${LOCK.engine})\n\nDownload every part (${name}.001, .002, …) into one folder. In ROBOTIC TYLER open\nSettings → Voice → Theme voices → Install from a folder… and choose that folder.\nEvery file is checked against the SHA-256 recorded in Tyler before it's used.\n\nContents: the voice engine for ${runtimes.join(' and ')}, and the model(s) ${models.join(', ')}.\nSources: python.org, PyPI, download.pytorch.org and Hugging Face (Qwen3-TTS, Apache-2.0).\n`;
+const readme=`ROBOTIC TYLER theme voices: offline bundle (engine ${LOCK.engine})\n\nDownload every part (${name}.001, .002, …) into one folder. In ROBOTIC TYLER open\nSettings → Theme voices → Install from a folder… and choose that folder.\nEvery file is checked against the SHA-256 recorded in Tyler before it's used.\n\nContents: the voice engine for ${runtimes.join(' and ')}, and the model(s) ${models.join(', ')}.\nSources: python.org, PyPI, download.pytorch.org and Hugging Face (Qwen3-TTS, Apache-2.0).\n`;
 for(const f of list)index.files.push({name:f.sha256.slice(0,16)+'-'+path.basename(f.name),size:f.size,sha256:f.sha256,from:f.url});
 const meta=Buffer.from(JSON.stringify(index,null,1)),rd=Buffer.from(readme);
 write(header('BUNDLE.json',meta.length));write(meta);write(pad(meta.length));write(header('README.txt',rd.length));write(rd);write(pad(rd.length));

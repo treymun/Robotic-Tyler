@@ -107,7 +107,7 @@ test('cloud hearing is unchanged: with Hearing → Cloud the saved key hears, an
 });
 test('hearing on this PC fails: the turn fails with the reason; nothing is sent to OpenRouter or Google instead, though both keys are saved',async()=>{
  reset({openrouterKey:'sk-or-test',geminiKey:'AIza-test'});
- hearFail=Object.assign(Error('Hearing on this PC isn’t installed yet. Install it in Settings → AI & personality → AI on this PC. Tyler didn’t use a cloud service instead.'),{code:'not_installed',kind:'fatal'});
+ hearFail=Object.assign(Error('Hearing on this PC isn’t installed yet. Install it in Settings → On this PC. Tyler didn’t use a cloud service instead.'),{code:'not_installed',kind:'fatal'});
  const r=await voiceTurn();assert.equal(r.ok,false);assert.match(r.error,/isn’t installed yet/);assert.equal(r.kind,'fatal','automatic mode stops and says why');
  assert.deepEqual(cloud,[]);assert.equal(asked.length,0,'no reply was written');assert.equal(spoken.length,0);
  hearFail=Object.assign(Error('Hearing on this PC closed unexpectedly. Tyler didn’t use a cloud service instead.'),{code:'crashed',kind:'turn'});

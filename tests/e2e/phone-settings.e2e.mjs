@@ -121,7 +121,14 @@ test('Settings from the phone: open from the remote, change settings of each kin
   assert.match(await phone.textContent('#playground'),/Do this on your PC/);assert.match(await phone.textContent('#studio'),/Do this on your PC: the model test/);
   await phone.evaluate(()=>{location.hash='voice';});await phone.waitForTimeout(200);
   assert.equal(await phone.isVisible('#voiceTest'),false);assert.match(await phone.textContent('#voiceTestSheet'),/Do this on your PC/);
-  assert.match(await phone.textContent('#theme-voices'),/installed and set up in Settings on your PC/);assert.equal(await phone.isVisible('#tvVoices'),false);
+  // v2.41.1: Theme voices and On this PC have their own tabs; on the phone they say they're set up on the PC.
+  await phone.evaluate(()=>{location.hash='themevoices';});await phone.waitForTimeout(200);
+  assert.equal(await phone.isVisible('#theme-voices'),true);assert.match(await phone.textContent('#theme-voices'),/installed and set up in Settings on your PC/);assert.equal(await phone.isVisible('#tvVoices'),false);
+  await phone.evaluate(()=>{location.hash='pc';});await phone.waitForTimeout(200);
+  assert.equal(await phone.isVisible('#localAI'),true,'the On this PC tab isn’t empty on the phone');assert.match(await phone.textContent('#localAI'),/installed and set up in Settings on your PC/);
+  for(const id of ['#laInstall','#lsInstall','#liInstall'])assert.equal(await phone.isVisible(id),false,id+' stays on the PC');
+  await phone.evaluate(()=>{location.hash='images';});await phone.waitForTimeout(200);
+  assert.equal(await phone.isVisible('#imageSheet'),true);assert.equal(await phone.isVisible('#imgForgetVenice'),false,'Remove the Venice key stays on the PC');
   await phone.evaluate(()=>{location.hash='advanced';});await phone.waitForTimeout(200);
   for(const id of ['#v22Backup','#v22Import','#v22ElectronActivity'])assert.equal(await phone.isVisible(id),false,id);
   assert.match(await phone.textContent('#v22Tools'),/exported and imported on your PC/);
@@ -143,7 +150,7 @@ test('Settings from the phone: open from the remote, change settings of each kin
   assert.ok(bodies.some(b=>b.url.endsWith('/settings/get')&&b.status===200),'the answers were checked');
   assert.deepEqual(outside,[],'the phone only talks to the PC');
   // Readable at phone width: no sideways scrolling in any section.
-  for(const zone of ['overview','ai','voice','squad','games','appearance','advanced']){await phone.evaluate(z=>{location.hash=z;},zone);await phone.waitForTimeout(150);
+  for(const zone of ['overview','ai','images','voice','themevoices','pc','squad','games','appearance','advanced']){await phone.evaluate(z=>{location.hash=z;},zone);await phone.waitForTimeout(150);
    assert.equal(await phone.evaluate(()=>document.documentElement.scrollWidth-document.documentElement.clientWidth),0,zone);}
   // Back to the remote.
   await Promise.all([phone.waitForURL(base+'/'),phone.click('.phone-back')]);

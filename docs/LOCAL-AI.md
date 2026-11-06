@@ -14,15 +14,15 @@ the Windows desktop app and every part is optional: nothing is downloaded until 
 With all three on this PC, a Standard voice call needs no key at all, and nothing anyone says leaves
 the PC. Gemini Live is unchanged: it always uses Google.
 
-Both live in **Settings → AI & personality → AI on this PC** (it was called *Text AI on this PC* in
+Both live in **Settings → On this PC** (it was called *Text AI on this PC* in
 v2.38). The section shows once one of its parts is chosen or installed.
 
 # Text replies (v2.38, stage 1)
 
 ## Turning it on
 
-1. **Settings → AI & personality → AI provider → This PC (free, no key).** The section **AI on this
-   PC** appears below it.
+1. **Settings → AI & personality → AI provider → This PC (free, no key).** Then open the **On this
+   PC** tab (since v2.41.1 it has a tab of its own).
 2. Pick a model. Tyler suggests one for this PC (see *Which model*), but nothing installs or switches
    by itself.
 3. The section shows the download size and the disk space needed before anything downloads. Press
@@ -238,7 +238,7 @@ first and goes when neither is left.
 
 ## Turning it on
 
-1. **Settings → AI & personality → AI on this PC → Hearing and voice for calls.** Tick hearing, the
+1. **Settings → On this PC → Hearing and voice for calls.** Tick hearing, the
    voice or both. The download and disk space are shown before anything downloads. Press **Install**.
    **Stop installing** keeps what was downloaded, so **Retry** carries on from there.
 2. **Check hearing** turns a short built-in recording into text and shows the time and how many words

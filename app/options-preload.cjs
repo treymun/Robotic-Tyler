@@ -12,10 +12,10 @@ contextBridge.exposeInMainWorld('tylerSettings',{activity:()=>ipcRenderer.invoke
  // Settings → Theme voices (v2.35): install, repair and remove the local voice engine, voices and tests.
  voices:(op,extra={})=>ipcRenderer.invoke('tyler:settings',{...extra,action:'voices',op}),
  onVoices:fn=>{ipcRenderer.on('tyler:voices',(_event,e)=>fn(e));},
- // Settings → AI & personality → Text AI on this PC (v2.38): install, remove, choose the model, speed check.
+ // Settings → On this PC (v2.38): install, remove, choose the model, speed check.
  localAI:(op,extra={})=>ipcRenderer.invoke('tyler:settings',{...extra,action:'local-ai',op}),
  onLocalAI:fn=>{ipcRenderer.on('tyler:local-ai',(_event,e)=>fn(e));},
- // Settings → AI & personality → AI on this PC → Images on this PC (v2.40): install, remove, model, device, size, friends, test picture.
+ // Settings → On this PC → Images on this PC (v2.40): install, remove, model, device, size, friends, test picture.
  localImages:(op,extra={})=>ipcRenderer.invoke('tyler:settings',{...extra,action:'local-images',op}),
  onLocalImages:fn=>{ipcRenderer.on('tyler:local-images',(_event,e)=>fn(e));},
  voice:{devices:()=>ipcRenderer.invoke('tyler:settings',{action:'voice-devices'}),tone:device=>ipcRenderer.invoke('tyler:settings',{action:'voice-tone',device}),test:({engine,values})=>ipcRenderer.invoke('tyler:settings',{action:'voice-test',engine,values})}});

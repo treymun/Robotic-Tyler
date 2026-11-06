@@ -173,7 +173,7 @@
       <select id="geminiTextModel"><option value="gemini-3.1-flash-lite">Fast · Gemini 3.1 Flash-Lite</option><option value="gemini-3.5-flash-lite">Balanced · Gemini 3.5 Flash-Lite (recommended)</option><option value="gemini-3.8-flash">Advanced · Gemini 3.8 Flash</option></select>
     </label>
   </div>
-  <p class="hint only-local only-desktop">Text replies come from the <b>AI on this PC</b>, set up in the next section: no key and no cost per message. Voice calls need no key either when hearing and the voice run on this PC too (set up in the same section, then chosen in Settings → Voice); otherwise they use an OpenRouter or Google key below.</p>
+  <p class="hint only-local only-desktop">Text replies come from the <b>AI on this PC</b>, set up in <a href="#localAI">On this PC</a>: no key and no cost per message. Voice calls need no key either when hearing and the voice run on this PC too (set up there as well, then chosen in Settings → Voice); otherwise they use an OpenRouter or Google key below.</p>
   <p class="callout only-local only-chrome">Text AI on this PC is part of the ROBOTIC TYLER desktop app. In Chrome, choose OpenRouter or Google Gemini: with This PC chosen, Tyler can't answer here.</p>
   <div class="model-card" id="modelCard">
     <div class="mc-head"><span class="mc-tier" id="mcTier"></span><b class="mc-name" id="mcName"></b><span class="mc-badge" id="mcBadge"></span><code class="mc-id" id="mcId"></code></div>
@@ -204,7 +204,7 @@
 <!-- ── AI on this PC (desktop app, app/local-ai): text replies (v2.38, local-ai-settings.js),
      hearing and voice for calls (v2.39, local-speech-settings.js) and pictures (v2.40, app/local-images,
      local-images-settings.js). Hidden until something here is used. ── -->
-<section class="sheet only-desktop" id="localAI" data-ui-zone="ai" data-text-relevant="false" data-speech-relevant="false" data-images-relevant="false">
+<section class="sheet only-desktop" id="localAI" data-ui-zone="pc" data-text-relevant="false" data-speech-relevant="false" data-images-relevant="false">
   <div class="sheet-head">
     <h2>AI on this PC</h2>
     <p>Tyler can run his AI on this PC: the text replies (llama.cpp with Qwen3.5), hearing people in voice calls (NVIDIA Parakeet), a speaking voice (Kokoro) and the chat's pictures (stable-diffusion.cpp). No key, no account and no cost per message, and what's said isn't sent to an AI provider for the parts that run here. Each part is optional and nothing downloads until you press its Install button. With all three on this PC, a Standard voice call needs no key at all.</p>
@@ -213,7 +213,7 @@
   <h3>This PC</h3>
   <p class="hint" id="laHardware" role="status">Checking this PC…</p>
   <ul class="tv-notes" id="laAdvice"></ul>
-  <p class="hint la-text-off">Text replies on this PC: choose <b>This PC (free, no key)</b> as the AI provider above to set them up here.</p>
+  <p class="hint la-text-off">Text replies on this PC: choose <b>This PC (free, no key)</b> as the AI provider in <a href="#studio">AI &amp; personality</a> to set them up here.</p>
   <div class="la-text">
   <h3>Text replies: model</h3>
   <div class="engine-pick la-models" role="radiogroup" aria-label="Model for Text AI on this PC">
@@ -420,7 +420,7 @@
   <p class="chat-tag-preview" aria-live="polite"><span class="hint">Preview:</span> <span id="chatTagPreview">(ROBOTIC TYLER) Anyone up for another round?</span></p>
 </section>
 
-<section class="sheet" id="imageSheet" data-ui-zone="ai">
+<section class="sheet" id="imageSheet" data-ui-zone="images">
   <div class="sheet-head">
     <h2>Chat images</h2>
     <p>Friends type <code>!image</code> and a description (for example <code>!image a cat in a smoke grenade</code>, or <code>!image best …</code>, <code>!image venice …</code>); Tyler draws it and posts it in the chat as a normal Steam image. Every picture is a paid request to the style's provider, counted in your spending and stopped by the spending cap. Steam only lets the bot's account post pictures once it has spent $5 on Steam (a <a href="https://help.steampowered.com/faqs/view/71D3-35C2-AD96-AA3A" target="_blank" rel="noopener">limited account</a> can't); Tyler checks that before drawing, so a limited account never pays for a picture.</p>
@@ -506,7 +506,7 @@
       <label class="engine-card"><input type="radio" name="speechEnginePick" value="kokoro"><span><b>Voice on this PC (Kokoro)</b><small>Stock voices; lighter and quick on the processor</small></span></label>
     </div>
     <p class="hint" id="voiceLocalTip" role="status" hidden><b>Tip:</b> the replies and the hearing already run on this PC. Choose <b>Theme voice on this PC</b> (the same character voices) or <b>Voice on this PC</b> and the whole call runs here, free, with no key.</p>
-    <p class="hint" id="speechEngineNote">Both voices on this PC need no key and have no speech charge. Theme voices are set up in Settings → Voice → Theme voices (on the processor a theme voice can take a minute or more; with an NVIDIA card about as long as the reply lasts). If a voice on this PC can't speak, Tyler answers in text and says why: he doesn't switch to the paid cloud voice by himself. Gemini Live always speaks in Google's voices.</p>
+    <p class="hint" id="speechEngineNote">Both voices on this PC need no key and have no speech charge. Theme voices are set up in Settings → Theme voices (on the processor a theme voice can take a minute or more; with an NVIDIA card about as long as the reply lasts). If a voice on this PC can't speak, Tyler answers in text and says why: he doesn't switch to the paid cloud voice by himself. Gemini Live always speaks in Google's voices.</p>
   </div>
   <p class="callout only-desktop" id="voiceLocalState" role="status" hidden></p>
   <div class="grid two">
@@ -611,7 +611,7 @@
   <p class="hint" id="voiceTestState" role="status">Nothing is sent until you press Test voice.</p>
 </section>
 
-<section class="sheet" id="theme-voices" data-ui-zone="voice">
+<section class="sheet" id="theme-voices" data-ui-zone="themevoices">
   <div class="sheet-head">
     <h2>Theme voices</h2>
     <p>Tyler can say typed messages in each theme's character voice: G-Man for Steam, GLaDOS for Portal, the radio operator for Counter-Strike 1.6, and so on. The voices are clones made on this PC by a local engine (Qwen3-TTS), so they need no key, account or payment per message. Use them from the <b>Theme voices</b> card in Tyler's Steam chat panel, the phone remote, or <code>!say</code> in chat if you allow it below.</p>
@@ -624,7 +624,7 @@
       <p class="hint" id="tvGuidePc"></p>
       <p id="tvGuidePlan"></p>
       <div class="actions"><button id="tvGuideGo" type="button">Install now</button><button id="tvGuideSkip" type="button" class="secondary">Not now</button></div>
-      <small class="hint">Not now: Tyler won't ask again. You can install them any time here, in Settings → Voice → Theme voices.</small>
+      <small class="hint">Not now: Tyler won't ask again. You can install them any time here, in Settings → Theme voices.</small>
     </div>
     <p class="hint">Optional. Theme voices change Tyler's own spoken replies only if you choose <b>Theme voice on this PC</b> in Standard voice → Speaking voice; Gemini Live always uses Google's voices.</p>
     <h3>This PC</h3>

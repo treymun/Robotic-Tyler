@@ -1,4 +1,4 @@
-// Settings → AI → Chat images (v2.34): the six styles and their models, the limits, who can ask, and
+// Settings → Chat images (v2.34): the six styles and their models, the limits, who can ask, and
 // the Venice key. Saved as imageGen (plain settings) and veniceKey (a key: written here, never shown
 // again, never sent to the Steam page). Works in Chrome and in the desktop app's settings window.
 (() => {
@@ -19,10 +19,10 @@
   const row=document.createElement('div');row.className='image-style';row.dataset.style=key;
   const on=document.createElement('label');on.className='toggle';on.innerHTML='<input type="checkbox"><span><b></b><small></small></span>';
   on.querySelector('b').textContent=s.label+(s.provider==='venice'?' (Venice key)':s.provider==='local'?' (desktop app, no key)':' (OpenRouter key)');on.querySelector('small').textContent=s.about;
-  // v2.40: This PC has no model list here: the model is chosen in AI on this PC → Images on this PC.
+  // v2.40: This PC has no model list here: the model is chosen in On this PC → Images on this PC.
   if(s.provider==='local'){
    const note=document.createElement('small');note.className='hint';
-   if(desktop){note.append('The model is the one chosen in ');const a=document.createElement('a');a.href='#localImages';a.textContent='AI on this PC → Images on this PC';
+   if(desktop){note.append('The model is the one chosen in ');const a=document.createElement('a');a.href='#localImages';a.textContent='On this PC → Images on this PC';
     a.onclick=e=>{e.preventDefault();window.dispatchEvent(new Event('tyler:local-images-setup'));};note.append(a,'. Friends can use it only when you allow it there; your own Draw box in the panel always can.');}
    else{note.textContent='Images on this PC are part of the ROBOTIC TYLER desktop app; in Chrome this style can’t be used.';on.querySelector('input').disabled=true;}
    row.append(on,note);rows.append(row);continue;

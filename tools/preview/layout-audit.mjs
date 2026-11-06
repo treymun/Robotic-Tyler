@@ -150,7 +150,7 @@ for(const theme of THEMES){
  if(process.env.SETTINGS!=='0'){
  const s=await browser.newPage({viewport:{width:1280,height:900},reducedMotion:'reduce'});
  await s.addInitScript(stub,theme);await s.goto(base+'/browser-extension/settings.html');await s.waitForTimeout(500);await s.evaluate(()=>document.fonts.ready);
- for(const zone of ['ai','voice','squad','games','advanced']){
+ for(const zone of ['ai','images','voice','themevoices','squad','games','appearance','advanced']){
   await s.evaluate(z=>{location.hash=z;},zone);await s.waitForTimeout(250);
   out['settings-'+zone]=await s.evaluate(audit,'document');
   if(SHOTS)await s.screenshot({path:path.join(OUT,'audit-'+theme+'-settings-'+zone+'.png'),fullPage:true});
@@ -190,7 +190,7 @@ for(const theme of THEMES){
    const phone=await ctx.newPage();await phone.request.post(at+'/pair',{headers:{'content-type':'application/json','x-tyler-remote':'1'},data:{code:st.code}});
    await phone.goto(at+'/settings/');await phone.waitForFunction(()=>document.body.classList.contains('ui-ready'));await phone.evaluate(()=>window.tylerSettingsLoaded);
    await phone.waitForTimeout(SHOTS?1500:500);await phone.evaluate(()=>document.fonts.ready);
-   for(const zone of ['overview','ai','voice','squad','games','appearance','advanced']){
+   for(const zone of ['overview','ai','images','voice','themevoices','pc','squad','games','appearance','advanced']){
     await phone.evaluate(z=>{location.hash=z;},zone);await phone.waitForTimeout(300);
     out['phone-settings-'+zone]=await phone.evaluate(audit,'document');
     if(SHOTS){const h=await phone.evaluate(()=>document.documentElement.scrollHeight),step=844-150;

@@ -14,10 +14,10 @@
  const api=globalThis.TylerCompanion,I=globalThis.TylerImages,mount=(api?.getFeatureMount?.()||api?.getMount?.());if(!api||!I||!mount||globalThis.TylerImageGen)return;
  const panel=document.createElement('details');panel.className='feature';
  panel.innerHTML=`<summary><span class="feature-title">Chat images</span><span class="feature-meta" id="imgMeta">Off</span></summary>
- <p class="hint">Friends type <code>!image</code> and a description; Tyler draws it and posts it in the chat. Styles, models, limits and the Venice key are in Settings → Images.</p>
+ <p class="hint">Friends type <code>!image</code> and a description; Tyler draws it and posts it in the chat. Styles, models, limits and the Venice key are in Settings → Chat images.</p>
  <div id="imgDrawBox" hidden><label class="field">Draw on this PC <span class="field-note" id="imgDrawNote">posted in this chat</span><textarea id="imgDrawPrompt" rows="2" maxlength="600" placeholder="A chrome robot cheering in a neon arena"></textarea></label>
  <div class="btn-row"><button class="btn sm" id="imgDraw" type="button">Draw and post</button><button class="btn sm" id="imgDrawStop" type="button" hidden>Stop</button></div></div>
- <p id="imgStatus" role="status">Turn chat images on in Settings → Images.</p>
+ <p id="imgStatus" role="status">Turn chat images on in Settings → Chat images.</p>
  <p class="hint" id="imgCounts"></p>
  <div class="btn-row"><button class="btn sm" id="imgReset" type="button">Reset session counts</button><button class="btn sm" id="imgSettings" type="button">Settings</button></div>`;
  mount.append(panel);
@@ -29,7 +29,7 @@
   $('imgDrawBox').hidden=!local.available||api.isOwner?.()===false;$('imgDraw').disabled=busy&&queue.some(j=>j.owner);
   $('imgDrawNote').textContent=local.ready?'posted in this chat · '+(local.label||'this PC'):'set up in Settings → AI on this PC';
   // Until something happens, the status line says what's on (the Draw box is the owner's own, so it works either way).
-  if(idle)$('imgStatus').textContent=(cfg.enabled?'Chat images are on: friends can use !image.':'Chat images are off for friends: turn them on in Settings → Images.')+(local.available&&local.ready?' Your Draw box works either way.':'');
+  if(idle)$('imgStatus').textContent=(cfg.enabled?'Chat images are on: friends can use !image.':'Chat images are off for friends: turn them on in Settings → Chat images.')+(local.available&&local.ready?' Your Draw box works either way.':'');
   globalThis.TylerCommands?.set?.('image',{enabled:cfg.enabled});
   $('imgMeta').textContent=blocked==='limited'?'Steam account can’t post pictures':cfg.enabled?'On · '+(I.STYLES[cfg.defaultStyle]?.label||'Fast'):'Off';counts();}
  function counts(){const lim=n=>n?String(n):'no limit';$('imgCounts').textContent='This session: '+sessionCount+' of '+lim(cfg.perSession)+' · per person '+lim(cfg.perPerson)+' · cooldown '+(cfg.cooldownSec?cfg.cooldownSec>=60?cfg.cooldownSec/60+' min':cfg.cooldownSec+' s':'none')+'.';}
@@ -157,7 +157,7 @@
   const prompt=String($('imgDrawPrompt').value||'').replace(/\s+/g,' ').trim();
   if(prompt.length<2){status('Describe the picture first.');return;}
   if(!local.available){status('Images on this PC are part of the ROBOTIC TYLER desktop app.');return;}
-  if(!local.ready){status(local.problem||'Set up images on this PC in Settings → AI & personality → AI on this PC first.');return;}
+  if(!local.ready){status(local.problem||'Set up images on this PC in Settings → On this PC first.');return;}
   if(blocked==='limited'){status(LIMITED_PANEL);return;}
   if(queue.some(j=>j.owner)||(busy&&queue.length>=3)){status('Your picture is already waiting.');return;}
   queue.unshift({style:'pc',prompt:prompt.slice(0,600),who:{name:'you',key:'owner',speaker:null},owner:true,scope:api.getChatScope?.()||''});

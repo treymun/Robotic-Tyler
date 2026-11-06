@@ -106,14 +106,14 @@ async function localHear(audio,signal,onStage){
  if(!sp)throw Object.assign(Error(LOCAL_HEARING_CHROME_ERROR),{kind:'fatal'});
  return sp.hear({audio,signal,onStage});
 }
-// v2.38: Text AI on this PC (Settings → AI & personality → This PC). The desktop app's local engine
+// v2.38: Text AI on this PC (Settings → On this PC). The desktop app's local engine
 // (app/local-ai) writes the reply; there's no key and no cost. If it can't answer, the turn fails with
 // the reason: Tyler never asks a cloud AI instead, and never switches model by himself. Chrome has no
 // local engine, so there the turn fails with LOCAL_CHROME_ERROR.
 let localTab=null; // the Steam tab the local engines last served (closing it frees their memory)
 async function localStatus(){
  const ai=globalThis.tylerLocalAI;if(!ai)return {ready:false,problem:LOCAL_CHROME_ERROR};
- try{const s=await ai.status();return {...s,problem:s.ready?null:s.installed?'The '+s.label+' model isn’t installed. Install it in Settings → AI & personality → Text AI on this PC.':'Text AI on this PC isn’t installed yet. Install it in Settings → AI & personality.'};}
+ try{const s=await ai.status();return {...s,problem:s.ready?null:s.installed?'The '+s.label+' model isn’t installed. Install it in Settings → On this PC.':'Text AI on this PC isn’t installed yet. Install it in Settings → AI & personality.'};}
  catch(error){return {ready:false,problem:String(error?.message||error)};}
 }
 chrome.action.onClicked.addListener(()=>chrome.runtime.openOptionsPage());
@@ -534,8 +534,8 @@ async function handleGameUnlocked(message,sender){
 function imageProblem(provider,status,m){
  if(status===401)return (provider==='venice'?'Venice':'OpenRouter')+' rejected the key'+(provider==='venice'?' (or this model needs Venice Pro)':'')+'.';
  if(status===402)return provider==='venice'?'the Venice balance is empty. Add credit at venice.ai.':'the OpenRouter key is out of credits.';
- if(status===422||/moderat|safety|content polic|violat|refus|blocked/i.test(m))return 'the model refused that prompt'+(provider==='openrouter'?' (its content rules). An uncensored Venice style may be allowed in Settings → Images.':' (content policy).');
- if(status===404)return 'that model isn’t available right now. Pick another one in Settings → Images.';
+ if(status===422||/moderat|safety|content polic|violat|refus|blocked/i.test(m))return 'the model refused that prompt'+(provider==='openrouter'?' (its content rules). An uncensored Venice style may be allowed in Settings → Chat images.':' (content policy).');
+ if(status===404)return 'that model isn’t available right now. Pick another one in Settings → Chat images.';
  if(status===429||status===503)return 'the image model is busy. Try again in a moment.';
  return m||'the request failed.';
 }
@@ -556,7 +556,7 @@ async function themeVoices(message,tab){
 }
 // v2.40: images on this PC (the desktop app's app/local-images), as the chat side needs to know them.
 const LOCAL_IMAGES_CHROME='Images on this PC are part of the ROBOTIC TYLER desktop app, and this is Chrome. Use another style, or the desktop app.';
-const LOCAL_IMAGES_WHERE='Settings → AI & personality → AI on this PC → Images on this PC';
+const LOCAL_IMAGES_WHERE='Settings → On this PC → Images on this PC';
 async function localImagesInfo(){
  const li=globalThis.tylerLocalImages;if(!li)return {available:false,ready:false,problem:LOCAL_IMAGES_CHROME};
  const s=await li.status().catch(()=>null);if(!s)return {available:true,ready:false,problem:'Images on this PC aren’t available right now.'};
@@ -577,8 +577,8 @@ async function makeImage(message,tab){
  // Only that box sets fromPanel (image-gen.js, on a real click), and only for This PC: a chat line never does.
  const owner=message.fromPanel===true&&local;
  if(!owner){
-  if(!cfg.enabled)throw Error('Chat images are off. Turn them on in Settings → Images.');
-  if(!cfg.styles[style])throw Error('That image style is switched off in Settings → Images.');
+  if(!cfg.enabled)throw Error('Chat images are off. Turn them on in Settings → Chat images.');
+  if(!cfg.styles[style])throw Error('That image style is switched off in Settings → Chat images.');
   if(cfg.access==='selected'){const who=TylerIdentity.valid(message.speaker);if(!who||!cfg.allowedIDs.split('\n').includes(who.id))throw Error('This sender isn’t on the image allow list.');}
  }
  const req=TylerImages.request(cfg,style,message.prompt,NEVER_PROVIDERS),names=cleanNames(message.names);
@@ -589,7 +589,7 @@ async function makeImage(message,tab){
  if(local)return makeLocalImage(message,tab,{info,owner,names,prompt:req.prompt,style,spoiler:cfg.spoilerVenice});
  if(localBudgetReached(s.usage,s.spendingCapUSD))throw Error('The local spending cap is reached, so no more images. Raise it in Settings.');
  const key=req.provider==='venice'?s.veniceKey:s.openrouterKey;
- if(!key)throw Error(req.provider==='venice'?'Save a Venice API key in Settings → Images first.':'Save an OpenRouter key in Settings first.');
+ if(!key)throw Error(req.provider==='venice'?'Save a Venice API key in Settings → Chat images first.':'Save an OpenRouter key in Settings first.');
  if(imageJobs.has(tab))throw Error('Tyler is already drawing one. Try again once it’s posted.');
  const controller=new AbortController();imageJobs.set(tab,controller);const started=Date.now();
  try{

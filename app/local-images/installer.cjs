@@ -25,7 +25,7 @@ const {extractTarGz,stripPlace}=require('../local-ai/tar.cjs');
 const {Downloader,sha256File,abortError}=require('../local-ai/download.cjs');
 const LOCK=require('./lock.json');
 const GB=1024**3,MARGIN=256*1024**2;
-const WHERE='Settings → AI & personality → AI on this PC → Images on this PC';
+const WHERE='Settings → On this PC → Images on this PC';
 // Windows' "a DLL the program needs is missing" (STATUS_DLL_NOT_FOUND), as Node reports the exit code.
 const DLL_MISSING=new Set([3221225781,-1073741515]);
 // Microsoft's permalink for the latest supported x64 runtime (checked 2026-11-05 on

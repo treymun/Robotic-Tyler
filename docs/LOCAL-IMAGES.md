@@ -7,8 +7,8 @@ The cloud image styles (OpenRouter, Venice) work as before.
 
 ## Using it
 
-1. **Settings → AI & personality → AI on this PC → Images on this PC.** (It also opens from
-   *Settings → Images → This PC*.) The section shows this PC's processor, memory, graphics cards and
+1. **Settings → On this PC → Images on this PC.** (It also opens from
+   *Settings → Chat images → This PC*.) The section shows this PC's processor, memory, graphics cards and
    free disk space, suggests a model, and says what Install will download and how much disk it needs.
 2. Pick a model, where it runs (graphics card or processor only) and, if you like, a smaller picture
    size. Press **Install**. **Stop installing** keeps what was downloaded, so **Retry** carries on.
@@ -21,13 +21,13 @@ The cloud image styles (OpenRouter, Venice) work as before.
    only a real click on the box makes a request the owner's.
 5. **Friends** use `!image pc …` (or `!image thispc …`) only when you turn on
    *Friends can ask for images on this PC* (off by default), and then within the Chat images limits
-   (Settings → Images: on, who can ask, cooldown, per person, per session, three waiting at most).
-   The *This PC* style in Settings → Images must be on too.
+   (Settings → Chat images: on, who can ask, cooldown, per person, per session, three waiting at most).
+   The *This PC* style in Settings → Chat images must be on too.
    - **Friends never get an uncensored model** unless *Friends can use the uncensored model* is on as
      well (also off by default). If the chosen model is uncensored and that's off, a friend's request is
      refused in plain words; Tyler never quietly uses another model instead.
 6. Uncensored pictures are posted as Steam spoilers when *Post uncensored pictures as spoilers* is on
-   (Settings → Images; it was *Post Venice pictures as spoilers*).
+   (Settings → Chat images; it was *Post Venice pictures as spoilers*).
 
 Pictures made here are counted apart from billed use (Settings → Advanced → usage) and the spending
 cap doesn't block them: they cost nothing. In the Chrome extension this section is hidden and the

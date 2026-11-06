@@ -1,4 +1,4 @@
-// Settings → AI & personality → AI on this PC → text replies (v2.38, desktop app). Choose a model and
+// Settings → On this PC → text replies (v2.38, desktop app). Choose a model and
 // where it runs, see the download and disk space first, install, stop, remove, and time a reply.
 // Everything heavy happens in the desktop app's main process (app/local-ai); this page only shows it.
 // (v2.39: hearing and voice in the same section are local-speech-settings.js. The section shows when

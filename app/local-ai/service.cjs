@@ -15,7 +15,7 @@ const IDLE=[0,1,2,5,10,20,30,60];
 const SPEED_PROMPT=[{role:'system',content:'You are ROBOTIC TYLER, a friendly gaming companion in a Steam chat. Reply in one or two short sentences.'},{role:'user',content:'Hey Tyler, say hi to the squad and hype them up for the next match.'}];
 const err=(message,code,kind='fatal',extra={})=>Object.assign(Error(message),{code,kind,...extra});
 const NO_CLOUD=' Tyler didn’t use a cloud AI instead.';
-const WHERE='Settings → AI & personality → Text AI on this PC';
+const WHERE='Settings → On this PC';
 
 /** Processor threads for the engine: the physical cores (about half the logical ones), 1–16. */
 // The models' own chat templates (Qwen3.5's among them) refuse a conversation whose

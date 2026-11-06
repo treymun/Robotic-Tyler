@@ -1,4 +1,4 @@
-// Settings → AI & personality → AI on this PC → hearing and voice for calls (v2.39, desktop app).
+// Settings → On this PC → hearing and voice for calls (v2.39, desktop app).
 // See the downloads and their sizes first, install either or both, run the quick checks, close or
 // remove them. Also the status line under Settings → Voice → Standard voice when Hearing → This PC
 // or Voice on this PC (Kokoro) is chosen. Everything heavy happens in the desktop app's main process
@@ -28,7 +28,7 @@
   const lines=['hearing','voice'].filter(p=>c[p]).map(p=>i[p]?'✓ '+(p==='hearing'?'Hearing':'The voice')+' on this PC is installed'+(status.running?.[p]?' and running':'')+'.':(p==='hearing'?'Hearing':'The voice')+' on this PC isn’t installed yet ('+size(status.sizes?.[p]||0)+' download).');
   if(!lines.length||!status){v.hidden=true;return;}
   v.hidden=false;v.replaceChildren(lines.join(' '));
-  if(missing.length){const a=document.createElement('a');a.href='#localSpeech';a.textContent='Install '+(missing.length===2?'them':'it')+' in AI & personality → AI on this PC';a.addEventListener('click',e=>{e.preventDefault();location.hash='#localSpeech';setTimeout(()=>$('localSpeech')?.scrollIntoView({block:'start'}),120);});v.append(' ',a,'.');}
+  if(missing.length){const a=document.createElement('a');a.href='#localSpeech';a.textContent='Install '+(missing.length===2?'them':'it')+' in On this PC';a.addEventListener('click',e=>{e.preventDefault();location.hash='#localSpeech';setTimeout(()=>$('localSpeech')?.scrollIntoView({block:'start'}),120);});v.append(' ',a,'.');}
   else if(c.hearing&&c.voice&&$('aiProvider')?.value==='local')v.append(' Text, hearing and voice all run on this PC: a Standard voice call needs no key.');
  }
  function checkText(part,c){
