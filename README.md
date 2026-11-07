@@ -20,7 +20,7 @@
   &nbsp;·&nbsp;
   <a href="#what-he-does"><b>What he does</b></a>
   &nbsp;·&nbsp;
-  <a href="#a-closer-look"><b>Looks</b></a>
+  <a href="#a-closer-look"><b>Closer look</b></a>
   &nbsp;·&nbsp;
   <a href="#desktop-app-or-chrome-extension"><b>Desktop or Chrome</b></a>
   &nbsp;·&nbsp;
@@ -41,7 +41,8 @@
 2. Sign in to the bot's Steam account. The desktop app has its own Steam chat window. In Chrome, turn on **Developer mode**, click **Load unpacked**, and choose the folder Setup copied. You only have to load that folder once.
 3. In **Settings → AI & personality**, add an **OpenRouter** or **Google Gemini** key and pick a personality. On the desktop app you can instead choose **This PC (free, no key)** and install a text model under **On this PC**. Chrome needs a cloud key. Press **Save settings**.
 4. Open the group chat, then **Tyler's panel → Connect & start**, and join the voice channel. Tyler's synthetic microphone carries his voice. No virtual cable on this route.
-5. *Optional, desktop app:* **Settings → Overview → Phone remote**. Scan the QR code, type the 6-digit code, and add the page to your home screen. **Setup → Open Settings** on the phone changes his settings. The phone never sees your keys.
+
+*Optional, desktop app:* **Settings → Overview → Phone remote**. Scan the QR code, type the 6-digit code, and add the page to your home screen. **Setup → Open Settings** on the phone changes his settings. The phone never sees your keys.
 
 You need the app or the extension, the bot's Steam account, and a key or **This PC**. Theme voices, hearing, pictures, Music DJ and the rest wait until you ask for them. Nothing in that list downloads by itself.
 
@@ -49,7 +50,7 @@ You need the app or the extension, the bot's Steam account, and a key or **This 
 
 Which file to run, what a key costs, and what to try when he stays quiet: [Getting started](docs/GETTING-STARTED.md).
 
-## Lately
+## What's new
 
 Character voices ship with the app, Settings open on your phone, and the desktop app can run text, hearing, speech and pictures on your own PC. v2.44 adds names on Standard voice lines, and **Runs on** can split a text model between the graphics card and the processor. He never switches to a cloud AI by himself. Every heavy download stays off until you ask for it.
 
@@ -152,7 +153,7 @@ Real panel and Settings screens. The text spend, the names and the example PC ar
 </p>
 <p align="center">
   <img src="assets/readme/feature-pc.png" width="100%" alt="AI on your own PC: Settings → On this PC on an example PC with an RTX 3060, the Qwen3.5 9B model installed, and hearing (Parakeet) and voice (Kokoro) installed."><br>
-  <sub><b>On this PC.</b> An example PC. The graphics card, the model and the spend in these pictures are samples.</sub>
+  <sub><b>On this PC.</b> The example layout, with hearing and a voice installed.</sub>
 </p>
 <p align="center">
   <img src="assets/readme/feature-characters.png" width="100%" alt="Character voices: Settings → Theme voices → Character voices: 30 character voices built in (29 offered), nothing to import, with a picker for Team Fortress 2, Counter-Strike 2, Portal and Left 4 Dead, each with Original recording and Generated speech."><br>
@@ -171,12 +172,9 @@ Real panel and Settings screens. The text spend, the names and the example PC ar
 
 Same engine, same settings, same themes. The desktop app is the one to install. The Chrome extension is the backup, including when you are not on Windows.
 
-<table>
-<tr>
-<td width="50%" valign="top">
+### Desktop app
 
-<b>Desktop app</b><br>
-<sub>Recommended</sub>
+Recommended.
 
 - Its own Steam chat window
 - Tyler's synthetic microphone in that window. No VB-CABLE
@@ -188,11 +186,9 @@ Same engine, same settings, same themes. The desktop app is the one to install. 
 - Setup installs it. It updates itself
 - A dedicated bot PC or account
 
-</td>
-<td width="50%" valign="top">
+### Chrome extension
 
-<b>Chrome extension</b><br>
-<sub>Backup</sub>
+Backup.
 
 - Steam web chat, in Google Chrome
 - The same synthetic microphone, in that tab
@@ -203,10 +199,6 @@ Same engine, same settings, same themes. The desktop app is the one to install. 
 - The same hum and reconnect. The tab stays awake
 - Setup unpacks it. Load unpacked once
 - Tyler next to your normal browsing
-
-</td>
-</tr>
-</table>
 
 Prefer the older route through VB-CABLE and the Steam desktop app? It's still there: **Settings → Voice → Where Tyler joins voice**.
 
