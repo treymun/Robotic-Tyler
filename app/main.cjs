@@ -17,7 +17,7 @@ steamVoice.registerScheme(protocol);
 const root=path.join(process.env.LOCALAPPDATA||app.getPath('appData'),'RoboticTylerHydraCloudV12');fs.mkdirSync(path.join(root,'Data'),{recursive:true});app.setPath('userData',path.join(root,'Data'));
 const OLD_VOICE_DIR=path.join(app.getPath('appData'),'RoboticTylerNativeSteamCompanion');
 const OLD_VOICE_GUID='b0b8de7d-76bb-5d6f-99fa-c8a2fe9a49c6'; // electron-builder key for com.robotictyler.nativesteamcompanion
-let themeVoices=null,localAI=null,localImages=null,pendingVoicesSetup=false;
+let themeVoices=null,localAI=null,localImages=null,memoryMeter=null,pendingVoicesSetup=false;
 let bot,options,voiceWin,listener,tray,voice,updates,vault,remote,windowVoice=true,muteCall=false,steamWindow,media,quitting=false;const removed=[];const activity=[];function eventLog(kind,details=''){activity.unshift({at:Date.now(),kind,details:String(details).slice(0,140)});if(activity.length>120)activity.pop();}
 const icon=path.join(__dirname,'..','assets','robotic-tyler.png');
 function helperPath(){const p=app.isPackaged?path.join(process.resourcesPath,'windows-audio-bridge','RoboticTylerAudio.exe'):path.join(__dirname,'..','windows-audio-bridge','publish','RoboticTylerAudio.exe');if(!fs.existsSync(p))throw Error('The Windows audio helper is missing. Reinstall ROBOTIC TYLER (or build it with BUILD-WINDOWS-EXE.cmd).');return p;}
@@ -88,6 +88,12 @@ if(!app.requestSingleInstanceLock()){app.quit();}else{
   textVulkan:async()=>localAI?.service?await localAI.service.vulkan().catch(()=>null):null,
   send:e=>{try{if(options&&!options.isDestroyed())options.webContents.send('tyler:local-images',e);}catch{}}});}
  catch(error){localImages=null;eventLog('Images on this PC unavailable',error.message);}
+ // v2.45: the optional memory meter in Tyler's panel (app/memory-meter.cjs). Nothing runs until the panel asks
+ // (only while it's switched on and can be seen). It reads the services' process ids; it never changes them.
+ try{memoryMeter=require('./memory-meter.cjs').setupMemoryMeter({log:eventLog,appMetrics:()=>app.getAppMetrics(),
+  pids:()=>({text:[localAI?.service?.server?.proc?.pid],speech:[localAI?.speech?.workers?.hearing?.pid,localAI?.speech?.workers?.voice?.pid],voices:[themeVoices?.service?.worker?.proc?.pid],images:[localImages?.service?.job?.pid]}),
+  card:()=>localAI?.service?.loaded?.gpu?.name||null});globalThis.tylerMemory={read:()=>memoryMeter.view()};}
+ catch(error){memoryMeter=null;eventLog('Memory meter unavailable',error.message);}
  globalThis.tylerOpenSettings=section=>openSettings(section);
  if(pendingVoicesSetup){pendingVoicesSetup=false;setTimeout(()=>void openSettings('theme-voices-setup'),1500);}
  await import(pathToFileURL(path.join(__dirname,'companion','background.js')).href);
@@ -240,7 +246,7 @@ if(!app.requestSingleInstanceLock()){app.quit();}else{
  if(process.argv.includes('--install-theme-voices'))setTimeout(()=>void openSettings('theme-voices-setup'),1500);
  await bot.loadURL('https://steamcommunity.com/chat/');
  }).catch(error=>{dialog.showErrorBox('ROBOTIC TYLER could not start',String(error.message).replace(/sk-or-[\w-]+|AIza[\w-]+/g,'[redacted]'));app.quit();});
- app.on('before-quit',()=>{try{void voice?.stop('ROBOTIC TYLER is closing.');}catch{}try{void remote?.stop();}catch{}try{themeVoices?.kill();}catch{}try{localAI?.kill();}catch{}try{localImages?.kill();}catch{}});
+ app.on('before-quit',()=>{try{void voice?.stop('ROBOTIC TYLER is closing.');}catch{}try{void remote?.stop();}catch{}try{themeVoices?.kill();}catch{}try{localAI?.kill();}catch{}try{localImages?.kill();}catch{}try{memoryMeter?.stop();}catch{}});
  app.on('window-all-closed',()=>{if(!voice||voice.mode==='off')app.quit();});
 }
 

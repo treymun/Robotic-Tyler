@@ -5,5 +5,9 @@
    "mode": "pixels",
    "name": "Silk icon16/error.png (Garry's Mod Lua error notice)"
   }
+ },
+ "css":{
+  "p3-silk-drive":{"file":"themes/gmod/icons/icons-drive.png.png","mode":"pixels","name":"Silk icon16/drive.png"},
+  "p3-silk-monitor":{"file":"themes/gmod/icons/icons-monitor.png.png","mode":"pixels","name":"Silk icon16/monitor.png"}
  }
 }

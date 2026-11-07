@@ -27,5 +27,13 @@
    "mode": "lum",
    "name": "Ricochet death notice: falling (sprites/640_falling.spr)"
   }
+ },
+ "css":{
+  "p3-trim-blue":{"file":"themes/ricochet/textures/material-trim_blue1.png","mode":"pixels","resize":[64,16],"name":"Ricochet platform trim, blue"},
+  "p3-trim-yellow":{"file":"themes/ricochet/textures/material-trim_yellow1.png","mode":"pixels","resize":[64,16],"name":"Ricochet platform trim, yellow"},
+  "p3-trim-red":{"file":"themes/ricochet/textures/material-trim_red1.png","mode":"pixels","resize":[64,16],"name":"Ricochet platform trim, red"},
+  "p3-bounce-1":{"file":"themes/ricochet/icons/ricochet-sprites-640_1bounce.spr.png","mode":"lum","name":"Ricochet shot sprite: 1 bounce (sprites/640_1bounce.spr)"},
+  "p3-bounce-2":{"file":"themes/ricochet/icons/ricochet-sprites-640_2bounce.spr.png","mode":"lum","name":"Ricochet shot sprite: 2 bounces (sprites/640_2bounce.spr)"},
+  "p3-bounce-3":{"file":"themes/ricochet/icons/ricochet-sprites-640_3bounce.spr.png","mode":"lum","name":"Ricochet shot sprite: 3 bounces (sprites/640_3bounce.spr)"}
  }
 }

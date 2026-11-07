@@ -1,4 +1,47 @@
 {
+ "css": {
+  "p3-hdd": {
+   "bytes": 1096,
+   "file": "themes/xmb/icons/icons-xmb_icon_049.png.png",
+   "format": "svg",
+   "mask": true,
+   "mode": "trace",
+   "name": "PS3 XMB hard disk icon",
+   "sha256": "c7fa992ff4f5de7e90f049b3d05909fdc33b17b490f2356aef1cc8c4d1c2cc12",
+   "size": [
+    334.0,
+    229.0
+   ],
+   "source": {
+    "commit": "e718990670745077bbf73a92bdb2d3d8003f6f48",
+    "downloadUrl": "https://raw.githubusercontent.com/TheGammaSqueeze/xmb-web/e718990670745077bbf73a92bdb2d3d8003f6f48/icons/xmb_icon_049.png",
+    "kind": "firmware-derived-xmb-archive",
+    "path": "icons/xmb_icon_049.png",
+    "repo": "TheGammaSqueeze/xmb-web"
+   },
+   "tier": "Archived source artwork"
+  },
+  "p3-info-line": {
+   "bytes": 242,
+   "file": "themes/xmb/icons/icons-cinfo-fg.png.png",
+   "format": "png",
+   "mode": "pixels",
+   "name": "PS3 XMB content-information bar",
+   "sha256": "2bbb98cb5b937f99334d933ca19e6c59e396989f9daef06ff4c83267fbf6b54d",
+   "size": [
+    501,
+    5
+   ],
+   "source": {
+    "commit": "e718990670745077bbf73a92bdb2d3d8003f6f48",
+    "downloadUrl": "https://raw.githubusercontent.com/TheGammaSqueeze/xmb-web/e718990670745077bbf73a92bdb2d3d8003f6f48/icons/cinfo-fg.png",
+    "kind": "firmware-derived-xmb-archive",
+    "path": "icons/cinfo-fg.png",
+    "repo": "TheGammaSqueeze/xmb-web"
+   },
+   "tier": "Archived source artwork"
+  }
+ },
  "icons": {},
  "picks": {
   "p3-trophy": {

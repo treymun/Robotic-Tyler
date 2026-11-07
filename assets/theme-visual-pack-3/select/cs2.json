@@ -3,4 +3,8 @@
  "p3-gc-globe":{"file":"themes/cs2/icons/cs2-panorama-images-icons-ui-gc_connecting_inner.svg.svg","mode":"vector","mono":true},
  "p3-gc-ring":{"file":"themes/cs2/icons/cs2-panorama-images-icons-ui-gc_connecting_outer.svg.svg","mode":"vector","mono":true}
 },
- "states":{"waiting":"p3-gc-globe"}}
+ "states":{"waiting":"p3-gc-globe"},
+ "css":{
+  "p3-bullet":{"file":"themes/cs2/icons/cs2-panorama-images-icons-ui-bullet.svg.svg","mode":"vector","mono":true,"name":"CS2 Panorama bullet icon"}
+ }
+}

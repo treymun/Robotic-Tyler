@@ -252,3 +252,34 @@ html[data-rt-theme=winxp],[data-rt-theme=winxp] :is(.scroll,.content,main){scrol
 [data-rt-theme=winxp] .checklist li{animation:xp-balloon .28s ease-out backwards}
 [data-rt-theme=winxp] .pad.playing::before{animation:xp-hop .3s ease-out}
 @keyframes xp-hop{40%{transform:translateY(-4px)}}
+
+/* ── Memory meter skin (v2.45): Task Manager's Performance tab ──
+   Not the green block progress bar or the task-pane groups: each reading is Task Manager's "PF Usage" box,
+   an XP group box with its blue caption holding the black meter: a column of green LED dashes lit from the
+   bottom as far as is in use, Tyler's own share in the red Task Manager uses for kernel time, over the
+   dark-green graph grid, with the reading in green underneath. The pack has no Task Manager art, so it is
+   drawn here. From 75% the dashes turn yellow, from 90% orange and the box's frame red; with no reading the
+   meter is dark. */
+.panel[data-rt-theme=winxp] .tyler-mem{--mem-skin:winxp;margin:10px 10px 0}
+.panel[data-rt-theme=winxp] .tyler-mem .tyler-mem-stats{margin:0;padding:0;gap:8px;background:none;border:0;border-radius:0;box-shadow:none}
+.panel[data-rt-theme=winxp] .tyler-mem .tyler-mem-meter{--led:#00ff00;--led-dim:#00400a;position:relative;display:grid;grid-template-columns:26px minmax(0,1fr);grid-template-rows:auto auto 1fr;column-gap:8px;padding:11px 9px 9px;background:none;border:1px solid #d0d0bf;border-radius:3px}
+.panel[data-rt-theme=winxp] .tyler-mem .tyler-mem-meter[data-level=high]{--led:#ffff00}
+.panel[data-rt-theme=winxp] .tyler-mem .tyler-mem-meter[data-level=full]{--led:#ff8c00}
+.panel[data-rt-theme=winxp] .tyler-mem .tyler-mem-meter::before{content:"";position:absolute;inset:11px 7px 7px;background:linear-gradient(90deg,#008040 1px,transparent 1px) 0 0/12px 12px,linear-gradient(#008040 1px,transparent 1px) 0 0/12px 12px,#000;box-shadow:inset 0 0 0 1px #808080,0 0 0 1px #fff}
+.panel[data-rt-theme=winxp] .tyler-mem .tyler-mem-meter[data-level=full]::before{box-shadow:inset 0 0 0 1px #ff2a00,0 0 0 1px #fff}
+.panel[data-rt-theme=winxp] .tyler-mem .tyler-mem-label{position:absolute;top:-8px;left:7px;padding:0 3px;background:var(--x-beige);font:400 11px/1.3 var(--rt-font);color:#0046d5}
+.panel[data-rt-theme=winxp] .tyler-mem .tyler-mem-bar{grid-column:1;grid-row:1/4;align-self:center;width:26px;height:44px;margin:3px 0 2px 2px;border-radius:0;
+ background:repeating-linear-gradient(0deg,var(--led-dim) 0 2px,transparent 2px 3px) 0 100%/100% 3px;-webkit-mask:linear-gradient(90deg,#000 0 11px,transparent 11px 14px,#000 14px);mask:linear-gradient(90deg,#000 0 11px,transparent 11px 14px,#000 14px)}
+.panel[data-rt-theme=winxp] .tyler-mem .tyler-mem-bar::before,.panel[data-rt-theme=winxp] .tyler-mem .tyler-mem-bar-own{top:auto;bottom:0;left:0;right:0;width:auto;opacity:1;background:repeating-linear-gradient(0deg,var(--led) 0 2px,transparent 2px 3px) 0 100%/100% 3px}
+.panel[data-rt-theme=winxp] .tyler-mem .tyler-mem-bar::before{height:calc(var(--fill) * 100%)}
+.panel[data-rt-theme=winxp] .tyler-mem .tyler-mem-bar-own{height:calc(var(--own) * 100%);background-image:repeating-linear-gradient(0deg,#ff2020 0 2px,transparent 2px 3px)}
+.panel[data-rt-theme=winxp] .tyler-mem .tyler-mem-value{position:relative;grid-column:2;grid-row:1;margin:3px 0 0;font:700 11px/1.3 var(--rt-font);color:var(--led);text-shadow:0 0 2px #000,0 0 2px #000}
+.panel[data-rt-theme=winxp] .tyler-mem .tyler-mem-meter[data-missing=true] .tyler-mem-value{color:#00a000}
+.panel[data-rt-theme=winxp] .tyler-mem .tyler-mem-own{position:relative;grid-column:2;grid-row:2;display:block;font:400 10.5px/1.3 var(--rt-font);color:#00c000;text-shadow:0 0 2px #000,0 0 2px #000}
+.panel[data-rt-theme=winxp] .tyler-mem .tyler-mem-own-value{color:#ff5050}
+.panel[data-rt-theme=winxp] .tyler-mem-details{margin:7px 0 0;background:#fff;border:1px solid var(--x-edge)}
+.panel[data-rt-theme=winxp] .tyler-mem-summary{padding:3px 6px;font:400 11px/1.3 var(--rt-font);color:#000}
+.panel[data-rt-theme=winxp] .tyler-mem-list{gap:0;font:400 11px/1.35 var(--rt-font);color:#000}
+.panel[data-rt-theme=winxp] .tyler-mem-item{padding:0 6px}
+.panel[data-rt-theme=winxp] .tyler-mem-head{padding:2px 6px;background:linear-gradient(180deg,#fff,#ebeadb 80%,#d6d2c2);border-bottom:2px solid #d6d2c2;font-size:11px;letter-spacing:0;text-transform:none;color:#000}
+.panel[data-rt-theme=winxp] .tyler-mem-item[data-running=false]{color:#808080}

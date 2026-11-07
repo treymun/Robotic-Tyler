@@ -1,4 +1,101 @@
 {
+ "css": {
+  "p3-disk": {
+   "bytes": 237,
+   "file": "themes/doom/ui/stdisk.png",
+   "format": "png",
+   "mode": "pixels",
+   "name": "DOOM disk-access icon (STDISK)",
+   "sha256": "d80f5da3db718010bb74664d3936c99b5b880dd64e1f0f6bc60faf59cbc6159b",
+   "size": [
+    16,
+    15
+   ],
+   "source": {
+    "downloadUrl": "https://raw.githubusercontent.com/samrude005/doom1.wad/HEAD/doom1.wad",
+    "kind": "original-doom-shareware-art",
+    "path": "doom1.wad",
+    "repo": "samrude005/doom1.wad"
+   },
+   "tier": "Native / official source"
+  },
+  "p3-therm-knob": {
+   "bytes": 197,
+   "file": "themes/doom/ui/m_thermo.png",
+   "format": "png",
+   "mode": "pixels",
+   "name": "DOOM menu slider, knob (M_THERMO)",
+   "sha256": "8c518a0bd631ad63d2c3c5761f680bfbad738a4ffcb41ec771537fab0bb0a7e2",
+   "size": [
+    5,
+    11
+   ],
+   "source": {
+    "downloadUrl": "https://raw.githubusercontent.com/samrude005/doom1.wad/HEAD/doom1.wad",
+    "kind": "original-doom-shareware-art",
+    "path": "doom1.wad",
+    "repo": "samrude005/doom1.wad"
+   },
+   "tier": "Native / official source"
+  },
+  "p3-therm-left": {
+   "bytes": 169,
+   "file": "themes/doom/ui/m_therml.png",
+   "format": "png",
+   "mode": "pixels",
+   "name": "DOOM menu slider, left end (M_THERML)",
+   "sha256": "8874ffacb38dc63047af62329713c06f5e82819196699ff896a56a6a82c379c2",
+   "size": [
+    6,
+    13
+   ],
+   "source": {
+    "downloadUrl": "https://raw.githubusercontent.com/samrude005/doom1.wad/HEAD/doom1.wad",
+    "kind": "original-doom-shareware-art",
+    "path": "doom1.wad",
+    "repo": "samrude005/doom1.wad"
+   },
+   "tier": "Native / official source"
+  },
+  "p3-therm-mid": {
+   "bytes": 179,
+   "file": "themes/doom/ui/m_thermm.png",
+   "format": "png",
+   "mode": "pixels",
+   "name": "DOOM menu slider, middle (M_THERMM)",
+   "sha256": "d8c02ebb61a3342272109c4c168d7f2958cf8634aba35b7c2e8c469aa2c5553e",
+   "size": [
+    9,
+    13
+   ],
+   "source": {
+    "downloadUrl": "https://raw.githubusercontent.com/samrude005/doom1.wad/HEAD/doom1.wad",
+    "kind": "original-doom-shareware-art",
+    "path": "doom1.wad",
+    "repo": "samrude005/doom1.wad"
+   },
+   "tier": "Native / official source"
+  },
+  "p3-therm-right": {
+   "bytes": 155,
+   "file": "themes/doom/ui/m_thermr.png",
+   "format": "png",
+   "mode": "pixels",
+   "name": "DOOM menu slider, right end (M_THERMR)",
+   "sha256": "a4719cee475d3c0fdc7e94ca07772e97587b6efe250f3969defd631feb9f33f7",
+   "size": [
+    6,
+    13
+   ],
+   "source": {
+    "downloadUrl": "https://raw.githubusercontent.com/samrude005/doom1.wad/HEAD/doom1.wad",
+    "kind": "original-doom-shareware-art",
+    "path": "doom1.wad",
+    "repo": "samrude005/doom1.wad"
+   },
+   "tier": "Native / official source"
+  }
+ },
  "icons": {},
  "picks": {
   "p3-ammo-box": {

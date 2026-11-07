@@ -275,3 +275,40 @@
 [data-rt-theme=doom] .vote[data-arrived]{animation:doom-pickup .4s ease-out}
 [data-rt-theme=doom] .checklist li:last-child{animation:doom-msg .5s steps(1) 2}
 @keyframes doom-msg{50%{opacity:.3}}
+
+/* ── Memory meter skin (v2.45): DOOM's options-menu slider ──
+   Not the status bar's big red numbers: each reading is the slider from DOOM's options menu (the original
+   M_THERML, M_THERMM, M_THERMR and the M_THERMO knob, drawn at twice their size without smoothing) on the
+   menu's black, the knob standing at how much is in use and Tyler's own share washed red along the rail.
+   The label is red menu lettering with the disk-access icon (STDISK) the game shows while it loads; the
+   reading is in the menu's light grey. From 75% the reading turns ammo yellow, from 90% red and the knob
+   flashes like the menu's skull; with no reading the rail is dark and has no knob. */
+.panel[data-rt-theme=doom] .tyler-mem{--mem-skin:doom;--therm-segs:8;margin:8px 10px 0;padding:7px 10px 6px;background:rgba(0,0,0,.82);border:0;box-shadow:0 0 0 1px #000,inset 0 1px 0 rgba(255,59,31,.25)}
+.panel[data-rt-theme=doom] .tyler-mem .tyler-mem-stats{margin:0;padding:0;gap:12px;background:none;border:0;border-radius:0;box-shadow:none}
+.panel[data-rt-theme=doom] .tyler-mem .tyler-mem-meter{--read:#cfcfcf;display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto auto auto;align-items:baseline;column-gap:6px;padding:0;text-align:left;background:none;border:0}
+.panel[data-rt-theme=doom] .tyler-mem .tyler-mem-meter[data-level=high]{--read:var(--d-yellow)}
+.panel[data-rt-theme=doom] .tyler-mem .tyler-mem-meter[data-level=full]{--read:var(--d-red)}
+.panel[data-rt-theme=doom] .tyler-mem .tyler-mem-label{grid-column:1;grid-row:1;display:flex;align-items:center;gap:5px;margin:0;font:700 14px/1 var(--rt-font-display);letter-spacing:.04em;color:var(--d-red);text-shadow:1px 1px 0 #3a0000,2px 2px 0 #000}
+.panel[data-rt-theme=doom] .tyler-mem .tyler-mem-label::before{content:"";flex:none;width:16px;height:15px;background:var(--rt-art-p3-disk) 0 0/16px 15px no-repeat;image-rendering:pixelated}
+.panel[data-rt-theme=doom] .tyler-mem .tyler-mem-value{grid-column:2;grid-row:1;margin:0;font:400 12px/1 var(--rt-font);letter-spacing:0;text-align:right;color:var(--read);text-shadow:1px 1px 0 #000}
+.panel[data-rt-theme=doom] .tyler-mem .tyler-mem-bar{grid-column:1/-1;grid-row:2;position:relative;width:calc(24px + var(--therm-segs) * 18px);height:26px;margin:5px 0 3px;border:0 solid transparent;border-width:0 12px;border-radius:0;overflow:visible;
+ background:var(--rt-art-p3-therm-left) 0 0/12px 26px no-repeat border-box,var(--rt-art-p3-therm-right) 100% 0/12px 26px no-repeat border-box,var(--rt-art-p3-therm-mid) 0 0/18px 26px repeat-x padding-box;background-clip:border-box,border-box,padding-box;background-origin:border-box,border-box,padding-box;image-rendering:pixelated}
+.panel[data-rt-theme=doom] .tyler-mem .tyler-mem-bar::before{top:6px;bottom:6px;left:0;width:calc(var(--own) * 100%);background:rgba(255,40,16,.55);opacity:1;mix-blend-mode:screen}
+.panel[data-rt-theme=doom] .tyler-mem .tyler-mem-bar-own{top:2px;bottom:auto;left:calc(var(--fill) * (100% - 10px));width:10px;height:22px;background:var(--rt-art-p3-therm-knob) 0 0/10px 22px no-repeat;image-rendering:pixelated}
+.panel[data-rt-theme=doom] .tyler-mem .tyler-mem-meter[data-level=full] .tyler-mem-bar-own{animation:doom-knob .5s steps(1) infinite}
+@keyframes doom-knob{50%{opacity:.25}}
+.panel[data-rt-theme=doom] .tyler-mem .tyler-mem-meter[data-missing=true] .tyler-mem-bar{opacity:.35}
+.panel[data-rt-theme=doom] .tyler-mem .tyler-mem-meter[data-missing=true] .tyler-mem-bar-own{display:none}
+.panel[data-rt-theme=doom] .tyler-mem .tyler-mem-own{grid-column:1/-1;grid-row:3;display:block;margin:0;font:400 11px/1.2 var(--rt-font);text-transform:none;color:#9a9a9a;text-shadow:1px 1px 0 #000}
+.panel[data-rt-theme=doom] .tyler-mem .tyler-mem-own-value{color:#ff6a4a}
+@container tyler-mem (max-width:340px){.panel[data-rt-theme=doom] .tyler-mem{--therm-segs:7}}
+@container tyler-mem (max-width:300px){.panel[data-rt-theme=doom] .tyler-mem{--therm-segs:6}}
+.panel[data-rt-theme=doom] .tyler-mem-details{margin:6px 0 0;border-top:1px solid #2a0a06}
+.panel[data-rt-theme=doom] .tyler-mem-summary{padding:5px 0 1px;font:700 13px/1.2 var(--rt-font-display);color:var(--d-red);text-shadow:1px 1px 0 #000}
+.panel[data-rt-theme=doom] .tyler-mem-list{gap:2px;margin-top:4px;font:400 12px/1.25 var(--rt-font);color:#cfcfcf;text-shadow:1px 1px 0 #000}
+.panel[data-rt-theme=doom] .tyler-mem-head{font-size:11px;letter-spacing:.06em;color:var(--d-red)}
+.panel[data-rt-theme=doom] .tyler-mem-item :is(.tyler-mem-item-ram,.tyler-mem-item-vram){color:var(--d-yellow)}
+.panel[data-rt-theme=doom] .tyler-mem-head :is(.tyler-mem-item-ram,.tyler-mem-item-vram){color:var(--d-red)}
+.panel[data-rt-theme=doom] .tyler-mem-item[data-running=false]{color:#6e6e6e}
+.panel[data-rt-theme=doom] .tyler-mem-item[data-running=false] :is(.tyler-mem-item-ram,.tyler-mem-item-vram){color:#6e6e6e}
+.panel[data-rt-theme=doom] .tyler-mem-item[data-part=other]{border-top-color:#3a3a3a}

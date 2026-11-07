@@ -1,5 +1,5 @@
 // Content scripts may access only these non-secret settings through the worker.
-export const readable = new Set(['usage','spendingCapUSD','tylerLifetime','themeStats','musicQuality','musicDuck','activityEnabled','tylerArcadeStats','v22TurnMode','v22VoiceRecovery','v22SpeakerConsent','v22EmergencyStop','v22Latency','uiTheme','chatTagEnabled','chatTagName','panelLayout','keepAlive','voiceRooms','voiceMix','soundboardChatEnabled']);
+export const readable = new Set(['usage','spendingCapUSD','tylerLifetime','themeStats','musicQuality','musicDuck','activityEnabled','tylerArcadeStats','v22TurnMode','v22VoiceRecovery','v22SpeakerConsent','v22EmergencyStop','v22Latency','uiTheme','chatTagEnabled','chatTagName','panelLayout','keepAlive','voiceRooms','voiceMix','soundboardChatEnabled','memoryMeter']);
 const writable = new Set(['tylerArcadeStats','v22Latency','tylerLifetime','musicQuality','musicDuck','panelLayout','keepAlive','voiceRooms','voiceMix','soundboardChatEnabled']);
 // v2.33: the newer keys are checked for shape (the remembered voice channel per group, the master
 // volume and monitor, the soundboard's chat switch).

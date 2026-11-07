@@ -244,3 +244,34 @@ html[data-rt-theme=tf2]{scrollbar-color:var(--tf-tan) var(--tf-dark-brown)}
 [data-rt-theme=tf2] .pad.playing{animation:tf-drop .32s cubic-bezier(.2,.9,.3,1.2)}
 [data-rt-theme=tf2] .vote[data-arrived]{animation:tf-feed .34s cubic-bezier(.2,.9,.3,1)}
 [data-rt-theme=tf2] .checklist li{animation:tf-drop .3s ease-out backwards}
+
+/* ── Memory meter skin (v2.45): Payload Race ──
+   Not the ÜberCharge meter, the item-quality boxes or the class captions: the two readings are the two
+   carts of a Payload Race HUD, BLU's track for the PC's memory and RED's for the graphics card: a rail
+   with its ties and checkpoints, pushed in the team's colour as far as is in use, Tyler's own share the
+   cream of TF2's progress bars at the start, and the cart's marker at the head. The pack has no TF2 HUD art,
+   so the track is drawn here in the HUD's colours. From 75% the reading turns Strange orange, from 90% red
+   and the cart flashes like one about to reach the end; with no reading the track is empty, no cart. */
+.panel[data-rt-theme=tf2] .tyler-mem{--mem-skin:tf2;margin:8px 10px 0;padding:7px 11px 6px;background:linear-gradient(180deg,var(--tf-tan-darker),#1f1c1b);border-radius:6px;box-shadow:inset 0 0 0 1px rgba(235,226,202,.08),0 2px 0 rgba(0,0,0,.35)}
+.panel[data-rt-theme=tf2] .tyler-mem .tyler-mem-stats{grid-template-columns:minmax(0,1fr);margin:0;padding:0;gap:6px;background:none;border:0;border-radius:0;box-shadow:none}
+.panel[data-rt-theme=tf2] .tyler-mem .tyler-mem-meter{--team:var(--tf-blu);--team-hi:#7fb0d1;--read:var(--tf-tan-light);display:grid;grid-template-columns:44px minmax(0,1fr) auto;grid-template-rows:auto auto;column-gap:10px;align-items:center;padding:0;background:none;border:0;border-radius:0;box-shadow:none}
+.panel[data-rt-theme=tf2] .tyler-mem .tyler-mem-vram{--team:var(--tf-red);--team-hi:#e06a63}
+.panel[data-rt-theme=tf2] .tyler-mem .tyler-mem-meter[data-level=high]{--read:var(--tf-strange)}
+.panel[data-rt-theme=tf2] .tyler-mem .tyler-mem-meter[data-level=full]{--read:var(--rt-danger)}
+.panel[data-rt-theme=tf2] .tyler-mem .tyler-mem-label{grid-column:1;grid-row:1;font:400 15px/1 var(--rt-font-display);letter-spacing:.03em;color:var(--team-hi)}
+.panel[data-rt-theme=tf2] .tyler-mem .tyler-mem-bar{grid-column:2;grid-row:1;height:12px;margin:0;border-radius:6px;overflow:visible;
+ background:radial-gradient(circle at 33.33% 50%,var(--tf-tan-light) 0 2.5px,transparent 3px),radial-gradient(circle at 66.66% 50%,var(--tf-tan-light) 0 2.5px,transparent 3px),linear-gradient(transparent 5px,rgba(235,226,202,.22) 5px 7px,transparent 7px),repeating-linear-gradient(90deg,rgba(235,226,202,.13) 0 2px,transparent 2px 7px),#151312;box-shadow:inset 0 0 0 1px rgba(0,0,0,.7)}
+.panel[data-rt-theme=tf2] .tyler-mem .tyler-mem-bar::before{opacity:1;border-radius:6px;background:linear-gradient(180deg,var(--team-hi),var(--team) 60%)}
+.panel[data-rt-theme=tf2] .tyler-mem .tyler-mem-bar-own{border-radius:6px 0 0 6px;background:linear-gradient(180deg,#fff7e3,var(--tf-progress))}
+.panel[data-rt-theme=tf2] .tyler-mem .tyler-mem-bar::after{content:"";position:absolute;top:50%;left:calc(var(--fill) * 100%);width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;background:radial-gradient(circle,var(--tf-tan-light) 0 3px,var(--tf-dark-brown) 3.5px 5px,transparent 5.5px),var(--team);box-shadow:0 0 0 2px #151312,0 1px 3px rgba(0,0,0,.6)}
+.panel[data-rt-theme=tf2] .tyler-mem .tyler-mem-meter[data-level=full] .tyler-mem-bar::after{animation:tf-cart .7s steps(1) infinite}
+@keyframes tf-cart{50%{box-shadow:0 0 0 2px #151312,0 0 8px 2px var(--rt-danger)}}
+.panel[data-rt-theme=tf2] .tyler-mem .tyler-mem-meter[data-missing=true] .tyler-mem-bar::after{display:none}
+.panel[data-rt-theme=tf2] .tyler-mem .tyler-mem-value{grid-column:3;grid-row:1;margin:0;font:700 12px/1.2 var(--rt-font);letter-spacing:0;text-align:right;color:var(--read)}
+.panel[data-rt-theme=tf2] .tyler-mem .tyler-mem-own{grid-column:2/4;grid-row:2;display:block;margin-top:2px;font:400 10px/1.2 var(--rt-font);color:var(--tf-off-white)}
+.panel[data-rt-theme=tf2] .tyler-mem .tyler-mem-own-value{color:var(--tf-progress)}
+.panel[data-rt-theme=tf2] .tyler-mem-details{margin:7px 0 0;border-top:1px solid rgba(235,226,202,.1)}
+.panel[data-rt-theme=tf2] .tyler-mem-summary{padding:5px 0 2px;font:400 14px/1.2 var(--rt-font-display);letter-spacing:.03em;color:var(--tf-tan-light)}
+.panel[data-rt-theme=tf2] .tyler-mem-list{gap:2px;margin-top:3px;font:400 11px/1.3 var(--rt-font);color:var(--rt-ink-2)}
+.panel[data-rt-theme=tf2] .tyler-mem-head{font-size:10px;letter-spacing:.06em;color:var(--tf-off-white)}
+.panel[data-rt-theme=tf2] .tyler-mem-item[data-running=false]{color:var(--rt-ink-disabled)}

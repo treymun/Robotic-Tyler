@@ -1,4 +1,123 @@
 {
+ "css": {
+  "p3-bounce-1": {
+   "bytes": 447,
+   "file": "themes/ricochet/icons/ricochet-sprites-640_1bounce.spr.png",
+   "format": "png",
+   "mask": true,
+   "mode": "lum",
+   "name": "Ricochet shot sprite: 1 bounce (sprites/640_1bounce.spr)",
+   "sha256": "940198bb1c48621baa4acc86dbcf54fd4d34e1e3c3911e64040ac509b025eb80",
+   "size": [
+    32,
+    32
+   ],
+   "source": {
+    "kind": "official-valve-ricochet-depot",
+    "path": "ricochet/sprites/640_1bounce.spr"
+   },
+   "tier": "Native / official source"
+  },
+  "p3-bounce-2": {
+   "bytes": 450,
+   "file": "themes/ricochet/icons/ricochet-sprites-640_2bounce.spr.png",
+   "format": "png",
+   "mask": true,
+   "mode": "lum",
+   "name": "Ricochet shot sprite: 2 bounces (sprites/640_2bounce.spr)",
+   "sha256": "80b0a2b70cdc616887c7d029a23b2d0ba84802870d3ccf889b5d9a7ebc1213db",
+   "size": [
+    32,
+    32
+   ],
+   "source": {
+    "kind": "official-valve-ricochet-depot",
+    "path": "ricochet/sprites/640_2bounce.spr"
+   },
+   "tier": "Native / official source"
+  },
+  "p3-bounce-3": {
+   "bytes": 530,
+   "file": "themes/ricochet/icons/ricochet-sprites-640_3bounce.spr.png",
+   "format": "png",
+   "mask": true,
+   "mode": "lum",
+   "name": "Ricochet shot sprite: 3 bounces (sprites/640_3bounce.spr)",
+   "sha256": "828611537b2848ef3b9238ded001818ab0b715d9440ff6ad8e795ca1038b36dd",
+   "size": [
+    32,
+    32
+   ],
+   "source": {
+    "kind": "official-valve-ricochet-depot",
+    "path": "ricochet/sprites/640_3bounce.spr"
+   },
+   "tier": "Native / official source"
+  },
+  "p3-trim-blue": {
+   "bytes": 163,
+   "file": "themes/ricochet/textures/material-trim_blue1.png",
+   "format": "png",
+   "mode": "pixels",
+   "name": "Ricochet platform trim, blue",
+   "resize": [
+    64,
+    16
+   ],
+   "sha256": "baea1130786f9020eb838f50da527b9f69e1851c06aff8f2a2685d7467eb7214",
+   "size": [
+    64,
+    16
+   ],
+   "source": {
+    "kind": "official-valve-ricochet-depot",
+    "path": "ricochet/ricochet.wad"
+   },
+   "tier": "Native / official source"
+  },
+  "p3-trim-red": {
+   "bytes": 156,
+   "file": "themes/ricochet/textures/material-trim_red1.png",
+   "format": "png",
+   "mode": "pixels",
+   "name": "Ricochet platform trim, red",
+   "resize": [
+    64,
+    16
+   ],
+   "sha256": "39ec1946d1e3fa529856e6b59f0848aa51ccd43fc6944ab6f39cb30c7aba3447",
+   "size": [
+    64,
+    16
+   ],
+   "source": {
+    "kind": "official-valve-ricochet-depot",
+    "path": "ricochet/ricochet.wad"
+   },
+   "tier": "Native / official source"
+  },
+  "p3-trim-yellow": {
+   "bytes": 165,
+   "file": "themes/ricochet/textures/material-trim_yellow1.png",
+   "format": "png",
+   "mode": "pixels",
+   "name": "Ricochet platform trim, yellow",
+   "resize": [
+    64,
+    16
+   ],
+   "sha256": "98c51d8d7775d8254a45e0f6d5601f04537ae9cf7b3514b411d11522cc747b82",
+   "size": [
+    64,
+    16
+   ],
+   "source": {
+    "kind": "official-valve-ricochet-depot",
+    "path": "ricochet/ricochet.wad"
+   },
+   "tier": "Native / official source"
+  }
+ },
  "icons": {},
  "picks": {
   "p3-disc-blue": {

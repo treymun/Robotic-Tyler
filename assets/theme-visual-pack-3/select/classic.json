@@ -2,4 +2,10 @@
  "p3-away":{"file":"themes/classic/icons/og-steam-resource-icon_away.tga.png","mode":"pixels"},
  "p3-message":{"file":"themes/classic/icons/og-steam-resource-icon_message.tga.png","mode":"pixels"}
 },
- "states":{"paused":"p3-away"}}
+ "states":{"paused":"p3-away"},
+ "css":{
+  "p3-radio-on":{"file":"themes/classic/ui/og-steam-graphics-radselstd.tga.png","mode":"pixels","name":"2004 Steam VGUI radio button, selected","crop":[3,3,16,16]},
+  "p3-radio-focus":{"file":"themes/classic/ui/og-steam-graphics-radselfocus.tga.png","mode":"pixels","name":"2004 Steam VGUI radio button, selected with focus","crop":[3,3,16,16]},
+  "p3-radio-off":{"file":"themes/classic/ui/og-steam-graphics-radunselstd.tga.png","mode":"pixels","name":"2004 Steam VGUI radio button, not selected","crop":[3,3,16,16]}
+ }
+}

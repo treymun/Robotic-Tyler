@@ -5,5 +5,12 @@
   "p3-ammo-box": {"file": "themes/doom/icons/ammoa0.png", "mode": "pixels", "name": "DOOM box of bullets (AMMOA0)"},
   "p3-medikit": {"file": "themes/doom/icons/media0.png", "mode": "pixels", "name": "DOOM medikit (MEDIA0)"}
  },
- "states": {"listening": "p3-key-blue", "thinking": "p3-key-yellow", "error": "p3-key-red"}
+ "states": {"listening": "p3-key-blue", "thinking": "p3-key-yellow", "error": "p3-key-red"},
+ "css":{
+  "p3-therm-left":{"file":"themes/doom/ui/m_therml.png","mode":"pixels","name":"DOOM menu slider, left end (M_THERML)"},
+  "p3-therm-mid":{"file":"themes/doom/ui/m_thermm.png","mode":"pixels","name":"DOOM menu slider, middle (M_THERMM)"},
+  "p3-therm-right":{"file":"themes/doom/ui/m_thermr.png","mode":"pixels","name":"DOOM menu slider, right end (M_THERMR)"},
+  "p3-therm-knob":{"file":"themes/doom/ui/m_thermo.png","mode":"pixels","name":"DOOM menu slider, knob (M_THERMO)"},
+  "p3-disk":{"file":"themes/doom/ui/stdisk.png","mode":"pixels","name":"DOOM disk-access icon (STDISK)"}
+ }
 }

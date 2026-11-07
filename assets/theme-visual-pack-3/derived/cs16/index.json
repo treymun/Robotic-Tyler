@@ -1,4 +1,69 @@
 {
+ "css": {
+  "p3-ak47": {
+   "bytes": 362,
+   "file": "themes/cs16/icons/hud-hud-d_ak47.png",
+   "format": "png",
+   "mask": true,
+   "mode": "lum",
+   "name": "CS 1.6 HUD weapon icon: AK-47 (d_ak47)",
+   "sha256": "990ff9987696b0651f15c21a53d433e0dd13268a54abec9900741d601557881a",
+   "size": [
+    48,
+    16
+   ],
+   "source": {
+    "commit": "6ad155c7a610a85cfd443fcace2c97f2afcb2866",
+    "downloadUrl": "https://raw.githubusercontent.com/u3games/CS-Server/6ad155c7a610a85cfd443fcace2c97f2afcb2866/server/cstrike/sprites/640hud1.spr",
+    "kind": "archived-source-art",
+    "path": "server/cstrike/sprites/640hud1.spr",
+    "repo": "u3games/CS-Server"
+   },
+   "tier": "Archived source artwork"
+  },
+  "p3-awp": {
+   "bytes": 297,
+   "file": "themes/cs16/icons/hud-hud-d_awp.png",
+   "format": "png",
+   "mask": true,
+   "mode": "lum",
+   "name": "CS 1.6 HUD weapon icon: AWP (d_awp)",
+   "sha256": "478e78d7140784fef5b14a8b8bbc2ca3e0a56a057a5d7cb569e35bd46d121cc3",
+   "size": [
+    48,
+    16
+   ],
+   "source": {
+    "commit": "6ad155c7a610a85cfd443fcace2c97f2afcb2866",
+    "downloadUrl": "https://raw.githubusercontent.com/u3games/CS-Server/6ad155c7a610a85cfd443fcace2c97f2afcb2866/server/cstrike/sprites/640hud1.spr",
+    "kind": "archived-source-art",
+    "path": "server/cstrike/sprites/640hud1.spr",
+    "repo": "u3games/CS-Server"
+   },
+   "tier": "Archived source artwork"
+  },
+  "p3-selection": {
+   "bytes": 333,
+   "file": "themes/cs16/icons/hud-hud-selection.png",
+   "format": "png",
+   "mask": true,
+   "mode": "lum",
+   "name": "CS 1.6 weapon selection frame",
+   "sha256": "41566c525c0f741c20ede4e0e79be15fd54d7a1e24f61ba4ea23035967433561",
+   "size": [
+    170,
+    45
+   ],
+   "source": {
+    "commit": "6ad155c7a610a85cfd443fcace2c97f2afcb2866",
+    "downloadUrl": "https://raw.githubusercontent.com/u3games/CS-Server/6ad155c7a610a85cfd443fcace2c97f2afcb2866/server/cstrike/sprites/640hud3.spr",
+    "kind": "archived-source-art",
+    "path": "server/cstrike/sprites/640hud3.spr",
+    "repo": "u3games/CS-Server"
+   },
+   "tier": "Archived source artwork"
+  }
+ },
  "icons": {},
  "picks": {
   "p3-c4": {

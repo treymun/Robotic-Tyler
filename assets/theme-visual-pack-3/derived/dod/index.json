@@ -1,4 +1,56 @@
 {
+ "css": {
+  "p3-cap-ring": {
+   "bytes": 652,
+   "file": "themes/dod/ui/vgui-progress_bar.vtf.png",
+   "format": "png",
+   "mask": true,
+   "mode": "lum",
+   "name": "Day of Defeat: Source capture progress ring (vgui/progress_bar)",
+   "resize": [
+    64,
+    64
+   ],
+   "sha256": "17927b2e64e311b6bcbcdbe769a04465d6e7ab3db2a11bc784f74d52487c6c1e",
+   "size": [
+    64,
+    64
+   ],
+   "source": {
+    "commit": "d860b5cf055adedce621ef281fff41e28d7b79bd",
+    "downloadUrl": "https://raw.githubusercontent.com/bouletmarc/DOD_content/d860b5cf055adedce621ef281fff41e28d7b79bd/materials/vgui/progress_bar.vtf",
+    "kind": "archived-source-art",
+    "path": "materials/vgui/progress_bar.vtf",
+    "repo": "bouletmarc/DOD_content"
+   },
+   "tier": "Archived source artwork"
+  },
+  "p3-flag": {
+   "bytes": 717,
+   "file": "themes/dod/icons/sprites-hud-flag_neutral.vtf.png",
+   "format": "png",
+   "mask": true,
+   "mode": "lum",
+   "name": "Day of Defeat: Source HUD flag, neutral",
+   "resize": [
+    48,
+    48
+   ],
+   "sha256": "78dacf09d1836988ddad03bd83acede3668846db473dddad4cda566eb98ab357",
+   "size": [
+    48,
+    48
+   ],
+   "source": {
+    "commit": "d860b5cf055adedce621ef281fff41e28d7b79bd",
+    "downloadUrl": "https://raw.githubusercontent.com/bouletmarc/DOD_content/d860b5cf055adedce621ef281fff41e28d7b79bd/materials/sprites/hud/flag_neutral.vtf",
+    "kind": "archived-source-art",
+    "path": "materials/sprites/hud/flag_neutral.vtf",
+    "repo": "bouletmarc/DOD_content"
+   },
+   "tier": "Archived source artwork"
+  }
+ },
  "icons": {},
  "picks": {
   "p3-round-timer": {

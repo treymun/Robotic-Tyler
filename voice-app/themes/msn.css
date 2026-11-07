@@ -191,3 +191,30 @@ html[data-rt-theme=msn]{scrollbar-color:#9fbbe0 #e4eefa}
 [data-rt-theme=msn] .rt-toast:not(.rt-leaving){animation:m-rise .32s cubic-bezier(.2,.8,.3,1) backwards}
 [data-rt-theme=msn] .checklist li{animation:m-open .18s ease-out backwards}
 [data-rt-theme=msn] .vote[data-arrived]{animation:m-rise .25s ease-out}
+
+/* ── Memory meter skin (v2.45): a file transfer in the conversation window ──
+   Not the contact list, the status dots or the display picture: each reading is laid out like Messenger
+   7.5's file-transfer box in a conversation: the shared-folder icon from Messenger's own resources (the
+   12 px bitmap, its magenta key made clear, at twice its size), the name in the group-heading blue, the
+   reading, and the rounded transfer bar, Tyler's own share in the darker blue at its start. The bar is
+   Online green while there's room, Away orange from 75% and Busy red from 90%; with no reading the folder
+   shows Messenger's crossed-out version. */
+.panel[data-rt-theme=msn] .tyler-mem{--mem-skin:msn;margin:8px 10px 0}
+.panel[data-rt-theme=msn] .tyler-mem .tyler-mem-stats{margin:0;padding:0;gap:5px;background:none;border:0;border-radius:0;box-shadow:none}
+.panel[data-rt-theme=msn] .tyler-mem .tyler-mem-meter{--xfer:var(--m-online);display:grid;grid-template-columns:24px auto minmax(0,1fr);grid-template-rows:auto auto auto;column-gap:5px;align-items:center;padding:6px 8px 6px 6px;background:var(--m-glass);border:1px solid var(--m-edge);border-radius:7px;box-shadow:inset 0 1px 0 #fff}
+.panel[data-rt-theme=msn] .tyler-mem .tyler-mem-meter[data-level=high]{--xfer:var(--m-away)}
+.panel[data-rt-theme=msn] .tyler-mem .tyler-mem-meter[data-level=full]{--xfer:var(--m-busy)}
+.panel[data-rt-theme=msn] .tyler-mem .tyler-mem-meter::before{content:"";grid-column:1;grid-row:1;width:24px;height:24px;background:var(--rt-art-p3-folder) 0 0/24px 24px no-repeat;image-rendering:pixelated}
+.panel[data-rt-theme=msn] .tyler-mem .tyler-mem-meter[data-missing=true]::before{background-image:var(--rt-art-p3-folder-x)}
+.panel[data-rt-theme=msn] .tyler-mem .tyler-mem-label{grid-column:2;grid-row:1;font:700 12px/1.2 var(--rt-font);color:var(--m-group)}
+.panel[data-rt-theme=msn] .tyler-mem .tyler-mem-value{grid-column:3;grid-row:1;margin:0;font:400 12px/1.2 var(--rt-font);color:var(--m-ink);text-align:right}
+.panel[data-rt-theme=msn] .tyler-mem .tyler-mem-bar{grid-column:1/-1;grid-row:2;height:9px;margin:5px 0 0;border-radius:5px;background:linear-gradient(180deg,#dfe7f1,#fff);box-shadow:inset 0 0 0 1px #9fb6d3}
+.panel[data-rt-theme=msn] .tyler-mem .tyler-mem-bar::before{opacity:1;border-radius:5px;background:linear-gradient(180deg,rgba(255,255,255,.7),rgba(255,255,255,.1) 50%,rgba(0,0,0,.06) 51%),var(--xfer);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--xfer) 70%,#000)}
+.panel[data-rt-theme=msn] .tyler-mem .tyler-mem-bar-own{border-radius:5px 0 0 5px;background:linear-gradient(180deg,rgba(255,255,255,.55),rgba(255,255,255,0) 50%),#2d68b8;box-shadow:inset 0 0 0 1px #16458c}
+.panel[data-rt-theme=msn] .tyler-mem .tyler-mem-own{grid-column:1/-1;grid-row:3;display:block;margin-top:3px;font:italic 400 11px/1.2 var(--rt-font);color:var(--m-ink-2)}
+.panel[data-rt-theme=msn] .tyler-mem .tyler-mem-own-value{color:var(--m-link)}
+.panel[data-rt-theme=msn] .tyler-mem-details{margin:6px 0 0;background:#fff;border:1px solid #b9cfea;border-radius:6px}
+.panel[data-rt-theme=msn] .tyler-mem-summary{padding:4px 8px;font:700 11.5px/1.25 var(--rt-font);color:var(--m-group)}
+.panel[data-rt-theme=msn] .tyler-mem-list{gap:1px;padding:0 8px 5px;font:400 11px/1.35 var(--rt-font);color:var(--m-ink)}
+.panel[data-rt-theme=msn] .tyler-mem-head{font-size:10.5px;letter-spacing:0;text-transform:none;color:var(--m-group)}
+.panel[data-rt-theme=msn] .tyler-mem-item[data-running=false]{color:var(--m-offline);font-style:italic}

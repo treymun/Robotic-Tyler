@@ -5,4 +5,9 @@
  "p3-dmg-rad":{"file":"themes/hev/icons/hud-hud-dmg_rad.png","mode":"trace","light":true,"upscale":4}
 },
  "icons":{"error":"p3-dmg-rad","warning":"p3-dmg-rad"},
- "states":{"error":"p3-dmg-rad"}}
+ "states":{"error":"p3-dmg-rad"},
+ "css":{
+  "p3-suit-empty":{"file":"themes/hev/icons/hud-hud-suit_empty.png","mode":"lum","name":"Half-Life HUD armour suit, empty"},
+  "p3-suit-full":{"file":"themes/hev/icons/hud-hud-suit_full.png","mode":"lum","name":"Half-Life HUD armour suit, full"}
+ }
+}

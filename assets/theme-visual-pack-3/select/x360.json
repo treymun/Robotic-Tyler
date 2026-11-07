@@ -2,5 +2,8 @@
  "picks": {
   "p3-music": {"file": "themes/x360/ui/assets-blades-providedicons-media-music.png.png", "mode": "pixels", "name": "Blades Music"},
   "p3-network-settings": {"file": "themes/x360/ui/assets-blades-providedicons-system-network-settings.png.png", "mode": "pixels", "name": "Blades Network Settings"}
+ },
+ "css":{
+  "p3-memory":{"file":"themes/x360/ui/assets-blades-providediconsfit-system-memory.png.png","mode":"pixels","name":"Blades System > Memory icon"}
  }
 }

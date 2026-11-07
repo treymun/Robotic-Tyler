@@ -1,4 +1,56 @@
 {
+ "css": {
+  "p3-laser": {
+   "bytes": 333,
+   "file": "themes/combine/icons/effects-bluelaser1.vtf.png",
+   "format": "png",
+   "mask": true,
+   "mode": "lum",
+   "name": "Combine emitter beam (effects/bluelaser1)",
+   "resize": [
+    16,
+    32
+   ],
+   "sha256": "56a3684dfa6e04ea1e32a988fb98fc5247ddbd04fac81a56f8ba57989c2be549",
+   "size": [
+    16,
+    32
+   ],
+   "source": {
+    "commit": "472d4cb9ac7a32a8a408ac8cfeff6d978e70a75f",
+    "downloadUrl": "https://raw.githubusercontent.com/bouletmarc/hl2_ep2_content/472d4cb9ac7a32a8a408ac8cfeff6d978e70a75f/materials/effects/bluelaser1.vtf",
+    "kind": "archived-source-art",
+    "path": "materials/effects/bluelaser1.vtf",
+    "repo": "bouletmarc/hl2_ep2_content"
+   },
+   "tier": "Archived source artwork"
+  },
+  "p3-shield": {
+   "bytes": 4215,
+   "file": "themes/combine/icons/effects-combineshield-comshieldwall_close.vtf.png",
+   "format": "png",
+   "mask": true,
+   "mode": "lum",
+   "name": "Combine force field (effects/combineshield/comshieldwall_close)",
+   "resize": [
+    96,
+    96
+   ],
+   "sha256": "b932617e5dbb89bda66e23fb0f7c2d9f0892699e88d1bcc9672f43a72795811c",
+   "size": [
+    96,
+    96
+   ],
+   "source": {
+    "commit": "472d4cb9ac7a32a8a408ac8cfeff6d978e70a75f",
+    "downloadUrl": "https://raw.githubusercontent.com/bouletmarc/hl2_ep2_content/472d4cb9ac7a32a8a408ac8cfeff6d978e70a75f/materials/effects/combineshield/comshieldwall_close.vtf",
+    "kind": "archived-source-art",
+    "path": "materials/effects/combineshield/comshieldwall_close.vtf",
+    "repo": "bouletmarc/hl2_ep2_content"
+   },
+   "tier": "Archived source artwork"
+  }
+ },
  "icons": {},
  "picks": {
   "p3-citizen": {

@@ -1,4 +1,46 @@
 {
+ "css": {
+  "p3-silk-drive": {
+   "bytes": 436,
+   "file": "themes/gmod/icons/icons-drive.png.png",
+   "format": "png",
+   "mode": "pixels",
+   "name": "Silk icon16/drive.png",
+   "sha256": "0f8f214abfe75688c08dbd00b0c7b35a2f0eefc756508fe1bc069b0a72310c0e",
+   "size": [
+    16,
+    16
+   ],
+   "source": {
+    "commit": "ae40eb194a6e4e86ad64d677611868c3d22d3c2a",
+    "downloadUrl": "https://raw.githubusercontent.com/markjames/famfamfam-silk-icons/ae40eb194a6e4e86ad64d677611868c3d22d3c2a/icons/drive.png",
+    "kind": "silk-source-era-icon",
+    "path": "icons/drive.png",
+    "repo": "markjames/famfamfam-silk-icons"
+   },
+   "tier": "Community / period source"
+  },
+  "p3-silk-monitor": {
+   "bytes": 559,
+   "file": "themes/gmod/icons/icons-monitor.png.png",
+   "format": "png",
+   "mode": "pixels",
+   "name": "Silk icon16/monitor.png",
+   "sha256": "89aec3d1821191e1a91d777ffd353cb305f85986c8579b1caa3ca78ccdbab6fb",
+   "size": [
+    16,
+    16
+   ],
+   "source": {
+    "commit": "ae40eb194a6e4e86ad64d677611868c3d22d3c2a",
+    "downloadUrl": "https://raw.githubusercontent.com/markjames/famfamfam-silk-icons/ae40eb194a6e4e86ad64d677611868c3d22d3c2a/icons/monitor.png",
+    "kind": "silk-source-era-icon",
+    "path": "icons/monitor.png",
+    "repo": "markjames/famfamfam-silk-icons"
+   },
+   "tier": "Community / period source"
+  }
+ },
  "icons": {},
  "picks": {
   "p3-silk-error": {

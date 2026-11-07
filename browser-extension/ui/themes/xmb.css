@@ -196,3 +196,29 @@ html[data-rt-theme=xmb]{scrollbar-color:rgba(255,255,255,.35) #0b1838}
 [data-rt-theme=xmb] .checklist li{animation:xb-in .25s ease-out backwards}
 [data-rt-theme=xmb] .vote[data-arrived]{animation:xb-drop .25s ease-out}
 @media (prefers-reduced-motion:reduce){.panel[data-rt-theme=xmb]::before,.panel[data-rt-theme=xmb]::after,[data-rt-theme=xmb] body::before,[data-rt-theme=xmb] body::after{animation:none}}
+
+/* ── Memory meter skin (v2.45): a hard disk item on the XrossMediaBar ──
+   Not the category icons or the glowing list rows: each reading is laid out like an item being copied to
+   the system storage: the XMB's own hard-disk icon (xmb-web's xmb_icon_049, traced, glowing white), the name
+   in thin type, the content-information bar (cinfo-fg.png) drawn across as far as is in use, Tyler's own
+   share brighter at its start, and the percentage the XMB shows for a copy. From 75% the line warms to
+   amber, from 90% it turns red; with no reading the disk is dim and the line empty. */
+.panel[data-rt-theme=xmb] .tyler-mem{--mem-skin:xmb;margin:8px 12px 0}
+.panel[data-rt-theme=xmb] .tyler-mem .tyler-mem-stats{margin:0;padding:0;gap:14px;background:none;border:0;border-radius:0;box-shadow:none}
+.panel[data-rt-theme=xmb] .tyler-mem .tyler-mem-meter{--line:#fff;display:grid;grid-template-columns:30px minmax(0,1fr) auto;grid-template-rows:auto auto auto;column-gap:8px;align-items:center;padding:2px 0;background:none;border:0;border-radius:0}
+.panel[data-rt-theme=xmb] .tyler-mem .tyler-mem-meter[data-level=high]{--line:#ffcf7a}
+.panel[data-rt-theme=xmb] .tyler-mem .tyler-mem-meter[data-level=full]{--line:#ff8e80}
+.panel[data-rt-theme=xmb] .tyler-mem .tyler-mem-meter::before{content:"";grid-column:1;grid-row:1/4;width:30px;height:21px;background:#fff;filter:drop-shadow(0 0 4px rgba(255,255,255,.75));-webkit-mask:var(--rt-art-p3-hdd) 50% 50%/contain no-repeat;mask:var(--rt-art-p3-hdd) 50% 50%/contain no-repeat}
+.panel[data-rt-theme=xmb] .tyler-mem .tyler-mem-meter[data-missing=true]::before{opacity:.35;filter:none}
+.panel[data-rt-theme=xmb] .tyler-mem .tyler-mem-label{grid-column:2;grid-row:1;font:300 12px/1.2 var(--rt-font);color:#fff;text-shadow:var(--xb-glow)}
+.panel[data-rt-theme=xmb] .tyler-mem .tyler-mem-pct{display:block;grid-column:3;grid-row:1;font:300 12px/1.2 var(--rt-font);color:var(--line);text-shadow:var(--xb-glow)}
+.panel[data-rt-theme=xmb] .tyler-mem .tyler-mem-bar{grid-column:2/4;grid-row:2;height:5px;margin:4px 0 3px;border-radius:0;overflow:visible;background:linear-gradient(90deg,rgba(255,255,255,.08),rgba(255,255,255,.22) 50%,rgba(255,255,255,.08))}
+.panel[data-rt-theme=xmb] .tyler-mem .tyler-mem-bar::before{opacity:1;background:var(--line);-webkit-mask:var(--rt-art-p3-info-line) 100% 0/auto 5px no-repeat,linear-gradient(#000,#000) 0 0/calc(100% - 40px) 100% no-repeat;mask:var(--rt-art-p3-info-line) 100% 0/auto 5px no-repeat,linear-gradient(#000,#000) 0 0/calc(100% - 40px) 100% no-repeat;filter:drop-shadow(0 0 3px var(--line))}
+.panel[data-rt-theme=xmb] .tyler-mem .tyler-mem-bar-own{height:3px;top:1px;background:#fff;box-shadow:0 0 6px #fff}
+.panel[data-rt-theme=xmb] .tyler-mem .tyler-mem-value{grid-column:2/4;grid-row:3;margin:0;font:300 13px/1.25 var(--rt-font);color:#eef3ff;text-shadow:none}
+.panel[data-rt-theme=xmb] .tyler-mem .tyler-mem-own{grid-column:2/4;grid-row:4;display:block;font:300 11px/1.25 var(--rt-font);color:var(--rt-ink-3)}
+.panel[data-rt-theme=xmb] .tyler-mem-details{margin:8px 0 0;background:rgba(0,0,0,.2);border:1px solid rgba(255,255,255,.1);border-radius:8px}
+.panel[data-rt-theme=xmb] .tyler-mem-summary{padding:5px 10px;font:300 12px/1.25 var(--rt-font);color:#fff}
+.panel[data-rt-theme=xmb] .tyler-mem-list{gap:1px;padding:0 10px 6px;font:300 11.5px/1.35 var(--rt-font);color:var(--rt-ink-2)}
+.panel[data-rt-theme=xmb] .tyler-mem-head{font-size:10.5px;letter-spacing:0;text-transform:none;color:var(--rt-ink-4)}
+.panel[data-rt-theme=xmb] .tyler-mem-item[data-running=false]{color:var(--rt-ink-disabled)}

@@ -209,3 +209,30 @@ html[data-rt-theme=x360]{scrollbar-color:#a8ada5 #e4e6e2}
 [data-rt-theme=x360] .rt-toast:not(.rt-leaving){animation:x-rise .3s cubic-bezier(.2,.8,.25,1) backwards}
 [data-rt-theme=x360] .checklist li{animation:x-blade .22s ease-out backwards}
 [data-rt-theme=x360] .vote[data-arrived]{animation:x-rise .25s ease-out}
+
+/* ── Memory meter skin (v2.45): the System blade's Memory screen ──
+   Not the white stat cards or the glossy green selection bar: each reading is a storage device as the
+   System blade's Memory area lists it: the dashboard's own Memory icon (Blades providedicons, system-memory)
+   on a silver device plate, the name and reading in the dashboard's type, and a capacity groove that fills in
+   brushed silver with Tyler's own share in charcoal. From 75% the fill is the Marketplace orange, from 90%
+   red; with no reading the groove is empty and the device greyed out. */
+.panel[data-rt-theme=x360] .tyler-mem{--mem-skin:x360;margin:8px 10px 0}
+.panel[data-rt-theme=x360] .tyler-mem .tyler-mem-stats{margin:0;padding:0;gap:6px;background:none;border:0;border-radius:0;box-shadow:none}
+.panel[data-rt-theme=x360] .tyler-mem .tyler-mem-meter{--cap-a:#e3e6e1;--cap-b:#a4aaa1;display:grid;grid-template-columns:38px minmax(0,1fr);grid-template-rows:auto auto auto auto;column-gap:7px;padding:6px 9px 7px 7px;background:linear-gradient(180deg,#fdfdfc,#eceeea 55%,#e2e5df);border:1px solid #c5c9c3;border-radius:4px 14px 4px 4px;box-shadow:inset 0 1px 0 #fff,0 1px 3px rgba(0,0,0,.12)}
+.panel[data-rt-theme=x360] .tyler-mem .tyler-mem-meter[data-level=high]{--cap-a:#ffc27a;--cap-b:#e8790e}
+.panel[data-rt-theme=x360] .tyler-mem .tyler-mem-meter[data-level=full]{--cap-a:#ff8a7c;--cap-b:#c4170f}
+.panel[data-rt-theme=x360] .tyler-mem .tyler-mem-meter::before{content:"";grid-column:1;grid-row:1/4;align-self:center;width:38px;height:38px;border-radius:50%;background:var(--rt-art-p3-memory) 50% 50%/40px 40px no-repeat,radial-gradient(circle at 50% 35%,#fff,#dfe3dc 70%);box-shadow:inset 0 0 0 1px #cfd3cc}
+.panel[data-rt-theme=x360] .tyler-mem .tyler-mem-meter[data-missing=true]::before{filter:grayscale(1);opacity:.5}
+.panel[data-rt-theme=x360] .tyler-mem .tyler-mem-label{grid-column:2;grid-row:1;font:600 11px/1.2 var(--rt-font);color:var(--rt-ink-3)}
+.panel[data-rt-theme=x360] .tyler-mem .tyler-mem-value{grid-column:2;grid-row:2;margin:0;font:600 14px/1.25 var(--rt-font);color:#2a2c2b}
+.panel[data-rt-theme=x360] .tyler-mem .tyler-mem-meter[data-level=full] .tyler-mem-value{color:var(--rt-danger)}
+.panel[data-rt-theme=x360] .tyler-mem .tyler-mem-own{grid-column:2;grid-row:3;display:block;font:400 10.5px/1.25 var(--rt-font);color:var(--rt-ink-4)}
+.panel[data-rt-theme=x360] .tyler-mem .tyler-mem-own-value{color:#2a2c2b;font-weight:600}
+.panel[data-rt-theme=x360] .tyler-mem .tyler-mem-bar{grid-column:1/-1;grid-row:4;height:7px;margin:6px 0 0;border-radius:4px;background:linear-gradient(180deg,#c9cdc6,#eef0ec);box-shadow:inset 0 1px 2px rgba(0,0,0,.25)}
+.panel[data-rt-theme=x360] .tyler-mem .tyler-mem-bar::before{opacity:1;border-radius:4px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.25) 0 1px,transparent 1px 3px),linear-gradient(180deg,var(--cap-a),var(--cap-b))}
+.panel[data-rt-theme=x360] .tyler-mem .tyler-mem-bar-own{border-radius:4px 0 0 4px;background:linear-gradient(180deg,#5a5e5b,#2a2c2b)}
+.panel[data-rt-theme=x360] .tyler-mem-details{margin:6px 0 0;background:#fff;border:1px solid #d3d6d0;border-radius:6px}
+.panel[data-rt-theme=x360] .tyler-mem-summary{padding:5px 9px;font:600 11.5px/1.25 var(--rt-font);color:#3c3f3d}
+.panel[data-rt-theme=x360] .tyler-mem-list{gap:1px;padding:0 9px 5px;font:400 11px/1.35 var(--rt-font);color:#2a2c2b}
+.panel[data-rt-theme=x360] .tyler-mem-head{font-size:10px;letter-spacing:0;text-transform:none;color:var(--rt-ink-4)}
+.panel[data-rt-theme=x360] .tyler-mem-item[data-running=false]{color:var(--rt-ink-disabled)}

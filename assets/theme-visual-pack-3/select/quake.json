@@ -4,5 +4,17 @@
   "p3-invuln": {"file": "themes/quake/ui/sb_invuln.png", "mode": "pixels", "name": "Quake status bar Pentagram of Protection (SB_INVULN)"},
   "p3-net": {"file": "themes/quake/ui/net.png", "mode": "pixels", "name": "Quake connection-interrupted icon (NET)"}
  },
- "states": {"waiting": "p3-net"}
+ "states": {"waiting": "p3-net"},
+ "css":{
+  "p3-ram":{"file":"themes/quake/ui/ram.png","mode":"pixels","name":"Quake low-memory icon (RAM)"},
+  "p3-box-tl":{"file":"themes/quake/ui/box_tl.png","mode":"pixels","name":"Quake menu box, top left"},
+  "p3-box-tm":{"file":"themes/quake/ui/box_tm.png","mode":"pixels","name":"Quake menu box, top"},
+  "p3-box-tr":{"file":"themes/quake/ui/box_tr.png","mode":"pixels","name":"Quake menu box, top right"},
+  "p3-box-ml":{"file":"themes/quake/ui/box_ml.png","mode":"pixels","name":"Quake menu box, left"},
+  "p3-box-mm":{"file":"themes/quake/ui/box_mm.png","mode":"pixels","name":"Quake menu box, middle"},
+  "p3-box-mr":{"file":"themes/quake/ui/box_mr.png","mode":"pixels","name":"Quake menu box, right"},
+  "p3-box-bl":{"file":"themes/quake/ui/box_bl.png","mode":"pixels","name":"Quake menu box, bottom left"},
+  "p3-box-bm":{"file":"themes/quake/ui/box_bm.png","mode":"pixels","name":"Quake menu box, bottom"},
+  "p3-box-br":{"file":"themes/quake/ui/box_br.png","mode":"pixels","name":"Quake menu box, bottom right"}
+ }
 }

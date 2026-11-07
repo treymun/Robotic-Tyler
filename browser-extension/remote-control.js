@@ -62,8 +62,14 @@
    music:{title:clean(S.music,120),by:clean(S.musicBy,60),sharing:!!music.sharing,open:!!music.open},
    sounds:[...(board.slots||[])].sort((a,b)=>fav.has(b.slot)-fav.has(a.slot)).slice(0,40).map(s=>({slot:s.slot,name:clean(s.name,40),fav:fav.has(s.slot)})),
    favorites:[...fav].slice(0,40),
-   controls:controls(),fx:fx(),themeVoices:themeVoices()};
+   controls:controls(),fx:fx(),themeVoices:themeVoices(),memory:memory(st.memory)};
  }
+ // v2.45: the memory meter's text while it's on (the same text as on the panel; never other programs' names).
+ function memory(m){if(!m||typeof m!=='object')return null;const f=v=>Math.max(0,Math.min(1,Number(v)||0)),PARTS=['app','text','voices','speech','images','other'];
+  const unit=u=>(/^\s/.test(String(u??''))?' ':'')+clean(u,12);
+  const gauge=g=>g&&typeof g==='object'?{label:clean(g.label,12),value:clean(g.value,24),own:clean(g.own,24),used:clean(g.used,8),total:clean(g.total,8),unit:unit(g.unit),ownValue:clean(g.ownValue,12),pct:clean(g.pct,6),card:clean(g.card,80),
+   fill:f(g.fill),ownFill:f(g.ownFill),level:['ok','high','full'].includes(g.level)?g.level:'ok',missing:g.missing===true,tip:clean(g.tip,400)}:null;
+  return {at:Number(m.at)||0,ram:gauge(m.ram),vram:gauge(m.vram),parts:(Array.isArray(m.parts)?m.parts:[]).filter(p=>PARTS.includes(p?.id)).slice(0,6).map(p=>({id:p.id,label:clean(p.label,40),running:p.running!==false,ram:clean(p.ram,12),vram:clean(p.vram,12),ramFill:f(p.ramFill),vramFill:f(p.vramFill)}))};}
 
  function themeVoices(){const tv=globalThis.TylerThemeVoices;if(!tv)return {available:false};const st=tv.state();if(st.available===false)return {available:false};
   // v2.41: each theme's character voices that can be used on the PC, and the one picked for it.

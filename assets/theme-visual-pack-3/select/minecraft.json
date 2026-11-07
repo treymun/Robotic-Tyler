@@ -122,5 +122,11 @@
    "mode": "pixels",
    "name": "Music Disc Ward (items/record_ward.png)"
   }
+ },
+ "css":{
+  "p3-arrow-empty":{"file":"themes/minecraft/ui/gui-container-furnace.png.png","mode":"pixels","crop":[79,34,24,17],"name":"Furnace screen: progress arrow, empty"},
+  "p3-arrow-full":{"file":"themes/minecraft/ui/gui-container-furnace.png.png","mode":"pixels","crop":[176,14,24,17],"name":"Furnace screen: progress arrow, full"},
+  "p3-flame-empty":{"file":"themes/minecraft/ui/gui-container-furnace.png.png","mode":"pixels","crop":[56,36,14,14],"name":"Furnace screen: fuel flame, out"},
+  "p3-flame-full":{"file":"themes/minecraft/ui/gui-container-furnace.png.png","mode":"pixels","crop":[176,0,14,14],"name":"Furnace screen: fuel flame, burning"}
  }
 }

@@ -181,3 +181,30 @@ html[data-rt-theme=ricochet]{scrollbar-color:#22304d #04060e}
 @keyframes rc-charge{50%{box-shadow:0 0 0 1px #59d7ff,0 0 16px rgba(89,215,255,.6)}}
 [data-rt-theme=ricochet] .checklist li::before{animation:rc-skim .35s cubic-bezier(.2,.9,.3,1) backwards}
 @keyframes rc-skim{from{transform:translateX(-30px);opacity:0}}
+
+/* ── Memory meter skin (v2.45): an arena trim and a bounce shot ──
+   Not the floating platforms, the discs or the pads: each reading is a channel cut into the arena floor
+   whose trim (the arena's own trim_blue1 / trim_yellow1 / trim_red1 textures) lights up as far as is in
+   use, Tyler's own share a white-hot core, beside the death-notice sprite for a disc shot: one bounce while
+   there's room, two from 75% (the yellow trim), three from 90% (the red trim). With no reading the channel
+   is dark and the shot dim. */
+.panel[data-rt-theme=ricochet] .tyler-mem{--mem-skin:ricochet;margin:8px 10px 0;padding:7px 10px 7px;background:rgba(4,6,14,.6);border:1px solid #22304d;border-radius:10px}
+.panel[data-rt-theme=ricochet] .tyler-mem .tyler-mem-stats{margin:0;padding:0;gap:12px;background:none;border:0;border-radius:0;box-shadow:none}
+.panel[data-rt-theme=ricochet] .tyler-mem .tyler-mem-meter{--shot:var(--rc-cyan);--trim:var(--rt-art-p3-trim-blue);--bounce:var(--rt-art-p3-bounce-1);display:grid;grid-template-columns:24px auto minmax(0,1fr);grid-template-rows:auto auto auto;column-gap:6px;align-items:center;padding:0;background:none;border:0;border-radius:0;box-shadow:none}
+.panel[data-rt-theme=ricochet] .tyler-mem .tyler-mem-meter[data-level=high]{--shot:#ffd84a;--trim:var(--rt-art-p3-trim-yellow);--bounce:var(--rt-art-p3-bounce-2)}
+.panel[data-rt-theme=ricochet] .tyler-mem .tyler-mem-meter[data-level=full]{--shot:#ff5a5a;--trim:var(--rt-art-p3-trim-red);--bounce:var(--rt-art-p3-bounce-3)}
+.panel[data-rt-theme=ricochet] .tyler-mem .tyler-mem-meter::before{content:"";grid-column:1;grid-row:1;width:24px;height:24px;background:var(--shot);filter:drop-shadow(0 0 3px var(--shot));-webkit-mask:var(--bounce) 0 0/24px 24px no-repeat;mask:var(--bounce) 0 0/24px 24px no-repeat}
+.panel[data-rt-theme=ricochet] .tyler-mem .tyler-mem-meter[data-missing=true]::before{opacity:.3;filter:none}
+.panel[data-rt-theme=ricochet] .tyler-mem .tyler-mem-label{grid-column:2;grid-row:1;font:400 12px/1.2 var(--rt-font-display);letter-spacing:.06em;color:var(--rc-cyan)}
+.panel[data-rt-theme=ricochet] .tyler-mem .tyler-mem-value{grid-column:3;grid-row:1;margin:0;font:600 13px/1.2 var(--rt-font);letter-spacing:0;text-align:right;color:#fff;text-shadow:none}
+.panel[data-rt-theme=ricochet] .tyler-mem .tyler-mem-meter:is([data-level=high],[data-level=full]) .tyler-mem-value{color:var(--shot)}
+.panel[data-rt-theme=ricochet] .tyler-mem .tyler-mem-bar{grid-column:1/-1;grid-row:2;height:10px;margin:6px 0 4px;border-radius:5px;background:#03050b;box-shadow:inset 0 2px 3px rgba(0,0,0,.9),0 1px 0 rgba(124,236,255,.18)}
+.panel[data-rt-theme=ricochet] .tyler-mem .tyler-mem-bar::before{top:1px;bottom:1px;left:1px;width:calc(var(--fill) * (100% - 2px));opacity:1;border-radius:4px;background:var(--trim) 0 50%/32px 100% repeat-x;filter:drop-shadow(0 0 3px var(--shot));image-rendering:auto}
+.panel[data-rt-theme=ricochet] .tyler-mem .tyler-mem-bar-own{top:3px;bottom:3px;left:1px;width:calc(var(--own) * (100% - 2px));border-radius:3px;background:#fff;box-shadow:0 0 6px #fff,0 0 2px var(--shot)}
+.panel[data-rt-theme=ricochet] .tyler-mem .tyler-mem-own{grid-column:1/-1;grid-row:3;display:block;font:400 11px/1.25 var(--rt-font);color:var(--rt-ink-4)}
+.panel[data-rt-theme=ricochet] .tyler-mem .tyler-mem-own-value{color:#fff}
+.panel[data-rt-theme=ricochet] .tyler-mem-details{margin:7px 0 0;border-top:1px solid #22304d}
+.panel[data-rt-theme=ricochet] .tyler-mem-summary{padding:5px 0 2px;font:400 11px/1.2 var(--rt-font-display);letter-spacing:.06em;color:var(--rc-cyan)}
+.panel[data-rt-theme=ricochet] .tyler-mem-list{gap:2px;margin-top:3px;font:400 11.5px/1.3 var(--rt-font);color:var(--rt-ink-2)}
+.panel[data-rt-theme=ricochet] .tyler-mem-head{font:400 9.5px/1.3 var(--rt-font-display);letter-spacing:.08em;color:var(--rt-ink-4)}
+.panel[data-rt-theme=ricochet] .tyler-mem-item[data-running=false]{color:#5a6a80}

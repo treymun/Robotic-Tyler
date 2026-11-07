@@ -237,3 +237,30 @@ html[data-rt-theme=ipod]{scrollbar-color:#a9a9a9 #e6e6e6}
 [data-rt-theme=ipod] .rt-toast:not(.rt-leaving){animation:ip-fade .2s ease-out backwards}
 [data-rt-theme=ipod] .checklist li{animation:ip-fade .2s ease-out backwards}
 [data-rt-theme=ipod] .vote[data-arrived]{animation:ip-slide .22s ease-out}
+
+/* ── Memory meter skin (v2.45): podcast play dots ──
+   Not the scrub bar, the battery or the click wheel: each reading is a row of an iPod list with the dot
+   the iPod puts beside a podcast: the blue dot of one you haven't heard, filled round like a clock as far
+   as is in use (as the half dot shows one you've partly heard), Tyler's own share in deeper blue. The pack
+   has no iPod menu art (only the built-in games'), so the dot is drawn here. From 75% the dot turns the
+   low-battery orange, from 90% red; with no reading it's an empty ring. */
+.panel[data-rt-theme=ipod] .tyler-mem{--mem-skin:ipod;margin:8px 10px 0;background:#fff;border:1px solid var(--ip-rule);border-radius:6px;overflow:hidden}
+.panel[data-rt-theme=ipod] .tyler-mem .tyler-mem-stats{grid-template-columns:minmax(0,1fr);margin:0;padding:0;gap:0;background:none;border:0;border-radius:0;box-shadow:none}
+.panel[data-rt-theme=ipod] .tyler-mem .tyler-mem-meter{--dot:#2b7fe5;--dot-deep:#0f4fa8;display:grid;grid-template-columns:16px auto minmax(0,1fr);grid-template-rows:auto auto;column-gap:9px;align-items:center;padding:6px 11px;background:none;border:0}
+.panel[data-rt-theme=ipod] .tyler-mem .tyler-mem-vram{border-top:1px solid var(--ip-rule)}
+.panel[data-rt-theme=ipod] .tyler-mem .tyler-mem-meter[data-level=high]{--dot:#f0961c;--dot-deep:#b05f00}
+.panel[data-rt-theme=ipod] .tyler-mem .tyler-mem-meter[data-level=full]{--dot:#e0302a;--dot-deep:#9a1510}
+.panel[data-rt-theme=ipod] .tyler-mem .tyler-mem-bar{grid-column:1;grid-row:1/3;width:16px;height:16px;margin:0;border-radius:50%;background:radial-gradient(circle at 50% 30%,rgba(255,255,255,.55),transparent 55%),conic-gradient(var(--dot-deep) 0 calc(var(--own) * 360deg),var(--dot) 0 calc(var(--fill) * 360deg),#e9eef5 0);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--dot) 70%,#000),0 1px 0 #fff}
+.panel[data-rt-theme=ipod] .tyler-mem .tyler-mem-bar::before,.panel[data-rt-theme=ipod] .tyler-mem .tyler-mem-bar-own{display:none}
+.panel[data-rt-theme=ipod] .tyler-mem .tyler-mem-meter[data-missing=true] .tyler-mem-bar{opacity:1;background:#fff;box-shadow:inset 0 0 0 1.5px #9aa3ad}
+.panel[data-rt-theme=ipod] .tyler-mem .tyler-mem-label{grid-column:2;grid-row:1;font:600 14px/1.2 var(--rt-font);color:var(--ip-ink)}
+.panel[data-rt-theme=ipod] .tyler-mem .tyler-mem-value{grid-column:3;grid-row:1;margin:0;font:400 14px/1.2 var(--rt-font);text-align:right;color:var(--ip-ink-2)}
+.panel[data-rt-theme=ipod] .tyler-mem .tyler-mem-meter:is([data-level=high],[data-level=full]) .tyler-mem-value{color:var(--dot-deep)}
+.panel[data-rt-theme=ipod] .tyler-mem .tyler-mem-own{grid-column:2/4;grid-row:2;display:block;font:400 11.5px/1.25 var(--rt-font);color:var(--ip-dim)}
+.panel[data-rt-theme=ipod] .tyler-mem .tyler-mem-own-value{color:var(--dot-deep)}
+.panel[data-rt-theme=ipod] .tyler-mem-details{margin:0;border-top:1px solid var(--ip-rule)}
+.panel[data-rt-theme=ipod] .tyler-mem-details[open]{padding-bottom:4px}
+.panel[data-rt-theme=ipod] .tyler-mem-summary{padding:6px 11px;font:600 13px/1.2 var(--rt-font);color:var(--ip-ink)}
+.panel[data-rt-theme=ipod] .tyler-mem-list{gap:1px;padding:0 11px;font:400 12px/1.35 var(--rt-font);color:var(--ip-ink)}
+.panel[data-rt-theme=ipod] .tyler-mem-head{font-size:11px;letter-spacing:0;text-transform:none;color:var(--ip-dim)}
+.panel[data-rt-theme=ipod] .tyler-mem-item[data-running=false]{color:#a0a0a0}

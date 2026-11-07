@@ -44,11 +44,19 @@
     'lease:claim':()=>({owner:true}),'lease:check':()=>({owner:true}),
     connection:()=>({keyConfigured:true,provider:'OpenRouter',model:'Llama 3.3 70B',speechVoice:'rex',noiseLevel:'balanced',talkativeness:'active',textSpeed:'balanced',quickSetup:{mode:'auto',botName:'ROBOTIC TYLER'}}),
     // An in-memory store (sessionStorage keeps theme stats across a reload, as a real profile would).
-    'storage:content':m=>{let saved={};try{saved=JSON.parse(sessionStorage.getItem('tylerPreviewStore')||'{}');}catch{}const store={usage,activityEnabled:false,tylerArcadeStats:{},v22Latency:latency,uiTheme:params.get('theme')||'steam',...saved};
+    'storage:content':m=>{let saved={};try{saved=JSON.parse(sessionStorage.getItem('tylerPreviewStore')||'{}');}catch{}const store={usage,activityEnabled:false,tylerArcadeStats:{},v22Latency:latency,uiTheme:params.get('theme')||'steam',...(params.get('memory')==='on'?{memoryMeter:true}:{}),...saved};
      if(m.action==='get')return {values:store};
      if(m.action==='set')Object.assign(saved,m.values);else if(m.action==='remove')for(const k of [].concat(m.keys))delete saved[k];
      try{sessionStorage.setItem('tylerPreviewStore',JSON.stringify(saved));}catch{}return {};},
     'soundboard:list':()=>({preferences:{volume:.6,access:'everyone',allowedIDs:''},slots:names.map((name,i)=>({slot:i+1,name,trigger:i===1?'!airhorn':'',custom:false})),boardBank:'Arcade',favorites:[2]}),
+    // v2.45 memory meter (?memory=on): a sample reading in app/memory-meter.cjs view()'s shape; window.__memReading
+    // replaces it and window.__memReads counts the questions (tests/e2e/memory-meter.e2e.mjs).
+    'memory:read':()=>{window.__memReads=(window.__memReads||0)+1;const sample={at:Date.now(),
+      ram:{label:'RAM',value:'14.2/32 GB',used:'14.2',total:'32',unit:' GB',own:'Tyler 6.1 GB',ownValue:'6.1 GB',pct:'44%',card:'',fill:.444,ownFill:.191,level:'ok',missing:false,tip:'PC memory: 14.2 GB in use of 31.9 GB. Tyler: 6.1 GB (The app 943 MB, Text AI on this PC 2.4 GB, Theme voices 2.6 GB, Hearing and voice on this PC 210 MB). Other programs: 8.1 GB.'},
+      vram:{label:'VRAM',value:'11.6/12 GB',used:'11.6',total:'12',unit:' GB',own:'Tyler 9.8 GB',ownValue:'9.8 GB',pct:'97%',card:'NVIDIA GeForce RTX 3060',fill:.967,ownFill:.815,level:'full',missing:false,tip:'NVIDIA GeForce RTX 3060: 11.6 GB in use of 12.0 GB. Tyler: 9.8 GB (The app 180 MB, Text AI on this PC 3.1 GB, Theme voices 6.5 GB). Other programs: 1.8 GB.'},
+      parts:[{id:'app',label:'The app',running:true,ram:'943 MB',vram:'180 MB',ramFill:.029,vramFill:.015},{id:'text',label:'Text AI on this PC',running:true,ram:'2.4 GB',vram:'3.1 GB',ramFill:.075,vramFill:.258},{id:'voices',label:'Theme voices',running:true,ram:'2.6 GB',vram:'6.5 GB',ramFill:.081,vramFill:.542},
+       {id:'speech',label:'Hearing and voice on this PC',running:true,ram:'210 MB',vram:'0 MB',ramFill:.006,vramFill:0},{id:'images',label:'Images on this PC',running:false,ram:'off',vram:'off',ramFill:0,vramFill:0},{id:'other',label:'Other programs',running:true,ram:'8.1 GB',vram:'1.8 GB',ramFill:.254,vramFill:.152}]};
+      return {reading:window.__memReading||sample};},
     'suite:status':()=>({options:{hudEnabled:true},queue:[],party:null,votes:(window.__votes||[{title:'Deep Rock Galactic',count:3},{title:'Lethal Company',count:2},{title:'Golf With Your Friends',count:1}]),leaderboard:[],xp:[{id:'Alex',level:4,xp:410},{id:'Sam',level:2,xp:150}],diagnostics:{model:'demo'},usage:{requests:42,reportedCostUSD:0.0314}}),
   };
   const listeners=[];

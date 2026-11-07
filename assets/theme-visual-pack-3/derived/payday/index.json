@@ -1,4 +1,151 @@
 {
+ "css": {
+  "p3-ammo-bag": {
+   "bytes": 3528,
+   "file": "themes/payday/icons/deployables-ammo_bag.png.png",
+   "format": "png",
+   "mode": "pixels",
+   "name": "PAYDAY 2 deployable: Ammo Bag",
+   "resize": [
+    64,
+    64
+   ],
+   "sha256": "825044f021f1a12271ad5722491b0229ad06dddcebe9117495a2a7c7d23d5d97",
+   "size": [
+    64,
+    64
+   ],
+   "source": {
+    "commit": "507041aa0a6645d1a0fbff49212f3ec347c0244a",
+    "downloadUrl": "https://raw.githubusercontent.com/r-paydaybuilds/pd2builder/507041aa0a6645d1a0fbff49212f3ec347c0244a/public/img/deployables/ammo_bag.png",
+    "kind": "payday2-builder-game-ui-art",
+    "path": "public/img/deployables/ammo_bag.png",
+    "repo": "r-paydaybuilds/pd2builder"
+   },
+   "tier": "Archived source artwork"
+  },
+  "p3-bracket": {
+   "bytes": 488,
+   "file": "themes/payday/ui/borders-border.png.png",
+   "format": "png",
+   "mask": true,
+   "mode": "lum",
+   "name": "PAYDAY 2 menu corner brackets",
+   "sha256": "e17663246793cea64c746461ca0d9e63921c7b0d495415eb7b8941e5bc37b34d",
+   "size": [
+    64,
+    64
+   ],
+   "source": {
+    "commit": "507041aa0a6645d1a0fbff49212f3ec347c0244a",
+    "downloadUrl": "https://raw.githubusercontent.com/r-paydaybuilds/pd2builder/507041aa0a6645d1a0fbff49212f3ec347c0244a/public/img/borders/border.png",
+    "kind": "payday2-builder-game-ui-art",
+    "path": "public/img/borders/border.png",
+    "repo": "r-paydaybuilds/pd2builder"
+   },
+   "tier": "Archived source artwork"
+  },
+  "p3-t1": {
+   "bytes": 9134,
+   "file": "themes/payday/icons/deployables-ammo_bag.png.png",
+   "format": "svg",
+   "mask": true,
+   "mode": "trace",
+   "name": "p3-t1",
+   "resize": [
+    56,
+    56
+   ],
+   "sha256": "825044f021f1a12271ad5722491b0229ad06dddcebe9117495a2a7c7d23d5d97",
+   "size": [
+    47.25,
+    36.5
+   ],
+   "source": {
+    "commit": "507041aa0a6645d1a0fbff49212f3ec347c0244a",
+    "downloadUrl": "https://raw.githubusercontent.com/r-paydaybuilds/pd2builder/507041aa0a6645d1a0fbff49212f3ec347c0244a/public/img/deployables/ammo_bag.png",
+    "kind": "payday2-builder-game-ui-art",
+    "path": "public/img/deployables/ammo_bag.png",
+    "repo": "r-paydaybuilds/pd2builder"
+   },
+   "tier": "Archived source artwork"
+  },
+  "p3-t2": {
+   "bytes": 9134,
+   "file": "themes/payday/icons/deployables-ammo_bag.png.png",
+   "format": "svg",
+   "mask": true,
+   "mode": "trace",
+   "name": "p3-t2",
+   "resize": [
+    56,
+    56
+   ],
+   "sha256": "825044f021f1a12271ad5722491b0229ad06dddcebe9117495a2a7c7d23d5d97",
+   "size": [
+    47.25,
+    36.5
+   ],
+   "source": {
+    "commit": "507041aa0a6645d1a0fbff49212f3ec347c0244a",
+    "downloadUrl": "https://raw.githubusercontent.com/r-paydaybuilds/pd2builder/507041aa0a6645d1a0fbff49212f3ec347c0244a/public/img/deployables/ammo_bag.png",
+    "kind": "payday2-builder-game-ui-art",
+    "path": "public/img/deployables/ammo_bag.png",
+    "repo": "r-paydaybuilds/pd2builder"
+   },
+   "tier": "Archived source artwork"
+  },
+  "p3-t3": {
+   "bytes": 1691,
+   "file": "themes/payday/icons/deployables-ecm_jammer.png.png",
+   "format": "svg",
+   "mask": true,
+   "mode": "trace",
+   "name": "p3-t3",
+   "resize": [
+    56,
+    56
+   ],
+   "sha256": "6ff5fd0dfeb4255c8f6597c45f304784f6434f43821714f6470f00d785b4f205",
+   "size": [
+    12.25,
+    46.25
+   ],
+   "source": {
+    "commit": "507041aa0a6645d1a0fbff49212f3ec347c0244a",
+    "downloadUrl": "https://raw.githubusercontent.com/r-paydaybuilds/pd2builder/507041aa0a6645d1a0fbff49212f3ec347c0244a/public/img/deployables/ecm_jammer.png",
+    "kind": "payday2-builder-game-ui-art",
+    "path": "public/img/deployables/ecm_jammer.png",
+    "repo": "r-paydaybuilds/pd2builder"
+   },
+   "tier": "Archived source artwork"
+  },
+  "p3-t4": {
+   "bytes": 7194,
+   "file": "themes/payday/icons/deployables-doctor_bag.png.png",
+   "format": "svg",
+   "mask": true,
+   "mode": "trace",
+   "name": "p3-t4",
+   "resize": [
+    56,
+    56
+   ],
+   "sha256": "b761a50f866841a12cf6405bc50683a784c6bcd884ced289ff9df501f57d5f9d",
+   "size": [
+    42.0,
+    51.0
+   ],
+   "source": {
+    "commit": "507041aa0a6645d1a0fbff49212f3ec347c0244a",
+    "downloadUrl": "https://raw.githubusercontent.com/r-paydaybuilds/pd2builder/507041aa0a6645d1a0fbff49212f3ec347c0244a/public/img/deployables/doctor_bag.png",
+    "kind": "payday2-builder-game-ui-art",
+    "path": "public/img/deployables/doctor_bag.png",
+    "repo": "r-paydaybuilds/pd2builder"
+   },
+   "tier": "Archived source artwork"
+  }
+ },
  "icons": {},
  "picks": {
   "p3-skill-drill-sawgeant": {

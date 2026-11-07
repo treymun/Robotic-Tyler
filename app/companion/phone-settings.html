@@ -820,6 +820,15 @@
   </label>
 </section>
 
+<!-- v2.45: the memory meter in Tyler's panel (desktop app; app/memory-meter.cjs). Off by default; in Chrome the sheet is hidden. -->
+<section class="sheet only-desktop" id="memoryMeterSheet" data-ui-zone="advanced">
+  <div class="sheet-head">
+    <h2>Memory meter</h2>
+    <p>See how much of the PC's memory and the graphics card's memory is in use, and how much of it is Tyler's own: the app, Text AI on this PC, theme voices, hearing and the voice on this PC, and images.</p>
+  </div>
+  <label class="toggle"><input id="memoryMeter" type="checkbox"><span><b>Show a memory meter in Tyler's panel</b><small>Under the numbers at the top of Tyler's panel (and on the phone remote). It updates every few seconds only while it's on and the panel is open; off, it does nothing. Graphics memory comes from Windows' own GPU counters; a reading that isn't available shows "—" and says why.</small></span></label>
+</section>
+
 <section class="sheet" id="usageSection" data-ui-zone="advanced">
   <div class="sheet-head">
     <h2>Keys and usage detail</h2>

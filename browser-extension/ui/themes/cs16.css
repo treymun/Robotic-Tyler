@@ -217,3 +217,35 @@
 @keyframes cs16-key{50%{opacity:.2}}
 [data-rt-theme=cs16] .vote[data-arrived]{animation:cs16-snap .2s steps(2)}
 [data-rt-theme=cs16] .checklist li{animation:cs16-snap .12s steps(1) backwards}
+
+/* ── Memory meter skin (v2.45): the weapon-selection slot ──
+   Not the HUD's amber numbers or the health cross: each reading is a slot from the weapon selection
+   (sprites/640hud: the selection frame and the HUD's own weapon icons, an AK-47 for the PC's memory and an
+   AWP for the graphics card's, additive and tinted HUD amber) with the two little ammo bars the Half-Life HUD
+   draws under a weapon: the long one is how much is in use, the short one Tyler's own share. The readout
+   is in the menus' white Verdana. From 75% the HUD amber turns orange, from 90% it goes red as the HUD
+   does when health is low; with no reading the slot is empty and dim. */
+.panel[data-rt-theme=cs16] .tyler-mem{--mem-skin:cs16;margin:8px 8px 0}
+.panel[data-rt-theme=cs16] .tyler-mem .tyler-mem-stats{margin:0;padding:0;gap:6px;background:none;border:0;border-radius:0;box-shadow:none}
+.panel[data-rt-theme=cs16] .tyler-mem .tyler-mem-meter{--hud:var(--c-orange);position:relative;display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:34px auto auto auto;column-gap:6px;padding:4px 9px 6px;background:rgba(0,0,0,.66);border:0;border-radius:0}
+.panel[data-rt-theme=cs16] .tyler-mem .tyler-mem-meter[data-level=high]{--hud:#ff8a00}
+.panel[data-rt-theme=cs16] .tyler-mem .tyler-mem-meter[data-level=full]{--hud:#ff2a2a}
+.panel[data-rt-theme=cs16] .tyler-mem .tyler-mem-meter::before{content:"";position:absolute;left:4px;right:4px;top:3px;height:34px;background:var(--hud);opacity:.85;-webkit-mask:var(--rt-art-p3-selection) 0 0/100% 100% no-repeat;mask:var(--rt-art-p3-selection) 0 0/100% 100% no-repeat}
+.panel[data-rt-theme=cs16] .tyler-mem .tyler-mem-meter::after{content:"";position:absolute;left:50%;top:7px;width:96px;height:32px;margin-left:-48px;background:var(--hud);filter:drop-shadow(0 0 3px color-mix(in srgb,var(--hud) 60%,transparent));-webkit-mask:var(--rt-art-p3-ak47) 0 0/96px 32px no-repeat;mask:var(--rt-art-p3-ak47) 0 0/96px 32px no-repeat;image-rendering:pixelated}
+.panel[data-rt-theme=cs16] .tyler-mem .tyler-mem-vram::after{-webkit-mask-image:var(--rt-art-p3-awp);mask-image:var(--rt-art-p3-awp)}
+.panel[data-rt-theme=cs16] .tyler-mem .tyler-mem-meter[data-missing=true]::after{opacity:.3;filter:none}
+.panel[data-rt-theme=cs16] .tyler-mem .tyler-mem-meter[data-missing=true]::before{opacity:.35}
+.panel[data-rt-theme=cs16] .tyler-mem .tyler-mem-bar{grid-column:1/-1;grid-row:2;height:4px;margin:3px 2px 0;border-radius:0;overflow:visible;background:color-mix(in srgb,var(--hud) 22%,transparent)}
+.panel[data-rt-theme=cs16] .tyler-mem .tyler-mem-bar::before{opacity:1;background:var(--hud)}
+.panel[data-rt-theme=cs16] .tyler-mem .tyler-mem-bar-own{top:6px;bottom:auto;height:3px;max-width:100%;background:#fff;box-shadow:0 0 2px var(--hud)}
+.panel[data-rt-theme=cs16] .tyler-mem .tyler-mem-label{grid-column:1;grid-row:3;margin-top:9px;font:700 10px/1.2 var(--rt-font);letter-spacing:0;text-transform:uppercase;color:var(--hud)}
+.panel[data-rt-theme=cs16] .tyler-mem .tyler-mem-value{grid-column:2;grid-row:3;text-align:right;margin:9px 0 0;font:400 11px/1.2 var(--rt-font);letter-spacing:0;color:#fff;text-shadow:none}
+.panel[data-rt-theme=cs16] .tyler-mem .tyler-mem-value::before{content:none}
+.panel[data-rt-theme=cs16] .tyler-mem .tyler-mem-own{grid-column:1/-1;grid-row:4;display:block;margin-top:1px;font:400 10px/1.25 var(--rt-font);color:#c8c8c8}
+.panel[data-rt-theme=cs16] .tyler-mem .tyler-mem-own-value{color:#fff}
+.panel[data-rt-theme=cs16] .tyler-mem-details{margin:6px 0 0;background:rgba(0,0,0,.66)}
+.panel[data-rt-theme=cs16] .tyler-mem-summary{padding:5px 9px;font:700 11px/1.2 var(--rt-font);color:var(--c-orange)}
+.panel[data-rt-theme=cs16] .tyler-mem-list{gap:1px;padding:0 9px 2px;font:400 11px/1.3 var(--rt-font);color:#e6e6e6}
+.panel[data-rt-theme=cs16] .tyler-mem-head{font-size:10px;letter-spacing:0;text-transform:none;color:var(--c-orange)}
+.panel[data-rt-theme=cs16] .tyler-mem-item[data-running=false]{color:#8a8a8a}
+.panel[data-rt-theme=cs16] .tyler-mem-item[data-part=other]{border-top-color:rgba(255,176,0,.3)}

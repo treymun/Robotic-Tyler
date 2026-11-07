@@ -21,11 +21,23 @@ Modes (per pick):
   Any mode: seek (a frame of an animated PNG/GIF, 0 first).
   vector  the source's own SVG, cleaned (plain drawing elements only). Options: mono (currentColor).
 
+CSS art (v2.45, the memory meter skins): a select file's optional "css" object lists art a theme's own
+stylesheet draws, as {"p3-<id>": {"file": ..., "mode": ..., ...}} with the same modes. It is not put in
+ui-brand.js: tools/build.mjs turns each one into a data: URL in the CSS variable --rt-art-<id>, set only
+under that theme (Steam's page allows data: images, never a file or a link). Each is drawn at its own size:
+  pixels  a PNG of the native bitmap (a palette when it has 256 colours or fewer), drawn with hard edges
+  lum     a PNG mask: white, the additive sprite's brightness as its opacity (16 steps), for mask-image
+  trace   an SVG mask (white glyph) in the glyph's own box
+  vector  the source's SVG in its own viewBox (mono: one white shape, for mask-image)
+  Options: crop, frame, seek as above; resize [w, h] (a large texture scaled down, smoothly, before drawing);
+  rotate (90/180/270, a horizontal strip turned upright); key "#rrggbb" (a Windows bitmap's transparent colour).
+  derived/<theme>/css/<id>.png|.svg and the "css" part of index.json (same provenance as the picks).
+
 Usage:  python3 tools/brand/pack3.py --pack <extracted pack folder> <theme> [<theme> ...]
         (--pack is needed only when a source file isn't in source/<theme>/ yet)
 Needs Pillow and NumPy (potracer for trace).
 """
-import argparse, hashlib, json, os, re, shutil, sys
+import argparse, hashlib, io, json, os, re, shutil, sys
 import xml.etree.ElementTree as ET
 import numpy as np
 from PIL import Image
@@ -36,6 +48,7 @@ BASE = os.path.join(ROOT, 'assets', 'theme-visual-pack-3')
 THEMES = ['steam', 'classic', 'tf2', 'cs2', 'portal', 'cs16', 'hev', 'l4d', 'winxp', 'doom', 'quake', 'pipboy', 'combine',
           'deadlock', 'minecraft', 'payday', 'dreamcast', 'gmod', 'ricochet', 'dod', 'rust', 'x360', 'ipod', 'msn', 'xmb']
 MAX_SVG = 48 * 1024  # one drawing; the panel loads every theme's drawings at once, so keep them small
+MAX_CSS = 16 * 1024  # one piece of CSS art (it is in the panel's stylesheet for every theme, as a data: URL)
 
 sys.path.insert(0, HERE)
 from pack2 import num, artboard, fit, clean_element  # noqa: E402  (same cleaning rules as Pack 2)
@@ -118,6 +131,8 @@ def lum(theme, pick):
 def trace(theme, pick):
     import potrace
     im = load(theme, pick)
+    if pick.get('resize'):  # CSS art only: a large render traced at a smaller size, for a simpler outline
+        im = im.resize(tuple(pick['resize']), Image.LANCZOS)
     up = pick.get('upscale', 1)
     if up > 1:
         im = im.resize((im.width * up, im.height * up), Image.LANCZOS)
@@ -161,6 +176,107 @@ def vector(theme, pick):
 
 
 MODES = {'pixels': pixels, 'lum': lum, 'trace': trace, 'vector': vector}
+
+
+# ── CSS art (v2.45): files for a theme's own stylesheet, each at its own size ──────────────────────────
+def css_load(theme, pick):
+    im = load(theme, pick)
+    if pick.get('key'):  # a Windows resource bitmap's transparent colour (Messenger's magenta)
+        key = tuple(int(pick['key'][i:i + 2], 16) for i in (1, 3, 5))
+        px = np.asarray(im).copy()
+        px[(px[..., 0] == key[0]) & (px[..., 1] == key[1]) & (px[..., 2] == key[2])] = 0
+        im = Image.fromarray(px, 'RGBA')
+    if pick.get('rotate'):
+        im = im.rotate(-pick['rotate'], expand=True)  # clockwise, without resampling (multiples of 90)
+    if pick.get('resize'):
+        im = im.resize(tuple(pick['resize']), Image.LANCZOS)
+    return im
+
+
+def png(im):
+    """The smallest lossless PNG of an RGBA image: RGBA, or a palette with per-entry opacity."""
+    out = []
+    b = io.BytesIO()
+    im.save(b, 'PNG', optimize=True)
+    out.append(b.getvalue())
+    colours = im.getcolors(256)
+    if colours:
+        cols = [c for _, c in colours]
+        at = {c: i for i, c in enumerate(cols)}
+        p = Image.new('P', im.size)
+        p.putdata([at[v] for v in im.getdata()])
+        p.putpalette([ch for c in cols for ch in c[:3]])
+        b = io.BytesIO()
+        p.save(b, 'PNG', optimize=True, transparency=bytes(c[3] for c in cols))
+        out.append(b.getvalue())
+    return min(out, key=len)
+
+
+def css_pixels(theme, pick):
+    im = css_load(theme, pick)
+    return png(im), 'png', {'size': list(im.size)}
+
+
+def css_lum(theme, pick):
+    im = css_load(theme, pick)
+    px = np.asarray(im).astype(float)
+    # Additive, as lum(): the brightness over black is what shows. White, with that as its opacity in 16 steps.
+    a = np.round(px[..., :3].max(axis=2) / 255 * (px[..., 3] / 255) * 15) * 17
+    out = np.zeros(px.shape, np.uint8)
+    out[..., :3] = 255
+    out[..., 3] = a.astype(np.uint8)
+    return png(Image.fromarray(out, 'RGBA')), 'png', {'size': list(im.size), 'mask': True}
+
+
+def css_trace(theme, pick):
+    svg, info = trace(theme, pick)
+    # trace() fits the glyph into the 64 x 64 artboard: keep only the inner drawing, in its own box.
+    m = re.search(r'<svg [^>]*?viewBox="([^"]+)"><path fill="currentColor" fill-rule="evenodd" stroke="none" d="([^"]+)"/></svg>', svg)
+    vb, d = m.group(1), m.group(2)
+    w, h = [float(v) for v in vb.split()[2:]]
+    return ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="%s"><path fill="#fff" fill-rule="evenodd" d="%s"/></svg>' % (vb, d)).encode(), \
+        'svg', {'size': [round(w / pick.get('upscale', 1), 2), round(h / pick.get('upscale', 1), 2)], 'mask': True}
+
+
+def css_vector(theme, pick):
+    root = ET.parse(source_path(theme, pick)).getroot()
+    vb = [float(x) for x in re.split(r'[\s,]+', root.attrib['viewBox'].strip())] if root.attrib.get('viewBox') else \
+        [0, 0, float(re.sub('[^0-9.]', '', root.attrib['width'])), float(re.sub('[^0-9.]', '', root.attrib['height']))]
+    body = []
+    for c in root:
+        clean_element(c, pick.get('mono'), body)
+    inner = ''.join(body).replace('currentColor', '#fff')
+    fill = ' fill="#fff"' if pick.get('mono') else ''
+    return ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="%s"%s>%s</svg>' % (' '.join(num(v) for v in vb), fill, inner)).encode(), \
+        'svg', {'size': [vb[2], vb[3]], **({'mask': True} if pick.get('mono') else {})}
+
+
+CSS_MODES = {'pixels': css_pixels, 'lum': css_lum, 'trace': css_trace, 'vector': css_vector}
+
+
+def provenance(theme, aid, pick, rec, old):
+    if rec:
+        src = rec.get('source') or {}
+        return {'sha256': rec.get('sha256'), 'tier': rec.get('sourceTier'),
+                'source': {k: src.get(k) for k in ('repo', 'commit', 'path', 'kind', 'downloadUrl', 'archive', 'container', 'offset') if src.get(k)}}
+    prev = old.get(aid) if old.get(aid, {}).get('file') == pick['file'] else None
+    if not prev:  # run without --pack: keep what was recorded when the file was copied
+        raise SystemExit('%s: no provenance for %s: pass --pack <extracted pack folder>' % (theme, pick['file']))
+    return {k: prev.get(k) for k in ('sha256', 'tier', 'source')}
+
+
+def copy_source(theme, pick, pack, manifest):
+    dest = source_path(theme, pick)
+    rec = manifest.get(pick['file'])
+    if rec and rec.get('useAsReferenceOnly'):
+        raise SystemExit('%s: %s is a reference image (not for use in the app)' % (theme, pick['file']))
+    if not os.path.exists(dest):
+        if not pack:
+            raise SystemExit('%s: %s isn\'t copied yet: pass --pack <extracted pack folder>' % (theme, pick['file']))
+        shutil.copyfile(os.path.join(pack, pick['file']), dest)
+    if rec and rec.get('sha256') and sha256(dest) != rec['sha256']:
+        raise SystemExit('%s: %s doesn\'t match the pack manifest\'s SHA-256' % (theme, pick['file']))
+    return rec
 
 
 def sha256(path):
@@ -215,13 +331,40 @@ def run(theme, pack, manifest):
         index[aid] = {'name': pick.get('name') or (rec or {}).get('title') or (rec or {}).get('name') or (old.get(aid) or {}).get('name') or aid,
                       'mode': pick['mode'], 'file': pick['file'], **info, **({'crop': pick['crop']} if pick.get('crop') else {}), **prov}
         print('%-9s %-34s %-6s %6d bytes' % (theme, aid, pick['mode'], len(svg)))
+    # v2.45: the art the theme's own stylesheet draws (tools/build.mjs: data: URLs in --rt-art-<id>).
+    css, css_index, css_dir = sel.get('css') or {}, {}, os.path.join(out, 'css')
+    old_css = json.load(open(old_path)).get('css', {}) if os.path.exists(old_path) else {}
+    if css:
+        os.makedirs(css_dir, exist_ok=True)
+    for aid, pick in css.items():
+        if not re.fullmatch(r'p3-[a-z0-9-]+', aid) or aid in picks:
+            raise SystemExit('%s: CSS art ids are p3-<lowercase-words>, unlike the picks (got %s)' % (theme, aid))
+        rec = copy_source(theme, pick, pack, manifest)
+        used_files.add(os.path.basename(pick['file']))
+        data, ext, info = CSS_MODES[pick['mode']](theme, pick)
+        if len(data) > MAX_CSS:
+            raise SystemExit('%s: %s is %d bytes (at most %d): crop, resize or pick a smaller source' % (theme, aid, len(data), MAX_CSS))
+        for e in ('png', 'svg'):
+            if e != ext and os.path.exists(os.path.join(css_dir, aid + '.' + e)):
+                os.remove(os.path.join(css_dir, aid + '.' + e))
+        open(os.path.join(css_dir, aid + '.' + ext), 'wb').write(data)
+        css_index[aid] = {'name': pick.get('name') or (rec or {}).get('title') or (old_css.get(aid) or {}).get('name') or aid,
+                          'mode': pick['mode'], 'file': pick['file'], 'format': ext, 'bytes': len(data), **info,
+                          **{k: pick[k] for k in ('crop', 'resize', 'rotate', 'key') if pick.get(k)}, **provenance(theme, aid, pick, rec, old_css)}
+        print('%-9s %-34s %-6s %6d bytes (CSS %s)' % (theme, aid, pick['mode'], len(data), ext))
+    if os.path.isdir(css_dir):
+        for f in os.listdir(css_dir):
+            if f.rsplit('.', 1)[0] not in css:
+                os.remove(os.path.join(css_dir, f))
+        if not os.listdir(css_dir):
+            os.rmdir(css_dir)
     for old in os.listdir(out):
         if old.endswith('.svg') and old[:-4] not in picks:
             os.remove(os.path.join(out, old))
     for old in os.listdir(src_dir):
         if old not in used_files:
             os.remove(os.path.join(src_dir, old))
-    doc = {'picks': index, 'icons': sel.get('icons') or {}, 'states': sel.get('states') or {}}
+    doc = {'picks': index, 'icons': sel.get('icons') or {}, 'states': sel.get('states') or {}, **({'css': css_index} if css_index else {})}
     json.dump(doc, open(os.path.join(out, 'index.json'), 'w'), indent=1, sort_keys=True)
     open(os.path.join(out, 'index.json'), 'a').write('\n')
 
@@ -238,7 +381,9 @@ def credits(pack):
     repos = set()
     for theme in THEMES:
         f = os.path.join(BASE, 'derived', theme, 'index.json')
-        picks = json.load(open(f)).get('picks', {}) if os.path.exists(f) else {}
+        doc = json.load(open(f)) if os.path.exists(f) else {}
+        # v2.45: the art a theme's stylesheet draws (the memory meter skins) is marked "CSS".
+        picks = {**doc.get('picks', {}), **{k: {**v, 'name': (v.get('name') or k) + ', CSS'} for k, v in doc.get('css', {}).items()}}
         if not picks:
             continue
         lines += ['## ' + theme, '', '| Drawing | Source file | Source | Tier |', '|---|---|---|---|']

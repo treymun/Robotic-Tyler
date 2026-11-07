@@ -316,3 +316,34 @@ html[data-rt-theme=classic],[data-rt-theme=classic] :is(.scroll,.content,main){s
 @keyframes cl-pad{to{background-size:calc(100% - 8px) 3px,auto}}
 [data-rt-theme=classic] .vote[data-arrived]{animation:cl-vote .5s steps(1) 2}
 @keyframes cl-vote{0%{background:var(--c-sel)}50%{background:transparent}}
+
+/* ── Memory meter skin (v2.45): a row of VGUI radio buttons as lamps ──
+   Not the client's segmented progress bar: each reading is a row of ten of the 2004 client's own radio
+   buttons (resource/graphics radselstd, radselfocus and radunselstd from the OG Steam skin, at their own
+   size) inside an etched group box, one lamp for each tenth: lit with the gold focus ring for Tyler's own
+   share, lit plain for the rest of what's in use, empty for what's free. From 75% the lit lamps take the
+   selection gold, from 90% they turn red; with no reading every lamp is empty. */
+.panel[data-rt-theme=classic] .tyler-mem{--mem-skin:classic;--lamp:16px;margin:8px 10px 0;padding:7px 9px;background:var(--c-face);border:1px solid var(--c-lo);box-shadow:inset 1px 1px 0 var(--c-hi),1px 1px 0 var(--c-hi)}
+.panel[data-rt-theme=classic] .tyler-mem .tyler-mem-stats{grid-template-columns:minmax(0,1fr);margin:0;padding:0;gap:5px;background:none;border:0;border-radius:0}
+.panel[data-rt-theme=classic] .tyler-mem .tyler-mem-meter{display:grid;grid-template-columns:38px calc(var(--lamp) * 10) minmax(0,1fr);grid-template-rows:auto auto;column-gap:8px;align-items:center;padding:0;background:none;border:0}
+.panel[data-rt-theme=classic] .tyler-mem .tyler-mem-label{grid-column:1;grid-row:1/3;font:700 11px/1.2 var(--rt-font);letter-spacing:0;text-transform:none;color:var(--c-gold)}
+.panel[data-rt-theme=classic] .tyler-mem .tyler-mem-bar{grid-column:2;grid-row:1/3;height:var(--lamp);margin:0;border-radius:0;background:var(--rt-art-p3-radio-off) 0 0/var(--lamp) var(--lamp) repeat-x;image-rendering:pixelated}
+.panel[data-rt-theme=classic] .tyler-mem .tyler-mem-bar::before,.panel[data-rt-theme=classic] .tyler-mem .tyler-mem-bar-own{bottom:auto;height:var(--lamp);opacity:1;background:var(--rt-art-p3-radio-on) 0 0/var(--lamp) var(--lamp) repeat-x;image-rendering:pixelated}
+.panel[data-rt-theme=classic] .tyler-mem .tyler-mem-bar::before{width:calc(round(nearest,var(--fill) * 10,1) * var(--lamp))}
+.panel[data-rt-theme=classic] .tyler-mem .tyler-mem-bar-own{width:calc(round(nearest,var(--own) * 10,1) * var(--lamp));background-image:var(--rt-art-p3-radio-focus)}
+.panel[data-rt-theme=classic] .tyler-mem .tyler-mem-meter[data-level=high] .tyler-mem-bar::before{filter:sepia(1) saturate(2.6) brightness(1.05)}
+.panel[data-rt-theme=classic] .tyler-mem .tyler-mem-meter[data-level=full] .tyler-mem-bar::before,.panel[data-rt-theme=classic] .tyler-mem .tyler-mem-meter[data-level=full] .tyler-mem-bar-own{filter:sepia(1) saturate(10) hue-rotate(-52deg) brightness(.92)}
+.panel[data-rt-theme=classic] .tyler-mem .tyler-mem-meter[data-missing=true] .tyler-mem-bar{opacity:.7}
+.panel[data-rt-theme=classic] .tyler-mem .tyler-mem-value{grid-column:3;grid-row:1;margin:0;font:700 11px/1.25 var(--rt-font);letter-spacing:0;text-align:right;color:var(--rt-ink-strong)}
+.panel[data-rt-theme=classic] .tyler-mem .tyler-mem-meter[data-level=high] .tyler-mem-value{color:var(--c-gold)}
+.panel[data-rt-theme=classic] .tyler-mem .tyler-mem-meter[data-level=full] .tyler-mem-value{color:var(--rt-danger)}
+.panel[data-rt-theme=classic] .tyler-mem .tyler-mem-own{grid-column:3;grid-row:2;display:block;font:400 10px/1.25 var(--rt-font);text-align:right;color:var(--rt-ink-3)}
+.panel[data-rt-theme=classic] .tyler-mem .tyler-mem-own-value{color:var(--c-gold)}
+@container tyler-mem (max-width:330px){.panel[data-rt-theme=classic] .tyler-mem .tyler-mem-meter{grid-template-columns:34px calc(var(--lamp) * 10) minmax(0,1fr);column-gap:6px}}
+.panel[data-rt-theme=classic] .tyler-mem-details{margin:7px 0 0;background:var(--c-deep);border:1px solid;border-color:var(--c-lo) var(--c-hi) var(--c-hi) var(--c-lo)}
+.panel[data-rt-theme=classic] .tyler-mem-summary{padding:4px 6px;font:400 11px/1.2 var(--rt-font);color:var(--rt-ink-2)}
+.panel[data-rt-theme=classic] .tyler-mem-list{gap:0;font:400 11px/1.3 var(--rt-font);color:var(--rt-ink-2)}
+.panel[data-rt-theme=classic] .tyler-mem-item{padding:1px 6px}
+.panel[data-rt-theme=classic] .tyler-mem-head{padding:2px 6px;background:var(--c-face);border-bottom:1px solid var(--c-lo);font-size:10px;letter-spacing:0;text-transform:none;color:var(--rt-ink-3)}
+.panel[data-rt-theme=classic] .tyler-mem-item[data-running=false]{color:#8e9886}
+.panel[data-rt-theme=classic] .tyler-mem-item[data-part=other]{border-top-color:var(--c-hi)}

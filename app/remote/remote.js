@@ -152,6 +152,13 @@
   for(const k of SLOT_ORDER){const name=k[0].toUpperCase()+k.slice(1);if(live.hud[k]!=null)$('hud'+name).textContent=live.hud[k];if(live.hud[k+'Meta']!=null)$('hud'+name+'Meta').textContent=live.hud[k+'Meta'];}
   if(fxLoaded)emit('hud',{...live.hud});
  }
+ // v2.45: the memory meter as the PC's panel shows it (Settings → Advanced), put in place by the same
+ // memory-meter.js. Shown only while it's on there and its reading is fresh (the panel reads only while it can be seen).
+ function setMemory(m,now){
+  const el=$('memMeter');if(!el)return;const fresh=!!m?.ram&&!!m?.vram&&(!Number.isFinite(now)||!m.at||Math.abs(now-m.at)<15000);
+  el.hidden=!fresh;if(!fresh){el.dataset.state='off';return;}
+  globalThis.TylerMemoryMeter?.render(el,m);
+ }
  function setLink(state){
   linkState=state;const chip=$('platformChip');if(!chip)return;
   chip.textContent='Phone remote · '+({live:'Live',polling:'Connected',reconnecting:'Reconnecting…',lost:'PC not reachable',pc:'PC online',pair:'Not paired',connecting:'Connecting…'}[state]||'Connecting…');
@@ -423,6 +430,7 @@
   if(!stale){
    if(s.state!==live.state||s.label!==live.label||s.text!==live.text)setActivity(s.state,s.label,s.text);
    if(s.hud&&SLOT_ORDER.some(k=>s.hud[k]!==live.hud[k]||s.hud[k+'Meta']!==live.hud[k+'Meta']))setHud(s.hud);
+   setMemory(s.memory,s.now);
   }
   renderControls(s);
   // Steam chat reloaded on the PC (a new session there): start the extras' numbers over from it.
@@ -486,7 +494,7 @@
   let who={};try{who=await (await fetch('/whoami',{cache:'no-store'})).json();}catch{}
   version=String(who.version||'');theme=THEMES.includes(who.theme)?who.theme:'steam';
   const v='?v='+encodeURIComponent(version);
-  try{for(const f of ['ui-template.js','ui-icons.js','ui-kit.js','ui-logos.js','ui-brand.js'])await load('/lib/'+f+v);await build();}
+  try{for(const f of ['ui-template.js','ui-icons.js','ui-kit.js','ui-logos.js','ui-brand.js','memory-meter.js'])await load('/lib/'+f+v);await build();}
   catch(e){document.getElementById('boot').textContent='Tyler’s remote couldn’t load: '+e.message+' Reload the page to try again.';return;}
   document.getElementById('boot')?.remove();
   setLink('connecting');setActivity('ready','Connecting','Looking for Tyler on your PC…');

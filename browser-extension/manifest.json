@@ -87,6 +87,7 @@
         "ui-brand.js",
         "ui-icons.js",
         "ui-kit.js",
+        "memory-meter.js",
         "ui-state.js",
         "setup-detect.js",
         "content.js",

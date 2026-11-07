@@ -1,4 +1,9 @@
 {"picks": {
   "p3-stunstick": {"file": "themes/combine/icons/hl2-native-hud-glyph-u006e.svg", "mode": "vector", "mono": true, "name": "Half-Life 2 HUD weapon icon: stunstick (halflife2.ttf n)"},
   "p3-citizen": {"file": "themes/combine/icons/hl2-native-hud-glyph-u0043.svg", "mode": "vector", "mono": true, "name": "Half-Life 2 HUD squad figure (halflife2.ttf C)"}
-}}
+},
+ "css":{
+  "p3-shield":{"file":"themes/combine/icons/effects-combineshield-comshieldwall_close.vtf.png","mode":"lum","resize":[96,96],"name":"Combine force field (effects/combineshield/comshieldwall_close)"},
+  "p3-laser":{"file":"themes/combine/icons/effects-bluelaser1.vtf.png","mode":"lum","resize":[16,32],"name":"Combine emitter beam (effects/bluelaser1)"}
+ }
+}

@@ -1,4 +1,27 @@
 {
+ "css": {
+  "p3-storage-card": {
+   "bytes": 192,
+   "file": "themes/steam/icons/native-steam-storage-card.svg",
+   "format": "svg",
+   "mask": true,
+   "mode": "vector",
+   "name": "Steam storage icon (Settings > Storage)",
+   "sha256": "d4ac094f0b54b878c38d9c919a6410aec216a6dba055f885c6c8a309358a8242",
+   "size": [
+    36.0,
+    36.0
+   ],
+   "source": {
+    "commit": "bf4375cef89cbfa7892e4c8e15e28f6569578017",
+    "downloadUrl": "https://raw.githubusercontent.com/SteamDatabase/SteamTracking/bf4375cef89cbfa7892e4c8e15e28f6569578017/ClientExtracted/steamui/sp.js",
+    "kind": "native-current-steam-client-svg",
+    "path": "ClientExtracted/steamui/sp.js",
+    "repo": "SteamDatabase/SteamTracking"
+   },
+   "tier": "Native / official source"
+  }
+ },
  "icons": {},
  "picks": {
   "p3-away": {

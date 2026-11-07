@@ -2,4 +2,10 @@
  "p3-hp-cross":{"file":"themes/cs16/icons/hud-hud-cross.png","mode":"lum"},
  "p3-c4":{"file":"themes/cs16/icons/hud-hud-c4.png","mode":"lum","crop":[0,8,32,16]}
 },
- "states":{"thinking":"p3-c4"}}
+ "states":{"thinking":"p3-c4"},
+ "css":{
+  "p3-ak47":{"file":"themes/cs16/icons/hud-hud-d_ak47.png","mode":"lum","name":"CS 1.6 HUD weapon icon: AK-47 (d_ak47)"},
+  "p3-awp":{"file":"themes/cs16/icons/hud-hud-d_awp.png","mode":"lum","name":"CS 1.6 HUD weapon icon: AWP (d_awp)"},
+  "p3-selection":{"file":"themes/cs16/icons/hud-hud-selection.png","mode":"lum","name":"CS 1.6 weapon selection frame"}
+ }
+}

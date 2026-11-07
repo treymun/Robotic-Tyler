@@ -10,4 +10,8 @@
  "p3-home":{"file":"themes/steam/icons/native-steam-home.svg","mode":"vector","mono":true},
  "p3-clock":{"file":"themes/steam/icons/native-steam-clock.svg","mode":"vector","mono":true},
  "p3-refresh":{"file":"themes/steam/icons/native-steam-refresh.svg","mode":"vector","mono":true}
-}}
+},
+ "css":{
+  "p3-storage-card":{"file":"themes/steam/icons/native-steam-storage-card.svg","mode":"vector","mono":true,"name":"Steam storage icon (Settings > Storage)"}
+ }
+}

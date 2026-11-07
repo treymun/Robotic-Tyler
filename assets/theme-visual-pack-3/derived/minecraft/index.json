@@ -1,4 +1,110 @@
 {
+ "css": {
+  "p3-arrow-empty": {
+   "bytes": 145,
+   "crop": [
+    79,
+    34,
+    24,
+    17
+   ],
+   "file": "themes/minecraft/ui/gui-container-furnace.png.png",
+   "format": "png",
+   "mode": "pixels",
+   "name": "Furnace screen: progress arrow, empty",
+   "sha256": "a4c43643c5b195a7ab8527eb5eb8d1a64e084c1c41512536aea55f312e4e3f2f",
+   "size": [
+    24,
+    17
+   ],
+   "source": {
+    "commit": "6c571b0825ee27b81f01127c2bd0d4ba2c89abb9",
+    "downloadUrl": "https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/6c571b0825ee27b81f01127c2bd0d4ba2c89abb9/data/1.8.8/gui/container/furnace.png",
+    "kind": "vanilla-1.8.8-texture",
+    "path": "data/1.8.8/gui/container/furnace.png",
+    "repo": "PrismarineJS/minecraft-assets"
+   },
+   "tier": "Native / official source"
+  },
+  "p3-arrow-full": {
+   "bytes": 173,
+   "crop": [
+    176,
+    14,
+    24,
+    17
+   ],
+   "file": "themes/minecraft/ui/gui-container-furnace.png.png",
+   "format": "png",
+   "mode": "pixels",
+   "name": "Furnace screen: progress arrow, full",
+   "sha256": "a4c43643c5b195a7ab8527eb5eb8d1a64e084c1c41512536aea55f312e4e3f2f",
+   "size": [
+    24,
+    17
+   ],
+   "source": {
+    "commit": "6c571b0825ee27b81f01127c2bd0d4ba2c89abb9",
+    "downloadUrl": "https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/6c571b0825ee27b81f01127c2bd0d4ba2c89abb9/data/1.8.8/gui/container/furnace.png",
+    "kind": "vanilla-1.8.8-texture",
+    "path": "data/1.8.8/gui/container/furnace.png",
+    "repo": "PrismarineJS/minecraft-assets"
+   },
+   "tier": "Native / official source"
+  },
+  "p3-flame-empty": {
+   "bytes": 140,
+   "crop": [
+    56,
+    36,
+    14,
+    14
+   ],
+   "file": "themes/minecraft/ui/gui-container-furnace.png.png",
+   "format": "png",
+   "mode": "pixels",
+   "name": "Furnace screen: fuel flame, out",
+   "sha256": "a4c43643c5b195a7ab8527eb5eb8d1a64e084c1c41512536aea55f312e4e3f2f",
+   "size": [
+    14,
+    14
+   ],
+   "source": {
+    "commit": "6c571b0825ee27b81f01127c2bd0d4ba2c89abb9",
+    "downloadUrl": "https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/6c571b0825ee27b81f01127c2bd0d4ba2c89abb9/data/1.8.8/gui/container/furnace.png",
+    "kind": "vanilla-1.8.8-texture",
+    "path": "data/1.8.8/gui/container/furnace.png",
+    "repo": "PrismarineJS/minecraft-assets"
+   },
+   "tier": "Native / official source"
+  },
+  "p3-flame-full": {
+   "bytes": 219,
+   "crop": [
+    176,
+    0,
+    14,
+    14
+   ],
+   "file": "themes/minecraft/ui/gui-container-furnace.png.png",
+   "format": "png",
+   "mode": "pixels",
+   "name": "Furnace screen: fuel flame, burning",
+   "sha256": "a4c43643c5b195a7ab8527eb5eb8d1a64e084c1c41512536aea55f312e4e3f2f",
+   "size": [
+    14,
+    14
+   ],
+   "source": {
+    "commit": "6c571b0825ee27b81f01127c2bd0d4ba2c89abb9",
+    "downloadUrl": "https://raw.githubusercontent.com/PrismarineJS/minecraft-assets/6c571b0825ee27b81f01127c2bd0d4ba2c89abb9/data/1.8.8/gui/container/furnace.png",
+    "kind": "vanilla-1.8.8-texture",
+    "path": "data/1.8.8/gui/container/furnace.png",
+    "repo": "PrismarineJS/minecraft-assets"
+   },
+   "tier": "Native / official source"
+  }
+ },
  "icons": {},
  "picks": {
   "p3-food-empty": {

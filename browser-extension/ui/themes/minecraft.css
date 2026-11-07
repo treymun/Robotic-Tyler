@@ -226,3 +226,33 @@ html[data-rt-theme=minecraft]{scrollbar-color:#6f6f6f #8b8b8b}
 [data-rt-theme=minecraft] .pad.playing{animation:mc-snap .16s steps(2)}
 [data-rt-theme=minecraft] .vote[data-arrived]::before{animation:mc-pop .25s steps(3)}
 @keyframes mc-pop{0%{transform:scale(1.25)}100%{transform:none}}
+
+/* ── Memory meter skin (v2.45): the furnace ──
+   Not the hotbar, the slots or the hearts: each reading is the furnace screen's own progress arrow and fuel
+   flame (gui/container/furnace.png, the original pieces at twice their size, without smoothing). The arrow
+   fills left to right with how much is in use; the flame burns as high as Tyler's own part of that. The
+   reading is in the GUI's dark grey title lettering. From 75% the arrow glows gold, from 90% red, and the
+   reading takes the same chat colour; with no reading the arrow and the flame are out. */
+.panel[data-rt-theme=minecraft] .tyler-mem{--mem-skin:minecraft;margin:8px 10px 0;padding:6px 8px 5px;background:var(--mc-gui);border:2px solid var(--mc-outline);box-shadow:var(--mc-raised)}
+.panel[data-rt-theme=minecraft] .tyler-mem .tyler-mem-stats{margin:0;padding:0;gap:10px;background:none;border:0;border-radius:0;box-shadow:none}
+.panel[data-rt-theme=minecraft] .tyler-mem .tyler-mem-meter{--ink:#404040;display:grid;grid-template-columns:28px 48px minmax(0,1fr);grid-template-rows:auto 34px auto;column-gap:5px;align-items:center;padding:0;background:none;border:0;box-shadow:none}
+.panel[data-rt-theme=minecraft] .tyler-mem .tyler-mem-meter[data-level=high]{--ink:#a86a00}
+.panel[data-rt-theme=minecraft] .tyler-mem .tyler-mem-meter[data-level=full]{--ink:#aa0000}
+.panel[data-rt-theme=minecraft] .tyler-mem .tyler-mem-label{grid-column:1/-1;grid-row:1;margin-bottom:2px;font:400 11px/1.2 var(--rt-font);color:#404040;text-shadow:none}
+.panel[data-rt-theme=minecraft] .tyler-mem .tyler-mem-meter::before{content:"";grid-column:1;grid-row:2;width:28px;height:28px;background:var(--rt-art-p3-flame-empty) 0 0/28px 28px no-repeat;image-rendering:pixelated}
+.panel[data-rt-theme=minecraft] .tyler-mem .tyler-mem-meter::after{content:"";grid-column:1;grid-row:2;width:28px;height:28px;background:var(--rt-art-p3-flame-full) 0 0/28px 28px no-repeat;image-rendering:pixelated;clip-path:inset(calc((1 - min(1,var(--own) / max(var(--fill),.01))) * 100%) 0 0 0)}
+.panel[data-rt-theme=minecraft] .tyler-mem .tyler-mem-bar{grid-column:2;grid-row:2;width:48px;height:34px;margin:0;border-radius:0;overflow:hidden;background:var(--rt-art-p3-arrow-empty) 0 0/48px 34px no-repeat;image-rendering:pixelated}
+.panel[data-rt-theme=minecraft] .tyler-mem .tyler-mem-bar::before{width:calc(var(--fill) * 48px);opacity:1;background:var(--rt-art-p3-arrow-full) 0 0/48px 34px no-repeat;image-rendering:pixelated}
+.panel[data-rt-theme=minecraft] .tyler-mem .tyler-mem-bar-own{display:none}
+.panel[data-rt-theme=minecraft] .tyler-mem .tyler-mem-meter[data-level=high] .tyler-mem-bar::before{background:var(--rt-art-p3-arrow-full) 0 0/48px 34px no-repeat;filter:sepia(1) saturate(5) hue-rotate(-8deg) brightness(1.05)}
+.panel[data-rt-theme=minecraft] .tyler-mem .tyler-mem-meter[data-level=full] .tyler-mem-bar::before{background:var(--rt-art-p3-arrow-full) 0 0/48px 34px no-repeat;filter:sepia(1) saturate(8) hue-rotate(-48deg) brightness(.95)}
+.panel[data-rt-theme=minecraft] .tyler-mem .tyler-mem-meter[data-missing=true]::after{display:none}
+.panel[data-rt-theme=minecraft] .tyler-mem .tyler-mem-value{grid-column:3;grid-row:2;align-self:center;margin:0;font:400 12px/1.25 var(--rt-font);letter-spacing:0;color:var(--ink);text-shadow:none;white-space:normal}
+.panel[data-rt-theme=minecraft] .tyler-mem .tyler-mem-own{grid-column:1/-1;grid-row:3;display:block;margin-top:2px;font:400 10px/1.2 var(--rt-font);color:#555}
+.panel[data-rt-theme=minecraft] .tyler-mem .tyler-mem-own-value{color:#404040}
+.panel[data-rt-theme=minecraft] .tyler-mem-details{margin:6px 0 0;background:var(--mc-slot);box-shadow:var(--mc-sunk)}
+.panel[data-rt-theme=minecraft] .tyler-mem-summary{padding:4px 6px;font:400 11px/1.2 var(--rt-font);color:#fff;text-shadow:var(--mc-shadow)}
+.panel[data-rt-theme=minecraft] .tyler-mem-list{gap:1px;padding:0 6px 4px;font:400 11px/1.3 var(--rt-font);color:#fff;text-shadow:var(--mc-shadow)}
+.panel[data-rt-theme=minecraft] .tyler-mem-head{font-size:10px;letter-spacing:0;text-transform:none;color:var(--mc-yellow)}
+.panel[data-rt-theme=minecraft] .tyler-mem-item[data-running=false]{color:#c6c6c6}
+.panel[data-rt-theme=minecraft] .tyler-mem-item[data-part=other]{color:#fff;border-top-color:#373737}

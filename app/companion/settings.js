@@ -2,7 +2,7 @@
 'use strict';
 const $=id=>document.getElementById(id);
 let noiseChanged=false;
-const fields=['aiProvider','localExplicit','personality','length','brain','geminiTextModel','themeStats','roastMode','talkativeness','insideJokes','callbackGap','nicknameAliases','textSpeed','spendingCapUSD','streamAI','friendMemory','smartRouting','libraryAllowedIds','activityEnabled','activitySteamIds','voiceEngine','geminiVoice','geminiTtsModel','liveModel','liveVoice','liveInterrupt','liveSilenceMs','liveStartSensitivity','liveEndSensitivity','speechVoice','noiseLevel','fastSpeech','speechEngine','voiceHearing','kokoroVoice','desktopVoice','desktopMuteCall','voiceOutputDevice','voiceListenDevice','voiceListenConsent','chatTagEnabled','chatTagName','voiceSpeakers'];
+const fields=['aiProvider','localExplicit','personality','length','brain','geminiTextModel','themeStats','roastMode','talkativeness','insideJokes','callbackGap','nicknameAliases','textSpeed','spendingCapUSD','streamAI','friendMemory','smartRouting','libraryAllowedIds','activityEnabled','activitySteamIds','voiceEngine','geminiVoice','geminiTtsModel','liveModel','liveVoice','liveInterrupt','liveSilenceMs','liveStartSensitivity','liveEndSensitivity','speechVoice','noiseLevel','fastSpeech','speechEngine','voiceHearing','kokoroVoice','desktopVoice','desktopMuteCall','voiceOutputDevice','voiceListenDevice','voiceListenConsent','chatTagEnabled','chatTagName','voiceSpeakers','memoryMeter'];
 const sliderIds=['humorLevel','edgeLevel','helpLevel','chaosLevel'];
 const sliderLabels={humorLevel:['Dry','Light','High','Unhinged'],edgeLevel:['Soft','Spicy','Rowdy','Savage'],helpLevel:['Low','Balanced','Helpful','Coach mode'],chaosLevel:['Controlled','Loose','Chaotic','Gremlin']};
 const presetMap={

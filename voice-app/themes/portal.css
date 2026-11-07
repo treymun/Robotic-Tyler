@@ -275,3 +275,41 @@ html[data-rt-theme=portal]{scrollbar-color:#9aa1a8 transparent}
 [data-rt-theme=portal] .vote[data-arrived] .vote-marker{animation:p-flip .6s steps(1) 2}
 [data-rt-theme=portal] .vote[data-arrived]:not([data-leader]) .vote-marker{border-radius:50%;box-shadow:0 0 0 2px var(--p-blue)}
 [data-rt-theme=portal] .checklist li{animation:p-tick .3s ease-out backwards}
+
+/* ── Memory meter skin (v2.45): the portal gun's crosshair ──
+   Not the chamber sign, its numbers or the portal ovals: the two readings meet in the middle as the
+   Aperture Science Handheld Portal Device's crosshair, the blue bracket on the left for the PC's memory and
+   the orange one on the right for the graphics card. Each bracket fills from the bottom as far as is in
+   use, Tyler's own share in the deeper shade; an empty bracket is the crosshair's outline, as when no portal
+   is placed. The pack has no crosshair art, so it is drawn here. From 75% the reading is underlined with the
+   chambers' orange-and-black hazard stripe, from 90% it turns red and the bracket flashes. */
+.panel[data-rt-theme=portal] .tyler-mem{--mem-skin:portal;margin:9px 10px 0;padding:4px 0 2px}
+.panel[data-rt-theme=portal] .tyler-mem .tyler-mem-stats{margin:0;padding:0;gap:0;background:none;border:0;border-radius:0;box-shadow:none}
+.panel[data-rt-theme=portal] .tyler-mem .tyler-mem-meter{--c:var(--p-blue);--deep:var(--p-blue-fill);--dim:rgba(27,29,31,.14);display:grid;grid-template-columns:minmax(0,1fr) 24px;grid-template-rows:auto auto auto;align-content:center;padding:0;background:none;border:0;text-align:right}
+.panel[data-rt-theme=portal] .tyler-mem .tyler-mem-vram{--c:var(--p-orange);--deep:#c25f00;grid-template-columns:24px minmax(0,1fr);text-align:left}
+.panel[data-rt-theme=portal] .tyler-mem .tyler-mem-meter>:not(.tyler-mem-bar){grid-column:1;padding-right:10px}
+.panel[data-rt-theme=portal] .tyler-mem .tyler-mem-vram>:not(.tyler-mem-bar){grid-column:2;padding:0 0 0 10px}
+.panel[data-rt-theme=portal] .tyler-mem .tyler-mem-bar{grid-column:2;grid-row:1/4;align-self:center;width:24px;height:48px;margin:0;border-radius:0;
+ background:conic-gradient(from 200deg at 100% 50%,var(--deep) 0 calc(var(--own) * 140deg),var(--c) 0 calc(var(--fill) * 140deg),var(--dim) 0);
+ -webkit-mask:radial-gradient(circle at 100% 50%,transparent 17.5px,#000 18px 23.5px,transparent 24px),conic-gradient(from 200deg at 100% 50%,#000 0 140deg,transparent 0);-webkit-mask-composite:source-in;
+ mask:radial-gradient(circle at 100% 50%,transparent 17.5px,#000 18px 23.5px,transparent 24px) intersect,conic-gradient(from 200deg at 100% 50%,#000 0 140deg,transparent 0)}
+.panel[data-rt-theme=portal] .tyler-mem .tyler-mem-vram .tyler-mem-bar{grid-column:1;
+ background:conic-gradient(from 20deg at 0 50%,var(--dim) 0 calc((1 - var(--fill)) * 140deg),var(--c) 0 calc((1 - var(--own)) * 140deg),var(--deep) 0 140deg,transparent 0);
+ -webkit-mask:radial-gradient(circle at 0 50%,transparent 17.5px,#000 18px 23.5px,transparent 24px),conic-gradient(from 20deg at 0 50%,#000 0 140deg,transparent 0);-webkit-mask-composite:source-in;
+ mask:radial-gradient(circle at 0 50%,transparent 17.5px,#000 18px 23.5px,transparent 24px) intersect,conic-gradient(from 20deg at 0 50%,#000 0 140deg,transparent 0)}
+.panel[data-rt-theme=portal] .tyler-mem .tyler-mem-bar::before,.panel[data-rt-theme=portal] .tyler-mem .tyler-mem-bar-own{display:none}
+.panel[data-rt-theme=portal] .tyler-mem .tyler-mem-meter[data-missing=true] .tyler-mem-bar{opacity:1;background:var(--dim)}
+.panel[data-rt-theme=portal] .tyler-mem .tyler-mem-meter[data-level=full] .tyler-mem-bar{animation:po-flash .9s steps(1) infinite}
+@keyframes po-flash{50%{opacity:.35}}
+.panel[data-rt-theme=portal] .tyler-mem .tyler-mem-label{grid-row:1;font:600 10px/1.2 var(--rt-font);letter-spacing:.18em;text-transform:uppercase;color:var(--p-ink)}
+.panel[data-rt-theme=portal] .tyler-mem .tyler-mem-value{grid-row:2;justify-self:end;margin:1px 0 0;font:300 17px/1.15 var(--rt-font);letter-spacing:.01em;color:#000}
+.panel[data-rt-theme=portal] .tyler-mem .tyler-mem-vram .tyler-mem-value{justify-self:start}
+.panel[data-rt-theme=portal] .tyler-mem .tyler-mem-meter[data-level=high] .tyler-mem-value{padding-bottom:4px;color:var(--p-orange-ink);background:repeating-linear-gradient(-45deg,var(--p-orange) 0 4px,var(--p-ink) 4px 8px) 0 100%/100% 3px no-repeat}
+.panel[data-rt-theme=portal] .tyler-mem .tyler-mem-meter[data-level=full] .tyler-mem-value{padding-bottom:4px;font-weight:400;color:var(--rt-danger);background:repeating-linear-gradient(-45deg,var(--rt-danger) 0 4px,var(--p-ink) 4px 8px) 0 100%/100% 3px no-repeat}
+.panel[data-rt-theme=portal] .tyler-mem .tyler-mem-own{grid-row:3;display:block;font:400 10.5px/1.25 var(--rt-font);color:var(--rt-ink-3)}
+.panel[data-rt-theme=portal] .tyler-mem .tyler-mem-own-value{color:var(--deep)}
+.panel[data-rt-theme=portal] .tyler-mem-details{margin:6px 0 0;background:#fff;border:1px solid var(--rt-line)}
+.panel[data-rt-theme=portal] .tyler-mem-summary{padding:5px 9px;font:600 10.5px/1.2 var(--rt-font);letter-spacing:.14em;text-transform:uppercase;color:var(--p-ink)}
+.panel[data-rt-theme=portal] .tyler-mem-list{gap:1px;padding:0 9px 5px;font:400 11.5px/1.35 var(--rt-font);color:var(--p-ink)}
+.panel[data-rt-theme=portal] .tyler-mem-head{font-size:9.5px;letter-spacing:.14em;color:var(--rt-ink-4)}
+.panel[data-rt-theme=portal] .tyler-mem-item[data-running=false]{color:var(--rt-ink-disabled)}

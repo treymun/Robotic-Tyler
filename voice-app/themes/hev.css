@@ -229,3 +229,39 @@
 @keyframes hev-seg{0%{opacity:0}100%{opacity:1}}
 [data-rt-theme=hev] .pad.playing{animation:hev-charge 1.1s ease-in-out infinite}
 [data-rt-theme=hev] .checklist li{animation:hev-on .4s ease-out backwards}
+
+/* ── Memory meter skin (v2.45): the Half-Life HUD's armour suit ──
+   Not the HUD's big numbers: each reading is the HUD's own suit sprite (sprites/640hud7: suit_empty and
+   suit_full, additive, tinted like the HUD) filling from the boots up: Tyler's own share in the suit's orange
+   at the bottom, the rest of what's in use in HUD yellow above it, beside small typed readouts. From 75% the
+   suit turns amber, from 90% red and it blinks, as the HUD does when you're hurt; with no reading it's an
+   empty outline. A divider like the HUD's stands between the two. */
+.panel[data-rt-theme=hev] .tyler-mem{--mem-skin:hev;margin:8px 10px 0;padding:6px 6px 5px;background:linear-gradient(90deg,rgba(0,0,0,.55),rgba(0,0,0,.25));border-top:1px dashed rgba(255,220,0,.28);border-bottom:1px dashed rgba(255,220,0,.28)}
+.panel[data-rt-theme=hev] .tyler-mem .tyler-mem-stats{margin:0;padding:0;background:none;border:0;border-radius:0}
+.panel[data-rt-theme=hev] .tyler-mem .tyler-mem-meter{--suit:var(--h-yellow);display:grid;grid-template-columns:40px minmax(0,1fr);grid-template-rows:auto auto auto;column-gap:7px;align-content:center;min-height:40px;padding:0 4px 0 10px;background:none;border:0;border-radius:0}
+.panel[data-rt-theme=hev] .tyler-mem .tyler-mem-ram{padding-left:0}
+.panel[data-rt-theme=hev] .tyler-mem .tyler-mem-vram{border-left:2px solid transparent;border-image:linear-gradient(180deg,transparent,rgba(255,220,0,.45) 25% 75%,transparent) 1}
+.panel[data-rt-theme=hev] .tyler-mem .tyler-mem-meter[data-level=high]{--suit:#ffa600}
+.panel[data-rt-theme=hev] .tyler-mem .tyler-mem-meter[data-level=full]{--suit:#ff3a1a}
+.panel[data-rt-theme=hev] .tyler-mem .tyler-mem-meter::before,.panel[data-rt-theme=hev] .tyler-mem .tyler-mem-bar{grid-column:1;grid-row:1/4;align-self:center;width:40px;height:40px;margin:0;border-radius:0;-webkit-mask:var(--rt-art-p3-suit-empty) 0 0/40px 40px no-repeat;mask:var(--rt-art-p3-suit-empty) 0 0/40px 40px no-repeat;image-rendering:pixelated}
+.panel[data-rt-theme=hev] .tyler-mem .tyler-mem-meter::before{content:"";background:rgba(255,220,0,.4)}
+.panel[data-rt-theme=hev] .tyler-mem .tyler-mem-bar{overflow:visible;background:linear-gradient(0deg,var(--h-orange) 0 calc(var(--own) * 100%),var(--suit) calc(var(--own) * 100%) calc(var(--fill) * 100%),transparent calc(var(--fill) * 100%));-webkit-mask-image:var(--rt-art-p3-suit-full);mask-image:var(--rt-art-p3-suit-full)}
+.panel[data-rt-theme=hev] .tyler-mem .tyler-mem-bar::before,.panel[data-rt-theme=hev] .tyler-mem .tyler-mem-bar-own{display:none}
+.panel[data-rt-theme=hev] .tyler-mem .tyler-mem-meter[data-level=full]::before,.panel[data-rt-theme=hev] .tyler-mem .tyler-mem-meter[data-level=full] .tyler-mem-bar{animation:hev-suit-low 1.2s steps(2,jump-none) infinite}
+@keyframes hev-suit-low{0%{opacity:1}100%{opacity:.45}}
+.panel[data-rt-theme=hev] .tyler-mem .tyler-mem-meter[data-missing=true] .tyler-mem-bar{visibility:hidden}
+.panel[data-rt-theme=hev] .tyler-mem .tyler-mem-label{grid-column:2;grid-row:1;font:400 10px/1.2 var(--rt-font-display);letter-spacing:.2em;color:var(--h-dim)}
+.panel[data-rt-theme=hev] .tyler-mem .tyler-mem-value{grid-column:2;grid-row:2;margin:1px 0 0;font:400 13px/1.25 var(--rt-font-display);letter-spacing:.02em;color:var(--suit);text-shadow:none}
+.panel[data-rt-theme=hev] .tyler-mem .tyler-mem-value :is(.tyler-mem-sep,.tyler-mem-total,.tyler-mem-unit){color:color-mix(in srgb,var(--suit) 62%,transparent)}
+.panel[data-rt-theme=hev] .tyler-mem .tyler-mem-meter[data-missing=true] .tyler-mem-value{color:var(--h-dim)}
+.panel[data-rt-theme=hev] .tyler-mem .tyler-mem-own{display:block;grid-column:2;grid-row:3;font:400 10.5px/1.3 var(--rt-font);letter-spacing:0;color:var(--rt-ink-4)}
+.panel[data-rt-theme=hev] .tyler-mem .tyler-mem-own-value{color:var(--h-orange)}
+.panel[data-rt-theme=hev] .tyler-mem-details{margin:5px 0 0;border-top:1px solid rgba(255,220,0,.12)}
+.panel[data-rt-theme=hev] .tyler-mem-summary{padding:5px 0 1px;font:400 10px/1.3 var(--rt-font-display);letter-spacing:.16em;text-transform:uppercase;color:var(--h-dim)}
+.panel[data-rt-theme=hev] .tyler-mem-list{gap:1px;margin-top:3px;font:400 11px/1.35 var(--rt-font-display);color:var(--h-yellow)}
+.panel[data-rt-theme=hev] .tyler-mem-item{border-left:2px solid rgba(255,220,0,.3);padding-left:6px}
+.panel[data-rt-theme=hev] .tyler-mem-item .tyler-mem-item-label{font-family:var(--rt-font);color:var(--rt-ink-2)}
+.panel[data-rt-theme=hev] .tyler-mem-head{border-left-color:transparent;font-size:9.5px;letter-spacing:.16em;color:var(--h-dim)}
+.panel[data-rt-theme=hev] .tyler-mem-item[data-running=false]{opacity:.5;border-left-color:rgba(255,220,0,.1)}
+.panel[data-rt-theme=hev] .tyler-mem-item[data-part=other]{border-top:1px dashed rgba(255,220,0,.2);border-left-color:transparent}
+.panel[data-rt-theme=hev] .tyler-mem .tyler-mem-value::before{content:none}

@@ -208,3 +208,32 @@ html[data-rt-theme=rust]{scrollbar-color:#4a4642 #141311}
 [data-rt-theme=rust] .rt-toast:not(.rt-leaving){animation:ru-pick .22s cubic-bezier(.2,.8,.3,1) backwards}
 [data-rt-theme=rust] .checklist li{animation:ru-pick .2s ease-out backwards}
 [data-rt-theme=rust] .vote[data-arrived]{animation:ru-pick .22s ease-out}
+
+/* ── Memory meter skin (v2.45): a battery on the power grid ──
+   Not the vitals, the belt or the status-effect row: each reading is a battery from Rust's electricity,
+   with Rust's own plug icon (gui/ui plug-on, or plug-off when there's no reading) and a cell-divided
+   charge filling in off-white as far as is in use, Tyler's own share in the olive of the Craft button.
+   From 75% the charge is the food orange, from 90% rust red; with no reading the battery is dead. */
+.panel[data-rt-theme=rust] .tyler-mem{--mem-skin:rust;margin:8px 10px 0;padding:7px 9px 6px;background:rgba(0,0,0,.42);box-shadow:inset 0 0 0 1px var(--ru-line)}
+.panel[data-rt-theme=rust] .tyler-mem .tyler-mem-stats{margin:0;padding:0;gap:12px;background:none;border:0;border-radius:0;box-shadow:none}
+.panel[data-rt-theme=rust] .tyler-mem .tyler-mem-meter{--charge:var(--ru-ink);display:grid;grid-template-columns:16px auto minmax(0,1fr);grid-template-rows:auto auto auto;column-gap:6px;align-items:center;padding:0;background:none;border:0;border-radius:0}
+.panel[data-rt-theme=rust] .tyler-mem .tyler-mem-meter[data-level=high]{--charge:var(--ru-food)}
+.panel[data-rt-theme=rust] .tyler-mem .tyler-mem-meter[data-level=full]{--charge:var(--ru-rust-hi)}
+.panel[data-rt-theme=rust] .tyler-mem .tyler-mem-meter::before{content:"";grid-column:1;grid-row:1;width:16px;height:16px;background:var(--ru-ink);-webkit-mask:var(--rt-art-p3-plug-on) 50% 50%/contain no-repeat;mask:var(--rt-art-p3-plug-on) 50% 50%/contain no-repeat}
+.panel[data-rt-theme=rust] .tyler-mem .tyler-mem-meter[data-missing=true]::before{background:var(--ru-rust-hi);-webkit-mask-image:var(--rt-art-p3-plug-off);mask-image:var(--rt-art-p3-plug-off)}
+.panel[data-rt-theme=rust] .tyler-mem .tyler-mem-label{grid-column:2;grid-row:1;font:700 12px/1.2 var(--rt-font-display);letter-spacing:.04em;text-transform:uppercase;color:var(--ru-dim)}
+.panel[data-rt-theme=rust] .tyler-mem .tyler-mem-value{grid-column:3;grid-row:1;margin:0;font:700 14px/1.15 var(--rt-font-display);letter-spacing:.01em;text-align:right;color:var(--ru-ink)}
+.panel[data-rt-theme=rust] .tyler-mem .tyler-mem-meter:is([data-level=high],[data-level=full]) .tyler-mem-value{color:var(--charge)}
+.panel[data-rt-theme=rust] .tyler-mem .tyler-mem-bar{grid-column:1/-1;grid-row:2;height:16px;margin:5px 6px 4px 0;border:2px solid var(--ru-ink-2);border-radius:2px;overflow:visible;background:#11100f}
+.panel[data-rt-theme=rust] .tyler-mem .tyler-mem-bar::after{content:"";position:absolute;right:-7px;top:2px;width:4px;height:8px;border-radius:0 2px 2px 0;background:var(--ru-ink-2)}
+.panel[data-rt-theme=rust] .tyler-mem .tyler-mem-bar::before,.panel[data-rt-theme=rust] .tyler-mem .tyler-mem-bar-own{inset:2px;width:auto;opacity:1;background:repeating-linear-gradient(90deg,var(--c) 0 calc(10% - 2px),transparent 0 10%)}
+.panel[data-rt-theme=rust] .tyler-mem .tyler-mem-bar::before{--c:var(--charge);clip-path:inset(0 calc((1 - var(--fill)) * 100%) 0 0)}
+.panel[data-rt-theme=rust] .tyler-mem .tyler-mem-bar-own{--c:var(--ru-green-hi);clip-path:inset(0 calc((1 - var(--own)) * 100%) 0 0)}
+.panel[data-rt-theme=rust] .tyler-mem .tyler-mem-meter[data-missing=true] .tyler-mem-bar{opacity:.5}
+.panel[data-rt-theme=rust] .tyler-mem .tyler-mem-own{grid-column:1/-1;grid-row:3;display:block;font:400 11px/1.2 var(--rt-font);letter-spacing:.02em;text-transform:uppercase;color:var(--rt-ink-4)}
+.panel[data-rt-theme=rust] .tyler-mem .tyler-mem-own-value{color:var(--ru-green-ink)}
+.panel[data-rt-theme=rust] .tyler-mem-details{margin:7px 0 0;border-top:1px solid var(--ru-line)}
+.panel[data-rt-theme=rust] .tyler-mem-summary{padding:5px 0 2px;font:700 11.5px/1.2 var(--rt-font-display);letter-spacing:.04em;text-transform:uppercase;color:var(--ru-ink-2)}
+.panel[data-rt-theme=rust] .tyler-mem-list{gap:2px;margin-top:3px;font:400 12px/1.3 var(--rt-font);color:var(--ru-ink-2)}
+.panel[data-rt-theme=rust] .tyler-mem-head{font:700 10.5px/1.3 var(--rt-font-display);letter-spacing:.04em;color:var(--ru-dim)}
+.panel[data-rt-theme=rust] .tyler-mem-item[data-running=false]{color:#6e675d}

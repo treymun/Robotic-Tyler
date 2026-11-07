@@ -1,4 +1,60 @@
 {
+ "css": {
+  "p3-folder": {
+   "bytes": 145,
+   "crop": [
+    48,
+    0,
+    12,
+    12
+   ],
+   "file": "themes/msn/icons/public-msn-assets-msn75-resources-msnmsgr-bitmap-msnmsgr_bitmap_723_9.png.png",
+   "format": "png",
+   "key": "#ff00ff",
+   "mode": "pixels",
+   "name": "Messenger 7.5 shared folder icon",
+   "sha256": "25077f7cae211a96e2e3dec2342dd047d0a5ad5383614f4d442f78d83f55a383",
+   "size": [
+    12,
+    12
+   ],
+   "source": {
+    "commit": "fe8cd7b67bd1f8a65b148aa3f0d7ebd67a4a6ef6",
+    "downloadUrl": "https://raw.githubusercontent.com/anisayari/codex-messenger/fe8cd7b67bd1f8a65b148aa3f0d7ebd67a4a6ef6/public/msn-assets/msn75/resources/msnmsgr/bitmap/msnmsgr_bitmap_723_9.png",
+    "kind": "msn-7.5-archived-installer-resource",
+    "path": "public/msn-assets/msn75/resources/msnmsgr/bitmap/msnmsgr_bitmap_723_9.png",
+    "repo": "anisayari/codex-messenger"
+   },
+   "tier": "Archived source artwork"
+  },
+  "p3-folder-x": {
+   "bytes": 159,
+   "crop": [
+    60,
+    0,
+    12,
+    12
+   ],
+   "file": "themes/msn/icons/public-msn-assets-msn75-resources-msnmsgr-bitmap-msnmsgr_bitmap_723_9.png.png",
+   "format": "png",
+   "key": "#ff00ff",
+   "mode": "pixels",
+   "name": "Messenger 7.5 shared folder icon, unavailable",
+   "sha256": "25077f7cae211a96e2e3dec2342dd047d0a5ad5383614f4d442f78d83f55a383",
+   "size": [
+    12,
+    12
+   ],
+   "source": {
+    "commit": "fe8cd7b67bd1f8a65b148aa3f0d7ebd67a4a6ef6",
+    "downloadUrl": "https://raw.githubusercontent.com/anisayari/codex-messenger/fe8cd7b67bd1f8a65b148aa3f0d7ebd67a4a6ef6/public/msn-assets/msn75/resources/msnmsgr/bitmap/msnmsgr_bitmap_723_9.png",
+    "kind": "msn-7.5-archived-installer-resource",
+    "path": "public/msn-assets/msn75/resources/msnmsgr/bitmap/msnmsgr_bitmap_723_9.png",
+    "repo": "anisayari/codex-messenger"
+   },
+   "tier": "Archived source artwork"
+  }
+ },
  "icons": {},
  "picks": {
   "p3-badge-away": {

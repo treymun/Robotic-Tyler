@@ -1,4 +1,48 @@
 {
+ "css": {
+  "p3-suit-empty": {
+   "bytes": 525,
+   "file": "themes/hev/icons/hud-hud-suit_empty.png",
+   "format": "png",
+   "mask": true,
+   "mode": "lum",
+   "name": "Half-Life HUD armour suit, empty",
+   "sha256": "795560df794a4a97686ff5dd22cd7b66717488b3b0d7f70f1418cdf5a3b0d58d",
+   "size": [
+    40,
+    40
+   ],
+   "source": {
+    "commit": "6ad155c7a610a85cfd443fcace2c97f2afcb2866",
+    "downloadUrl": "https://raw.githubusercontent.com/u3games/CS-Server/6ad155c7a610a85cfd443fcace2c97f2afcb2866/server/valve/sprites/640hud7.spr",
+    "kind": "archived-source-art",
+    "path": "server/valve/sprites/640hud7.spr",
+    "repo": "u3games/CS-Server"
+   },
+   "tier": "Archived source artwork"
+  },
+  "p3-suit-full": {
+   "bytes": 640,
+   "file": "themes/hev/icons/hud-hud-suit_full.png",
+   "format": "png",
+   "mask": true,
+   "mode": "lum",
+   "name": "Half-Life HUD armour suit, full",
+   "sha256": "2ef3cdaba040acf0b3d675ffc02857728d96b7211cd5312341501e7afc62894c",
+   "size": [
+    40,
+    40
+   ],
+   "source": {
+    "commit": "6ad155c7a610a85cfd443fcace2c97f2afcb2866",
+    "downloadUrl": "https://raw.githubusercontent.com/u3games/CS-Server/6ad155c7a610a85cfd443fcace2c97f2afcb2866/server/valve/sprites/640hud7.spr",
+    "kind": "archived-source-art",
+    "path": "server/valve/sprites/640hud7.spr",
+    "repo": "u3games/CS-Server"
+   },
+   "tier": "Archived source artwork"
+  }
+ },
  "icons": {
   "error": "p3-dmg-rad",
   "warning": "p3-dmg-rad"

@@ -1,4 +1,84 @@
 {
+ "css": {
+  "p3-radio-focus": {
+   "bytes": 311,
+   "crop": [
+    3,
+    3,
+    16,
+    16
+   ],
+   "file": "themes/classic/ui/og-steam-graphics-radselfocus.tga.png",
+   "format": "png",
+   "mode": "pixels",
+   "name": "2004 Steam VGUI radio button, selected with focus",
+   "sha256": "a980fedee99d58cd2ebd29ac1beed79a1509daad92a0b8a12f023140a6d82476",
+   "size": [
+    16,
+    16
+   ],
+   "source": {
+    "commit": "411aa955e76759bf24cee9dc38fa459cb9040823",
+    "downloadUrl": "https://raw.githubusercontent.com/ungstein/OG-Steam/411aa955e76759bf24cee9dc38fa459cb9040823/OG-Steam/graphics/radSelFocus.tga",
+    "kind": "community-2004-skin-assets",
+    "path": "OG-Steam/graphics/radSelFocus.tga",
+    "repo": "ungstein/OG-Steam"
+   },
+   "tier": "Community / period source"
+  },
+  "p3-radio-off": {
+   "bytes": 273,
+   "crop": [
+    3,
+    3,
+    16,
+    16
+   ],
+   "file": "themes/classic/ui/og-steam-graphics-radunselstd.tga.png",
+   "format": "png",
+   "mode": "pixels",
+   "name": "2004 Steam VGUI radio button, not selected",
+   "sha256": "95da25d984be2817f6ae1f0310016da9f3bd7c0910828932952bc2ce03f684c2",
+   "size": [
+    16,
+    16
+   ],
+   "source": {
+    "commit": "411aa955e76759bf24cee9dc38fa459cb9040823",
+    "downloadUrl": "https://raw.githubusercontent.com/ungstein/OG-Steam/411aa955e76759bf24cee9dc38fa459cb9040823/OG-Steam/graphics/radUnselStd.tga",
+    "kind": "community-2004-skin-assets",
+    "path": "OG-Steam/graphics/radUnselStd.tga",
+    "repo": "ungstein/OG-Steam"
+   },
+   "tier": "Community / period source"
+  },
+  "p3-radio-on": {
+   "bytes": 301,
+   "crop": [
+    3,
+    3,
+    16,
+    16
+   ],
+   "file": "themes/classic/ui/og-steam-graphics-radselstd.tga.png",
+   "format": "png",
+   "mode": "pixels",
+   "name": "2004 Steam VGUI radio button, selected",
+   "sha256": "83069808f3c7dc47306772ae4b69f79b3a5c8cceffab6337ff8a8d2e228ba431",
+   "size": [
+    16,
+    16
+   ],
+   "source": {
+    "commit": "411aa955e76759bf24cee9dc38fa459cb9040823",
+    "downloadUrl": "https://raw.githubusercontent.com/ungstein/OG-Steam/411aa955e76759bf24cee9dc38fa459cb9040823/OG-Steam/graphics/radSelStd.tga",
+    "kind": "community-2004-skin-assets",
+    "path": "OG-Steam/graphics/radSelStd.tga",
+    "repo": "ungstein/OG-Steam"
+   },
+   "tier": "Community / period source"
+  }
+ },
  "icons": {},
  "picks": {
   "p3-away": {

@@ -209,3 +209,32 @@ html[data-rt-theme=deadlock]{scrollbar-color:#7a5f2e #0c0a0a}
 [data-rt-theme=deadlock] .pad.playing{animation:dl-spectre 1.8s ease-in-out infinite}
 [data-rt-theme=deadlock] .vote[data-arrived]{animation:dl-lamp .5s ease-out}
 [data-rt-theme=deadlock] .checklist li{animation:dl-note .3s ease-out backwards}
+
+/* ── Memory meter skin (v2.45): two vials of spirit ──
+   Not the marquee bulbs, the souls counter or the shop's stat icons: each reading is a stoppered glass
+   vial on a brass stand, filled with the theme's spectral teal as far as is in use; Tyler's own share glows
+   brighter at the bottom. The pack's Deadlock art is hero abilities and stat symbols, none of them a gauge, so
+   the vials are drawn here in the theme's brass, lacquer and spirit colours. From 75% the spirit turns amber,
+   from 90% oxblood and the vial flickers; with no reading the vial is empty glass. */
+.panel[data-rt-theme=deadlock] .tyler-mem{--mem-skin:deadlock;margin:8px 10px 0;padding:7px 10px 6px;background:linear-gradient(180deg,#1b1716,#120f10);border-top:1px solid rgba(201,164,92,.4);border-bottom:1px solid rgba(201,164,92,.4)}
+.panel[data-rt-theme=deadlock] .tyler-mem .tyler-mem-stats{margin:0;padding:0;gap:12px;background:none;border:0;border-radius:0;box-shadow:none}
+.panel[data-rt-theme=deadlock] .tyler-mem .tyler-mem-meter{--spirit:var(--dl-teal);--spirit-lo:var(--dl-teal-dim);display:grid;grid-template-columns:16px minmax(0,1fr);grid-template-rows:auto auto auto;column-gap:10px;align-content:center;padding:0;background:none;border:0}
+.panel[data-rt-theme=deadlock] .tyler-mem .tyler-mem-meter[data-level=high]{--spirit:#e8a64a;--spirit-lo:#7a4f18}
+.panel[data-rt-theme=deadlock] .tyler-mem .tyler-mem-meter[data-level=full]{--spirit:#e0563f;--spirit-lo:var(--dl-blood)}
+.panel[data-rt-theme=deadlock] .tyler-mem .tyler-mem-bar{grid-column:1;grid-row:1/4;align-self:end;width:14px;height:40px;margin:8px 1px 3px;border:1px solid rgba(236,208,143,.7);border-top:4px solid #8a5a2a;border-radius:2px 2px 8px 8px;background:linear-gradient(90deg,rgba(255,255,255,.12),transparent 40%,rgba(0,0,0,.35)),rgba(20,28,27,.9);box-shadow:0 2px 0 -1px var(--dl-brass),0 3px 0 -1px var(--dl-brass-lo),0 0 8px color-mix(in srgb,var(--spirit) 30%,transparent)}
+.panel[data-rt-theme=deadlock] .tyler-mem .tyler-mem-bar::before,.panel[data-rt-theme=deadlock] .tyler-mem .tyler-mem-bar-own{top:auto;bottom:0;left:0;right:0;width:auto;opacity:1;border-radius:0 0 7px 7px}
+.panel[data-rt-theme=deadlock] .tyler-mem .tyler-mem-bar::before{height:calc(var(--fill) * 100%);background:linear-gradient(90deg,color-mix(in srgb,var(--spirit) 75%,#fff),var(--spirit) 45%,var(--spirit-lo));box-shadow:inset 0 2px 0 rgba(255,255,255,.35)}
+.panel[data-rt-theme=deadlock] .tyler-mem .tyler-mem-bar-own{height:calc(var(--own) * 100%);background:linear-gradient(90deg,#f6fffb,color-mix(in srgb,var(--spirit) 60%,#fff));box-shadow:0 0 6px var(--spirit)}
+.panel[data-rt-theme=deadlock] .tyler-mem .tyler-mem-meter[data-level=full] .tyler-mem-bar::before{animation:dl-flicker 1.4s steps(2,jump-none) infinite}
+@keyframes dl-flicker{0%{opacity:1}100%{opacity:.6}}
+.panel[data-rt-theme=deadlock] .tyler-mem .tyler-mem-meter[data-missing=true] .tyler-mem-bar{box-shadow:0 2px 0 -1px var(--dl-brass),0 3px 0 -1px var(--dl-brass-lo)}
+.panel[data-rt-theme=deadlock] .tyler-mem .tyler-mem-label{grid-column:2;grid-row:1;font:600 10px/1.2 var(--dl-caps);letter-spacing:.16em;color:var(--dl-brass)}
+.panel[data-rt-theme=deadlock] .tyler-mem .tyler-mem-value{grid-column:2;grid-row:2;margin:1px 0 0;font:400 15px/1.2 var(--rt-font);letter-spacing:.01em;color:var(--dl-parch)}
+.panel[data-rt-theme=deadlock] .tyler-mem .tyler-mem-meter:is([data-level=high],[data-level=full]) .tyler-mem-value{color:var(--spirit)}
+.panel[data-rt-theme=deadlock] .tyler-mem .tyler-mem-own{grid-column:2;grid-row:3;display:block;font:italic 400 11px/1.25 var(--rt-font);color:var(--rt-ink-4)}
+.panel[data-rt-theme=deadlock] .tyler-mem .tyler-mem-own-value{font-style:normal;color:var(--dl-teal)}
+.panel[data-rt-theme=deadlock] .tyler-mem-details{margin:7px 0 0;border-top:1px solid rgba(201,164,92,.2)}
+.panel[data-rt-theme=deadlock] .tyler-mem-summary{padding:5px 0 2px;font:600 10.5px/1.2 var(--dl-caps);letter-spacing:.14em;text-transform:uppercase;color:var(--dl-brass)}
+.panel[data-rt-theme=deadlock] .tyler-mem-list{gap:2px;margin-top:3px;font:400 12px/1.3 var(--rt-font);color:var(--rt-ink-2)}
+.panel[data-rt-theme=deadlock] .tyler-mem-head{font:600 9.5px/1.3 var(--dl-caps);letter-spacing:.14em;color:var(--rt-ink-4)}
+.panel[data-rt-theme=deadlock] .tyler-mem-item[data-running=false]{color:var(--rt-ink-disabled);font-style:italic}

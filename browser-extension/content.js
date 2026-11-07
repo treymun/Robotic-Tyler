@@ -103,6 +103,36 @@
  TylerStorage.onChanged?.addListener((changes,area)=>{if(area!=='local')return;if(changes.usage)showUsage(changes.usage.newValue||{});if(changes.v22Latency)renderLatency(changes.v22Latency.newValue);});
  refreshHudUsage();
 
+ // ── Memory meter (v2.45, desktop app; Settings → Advanced, off by default) ─
+ // The PC's memory and the graphics card's, and Tyler's own share, under the numbers. The app sends the
+ // text (app/memory-meter.cjs view()); memory-meter.js puts it in place, here and on the phone remote (the
+ // contract is in ui/memory-meter.css). One reading every 2.5 s, and only while the meter is on and the
+ // panel can be seen: off, collapsed, behind another window or minimised, nothing is asked.
+ const mem={on:false,timer:0,busy:false,view:null},memEl=$('memMeter');
+ const memLive=()=>mem.on&&platform.id==='desktop'&&!!memEl&&!host.classList.contains('mini')&&!host.dataset.offscreen&&document.visibilityState==='visible';
+ function memRender(v){
+  if(!memEl||!v)return;mem.view=v;globalThis.TylerMemoryMeter?.render(memEl,v);
+  // For a theme's own code (theme-features.js, the theme packs): the levels and fills as numbers.
+  emit('memory',{ram:v.ram?.value,vram:v.vram?.value,ramLevel:v.ram?.level,vramLevel:v.vram?.level,ramFill:Number(v.ram?.fill)||0,vramFill:Number(v.vram?.fill)||0,ramOwn:Number(v.ram?.ownFill)||0,vramOwn:Number(v.vram?.ownFill)||0,missing:{ram:v.ram?.missing===true,vram:v.vram?.missing===true}});
+ }
+ function memSchedule(soon=false){clearTimeout(mem.timer);mem.timer=0;if(memLive())mem.timer=setTimeout(memTick,soon?0:2500);}
+ async function memTick(){
+  mem.timer=0;if(!memLive()||mem.busy)return;mem.busy=true;
+  try{const r=await chrome.runtime.sendMessage({type:'memory:read'});if(r?.reading&&mem.on)memRender(r.reading);}catch{}
+  finally{mem.busy=false;memSchedule();}
+ }
+ function memSet(on){
+  mem.on=on===true&&platform.id==='desktop';if(!memEl)return;
+  memEl.hidden=!mem.on;if(!mem.on){clearTimeout(mem.timer);mem.timer=0;mem.view=null;memEl.dataset.state='off';return;}
+  if(!mem.view)globalThis.TylerMemoryMeter?.render(memEl,null);memSchedule(true);
+ }
+ if(platform.id==='desktop'){
+  TylerStorage.get('memoryMeter').then(({memoryMeter})=>memSet(memoryMeter)).catch(()=>{});
+  TylerStorage.onChanged?.addListener((changes,area)=>{if(area==='local'&&changes.memoryMeter)memSet(changes.memoryMeter.newValue);});
+  document.addEventListener('visibilitychange',()=>memSchedule(true));
+  uiListeners.add(type=>{if(type==='mini'||type==='offscreen')memSchedule(true);});
+ }
+
  // ── Voice reply timing (Checks tab): where each spoken reply spent its time ─
  const seconds=ms=>Number.isFinite(ms)?(ms/1000).toFixed(1)+' s':'?';
  function renderLatency(samples){
@@ -457,7 +487,7 @@
   locateChat,chooseTarget,prepareBridge,getDiscovery:()=>discovery,setChatHint:v=>{chatHint=['text','voice-room'].includes(v)?v:null;},getChatKind:()=>composer?.isConnected?TylerSelection.kind(composer):null,getVoiceState:()=>voiceReport,getChatScope:()=>TylerSetup.scope(region,document),request,showTab,setActivity,
   notify,confirm:confirmBox,emit,trace:text=>traceState(String(text||'').slice(0,160),true),
   // Theme features (theme-features.js): the panel, live state and a subscription. Isolated world only.
-  ui:{root,panel,host,onUI:fn=>{uiListeners.add(fn);return ()=>uiListeners.delete(fn);},state:()=>({state:$('activityCard').dataset.state,label:$('activityLabel').textContent,text:$('activity').textContent,tab:currentTab,hud:{...hudState},mini:host.classList.contains('mini'),theme:uiTheme,owner})},
+  ui:{root,panel,host,onUI:fn=>{uiListeners.add(fn);return ()=>uiListeners.delete(fn);},state:()=>({state:$('activityCard').dataset.state,label:$('activityLabel').textContent,text:$('activity').textContent,tab:currentTab,hud:{...hudState},memory:mem.on?mem.view:null,mini:host.classList.contains('mini'),theme:uiTheme,owner})},
   isOwner:()=>owner,setAutomaticActive:value=>{autoActive=value;if(value)userPaused=false;},isAiPaused:()=>userPaused,isAutomaticActive:()=>autoActive,reportTurn,getIncoming:()=>incomingReport,getComposer:()=>composer,getRegion:()=>region,getSample:()=>sampleElement,getEpoch:()=>epoch,
   platform};
 })();

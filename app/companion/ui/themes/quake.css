@@ -213,3 +213,40 @@ html[data-rt-theme=quake]{scrollbar-color:#6b4420 #0b0907}
 [data-rt-theme=quake] .vote[data-arrived]::before{animation:qk-frag .45s steps(2) 2}
 @keyframes qk-frag{50%{filter:brightness(1.8)}}
 [data-rt-theme=quake] .checklist li{animation:qk-drop .28s ease-out backwards}
+
+/* ── Memory meter skin (v2.45): Quake's low-memory warning in a menu text box ──
+   Not the status bar's bronze numbers: the meter is the text box Quake draws behind its menu messages
+   (gfx/box_*, the original pieces at twice their size, without smoothing), and each reading has the RAM chip
+   icon (gfx/ram) the engine flashes in the corner of the screen when memory runs short. Here it glows
+   faintly while there's room, lights from 75% and flashes from 90%. Beside it the reading in the text face
+   and a rail filled in bronze, Tyler's own share in ember orange; with no reading the chip is dark. */
+.panel[data-rt-theme=quake] .tyler-mem{--mem-skin:quake;margin:8px 8px 0;padding:2px 4px;border:16px solid transparent;
+ background:var(--rt-art-p3-box-tl) 0 0/16px 16px no-repeat,var(--rt-art-p3-box-tr) 100% 0/16px 16px no-repeat,var(--rt-art-p3-box-bl) 0 100%/16px 16px no-repeat,var(--rt-art-p3-box-br) 100% 100%/16px 16px no-repeat,
+  var(--rt-art-p3-box-tm) 16px 0/32px 16px repeat-x,var(--rt-art-p3-box-bm) 16px 100%/32px 16px repeat-x,var(--rt-art-p3-box-ml) 0 16px/16px 16px repeat-y,var(--rt-art-p3-box-mr) 100% 16px/16px 16px repeat-y,
+  var(--rt-art-p3-box-mm) 0 0/32px 16px repeat;
+ background-origin:border-box,border-box,border-box,border-box,border-box,border-box,border-box,border-box,padding-box;background-clip:border-box,border-box,border-box,border-box,border-box,border-box,border-box,border-box,padding-box;image-rendering:pixelated;box-shadow:inset 0 0 0 1px rgba(0,0,0,.4)}
+.panel[data-rt-theme=quake] .tyler-mem .tyler-mem-stats{margin:0;padding:0;gap:10px;background:none;border:0;border-radius:0;box-shadow:none}
+.panel[data-rt-theme=quake] .tyler-mem .tyler-mem-meter{--chip:.5;display:grid;grid-template-columns:32px minmax(0,1fr);grid-template-rows:auto auto auto auto;column-gap:7px;align-content:center;padding:0;background:none;border:0;box-shadow:none}
+.panel[data-rt-theme=quake] .tyler-mem .tyler-mem-meter::before{content:"";grid-column:1;grid-row:1/5;align-self:center;width:32px;height:32px;background:var(--rt-art-p3-ram) 0 0/32px 32px no-repeat;image-rendering:pixelated;opacity:var(--chip);filter:saturate(.6)}
+.panel[data-rt-theme=quake] .tyler-mem .tyler-mem-meter[data-level=high]{--chip:.85}
+.panel[data-rt-theme=quake] .tyler-mem .tyler-mem-meter[data-level=high]::before{filter:none}
+.panel[data-rt-theme=quake] .tyler-mem .tyler-mem-meter[data-level=full]{--chip:1}
+.panel[data-rt-theme=quake] .tyler-mem .tyler-mem-meter[data-level=full]::before{filter:drop-shadow(0 0 4px rgba(255,165,58,.8));animation:qk-ram .8s steps(1) infinite}
+@keyframes qk-ram{50%{opacity:.3}}
+.panel[data-rt-theme=quake] .tyler-mem .tyler-mem-meter[data-missing=true]{--chip:.15}
+.panel[data-rt-theme=quake] .tyler-mem .tyler-mem-label{grid-column:2;grid-row:1;font:600 10px/1.2 var(--rt-font);letter-spacing:.14em;text-transform:uppercase;color:var(--q-bronze)}
+.panel[data-rt-theme=quake] .tyler-mem .tyler-mem-value{grid-column:2;grid-row:2;margin:1px 0 0;font:600 14px/1.15 var(--rt-font);letter-spacing:.01em;color:#e6d6b8;background:none;-webkit-background-clip:border-box;background-clip:border-box;filter:none;text-shadow:1px 1px 0 #000}
+.panel[data-rt-theme=quake] .tyler-mem .tyler-mem-meter[data-level=high] .tyler-mem-value{color:var(--q-ember)}
+.panel[data-rt-theme=quake] .tyler-mem .tyler-mem-meter[data-level=full] .tyler-mem-value{color:#ff6a3a}
+.panel[data-rt-theme=quake] .tyler-mem .tyler-mem-bar{grid-column:2;grid-row:3;height:5px;margin:4px 0 2px;border-radius:0;background:#0b0907;box-shadow:inset 0 1px 0 #000,0 1px 0 rgba(233,184,116,.18)}
+.panel[data-rt-theme=quake] .tyler-mem .tyler-mem-bar::before{opacity:1;background:repeating-linear-gradient(90deg,transparent 0 7px,rgba(0,0,0,.55) 7px 8px),linear-gradient(180deg,#e9b874,#9a6630)}
+.panel[data-rt-theme=quake] .tyler-mem .tyler-mem-bar-own{background:repeating-linear-gradient(90deg,transparent 0 7px,rgba(0,0,0,.45) 7px 8px),linear-gradient(180deg,#ffd27a,var(--q-ember))}
+.panel[data-rt-theme=quake] .tyler-mem .tyler-mem-meter:is([data-level=high],[data-level=full]) .tyler-mem-bar::before{background:repeating-linear-gradient(90deg,transparent 0 7px,rgba(0,0,0,.55) 7px 8px),linear-gradient(180deg,#ff8a5a,var(--q-blood))}
+.panel[data-rt-theme=quake] .tyler-mem .tyler-mem-own{grid-column:2;grid-row:4;display:block;font:400 11px/1.25 var(--rt-font);color:var(--rt-ink-4)}
+.panel[data-rt-theme=quake] .tyler-mem .tyler-mem-own-value{color:var(--q-ember)}
+.panel[data-rt-theme=quake] .tyler-mem-details{margin:6px 0 0;border-top:1px solid rgba(233,184,116,.18)}
+.panel[data-rt-theme=quake] .tyler-mem-summary{padding:5px 0 1px;font:600 11px/1.2 var(--rt-font);letter-spacing:.12em;text-transform:uppercase;color:var(--q-bronze-hi)}
+.panel[data-rt-theme=quake] .tyler-mem-list{gap:2px;margin-top:3px;font:400 12px/1.3 var(--rt-font);color:#d8c7a8}
+.panel[data-rt-theme=quake] .tyler-mem-head{font-size:10px;color:var(--q-bronze)}
+.panel[data-rt-theme=quake] .tyler-mem-item[data-running=false]{color:#6e6250}
+.panel[data-rt-theme=quake] .tyler-mem-item[data-part=other]{border-top-color:rgba(233,184,116,.2)}

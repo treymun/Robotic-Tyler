@@ -1,4 +1,48 @@
 {
+ "css": {
+  "p3-plug-off": {
+   "bytes": 1324,
+   "file": "themes/rust/icons/gui-ui-plug-off.png.png",
+   "format": "svg",
+   "mask": true,
+   "mode": "trace",
+   "name": "Rust UI plug, disconnected",
+   "sha256": "8ddaadef264b649f93bd2655564bc153e03a112973769fc5aca5641725874b9d",
+   "size": [
+    488.0,
+    489.0
+   ],
+   "source": {
+    "commit": "dc357ff3b6748ccc12231135c6466a379a18adbf",
+    "downloadUrl": "https://raw.githubusercontent.com/LehaSex/rust-game-icons/dc357ff3b6748ccc12231135c6466a379a18adbf/gui/ui/plug-off.png",
+    "kind": "extracted-game-art",
+    "path": "gui/ui/plug-off.png",
+    "repo": "LehaSex/rust-game-icons"
+   },
+   "tier": "Archived source artwork"
+  },
+  "p3-plug-on": {
+   "bytes": 569,
+   "file": "themes/rust/icons/gui-ui-plug-on.png.png",
+   "format": "svg",
+   "mask": true,
+   "mode": "trace",
+   "name": "Rust UI plug, connected",
+   "sha256": "f0e5f74f62d921a5e707390009818a925efd76e93b38e2a4f1e32e9c531f4728",
+   "size": [
+    332.0,
+    499.0
+   ],
+   "source": {
+    "commit": "dc357ff3b6748ccc12231135c6466a379a18adbf",
+    "downloadUrl": "https://raw.githubusercontent.com/LehaSex/rust-game-icons/dc357ff3b6748ccc12231135c6466a379a18adbf/gui/ui/plug-on.png",
+    "kind": "extracted-game-art",
+    "path": "gui/ui/plug-on.png",
+    "repo": "LehaSex/rust-game-icons"
+   },
+   "tier": "Archived source artwork"
+  }
+ },
  "icons": {},
  "picks": {
   "p3-ui-broadcast": {

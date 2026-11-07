@@ -204,3 +204,30 @@ html[data-rt-theme=dod]{scrollbar-color:#6b7343 #23261a}
 @keyframes dd-lamp{50%{box-shadow:inset 3px 0 0 var(--dd-amber),0 0 12px rgba(255,184,77,.4)}}
 [data-rt-theme=dod] .vote[data-arrived]{animation:dd-feed .3s steps(4,end)}
 [data-rt-theme=dod] .checklist li{animation:dd-feed .3s steps(4,end) backwards}
+
+/* ── Memory meter skin (v2.45): a capture zone ──
+   Not the radio's dials, lamps or channel buttons: each reading is a capture point as Day of Defeat:
+   Source's HUD shows one being taken: the flag (sprites/hud/flag_neutral) inside the ring of capture ticks
+   (vgui/progress_bar), both the game's own art, the ticks lit amber as far as is in use and Tyler's own
+   share in cream. From 75% the ticks and the flag turn orange, from 90% the red of the transmit lamp; with no
+   reading the ring is dark and the flag furled grey. */
+.panel[data-rt-theme=dod] .tyler-mem{--mem-skin:dod;margin:8px 10px 0;padding:6px 8px;background:#23261a;border:1px solid #10120a;border-radius:var(--rt-r-md);box-shadow:inset 0 2px 4px rgba(0,0,0,.5)}
+.panel[data-rt-theme=dod] .tyler-mem .tyler-mem-stats{margin:0;padding:0;gap:10px;background:none;border:0;border-radius:0;box-shadow:none}
+.panel[data-rt-theme=dod] .tyler-mem .tyler-mem-meter{--cap:var(--dd-amber);--flag:var(--dd-cream);display:grid;grid-template-columns:44px minmax(0,1fr);grid-template-rows:auto auto auto;column-gap:8px;align-content:center;padding:0;background:none;border:0;border-radius:0;box-shadow:none}
+.panel[data-rt-theme=dod] .tyler-mem .tyler-mem-meter[data-level=high]{--cap:#ff8a1e;--flag:#ffb84d}
+.panel[data-rt-theme=dod] .tyler-mem .tyler-mem-meter[data-level=full]{--cap:var(--dd-lamp);--flag:var(--dd-lamp)}
+.panel[data-rt-theme=dod] .tyler-mem .tyler-mem-bar{grid-column:1;grid-row:1/4;align-self:center;width:44px;height:44px;margin:0;border-radius:0;background:conic-gradient(var(--dd-cream) 0 calc(var(--own) * 360deg),var(--cap) 0 calc(var(--fill) * 360deg),rgba(233,223,191,.16) 0);-webkit-mask:var(--rt-art-p3-cap-ring) 0 0/44px 44px no-repeat;mask:var(--rt-art-p3-cap-ring) 0 0/44px 44px no-repeat}
+.panel[data-rt-theme=dod] .tyler-mem .tyler-mem-bar::before,.panel[data-rt-theme=dod] .tyler-mem .tyler-mem-bar-own{display:none}
+.panel[data-rt-theme=dod] .tyler-mem .tyler-mem-meter::before{content:"";grid-column:1;grid-row:1/4;place-self:center;width:24px;height:24px;background:var(--flag);filter:drop-shadow(0 0 3px rgba(0,0,0,.6));-webkit-mask:var(--rt-art-p3-flag) 0 0/24px 24px no-repeat;mask:var(--rt-art-p3-flag) 0 0/24px 24px no-repeat}
+.panel[data-rt-theme=dod] .tyler-mem .tyler-mem-meter[data-missing=true]::before{background:#7a7a68}
+.panel[data-rt-theme=dod] .tyler-mem .tyler-mem-meter[data-missing=true] .tyler-mem-bar{opacity:1}
+.panel[data-rt-theme=dod] .tyler-mem .tyler-mem-label{grid-column:2;grid-row:1;font:700 11px/1.2 var(--rt-font-display);letter-spacing:.12em;text-transform:uppercase;color:var(--dd-cream)}
+.panel[data-rt-theme=dod] .tyler-mem .tyler-mem-value{grid-column:2;grid-row:2;margin:1px 0 0;font:700 12.5px/1.2 var(--rt-font);letter-spacing:0;color:var(--dd-cream);text-shadow:none}
+.panel[data-rt-theme=dod] .tyler-mem .tyler-mem-meter:is([data-level=high],[data-level=full]) .tyler-mem-value{color:var(--cap)}
+.panel[data-rt-theme=dod] .tyler-mem .tyler-mem-own{grid-column:2;grid-row:3;display:block;font:400 10.5px/1.25 var(--rt-font);color:var(--rt-ink-4)}
+.panel[data-rt-theme=dod] .tyler-mem .tyler-mem-own-value{color:var(--dd-cream)}
+.panel[data-rt-theme=dod] .tyler-mem-details{margin:6px 0 0;border-top:1px solid #10120a}
+.panel[data-rt-theme=dod] .tyler-mem-summary{padding:5px 0 2px;font:700 11px/1.2 var(--rt-font-display);letter-spacing:.1em;text-transform:uppercase;color:var(--dd-cream)}
+.panel[data-rt-theme=dod] .tyler-mem-list{gap:2px;margin-top:3px;font:400 12px/1.3 var(--dd-log);color:var(--rt-ink-2)}
+.panel[data-rt-theme=dod] .tyler-mem-head{font:700 10px/1.3 var(--rt-font-display);letter-spacing:.1em;color:var(--rt-ink-4)}
+.panel[data-rt-theme=dod] .tyler-mem-item[data-running=false]{color:#8a8468}

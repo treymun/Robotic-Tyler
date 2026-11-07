@@ -1,4 +1,26 @@
 {
+ "css": {
+  "p3-memory": {
+   "bytes": 3443,
+   "file": "themes/x360/ui/assets-blades-providediconsfit-system-memory.png.png",
+   "format": "png",
+   "mode": "pixels",
+   "name": "Blades System > Memory icon",
+   "sha256": "c5a63df0112e824f3208ec60acbf527cc1b58b8199299cf75fd3dd85c62c1e75",
+   "size": [
+    64,
+    64
+   ],
+   "source": {
+    "commit": "7d92705cf2131e6159120cfa5ae10736ddfabf68",
+    "downloadUrl": "https://raw.githubusercontent.com/ZivvoZ/dashx360/7d92705cf2131e6159120cfa5ae10736ddfabf68/Assets/Blades/ProvidedIconsFit/system/memory.png",
+    "kind": "blades-recreation-source-assets",
+    "path": "Assets/Blades/ProvidedIconsFit/system/memory.png",
+    "repo": "ZivvoZ/dashx360"
+   },
+   "tier": "Community / period source"
+  }
+ },
  "icons": {},
  "picks": {
   "p3-music": {

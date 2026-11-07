@@ -1,4 +1,196 @@
 {
+ "css": {
+  "p3-box-bl": {
+   "bytes": 121,
+   "file": "themes/quake/ui/box_bl.png",
+   "format": "png",
+   "mode": "pixels",
+   "name": "Quake menu box, bottom left",
+   "sha256": "0a95751d9eba8f9c6b61f379282e1ece6e22fac51e027b9459b599a5498836d0",
+   "size": [
+    8,
+    8
+   ],
+   "source": {
+    "downloadUrl": "https://raw.githubusercontent.com/pweil-/origin-quake/master/id1/pak0.pak",
+    "kind": "original-quake-shareware-art",
+    "path": "id1/pak0.pak",
+    "repo": "pweil-/origin-quake"
+   },
+   "tier": "Native / official source"
+  },
+  "p3-box-bm": {
+   "bytes": 143,
+   "file": "themes/quake/ui/box_bm.png",
+   "format": "png",
+   "mode": "pixels",
+   "name": "Quake menu box, bottom",
+   "sha256": "4cc4c291ab8633be283640861bfe2c1913c82130718697159bcdd7012f742249",
+   "size": [
+    16,
+    8
+   ],
+   "source": {
+    "downloadUrl": "https://raw.githubusercontent.com/pweil-/origin-quake/master/id1/pak0.pak",
+    "kind": "original-quake-shareware-art",
+    "path": "id1/pak0.pak",
+    "repo": "pweil-/origin-quake"
+   },
+   "tier": "Native / official source"
+  },
+  "p3-box-br": {
+   "bytes": 120,
+   "file": "themes/quake/ui/box_br.png",
+   "format": "png",
+   "mode": "pixels",
+   "name": "Quake menu box, bottom right",
+   "sha256": "2d54643dd79228d171458285b4589f7fc3cb8af3088cfd07e60197e203fd98da",
+   "size": [
+    8,
+    8
+   ],
+   "source": {
+    "downloadUrl": "https://raw.githubusercontent.com/pweil-/origin-quake/master/id1/pak0.pak",
+    "kind": "original-quake-shareware-art",
+    "path": "id1/pak0.pak",
+    "repo": "pweil-/origin-quake"
+   },
+   "tier": "Native / official source"
+  },
+  "p3-box-ml": {
+   "bytes": 136,
+   "file": "themes/quake/ui/box_ml.png",
+   "format": "png",
+   "mode": "pixels",
+   "name": "Quake menu box, left",
+   "sha256": "94b9366fe3b9a7ec6e8ad4a8f88ae3c85fc5ab213db54697773b008f65d20191",
+   "size": [
+    8,
+    8
+   ],
+   "source": {
+    "downloadUrl": "https://raw.githubusercontent.com/pweil-/origin-quake/master/id1/pak0.pak",
+    "kind": "original-quake-shareware-art",
+    "path": "id1/pak0.pak",
+    "repo": "pweil-/origin-quake"
+   },
+   "tier": "Native / official source"
+  },
+  "p3-box-mm": {
+   "bytes": 176,
+   "file": "themes/quake/ui/box_mm.png",
+   "format": "png",
+   "mode": "pixels",
+   "name": "Quake menu box, middle",
+   "sha256": "7d941c25421d60cd2a6ae822319ccbfb0794dab72287586070755f0ab7274038",
+   "size": [
+    16,
+    8
+   ],
+   "source": {
+    "downloadUrl": "https://raw.githubusercontent.com/pweil-/origin-quake/master/id1/pak0.pak",
+    "kind": "original-quake-shareware-art",
+    "path": "id1/pak0.pak",
+    "repo": "pweil-/origin-quake"
+   },
+   "tier": "Native / official source"
+  },
+  "p3-box-mr": {
+   "bytes": 131,
+   "file": "themes/quake/ui/box_mr.png",
+   "format": "png",
+   "mode": "pixels",
+   "name": "Quake menu box, right",
+   "sha256": "1d15663eb99ab07463c1bc5bf6553be7963bf30be5998f205f6996ba35c300fa",
+   "size": [
+    8,
+    8
+   ],
+   "source": {
+    "downloadUrl": "https://raw.githubusercontent.com/pweil-/origin-quake/master/id1/pak0.pak",
+    "kind": "original-quake-shareware-art",
+    "path": "id1/pak0.pak",
+    "repo": "pweil-/origin-quake"
+   },
+   "tier": "Native / official source"
+  },
+  "p3-box-tl": {
+   "bytes": 121,
+   "file": "themes/quake/ui/box_tl.png",
+   "format": "png",
+   "mode": "pixels",
+   "name": "Quake menu box, top left",
+   "sha256": "4b790e5da4fe49a89586bab043966f599874e0c681e9f9b818dcee3dbd381041",
+   "size": [
+    8,
+    8
+   ],
+   "source": {
+    "downloadUrl": "https://raw.githubusercontent.com/pweil-/origin-quake/master/id1/pak0.pak",
+    "kind": "original-quake-shareware-art",
+    "path": "id1/pak0.pak",
+    "repo": "pweil-/origin-quake"
+   },
+   "tier": "Native / official source"
+  },
+  "p3-box-tm": {
+   "bytes": 157,
+   "file": "themes/quake/ui/box_tm.png",
+   "format": "png",
+   "mode": "pixels",
+   "name": "Quake menu box, top",
+   "sha256": "46a5511b4ee26df62fa49cc0ffcf5789bc547b506e57acd97aa6f2cc9a575337",
+   "size": [
+    16,
+    8
+   ],
+   "source": {
+    "downloadUrl": "https://raw.githubusercontent.com/pweil-/origin-quake/master/id1/pak0.pak",
+    "kind": "original-quake-shareware-art",
+    "path": "id1/pak0.pak",
+    "repo": "pweil-/origin-quake"
+   },
+   "tier": "Native / official source"
+  },
+  "p3-box-tr": {
+   "bytes": 117,
+   "file": "themes/quake/ui/box_tr.png",
+   "format": "png",
+   "mode": "pixels",
+   "name": "Quake menu box, top right",
+   "sha256": "aa4c35f32fef89016c7368cbc9c9791590d45491df5366824544621aeea65bad",
+   "size": [
+    8,
+    8
+   ],
+   "source": {
+    "downloadUrl": "https://raw.githubusercontent.com/pweil-/origin-quake/master/id1/pak0.pak",
+    "kind": "original-quake-shareware-art",
+    "path": "id1/pak0.pak",
+    "repo": "pweil-/origin-quake"
+   },
+   "tier": "Native / official source"
+  },
+  "p3-ram": {
+   "bytes": 389,
+   "file": "themes/quake/ui/ram.png",
+   "format": "png",
+   "mode": "pixels",
+   "name": "Quake low-memory icon (RAM)",
+   "sha256": "371448a82afcaa9d784e9b7ae5340d6cbfdf56da512e59a29be9e05a809a2df6",
+   "size": [
+    32,
+    32
+   ],
+   "source": {
+    "downloadUrl": "https://raw.githubusercontent.com/pweil-/origin-quake/master/id1/pak0.pak",
+    "kind": "original-quake-shareware-art",
+    "path": "id1/pak0.pak",
+    "repo": "pweil-/origin-quake"
+   },
+   "tier": "Native / official source"
+  }
+ },
  "icons": {},
  "picks": {
   "p3-invuln": {

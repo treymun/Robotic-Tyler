@@ -25,5 +25,9 @@
    "mode": "trace",
    "name": "Rust UI warning"
   }
+ },
+ "css":{
+  "p3-plug-on":{"file":"themes/rust/icons/gui-ui-plug-on.png.png","mode":"trace","name":"Rust UI plug, connected"},
+  "p3-plug-off":{"file":"themes/rust/icons/gui-ui-plug-off.png.png","mode":"trace","name":"Rust UI plug, disconnected"}
  }
 }

@@ -169,6 +169,23 @@ share one NVIDIA card: whichever loaded first took the card's memory and the oth
 - Same model, same provider: only where its layers run changes. Tyler never switches to a cloud AI or
   another model.
 
+## Memory meter (v2.45)
+
+**Settings → Advanced → Show a memory meter in Tyler's panel** (desktop app, off by default) shows, under the
+numbers in Tyler's panel and on the phone remote, the PC's memory and the graphics card's: in use, the total and
+Tyler's own share, with "What Tyler uses" broken down into the app, Text AI on this PC, theme voices, hearing and
+the voice on this PC, and images (other programs only as the rest, never named). It updates every 2.5 s only while
+it's on and the panel can be seen; off, nothing runs. A reading that isn't available shows "—" and says why.
+
+- PC memory: the system's own figures. Tyler's share: the working set of the app's processes and everything it
+  started, by parent process (each part is its own process and what that started).
+- Graphics memory (Windows): Windows' GPU memory counters ("GPU Adapter Memory", "GPU Process Memory", dedicated
+  usage, any card maker), read through WMI's language-neutral performance classes, with the card's name and size
+  from DXGI; one hidden PowerShell answers each reading and closes 20 s after the last. Not on Linux.
+- The card shown is the one Tyler's AI uses (else the text AI's card, else the largest one).
+- Code: `app/memory-meter.cjs` (the reader), `browser-extension/memory-meter.js` (puts it in place); the skinning
+  contract for theme designs is at the top of `browser-extension/ui/memory-meter.css`.
+
 ## When it runs
 
 - It starts only when needed: the first reply with *This PC*, or the speed check. Installing,

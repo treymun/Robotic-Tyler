@@ -40,6 +40,34 @@
     <div class="stat"><dt>Last reply</dt><dd id="hudLatency">—</dd><small id="hudLatencyMeta">None yet</small></div>
   </dl>
 
+  <!-- v2.45 memory meter (desktop app; Settings → Advanced, off by default). memory-meter.js fills it, for the panel
+       (content.js) and the phone remote alike. The skinning contract (classes, data attributes, CSS variables) is at
+       the top of ui/memory-meter.css: keep these classes together with it. -->
+  <section id="memMeter" class="tyler-mem" aria-label="Memory" data-state="off" hidden>
+    <dl class="stats tyler-mem-stats">
+      <div class="stat tyler-mem-meter tyler-mem-ram" data-kind="ram" data-level="ok" data-missing="true" tabindex="0">
+        <dt class="tyler-mem-label">RAM</dt>
+        <dd class="tyler-mem-value"><span class="tyler-mem-used">…</span><span class="tyler-mem-sep"></span><span class="tyler-mem-total"></span><span class="tyler-mem-unit"></span></dd>
+        <small class="tyler-mem-own"><span class="tyler-mem-own-label">Tyler </span><span class="tyler-mem-own-value">…</span></small>
+        <span class="tyler-mem-pct"></span><span class="tyler-mem-card"></span>
+        <span class="tyler-mem-bar" aria-hidden="true"><i class="tyler-mem-bar-own"></i></span>
+      </div>
+      <div class="stat tyler-mem-meter tyler-mem-vram" data-kind="vram" data-level="ok" data-missing="true" tabindex="0">
+        <dt class="tyler-mem-label">VRAM</dt>
+        <dd class="tyler-mem-value"><span class="tyler-mem-used">…</span><span class="tyler-mem-sep"></span><span class="tyler-mem-total"></span><span class="tyler-mem-unit"></span></dd>
+        <small class="tyler-mem-own"><span class="tyler-mem-own-label">Tyler </span><span class="tyler-mem-own-value">…</span></small>
+        <span class="tyler-mem-pct"></span><span class="tyler-mem-card"></span>
+        <span class="tyler-mem-bar" aria-hidden="true"><i class="tyler-mem-bar-own"></i></span>
+      </div>
+    </dl>
+    <details class="tyler-mem-details">
+      <summary class="tyler-mem-summary">What Tyler uses</summary>
+      <ul class="tyler-mem-list">
+        <li class="tyler-mem-item tyler-mem-head" data-part="head"><span class="tyler-mem-item-label">Part</span><span class="tyler-mem-item-ram">RAM</span><span class="tyler-mem-item-vram">VRAM</span></li>
+      </ul>
+    </details>
+  </section>
+
   <div id="fxDeck" class="fx-slot fx-deck"></div>
 
   <nav class="tabs" role="tablist" aria-label="Companion sections">

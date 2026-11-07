@@ -1,4 +1,27 @@
 {
+ "css": {
+  "p3-bullet": {
+   "bytes": 1129,
+   "file": "themes/cs2/icons/cs2-panorama-images-icons-ui-bullet.svg.svg",
+   "format": "svg",
+   "mask": true,
+   "mode": "vector",
+   "name": "CS2 Panorama bullet icon",
+   "sha256": "43f2156371302e3305fd1b66a2701f727e1ba83986b862fd6f97d0d1e099478a",
+   "size": [
+    32.0,
+    32.0
+   ],
+   "source": {
+    "commit": "edbfa7613cda0bee919a9e8ebbacee7059e37f23",
+    "downloadUrl": "https://raw.githubusercontent.com/Juknum/counter-strike-icons/edbfa7613cda0bee919a9e8ebbacee7059e37f23/cs2/panorama/images/icons/ui/bullet.svg",
+    "kind": "extracted-game-art",
+    "path": "cs2/panorama/images/icons/ui/bullet.svg",
+    "repo": "Juknum/counter-strike-icons"
+   },
+   "tier": "Archived source artwork"
+  }
+ },
  "icons": {},
  "picks": {
   "p3-buyzone": {

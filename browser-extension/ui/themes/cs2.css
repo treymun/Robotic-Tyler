@@ -241,3 +241,31 @@ html[data-rt-theme=cs2]{scrollbar-color:#3a4a5a transparent}
 @keyframes cs2-rarity{50%{box-shadow:inset 3px 0 0 #65e46a,inset 0 -3px 0 var(--rar),inset 0 -22px 22px -14px var(--rar)}}
 [data-rt-theme=cs2] .vote[data-arrived]{animation:cs2-wipe .3s ease-out}
 [data-rt-theme=cs2] .checklist li{animation:cs2-wipe .25s ease-out backwards}
+
+/* ── Memory meter skin (v2.45): the ammo counter ──
+   Not the rating plates or the scoreboard: each reading is laid out like the HUD's ammunition counter, the
+   amount in use large and the total small after a slash, over a clip of ten rounds drawn with Panorama's own
+   bullet icon (panorama/images/icons/ui/bullet.svg): one round for each tenth in use, Tyler's own share in
+   the T-side gold, the rest white, spent ones dim. From 75% the count turns orange and from 90% red, as the
+   HUD does when a clip runs low; with no reading the clip is empty. */
+.panel[data-rt-theme=cs2] .tyler-mem{--mem-skin:cs2;--round:13px;margin:8px 10px 0;padding:6px 10px 6px;background:linear-gradient(90deg,rgba(0,0,0,.55),rgba(0,0,0,.2));border:0;border-right:2px solid rgba(255,255,255,.12);border-radius:0}
+.panel[data-rt-theme=cs2] .tyler-mem .tyler-mem-stats{margin:0;padding:0;gap:14px;background:none;border:0;border-radius:0;box-shadow:none}
+.panel[data-rt-theme=cs2] .tyler-mem .tyler-mem-meter{--count:#fff;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto auto auto;align-items:end;padding:0;background:none;border:0}
+.panel[data-rt-theme=cs2] .tyler-mem .tyler-mem-meter[data-level=high]{--count:#f3a43c}
+.panel[data-rt-theme=cs2] .tyler-mem .tyler-mem-meter[data-level=full]{--count:#f0675b}
+.panel[data-rt-theme=cs2] .tyler-mem .tyler-mem-label{grid-column:1;grid-row:1;font:600 10px/1.2 var(--rt-font);letter-spacing:.12em;color:var(--cs-text)}
+.panel[data-rt-theme=cs2] .tyler-mem .tyler-mem-value{grid-column:1/-1;grid-row:2;display:block;max-width:none;margin:1px 0 0;padding:0;font:600 13px/1.1 var(--rt-font);letter-spacing:.01em;color:rgba(255,255,255,.55);background:none;clip-path:none}
+.panel[data-rt-theme=cs2] .tyler-mem .tyler-mem-used{margin-right:3px;font-size:24px;font-weight:600;line-height:1;color:var(--count);text-shadow:0 0 10px rgba(0,0,0,.6)}
+.panel[data-rt-theme=cs2] .tyler-mem .tyler-mem-sep{margin-right:2px}
+.panel[data-rt-theme=cs2] .tyler-mem .tyler-mem-bar{grid-column:1/-1;grid-row:3;width:calc(var(--round) * 10);height:20px;margin:4px 0 2px;border-radius:0;background:rgba(255,255,255,.16);-webkit-mask:var(--rt-art-p3-bullet) 0 0/var(--round) 20px repeat-x;mask:var(--rt-art-p3-bullet) 0 0/var(--round) 20px repeat-x}
+.panel[data-rt-theme=cs2] .tyler-mem .tyler-mem-bar::before{opacity:1;width:calc(round(nearest,var(--fill) * 10,1) * var(--round));background:#fff}
+.panel[data-rt-theme=cs2] .tyler-mem .tyler-mem-bar-own{width:calc(round(nearest,var(--own) * 10,1) * var(--round));background:var(--cs-t)}
+.panel[data-rt-theme=cs2] .tyler-mem .tyler-mem-meter:is([data-level=high],[data-level=full]) .tyler-mem-bar::before{background:var(--count)}
+.panel[data-rt-theme=cs2] .tyler-mem .tyler-mem-own{grid-column:1/-1;grid-row:4;display:block;font:400 10.5px/1.25 var(--rt-font);color:#9aa4ad}
+.panel[data-rt-theme=cs2] .tyler-mem .tyler-mem-own-value{color:var(--cs-t)}
+.panel[data-rt-theme=cs2] .tyler-mem .tyler-mem-value::before{content:none}
+.panel[data-rt-theme=cs2] .tyler-mem-details{margin:6px 0 0;border-top:1px solid rgba(255,255,255,.1)}
+.panel[data-rt-theme=cs2] .tyler-mem-summary{padding:5px 0 2px;font:600 11px/1.2 var(--rt-font);letter-spacing:.08em;text-transform:uppercase;color:var(--cs-nav)}
+.panel[data-rt-theme=cs2] .tyler-mem-list{gap:1px;margin-top:3px;font:400 11.5px/1.35 var(--rt-font);color:var(--cs-text)}
+.panel[data-rt-theme=cs2] .tyler-mem-head{font-size:10px;color:#8a949c}
+.panel[data-rt-theme=cs2] .tyler-mem-item[data-running=false]{color:#6b747c}

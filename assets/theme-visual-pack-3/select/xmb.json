@@ -1,5 +1,9 @@
 {
  "picks": {
   "p3-trophy": {"file": "themes/xmb/icons/icons-xmb_icon_039.png.png", "mode": "trace", "name": "PS3 XMB Trophy Collection"}
+ },
+ "css":{
+  "p3-hdd":{"file":"themes/xmb/icons/icons-xmb_icon_049.png.png","mode":"trace","name":"PS3 XMB hard disk icon"},
+  "p3-info-line":{"file":"themes/xmb/icons/icons-cinfo-fg.png.png","mode":"pixels","name":"PS3 XMB content-information bar"}
  }
 }

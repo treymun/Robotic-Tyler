@@ -1,0 +1,126 @@
+/*
+ * Memory meter (v2.45, desktop app). Tyler's panel, right under the numbers (#hud). Off by default (Settings →
+ * Advanced → "Show a memory meter in Tyler's panel"). memory-meter.js fills it every 2.5 s while it's on and the
+ * panel can be seen, for the panel (content.js) and the phone remote (app/remote/remote.js) alike. Compiled into
+ * ui-template.js after panel.css and before the themes, so every theme file (and a skin added after it) can
+ * restyle all of it.
+ *
+ * ── SKINNING CONTRACT ── stable: rename nothing here without memory-meter.js, content.js, app/remote/remote.js,
+ * ui/panel.html and the tests (tests/memory-meter.test.mjs, tests/e2e/memory-meter.e2e.mjs).
+ *
+ * section#memMeter.tyler-mem                 the root, in the panel's normal flow between #hud and #fxDeck (a flex
+ *   [hidden]                                 column: a skin may make it any height). Hidden while the meter is off.
+ *   [data-state="wait|on"]                   wait: on, no reading yet (the digits show "…"); on: showing a reading
+ *   dl.stats.tyler-mem-stats                 the two gauges. Also .stats/.stat, so each theme's own HUD look applies
+ *                                            until a skin replaces it (override .stats/.stat rules under .tyler-mem)
+ *     div.stat.tyler-mem-meter.tyler-mem-ram    [data-kind="ram"]   the PC's memory
+ *     div.stat.tyler-mem-meter.tyler-mem-vram   [data-kind="vram"]  the graphics card Tyler uses
+ *       data-level="ok|high|full"            used ÷ total: under 75% / 75% up to 90% / 90% or more ("ok" if not read)
+ *       data-missing="true|false"            true: this reading isn't available (digits "—"; data-tip says why)
+ *       --fill: 0…1                          used ÷ total (0 when missing). Inherited: usable in any child or ::before
+ *       --own:  0…1                          Tyler's own share ÷ total (0 when missing or not known)
+ *       data-tip, aria-label                 the whole reading in words (the themed tooltip, ui-kit.js)
+ *       tabindex="0"                         focusable, so the tooltip opens from the keyboard too
+ *       dt.tyler-mem-label                   "RAM" / "VRAM"
+ *       dd.tyler-mem-value                   all of "14.2/32 GB" in pieces, each its own span (text):
+ *         span.tyler-mem-used                  "14.2"  ("—" when missing, "…" before the first reading)
+ *         span.tyler-mem-sep                   "/"     (empty when there's no total)
+ *         span.tyler-mem-total                 "32"    (empty when the card's size isn't known)
+ *         span.tyler-mem-unit                  " GB"   (" GB used" without a total; empty when missing)
+ *       small.tyler-mem-own                  Tyler's share: span.tyler-mem-own-label "Tyler " + span.tyler-mem-own-value
+ *                                            "6.1 GB" / "640 MB" / "—"
+ *       span.tyler-mem-pct                   "44%" or "—"      (hidden by default: display:none; a skin may show it)
+ *       span.tyler-mem-card                  the card's name on VRAM, "" on RAM   (hidden by default, as above)
+ *       span.tyler-mem-bar > i.tyler-mem-bar-own   the default bar: track, used fill (::before), Tyler's part
+ *   details.tyler-mem-details                the breakdown, closed until opened (summary.tyler-mem-summary,
+ *                                            "What Tyler uses")
+ *     ul.tyler-mem-list > li.tyler-mem-item[data-part]   one row per part, always in this order: head (the column
+ *                                            names), app, text, voices, speech, images, other ("Other programs":
+ *                                            the rest of what's in use, never named)
+ *       [data-running="true|false"]          false: that part isn't running now (its cells say "off")
+ *       --ram, --vram: 0…1                   that part's share of the PC's memory / the card's (0 when off or missing)
+ *       span.tyler-mem-item-label / span.tyler-mem-item-ram / span.tyler-mem-item-vram   the cells (text)
+ *
+ * Also for a theme's own code (theme-features.js and the theme packs): each reading is a UI event
+ * 'memory' {ram, vram (the value text), ramLevel, vramLevel, ramFill, vramFill, ramOwn, vramOwn, missing}
+ * through TylerCompanion.ui.onUI (the same way as 'hud').
+ *
+ * A skin can change everything a stylesheet can: the layout, size and order of all of the above, the bars (or
+ * none), the digits' font and place, colours per data-level, icons per data-part, and words via ::before/::after
+ * with the real text hidden. The numbers always stay in the DOM as text, so a skin may show its own digits or
+ * hide them and keep only bars or gauges built from --fill, --own, --ram and --vram.
+ * A skin can't change: the readings, their wording and units, the 75% / 90% thresholds, the 2.5 s refresh, which
+ * card is shown, the parts and their order, the tooltip's text, the meter's place in the markup (between #hud and
+ * #fxDeck; CSS `order` can still move it within the panel's column), or the breakdown being closed at first
+ * (Chromium's details::details-content can show it open).
+ *
+ * Art: never a url() to a file or another site. Steam's page doesn't allow them and the panel has no file
+ * URLs. Use what the panel already uses: inline SVG from ui-brand.js (TylerBrand, built by tools/brand from the
+ * owner's asset packs; TylerBrand.el(theme,id) gives an element), CSS gradients and shapes, or
+ * data:image/svg+xml URLs inside the CSS as ui/theme-features.css does. Theme fonts come from ui-fonts.js
+ * (TylerFonts, the FontFace API), not @font-face rules.
+ *
+ * ── THE SKINS (v2.45) ── every theme has its own meter, a new piece in that theme's style that doesn't reuse
+ * the theme's HUD numbers or any other part the theme already shows: the rules are at the end of each
+ * ui/themes/<theme>.css ("Memory meter skin"), and Steam's, which has no theme file, at the end of this one. Each
+ * sets --mem-skin to its theme's name (tests/e2e/memory-meter.e2e.mjs checks every theme draws its own).
+ * The owner's pack art reaches them as CSS variables: a theme's select file in assets/theme-visual-pack-3/select
+ * lists it under "css", tools/brand/pack3.py draws it at its own size, and tools/build.mjs sets
+ * --rt-art-<id>: url("data:…") under that theme only (used as background-image, or as mask-image for a
+ * one-colour sprite the skin tints). #memMeter is a size container ("tyler-mem"), so a skin can lay itself out
+ * for a narrow panel with @container tyler-mem (…).
+ */
+.tyler-mem{flex-shrink:0;container:tyler-mem/inline-size}
+.tyler-mem-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+.tyler-mem-meter{--fill:0;--own:0;position:relative;outline:none}
+.tyler-mem-meter:focus-visible{box-shadow:inset 0 0 0 1px var(--rt-focus)}
+.tyler-mem-pct,.tyler-mem-card{display:none}
+.tyler-mem-bar{display:block;position:relative;height:4px;margin-top:5px;overflow:hidden;border-radius:var(--rt-r-pill);background:color-mix(in srgb,currentColor 14%,transparent)}
+.tyler-mem-bar::before,.tyler-mem-bar-own{content:"";position:absolute;top:0;bottom:0;left:0;background:var(--rt-meter)}
+.tyler-mem-bar::before{width:calc(var(--fill) * 100%);opacity:.45}
+.tyler-mem-bar-own{width:calc(var(--own) * 100%)}
+.tyler-mem-meter[data-level=high] .tyler-mem-bar::before,.tyler-mem-meter[data-level=high] .tyler-mem-bar-own{background:var(--rt-state-waiting)}
+.tyler-mem-meter[data-level=full] .tyler-mem-bar::before,.tyler-mem-meter[data-level=full] .tyler-mem-bar-own{background:var(--rt-danger)}
+.tyler-mem-meter[data-missing=true] .tyler-mem-bar{opacity:.45}
+.tyler-mem-details{margin:6px 10px 0;flex-shrink:0}
+.tyler-mem-details[open]{padding-bottom:6px}
+.tyler-mem-summary{padding:5px 10px;font-size:var(--rt-text-xs)}
+.tyler-mem-list{display:grid;gap:2px;margin:0;padding:0;list-style:none;font-size:var(--rt-text-xs)}
+.tyler-mem-item{--ram:0;--vram:0;display:grid;grid-template-columns:minmax(0,1fr) 5.2em 5.2em;gap:8px;align-items:baseline}
+.tyler-mem-item>span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tyler-mem-item-ram,.tyler-mem-item-vram{text-align:right;font-variant-numeric:tabular-nums}
+.tyler-mem-head{font-size:10px;color:var(--rt-ink-4);text-transform:uppercase;letter-spacing:var(--rt-track)}
+.tyler-mem-item[data-running=false]{color:var(--rt-ink-4)}
+.tyler-mem-item[data-part=other]{margin-top:2px;padding-top:3px;border-top:1px solid var(--rt-line-soft);color:var(--rt-ink-3)}
+:host(.mini) .tyler-mem{display:none}
+@media (max-height:640px){.tyler-mem{display:none}}
+
+/* ── Steam's skin (v2.45): the Storage page ──
+   Steam's look is tokens.css itself, so its skin is here. Not the friends list or the download graph: each
+   reading is a drive from Settings → Storage: Steam's own storage icon (the client's native vector), the name
+   and how much of how much is used, and the long segmented bar: Tyler's own share in Steam blue, the rest of
+   what's in use in the client's grey, free space dark, with the blue key under it. From 75% the grey part
+   turns Steam's gold, from 90% red; with no reading the bar is empty. */
+.panel[data-rt-theme=steam] .tyler-mem{--mem-skin:steam;margin:10px 10px 0;padding:8px 10px 7px;background:linear-gradient(180deg,rgba(62,70,85,.35),rgba(23,26,33,.55));border-radius:var(--rt-r-sm);box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+.panel[data-rt-theme=steam] .tyler-mem .tyler-mem-stats{margin:0;padding:0;gap:14px;background:none;border-radius:0}
+.panel[data-rt-theme=steam] .tyler-mem .tyler-mem-meter{--used:#8f98a0;display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto auto auto;align-items:center;column-gap:6px;padding:0;border:0}
+.panel[data-rt-theme=steam] .tyler-mem .tyler-mem-meter[data-level=high]{--used:#d6a945}
+.panel[data-rt-theme=steam] .tyler-mem .tyler-mem-meter[data-level=full]{--used:var(--rt-danger)}
+.panel[data-rt-theme=steam] .tyler-mem .tyler-mem-label{grid-column:1;grid-row:1;display:flex;align-items:center;gap:6px;font:700 11px/1.2 var(--rt-font);letter-spacing:.04em;color:#dcdedf}
+.panel[data-rt-theme=steam] .tyler-mem .tyler-mem-label::before{content:"";width:13px;height:13px;background:var(--rt-blue);-webkit-mask:var(--rt-art-p3-storage-card) 50% 50%/contain no-repeat;mask:var(--rt-art-p3-storage-card) 50% 50%/contain no-repeat}
+.panel[data-rt-theme=steam] .tyler-mem .tyler-mem-value{grid-column:2;grid-row:1;margin:0;font:400 11px/1.2 var(--rt-font);text-align:right;color:var(--rt-ink-3)}
+.panel[data-rt-theme=steam] .tyler-mem .tyler-mem-used{color:#dcdedf}
+.panel[data-rt-theme=steam] .tyler-mem .tyler-mem-meter:is([data-level=high],[data-level=full]) .tyler-mem-used{color:var(--used)}
+.panel[data-rt-theme=steam] .tyler-mem .tyler-mem-bar{grid-column:1/-1;grid-row:2;height:10px;margin:6px 0 5px;border-radius:2px;background:#0e141b;box-shadow:inset 0 0 0 1px rgba(255,255,255,.05)}
+.panel[data-rt-theme=steam] .tyler-mem .tyler-mem-bar::before{opacity:1;background:var(--used)}
+.panel[data-rt-theme=steam] .tyler-mem .tyler-mem-bar-own{background:var(--rt-active);box-shadow:1px 0 0 #0e141b}
+.panel[data-rt-theme=steam] .tyler-mem .tyler-mem-own{grid-column:1/-1;grid-row:3;display:flex;align-items:center;gap:5px;font:400 11px/1.2 var(--rt-font);color:var(--rt-ink-3)}
+.panel[data-rt-theme=steam] .tyler-mem .tyler-mem-own::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--rt-active)}
+.panel[data-rt-theme=steam] .tyler-mem .tyler-mem-own-value{color:#dcdedf}
+.panel[data-rt-theme=steam] .tyler-mem-details{margin:7px 0 0;border-top:1px solid rgba(255,255,255,.06)}
+.panel[data-rt-theme=steam] .tyler-mem-summary{padding:6px 0 2px;font:700 11px/1.2 var(--rt-font);letter-spacing:.04em;color:var(--rt-blue)}
+.panel[data-rt-theme=steam] .tyler-mem-list{gap:2px;margin-top:4px;color:var(--rt-ink-2)}
+.panel[data-rt-theme=steam] .tyler-mem-item:not(.tyler-mem-head) .tyler-mem-item-label{display:flex;align-items:center;gap:6px}
+.panel[data-rt-theme=steam] .tyler-mem-item:not(.tyler-mem-head) .tyler-mem-item-label::before{content:"";flex:none;width:6px;height:6px;border-radius:50%;background:var(--rt-active)}
+.panel[data-rt-theme=steam] .tyler-mem-item[data-part=other] .tyler-mem-item-label::before{background:#8f98a0}
+.panel[data-rt-theme=steam] .tyler-mem-item[data-running=false] .tyler-mem-item-label::before{background:#3d4450}
