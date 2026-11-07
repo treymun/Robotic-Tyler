@@ -1,7 +1,7 @@
-ROBOTIC TYLER — v2.44.0
+ROBOTIC TYLER — v2.45.0
 
 JUST WANT TO USE IT?
-  Download ROBOTIC-TYLER-Setup-2.44.0.exe from
+  Download ROBOTIC-TYLER-Setup-2.45.0.exe from
   github.com/treymun/Robotic-Tyler/releases/latest and run it. Two parts:
     Desktop app        → Steam chat and Steam voice on Windows, no Chrome needed
                          (voice: Standard or Gemini Live, right in its Steam window)
@@ -12,6 +12,8 @@ JUST WANT TO USE IT?
   Studio (its settings are imported on first start; it then offers to remove it).
   Pick a look in Settings → Appearance: 25 themes, from Steam, Team Fortress 2,
   Counter-Strike 2 and Portal to DOOM, Deadlock, PAYDAY 2, Xbox 360 and MSN.
+  In the desktop app, set Steam chat appearance to Full visual styling to
+  carry the same look into the Steam chat window.
 
 VOICE ON THE DESKTOP (v2.19):
   1. Sign in to the bot's Steam account in the app's Steam chat window.

@@ -17,7 +17,7 @@ steamVoice.registerScheme(protocol);
 const root=path.join(process.env.LOCALAPPDATA||app.getPath('appData'),'RoboticTylerHydraCloudV12');fs.mkdirSync(path.join(root,'Data'),{recursive:true});app.setPath('userData',path.join(root,'Data'));
 const OLD_VOICE_DIR=path.join(app.getPath('appData'),'RoboticTylerNativeSteamCompanion');
 const OLD_VOICE_GUID='b0b8de7d-76bb-5d6f-99fa-c8a2fe9a49c6'; // electron-builder key for com.robotictyler.nativesteamcompanion
-let themeVoices=null,localAI=null,localImages=null,pendingVoicesSetup=false;
+let themeVoices=null,localAI=null,localImages=null,pendingVoicesSetup=false,steamAppearance=null;
 let bot,options,voiceWin,listener,tray,voice,updates,vault,remote,windowVoice=true,muteCall=false,steamWindow,media,quitting=false;const removed=[];const activity=[];function eventLog(kind,details=''){activity.unshift({at:Date.now(),kind,details:String(details).slice(0,140)});if(activity.length>120)activity.pop();}
 const icon=path.join(__dirname,'..','assets','robotic-tyler.png');
 function helperPath(){const p=app.isPackaged?path.join(process.resourcesPath,'windows-audio-bridge','RoboticTylerAudio.exe'):path.join(__dirname,'..','windows-audio-bridge','publish','RoboticTylerAudio.exe');if(!fs.existsSync(p))throw Error('The Windows audio helper is missing. Reinstall ROBOTIC TYLER (or build it with BUILD-WINDOWS-EXE.cmd).');return p;}
@@ -159,6 +159,7 @@ if(!app.requestSingleInstanceLock()){app.quit();}else{
    if([401,403].includes(result.status))throw Error('OpenRouter rejected the key. Paste the full secret from your OpenRouter Keys page.');
    if(!result.ok)throw Error('OpenRouter key check returned HTTP '+result.status+'. Try again shortly.');return true;
   }
+  if(request.action==='steam-appearance')return steamAppearance?.status()||{preferred:'off',effective:'off',reason:'Steam appearance is unavailable.'};
   if(request.action==='get'){const names=(Array.isArray(request.keys)?request.keys:[request.keys]).filter(k=>settingsKeys.has(k));const data=await vault.get(names);if(data.geminiKey)data.geminiKey=true;if(data.openrouterKey)data.openrouterKey=true;if(data.veniceKey)data.veniceKey=true;delete data.speechKey;return data;}
   if(request.action==='set'){await local.set(sanitizeSettings(request.values));return {};}
   if(request.action==='remove'){await local.remove((Array.isArray(request.keys)?request.keys:[request.keys]).filter(k=>settingsKeys.has(k)));return {};}
@@ -230,6 +231,18 @@ if(!app.requestSingleInstanceLock()){app.quit();}else{
  bot=new BrowserWindow({...windowDefaults,width:1380,height:920,minWidth:850,minHeight:620,title:'ROBOTIC TYLER',icon,webPreferences:{...windowDefaults.webPreferences,partition:'persist:robotic-tyler-steam',backgroundThrottling:false,autoplayPolicy:'no-user-gesture-required',preload:path.join(__dirname,'steam-preload.cjs')}});configure(bot);applyMute();
  // configure() set the generic window rules; the Steam window's session keeps steam-voice.cjs's handlers.
  steamWindow.applyPermissions();steamWindow.watch(bot.webContents);
+ // Appearance is independent of the preload, voice routing and chat engine. No
+ // privileged bridge is exposed to Steam; Off is the default for existing users.
+ try{
+  steamAppearance=require('./steam-appearance/controller.cjs').createAppearance(bot.webContents,{log:eventLog});
+  let appearancePrefs=await local.get(['uiTheme','steamChatAppearance']);
+  void steamAppearance.update(appearancePrefs);
+  changeListeners.push(changes=>{
+   if(!changes.uiTheme&&!changes.steamChatAppearance)return;
+   for(const key of ['uiTheme','steamChatAppearance'])if(changes[key])appearancePrefs={...appearancePrefs,[key]:changes[key].newValue};
+   void steamAppearance.update(appearancePrefs);
+  });
+ }catch(error){eventLog('Steam appearance unavailable',error.message);}
  // While voice runs, closing the chat window keeps Tyler in the tray instead of quitting.
  for(const [ev,visible] of [['hide',false],['minimize',false],['show',true],['restore',true]])bot.on(ev,()=>{try{bot.webContents.send('tyler:message',{type:'tyler:window-visible',visible});}catch{}});
  bot.on('close',event=>{if(!quitting&&voice.mode!=='off'){event.preventDefault();bot.hide();tray?.displayBalloon?.({title:'ROBOTIC TYLER is still in voice chat',content:'Stop voice or quit from the tray icon.'});}});

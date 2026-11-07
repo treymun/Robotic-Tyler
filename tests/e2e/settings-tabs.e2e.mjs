@@ -21,7 +21,7 @@ const serve=()=>http.createServer((req,res)=>{
 }).listen(0);
 const stub=([desktop])=>{const store={uiTheme:'steam',aiProvider:'openrouter'};const local={get:async k=>{const l=k==null?Object.keys(store):Array.isArray(k)?k:[k];return Object.fromEntries(l.filter(x=>x in store).map(x=>[x,store[x]]));},set:async v=>Object.assign(store,v),remove:async()=>{}};
  window.chrome={storage:{local},tabs:{create:()=>{},query:async()=>[]}};
- if(desktop)window.tylerSettings={storage:{local},tabs:{create:async()=>{}},verifyKey:async()=>true,activity:async()=>[],ai:async()=>({ok:true}),onTheme:()=>{},onVoices:()=>{},remote:async()=>({}),voice:{devices:async()=>[],tone:async()=>'',test:async()=>({})},onLocalAI:()=>{},
+ if(desktop)window.tylerSettings={storage:{local},steamAppearance:async()=>({preferred:store.steamChatAppearance||'off',effective:store.steamChatAppearance||'off'}),tabs:{create:async()=>{}},verifyKey:async()=>true,activity:async()=>[],ai:async()=>({ok:true}),onTheme:()=>{},onVoices:()=>{},remote:async()=>({}),voice:{devices:async()=>[],tone:async()=>'',test:async()=>({})},onLocalAI:()=>{},
   localAI:async op=>op==='status'?{status:{supported:true,installed:false,models:{},settings:{},hardware:{cpu:{model:'CPU',threads:8},ram:{total:16e9},gpus:[]},suggestion:{model:'4b',device:'cpu',notes:[]}},models:{}}:op==='speech-status'?{status:{supported:true,engine:{name:'sherpa-onnx',version:'1.13.8'},installed:{},ready:{},running:{},starting:{},sizes:{},models:{hearing:{label:'Parakeet'},voice:{label:'Kokoro'}},voices:[],checks:{},lastError:{},settings:{}}}:{},
   localImages:async op=>op==='status'?{status:{supported:true,installed:false,models:{},settings:{}},models:{},sizes:[256,512]}:{},voices:async op=>op==='status'?{status:{installed:false,settings:{}},voices:[],modes:{},models:{}}:{}};};
 const TABS=['Overview','AI & personality','Chat images','Voice','Theme voices','On this PC','Squad & friends','Games','Appearance','Advanced'];
@@ -60,6 +60,17 @@ for(const [mode,url,desktop] of [['Chrome','/browser-extension/settings.html',fa
    const cols=await page.evaluate(()=>new Set([...document.querySelectorAll('#themeGallery .tg-card')].map(c=>Math.round(c.getBoundingClientRect().left))).size);
    assert.equal(cols,2,'two columns of theme cards beside the preview');
    const galleryHeight=await page.evaluate(()=>document.documentElement.scrollHeight);
+   if(desktop){
+    await page.waitForFunction(()=>document.getElementById('steamAppearanceStatus').textContent.includes('original appearance'));
+    const theme=await page.evaluate(()=>TylerTheme.current()),navStatus=await page.locator('#uiNavStatus').textContent();
+    await page.selectOption('#steamAppearanceMode','full');
+    await page.waitForFunction(async()=>(await window.tylerSettings.storage.local.get(['steamChatAppearance'])).steamChatAppearance==='full');
+    assert.equal(await page.evaluate(()=>TylerTheme.current()),theme,'appearance mode does not change theme');
+    assert.equal(await page.locator('#uiNavStatus').textContent(),navStatus,'immediate appearance setting does not dirty the save bar');
+    await page.click('#steamAppearanceOff');await page.waitForFunction(()=>document.getElementById('steamAppearanceStatus').textContent.includes('original appearance'));
+    assert.equal(await page.inputValue('#steamAppearanceMode'),'off');
+    await page.locator('#steamAppearance').screenshot({path:path.join(ROOT,'test-results/steam-appearance/settings-recovery-fixture.png')});
+   }else assert.equal(await page.locator('#steamAppearanceMode').count(),0,'Chrome Settings has no desktop control');
    assert.ok(aiHeight<3400,'AI & personality is '+aiHeight+' px (it was about 4,600)');assert.ok(galleryHeight<3400,'Appearance is '+galleryHeight+' px (it was about 5,100)');
    assert.deepEqual(errors,[]);
   }finally{await browser.close();server.close();}

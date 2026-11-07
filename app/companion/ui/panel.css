@@ -1,0 +1,474 @@
+/*
+ * In-chat panel components, Steam theme. Compiled with tokens.css into
+ * ui-template.js and attached to the closed shadow root once (adoptedStyleSheets).
+ *
+ * Feature modules write plain markup (label > input, details > summary,
+ * bare <button>), so element defaults here carry most of the look. Modifiers:
+ *   button.primary / .danger / .ghost / .icon / .sm / .block
+ *   details.feature (+ .feature-title / .feature-meta in the summary)
+ *   .btn-row  .pill  .hint  .output  .callout  .stats  .tally
+ * Keep selectors flat (one class, or element + one class) so modifiers always
+ * win over element defaults.
+ */
+:host{all:initial;color-scheme:dark}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+
+/* ── Shell: a Steam popup window ───────────────────────── */
+.panel{
+  position:fixed;right:16px;bottom:16px;z-index:2147483647;
+  width:var(--rt-panel-w,392px);max-width:calc(100vw - 24px);height:var(--rt-panel-h,min(760px,90vh));max-height:calc(100vh - 24px);
+  display:flex;flex-direction:column;overflow:hidden;
+  background:var(--rt-bg);color:var(--rt-ink);
+  border-radius:var(--rt-r-lg);box-shadow:var(--rt-shadow-float);
+  font:400 var(--rt-text-md)/1.45 var(--rt-font);
+  -webkit-font-smoothing:antialiased;
+}
+
+.bar{display:flex;align-items:center;gap:10px;padding:10px 10px 10px 12px;flex-shrink:0;background:var(--rt-bar)}
+.mark{width:30px;height:30px;flex-shrink:0;display:grid;place-items:center;overflow:hidden;border-radius:var(--rt-r-sm);background:#171f28;color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.25)}
+.mark svg{display:block;width:100%;height:100%}
+/* Theme logo (v2.13): ui-logos.js draws the chosen theme's Tyler on this canvas.
+   Until it has drawn, the vector logo above shows. Logos are transparent art. */
+.mark{position:relative}
+.mark-art{position:absolute;left:var(--logo-pad,0px);top:var(--logo-pad,0px);width:calc(100% - 2 * var(--logo-pad,0px));height:calc(100% - 2 * var(--logo-pad,0px));display:none}
+.mark[data-logo]{width:38px;height:38px;margin:-4px 0;background:transparent;box-shadow:none;border:0;border-radius:0;overflow:visible}
+.mark[data-logo] svg{display:none}
+.mark[data-logo] .mark-art{display:block}
+.ident{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.2}
+.wordmark{font:700 14px/1.15 var(--rt-font-display);letter-spacing:.08em;color:var(--rt-ink-strong)}
+.ident-sub{font-size:var(--rt-text-xs);color:var(--rt-ink-3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-transform:uppercase;letter-spacing:var(--rt-track)}
+.icon-btn{width:28px;height:28px;padding:0;margin:0;display:grid;place-items:center;border-radius:var(--rt-r-sm);background:transparent;border:0;color:var(--rt-ink-3);box-shadow:none}
+.icon-btn svg{width:16px;height:16px}
+.icon-btn:hover{background:var(--rt-select);color:var(--rt-ink-strong)}
+
+.banner{display:flex;align-items:center;gap:10px;margin:8px 10px 0;padding:8px 8px 8px 12px;border-radius:var(--rt-r-sm);font-size:var(--rt-text-sm);
+  background:rgba(224,135,59,.16);border-left:3px solid var(--rt-state-waiting);color:var(--rt-ink-strong)}
+.banner span{flex:1}
+.banner button{margin:0}
+
+/* ── Tally: live status in Steam presence colours ─────── */
+.tally{
+  --tone:var(--rt-state-ready);
+  display:flex;gap:10px;margin:10px 10px 0;padding:9px 12px 10px 10px;flex-shrink:0;
+  border-radius:var(--rt-r-sm);
+  background:linear-gradient(90deg,color-mix(in srgb,var(--tone) 16%,transparent),rgba(0,0,0,.2) 70%);
+  transition:background var(--rt-med) var(--rt-ease);
+}
+.tally[data-state=standby],.tally[data-state=paused]{--tone:var(--rt-state-standby)}
+.tally[data-state=listening]{--tone:var(--rt-state-listening)}
+.tally[data-state=thinking]{--tone:var(--rt-state-thinking)}
+.tally[data-state=speaking]{--tone:var(--rt-state-speaking)}
+.tally[data-state=waiting]{--tone:var(--rt-state-waiting)}
+.tally[data-state=error]{--tone:var(--rt-state-error)}
+.tally-light{width:3px;flex-shrink:0;border-radius:1px;background:var(--tone);box-shadow:0 0 10px color-mix(in srgb,var(--tone) 70%,transparent)}
+.tally[data-state=standby] .tally-light,.tally[data-state=paused] .tally-light{box-shadow:none}
+.tally-body{flex:1;min-width:0}
+.tally-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.tally-label{font-weight:700;font-size:var(--rt-text-xs);color:var(--tone);letter-spacing:var(--rt-track);text-transform:uppercase}
+.tally-text{margin:2px 0 0;font-size:var(--rt-text-sm);line-height:1.4;color:var(--rt-ink);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.tally-wave{display:flex;align-items:center;gap:2px;height:14px}
+.tally-wave i{display:block;width:2px;height:2px;border-radius:1px;background:var(--tone);opacity:.8}
+.tally[data-state=listening] .tally-wave i,.tally[data-state=speaking] .tally-wave i{animation:rt-wave 1.1s var(--rt-ease) infinite}
+.tally-wave i:nth-child(2){animation-delay:-.9s!important}.tally-wave i:nth-child(3){animation-delay:-.3s!important}
+.tally-wave i:nth-child(4){animation-delay:-.6s!important}.tally-wave i:nth-child(5){animation-delay:-.15s!important}
+.tally-wave i:nth-child(6){animation-delay:-.75s!important}.tally-wave i:nth-child(7){animation-delay:-.45s!important}
+.tally[data-state=thinking] .tally-wave i{animation:rt-think 1.4s ease-in-out infinite}
+@keyframes rt-wave{0%,100%{height:2px}50%{height:13px}}
+@keyframes rt-think{0%,100%{opacity:.25}50%{opacity:.95}}
+/* Each theme draws its own status strip on top of this (meters, radar, heart
+   monitor…). Decorations sit behind the text; .tally-trace is the heart-monitor
+   line, hidden unless a theme shows it. */
+.tally{position:relative;overflow:hidden}
+.tally-light,.tally-body{position:relative;z-index:1}
+.tally-trace{display:none}
+
+/* Steam: a friends-list entry in voice chat. The avatar frame takes Steam's
+   presence colours (online blue, in-game green, offline grey), the mic glows
+   while Tyler talks, and a loading bar runs along the bottom while it thinks. */
+[data-rt-theme=steam] .tally{align-items:center;padding-bottom:12px}
+[data-rt-theme=steam] .tally-light{width:34px;height:34px;flex:0 0 34px;border-radius:2px;
+  background:linear-gradient(var(--tone),var(--tone)) 50% 21px/2px 5px no-repeat,linear-gradient(var(--tone),var(--tone)) 50% 26px/10px 2px no-repeat,linear-gradient(160deg,#3d5a74,#1f2c3a 60%,#16202b);
+  box-shadow:0 0 0 2px var(--tone),0 2px 6px rgba(0,0,0,.5)}
+[data-rt-theme=steam] .tally-light::before{content:"";position:absolute;left:13px;top:6px;width:8px;height:12px;border-radius:4px;background:var(--tone)}
+[data-rt-theme=steam] .tally-light::after{content:"";position:absolute;left:10px;top:11px;width:14px;height:10px;border:2px solid var(--tone);border-top:0;border-radius:0 0 7px 7px}
+[data-rt-theme=steam] .tally[data-state=standby] .tally-light,[data-rt-theme=steam] .tally[data-state=paused] .tally-light{box-shadow:0 0 0 2px var(--tone);filter:grayscale(1) brightness(.8)}
+[data-rt-theme=steam] .tally[data-state=speaking] .tally-light{animation:st-talk 1s ease-in-out infinite}
+@keyframes st-talk{0%,100%{box-shadow:0 0 0 2px var(--tone),0 0 0 0 transparent}50%{box-shadow:0 0 0 2px var(--tone),0 0 14px 3px color-mix(in srgb,var(--tone) 70%,transparent)}}
+[data-rt-theme=steam] .tally::after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:color-mix(in srgb,var(--tone) 30%,transparent)}
+[data-rt-theme=steam] .tally[data-state=listening]::after{background:var(--tone);animation:st-breathe 2.2s ease-in-out infinite}
+[data-rt-theme=steam] .tally[data-state=thinking]::after{height:3px;background:linear-gradient(90deg,transparent,#66c0f4 30% 70%,transparent) 0 0/38% 100% no-repeat,rgba(102,192,244,.12);animation:st-load 1.3s cubic-bezier(.45,.05,.55,.95) infinite}
+[data-rt-theme=steam] .tally[data-state=speaking]::after{height:3px;background:repeating-linear-gradient(-45deg,rgba(255,255,255,.28) 0 4px,transparent 4px 8px),linear-gradient(90deg,#5c7e10,var(--tone));animation:st-flow .5s linear infinite}
+[data-rt-theme=steam] .tally[data-state=error]::after{background:var(--tone)}
+@keyframes st-breathe{0%,100%{opacity:.35}50%{opacity:1}}
+@keyframes st-load{from{background-position:-70% 0,0 0}to{background-position:170% 0,0 0}}
+@keyframes st-flow{to{background-position:11.31px 0,0 0}}
+
+/* ── Stats strip ──────────────────────────────────────── */
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:10px 10px 0;padding:8px 0;flex-shrink:0;background:var(--rt-block);border-radius:var(--rt-r-sm)}
+.stat{min-width:0;padding:0 10px;border-left:1px solid var(--rt-line-soft)}
+.stat:first-child{border-left:0}
+.stat dt{font-size:10px;font-weight:700;color:var(--rt-ink-3);text-transform:uppercase;letter-spacing:var(--rt-track)}
+.stat dd{margin:2px 0 0;font:700 var(--rt-text-lg)/1.25 var(--rt-font-display);color:var(--rt-ink-strong);font-variant-numeric:tabular-nums;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stat small{display:block;font-size:var(--rt-text-xs);color:var(--rt-ink-4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:0}
+
+/* ── Tabs: Steam sub-navigation ──────────────────────── */
+.tabs{display:flex;gap:0;padding:0 6px;margin-top:10px;background:var(--rt-bar);flex-shrink:0;box-shadow:inset 0 -1px 0 var(--rt-edge)}
+.tabs button{flex:1;min-height:0;margin:0;padding:10px 2px 9px;border:0;border-bottom:2px solid transparent;border-radius:0;background:transparent;box-shadow:none;
+  color:var(--rt-ink-3);font-size:var(--rt-text-xs);font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+.tabs button:hover{background:transparent;color:var(--rt-ink-strong)}
+.tabs button[aria-selected=true]{color:var(--rt-ink-strong);border-bottom-color:var(--rt-active)}
+.tabs button:active{transform:none}
+
+.scroll{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:14px 12px 18px;scrollbar-width:thin;scrollbar-color:var(--rt-select) transparent}
+.view-head{margin-bottom:12px}
+.view-head h2{margin:0 0 6px}
+.view-head p{margin:0}
+
+/* ── Footer ───────────────────────────────────────────── */
+.foot{display:flex;align-items:center;gap:6px;padding:7px 8px 7px 12px;background:var(--rt-bar);box-shadow:inset 0 1px 0 var(--rt-edge);flex-shrink:0}
+.foot small{flex:1;min-width:0;margin:0;font-size:var(--rt-text-xs);line-height:1.25;color:var(--rt-ink-3);overflow:hidden;overflow-wrap:anywhere;text-wrap:balance;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2}
+.foot button{margin:0}
+.owner-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;background:var(--rt-state-standby)}
+.panel[data-owner=true] .owner-dot{background:var(--rt-state-ready);box-shadow:0 0 6px var(--rt-state-ready)}
+
+/* Collapsed: header, tally and footer only. */
+:host(.mini) .panel{height:auto;width:392px}
+/* v2.23 (panel-layout.js): resize handles on the left edge, top edge and top-left corner, and the
+   panel docked as a full-height column beside Steam's chat. */
+.rt-resize{position:absolute;z-index:40;touch-action:none}
+.rt-resize-w{left:0;top:16px;bottom:16px;width:7px;cursor:ew-resize}
+.rt-resize-h{top:0;left:16px;right:44px;height:6px;cursor:ns-resize}
+.rt-resize-c{left:0;top:0;width:14px;height:14px;cursor:nwse-resize}
+.rt-resize::after{content:"";position:absolute;opacity:0;border-radius:2px;background:var(--rt-active,#67c1f5);transition:opacity .15s}
+.rt-resize-w::after{left:2px;top:50%;width:3px;height:40px;margin-top:-20px}
+.rt-resize-h::after{top:1px;left:50%;width:40px;height:3px;margin-left:-20px}
+.rt-resize-c::after{left:2px;top:2px;width:8px;height:8px;border-radius:1px;background:none;border-left:3px solid var(--rt-active,#67c1f5);border-top:3px solid var(--rt-active,#67c1f5)}
+.rt-resize:hover::after,.rt-resize:focus-visible::after,:host(.resizing) .rt-resize::after{opacity:.85}
+.rt-resize:focus-visible{outline:none}
+:host(.mini) .rt-resize,:host([data-dock=side]) .rt-resize-h,:host([data-dock=side]) .rt-resize-c{display:none}
+:host([data-dock=side]) .rt-resize-w{top:0;bottom:0}
+:host([data-dock=side]) .panel{top:0!important;right:0!important;bottom:0!important;left:auto!important;width:var(--rt-dock-w,440px)!important;max-width:none!important;height:100vh!important;max-height:none!important;border-radius:0!important;box-shadow:-1px 0 0 rgba(0,0,0,.45),-10px 0 28px rgba(0,0,0,.3)!important}
+:host(.resizing) .panel{transition:none!important;animation:none!important}
+:host(.resizing){user-select:none;-webkit-user-select:none}
+:host(.mini) .stats,:host(.mini) .tabs,:host(.mini) .scroll{display:none}
+:host(.mini) .tally{margin-bottom:10px}
+/* Collapsed, a notification is one compact row between the status strip and the footer (the panel
+   grows to fit it), so it never covers the header or the status it refers to. */
+:host(.mini) .rt-layer{position:static;order:1}
+:host(.mini) .foot{order:2}
+:host(.mini) .rt-toasts{position:static;margin:0 10px 10px;gap:4px}
+:host(.mini) .rt-toasts:empty{display:none}
+/* Collapsed, the owner line stays to one or two short lines whatever the theme's type (v2.18). */
+:host(.mini) .foot small{font-size:10px;line-height:1.2;letter-spacing:0}
+/* Collapsing and expanding ease the panel in from its corner (themes may swap the motion). */
+@keyframes rt-mini{from{opacity:.4;transform:scale(.98,1.3);transform-origin:100% 100%}to{opacity:1;transform:none}}
+@keyframes rt-unmini{from{opacity:.5;transform:scale(.98,.82);transform-origin:100% 100%}to{opacity:1;transform:none}}
+:host(.mini) .panel{animation:rt-mini .18s ease-out}
+:host(.expanding) .panel{animation:rt-unmini .2s ease-out}
+:host(.mini) .rt-toast{grid-template-columns:auto minmax(0,1fr) auto auto;align-items:center;gap:0 8px;padding-top:6px;padding-bottom:6px}
+:host(.mini) .rt-toast:has(.rt-toast-text) .rt-toast-title{display:none}
+:host(.mini) .rt-toast>.ic{grid-row:1;margin:0}
+:host(.mini) :is(.rt-toast-title,.rt-toast-text){grid-column:2;grid-row:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+:host(.mini) .rt-toast-actions{grid-column:3;grid-row:1;margin:0;flex-wrap:nowrap}
+:host(.mini) .rt-toast .rt-x{grid-column:4;grid-row:1;margin:0}
+
+/* ── Type: Steam section heads are tracked uppercase ─── */
+h2{font:400 var(--rt-text-lg)/1.3 var(--rt-font-display);letter-spacing:.06em;text-transform:uppercase;margin:4px 0 10px;color:var(--rt-ink-strong)}
+h3{font:700 var(--rt-text-md)/1.35 var(--rt-font);margin:14px 0 6px;color:var(--rt-ink-strong)}
+p{margin:6px 0;color:var(--rt-ink-3);line-height:1.5}
+small,.hint{display:block;font-size:var(--rt-text-xs);line-height:1.5;color:var(--rt-ink-4);margin:6px 0}
+p.hint{font-size:var(--rt-text-sm);color:var(--rt-ink-3)}
+b,strong{font-weight:700;color:var(--rt-ink-strong)}
+code{font:var(--rt-text-xs)/1.4 var(--rt-font-mono);color:var(--rt-link);background:rgba(0,0,0,.3);border-radius:var(--rt-r-xs);padding:1px 5px;white-space:nowrap}
+hr{border:0;border-top:1px solid var(--rt-line-soft);margin:14px 0}
+a{color:var(--rt-link);text-decoration:none}
+a:hover{color:var(--rt-link-hover)}
+ol,ul{color:var(--rt-ink-3)}
+
+/* ── Buttons: Steam's blue hover-fade by default ─────── */
+button,.btn{
+  font:400 var(--rt-text-sm)/1.2 var(--rt-font);
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  min-height:30px;padding:6px 14px;margin:4px 6px 4px 0;
+  color:var(--rt-blue);background:var(--rt-blue-fade);
+  border:0;border-radius:var(--rt-r-sm);
+  cursor:pointer;text-align:center;
+}
+button:hover{color:var(--rt-on-accent);background:var(--rt-blue-fade-hover)}
+button:active{transform:translateY(1px)}
+button:disabled{opacity:.4;cursor:not-allowed;transform:none;color:var(--rt-ink-disabled);background:rgba(255,255,255,.05)}
+.primary,#start{color:var(--rt-green-ink);background:var(--rt-green);box-shadow:inset 0 0 0 1px var(--rt-green-line)}
+.primary:hover,#start:hover{color:var(--rt-green-ink);background:var(--rt-green-hover)}
+.danger{color:var(--rt-danger-ink);background:var(--rt-danger-bg)}
+.danger:hover{color:var(--rt-on-accent);background:var(--rt-danger-hover)}
+.ghost,.icon{color:var(--rt-ink-3);background:transparent}
+.ghost:hover,.icon:hover{color:var(--rt-ink-strong);background:var(--rt-select)}
+.icon{min-height:26px;padding:4px 9px;font-size:var(--rt-text-xs)}
+.sm{min-height:26px;padding:4px 10px;font-size:var(--rt-text-xs)}
+.block{display:flex;width:100%;margin:8px 0;min-height:36px;font-size:var(--rt-text-lg)}
+.btn-row,.actions{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0}
+.btn-row>button,.actions>button{flex:1 1 auto;margin:0}
+.btn-row>input{flex:1 1 150px;width:auto;margin:0}
+.actions>label{flex:1 1 140px;margin:0}
+
+/* ── Fields ───────────────────────────────────────────── */
+label{display:block;margin:12px 0 0;font-size:var(--rt-text-xs);font-weight:700;color:var(--rt-ink-3);text-transform:uppercase;letter-spacing:var(--rt-track)}
+label small{font-weight:400;text-transform:none;letter-spacing:0}
+.field-note{font-weight:400;color:var(--rt-ink-4);margin-left:4px;text-transform:none;letter-spacing:0}
+input:where(:not([type=checkbox],[type=radio],[type=range],[type=file])),textarea,select{
+  display:block;width:100%;min-width:0;margin-top:5px;padding:7px 10px;min-height:32px;
+  font:400 var(--rt-text-md)/1.4 var(--rt-font);color:var(--rt-ink-strong);text-transform:none;letter-spacing:0;
+  background:var(--rt-input);border:1px solid var(--rt-edge);border-radius:var(--rt-r-sm);
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.4);
+  transition:border-color var(--rt-fast),box-shadow var(--rt-fast);
+}
+textarea{resize:vertical;min-height:58px}
+select{appearance:none;padding-right:28px;cursor:pointer;text-overflow:ellipsis;
+  background-image:linear-gradient(45deg,transparent 50%,var(--rt-blue) 50%),linear-gradient(135deg,var(--rt-blue) 50%,transparent 50%);
+  background-position:calc(100% - 15px) 52%,calc(100% - 10px) 52%;background-size:5px 5px;background-repeat:no-repeat}
+input::placeholder,textarea::placeholder{color:var(--rt-ink-4)}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--rt-focus);box-shadow:inset 0 1px 3px rgba(0,0,0,.4),0 0 0 1px var(--rt-focus)}
+input[readonly],textarea[readonly]{color:var(--rt-ink-3)}
+input[type=file]{display:block;width:100%;margin-top:6px;font-size:var(--rt-text-xs);color:var(--rt-ink-3);text-transform:none;letter-spacing:0}
+input[type=file]::file-selector-button{font:400 var(--rt-text-xs) var(--rt-font);margin-right:10px;padding:6px 12px;color:var(--rt-blue);background:var(--rt-blue-fade);border:0;border-radius:var(--rt-r-sm);cursor:pointer}
+input[type=file]::file-selector-button:hover{color:var(--rt-on-accent);background:var(--rt-blue-fade-hover)}
+input[type=range]{display:block;width:100%;margin:8px 0 2px;accent-color:var(--rt-active);cursor:pointer}
+
+/* Steam checkbox: dark square, blue when ticked. */
+input[type=checkbox]{appearance:none;-webkit-appearance:none;position:relative;width:16px;height:16px;margin:0;flex-shrink:0;cursor:pointer;
+  background:var(--rt-input);border:1px solid var(--rt-edge);border-radius:var(--rt-r-xs);box-shadow:inset 0 1px 2px rgba(0,0,0,.5)}
+input[type=checkbox]:hover{border-color:var(--rt-blue-deep)}
+input[type=checkbox]:checked{background:var(--rt-accent-fill);border-color:var(--rt-blue-deep)}
+input[type=checkbox]:checked::after{content:"";position:absolute;left:4.5px;top:1.5px;width:4px;height:8px;border:solid var(--rt-on-accent);border-width:0 2px 2px 0;transform:rotate(45deg)}
+
+/* Checkbox rows: works for <label><input type=checkbox> text</label> written anywhere. */
+label:has(>input[type=checkbox]),.check{display:flex;align-items:flex-start;gap:9px;margin:10px 0 0;font-size:var(--rt-text-md);font-weight:400;color:var(--rt-ink);line-height:1.45;cursor:pointer;text-transform:none;letter-spacing:0}
+label:has(>input[type=checkbox])>input,.check>input{margin-top:1px}
+.check span{flex:1}
+
+/* ── Content blocks (Room tab and other disclosure panels) ── */
+details{margin:10px 0;padding:0 10px;background:var(--rt-block);border-radius:var(--rt-r-sm)}
+details[open]{padding-bottom:10px}
+summary{display:flex;align-items:center;gap:8px;list-style:none;cursor:pointer;margin:0 -10px;padding:8px 10px;
+  font-size:var(--rt-text-sm);color:var(--rt-ink);border-radius:var(--rt-r-sm)}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"";margin-left:auto;width:6px;height:6px;flex-shrink:0;border-right:1.5px solid var(--rt-blue);border-bottom:1.5px solid var(--rt-blue);transform:rotate(45deg) translate(-2px,-1px);transition:transform var(--rt-fast)}
+details[open]>summary::after{transform:rotate(225deg) translate(-2px,-1px)}
+summary:hover{color:var(--rt-ink-strong);background:var(--rt-block-hover)}
+details[open]>summary{color:var(--rt-ink-strong)}
+
+details.feature{margin:0 0 6px;padding:0 12px;border-radius:var(--rt-r-sm);background:var(--rt-block)}
+details.feature[open]{padding-bottom:12px;background:rgba(0,0,0,.28)}
+details.feature>summary{margin:0 -12px;padding:11px 12px;font-size:var(--rt-text-sm);font-weight:700;color:var(--rt-ink-strong);text-transform:uppercase;letter-spacing:var(--rt-track);border-radius:var(--rt-r-sm)}
+details.feature[open]>summary{border-radius:var(--rt-r-sm) var(--rt-r-sm) 0 0;margin-bottom:4px;box-shadow:inset 0 -1px 0 var(--rt-line-soft)}
+details.feature>summary:hover{background:var(--rt-block-hover)}
+.feature-title{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.feature-meta{margin-left:auto;font-size:var(--rt-text-xs);font-weight:400;color:var(--rt-ink-3);white-space:nowrap;text-transform:none;letter-spacing:0}
+summary:has(.feature-meta)::after,summary:has(.pill)::after{margin-left:10px}
+details.feature details{background:rgba(0,0,0,.2)}
+.feature-list{display:block}
+
+/* Pills */
+.pill{display:inline-flex;align-items:center;gap:5px;padding:2px 7px;border-radius:var(--rt-r-xs);font-size:10px;font-weight:700;line-height:1.5;color:var(--rt-blue);background:var(--rt-blue-fade);white-space:nowrap;text-transform:uppercase;letter-spacing:var(--rt-track)}
+.pill.on{color:#beee11;background:#4c6b22}
+summary .pill{margin-left:auto}
+
+/* Output and status text */
+pre,.output{font:var(--rt-text-sm)/1.5 var(--rt-font);white-space:pre-wrap;overflow-wrap:anywhere;max-height:160px;overflow:auto;margin:10px 0;padding:9px 11px;
+  color:var(--rt-ink);background:var(--rt-bg-deep);border-radius:var(--rt-r-sm);box-shadow:inset 0 1px 3px rgba(0,0,0,.5)}
+pre:empty{display:none}
+[role=status]{overflow-wrap:anywhere}
+
+/* Callouts */
+.callout,.quick-help{margin:10px 0;padding:11px 12px;border-radius:var(--rt-r-sm);background:var(--rt-block)}
+/* v2.32: Steam voice call (voice-call.js): what Steam shows, and Join / Leave. */
+.voice-call{margin:10px 0;padding:10px 12px;border-radius:var(--rt-r-sm);background:var(--rt-block)}
+.voice-call-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.voice-call .hint{margin:4px 0 0}
+.voice-call .btn-row{margin:8px 0 0}
+/* The state's colour is a dot; the words keep the theme's own readable pill colours. */
+.voice-call .pill::before{content:"";width:7px;height:7px;border-radius:50%;flex-shrink:0;background:var(--rt-state-standby,#9a9a9a)}
+.voice-call[data-state=connected] .pill::before{background:var(--rt-state-speaking,#90ba3c)}
+.voice-call:is([data-state=joining],[data-state=leaving]) .pill::before{background:var(--rt-state-thinking,#dba520)}
+.voice-call[data-state=failed] .pill::before{background:var(--rt-state-error,#ec6767)}
+.quick-help{background:linear-gradient(90deg,rgba(26,159,255,.18),rgba(0,0,0,.2) 80%);border-left:3px solid var(--rt-active)}
+.quick-help p{margin-top:0;color:var(--rt-ink-strong)}
+.quick-help button{margin-top:8px}
+.quick-status{font-size:var(--rt-text-sm);color:var(--rt-ink-3);margin:8px 0 12px}
+
+/* Entry row: "Just here for the sounds?" style prompts */
+.deck-entry{display:flex;flex-wrap:wrap;align-items:center;gap:10px 12px;margin:0 0 10px;padding:11px 12px;border-radius:var(--rt-r-sm);background:linear-gradient(90deg,rgba(103,193,245,.12),rgba(0,0,0,.2) 75%)}
+/* The button drops below the text when a wide theme font would squeeze the text column. */
+.deck-entry>div{flex:1 1 170px;min-width:0;display:flex;flex-direction:column;gap:2px}
+.deck-entry small{margin:0;font-size:var(--rt-text-xs);color:var(--rt-ink-3)}
+.deck-entry b{font-size:var(--rt-text-md)}
+.deck-entry span{font-size:var(--rt-text-xs);color:var(--rt-ink-3);line-height:1.45}
+.deck-entry button{margin:0;flex-shrink:0}
+
+/* ── Conversation deck (automatic.js) ─────────────────── */
+.deck-head{display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
+.deck-head h2{margin:0}
+#mode{display:none}
+#setup{font-size:var(--rt-text-sm);color:var(--rt-ink);padding:8px 10px;border-radius:var(--rt-r-sm);background:var(--rt-block);border-left:3px solid var(--rt-state-waiting);margin:8px 0 4px}
+#goSetup{margin:2px 0 6px}
+.route-hint{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 2px}
+.route-hint span{display:inline-flex;padding:3px 8px;border-radius:var(--rt-r-xs);font-size:var(--rt-text-xs);color:var(--rt-ink);background:var(--rt-block)}
+#presence,#listener,#occupancyNow{font-size:var(--rt-text-xs);color:var(--rt-ink-3);text-transform:none;letter-spacing:0}
+#occupancyNow{margin:4px 0 0}
+#listener{display:flex;justify-content:space-between;margin:14px 0 6px}
+.meter{position:relative;height:6px;border-radius:var(--rt-r-xs);overflow:hidden;background:var(--rt-bg-deep);box-shadow:inset 0 1px 2px rgba(0,0,0,.6)}
+#level{height:100%;width:0;background:var(--rt-meter);transition:width 90ms linear}
+#marker{position:absolute;top:-2px;bottom:-2px;left:50%;width:2px;background:var(--rt-marker)}
+#levelLabel{margin-top:6px}
+
+/* ── Soundboard ───────────────────────────────────────── */
+.board-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+.board-top h2{margin:0}
+.board-top button{margin:0;flex-shrink:0}
+.pads{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;margin:10px 0}
+.pad{position:relative;min-width:0;min-height:50px;margin:0;padding:8px 30px 8px 11px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:1px;text-align:left;
+  color:var(--rt-ink);background:var(--rt-surface);border-radius:var(--rt-r-sm);box-shadow:inset 0 0 0 1px rgba(0,0,0,.35)}
+.pad span{font-size:10px;font-weight:700;color:var(--rt-ink-3);text-transform:uppercase;letter-spacing:var(--rt-track);font-variant-numeric:tabular-nums}
+.pad b{max-width:100%;font-size:var(--rt-text-md);font-weight:400;color:var(--rt-ink-strong);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pad::after{content:"";position:absolute;right:11px;top:50%;width:0;height:0;margin-top:-5px;border-left:8px solid var(--rt-blue);border-top:5px solid transparent;border-bottom:5px solid transparent}
+.pad:hover{color:var(--rt-ink);background:var(--rt-select)}
+.pad:hover::after{border-left-color:var(--rt-ink-strong)}
+.pad.playing{background:linear-gradient(90deg,rgba(144,186,60,.28),var(--rt-surface) 80%);box-shadow:inset 3px 0 0 var(--rt-state-speaking)}
+.pad.playing::after{width:9px;height:9px;margin-top:-4.5px;border:0;border-radius:1px;background:var(--rt-state-speaking)}
+.board-tools{margin:10px 0;padding:2px 12px 10px;border-radius:var(--rt-r-sm);background:var(--rt-block)}
+.cue-sheet textarea{font:var(--rt-text-xs)/1.6 var(--rt-font-mono)}
+
+/* Arcade */
+.arcade-lobby h3{font-size:var(--rt-text-lg)}
+.arcade-tickets{display:grid;gap:2px;margin:8px 0}
+.arcade-tickets>div{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:9px 11px;background:rgba(0,0,0,.25);border-radius:var(--rt-r-xs)}
+.arcade-tickets b{font-size:var(--rt-text-sm)}
+.arcade-tickets code{grid-row:1;grid-column:2;align-self:center}
+.arcade-tickets small{grid-column:1/-1;margin:0}
+.marquee{margin:12px 0 4px;font:700 var(--rt-text-lg)/1.3 var(--rt-font-display);color:var(--rt-ink-strong);font-variant-numeric:tabular-nums;text-transform:uppercase;letter-spacing:var(--rt-track)}
+.arcade-meta{display:flex;justify-content:space-between;gap:8px;margin:4px 0 6px;font-size:var(--rt-text-xs);color:var(--rt-ink-3);font-variant-numeric:tabular-nums}
+.arcade-progress{height:6px;border-radius:var(--rt-r-xs);overflow:hidden;background:var(--rt-bg-deep)}
+.arcade-progress span{display:block;height:100%;width:0;background:var(--rt-meter);transition:width .5s var(--rt-ease)}
+.badge-row{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
+.arcade-achievement{display:inline-flex;padding:3px 8px;border-radius:var(--rt-r-xs);font-size:var(--rt-text-xs);color:var(--rt-ink-4);background:rgba(0,0,0,.25)}
+.arcade-achievement.earned{color:var(--rt-ink-strong);background:linear-gradient(90deg,rgba(255,217,0,.22),rgba(0,0,0,.25));box-shadow:inset 2px 0 0 #ffd900}
+#arcadeLeaderboard{padding-left:20px;line-height:1.9;color:var(--rt-ink);font-variant-numeric:tabular-nums}
+
+/* ── Setup steps (a real sequence, so numbered) ───────── */
+.steps{list-style:none;margin:14px 0 6px;padding:0}
+.step{display:flex;gap:12px;padding:12px 0;border-top:1px solid var(--rt-line-soft)}
+.step-n{width:22px;height:22px;flex-shrink:0;display:grid;place-items:center;border-radius:var(--rt-r-sm);font-size:var(--rt-text-xs);font-weight:700;color:var(--rt-on-accent);background:var(--rt-accent-fill);font-variant-numeric:tabular-nums}
+.step-body{flex:1;min-width:0}
+.step-body h3{margin:1px 0 4px}
+.step-body label:first-of-type{margin-top:6px}
+.step-body>button{margin-top:6px}
+#automaticSetupMount:not([hidden])~.step-fallback{display:none}
+
+/* ── Checks ───────────────────────────────────────────── */
+.checklist,.diagnostic{list-style:none;padding:0;margin:10px 0}
+.checklist li,.diagnostic li{padding:9px 0;border-top:1px solid var(--rt-line-soft);font-size:var(--rt-text-sm);color:var(--rt-ink)}
+.checklist li:first-child,.diagnostic li:first-child{border-top:0}
+.checklist b,.diagnostic b{font-weight:700}
+.checklist span,.diagnostic span{display:block;margin-top:2px;font-size:var(--rt-text-xs);color:var(--rt-ink-3)}
+.confirm{margin:10px 0;padding:10px 12px;border-radius:var(--rt-r-sm);background:linear-gradient(90deg,rgba(26,159,255,.18),rgba(0,0,0,.2) 80%);border-left:3px solid var(--rt-active)}
+.confirm p{margin:0 0 4px;color:var(--rt-ink-strong)}
+.trail{list-style:none;margin:6px 0 0;padding:0}
+.trail li{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-top:1px solid var(--rt-line-soft);font-size:var(--rt-text-xs)}
+.trail li:first-child{border-top:0}
+.trail b{font-weight:700;color:var(--rt-ink-strong)}
+.trail time{color:var(--rt-ink-4);font-variant-numeric:tabular-nums}
+.trail-empty{color:var(--rt-ink-4)}
+
+/* Voice reply timing chart (Checks tab) */
+.lat-chart{display:grid;gap:5px;margin:8px 0 10px}
+.lat-row{display:grid;grid-template-columns:auto 1fr 40px;white-space:nowrap;align-items:center;gap:8px;font-size:var(--rt-text-xs);color:var(--rt-ink-3);font-variant-numeric:tabular-nums}
+.lat-total{text-align:right;color:var(--rt-ink-strong);font-weight:700}
+.lat-track{position:relative;display:flex;height:10px;border-radius:var(--rt-r-xs);background:var(--rt-bg-deep);box-shadow:inset 0 1px 2px rgba(0,0,0,.6)}
+.lat-track i{display:block;height:100%;min-width:2px}
+.lat-track i:first-child{border-radius:var(--rt-r-xs) 0 0 var(--rt-r-xs)}
+.seg-stt{background:var(--rt-state-listening)}
+.seg-think{background:var(--rt-state-thinking)}
+.seg-speech{background:var(--rt-state-speaking)}
+.seg-other{background:rgba(255,255,255,.14)}
+.lat-first{position:absolute;top:-3px;bottom:-3px;width:2px;margin-left:-1px;background:var(--rt-marker);box-shadow:0 0 4px rgba(0,0,0,.8)}
+.lat-legend{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:var(--rt-text-xs);color:var(--rt-ink-3)}
+.lat-legend span{display:inline-flex;align-items:center;gap:5px}
+.lat-legend i{display:inline-block;width:10px;height:6px;border-radius:1px}
+.lat-key{display:inline-block;width:2px;height:10px;background:var(--rt-marker)}
+
+/* Ctrl+Shift+H command card (separate shadow root, same sheet). */
+.panel.help-card{display:block;height:auto;width:300px;right:424px;bottom:24px;padding:14px 16px}
+.help-card strong{text-transform:uppercase;letter-spacing:var(--rt-track)}
+.help-card p{line-height:1.9}
+@media (max-width:860px){.panel.help-card{right:16px;bottom:auto;top:16px}}
+
+/* Platform capability gating: desktop is text-only. */
+.panel[data-voice=false] [data-capability=voice]{display:none!important}
+
+/* Focus & motion */
+button:focus-visible,summary:focus-visible,a:focus-visible,input[type=checkbox]:focus-visible,input[type=range]:focus-visible,input[type=file]:focus-visible{outline:var(--rt-focus-w,2px) var(--rt-focus-style,solid) var(--rt-focus);outline-offset:var(--rt-focus-offset,2px)}
+@media (max-height:640px){.panel{height:94vh;bottom:8px;right:8px}.stats{display:none}}
+@media (max-width:460px){.panel{right:8px;bottom:8px;width:calc(100vw - 16px);max-width:none;height:min(680px,92dvh)}}
+/* Game votes (v2.18): a ranked board; each theme may restyle it (contracts, platforms…). */
+.vote-board .votes{list-style:none;margin:6px 0 8px;padding:0;display:grid;gap:4px}
+.vote{position:relative;display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:8px;padding:6px 9px;border-radius:var(--rt-r-sm);
+  background:linear-gradient(90deg,var(--rt-accent-soft) calc(var(--share,0)*100%),rgba(0,0,0,.12) 0)}
+.vote-marker{min-width:1.4em;text-align:center;font:700 var(--rt-text-xs)/1.3 var(--rt-font-display);color:var(--rt-ink-3)}
+.vote-title{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--rt-ink-strong)}
+.vote-count{font-size:var(--rt-text-xs);color:var(--rt-ink-2);font-variant-numeric:tabular-nums;white-space:nowrap}
+.vote[data-leader=true] .vote-title{font-weight:700}
+.vote-discs{display:none}
+/* Before anyone votes, the board is an empty-state note in the theme's own line and ink colours. */
+#sqVotes:not(.vote-board):not(:empty){margin:6px 0 8px;padding:10px;border:1px dashed var(--rt-line-strong);border-radius:var(--rt-r-sm);color:var(--rt-ink-3);font-size:var(--rt-text-sm);text-align:center}
+
+/* ── v2.18 motion: Steam ──
+   A playing pad runs a thin download bar along its foot; an arriving vote's count flashes Steam
+   blue; check lines slide in as they are written. */
+[data-rt-theme=steam] .pad.playing{background:linear-gradient(90deg,#417a9b,#67c1f5) 0 100%/0 2px no-repeat,linear-gradient(90deg,rgba(144,186,60,.28),var(--rt-surface) 80%);animation:st-pad 2.4s linear infinite}
+@keyframes st-pad{to{background-size:100% 2px,auto}}
+[data-rt-theme=steam] .vote[data-arrived] .vote-count{animation:st-count .6s ease-out}
+@keyframes st-count{0%{color:#fff;text-shadow:0 0 8px #66c0f4}}
+[data-rt-theme=steam] .checklist li{animation:st-row .25s ease-out backwards}
+@keyframes st-row{from{opacity:0;transform:translateY(-4px)}}
+
+/* Sound banks as a rail (themes that lay the soundboard out as a spawn menu show it). */
+.bank-rail{display:none}
+/* Narrow windows (panel under ~385px): the footer note gets its own line, stat captions step aside
+   and the widest theme faces shrink a little so values aren't cut off. */
+@media (max-width:400px){
+  .foot{flex-wrap:wrap;row-gap:4px}
+  .foot small{flex:1 0 calc(100% - 14px);-webkit-line-clamp:1}
+  .stat{padding:0 7px}
+  .stat small{display:none}
+  .panel[data-rt-theme=doom] .stat dd{font-size:20px}
+  .panel[data-rt-theme=cs16] .stat dd{font-size:17px}
+  .panel[data-rt-theme=tf2] .stat dd{font-size:19px}
+  .panel[data-rt-theme=portal] .stat dd{font-size:20px}
+  .panel[data-rt-theme=portal] .wordmark{font-size:16px;letter-spacing:.08em;white-space:nowrap}
+  .panel[data-rt-theme=doom] .wordmark{font-size:21px;letter-spacing:.02em}
+  .panel[data-rt-theme=hev] .bar::after{display:none}
+  .panel[data-rt-theme=hev] .stat dd{font-size:17px;letter-spacing:.02em}
+  .panel[data-rt-theme=cs2] .stat dd{padding:1px 9px 1px 10px;font-size:15px}
+  .panel[data-rt-theme=quake] .stat dd{font-size:17px}
+  .panel[data-rt-theme=pipboy] .stat dd{font-size:21px}
+  .panel[data-rt-theme=deadlock] .stat dd{font-size:16px}
+  .panel[data-rt-theme=minecraft] .stat dd{font-size:12px}
+  .panel[data-rt-theme=minecraft] .stat{padding:5px 5px}
+}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+/* ── Steam (v2.13): your own entry at the top of the Steam friends list ──
+   The avatar sits in Steam's presence frame (online blue, in-game green while
+   Tyler is on air, grey on standby), the name is in online blue, and the header
+   uses the store's #2a475e → #1b2838 gradient. */
+[data-rt-theme=steam] .bar{background:linear-gradient(180deg,#2a475e,#1b2838)}
+[data-rt-theme=steam] :is(.mark[data-logo],img.mark,#brand-logo){--logo-pad:2px;background:#1b2838;border:2px solid #53a4c4;border-radius:2px}
+[data-rt-theme=steam] .panel:has(.tally[data-state=speaking]) .mark[data-logo],.panel[data-rt-theme=steam]:has(.tally[data-state=speaking]) .mark[data-logo]{border-color:#8fb93b}
+.panel[data-rt-theme=steam]:has(.tally:is([data-state=standby],[data-state=paused])) .mark[data-logo]{border-color:#6a6a6a}
+[data-rt-theme=steam] .wordmark{color:#6dcff6}
+[data-rt-theme=steam] .ident-sub{color:#7fb6cf}
+
+/* v2.33: the desktop window hidden to the tray or minimized. Animations pause where they are and carry on
+ * when it's shown again; nothing changes while it's visible. */
+:host([data-offscreen]) *,:host([data-offscreen]) *::before,:host([data-offscreen]) *::after{animation-play-state:paused!important}

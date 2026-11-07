@@ -1,6 +1,6 @@
 {
   "name": "robotic-tyler-control-center",
-  "version": "2.44.0",
+  "version": "2.45.0",
   "private": true,
   "description": "ROBOTIC TYLER: the Windows desktop app (Steam text chat and voice) and the Chrome extension",
   "main": "app/main.cjs",

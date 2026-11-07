@@ -1,0 +1,87 @@
+<!doctype html>
+<!-- Synthetic chat for appearance tests, not a recording of signed-in Steam.
+     Class names were checked against Steam's public friends.css on 2026-11-06. -->
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'nonce-fixture'; img-src data:; script-src 'none'">
+<title>Steam appearance test fixture</title>
+<style nonce="fixture">
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;font:14px/1.4 Arial,sans-serif;color:#cad2dc;background:#19202a}
+.friendsui-container{height:100vh;display:flex}.friendlist{width:180px;flex-shrink:0;background:#252d39}
+.friendListHeaderContainer{height:58px;padding:18px 12px}.friendlistListContainer{height:calc(100% - 58px);overflow:auto;padding:12px}
+.friend{padding:9px 0;display:flex;align-items:center;gap:8px}.avatar{width:28px;height:28px;border-radius:3px;object-fit:cover}
+.status{display:inline-block;width:8px;height:8px;border-radius:50%;background:#83bb3b;color:#83bb3b;flex-shrink:0}
+.personaName{color:#57cbde}.chatWindow{flex:1;min-width:0;display:flex;flex-direction:column;background:#111820!important}
+.titleBarContainer.ChatTabs{display:flex;align-items:end;height:37px;padding:5px 12px 0;background:#1c232c;flex:none}
+.chatTabList{display:flex;max-width:100%;overflow:auto}.DqU8CxKNh5w-{display:flex}
+.chatTabList .LUogGjb84qw-{position:relative;display:flex;align-items:center;justify-content:space-between;gap:8px;width:150px;height:31px;padding:0 12px 0 10px;border-radius:3px 3px 0 0;color:#c5d6d4;cursor:pointer}
+.chatTabList .LUogGjb84qw-:hover{background:#4349534d}
+.chatTabList .LUogGjb84qw-.okAC0yOlZwY-{background:#3a3e46}
+.LUogGjb84qw-::before,.LUogGjb84qw-:last-of-type::after{content:"";background:#5a626f;width:1px;position:absolute;top:8px;bottom:8px;left:0}
+.LUogGjb84qw-:last-of-type::after{left:auto;right:0}.LUogGjb84qw-:first-of-type::before,.LUogGjb84qw-.okAC0yOlZwY-+.LUogGjb84qw-::before{background:transparent}
+._6eLMujxXW24-{color:#c5d6d4;white-space:nowrap;overflow:hidden}
+.vpbEs5-dLIs-{cursor:pointer;flex:none;width:12px;height:12px}.vpbEs5-dLIs- svg{display:block;width:12px;height:12px}
+.vpbEs5-dLIs- .SVGIcon_X_Line line{stroke:#71767f;stroke-width:2px}.vpbEs5-dLIs-:hover .SVGIcon_X_Line line{stroke:#fff}
+.J-r3MMTSP90-{background:#ff0;width:4px;height:4px;border-radius:50%;position:absolute;right:4px;bottom:3px}
+.chatHeader{display:flex;align-items:center;gap:12px;flex-shrink:0;height:58px;padding:10px 14px;background:linear-gradient(90deg,#343b48,#212735)}
+.chatRoomName{flex:1;min-width:0}.chatHistoryAndMembers{display:flex;flex:1;min-height:0}
+.chatRoomGroupNavColumn{width:110px;padding:10px 5px;flex:none;background:#262d38;border-right:1px solid #151b23}
+.chatRoomTextChannel{padding:5px 8px;border-radius:3px;color:#bcc6d3;cursor:pointer}.chatRoomTextChannel:hover,.chatRoomTextChannel.ActiveTextChannel{background:#3a3e46;color:#fff}
+.ChatHistoryContainer{flex:1;min-width:0;display:flex;flex-direction:column;background:#1a2330}
+.chatHistoryScroll{flex:1;min-height:0;overflow:auto;padding:14px 16px;background:#202c3b}
+.disconnectBlocker{display:none}.errorDisconnected .disconnectBlocker{display:block}
+.chatHistoryScroll::-webkit-scrollbar{width:12px}.chatHistoryScroll::-webkit-scrollbar-thumb{background:#52627a;border-radius:7px}
+.msg{padding:10px 0}.msgText{white-space:pre-wrap;overflow-wrap:anywhere;color:#d1d9e5}.msgText a{color:#8cd6ff}
+.timeDivision{display:flex;gap:8px;align-items:center;color:#8899ad;font-size:11px}.horizDivider{flex:1;height:1px;background:#52627a}.new_messages .horizDivider{background:#c87b39}
+.msg.ChatMessageErrorSending .msgText{color:#dba2a2;background:#2e1c20}
+.FriendChatTimeStamp{font-size:11px;color:#8899ad}.chatRoomMembers{width:150px;flex-shrink:0;padding:12px;background:#252d39}
+.chatEntry{height:82px;display:flex;gap:9px;align-items:center;padding:12px;background:#303c50;border-top:1px solid #52627a;flex-shrink:0}
+.chatEntry form{flex:1;min-width:0;display:flex;gap:9px;align-items:center}
+.chatEntry textarea{flex:1;min-width:0;height:52px;resize:none;padding:8px;font:14px/18px Arial,sans-serif;color:#d1d9e5;background:#202c3b;border:1px solid #52627a;border-radius:6px}
+.chatEntry button[type="submit"],.chatEntry .uploadButton{width:46px;height:46px;flex:none;display:grid;place-items:center;padding:0;border:1px solid #1b1c20;border-radius:2px;background:#263449;color:#eee}
+.chatEntry button[type="submit"]:enabled{background:linear-gradient(136deg,#0056d6 1%,#1a9fff 60%)}
+.chatEntry button[type="submit"]:disabled{background:#24272b}
+.chatEntry button[type="submit"]:focus,.DialogButton:focus{outline:none}
+.SVGIcon_Submit{width:26px;height:26px}.SVGIcon_Submit path{fill:#5f5f5f;stroke-width:2px}
+.uploadButton svg{width:20px;height:20px;fill:#898989}
+.DialogButton{min-width:60px;height:30px;padding:4px 12px;border:0;border-radius:2px;background:#384c68!important;color:#eee;font:13px/20px Arial,sans-serif;cursor:pointer}
+.DialogButton:hover{background:#4a668b!important}
+.DialogButton:disabled,.DialogButton.Disabled{opacity:.5;cursor:default}.DialogButton.Disabled{pointer-events:none}
+.JFSzUCtMXFw-{position:absolute;top:72px;right:170px;min-width:160px;background:#323e50;border:1px solid #69768a;border-radius:6px}
+.contextMenuSectionContent{padding:5px}.contextMenuItem{padding:7px 12px;color:#ddd;cursor:pointer}.contextMenuItem:hover{background:#486180}
+.DialogContent{position:absolute;left:210px;bottom:120px;width:250px;border:1px solid #69768a;border-radius:6px;background:#28374a;padding:12px}
+.DialogHeader{margin-bottom:6px;padding:4px 6px;color:#fff;background:#35475e}
+.DialogBody{margin-bottom:10px;padding:6px;color:#d1d9e5}.icon{width:18px;height:18px;fill:#e7b94d;color:#e7b94d}.emoji{font-family:'Segoe UI Emoji';font-size:20px}
+.VoiceRoomChatHistory{display:none;width:210px;background:#0000008a}.VoiceRoomChatWindow{display:flex;flex-direction:column;width:100%}.ChatSpeaker{font-weight:normal}
+.VoiceRoomChatTitle{position:relative;padding:6px 8px;background:#5f6974;display:flex;justify-content:center}
+.VoiceChatTextChannelName{color:#eee}.MinimizeTextChat{position:absolute;right:6px;width:16px;height:16px}.MinimizeTextChat line{stroke:#fff}
+@media(max-width:700px){.chatRoomMembers,.chatRoomGroupNavColumn{display:none}.friendlist{width:130px}.JFSzUCtMXFw-{right:12px}.DialogContent{left:145px;width:220px}}
+</style></head><body><div class="friendsui-container" id="root">
+<aside class="friendlist" id="friends"><div class="friendListHeaderContainer">Friends</div><div class="friendlistListContainer" id="friendScroll">
+<div class="friend"><img id="avatar" class="avatar" alt="Sample avatar" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+jRZkAAAAASUVORK5CYII="><span class="personaName">Alex</span><i id="status" class="status"></i></div>
+<div class="friend"><i class="status"></i><span class="personaName">Sam</span></div><p>Group chat</p><p>Squad lounge</p></div></aside>
+<main class="chatWindow" id="chat">
+<div class="titleBarContainer ChatTabs" id="tabRail"><div class="chatTabList" role="tablist"><div class="DqU8CxKNh5w-">
+ <div role="tab" tabindex="0" class="LUogGjb84qw- okAC0yOlZwY- no-drag" id="activeTab" aria-selected="true"><div class="WthRniUDu7Y-"><span class="_6eLMujxXW24-" id="activeTabLabel">Squad lounge</span></div><div class="vpbEs5-dLIs-" id="tabClose" title="Close"><svg class="SVGIcon_X_Line" viewBox="0 0 12 12" aria-hidden="true"><line id="tabCloseStroke" x1="2" y1="2" x2="10" y2="10"/><line x1="10" y1="2" x2="2" y2="10"/></svg></div></div>
+ <div role="tab" tabindex="0" class="LUogGjb84qw- no-drag" id="tab" aria-selected="false"><div class="WthRniUDu7Y-"><span class="_6eLMujxXW24-">Planning</span></div><i class="J-r3MMTSP90-" id="tabUnread"></i></div>
+ <div role="tab" tabindex="0" class="LUogGjb84qw- no-drag" id="contactTab" aria-selected="false"><div class="nHfaWz8Bomg-"><span class="personaName" id="contactName">Alex</span></div></div>
+</div></div></div>
+<header class="chatHeader" id="header"><span class="chatRoomName" id="title">Squad lounge</span><svg id="icon" class="icon" viewBox="0 0 20 20" aria-label="Voice"><path d="M2 6h5l5-4v16l-5-4H2z"/></svg><button class="DialogButton" id="join">Join voice</button></header>
+<div class="chatHistoryAndMembers" id="columns">
+<nav class="chatRoomGroupNavColumn" id="channels" aria-label="Channels"><div class="chatRoomTextChannel ActiveTextChannel" id="activeChannel"><span class="chatRoomTextChannelName"># general</span></div><div class="chatRoomTextChannel" id="channel"><span class="chatRoomTextChannelName"># planning</span></div></nav>
+<div class="ChatHistoryContainer" id="historyContainer"><div class="chatHistoryScroll" id="history" role="log"><div class="chatHistory">
+<div class="timeDivision"><i class="horizDivider" id="dayDivider"></i> Friday <i class="horizDivider"></i></div>
+<div class="msg"><span class="FriendChatTimeStamp" id="stamp">20:12</span><div class="msgText" id="message">This is sample text for appearance tests. The layout, line breaks and controls must stay exactly where Steam put them. <a href="#example" id="link">Example link</a> <span class="emoji" id="emoji">🎮</span></div></div>
+<div class="msg"><div class="msgText">A longer message wraps naturally inside this history, including when the window narrows. No theme may resize the text, widen controls, change padding, or move the member list.</div></div>
+<div class="timeDivision new_messages"><i class="horizDivider" id="unreadDivider"></i> New messages <i class="horizDivider"></i></div>
+<div class="msg"><div class="msgText">One more sample line.</div></div><div class="msg"><div class="msgText">Four</div></div><div class="msg"><div class="msgText">Five</div></div><div class="msg"><div class="msgText">Six</div></div><div class="msg"><div class="msgText">Seven</div></div><div class="msg"><div class="msgText">Eight</div></div><div class="msg"><div class="msgText">Nine</div></div><div class="msg"><div class="msgText">Ten</div></div>
+<div class="msg ChatMessageErrorSending"><div class="msgText" id="sendError">This sample message failed to send.</div></div>
+<div class="disconnectBlocker"></div></div></div>
+<div class="chatEntry" id="composer">
+ <form id="sendForm"><textarea id="entry" aria-label="Message">Unsent sample draft</textarea><button type="submit" id="send" aria-label="Send"><svg class="SVGIcon_Submit SVGIcon_Button" id="sendIcon" viewBox="0 0 24 24" aria-hidden="true"><path id="sendGlyph" d="M3 3 L21 12 L3 21 L6 13 L14 12 L6 11 Z"/></svg></button></form>
+ <div class="compactableHeight"><button class="uploadButton" type="button" id="upload" aria-label="Attach"><svg viewBox="0 0 24 24" aria-hidden="true" id="uploadIcon"><path d="M10 6 H14 V10 H18 V14 H14 V18 H10 V14 H6 V10 H10 Z"/></svg></button></div>
+</div></div>
+<aside class="chatRoomMembers" id="members"><b>Members</b><div class="friend"><i class="status"></i><span class="personaName">Alex</span></div><div class="friend"><i class="status"></i><span class="personaName">Sam</span></div></aside></div></main>
+<div class="JFSzUCtMXFw- visible" id="menu"><div class="contextMenuSectionContent"><div class="contextMenuItem" tabindex="0" id="menuItem">Invite to chat</div><div class="contextMenuItem">View profile</div></div></div>
+<div class="DialogContent" id="dialog"><div class="DialogHeader" id="dialogHeader">Group settings</div><div class="DialogBody" id="dialogBody">Sample dialog</div><button class="DialogButton Primary" id="ok">OK</button> <button class="DialogButton Disabled" id="disabled" aria-disabled="true">Disabled</button></div>
+<div class="VoiceRoomChatHistory" id="voice"><div class="VoiceRoomChatWindow"><div class="VoiceRoomChatTitle" id="voiceTitle"><span class="VoiceChatTextChannelName" id="voiceLabel">Scratch pad</span><svg class="MinimizeTextChat" id="voiceMinimize" viewBox="0 0 16 16" aria-label="Minimize"><line id="voiceStroke" x1="3" y1="10" x2="13" y2="10"/></svg></div><div class="chatHistoryScroll" id="voiceHistory" role="log"><p class="msgText">Sample voice-room message.</p></div><div class="chatEntry"><textarea id="voiceEntry" aria-label="Voice room message"></textarea></div></div></div>
+</div></body></html>

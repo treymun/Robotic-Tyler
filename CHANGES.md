@@ -1,3 +1,20 @@
+# ROBOTIC TYLER v2.45.0 — Steam chat follows your Tyler theme
+
+The desktop Steam chat window can now use all 25 Tyler themes. Open **Settings → Appearance → Steam chat appearance** and choose **Colors only** or **Full visual styling**. **Off** keeps Steam’s original appearance and is the default.
+
+- **Colors only** brings the theme’s palette into the chat window. **Full visual styling** also applies Claude’s textures, borders, tab selections, menus, and button finishes. The selected Tyler theme drives both modes.
+- The full mode includes details such as TF2’s RED/BLU strip, Portal’s tiles, the Pip-Boy scanlines, and the XMB ribbons. Empty histories can show the matching Tyler artwork.
+- Steam keeps its layout, fonts, and click areas. Full styling paints bevels inside the existing controls and gives the native Send icon the theme’s button ink. Its shape and disabled state stay native.
+- The separate Settings window can switch to Colors only or restore Steam’s original appearance. If Steam changes a required structure, the app can temporarily use Colors only while keeping the saved preference.
+
+## Tested
+
+- **Mocked Steam and Settings data.** All 25 themes were compared against Tyler’s original control paint. The fixtures cover narrow layouts, tab and button states, the voice scratch pad, and Settings recovery.
+- **Real Chromium and Windows Electron.** The fixtures use browser layout, keyboard and mouse input, and Electron’s stylesheet insertion and removal.
+- **Not tested.** Signed-in Steam and live calls.
+
+---
+
 # ROBOTIC TYLER v2.44.0: Who's speaking, sharing the graphics card, and a sharper voice
 
 Four changes, each with its own section below: Tyler can tell who's speaking in voice (optional), the text AI on this PC can split between the graphics card and the processor, theme voices can move to the processor when the card is full (the old behaviour stays as an option), and an experimental sharper voice for Medic, Lash and Kelvin (optional download).
