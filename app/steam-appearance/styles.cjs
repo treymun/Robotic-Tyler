@@ -70,7 +70,7 @@ function componentPriority(selector,component,state,theme){
 }
 // Border radii also change corner hit testing, even with identical rectangles.
 const paint=new Set(['background','background-color','background-image','background-position','background-size','background-repeat','background-clip','-webkit-background-clip','color','border-color','border-top-color','border-right-color','border-bottom-color','border-left-color','box-shadow','text-shadow','outline-color']);
-const controlPaint=new Set(['outline','outline-offset','fill']);
+const controlPaint=new Set(['outline','outline-offset','fill','stroke']);
 const paintVariables=new Set(['--blade','--cb-k','--tone']);
 const namespace=s=>s.replace(/--([\w-]+)/g,'--rt-steam-$1');
 function safeValue(value){
@@ -120,6 +120,10 @@ function sourcePainter(sourceRules,theme){
 
 const nav='.chatRoomGroupNavColumn:not(.chatRoomGroupNavCollapsed)';
 const channelRow=' .chatRoomTextChannel:not(.chatRoomVoiceChannel *)';
+const rosterPanels='.friendlist,.friendlistListContainer,.MemberListColumn,.chatRoomMembers:not(.MemberListColumn *)';
+const voiceRow=nav+' .chatRoomVoiceChannel';
+const rosterRows='.friendlist .friend,.MemberListColumn .friend,.chatRoomMembers .friend,'+voiceRow+' .friend';
+const rosterSearch='.MemberListOptionsContainer .friendSearchInput,.friendlistListContainer .friendSearchInput';
 const dialogInput='.DialogInput:is(textarea,input:not([type]),input[type="text"],input[type="search"],input[type="password"])';
 const menuItem=' .contextMenuItem:not(.contextMenuUnselectable,.contextMenuGameItem,.disabled,[aria-disabled="true"])';
 // Current Steam uses CSS modules for the tab itself and its selected state.
@@ -127,17 +131,24 @@ const menuItem=' .contextMenuItem:not(.contextMenuUnselectable,.contextMenuGameI
 const nativeTab='.chatTabList .LUogGjb84qw-';
 const nativeActiveTab=nativeTab+'.okAC0yOlZwY-';
 const nativeTabClose=' .vpbEs5-dLIs-';
+const contactTab=nativeTab+' .nHfaWz8Bomg-';
+const presenceLabel=' :is(.personaName,.playerName,.richPresenceLabel,.status:not(i,svg),.JT7Tc3-HVD8-,.DiM-YEuAiRQ-,.eOmjO6XkTx4-,.KzNkmPbkAaI-)';
 const tabClasses='.chatTab,.LUogGjb84qw-,.InnerChatTab';
 const tab='.chatTabList .chatTab,'+nativeTab+',.chatBody .InnerChatTabs .InnerChatTab';
 // Steam's desktop composer uses a submit button and a stable SVG class. Its
 // hashed CSS module class is shared with accessory buttons such as the uploader.
 const nativeSend='.chatEntry form button[type="submit"]:has(.SVGIcon_Submit)';
 const send=nativeSend+',.chatEntry .chatSubmitButton';
+const friendsButton='.ChatTabs .chatTabOpenFriendsList';
+const groupButtons='.chatRoomGroupControls .chatRoomButton';
+const accessoryButtons='.chatEntry .compactableHeight :is(button,[role="button"]):has(:is(.SVGIcon_Emoticon,.SVGIcon_Paperclip,.SVGIcon_VoiceRoom)):not(.VoiceToggle.Active,.Qa8A8WCx2xY-)';
+const messageRow='.chatHistoryScroll .MSBEt-QmXoE-';
+const messageActions=messageRow+' .RgyuexI0ysE-';
 const SURFACES={
  canvas:'.friendsui-container,.chatWindow,.chatDialogs,.ChatRoomGroup_MainAndChatEntry,.VoiceRoomChatWindow',
  // VoiceRoomChatHistory is Steam's translucent modal backdrop, not the scroll pane.
  history:'.chatHistoryScroll,.ChatHistoryContainer:not(:has(.chatHistoryScroll))',
- side:'.friendlist,.friendlistListContainer,.chatRoomGroupNavColumn,.MemberListColumn,.chatRoomMembers,.ChatRoomMemberScrollList_List',
+ side:rosterPanels+','+nav,
  header:'.chatHeader,.chatRoomGroupHeader,.chatRoomHeader,.friendListHeaderContainer,.VoiceRoomChatTitle',
  title:'.chatHeader .chatRoomName,.chatRoomGroupHeaderName,.chatRoomGroupActiveChatName,.VoiceChatTextChannelName',
  tabRail:'.titleBarContainer.ChatTabs,.chatBody .ChatBodyControls',
@@ -154,7 +165,7 @@ const SURFACES={
  // anchor keeps this selector off unrelated popups if Valve changes the hash.
  menu:'.contextMenuPopup,.JFSzUCtMXFw-:has(.contextMenuItem)',
  dialog:'.DialogContent',
- button:'.chatHeader .DialogButton:not(.chatRoomHeaderButton,.VoiceControlPanelButton),.chatEntry .DialogButton,.DialogContent .DialogButton:not(.deleteButton,.roleButton,.DialogInput_CopyAction),'+send,
+ button:'.chatHeader .DialogButton:not(.chatRoomHeaderButton,.VoiceControlPanelButton),.chatEntry .DialogButton,.DialogContent .DialogButton:not(.deleteButton,.roleButton,.DialogInput_CopyAction),'+[send,friendsButton,groupButtons,accessoryButtons].join(','),
  divider:'.timeDivision:not(.new_messages,.time_passes) :is(.horizDivider,.preHorizDivider,.postHorizDivider),.contextMenuItemHR',
 };
 // Valve can mark the document element itself, its body or a mounted chat
@@ -162,10 +173,44 @@ const SURFACES={
 const scoped=list=>selectors(list).map(s=>'html:is(.friendsui-container,:has(.friendsui-container)) '+s).join(',');
 const withoutPresence=list=>selectors(list).map(s=>s+':not(:has(.friendlist,.chatRoomMembers,.groupMemberList,.friend,.personaName))').join(',');
 const qualify=(list,suffix)=>selectors(list).map(s=>s+suffix).join(',');
-const disabled=':is(:disabled,.disabled,.Disabled,[aria-disabled="true"])';
+const disabled=':is(:disabled,.disabled,.Disabled,._4X5-n9MaD8g-,[aria-disabled="true"])';
 const enabled=':where(:not('+disabled+'))';
 const tabHover=':where(:hover)'+enabled;
 const colorLayer=color=>'linear-gradient('+color+','+color+')';
+const inkWash=percent=>'color-mix(in srgb,'+v('ink-strong')+' '+percent+'%,transparent)';
+
+function paintPresence(add,light){
+ // Use Valve's status hues with the theme's ink for contrast. The avatar,
+ // its status stripe and the voice glyphs keep their original paint.
+ const speaker=light?',.chatHistoryScroll .ChatSpeaker .speaker':'';
+ const people=':is('+rosterRows+',.friendlistListContainer .currentUserContainer'+speaker+')';
+ const statusTint=light?38:45;
+ add(people,[['color',v(light?'ink-3':'ink-2')]]);
+ add(people+presenceLabel,[['color','inherit']]);
+ for(const [state,ink] of [['online','#6dcff6'],['ingame','#91c257'],['watchingbroadcast','#9c8fd4']]){
+  add(people+'.'+state,[['color','color-mix(in srgb,'+ink+' '+statusTint+'%,'+v('ink-strong')+')']]);
+ }
+}
+
+function paintControlIcons(add){
+ const plain=[friendsButton,groupButtons,accessoryButtons,messageActions+' .JLdrknAnS-A-'].join(',');
+ add(qualify(plain,' svg'),[['color','inherit'],['fill','currentColor']]);
+ add(qualify(groupButtons, ' .SVGIcon_Button line'),[['stroke','currentColor']]);
+ const emoticons=accessoryButtons+' .SVGIcon_Emoticon,'+messageActions+' .SVGIcon_Emoticon';
+ add(qualify(emoticons,' :is(line,circle,path)'),[['stroke','currentColor']]);
+ add(emoticons,[['fill','none']]);
+ const paperclip=accessoryButtons+' .SVGIcon_Paperclip';
+ add(paperclip,[['fill','none']]);
+ add(paperclip+' path',[['stroke','currentColor']]);
+ const voice=accessoryButtons+' .SVGIcon_VoiceRoom';
+ add(voice,[['fill','none'],['stroke','currentColor']]);
+ add(voice+' :is(.Microphone,.AudioLines,.VDPUW3nsNIQ-)',[['fill','currentColor']]);
+ const close=nativeTab+nativeTabClose;
+ add(close+' .SVGIcon_X_Line',[['color','inherit']]);
+ add(close+' .SVGIcon_X_Line line',[['stroke','currentColor']]);
+ add(close+':hover',[['background-color',inkWash(13)]]);
+ add(':is('+nav+' .chatRoomGroupNavCollapseExpand,.MemberListOptionsContainer .MemberListOption) svg',[['color',v('ink-3')],['fill','currentColor']]);
+}
 
 // Most themes put their signature art on the panel itself. These few use
 // a different reading surface in Tyler's panel and should keep that material.
@@ -276,7 +321,9 @@ function paintButtons(add,theme,surface,source,vars){
 }
 
 function fullPaint(theme,surface,source,logo,light,vars){
- let full='';
+ // Remove only Steam's web navigation. Keep the chat rail and the original
+ // profile link in the DOM so Tyler can still recognise its account.
+ let full=scoped('#global_header:has(.supernav_container)')+'{display:none !important;--rt-steam-navigation-hidden:1;}\n';
  const add=(targets,values)=>{full+=cssRule(scoped(targets),values);};
  const project=(component,targets,filter=()=>true)=>add(targets,source(component).filter(filter));
  const base=source('.panel').filter(bg);
@@ -287,8 +334,7 @@ function fullPaint(theme,surface,source,logo,light,vars){
  const textInk=([key,val])=>key==='color'&&val!=='transparent';
  const history=surface.history;
  const panelBackdrop=last(base,'background')||v('bg');
- // The light panel normally backs these translucent surfaces. Steam's
- // nearby presence list may still be using its own dark backing.
+ // The light panel normally backs these translucent surfaces.
  const overPanel=values=>{
   if(!light)return values;
   const background=last(values,'background');
@@ -361,7 +407,7 @@ function fullPaint(theme,surface,source,logo,light,vars){
    add(qualify(targets,state),values);
    const frame=buttonFrame(values,vars,theme).slice(values.length).filter(([key])=>key==='box-shadow');
    // The modern Steam tab has no border. Carry the authored edge in paint.
-   add((light?withoutPresence(native):native)+state+(theme==='ipod'?':not('+lastTab+')':''),frame);
+   add(native+state+(theme==='ipod'?':not('+lastTab+')':''),frame);
   }
  }
  if(theme==='steam')add(qualify(surface.activeTab,':not(.LUogGjb84qw-)'),[['box-shadow','inset 0 -2px 0 '+v('active')]]);
@@ -375,15 +421,21 @@ function fullPaint(theme,surface,source,logo,light,vars){
  }
  if(theme==='cs2')project('.tabs button:first-child',qualify(surface.tab,':where(:nth-child(1 of '+tabClasses+'):not(.active,.okAC0yOlZwY-,.Active))'));
  if(theme==='ipod')project('.tabs button:last-child',qualify(surface.tab,lastTab));
- // Keep Steam's native gray/white close icon legible on the brighter faces.
- if(light||['dod','gmod'].includes(theme))add(nativeTab+nativeTabClose,[['background-color','#23262e']]);
- else if(['combine','cs16','quake'].includes(theme))add(nativeActiveTab+nativeTabClose,[['background-color','#23262e']]);
- add(surface.nav,overPanel(source('.side')));
+ add(surface.side,overPanel(source('.side')));
  project('.section-nav',surface.nav);
+ // These themes have a dark navigation rail and a lighter reading panel.
+ // Use the latter behind the long roster, where name and status text belongs.
+ if(['minecraft','winxp','gmod'].includes(theme)){
+  add(rosterPanels,[['background',v('surface')],['box-shadow','inset 0 0 0 1px '+v('line-strong')]]);
+ }
+ if(['minecraft','gmod'].includes(theme))add(surface.nav+' :is(.ChannelTypeTitle,.chatRoomGroupNavCollapseExpand svg)',[['color','#fff']]);
+ if(theme==='hev'){
+  add(rosterPanels,[['background',v('surface')]]);
+  add(surface.nav+' :is(.ChannelTypeTitle,.chatRoomGroupNavCollapseExpand svg)',[['color','#1a0c00']]);
+ }
  project('.section-nav button',surface.channel);
  add(qualify(surface.channel,':hover'+enabled),source('.section-nav button',':hover'));
  project('.section-nav button[aria-current=page]',surface.activeChannel);
- add(qualify(surface.channel,' .chatRoomTextChannelName:not(.IsCommonsChannel)'),[['color','inherit']]);
  if(theme==='minecraft'){
   add(surface.channel,[['color','#fff'],['text-shadow','var(--mc-shadow)']]);
   add(surface.activeTab,[['box-shadow','inset 0 0 0 2px #000,inset 0 0 0 4px #eaeaea']]);
@@ -459,45 +511,59 @@ function stylesFor(value){
   for(const [key,val]of rule.values)if(key.startsWith('--')&&safeValue(val))vars.set(key,val);
  }
  const variableCss='html{'+[...vars].map(([k,v])=>namespace(k)+':'+namespace(v)+';').join('')+'}\n';
- const surface={...SURFACES,nav:light?withoutPresence(nav):nav};
+ const surface={...SURFACES,nav};
  surface.channel=surface.nav+channelRow;
  surface.activeChannel=surface.channel+'.ActiveTextChannel';
- if(light){
-  for(const key of ['canvas','tab','activeTab','dialog','menu'])surface[key]=withoutPresence(surface[key]);
-  surface.side=surface.nav;
- }
+ if(light)for(const key of ['canvas','dialog','menu'])surface[key]=withoutPresence(surface[key]);
  surface.item=qualify(surface.menu,menuItem);
  let colors=variableCss;
  const add=(targets,values)=>{colors+=cssRule(scoped(targets),values);};
  // Solid surfaces also remove Steam's decorative gradients: leaving a dark
  // gradient behind a light theme's dark ink would make Colors only unreadable.
- // Keep Steam's status-coloured names and native dark list backdrops together
- // on light themes. Some group rosters inherit the enclosing chat's backdrop.
  add(surface.canvas,[['background',v('bg')],['color',v('ink')]]);
  add(surface.history,[['background',v('bg-deep')],['color',v('ink')]]);
  add(surface.side,[['background',v('surface')],['color',v('ink')],['border-color',v('line')]]);
+ add('.MemberListColumn .chatRoomMembers,.chatRoomMembers .ChatRoomMemberScrollList_List,'+nav+' .chatRoomChannelGroups',[['background','transparent']]);
+ add(nav+' .ChannelTypeTitle,:is('+rosterPanels+') .groupName',[['color',v('ink-strong')]]);
+ add(nav+' .ChannelTypeTitle .ChannelTypeLabel',[['color','inherit']]);
+ add(':is('+rosterPanels+') .groupCount',[['color',v('ink-3')]]);
+ add(voiceRow,[['background',v('surface-2')],['color',v('ink')],['border-color',v('line')]]);
+ add(voiceRow+':is(:hover,.ActiveVoiceChannel)',[['background',v('select')]]);
+ add(voiceRow+' .chatRoomVoiceChannelName',[['color','inherit']]);
+ add(qualify(rosterRows,':is(:hover,.Friend_ContextMenuActive)'),[['background-color',inkWash(9)]]);
+ add(rosterSearch,[['background-color',v('surface-2')],['color',v('ink-strong')],['border-color',v('line-strong')],['box-shadow','none']]);
+ add(qualify(rosterSearch,'::placeholder'),[['color',v('ink-3')]]);
+ paintPresence(add,light);
  add([surface.header,surface.tabRail,surface.composer].join(','),[['background',v(light?'surface':'bar')],['color',v('ink-strong')],['border-color',v('line')]]);
+ add('.chatRoomGroupHeaderTagline:not(a)',[['color','color-mix(in srgb,currentColor 85%,transparent)']]);
  add(surface.input,[['background-color',v('input')],['color',last(source('textarea'),'color')||v('ink')],['border-color',v('line-strong')]]);
  add(surface.text,[['color',v('ink')]]);add(surface.muted,[['color',v('ink-4')]]);
  add(surface.link,[['color',v('link')]]);
+ // Keep the reading surface visible under a hovered message, including paper
+ // and textured themes. The action strip retains its native hit areas.
+ add(messageRow+':hover:not(:has(.ChatMessageErrorSending,.ChatMessageBlock_SuspiciousSender,.ChatMessageBlock_BlockedSender))',[['background-color',inkWash(9)]]);
+ add(messageActions,[['background',v('surface-2')],['box-shadow','inset 0 0 0 1px '+v('line-strong')]]);
+ add(messageActions+' .JLdrknAnS-A-',[['color',v('ink-strong')]]);
+ add(messageActions+' .JLdrknAnS-A-:hover',[['color',v('link')]]);
+ add('.chatHistoryScroll .ChatMessageBlock.SingletonMsg .FriendChatTimeStamp',[['background','transparent']]);
  add([surface.menu,surface.dialog].join(','),[['background',v('surface')],['color',v('ink')],['border-color',v('line-strong')]]);
  add(qualify(surface.dialog,' :is(.DialogHeader,.DialogBody,.DialogBodyText)'),[['color',v('ink')]]);
  add(qualify(surface.dialog,' .DialogHeader'),[['background-color','transparent']]);
  add([surface.button,surface.tab].join(','),[['background',v('surface-3')],['color',v('ink-strong')],['border-color',v('line-strong')]]);
  add(surface.tabLabel,[['color','inherit']]);
+ // The tab text uses the same ink as the themed tab face. Steam's avatar
+ // badge and stripe still carry the contact's presence.
+ add(contactTab+' .friend,'+contactTab+presenceLabel,[['color','inherit']]);
  add(qualify(surface.menu,' .contextMenuSectionContent'),[['background-color','transparent']]);
  add(surface.item,[['color',v('ink')]]);
  add(surface.channel,[['color',v('ink')]]);
- add(qualify(surface.channel,' .chatRoomTextChannelName:not(.IsCommonsChannel)'),[['color','inherit']]);
+ add(qualify(surface.channel,' .chatRoomTextChannelName'),[['color','inherit']]);
  add(surface.divider,[['background-color',v('line')],['border-color',v('line')]]);
  for(const target of [surface.button,surface.item,surface.tab,surface.channel]){
   add(qualify(target,target===surface.tab?tabHover:':hover'+enabled),[['background-color',v('select')],['color',v('ink-strong')]]);
  }
  add([surface.activeTab,surface.activeChannel].join(','),[['background-color',v('select')],['color',v('ink-strong')],['border-color',v('active')]]);
- // A contact tab can sit on a bright theme face. Preserve the native dark
- // backing immediately behind Valve's status-coloured name and avatar.
- add(nativeTab+' .nHfaWz8Bomg-',[['background-color','#23262e']]);
- if(light)add(nativeTab+nativeTabClose,[['background-color','#23262e']]);
+ paintControlIcons(add);
  add(qualify(surface.button,disabled),[['color',v('ink-disabled')]]);
  // Match Steam's roster thumb reveal on hover and leave its geometry intact.
  add('.chatHistoryScroll::-webkit-scrollbar-thumb,.friendlistListContainer:hover::-webkit-scrollbar-thumb,.ChatRoomList:hover::-webkit-scrollbar-thumb',[['background-color',v('surface-3')]]);

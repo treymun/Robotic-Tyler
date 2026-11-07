@@ -1,0 +1,12 @@
+# ROBOTIC TYLER v2.45.2 — Theme the whole Steam chat
+
+Steam chat’s channel list, voice roster, member list, and member filter now use Tyler’s theme. Light themes use their own reading surfaces, with darker presence labels that keep the online, in-game, and offline states easy to tell apart.
+
+- The hovered message and its action buttons use the theme’s colors, so the text stays readable. The Friends List, composer, and group controls use the theme’s button finishes.
+- **Full visual styling** hides Steam’s website navigation strip and gives that space to chat. Open Friends List still opens the native list, and Tyler can identify its Steam account with the strip hidden. **Colors only** and **Off** show the strip.
+
+## Tested
+
+- **Mocked Steam and Settings data.** Compared all 25 themes with Tyler’s original styles and checked the side panes, hover colors, controls, and the Off escape hatch.
+- **Real Chromium and Windows Electron.** Verified stylesheet switching, the existing Friends List click, account detection, and the space returned to chat.
+- **Not tested.** This build’s appearance in signed-in Steam and live calls.

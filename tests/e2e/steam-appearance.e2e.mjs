@@ -22,7 +22,7 @@ function metrics(){return [...document.querySelectorAll('[id]')].map(el=>{
  return {id:el.id,x:r.x,y:r.y,w:r.width,h:r.height,scrollW:el.scrollWidth,scrollH:el.scrollHeight,scrollTop:el.scrollTop,
   font:s.font,fontFamily:s.fontFamily,lineHeight:s.lineHeight,whiteSpace:s.whiteSpace,padding:s.padding,margin:s.margin,borderWidth:s.borderWidth,display:s.display,overflow:s.overflow};
 });}
-function hitTargets(){return ['send','upload','join','entry','menuItem','ok','disabled','activeTab','tabClose','channel'].map(id=>{
+function hitTargets(){return ['send','upload','emoticon','voiceControl','groupControl','openFriends','join','entry','menuItem','ok','disabled','activeTab','tabClose','channel'].map(id=>{
  const r=document.getElementById(id).getBoundingClientRect();
  const points=[[r.width/2,r.height/2]];
  for(const inset of [.5,1.5,3.5,5.5]){
@@ -31,7 +31,7 @@ function hitTargets(){return ['send','upload','join','entry','menuItem','ok','di
  return points.map(([x,y])=>document.elementFromPoint(r.left+x,r.top+y)?.closest('[id]')?.id||null);
 });}
 function paint(){
- const ids=['chat','header','title','tabRail','tab','activeTab','activeTabLabel','tabCloseStroke','tabUnread','contactTab','contactName','activeChannel','history','message','stamp','link','dayDivider','unreadDivider','sendError','composer','entry','send','sendGlyph','upload','uploadIcon','join','ok','disabled','icon','avatar','status','emoji','friends','members','menu','dialog','dialogHeader','dialogBody','voice','voiceTitle','voiceLabel','voiceStroke','voiceHistory'];
+ const ids=['chat','header','title','tabRail','tab','activeTab','activeTabLabel','tabCloseStroke','tabUnread','contactTab','contactName','activeChannel','commonsLabel','channels','channelGroups','voiceChannel','history','message','messageRow','messageActions','stamp','link','dayDivider','unreadDivider','sendError','composer','entry','send','sendGlyph','upload','uploadIcon','emoticon','emoticonStroke','voiceControl','groupControl','openFriends','join','ok','disabled','icon','avatar','status','emoji','friends','members','memberScroll','memberSearch','gameName','onlineName','offlineName','menu','dialog','dialogHeader','dialogBody','voice','voiceTitle','voiceLabel','voiceStroke','voiceHistory'];
  return Object.fromEntries(ids.map(id=>{
   const s=getComputedStyle(document.getElementById(id));
   const border=s.borderWidth==='0px'?null:s.borderColor,outline=s.outlineStyle==='none'?null:s.outlineColor;
@@ -101,7 +101,7 @@ test('all 25 themes: canonical paint, unchanged layout, controls, imagery and re
    if(theme==='classic')assert.match(got.activeTab.shadow,/1px 0px 0px .*inset/,'Classic inset edges on the borderless native tab');
    if(theme==='ipod'){
     assert.match(got.tab.shadow,/-1px 0px 0px 0px inset/,'iPod paints the inner divider');
-    assert.equal(got.contactTab.shadow,'none','iPod omits the divider on the end tab');
+    assert.doesNotMatch(got.contactTab.shadow,/-1px 0px 0px 0px inset/,'iPod omits the divider on the end tab');
     assert.equal(await page.locator('#contactTab').evaluate(el=>getComputedStyle(el,'::after').backgroundColor),'rgba(0, 0, 0, 0)','Steam’s last divider yields to the iPod end tab');
    }
    assert.equal(got.dialog.image,expected.dialog,theme+' canonical dialog');
@@ -132,11 +132,32 @@ test('all 25 themes: canonical paint, unchanged layout, controls, imagery and re
     });
     assert.notEqual(ink,'rgba(0, 0, 0, 0)','Quake title art keeps an embedded icon visible');
    }
-   if(expected.light)for(const id of ['friends','members'])assert.deepEqual(got[id],original[id],theme+' preserves native presence surface');
-   for(const id of ['icon','status','contactName','unreadDivider','sendError','upload','uploadIcon'])assert.deepEqual(got[id],original[id],theme+' preserves '+id);
-   for(const key of ['stroke','strokeWidth'])assert.equal(got.tabCloseStroke[key],original.tabCloseStroke[key],theme+' preserves native tab close '+key);
+   for(const id of ['channels','members','memberSearch','openFriends','upload','emoticon','voiceControl','groupControl']){
+    assert.notDeepEqual([got[id].bg,got[id].image,got[id].shadow],[original[id].bg,original[id].image,original[id].shadow],theme+' themes '+id);
+   }
+   assert.equal(got.channelGroups.bg,'rgba(0, 0, 0, 0)',theme+' channel wrapper exposes the theme');
+   assert.equal(got.memberScroll.bg,'rgba(0, 0, 0, 0)',theme+' roster wrapper exposes the theme');
+   assert.equal(got.commonsLabel.color,got.activeChannel.color,theme+' default channel label uses the selected ink');
+   assert.equal(got.contactName.color,got.contactTab.color,theme+' contact caption uses the tab ink');
+   assert.equal(got.tabCloseStroke.stroke,got.activeTab.color,theme+' close glyph uses the tab ink');
+   assert.equal(got.tabCloseStroke.strokeWidth,original.tabCloseStroke.strokeWidth,theme+' native close stroke width');
+   assert.equal(got.uploadIcon.stroke,got.upload.color,theme+' native attachment glyph uses the control ink');
+   assert.equal(got.uploadIcon.strokeWidth,original.uploadIcon.strokeWidth,theme+' native attachment geometry');
+   assert.equal(got.emoticonStroke.strokeWidth,original.emoticonStroke.strokeWidth,theme+' native emoticon geometry');
+   if(expected.light){
+    assert.notEqual(got.gameName.color,original.gameName.color,theme+' bright roster uses readable in-game ink');
+    assert.notEqual(got.gameName.color,got.onlineName.color,theme+' in-game and online stay distinct');
+    assert.notEqual(got.offlineName.color,got.onlineName.color,theme+' offline and online stay distinct');
+   }
+   for(const id of ['icon','status','unreadDivider','sendError'])assert.deepEqual(got[id],original[id],theme+' preserves '+id);
    for(const id of ['avatar','emoji','tabUnread']){const {color:unused,...visual}=got[id],{color:unusedOriginal,...originalVisual}=original[id];assert.deepEqual(visual,originalVisual,theme+' preserves '+id);}
-   if(['steam','classic','tf2','winxp','minecraft','xmb'].includes(theme))await page.screenshot({path:path.join(OUT,theme+'-full-fixture.png')});
+   await page.hover('#message');
+   const hovered=await page.evaluate(paint);
+   assert.notEqual(hovered.messageRow.bg,'rgb(41, 44, 52)',theme+' replaces the native dark hover block');
+   assert.notEqual(hovered.messageRow.bg,got.messageRow.bg,theme+' keeps hover feedback');
+   assert.equal(hovered.message.color,got.message.color,theme+' message ink stays legible on hover');
+   if(['portal','cs16','winxp','minecraft','dreamcast','x360','ipod','msn'].includes(theme))await page.screenshot({path:path.join(OUT,theme+'-full-fixture.png')});
+   await page.mouse.move(0,0);
    if(theme==='portal'){
     await page.hover('#tab');
     assert.match((await page.evaluate(paint)).tab.image,/rgb\(42, 157, 255\)/,'Portal uses its original blue hover ring');
@@ -226,6 +247,44 @@ test('all 25 themes: canonical paint, unchanged layout, controls, imagery and re
    assert.equal((await page.evaluate(paint)).history.bg,original.history.bg,marker+' removal leaves Steam paint');
    await clear();
   }
+ }finally{await browser.close();}
+});
+
+test('Full hides the Steam site strip and keeps account detection and the Friends List action',async()=>{
+ const browser=await chromium.launch();
+ try{
+  const page=await browser.newPage({viewport:{width:1180,height:760}});
+  const outerStyle='<style nonce="fixture">body{display:flex;flex-direction:column}#global_header{height:44px;flex:none;background:#000}#root{height:auto;flex:1;min-height:0}</style>';
+  const steamNavigation='<div id="global_header"><div class="supernav_container"><a href="/id/sample" id="profileLink">Sample account</a><div hidden><a href="/id/sample/friends">Friends</a></div></div></div>';
+  await page.setContent(fixture.replace('</head>',outerStyle+'</head>').replace('<body>','<body>'+steamNavigation));
+  const detect=read('browser-extension/setup-detect.js');
+  const account=()=>page.evaluate('(()=>{'+detect+'\nreturn TylerSetup.botName(document)})()');
+  const add=css=>page.evaluateHandle(css=>{const node=document.createElement('style');node.nonce='fixture';node.textContent=css;document.head.append(node);return node;},css);
+  const menu=page.locator('#global_header'),rail=page.locator('#tabRail'),history=page.locator('#history');
+  const friends=page.locator('#openFriends');
+  await friends.evaluate(node=>node.addEventListener('click',()=>node.dataset.opened='yes'));
+  const voice=page.locator('#voiceControl');
+  await voice.evaluate(node=>node.classList.replace('Inactive','Active'));
+  const voiceState=()=>voice.evaluate(node=>[getComputedStyle(node).background,getComputedStyle(node.querySelector('svg')).fill]);
+  const connected=await voiceState();
+  assert.equal(await account(),'Sample account');
+  const originalRail=await rail.boundingBox(),originalHistory=await history.boundingBox();
+  const styles=stylesFor('winxp');
+  const colors=await add(styles.colors);
+  assert.equal(await menu.isVisible(),true,'Colors only keeps the site strip');
+  const full=await add(styles.full);
+  assert.equal(await menu.isVisible(),false,'Full removes the Steam site strip');
+  assert.equal((await rail.boundingBox()).y,originalRail.y-44,'chat reclaims the site strip height');
+  assert.equal((await history.boundingBox()).width,originalHistory.width,'chat columns keep their width');
+  assert.equal(await account(),'Sample account','setup can still identify the hidden profile');
+  assert.deepEqual(await voiceState(),connected,'the connected voice control keeps its state paint');
+  await friends.click();
+  assert.equal(await friends.getAttribute('data-opened'),'yes','the existing Friends List control receives its click');
+  await full.evaluate(node=>node.remove());await colors.evaluate(node=>node.remove());
+  assert.equal(await menu.isVisible(),true,'Off restores the site strip');
+  assert.deepEqual(await rail.boundingBox(),originalRail);
+  await menu.evaluate(node=>node.style.display='none');
+  assert.equal(await account(),null,'an unrelated hidden profile is ignored');
  }finally{await browser.close();}
 });
 

@@ -92,10 +92,12 @@ test('Settings validates modes and keeps the desktop-only choice off the phone',
  for(const value of ['off','colors','full','invalid',null,{},true])assert.equal(sanitizeSettings({steamChatAppearance:value}).steamChatAppearance,['colors','full'].includes(value)?value:'off');
  assert.ok(phoneHidden.has('steamChatAppearance'));
 });
-test('all 25 themes reuse existing tokens, use paint-only declarations and have no remote URLs',()=>{
+test('all 25 themes use paint only apart from the Full mode Steam navigation strip',()=>{
  const themes=['steam',...fs.readdirSync(new URL('../browser-extension/ui/themes/',import.meta.url)).filter(f=>f.endsWith('.css')).map(f=>f.slice(0,-4))];assert.equal(themes.length,25);
  for(const theme of themes){const s=stylesFor(theme);assert.match(s.colors,/--rt-steam-rt-bg:/,theme);assert.match(s.full,/background/,theme);
-  assert.doesNotMatch(s.colors+s.full,/(?:^|[;{])(?:font(?:-[\w-]+)?|(?:min-|max-)?(?:width|height)|padding|margin|display|position|overflow|transform|translate|content|opacity|border(?:-(?:width|radius|style))?|clip-path|pointer-events)\s*:/m,theme);
+  const navigation=/#global_header:has\(\.supernav_container\)\{display:none !important;--rt-steam-navigation-hidden:1;\}/;
+  assert.match(s.full,navigation,theme);
+  assert.doesNotMatch(s.colors+s.full.replace(navigation,''),/(?:^|[;{])(?:font(?:-[\w-]+)?|(?:min-|max-)?(?:width|height)|padding|margin|display|position|overflow|transform|translate|content|opacity|border(?:-(?:width|radius|style))?|clip-path|pointer-events)\s*:/m,theme);
   const knownTabDividers=/\.chatTabList \.LUogGjb84qw-(?:::before|:last-of-type::after)/g;
   assert.doesNotMatch((s.colors+s.full).replace(knownTabDividers,''),/url\(["']?https?:|\*\s*\{|@import|::before|::after/,theme);
  }
