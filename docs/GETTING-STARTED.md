@@ -2,18 +2,18 @@
 
 The [README](../README.md) is the short path. This page covers which download to take, what can wait, what a key costs, and what to try when Tyler stays quiet.
 
+[Who's speaking](WHOS-SPEAKING.md) · [AI on this PC](LOCAL-AI.md) · [Images on this PC](LOCAL-IMAGES.md) · [Theme voices](THEME-VOICES.md) · [Music DJ](MUSIC-GUIDE.md) · [Trivia](TRIVIA-GUIDE.md) · [Arcade](ARCADE-GUIDE.md) · [Vote kick and Steam admin](MODERATION-GUIDE.md)
+
 ## The download
 
 On Windows, [ROBOTIC TYLER Setup](https://github.com/treymun/Robotic-Tyler/releases/latest) is the file. Its name is `ROBOTIC-TYLER-Setup-<version>.exe`. Run it and tick **Desktop app** (recommended), **Chrome extension**, or both.
 
 The other files on that release are not a second install:
 
-| File | What to do with it |
-|---|---|
-| `ROBOTIC-TYLER-Setup-<version>.exe` | Run this. |
-| `ROBOTIC-TYLER-Chrome-Extension-<version>.zip` | Only if you are not using Setup. Unzip it and open `How to install.html`. |
-| `ROBOTIC-TYLER-component-Desktop-…`, `.blockmap`, `control.yml` | Leave them. Setup and the desktop app's own updates use them. |
-| `SHA256SUMS.txt` | Optional check of the downloads. |
+- `ROBOTIC-TYLER-Setup-<version>.exe` — Run this.
+- `ROBOTIC-TYLER-Chrome-Extension-<version>.zip` — Only if you are not using Setup. Unzip it and open `How to install.html`.
+- `ROBOTIC-TYLER-component-Desktop-…`, `.blockmap`, `control.yml` — Leave them. Setup and the desktop app's own updates use them.
+- `SHA256SUMS.txt` — Optional check of the downloads.
 
 Setup is not code-signed. If Windows says *"Windows protected your PC"*, choose **More info → Run anyway**. Setup checks each download's SHA-256 before it runs it. The desktop app updates itself. Run Setup again later to add, update or repair a part. Settings and keys are kept.
 
@@ -31,25 +31,23 @@ Both are compared on the [README](../README.md#desktop-app-or-chrome-extension).
 
 ## What you need, and what can wait
 
-| Before he can answer | When you want it |
-|---|---|
-| The desktop app or the Chrome extension, a Steam account for the bot, and a way to write replies: a cloud key, or **This PC** on the desktop app | Phone remote, theme voices, hearing and Kokoro, chat pictures, the sharper voice, Music DJ, trivia and the arcade, vote kick, Gemini Live, the VB-CABLE route |
+**Before he can answer:** the desktop app or the Chrome extension, a Steam account for the bot, and a way to write replies: a cloud key, or **This PC** on the desktop app.
 
-Nothing in the right-hand column downloads by itself. Each install button shows the size and the free disk space first.
+**When you want it:** phone remote, theme voices, hearing and Kokoro, chat pictures, the sharper voice, Music DJ, trivia and the arcade, vote kick, Gemini Live, the VB-CABLE route.
+
+Nothing under **When you want it** downloads by itself. Each install button shows the size and the free disk space first.
 
 ## Keys, cost and hardware
 
-| How he answers | What it asks |
-|---|---|
-| OpenRouter text | Your OpenRouter key. Llama 3.3 70B, Mistral Small 3.2, or Venice Uncensored, each with its own routing. Priced per token. **Settings → AI & personality** has a spending cap for that text, and the key should have a limit of its own. |
-| Google Gemini text | Your Google AI key. 3.1 Flash-Lite, 3.5 Flash-Lite, or 3.8 Flash. Free while that project has no billing turned on, inside Google's rate limits. With billing on, Google charges. Tyler does not switch model or billing by himself. |
-| Text on this PC | No key. Optional download: Qwen3.5 4B (2.6 GB) or 9B (5.3 GB), or an uncensored build of either. Desktop app, on an NVIDIA, AMD or Intel card or on the processor. Since v2.44, **On this PC → Runs on** can keep the whole model on the card, use the processor only, or split layers between them. |
-| Standard voice, cloud hearing and speech | The saved OpenRouter or Google key. Hearing and speech are billed by that provider. |
-| Standard voice, all on this PC | No key, once text, hearing and a voice are all on this PC. Hearing is Parakeet (639 MB) and the stock voice is Kokoro (350 MB). Both run on the processor. A theme voice counts as a voice on this PC. |
-| Gemini Live | A Google AI key. Google bills the audio while a session runs. You start and stop every session. It always uses Google's voices. |
-| Theme voices | No key and no cost per line. Optional. Quality on an NVIDIA card is about 7 GB before anything downloads (the engine plus the 1.7B model). Since v2.44 the default moves the voice to the processor when the card is full, and says so. |
-| Sharper voice | Medic, Lash and Kelvin only. Off until you switch that character on. A separate download of about 1.33 GB, after theme voices. |
-| Chat pictures | An OpenRouter or Venice key, or no key on this PC. Cloud pictures count toward the spending cap. Pictures on this PC do not. |
+- **OpenRouter text.** Your OpenRouter key. Llama 3.3 70B, Mistral Small 3.2, or Venice Uncensored, each with its own routing. Priced per token. **Settings → AI & personality** has a spending cap for that text, and the key should have a limit of its own.
+- **Google Gemini text.** Your Google AI key. 3.1 Flash-Lite, 3.5 Flash-Lite, or 3.8 Flash. Free while that project has no billing turned on, inside Google's rate limits. With billing on, Google charges. Tyler does not switch model or billing by himself.
+- **Text on this PC.** No key. Optional download: Qwen3.5 4B (2.6 GB) or 9B (5.3 GB), or an uncensored build of either. Desktop app, on an NVIDIA, AMD or Intel card or on the processor. Since v2.44, **On this PC → Runs on** can keep the whole model on the card, use the processor only, or split layers between them.
+- **Standard voice, cloud hearing and speech.** The saved OpenRouter or Google key. Hearing and speech are billed by that provider.
+- **Standard voice, all on this PC.** No key, once text, hearing and a voice are all on this PC. Hearing is Parakeet (639 MB) and the stock voice is Kokoro (350 MB). Both run on the processor. A theme voice counts as a voice on this PC.
+- **Gemini Live.** A Google AI key. Google bills the audio while a session runs. You start and stop every session. It always uses Google's voices.
+- **Theme voices.** No key and no cost per line. Optional. Quality on an NVIDIA card is about 7 GB before anything downloads (the engine plus the 1.7B model). Since v2.44 the default moves the voice to the processor when the card is full, and says so.
+- **Sharper voice.** Medic, Lash and Kelvin only. Off until you switch that character on. A separate download of about 1.33 GB, after theme voices.
+- **Chat pictures.** An OpenRouter or Venice key, or no key on this PC. Cloud pictures count toward the spending cap. Pictures on this PC do not.
 
 **Test selected model** checks the cloud model. **Run a speed check** under **On this PC** is the measurement on your machine. The On this PC picture in the README is an example layout, not a benchmark. The v2.44 release tests did not include a real graphics card. Published times for the fast theme-voice engine on an NVIDIA card come from that engine's own notes, not from a Windows machine in this repo. On the processor, theme voices take several seconds of work per second of speech.
 

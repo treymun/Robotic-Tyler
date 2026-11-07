@@ -1,3 +1,5 @@
+[README](../README.md) · [Getting started](GETTING-STARTED.md)
+
 # Who's speaking in voice (v2.44)
 
 In a **Standard** voice call, Tyler can put a name in front of each line he hears, so he answers the person who spoke. This shipped in [v2.44.0](https://github.com/treymun/Robotic-Tyler/releases/tag/v2.44.0). It is optional and **on by default**.
