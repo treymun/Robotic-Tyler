@@ -1,3 +1,5 @@
+[README](../README.md) · [Getting started](GETTING-STARTED.md)
+
 # Theme voices (v2.35; the fast engine and spoken replies since v2.36; character voices since v2.41; the voice supplement since v2.42; character recordings built in since v2.43)
 
 Tyler can say typed messages in each theme's character voice. The voices are **clones made on your PC**

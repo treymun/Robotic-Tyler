@@ -1,3 +1,5 @@
+[README](../README.md) · [Getting started](GETTING-STARTED.md)
+
 # Music DJ — YouTube in the voice call
 
 Music plays through Tyler's synthetic microphone, separate from his own speech. The panel still says to keep his AI in **Text** mode, or to connect the soundboard only, so a reply and a song are not fighting for the same moment. The bot account has to stay in the Steam voice channel.

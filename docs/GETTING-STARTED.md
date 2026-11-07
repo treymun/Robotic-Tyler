@@ -2,6 +2,8 @@
 
 The [README](../README.md) is the short path. This page covers which download to take, what can wait, what a key costs, and what to try when Tyler stays quiet.
 
+[Who's speaking](WHOS-SPEAKING.md) · [AI on this PC](LOCAL-AI.md) · [Images on this PC](LOCAL-IMAGES.md) · [Theme voices](THEME-VOICES.md) · [Music DJ](MUSIC-GUIDE.md) · [Trivia](TRIVIA-GUIDE.md) · [Arcade](ARCADE-GUIDE.md) · [Vote kick and Steam admin](MODERATION-GUIDE.md)
+
 ## The download
 
 On Windows, [ROBOTIC TYLER Setup](https://github.com/treymun/Robotic-Tyler/releases/latest) is the file. Its name is `ROBOTIC-TYLER-Setup-<version>.exe`. Run it and tick **Desktop app** (recommended), **Chrome extension**, or both.

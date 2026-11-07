@@ -1,3 +1,5 @@
+[README](../README.md) · [Getting started](GETTING-STARTED.md)
+
 # After Hours Arcade
 
 Connect Tyler to the Steam text chat. In the panel, open **Sounds → Arcade**

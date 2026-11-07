@@ -1,3 +1,5 @@
+[README](../README.md) · [Getting started](GETTING-STARTED.md)
+
 # Vote kick, text mute and Steam admin
 
 These controls are in Tyler's panel → **Room**, in the desktop app and in the Chrome extension. Each one is off until you turn it on. They use permissions the bot's Steam account already has. Tyler cannot grant himself a role.

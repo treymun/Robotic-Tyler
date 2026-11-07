@@ -1,3 +1,5 @@
+[README](../README.md) · [Getting started](GETTING-STARTED.md)
+
 # Tyler Trivia: Steam chat edition
 
 500 questions in 10 categories, played right in your Steam group chat. Questions,

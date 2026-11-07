@@ -1,3 +1,5 @@
+[README](../README.md) · [Getting started](GETTING-STARTED.md)
+
 # AI on this PC
 
 Tyler can run his AI on your own PC, with no key, no account and no cost per message. It's part of
