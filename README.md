@@ -52,7 +52,7 @@ Which file to run, what a key costs, and what to try when he stays quiet: [Getti
 
 ## What's new
 
-Character voices ship with the app, Settings open on your phone, and the desktop app can run text, hearing, speech and pictures on your own PC. v2.44 adds names on Standard voice lines, and **Runs on** can split a text model between the graphics card and the processor. He never switches to a cloud AI by himself. Every heavy download stays off until you ask for it.
+Character recordings come with the desktop app. The theme-voice install that speaks them stays optional. Settings open on your phone, and the desktop app can run text, hearing, speech and pictures on your own PC. v2.44 adds names on Standard voice lines, and **Runs on** can split a text model between the graphics card and the processor. He never switches to a cloud AI by himself. Every heavy download stays off until you ask for it.
 
 <p align="center">
   <a href="CHANGES.md"><img src="assets/readme/whats-new.png" width="100%" alt="What's new, the v2.38 through v2.41 picture: character voices (v2.41), Settings from your phone (v2.41), fewer repeated openings and stuck words (v2.41), who's in the call from Steam's own data (v2.41), pictures on your PC (v2.40), hearing and voice on your PC (v2.39), text AI on your PC (v2.38) and keeping your personality on it (v2.38.1)."></a><br>

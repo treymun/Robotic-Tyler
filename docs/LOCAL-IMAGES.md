@@ -1,6 +1,8 @@
 [README](../README.md) · [Getting started](GETTING-STARTED.md)
 
-# Images on this PC (v2.40, stage 3)
+# Images on this PC
+
+v2.40, stage 3.
 
 Tyler can draw pictures on your own PC: no key, no account, no cost per image, and the description
 isn't sent to an image service. It's part of the Windows desktop app and optional: nothing downloads
