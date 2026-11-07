@@ -212,10 +212,20 @@ test('all 25 themes: canonical paint, unchanged layout, controls, imagery and re
   await page.locator('#chat').evaluate(el=>el.style.display='none');assert.equal((await probe()).full,true,'closed chat');
   await page.setContent(fixture);await page.locator('#history').evaluate(el=>el.className='NewHistory');await page.locator('#historyContainer').evaluate(el=>el.className='NewContainer');assert.equal((await probe()).full,false,'missing required history');
   await page.locator('#chat').evaluate(el=>el.setAttribute('aria-busy','true'));assert.equal((await probe()).ready,false,'busy chat');
-  // A body-root is supported, and the paint becomes inert if the chat root goes away.
-  await page.setContent(fixture);await page.evaluate(()=>{document.body.className='friendsui-container';document.getElementById('root').className='';});
-  const s=stylesFor('winxp');layers.push(await insert(s.colors));assert.equal((await page.evaluate(paint)).history.bg,'rgb(255, 255, 255)');
-  await page.evaluate(()=>document.body.className='');assert.equal((await page.evaluate(paint)).history.bg,original.history.bg);await clear();
+  // Steam can mark its document element, body or a mounted chat container.
+  for(const marker of ['body','documentElement']){
+   await page.setContent(fixture);
+   await page.evaluate(marker=>{document[marker].classList.add('friendsui-container');document.getElementById('root').className='';},marker);
+   assert.equal((await probe()).base,true,marker+' is recognised as chat');
+   const sheet=stylesFor('tf2');
+   layers.push(await insert(sheet.colors),await insert(sheet.full));
+   const themed=await page.evaluate(paint);
+   assert.notEqual(themed.history.bg,original.history.bg,marker+' enables the theme palette');
+   assert.notEqual(themed.header.image,original.header.image,marker+' enables the theme artwork');
+   await page.evaluate(marker=>document[marker].classList.remove('friendsui-container'),marker);
+   assert.equal((await page.evaluate(paint)).history.bg,original.history.bg,marker+' removal leaves Steam paint');
+   await clear();
+  }
  }finally{await browser.close();}
 });
 
@@ -223,12 +233,15 @@ test('Windows Electron: removable CSS priority, lifecycle, settings recovery and
  const tmp=fs.mkdtempSync(path.join(os.tmpdir(),'tyler-appearance-'));fs.mkdirSync(OUT,{recursive:true});
  const settings=path.join(tmp,'settings.html');
  fs.writeFileSync(settings,'<!doctype html><meta charset="utf-8"><meta http-equiv="Content-Security-Policy" content="default-src \'none\'; style-src \'self\'; script-src \'self\'"><link rel="stylesheet" href="'+pathToFileURL(path.join(ROOT,'app/companion/ui/tokens.css')).href+'"><link rel="stylesheet" href="'+pathToFileURL(path.join(ROOT,'app/companion/settings.css')).href+'"><body data-desktop="true">'+read('app/desktop-overrides/steam-appearance.html')+'<script src="'+pathToFileURL(path.join(ROOT,'app/companion/steam-appearance-settings.js')).href+'"></script></body>');
+ const htmlRootFixture=fixture.replace('<html>','<html class="friendsui-container web_chat_frame">')
+  .replace('<div class="friendsui-container" id="root">','<div id="root">')
+  .replace("script-src 'none'","script-src 'none'; frame-src 'self'");
  const main=path.join(tmp,'main.cjs');
- fs.writeFileSync(main,`const {app,BrowserWindow,protocol,ipcMain,Menu}=require('electron');const fs=require('fs');
+ fs.writeFileSync(main,`const {app,BrowserWindow,protocol,ipcMain,Menu}=require('electron');
  app.setPath('userData',${JSON.stringify(path.join(tmp,'profile'))});
  globalThis.boot=app.whenReady().then(async()=>{
  Menu.setApplicationMenu(null);
- protocol.handle('https',()=>new Response(fs.readFileSync(${JSON.stringify(path.join(ROOT,'tests/fixtures/steam-appearance.html'))}),{headers:{'content-type':'text/html'}}));
+ protocol.handle('https',request=>new Response(new URL(request.url).pathname==='/chat/embedded-test'?'<!doctype html><p>Embedded fixture</p>':${JSON.stringify(htmlRootFixture)},{headers:{'content-type':'text/html'}}));
  globalThis.chat=new BrowserWindow({show:false,width:1180,height:800,webPreferences:{contextIsolation:true,sandbox:true,nodeIntegration:false}});
  globalThis.appearance=require(${JSON.stringify(path.join(ROOT,'app/steam-appearance/controller.cjs'))}).createAppearance(chat.webContents,{delay:10,maxWaits:6});
  globalThis.prefs={uiTheme:'steam',steamChatAppearance:'off'};globalThis.choose=async(mode,theme=prefs.uiTheme)=>{prefs={uiTheme:theme,steamChatAppearance:mode};await appearance.update(prefs);};
@@ -253,6 +266,18 @@ test('Windows Electron: removable CSS priority, lifecycle, settings recovery and
    await choose('colors',theme);assert.equal((await page.evaluate(paint)).header.image,'none','Colors removes the full header paint');
    await choose('off',theme);assert.deepEqual(await page.evaluate(paint),original,'Off removes both native stylesheets');
   }
+  await choose('full','tf2');
+  const beforeFrame=await page.evaluate(paint);
+  assert.equal(await page.evaluate(async()=>{
+   const frame=document.createElement('iframe');
+   frame.hidden=true;frame.src='/chat/embedded-test';
+   const loaded=new Promise(resolve=>frame.addEventListener('load',resolve,{once:true}));
+   document.body.append(frame);await loaded;
+   const text=frame.contentDocument?.body?.textContent;
+   frame.remove();return text;
+  }),'Embedded fixture');
+  assert.deepEqual(await page.evaluate(paint),beforeFrame,'an embedded frame navigation leaves the top-level theme in place');
+  assert.equal(await electron.evaluate(()=>globalThis.appearance.status().effective),'full');
   await page.locator('#history > .chatHistory').evaluate(el=>el.replaceChildren(el.querySelector('.disconnectBlocker')));
   await choose('full','pipboy');
   assert.equal(await page.locator('#history').evaluate(async el=>{

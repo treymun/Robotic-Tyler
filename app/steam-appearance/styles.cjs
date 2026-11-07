@@ -157,9 +157,9 @@ const SURFACES={
  button:'.chatHeader .DialogButton:not(.chatRoomHeaderButton,.VoiceControlPanelButton),.chatEntry .DialogButton,.DialogContent .DialogButton:not(.deleteButton,.roleButton,.DialogInput_CopyAction),'+send,
  divider:'.timeDivision:not(.new_messages,.time_passes) :is(.horizDivider,.preHorizDivider,.postHorizDivider),.contextMenuItemHR',
 };
-// The root may be the body itself. Root-gating every paint rule also makes it
-// inert if Steam replaces chat with a login page without a document navigation.
-const scoped=list=>selectors(list).map(s=>'html:has(.friendsui-container) '+s).join(',');
+// Valve can mark the document element itself, its body or a mounted chat
+// container. Keep paint inert if that marker disappears on the same page.
+const scoped=list=>selectors(list).map(s=>'html:is(.friendsui-container,:has(.friendsui-container)) '+s).join(',');
 const withoutPresence=list=>selectors(list).map(s=>s+':not(:has(.friendlist,.chatRoomMembers,.groupMemberList,.friend,.personaName))').join(',');
 const qualify=(list,suffix)=>selectors(list).map(s=>s+suffix).join(',');
 const disabled=':is(:disabled,.disabled,.Disabled,[aria-disabled="true"])';

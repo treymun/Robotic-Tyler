@@ -39,6 +39,17 @@ test('navigation/reload including voice-route reload reapplies preference; leavi
  wc.navigate('https://steamcommunity.com/login/');await tick();assert.equal(wc.sheets.size,0);
  wc.navigate('https://steamcommunity.com/chat/');await tick();assert.equal(wc.sheets.size,2);await c.dispose();
 });
+test('Electron detail events for subframes and same-document navigation keep the chat sheets',async()=>{
+ const {wc,controller:c}=setup();
+ await c.update(prefs('full','tf2'));
+ const applied=[...wc.sheets.keys()];
+ wc.emit('did-start-navigation',{isMainFrame:false,isSameDocument:false});
+ wc.emit('did-start-navigation',{isMainFrame:true,isSameDocument:true});
+ await tick();
+ assert.deepEqual([...wc.sheets.keys()],applied);
+ assert.equal(c.status().effective,'full');
+ await c.dispose();
+});
 test('loading does not trigger fallback and polling stops at a fixed bound',async()=>{
  let calls=0;const {wc,controller:c}=setup({probe:async()=>{calls++;return {ready:false,base:false,full:false};}});
  await c.update(prefs('full'));await new Promise(r=>setTimeout(r,40));assert.equal(wc.sheets.size,0);assert.ok(calls<=5);assert.equal(c.status().preferred,'full');

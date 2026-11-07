@@ -64,7 +64,14 @@ function createAppearance(wc,{log=()=>{},probe=()=>wc.executeJavaScriptInIsolate
   }
   setStatus(mode,mode!==prefs.mode?'Full styling temporarily unavailable on this page; using Colors only. Your preference is kept.':'');
  }
- function navigation(_event,_url,inPlace,isMainFrame){if(isMainFrame===false||inPlace)return;invalidate();loading=true;waits=0;clearTimer();setStatus('off','Loading Steam.');void schedule();}
+ function navigation(details,_url,inPlace,isMainFrame){
+  // Electron 45 puts the navigation flags on the details object. Older
+  // versions pass them positionally. Only a new top-level document matters.
+  const mainFrame=details?.isMainFrame??isMainFrame;
+  const sameDocument=details?.isSameDocument??inPlace;
+  if(mainFrame===false||sameDocument)return;
+  invalidate();loading=true;waits=0;clearTimer();setStatus('off','Loading Steam.');void schedule();
+ }
  // A started navigation can be cancelled. Forget old keys only when a new
  // document commits, when Electron has actually discarded its stylesheets.
  const committed=()=>{invalidate();documentId++;keys=[];fallback=null;streak=0;};

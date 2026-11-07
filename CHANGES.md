@@ -1,3 +1,17 @@
+# ROBOTIC TYLER v2.45.1 — Steam chat styling fix
+
+The desktop app could report **Full visual styling** while Steam still showed its original colors. The app now applies the theme when Steam marks the outer page itself, and embedded content can load without clearing the active styling.
+
+Your saved theme and styling mode apply when the updated desktop app starts. Choose a mode in **Settings → Appearance → Steam chat appearance**.
+
+## Tested
+
+- **Mocked Steam and Settings data.** Checked all 25 themes and verified Colors only, Full visual styling, Off, theme switching, and reload.
+- **Real Chromium and Windows Electron.** Reproduced the missing paint with Steam’s chat class on the document element. Verified that the theme applies and stays in place when an embedded frame loads.
+- **Not tested.** Signed-in Steam and live calls.
+
+---
+
 # ROBOTIC TYLER v2.45.0 — Steam chat follows your Tyler theme
 
 The desktop Steam chat window can now use all 25 Tyler themes. Open **Settings → Appearance → Steam chat appearance** and choose **Colors only** or **Full visual styling**. **Off** keeps Steam’s original appearance and is the default.
