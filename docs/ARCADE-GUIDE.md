@@ -1,7 +1,8 @@
-# After Hours Arcade — v2.3.14
+# After Hours Arcade
 
-Connect Tyler to the Steam text channel and enable chat sound commands in
-Sounds. Start from the Play selector, or type one of these phrases in chat.
+Connect Tyler to the Steam text chat. In the panel, open **Sounds → Arcade**
+and leave **Chat sound commands and chat games on** ticked (it starts ticked).
+Start from **Start a round** and **Play**, or type one of these phrases in chat.
 
 | Start | How to answer |
 |---|---|
