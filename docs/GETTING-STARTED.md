@@ -1,6 +1,6 @@
 # Getting started
 
-The [README](../README.md) is the short path. This page is the rest: which download to take, what can wait, what a key costs, and what to try when Tyler stays quiet.
+The [README](../README.md) is the short path. This page covers which download to take, what can wait, what a key costs, and what to try when Tyler stays quiet.
 
 ## The download
 
@@ -17,13 +17,13 @@ The other files on that release are not a second install:
 
 Setup is not code-signed. If Windows says *"Windows protected your PC"*, choose **More info → Run anyway**. Setup checks each download's SHA-256 before it runs it. The desktop app updates itself. Run Setup again later to add, update or repair a part. Settings and keys are kept.
 
-After a Chrome update, press **Reload** on Tyler's card in `chrome://extensions`.
+After you update Tyler's unpacked extension, press **Reload** on his card in `chrome://extensions`.
 
 ## Desktop app and Chrome extension
 
 **Desktop app.** Sign in to the bot's Steam account in the app's own Steam chat window. In **Settings → AI & personality**, add an **OpenRouter** or **Google Gemini** key, or choose **This PC (free, no key)** and install a text model under **On this PC**. Press **Save settings**. Open the group chat, then **Tyler's panel → Connect & start**, and join the voice channel. This route uses Tyler's own synthetic microphone.
 
-**Chrome extension.** Tick it in Setup, or use the zip above. On `chrome://extensions`, turn on **Developer mode**, click **Load unpacked**, and choose the folder Setup copied. That step is once. Open Steam web chat in that same Chrome profile, signed in as the bot, add a cloud key, and press **Connect & start**. The extension cannot run AI on this PC. If **This PC** is selected anyway, Tyler says so and does not call a cloud model instead.
+**Chrome extension.** Tick it in Setup, or use the zip above. On `chrome://extensions`, turn on **Developer mode**, click **Load unpacked**, and choose the folder Setup copied. You only have to load that folder once. Open Steam web chat in that same Chrome profile, signed in as the bot, add a cloud key, and press **Connect & start**. The extension cannot run AI on this PC. If **This PC** is selected anyway, Tyler says so and does not call a cloud model instead.
 
 Both are compared on the [README](../README.md#desktop-app-or-chrome-extension). The older route through VB-CABLE and the Steam desktop app is still there: **Settings → Voice → Where Tyler joins voice**.
 
@@ -62,7 +62,7 @@ Sizes and the split-card rules: [AI on this PC](LOCAL-AI.md), [Theme voices](THE
 - **Chrome has no Tyler icon.** `chrome://extensions` → **Developer mode** → **Load unpacked** → the folder Setup copied. After an update, **Reload** that card.
 - **Friends can't hear him, or he can't hear them.** He only hears the Steam voice call he is in, and only after you confirm everyone knows. **Checks → Run full check**. His voice is a synthetic microphone, not your physical one.
 - **Names in voice look wrong.** Settings → Voice → Standard voice → turn off **Tell the AI who's speaking in voice**. A real Steam call has not yet shown which of Steam's talking fields switch. [Who's speaking](WHOS-SPEAKING.md).
-- **The graphics card is full.** Text AI: **On this PC → Runs on → Split between graphics card and processor**. Theme voices already move to the processor when the card is full, and say so. Neither one switches to a cloud model.
+- **The graphics card is full.** Text AI: **On this PC → Runs on → Split between graphics card and processor**. Theme voices, on the default **Runs on**, move to the processor when the card is full, and say so. **Graphics card only** stops with a message. Neither switches to a cloud model.
 - **Theme voices are too slow for a call.** The processor path is the slow one. An NVIDIA card, and the optional fast engine, is the path meant for replies in a call.
 - **Music DJ is missing.** **Room → Music DJ**, and only when voice is in the app's Steam window or in Chrome. The VB-CABLE route does not offer it. [Music DJ](MUSIC-GUIDE.md).
 - **An old Voice Studio or Control Center is still installed.** The desktop app replaces Control Center in place, imports Voice Studio's settings the first time it starts, and then offers to remove Voice Studio.
