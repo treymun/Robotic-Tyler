@@ -1,18 +1,14 @@
 # Vote kick, text mute and Steam admin
 
-These controls are in Tyler's panel → **Room**, in the desktop app and in the
-Chrome extension. Each one is off until you turn it on. They use permissions
-the bot's Steam account already has. Tyler cannot grant himself a role.
+These controls are in Tyler's panel → **Room**, in the desktop app and in the Chrome extension. Each one is off until you turn it on. They use permissions the bot's Steam account already has. Tyler cannot grant himself a role.
 
-This is experimental. The automated checks use simulated Steam objects. No live
-member was kicked and no live role was changed while they were written. A real
-Steam group can still disagree with the private page structure Tyler reads.
+This is experimental. The automated checks use simulated Steam objects. No live member was kicked and no live role was changed while they were written. A real Steam group can still disagree with the private page structure Tyler reads.
 
 ## Five-minute text mute votes
 
 1. Give the bot Steam message-deletion permission and enable **local admin
    controls** in **Room → Steam admin**.
-2. Open **Kick & text-mute votes**, check permissions, and enable
+2. Open **Room → Vote kick & text mute**, check permissions, and enable
    **five-minute vote-to-text-mute** for this group. This separate option
    defaults off and is independent of the kick-vote option.
 3. Type `!votemute NAME`. Other members vote with `!mute yes` or `!mute no`.
