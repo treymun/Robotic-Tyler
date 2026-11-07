@@ -17,6 +17,8 @@
 
 <p align="center"><a href="CHANGES.md"><img src="assets/readme/whats-new.png" width="100%" alt="What's new since v2.38: character voices (v2.41), Settings from your phone (v2.41), fewer repeated openings and stuck words (v2.41), who's in the call from Steam's own data (v2.41), pictures on your PC (v2.40), hearing and voice on your PC (v2.39), text AI on your PC (v2.38) and keeping your personality on it (v2.38.1)."></a></p>
 
+<p align="center"><sub>That picture stops at v2.41. <a href="https://github.com/treymun/Robotic-Tyler/releases/tag/v2.44.0">v2.44.0</a> also ships who's speaking in Standard voice, text AI that can share a graphics card, theme voices that move to the processor when the card is full, and an optional sharper voice for Medic, Lash and Kelvin. The full notes are in <a href="CHANGES.md">CHANGES.md</a>.</sub></p>
+
 ---
 
 ## What he does
@@ -35,15 +37,15 @@
 <td valign="top"><img src="assets/readme/icon-themes.png" width="52" align="left" alt="">&nbsp;<b>25 themes</b><br>&nbsp;Steam, TF2, CS2, Portal, DOOM, Rust, Xbox 360, iPod, MSN Messenger, PS3 and more, each with its own Tyler, status strip, menus and screens (a Quake console, a Pip-Boy radio, a click wheel, a Ring of Light, a working Dreamcast VMU…) and touches drawn from the game's own artwork.</td>
 </tr>
 <tr>
-<td valign="top"><img src="assets/readme/icon-theme-voices.png" width="52" align="left" alt="">&nbsp;<b>Theme voices</b> <sup>new</sup><br>&nbsp;Tyler speaks in the theme's character voice: G-Man, GLaDOS, the CS 1.6 radio, Bill and more, cloned on your PC, and optionally as one of the theme's characters (TF2's classes, Deadlock's heroes, Wheatley…), whose recordings come with the app. Type a line, or let him answer the call in it. An optional download in the desktop app, with a fast engine for NVIDIA cards; no key, no cost per line.</td>
-<td valign="top"><img src="assets/readme/icon-images.png" width="52" align="left" alt="">&nbsp;<b>Chat pictures</b> <sup>new</sup><br>&nbsp;<code>!image</code> and a description: Tyler draws it and posts it in the chat, with your own OpenRouter or Venice key and within your spending cap, or on your own PC with no key (desktop app, v2.40).</td>
+<td valign="top"><img src="assets/readme/icon-theme-voices.png" width="52" align="left" alt="">&nbsp;<b>Theme voices</b><br>&nbsp;Tyler speaks in the theme's character voice: G-Man, GLaDOS, the CS 1.6 radio, Bill and more, cloned on your PC, and optionally as one of the theme's characters (TF2's classes, Deadlock's heroes, Wheatley…), whose recordings come with the app. Type a line, or let him answer the call in it. An optional download in the desktop app, with a fast engine for NVIDIA cards; no key, no cost per line.</td>
+<td valign="top"><img src="assets/readme/icon-images.png" width="52" align="left" alt="">&nbsp;<b>Chat pictures</b><br>&nbsp;<code>!image</code> and a description: Tyler draws it and posts it in the chat, with your own OpenRouter or Venice key and within your spending cap, or on your own PC with no key (desktop app, optional).</td>
 </tr>
 <tr>
 <td valign="top"><img src="assets/readme/icon-remote.png" width="52" align="left" alt="">&nbsp;<b>Phone remote</b><br>&nbsp;Tyler's panel on your phone, live and in your theme. Start or pause him, play clips, run the music, read and type in chat, switch the theme, and open his <b>Settings</b> to change them (your keys stay on the PC). Nothing to install.</td>
 <td valign="top"><img src="assets/readme/icon-stay.png" width="52" align="left" alt="">&nbsp;<b>Stays in the call</b><br>&nbsp;A soft hum after 45 quiet minutes keeps Steam from dropping him, and he reconnects to the chat by himself. A full check tests every part in one pass.</td>
 </tr>
 <tr>
-<td colspan="2" valign="top"><img src="assets/readme/icon-pc.png" width="52" align="left" alt="">&nbsp;<b>AI on your own PC</b> <sup>new</sup><br>&nbsp;In the desktop app, Tyler can write his replies, hear the call, speak and draw the chat's pictures on your own graphics card or processor: no key, no account, no cost per message, and he never switches to a cloud AI by himself. Each part is an optional download.</td>
+<td colspan="2" valign="top"><img src="assets/readme/icon-pc.png" width="52" align="left" alt="">&nbsp;<b>AI on your own PC</b><br>&nbsp;In the desktop app, Tyler can write his replies, hear the call, speak and draw the chat's pictures on your own graphics card or processor: no key, no account, no cost per message, and he never switches to a cloud AI by himself. Each part is an optional download. The Chrome extension does not include this.</td>
 </tr>
 </table>
 
@@ -62,13 +64,64 @@
 
 ## Get going in a few minutes
 
-1. **[Download Setup](https://github.com/treymun/Robotic-Tyler/releases/latest)** (`ROBOTIC-TYLER-Setup-<version>.exe`) and run it. Tick the **Desktop app** (recommended), the **Chrome extension**, or both.
-2. Open ROBOTIC TYLER and sign in to your bot's Steam account in its Steam chat window.
-3. In **Settings**, add an **OpenRouter** or **Google Gemini** key and pick a personality. In the desktop app you can instead choose **This PC (free, no key)**: Tyler's text replies are written by a model on your own PC (see below).
-4. Open your group chat, then **Tyler's panel → Connect & start**, and join the voice channel. That's it: no virtual audio cable, no extra microphone.
-5. *Optional:* **Settings → Overview → Phone remote**, scan the QR code with your phone and type the 6-digit code. Add the page to your home screen and Tyler is one tap away; its **Setup → Open Settings** changes his settings from the phone.
+**On Windows, one download is enough:** [ROBOTIC TYLER Setup](https://github.com/treymun/Robotic-Tyler/releases/latest) (`ROBOTIC-TYLER-Setup-<version>.exe` on the latest release). Run it and tick **Desktop app** (recommended), **Chrome extension**, or both. The other files on that page (`ROBOTIC-TYLER-component-Desktop-…`, `.blockmap`, `control.yml`) are for Setup and for the desktop app's own updates. You do not download them yourself.
+
+**Not on Windows:** `ROBOTIC-TYLER-Chrome-Extension-<version>.zip` is the same Chrome extension. Unzip it and open `How to install.html`.
+
+### Desktop app
+
+1. Tick **Desktop app** in Setup and open ROBOTIC TYLER.
+2. Sign in to the bot's Steam account in the app's Steam chat window.
+3. **Settings → AI & personality:** add an **OpenRouter** or **Google Gemini** key, *or* choose **This PC (free, no key)** and install a text model under **On this PC**. Pick a personality and press **Save settings**.
+4. Open the group chat, then **Tyler's panel → Connect & start**, and join the voice channel. This route uses Tyler's own synthetic microphone. No VB-CABLE and no extra microphone.
+
+### Chrome extension
+
+1. Tick **Chrome extension** in Setup, or use the zip above. Setup unpacks the extension and opens Chrome's extensions page.
+2. Turn on **Developer mode**, click **Load unpacked**, and choose the folder Setup copied. Chrome only adds an extension from outside its Web Store this way, and you do it once.
+3. Open Steam web chat in that Chrome profile, signed in as the bot. Add an **OpenRouter** or **Google Gemini** key in **Settings → AI & personality** (the Chrome extension cannot run AI on this PC), then **Connect & start**.
+
+After an update, press **Reload** on Tyler's card in `chrome://extensions`. Run Setup again any time to add, update or repair a part. Settings and keys are kept.
 
 > Setup isn't code-signed. If Windows says *"Windows protected your PC"*, choose **More info → Run anyway**. Setup checks each download's SHA-256 before it runs it, and the desktop app updates itself.
+
+### Required, and what you can skip
+
+| You need this before he can answer | Optional, and off or absent until you add it |
+|---|---|
+| The desktop app **or** the Chrome extension, a Steam account for the bot, and a way to write replies: a cloud key, or (desktop only) **This PC** | Phone remote, theme voices, hearing and Kokoro on this PC, chat pictures, the sharper voice, Music DJ, trivia and the arcade, vote kick, Gemini Live, the older VB-CABLE voice route |
+
+Nothing in the optional column downloads by itself. Each install button shows the size and free disk space first.
+
+*Optional phone remote (desktop app):* **Settings → Overview → Phone remote**, scan the QR code and type the 6-digit code. **Setup → Open Settings** on the phone changes his settings. The phone never sees your API keys.
+
+### Keys, cost and hardware
+
+| How he answers | Key | What it costs | Where it runs |
+|---|---|---|---|
+| OpenRouter text (Llama 3.3 70B, Mistral Small 3.2, or Venice Uncensored) | OpenRouter | Provider price per token. **Settings → AI & personality** has a local spending cap for OpenRouter text. Set a limit on the key as well. | OpenRouter |
+| Google Gemini text (3.1 Flash-Lite, 3.5 Flash-Lite, or 3.8 Flash) | Google AI | Free tier while the project has no billing turned on, inside Google's rate limits. With billing on, Google charges. Tyler does not switch model or billing by himself. | Google |
+| **This PC** text replies | None | No cost per message. Optional download: Qwen3.5 4B (2.6 GB) or 9B (5.3 GB), or an uncensored build of either. | Desktop app. Vulkan on an NVIDIA, AMD or Intel card, or the processor. v2.44 can **split** layers between the card and the processor. |
+| Standard voice, cloud hearing and cloud speech | The saved OpenRouter or Google key | Hearing and speech are billed by that provider. | Cloud |
+| Standard voice with text, hearing and a voice all on this PC | None | No key. Hearing (Parakeet, 639 MB) and Kokoro (350 MB) are optional downloads and run on the processor. A theme voice counts as a voice on this PC. | Desktop app |
+| Gemini Live | Google AI | Google bills the audio while a session runs. You start and stop every session yourself. | Google. It always uses Google's voices. |
+| Theme voices | None | No cost per line. Optional. Quality on an NVIDIA card is about 7 GB before anything downloads (engine plus the 1.7B model). v2.44's default moves the voice to the processor when the card is full, and says so. | Desktop app |
+| Sharper voice (Medic, Lash, Kelvin) | None | Optional extra download, about 1.33 GB, and off until you switch that character on. | Desktop app, after theme voices |
+| Chat pictures | OpenRouter, Venice, or none on this PC | Cloud pictures count toward the spending cap. Pictures on this PC do not. | Either |
+
+**Test selected model** in Settings checks the cloud model you picked. **Run a speed check** under **On this PC** is the measurement for a model on your PC. The On this PC screenshot above is an example layout, not a benchmark, and the v2.44 release tests did not include a real graphics card. Sizes, licences and the split-card rules are in [`docs/LOCAL-AI.md`](docs/LOCAL-AI.md), [`docs/THEME-VOICES.md`](docs/THEME-VOICES.md) and [`docs/LOCAL-IMAGES.md`](docs/LOCAL-IMAGES.md).
+
+### If something is wrong
+
+- **He never answers.** Save a cloud key, or on the desktop app choose **This PC** and finish **Install**. In Chrome, **This PC** fails with a message and does not call a cloud model instead.
+- **Windows blocked Setup.** **More info → Run anyway.** Setup is not code-signed.
+- **Chrome has no Tyler icon.** `chrome://extensions` → **Developer mode** → **Load unpacked** → the folder Setup copied. After an update, **Reload** that card.
+- **Friends can't hear him, or he can't hear them.** He only hears the Steam voice call he is in, and only after you confirm everyone knows. **Checks → Run full check**. His voice is a synthetic microphone. It is not your physical microphone.
+- **Names in voice look wrong.** Settings → Voice → Standard voice → turn off **Tell the AI who's speaking in voice**. A real Steam call has not yet shown which of Steam's talking fields actually switch. See [`docs/WHOS-SPEAKING.md`](docs/WHOS-SPEAKING.md).
+- **The graphics card is full.** Text AI: **Settings → On this PC → Runs on → Split between graphics card and processor**. Theme voices: the default **Runs on** already moves to the processor when the card is full and says so. Neither one switches to a cloud model.
+- **Theme voices feel too slow for a conversation.** On the processor they take several seconds of work per second of speech. An NVIDIA card, and the optional fast engine, is the path meant for call replies. The published card times are the engine project's figures, not a measurement from this repo's Windows machines.
+- **Music DJ is missing.** It lives on **Room → Music DJ**, and only when voice is in the app's Steam window or in Chrome. The VB-CABLE route does not offer it. See [`docs/MUSIC-GUIDE.md`](docs/MUSIC-GUIDE.md).
+- **Old Voice Studio or Control Center.** The desktop app replaces Control Center in place and imports Voice Studio's settings the first time it starts, then offers to remove Voice Studio.
 
 ## Desktop app or Chrome extension?
 
@@ -89,20 +142,13 @@ Both run the same engine, settings and themes. Prefer the older desktop route th
 ## Voice engines
 
 - **Standard** waits for a pause, writes a reply with your AI provider (OpenRouter or Gemini) and speaks it, with Grok voices through OpenRouter or Google's voices with a Gemini key. Long replies are spoken in full.
-- **Text models:** OpenRouter with Llama 3.3 70B, Mistral Small 3.2 or **Venice Uncensored** (each with its own provider routing, never Parasail), or Google Gemini with **3.1 Flash-Lite, 3.5 Flash-Lite or 3.8 Flash** (all on Google's free tier). **Test selected model** in Settings checks yours.
-- **Text AI on this PC** <sup>new</sup> (desktop app, v2.38): no key, no account, no cost per message. Qwen3.5 4B (2.6 GB) or 9B (5.3 GB), or an **uncensored** version of either, running with llama.cpp on any recent graphics card (NVIDIA, AMD or Intel) or on the processor. It's an optional download with a speed check, it listens only inside your PC, and it never falls back to a cloud AI by itself. See [`docs/LOCAL-AI.md`](docs/LOCAL-AI.md).
-- **Hearing and a voice on this PC** <sup>new</sup> (desktop app, v2.39): NVIDIA Parakeet hears Standard voice calls and Kokoro speaks (six stock voices), both on the processor, and the theme voices count as a voice on this PC too. With the text replies, the hearing and the voice all on this PC, **a voice call needs no key at all**.
-- **Images on this PC** <sup>new</sup> (desktop app, v2.40): Tyler draws the chat's pictures with stable-diffusion.cpp on your own graphics card (NVIDIA, AMD or Intel) or the processor: no key, no cost per picture, and the description isn't sent anywhere. **Z-Image Turbo** (6.2 GB) or **Chroma1-HD uncensored** (8.1 GB), each in a version for 12 GB cards. Draw from the panel's **Draw** box, or let friends use `!image pc …` (off by default). Tyler's image rules apply to every picture, cloud styles included: never anything sexual involving minors, never sexual pictures of real people. See [`docs/LOCAL-IMAGES.md`](docs/LOCAL-IMAGES.md).
+- **Text models:** OpenRouter with Llama 3.3 70B, Mistral Small 3.2 or **Venice Uncensored** (each with its own provider routing, never Parasail), or Google Gemini with **3.1 Flash-Lite, 3.5 Flash-Lite or 3.8 Flash**. Those Gemini models are on Google's free tier while the project has no billing turned on. With billing on, Google charges, and Tyler does not switch model or billing by himself. **Test selected model** in Settings checks yours.
+- **Text AI on this PC** (desktop app, v2.38): no key, no account, no cost per message. Qwen3.5 4B (2.6 GB) or 9B (5.3 GB), or an **uncensored** version of either, running with llama.cpp through Vulkan (NVIDIA, AMD or Intel) or on the processor. It's an optional download with a speed check, it listens only inside your PC, and it never falls back to a cloud AI by itself. Since v2.44, **Runs on** can keep the whole model on the card, use the processor only, or **split** layers between them when a theme voice or a game is using the card. See [`docs/LOCAL-AI.md`](docs/LOCAL-AI.md).
+- **Hearing and a voice on this PC** (desktop app, v2.39): NVIDIA Parakeet hears Standard voice calls and Kokoro speaks (six stock voices), both on the processor, and the theme voices count as a voice on this PC too. With the text replies, the hearing and the voice all on this PC, **a voice call needs no key at all**.
+- **Images on this PC** (desktop app, v2.40): Tyler draws the chat's pictures with stable-diffusion.cpp on your own graphics card (NVIDIA, AMD or Intel) or the processor: no key, no cost per picture, and the description isn't sent anywhere. **Z-Image Turbo** (6.2 GB) or **Chroma1-HD uncensored** (8.1 GB), each in a version for 12 GB cards. Draw from the panel's **Draw** box, or let friends use `!image pc …` (off by default). Tyler's image rules apply to every picture, cloud styles included: never anything sexual involving minors, never sexual pictures of real people. See [`docs/LOCAL-IMAGES.md`](docs/LOCAL-IMAGES.md).
 - **Gemini Live** is a real-time conversation with Google: Tyler hears the call as people talk, answers in about a second and stops when someone talks over him. It needs a Google AI key, and Google bills the audio while a session runs, so you start and stop every session yourself.
-- **Theme voices** (desktop app, optional) say lines you type in each theme's character voice, cloned on your PC by Qwen3-TTS. Since v2.36 Tyler's Standard voice replies can use them too (Settings → Voice → Speaking voice), with an optional fast engine for NVIDIA cards (faster-qwen3-tts). Since v2.41 six themes can also speak as one of their characters (TF2's nine classes, thirteen more Deadlock heroes, Wheatley, Cave Johnson, Coach, Ellis, Zoey, the Phoenix and Leet faction voices and Alyx); since v2.43 their recordings are built into the app, so there's nothing to import. The theme's own voice stays the default. See [`docs/THEME-VOICES.md`](docs/THEME-VOICES.md).
-- **Who's speaking in voice** <sup>new</sup> (v2.44, Standard voice, optional and on by default): Tyler works out who said each line, so he answers the right person and doesn't mix people up. The AI sees *"Sam (in voice): …"*. Where it comes from, best first:
-  - **Steam's own talking data** (what lights up a talking member in Steam's voice list), once Tyler has seen it switch on and off for the same person;
-  - **each person's own audio**: Steam's voice server gives everyone in the call their own audio track. With one other person in voice every line is theirs. Otherwise a track is named once Steam's talking data has lined up with it during the call; until then people are kept apart as *"Speaker 1"*, *"Speaker 2"*;
-  - otherwise **unknown**, and Tyler says so. A name is never guessed.
-  - Two people at once comes out as *"Sam and Alex talking at once: …"*. Per-friend memory only gets a voice line from someone known by their Steam account.
-  - The panel's *Heard* line shows who (*"Heard Sam: …"*), the Signal trail says where it came from, and **Checks → Full check** lists the Steam fields and classes it found (names and counts only).
-  - **To turn it off:** Settings → Voice → Standard voice → *Tell the AI who's speaking in voice* (also on the phone's Settings). Off, the voice path is exactly as before v2.44: one mix, no extra measuring, the same prompt. If it ever can't tell (for example Steam changed its data), that line just goes out unlabelled, as before, with one line in the Signal trail.
-  - Gemini Live is unchanged: it hears the call as one mix.
+- **Theme voices** (desktop app, optional) say lines you type in each theme's character voice, cloned on your PC by Qwen3-TTS. Since v2.36 Tyler's Standard voice replies can use them too (Settings → Voice → Speaking voice), with an optional fast engine for NVIDIA cards (faster-qwen3-tts). Since v2.41 six themes can also speak as one of their characters (TF2's nine classes, thirteen more Deadlock heroes, Wheatley, Cave Johnson, Coach, Ellis, Zoey, the Phoenix and Leet faction voices and Alyx); since v2.43 their recordings are built into the app, so there's nothing to import. The theme's own voice stays the default. Since v2.44 the default **Runs on** uses the graphics card, or the processor when the card is full, and says so. An optional sharper voice for Medic, Lash and Kelvin is a separate download and stays off until you switch it on. See [`docs/THEME-VOICES.md`](docs/THEME-VOICES.md).
+- **Who's speaking in voice** (v2.44, Standard voice, on by default): the AI sees a name on the line, such as *"Sam (in voice): …"*, or *"Speaker 2"* until that person's audio track can be named. A name is never guessed. Two people at once stay labelled as overlap. Turn it off under Settings → Voice → Standard voice → **Tell the AI who's speaking in voice** (also on the phone). Gemini Live, and the VB-CABLE route, still hear one mix. A real Steam call has not confirmed which Steam talking fields switch. The v2.44 checks used mocked Steam, plus headless Chromium with a fake Steam page and real WebRTC audio. See [`docs/WHOS-SPEAKING.md`](docs/WHOS-SPEAKING.md).
 - **How he sounds:** Gemini Live replies play without crackle, the second half of a reply starts on the exact sample the first ends, and every reply comes out at the same loudness. Friends' voices reach his speech recognition through a proper filter, so "s" sounds don't turn into noise.
 
 Your personality, reply length and rules always apply, and people in the call can't change them.
@@ -114,6 +160,7 @@ Your personality, reply length and rules always apply, and people in the call ca
 ## Privacy and consent
 
 - Tyler only hears the Steam voice call he's in, and only after you confirm everyone knows he's listening. He never uses your physical microphone: his voice is a synthetic microphone that only carries what he says and plays.
+- People in the chat cannot change his rules, name, or language. Those stay on the settings you save. Image requests, including uncensored models and cloud styles, still refuse anything sexual, nude or revealing involving minors, and sexual, nude or revealing pictures of real people.
 - Who's speaking in voice (v2.44) uses only names from Steam's own member data. Nothing about anyone's voice is stored (no voiceprints, no speaker models); what was learned about whose audio track is whose lasts for that call only. The recording sent for hearing doesn't change; only the name in front of the line is new.
 - Your keys stay on your PC (encrypted by Windows in the desktop app) and never reach Steam's pages.
 - Screen commentary only sees the window you pick, as still pictures, and only while you share it.
@@ -141,7 +188,7 @@ Type `play trivia` in chat for a 10-question group race: 500 questions across 10
 | `app/`, `voice-app/` | The desktop app: main process, Steam window voice, Voice window (parts are generated from `browser-extension/`). |
 | `windows-audio-bridge/` | The Windows audio helper for the VB-CABLE voice route (C#, NAudio). |
 | `tools/setup/` | The Windows Setup (native Win32, `setup.c`) and its artwork (`art/`, rendered by `render-art.mjs`). |
-| `docs/` | Feature guides (arcade, trivia, music, moderation, theme voices), patch notes, and `archive/` for notes on old versions. |
+| `docs/` | Feature guides (who's speaking, local AI, images, arcade, trivia, music, moderation, theme voices), patch notes, and `archive/` for notes on old versions. |
 | `CHANGES.md`, `RELEASING.md` | What changed in each release; tests, releases, updates and signing. |
 
 ```

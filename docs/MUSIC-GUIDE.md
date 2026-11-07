@@ -1,25 +1,34 @@
-# Tyler DJ — experimental YouTube tab music
+# Music DJ — YouTube in the voice call
 
-Music plays through the existing Steam synthetic microphone independently
-of AI speech mode. Keep AI in **Text** mode, or connect soundboard only.
-The bot account must remain joined to the Steam voice channel. This is
-a Chrome extension feature; Electron and the native companion are unchanged.
+Music plays through Tyler's synthetic microphone, separate from his own speech.
+The panel still says to keep his AI in **Text** mode, or to connect the soundboard
+only, so a reply and a song are not fighting for the same moment. The bot account
+has to stay in the Steam voice channel.
+
+It is in the current desktop app and in the Chrome extension. Open Tyler's panel
+→ **Room → Music DJ**. Tyler controls an ordinary YouTube player and sends that
+player's sound into the call. He does not download the song, call a music API,
+or bypass any lock on the video.
 
 ## First setup
 
-1. Update the contents of your SAME existing unpacked extension folder,
-   reload the extension and reopen Steam web chat. Include every file and
-   the neural folder. Chrome may ask you to enable the added YouTube access.
-2. Connect Tyler to the desired Steam text chat. Use Text mode if you want
-   conversation replies only in text. Join Steam voice with the bot account.
-3. Open **Tyler DJ · Music in Steam voice** in the Conversation panel.
-4. Click **1 · Open YouTube music tab**. This creates or focuses one dedicated
-   YouTube tab. Accept any site consent there yourself if needed.
-5. Return to Steam and click **2 · Share that tab’s audio**. In Chrome’s picker,
-   choose the **YouTube tab**, enable **Share tab audio**, and share. Do not
-   select Steam, your desktop or a window. The picker must return tab audio.
-6. A friend types `!play artist song` in the connected Steam chat.
-7. If autoplay is blocked, click Play in the YouTube tab once. Keep it open.
+### Desktop app (voice in the Steam chat window)
+
+1. Sign in as the bot, connect the group chat, and join Steam voice. Use **Settings → Voice → Where Tyler joins voice → In this app's Steam chat window**. The older **Through VB-CABLE** route is text-only in that window, and the Music DJ is not offered there.
+2. Open **Room → Music DJ** and press **Start Music DJ**. One click opens a YouTube window and shares only that window's sound. It does not share your screen, Steam, or other apps.
+3. Keep that window open. If YouTube blocks autoplay, click Play there once and accept any consent screen yourself.
+4. A friend types `!play artist song` in the connected chat.
+
+**Reopen YouTube window** and **Share its audio again** are there if the window was closed.
+
+### Chrome extension
+
+1. Load the extension (Setup, or the Chrome zip's `How to install.html`), open Steam web chat, connect the group, and join voice on the bot account.
+2. Open **Room → Music DJ** and press **Start Music DJ**. YouTube opens in a background tab and Chrome's share picker appears on that same click.
+3. Choose the **YouTube tab** and leave **Also share tab audio** on. Do not pick Steam, your desktop, or another window.
+4. A friend types `!play artist song`. If autoplay is blocked, click Play in the YouTube tab once and leave it open.
+
+Chrome may ask you to allow the extension's YouTube access the first time.
 
 ## Chat commands
 
@@ -101,11 +110,13 @@ from the installed Steam interface source. It stays inside the current
 message and ignores bot-account and quoted-sender data. This fixes a
 missing layer in the earlier DOM-only property probe.
 
-Close both old Steam and Tyler YouTube tabs when updating, then reopen
-them through the normal setup. **v2.3.22** should be visible, and Sender
-check should report each friend's name and **ready for skip/stop votes**.
-If it says to reopen Steam, the new message adapter is not active in that
-old page. Live Chrome recognition still needs this check after installation.
+The Music DJ's **Sender check** line still reads **Sender check · v2.3.26**.
+When a friend's account is detected it adds their name and **ready for skip/stop votes**.
+**Check latest sender** inspects the latest visible message. If it says to reopen
+Steam, that chat page is still on an older reader: close the Steam chat tab (and
+the YouTube tab or window), then open them again from **Start Music DJ**.
+Live recognition in your current Steam layout is not something the automated
+tests claim to have verified.
 
 ## Group DJ features (2.3.19)
 
@@ -148,10 +159,11 @@ Example Steam chat card (plain text and emoji, not extension-only styling):
 
 ## Sources and behavior
 
-This controls the ordinary visible YouTube browser player and relays the tab
-audio explicitly shared through Chrome. It does not extract/download media
-URLs, access a private music API or bypass DRM. It selects the first regular
-video result in native YouTube search; an exact artist/title/version is not
+This controls the ordinary visible YouTube player. In Chrome that is a tab you
+share in Chrome's picker. In the desktop app it is the app's YouTube window,
+and only that window's sound is shared. It does not extract or download media
+URLs, access a private music API, or bypass DRM. It selects the first regular
+video result in YouTube's own search; an exact artist, title or version is not
 guaranteed. It may select a cover, live version, long video or other result.
 Use skip or more specific request text when that happens.
 
@@ -168,15 +180,16 @@ Only the dedicated configured YouTube tab is controlled. Existing history
 is marked read when binding so old song commands are not intentionally
 replayed. Music commands are kept out of ordinary AI text replies.
 
-Chrome's tab sharing includes a video track to keep capture alive. The bot
-connects only its audio tracks to the voice mixer; it does not record, save
-or transmit the video track. The selected tab's audio is transmitted to the
-Steam voice channel while sharing. No extra physical microphone is opened.
-After sharing, check the Steam voice meter and have a friend confirm audio.
+Sharing includes a video track so the capture stays alive. Tyler connects only
+the audio to the voice mixer. He does not record, save or transmit the video.
+The shared audio goes to the Steam voice channel while sharing is on. No extra
+physical microphone is opened. After sharing, watch the Steam voice meter and
+have a friend confirm they can hear the song.
 
-Automated checks cover parsing, tab routing, sender validation, fair queue
-rotation, distinct-account skip votes, chat cards, stale/repeated player
-events and separation from AI stop. Actual Chrome tab capture, YouTube
-playback, sender recognition in your live Steam layout and audio delivery
-have NOT been verified by the patch tests. Your existing working playback
-setup is retained.
+Automated checks cover parsing, routing, sender validation, fair queue
+rotation, distinct-account skip votes, chat cards, stale or repeated player
+events, and keeping music commands out of AI replies. A headed Chromium check
+(no Steam) measured that Tyler's share request leaves YouTube's sound
+untouched and in stereo, where Chrome's default processing does not. The
+desktop check used a mock Steam page and a mock YouTube window. A real Steam
+call and a real YouTube playback have not been part of those checks.

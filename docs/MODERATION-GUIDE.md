@@ -1,9 +1,17 @@
-# Chrome Steam administration (experimental Steam UI integration)
+# Vote kick, text mute and Steam admin
 
-## Five-minute text mute votes (v2.3.26)
+These controls are in Tyler's panel → **Room**, in the desktop app and in the
+Chrome extension. Each one is off until you turn it on. They use permissions
+the bot's Steam account already has. Tyler cannot grant himself a role.
+
+This is experimental. The automated checks use simulated Steam objects. No live
+member was kicked and no live role was changed while they were written. A real
+Steam group can still disagree with the private page structure Tyler reads.
+
+## Five-minute text mute votes
 
 1. Give the bot Steam message-deletion permission and enable **local admin
-   controls** in Conversation → Steam admin.
+   controls** in **Room → Steam admin**.
 2. Open **Kick & text-mute votes**, check permissions, and enable
    **five-minute vote-to-text-mute** for this group. This separate option
    defaults off and is independent of the kick-vote option.
@@ -38,7 +46,7 @@ The queue and timestamp limits below continue to apply.
 
 ## Local admin panel
 
-In Conversation, open **Steam admin**, click **Check permissions & refresh
+In **Room**, open **Steam admin**, click **Check permissions & refresh
 members**, and enable **local admin controls for this group**. Give the bot
 the corresponding permissions through Steam's group role settings first.
 Tyler cannot grant itself permissions. This enablement is separate from
@@ -86,17 +94,15 @@ permanently ban them, and Tyler does not automatically invite them back.
 
 ## One-time setup
 
-1. Update the SAME existing unpacked Chrome extension folder with every
-   file in browser-extension, including the new Steam chat adapter files.
-   Close old Steam and Tyler YouTube tabs, reload the extension, reopen Steam
-   chat, Connect & start, then reopen/share YouTube for music.
-2. As the Steam group owner, open the group chat's gear/permissions settings.
-   Give **ROBOTIC TYLER's Steam account** a role that can kick group members.
+1. Install the current desktop app or Chrome extension and press **Connect & start**
+   on the group chat. Music is separate: see [MUSIC-GUIDE.md](MUSIC-GUIDE.md) if you use it.
+2. As the Steam group owner, open the group chat's permissions.
+   Give **the bot's Steam account** a role that can kick group members.
    Assign that role to the bot. Tyler cannot grant itself permissions.
-3. In Tyler's Conversation panel, open **Vote-to-kick** and click
+3. In Tyler's panel, open **Room → Vote kick & text mute** and click
    **Check permissions & members**. The panel must report kick permission.
-4. Turn on **Enable vote-to-kick for this Steam group**. This is saved for
-   that group in the local Chrome profile. New groups default to disabled.
+4. Turn on **Enable one-hour vote-to-kick for this Steam group**. This is saved for
+   that group on this PC. New groups default to disabled.
 
 No manual Steam IDs are needed. Targets come from Steam's member list,
 and voters are identified from their actual incoming message metadata.
@@ -146,7 +152,7 @@ mute expiry, delayed deletion queues, old messages, disabling, group changes
 and at-most-once kicks.
 
 No live members were kicked and no live roles were changed during testing.
-This depends on private Steam browser UI structures and remains experimental
-until confirmed in your Chrome session. Small loaded friend-group member
-lists are supported; large virtualized member lists are not. If a control
-is unavailable, the panel reports it and does not invent a successful kick.
+This depends on private Steam page structures and remains experimental until
+you confirm it in your own group. Small loaded friend-group member lists are
+supported; large virtualized member lists are not. If a control is unavailable,
+the panel reports it and does not invent a successful kick.
