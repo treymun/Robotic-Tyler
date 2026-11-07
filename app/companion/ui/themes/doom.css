@@ -301,8 +301,8 @@
 .panel[data-rt-theme=doom] .tyler-mem .tyler-mem-meter[data-missing=true] .tyler-mem-bar-own{display:none}
 .panel[data-rt-theme=doom] .tyler-mem .tyler-mem-own{grid-column:1/-1;grid-row:3;display:block;margin:0;font:400 11px/1.2 var(--rt-font);text-transform:none;color:#9a9a9a;text-shadow:1px 1px 0 #000}
 .panel[data-rt-theme=doom] .tyler-mem .tyler-mem-own-value{color:#ff6a4a}
-@container tyler-mem (max-width:340px){.panel[data-rt-theme=doom] .tyler-mem{--therm-segs:7}}
-@container tyler-mem (max-width:300px){.panel[data-rt-theme=doom] .tyler-mem{--therm-segs:6}}
+@container tyler-mem (max-width:360px){.panel[data-rt-theme=doom] .tyler-mem{--therm-segs:6}}
+@container tyler-mem (max-width:300px){.panel[data-rt-theme=doom] .tyler-mem{--therm-segs:5}}
 .panel[data-rt-theme=doom] .tyler-mem-details{margin:6px 0 0;border-top:1px solid #2a0a06}
 .panel[data-rt-theme=doom] .tyler-mem-summary{padding:5px 0 1px;font:700 13px/1.2 var(--rt-font-display);color:var(--d-red);text-shadow:1px 1px 0 #000}
 .panel[data-rt-theme=doom] .tyler-mem-list{gap:2px;margin-top:4px;font:400 12px/1.25 var(--rt-font);color:#cfcfcf;text-shadow:1px 1px 0 #000}

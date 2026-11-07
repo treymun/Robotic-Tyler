@@ -233,11 +233,11 @@
    Not the survivor health bars, the heart monitor or the torn boxes: each reading is counted the way
    survivors scrawl on a safe-room wall, in tally marks: twenty marks, one for every 5% in use, struck through
    in fives. Tyler's own share is the red marker, the rest of what's in use chalk; the marks still to come
-   are the faint ghosts of earlier ones. The pack has no wall art that fits, so the marks are drawn here.
+   are the faint ghosts of earlier ones. The pack has no wall art that fits, so the marks are drawn by hand: the
+   two marker strokes (--tv, --td) are SVG data: URLs in ui/theme-features.css, as theme files use no data: images.
    From 75% the chalk turns the warning yellow, from 90% orange and the reading red; with no reading the
    wall is blank. */
-.panel[data-rt-theme=l4d] .tyler-mem{--mem-skin:l4d;--tv:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='22'%3E%3Cg fill='none' stroke='%23000' stroke-width='2.3' stroke-linecap='round'%3E%3Cpath d='M3.4 3.1L2.9 19.2'/%3E%3Cpath d='M9.5 2.5L9.9 19'/%3E%3Cpath d='M15.5 3.4L15.1 19.4'/%3E%3Cpath d='M21.3 2.8L21.8 18.9'/%3E%3C/g%3E%3C/svg%3E");--td:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='22'%3E%3Cpath d='M.8 16.6L24.6 5.4' fill='none' stroke='%23000' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E");
- margin:8px 10px 0;padding:7px 10px 6px;background:radial-gradient(80% 120% at 85% 0,rgba(170,190,160,.1),transparent 70%),repeating-linear-gradient(97deg,rgba(255,255,255,.025) 0 1px,transparent 1px 5px),linear-gradient(180deg,#323832,#252a25);box-shadow:inset 0 0 0 1px rgba(0,0,0,.6),inset 0 -10px 18px rgba(0,0,0,.25)}
+.panel[data-rt-theme=l4d] .tyler-mem{--mem-skin:l4d;margin:8px 10px 0;padding:7px 10px 6px;background:radial-gradient(80% 120% at 85% 0,rgba(170,190,160,.1),transparent 70%),repeating-linear-gradient(97deg,rgba(255,255,255,.025) 0 1px,transparent 1px 5px),linear-gradient(180deg,#323832,#252a25);box-shadow:inset 0 0 0 1px rgba(0,0,0,.6),inset 0 -10px 18px rgba(0,0,0,.25)}
 .panel[data-rt-theme=l4d] .tyler-mem .tyler-mem-stats{margin:0;padding:0;gap:14px;background:none;border:0;border-radius:0;box-shadow:none}
 .panel[data-rt-theme=l4d] .tyler-mem .tyler-mem-meter{--chalk:#e4e4e0;--read:#fff;--n:round(nearest,var(--fill) * 20,1);--g:round(down,var(--n) / 5,1);--on:round(nearest,var(--own) * 20,1);--og:round(down,var(--on) / 5,1);display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto auto auto;align-items:baseline;column-gap:6px;padding:0;background:none;border:0}
 .panel[data-rt-theme=l4d] .tyler-mem .tyler-mem-meter::after{display:none}

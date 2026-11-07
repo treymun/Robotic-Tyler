@@ -202,19 +202,20 @@ html[data-rt-theme=payday]{scrollbar-color:#2c3b4b #06090d}
 [data-rt-theme=payday] .checklist li::before{animation:pd-pin .3s cubic-bezier(.3,1.6,.6,1) backwards}
 @keyframes pd-pin{from{transform:rotate(-45deg) translate(6px,-10px);opacity:0}}
 
-/* ── Memory meter skin (v2.45): an ammo bag deployable ──
-   Not the contract map, the heist plan or the assault banner: each reading is a deployable as the loadout
-   screens show one, the Ammo Bag (the pd2builder render the loadout shows) inside the menus' white
-   corner brackets (both from the pack), with what's in use in Crime.net blue on a thin HUD bar, Tyler's own
-   share white. From 75% the bar runs heat orange, from 90% alarm red; with no reading the bag is a shadow. */
+/* ── Memory meter skin (v2.45): the Ammo Bag as a loadout item ──
+   Not the contract map, the heist plan, the crew avatars or the assault banner: each reading is an
+   equipment slot as the loadout screens frame one, inside the menus' white corner brackets (borders/border),
+   with the skill tree's own Ammo Bag icon (Bulletstorm, traced white with the HUD's blue glow) and what's in
+   use on a thin HUD bar in Crime.net blue, Tyler's own share white. From 75% the bar and reading run heat
+   orange, from 90% alarm red; with no reading the icon is a shadow. */
 .panel[data-rt-theme=payday] .tyler-mem{--mem-skin:payday;margin:8px 10px 0}
 .panel[data-rt-theme=payday] .tyler-mem .tyler-mem-stats{margin:0;padding:0;gap:6px;background:none;border:0;border-radius:0;box-shadow:none}
 .panel[data-rt-theme=payday] .tyler-mem .tyler-mem-meter{--pd:var(--pd-blue);position:relative;display:grid;grid-template-columns:36px minmax(0,1fr);grid-template-rows:auto auto auto auto;column-gap:8px;align-content:center;padding:8px 10px 8px 8px;background:rgba(4,8,12,.72);border:0;border-radius:0}
 .panel[data-rt-theme=payday] .tyler-mem .tyler-mem-meter[data-level=high]{--pd:var(--pd-heat)}
 .panel[data-rt-theme=payday] .tyler-mem .tyler-mem-meter[data-level=full]{--pd:var(--rt-danger)}
 .panel[data-rt-theme=payday] .tyler-mem .tyler-mem-meter::before{content:"";position:absolute;inset:2px;width:auto;height:auto;border-radius:0;box-shadow:none;background:rgba(255,255,255,.75);-webkit-mask:var(--rt-art-p3-bracket) 0 0/100% 100% no-repeat;mask:var(--rt-art-p3-bracket) 0 0/100% 100% no-repeat}
-.panel[data-rt-theme=payday] .tyler-mem .tyler-mem-meter::after{content:"";grid-column:1;grid-row:1/4;align-self:center;width:38px;height:38px;background:var(--rt-art-p3-ammo-bag) 50% 50%/38px 38px no-repeat;filter:brightness(1.2) contrast(1.1)}
-.panel[data-rt-theme=payday] .tyler-mem .tyler-mem-meter[data-missing=true]::after{opacity:.3;filter:grayscale(1)}
+.panel[data-rt-theme=payday] .tyler-mem .tyler-mem-meter::after{content:"";grid-column:1;grid-row:1/4;align-self:center;width:36px;height:36px;background:#eef3f8;filter:drop-shadow(0 0 4px rgba(63,160,255,.7));-webkit-mask:var(--rt-art-p3-bulletstorm) 50% 50%/contain no-repeat;mask:var(--rt-art-p3-bulletstorm) 50% 50%/contain no-repeat}
+.panel[data-rt-theme=payday] .tyler-mem .tyler-mem-meter[data-missing=true]::after{opacity:.3;filter:none}
 .panel[data-rt-theme=payday] .tyler-mem .tyler-mem-label{grid-column:2;grid-row:1;font:600 15px/1 var(--rt-font-display);letter-spacing:.06em;color:var(--pd-blue-hi)}
 .panel[data-rt-theme=payday] .tyler-mem .tyler-mem-value{grid-column:2;grid-row:2;margin:1px 0 0;font:600 13px/1.15 var(--rt-font);letter-spacing:0;color:#fff}
 .panel[data-rt-theme=payday] .tyler-mem .tyler-mem-meter:is([data-level=high],[data-level=full]) .tyler-mem-value{color:var(--pd)}

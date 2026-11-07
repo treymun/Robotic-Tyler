@@ -18,11 +18,7 @@
   }
  },
  "css":{
-  "p3-ammo-bag":{"file":"themes/payday/icons/deployables-ammo_bag.png.png","mode":"pixels","resize":[64,64],"name":"PAYDAY 2 deployable: Ammo Bag"},
-  "p3-bracket":{"file":"themes/payday/ui/borders-border.png.png","mode":"lum","name":"PAYDAY 2 menu corner brackets"},
-  "p3-t1":{"file":"themes/payday/icons/deployables-ammo_bag.png.png","mode":"trace","resize":[56,56],"upscale":4,"name":"p3-t1"},
-  "p3-t2":{"file":"themes/payday/icons/deployables-ammo_bag.png.png","mode":"trace","light":true,"resize":[56,56],"upscale":4,"name":"p3-t2"},
-  "p3-t3":{"file":"themes/payday/icons/deployables-ecm_jammer.png.png","mode":"trace","resize":[56,56],"upscale":4,"name":"p3-t3"},
-  "p3-t4":{"file":"themes/payday/icons/deployables-doctor_bag.png.png","mode":"trace","light":true,"resize":[56,56],"upscale":4,"name":"p3-t4"}
+  "p3-bulletstorm":{"file":"themes/payday/icons/skill-bulletstorm.png","mode":"trace","light":true,"name":"PAYDAY 2 skill icon: Bulletstorm (the Ammo Bag skill)"},
+  "p3-bracket":{"file":"themes/payday/ui/borders-border.png.png","mode":"lum","name":"PAYDAY 2 menu corner brackets"}
  }
 }

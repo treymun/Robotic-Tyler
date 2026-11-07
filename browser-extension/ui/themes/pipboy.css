@@ -210,7 +210,7 @@ html[data-rt-theme=pipboy]{scrollbar-color:var(--pb-dim) #020a05}
 /* ── Memory meter skin (v2.45): the status strip along the bottom of the screen ──
    Not the round RESP / RADS gauges, the CND bar or the radio scope: the two readings are the boxes of the
    strip along the bottom of Fallout 4's Pip-Boy (HP · LEVEL · AP): a dim green box with the name and the
-   reading in terminal capitals and, like LEVEL, a small framed bar filling as far as is in use, Tyler's own
+   reading in the strip's condensed capitals and, like LEVEL, a small framed bar filling as far as is in use, Tyler's own
    share in full brightness. The theme draws no Vault Boy, so the pack's Vault Boy art isn't used: this is
    drawn here in the screen's one green. From 75% the bar is hatched, from 90% the whole box inverts and
    blinks; with no reading the bar is an empty frame. */
@@ -218,7 +218,7 @@ html[data-rt-theme=pipboy]{scrollbar-color:var(--pb-dim) #020a05}
 .panel[data-rt-theme=pipboy] .tyler-mem .tyler-mem-stats{margin:0;padding:0;gap:6px;background:none;border:0;border-radius:0;box-shadow:none}
 .panel[data-rt-theme=pipboy] .tyler-mem .tyler-mem-meter{--ink:var(--pb-hi);--box:rgba(61,255,140,.13);display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:24px auto;column-gap:6px;align-items:center;padding:0 7px;background:linear-gradient(var(--box),var(--box)) 0 0/100% 24px no-repeat;border:0;box-shadow:none}
 .panel[data-rt-theme=pipboy] .tyler-mem .tyler-mem-label{grid-column:1;grid-row:1;font:400 13px/1 var(--rt-font-display);letter-spacing:.06em;color:var(--ink);text-shadow:var(--pb-glow)}
-.panel[data-rt-theme=pipboy] .tyler-mem .tyler-mem-value{grid-column:2;grid-row:1;margin:0;font:400 16px/1 var(--pb-term);letter-spacing:.02em;text-align:right;color:var(--ink);text-shadow:var(--pb-glow)}
+.panel[data-rt-theme=pipboy] .tyler-mem .tyler-mem-value{grid-column:2;grid-row:1;margin:0;font:400 14px/1 var(--rt-font-display);letter-spacing:.03em;text-align:right;color:var(--ink);text-shadow:var(--pb-glow)}
 .panel[data-rt-theme=pipboy] .tyler-mem .tyler-mem-bar{grid-column:1/-1;grid-row:2;height:7px;margin:5px 0 0;border-radius:0;background:transparent;box-shadow:inset 0 0 0 1px var(--pb-mid)}
 .panel[data-rt-theme=pipboy] .tyler-mem .tyler-mem-bar::before{top:2px;bottom:2px;left:2px;width:calc(var(--fill) * (100% - 4px));opacity:1;background:var(--pb-dim)}
 .panel[data-rt-theme=pipboy] .tyler-mem .tyler-mem-bar-own{top:2px;bottom:2px;left:2px;width:calc(var(--own) * (100% - 4px));background:var(--pb-hi);box-shadow:0 0 5px rgba(61,255,140,.7)}

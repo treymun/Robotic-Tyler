@@ -225,7 +225,7 @@ html[data-rt-theme=dreamcast]{scrollbar-color:#cfcac1 transparent}
 .panel[data-rt-theme=dreamcast] .tyler-mem .tyler-mem-meter[data-level=high]{--used:#e3c000}
 .panel[data-rt-theme=dreamcast] .tyler-mem .tyler-mem-meter[data-level=full]{--used:#d23a2a}
 .panel[data-rt-theme=dreamcast] .tyler-mem .tyler-mem-label{grid-column:1;grid-row:1;font:700 12px/1.2 var(--rt-font);color:var(--dc-ink)}
-.panel[data-rt-theme=dreamcast] .tyler-mem .tyler-mem-value{grid-column:2;grid-row:1;margin:0;font:700 13px/1.2 var(--rt-font);text-align:right;color:var(--dc-ink)}
+.panel[data-rt-theme=dreamcast] .tyler-mem .tyler-mem-value{grid-column:2;grid-row:1;margin:0;font:500 13px/1.2 var(--rt-font);text-align:right;color:var(--dc-blue)}
 .panel[data-rt-theme=dreamcast] .tyler-mem .tyler-mem-meter:is([data-level=high],[data-level=full]) .tyler-mem-used{color:var(--used)}
 .panel[data-rt-theme=dreamcast] .tyler-mem .tyler-mem-bar{grid-column:1/-1;grid-row:2;width:160px;height:14px;margin:6px 0 4px;border-radius:0;background:#dcd7ce;
  -webkit-mask:linear-gradient(90deg,#000 6px,transparent 6px) 0 0/8px 100%,linear-gradient(#000 6px,transparent 6px) 0 0/100% 8px;-webkit-mask-composite:source-in;mask:linear-gradient(90deg,#000 6px,transparent 6px) 0 0/8px 100% intersect,linear-gradient(#000 6px,transparent 6px) 0 0/100% 8px}

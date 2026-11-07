@@ -1412,3 +1412,7 @@
 .gm-tool-b small{grid-column:2}
 /* Rust: the HUD's own symbols take the vitals' white. */
 .rs-ic.rs-ic-b{color:#fff}.rs-chip .rs-ic.rs-ic-b{color:currentColor}
+
+/* Left 4 Dead's memory meter (v2.45, ui/themes/l4d.css): the hand-drawn tally strokes it counts with, four marks
+   (--tv) and the stroke through them (--td), each a 30 x 22 tile; the skin masks chalk and red marker with them. */
+.panel[data-rt-theme=l4d] .tyler-mem{--tv:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='22'%3E%3Cg fill='none' stroke='%23000' stroke-width='2.3' stroke-linecap='round'%3E%3Cpath d='M3.4 3.1L2.9 19.2'/%3E%3Cpath d='M9.5 2.5L9.9 19'/%3E%3Cpath d='M15.5 3.4L15.1 19.4'/%3E%3Cpath d='M21.3 2.8L21.8 18.9'/%3E%3C/g%3E%3C/svg%3E");--td:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='30' height='22'%3E%3Cpath d='M.8 16.6L24.6 5.4' fill='none' stroke='%23000' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E")}

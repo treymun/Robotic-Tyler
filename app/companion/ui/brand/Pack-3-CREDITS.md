@@ -180,8 +180,8 @@ the work of its creators; ROBOTIC TYLER is an unofficial fan project and uses it
 
 | Drawing | Source file | Source | Tier |
 |---|---|---|---|
-| p3-ammo-bag (PAYDAY 2 deployable: Ammo Bag, CSS) | deployables-ammo_bag.png.png | r-paydaybuilds/pd2builder public/img/deployables/ammo_bag.png @507041aa0a66 | Archived source artwork |
 | p3-bracket (PAYDAY 2 menu corner brackets, CSS) | borders-border.png.png | r-paydaybuilds/pd2builder public/img/borders/border.png @507041aa0a66 | Archived source artwork |
+| p3-bulletstorm (PAYDAY 2 skill icon: Bulletstorm (the Ammo Bag skill), CSS) | skill-bulletstorm.png | r-paydaybuilds/pd2builder public/img/skills/icons_atlas.png | Native / official source |
 | p3-skill-drill-sawgeant (PAYDAY 2 skill icon: Drill Sawgeant) | skill-drill_sawgeant.png | r-paydaybuilds/pd2builder public/img/skills/icons_atlas.png | Native / official source |
 | p3-tickbox (PAYDAY 2 tick box) | checkbox.png.png | r-paydaybuilds/pd2builder public/img/checkbox.png @507041aa0a66 | Archived source artwork |
 | p3-tickbox-ticked (PAYDAY 2 tick box, ticked) | checkbox_marked.png.png | r-paydaybuilds/pd2builder public/img/checkbox_marked.png @507041aa0a66 | Archived source artwork |
