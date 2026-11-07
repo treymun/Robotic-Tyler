@@ -99,6 +99,7 @@ One browser or test process at a time (the container ran out of memory once).
    audit call was a no-op (passed an element where the audit wanted a scope) → fixed via auditIn(). Old "pct inline"
    assertion relaxed to "shown" (Steam's grid blockifies it). New tests/memory-meter-skins.test.mjs (4 tests) passes.
    Dreamcast digits changed (500 weight, slate blue) and Pip-Boy digits use the condensed sans so neither copies its HUD.
-5. Full checks one at a time: node tools/build.mjs; npm run check; npm test; npm run test:e2e;
+5. Full checks one at a time (build ✓, check ✓, npm test 548/548 ✓; L4D tally SVG vars moved to ui/theme-features.css
+   because tests/theme.test.mjs keeps theme files free of data: images; e2e + desktop check pending): node tools/build.mjs; npm run check; npm test; npm run test:e2e;
    ELECTRON=…/scratchpad/electron-linux/dist/electron node tools/desktop-voice-check/check.mjs
 6. Release notes → scratchpad/changes-meter-skins.md; report (inventory/motif/assets per theme, bytes added).
