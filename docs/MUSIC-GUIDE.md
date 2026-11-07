@@ -1,30 +1,24 @@
 # Music DJ — YouTube in the voice call
 
-Music plays through Tyler's synthetic microphone, separate from his own speech.
-The panel still says to keep his AI in **Text** mode, or to connect the soundboard
-only, so a reply and a song are not fighting for the same moment. The bot account
-has to stay in the Steam voice channel.
+Music plays through Tyler's synthetic microphone, separate from his own speech. The panel still says to keep his AI in **Text** mode, or to connect the soundboard only, so a reply and a song are not fighting for the same moment. The bot account has to stay in the Steam voice channel.
 
-It is in the current desktop app and in the Chrome extension. Open Tyler's panel
-→ **Room → Music DJ**. Tyler controls an ordinary YouTube player and sends that
-player's sound into the call. He does not download the song, call a music API,
-or bypass any lock on the video.
+Open Tyler's panel → **Room → Music DJ**. It is in the desktop app and in the Chrome extension. Tyler controls an ordinary YouTube player and sends that player's sound into the call. He does not download the song or call a music service.
 
 ## First setup
 
-### Desktop app (voice in the Steam chat window)
+**Desktop app**, with voice in the Steam chat window (**Settings → Voice → Where Tyler joins voice → In this app's Steam chat window**):
 
-1. Sign in as the bot, connect the group chat, and join Steam voice. Use **Settings → Voice → Where Tyler joins voice → In this app's Steam chat window**. The older **Through VB-CABLE** route is text-only in that window, and the Music DJ is not offered there.
-2. Open **Room → Music DJ** and press **Start Music DJ**. One click opens a YouTube window and shares only that window's sound. It does not share your screen, Steam, or other apps.
-3. Keep that window open. If YouTube blocks autoplay, click Play there once and accept any consent screen yourself.
+1. Sign in as the bot, connect the group chat, and join Steam voice.
+2. Press **Start Music DJ**. One click opens a YouTube window and shares only that window's sound. It does not share your screen, Steam, or other apps.
+3. Keep that window open. If YouTube blocks autoplay, click Play there once.
 4. A friend types `!play artist song` in the connected chat.
 
-**Reopen YouTube window** and **Share its audio again** are there if the window was closed.
+**Reopen YouTube window** and **Share its audio again** are there if the window was closed. The older **Through VB-CABLE** route is text-only in that window, so the Music DJ is not offered there.
 
-### Chrome extension
+**Chrome extension:**
 
-1. Load the extension (Setup, or the Chrome zip's `How to install.html`), open Steam web chat, connect the group, and join voice on the bot account.
-2. Open **Room → Music DJ** and press **Start Music DJ**. YouTube opens in a background tab and Chrome's share picker appears on that same click.
+1. Load the extension, open Steam web chat, connect the group, and join voice on the bot account.
+2. Press **Start Music DJ**. YouTube opens in a background tab and Chrome's share picker appears on that same click.
 3. Choose the **YouTube tab** and leave **Also share tab audio** on. Do not pick Steam, your desktop, or another window.
 4. A friend types `!play artist song`. If autoplay is blocked, click Play in the YouTube tab once and leave it open.
 

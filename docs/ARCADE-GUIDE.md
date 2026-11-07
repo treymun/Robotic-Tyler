@@ -8,7 +8,7 @@ Start from **Start a round** and **Play**, or type one of these phrases in chat.
 |---|---|
 | `play vault` | A number from `1` to `20`; higher/lower hints |
 | `play scramble` | The unscrambled word, e.g. `portal` |
-| `play trivia` | `A`–`D`, `1`–`4`, or the answer. 500 questions, 10 categories: see TRIVIA-GUIDE.md |
+| `play trivia` | `A`–`D`, `1`–`4`, or the answer. 500 questions, 10 categories: see [TRIVIA-GUIDE.md](TRIVIA-GUIDE.md) |
 | `play hangman` | One letter, or `guess dragon` for a whole word |
 | `play math` | A number, including a negative answer if needed |
 | `play riddle` | The answer, or `guess your answer` |

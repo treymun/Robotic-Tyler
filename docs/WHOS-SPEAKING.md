@@ -37,10 +37,10 @@ If Steam's data changes or a level meter fails, that line goes out **unlabelled*
 
 ## What was tested for v2.44
 
-**Mocked:** fake Steam objects, a fake voice list, and numbers standing in for each person's level, with the real attribution code. That covers the loudest track, overlap, one other person, flags that never switch, learning a track and then keeping the name, and the setting turned off (those requests matched the v2.43 path).
+**Mocked.** Fake Steam objects, a fake voice list, and numbers standing in for each person's level. The checks covered the loudest track, two people at once, one other person in the call, flags that never switch, learning a track and then keeping the name, and the switch turned off. With the switch off, the requests matched the v2.43 path.
 
-**In a browser, with a fake Steam:** headless Chromium, real WebRTC tracks for two people, the real listener and panel. With a talking flag, lines came out as `Sam (in voice)` and `Alex (in voice)`. Without a flag, they stayed `Speaker 1` and `Speaker 2`.
+**In a browser, with a fake Steam page.** Headless Chromium, real WebRTC audio for two people, and the real listener and panel. With a talking flag, the lines were `Sam (in voice)` and `Alex (in voice)`. Without a flag, they stayed `Speaker 1` and `Speaker 2`.
 
-**Not tested:** a real Steam call, Steam's real voice server, Windows audio, and Gemini Live. The part that reads Steam's own "who's talking" data is a careful guess until one real call shows which fields actually switch.
+**Not tested.** A real Steam call, Steam's real voice server, Windows audio, and Gemini Live. Steam does not document the talking signal, so that part stays a careful guess until one real call shows which fields switch.
 
-**What one real call confirms:** join a Standard voice call with two friends, let each talk a few times, then run **Checks → Full check** and copy the report. The *Who is speaking in voice* row shows which Steam fields or classes switched, or that none did. Until that report exists, people are still kept apart by their audio tracks, and someone alone in a call with Tyler is named from that.
+**What one real call will show.** Join a Standard voice call with two friends, let each talk a few times, then run **Checks → Full check** and copy the report. The *Who is speaking in voice* row lists which Steam fields or classes switched, or that none did. Until that report exists, people are still kept apart by their audio tracks, and someone alone in a call with Tyler is named from that.
