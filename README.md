@@ -42,7 +42,7 @@
 3. In **Settings → AI & personality**, add an **OpenRouter** or **Google Gemini** key and pick a personality. On the desktop app you can instead choose **This PC (free, no key)** and install a text model under **On this PC**. Chrome needs a cloud key. Press **Save settings**.
 4. Open the group chat, then **Tyler's panel → Connect & start**, and join the voice channel. Tyler's synthetic microphone carries his voice. No virtual cable on this route.
 
-*Optional, desktop app:* **Settings → Overview → Phone remote**. Scan the QR code, type the 6-digit code, and add the page to your home screen. **Setup → Open Settings** on the phone changes his settings. The phone never sees your keys.
+*Optional, desktop app:* **Settings → Overview → Phone remote**. Scan the QR code, type the 6-digit code, and add the page to your home screen. **Settings → Overview → Phone remote → Away from home** (off by default) lets the phone reach Tyler through Tailscale. **Setup → Open Settings** on the phone changes his settings. The phone never sees your keys.
 
 You need the app or the extension, the bot's Steam account, and a key or **This PC**. Theme voices, hearing, pictures, Music DJ and the rest wait until you ask for them. Nothing in that list downloads by itself.
 
@@ -180,7 +180,7 @@ Recommended.
 - Tyler's synthetic microphone in that window. No VB-CABLE
 - Panel docked beside the chat, or floating
 - Music and screen commentary inside the app
-- Phone remote, on your home Wi-Fi
+- Phone remote, on your home Wi-Fi, or through Tailscale (**Settings → Overview → Phone remote → Away from home**, off by default)
 - Text, hearing, a voice and pictures on this PC
 - Quiet-call hum, and he reconnects the chat
 - Setup installs it. It updates itself
@@ -239,7 +239,7 @@ On the desktop app, **Settings → Appearance → Steam chat appearance** makes 
 - Who's speaking in voice (v2.44) uses only names from Steam's own member data. Nothing about anyone's voice is stored (no voiceprints, no speaker models); what was learned about whose audio track is whose lasts for that call only. The recording sent for hearing doesn't change; only the name in front of the line is new.
 - Your keys stay on your PC (encrypted by Windows in the desktop app) and never reach Steam's pages.
 - Screen commentary only sees the window you pick, as still pictures, and only while you share it.
-- The phone remote is off until you turn it on. It answers only devices on your home network, and only after pairing with a code from Settings. The phone sees what the panel shows, the chat's latest messages (for its Chat log card) and, in its Settings, the settings it can change. It never sees your API keys (only whether one is saved) and can't add or remove them; pairing phones, installs and tests that use your keys stay on the PC. Remove a phone (or all of them) in Settings at any time.
+- The phone remote is off until you turn it on. It answers only devices on your home network, or also your own Tailscale devices if you turn on Away from home (off by default). It still answers only after pairing with a code from Settings. The phone sees what the panel shows, the chat's latest messages (for its Chat log card) and, in its Settings, the settings it can change. It never sees your API keys (only whether one is saved) and can't add or remove them; pairing phones, installs and tests that use your keys stay on the PC. Remove a phone (or all of them) in Settings at any time. Away from home was not tested on a real Tailscale network.
 
 ## Guides
 
