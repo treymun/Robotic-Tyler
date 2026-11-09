@@ -27,7 +27,7 @@ After you update Tyler's unpacked extension, press **Reload** on his card in `ch
 
 Both are compared on the [README](../README.md#desktop-app-or-chrome-extension). The older route through VB-CABLE and the Steam desktop app is still there: **Settings → Voice → Where Tyler joins voice**.
 
-**Phone remote** (desktop app only). **Settings → Overview → Phone remote**, scan the QR code and type the 6-digit code. On the phone, **Setup → Open Settings** changes his settings. The phone never sees your API keys.
+**Phone remote** (desktop app only). **Settings → Overview → Phone remote**, scan the QR code and type the 6-digit code. **Settings → Overview → Phone remote → Away from home** (off by default) lets the phone reach Tyler through Tailscale. On the phone, **Setup → Open Settings** changes his settings. The phone never sees your API keys.
 
 ## What you need, and what can wait
 
