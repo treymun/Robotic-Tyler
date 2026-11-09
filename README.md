@@ -52,11 +52,11 @@ Which file to run, what a key costs, and what to try when he stays quiet: [Getti
 
 ## What's new
 
-Character recordings come with the desktop app. The theme-voice install that speaks them stays optional. Settings open on your phone, and the desktop app can run text, hearing, speech and pictures on your own PC. v2.44 adds names on Standard voice lines, and **Runs on** can split a text model between the graphics card and the processor. He never switches to a cloud AI by himself. Every heavy download stays off until you ask for it.
+Character recordings come with the desktop app. The theme-voice install that speaks them stays optional. Settings open on your phone, and the desktop app can run text, hearing, speech and pictures on your own PC. v2.44 adds names on Standard voice lines, and **Runs on** can split a text model between the graphics card and the processor. He never switches to a cloud AI by himself. Every heavy download stays off until you ask for it. v2.45 can make the desktop app's Steam chat window follow the Tyler theme you picked, and **Off** stays the default ([Steam chat appearance](docs/STEAM-CHAT-APPEARANCE.md)).
 
 <p align="center">
   <a href="CHANGES.md"><img src="assets/readme/whats-new.png" width="100%" alt="What's new, the v2.38 through v2.41 picture: character voices (v2.41), Settings from your phone (v2.41), fewer repeated openings and stuck words (v2.41), who's in the call from Steam's own data (v2.41), pictures on your PC (v2.40), hearing and voice on your PC (v2.39), text AI on your PC (v2.38) and keeping your personality on it (v2.38.1)."></a><br>
-  <sub>That picture stops at v2.41. v2.42 through v2.44, including who's speaking, are in the <a href="CHANGES.md">changelog</a>.</sub>
+  <sub>That picture stops at v2.41. v2.42 through v2.45, including who's speaking and <a href="docs/STEAM-CHAT-APPEARANCE.md">Steam chat appearance</a>, are in the <a href="CHANGES.md">changelog</a>.</sub>
 </p>
 
 ## What he does
@@ -230,6 +230,8 @@ Prefer the older route through VB-CABLE and the Steam desktop app? It's still th
 
 **Settings → Appearance** shows every theme as a live preview card, with the theme's real extras reacting as Tyler listens, thinks, talks, pauses or hits a problem; **Apply** changes every Tyler window at once (so does the phone remote's Setup tab). Every theme adds its own controls on top: Steam's persona menu and achievements, the Windows XP Start menu, a PAYDAY heist plan with a drill timer, a Minecraft hotbar of sound discs, a Deadlock shop, a Day of Defeat field radio, a Quake console, a Pip-Boy radio, a click wheel, a Ring of Light, a working Dreamcast VMU, and more. Game themes follow each game's own menu colors and shapes, with free look-alike fonts (bundled, SIL Open Font License). No game fonts are included.
 
+On the desktop app, **Settings → Appearance → Steam chat appearance** makes the Steam chat window follow the selected Tyler theme. **Off** is the default and keeps Steam's own look. **Colors only** uses the theme's colors. **Full visual styling** also uses the theme's textures, tab and button finishes, and hides Steam's website navigation strip. Chrome and the phone's Settings do not have this control. The separate Settings window can restore Steam's original appearance. It was tested on mocked Steam data and on real Chromium and Windows Electron fixtures. It was not tested in signed-in Steam or a live call. See [Steam chat appearance](docs/STEAM-CHAT-APPEARANCE.md).
+
 ## Privacy and consent
 
 - Tyler only hears the Steam voice call he's in, and only after you confirm everyone knows he's listening. He never uses your physical microphone: his voice is a synthetic microphone that only carries what he says and plays.
@@ -246,6 +248,7 @@ Prefer the older route through VB-CABLE and the Steam desktop app? It's still th
 - [Images on this PC](docs/LOCAL-IMAGES.md) covers chat pictures drawn on your own PC.
 - [Theme voices](docs/THEME-VOICES.md) covers the character voices cloned on your PC.
 - [Who's speaking](docs/WHOS-SPEAKING.md) covers names on Standard voice lines.
+- [Steam chat appearance](docs/STEAM-CHAT-APPEARANCE.md) covers the desktop app's Steam chat window following the Tyler theme.
 - [Music DJ](docs/MUSIC-GUIDE.md) covers the YouTube queue in the call.
 - [Trivia](docs/TRIVIA-GUIDE.md) and the [arcade](docs/ARCADE-GUIDE.md) cover the race and the other chat games.
 - [Vote kick and Steam admin](docs/MODERATION-GUIDE.md) stays off until you turn it on.
@@ -272,7 +275,7 @@ Type `play trivia` in chat for a 10-question group race: 500 questions across 10
 | `app/`, `voice-app/` | The desktop app: main process, Steam window voice, Voice window (parts are generated from `browser-extension/`). |
 | `windows-audio-bridge/` | The Windows audio helper for the VB-CABLE voice route (C#, NAudio). |
 | `tools/setup/` | The Windows Setup (native Win32, `setup.c`) and its artwork (`art/`, rendered by `render-art.mjs`). |
-| `docs/` | Feature guides (getting started, who's speaking, local AI, images, arcade, trivia, music, moderation, theme voices), patch notes, and `archive/` for notes on old versions. |
+| `docs/` | Feature guides (getting started, who's speaking, [steam chat appearance](docs/STEAM-CHAT-APPEARANCE.md), local AI, images, arcade, trivia, music, moderation, theme voices), patch notes, and `archive/` for notes on old versions. |
 | `CHANGES.md`, `RELEASING.md` | What changed in each release; tests, releases, updates and signing. |
 
 ```
